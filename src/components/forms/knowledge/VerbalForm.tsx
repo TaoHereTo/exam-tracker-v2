@@ -8,18 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 interface VerbalFormProps {
-    onAddKnowledge: (knowledge: { type: string; note: string }) => void;
+    onAddKnowledge: (knowledge: { idiom: string; meaning: string }) => void;
 }
 
 const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge }) => {
-    const [type, setType] = useState('');
-    const [note, setNote] = useState('');
+    const [idiom, setIdiom] = useState('');
+    const [meaning, setMeaning] = useState('');
 
     const handleSubmit = () => {
-        if (!type.trim() && !note.trim()) return;
-        onAddKnowledge({ type, note });
-        setType('');
-        setNote('');
+        if (!idiom.trim() && !meaning.trim()) return;
+        onAddKnowledge({ idiom, meaning });
+        setIdiom('');
+        setMeaning('');
     };
 
     return (
@@ -29,12 +29,12 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge }) => {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
-                    <Label htmlFor="type">类型</Label>
-                    <Input id="type" type="text" placeholder="例如：理解技巧" value={type} onChange={e => setType(e.target.value)} />
+                    <Label htmlFor="idiom">成语</Label>
+                    <Input id="idiom" type="text" placeholder="请输入成语" value={idiom} onChange={e => setIdiom(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                    <Label htmlFor="note">技巧记录</Label>
-                    <Textarea id="note" placeholder="请输入具体的技巧或知识点..." value={note} onChange={e => setNote(e.target.value)} />
+                    <Label htmlFor="meaning">含义</Label>
+                    <Textarea id="meaning" placeholder="请输入成语含义..." value={meaning} onChange={e => setMeaning(e.target.value)} />
                 </div>
             </CardContent>
             <CardFooter>
