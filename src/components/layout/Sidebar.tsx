@@ -15,61 +15,54 @@ type SidebarProps = {
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     return (
-        <aside className="w-64 min-h-screen bg-gray-50 border-r border-gray-200 p-4 flex flex-col">
-            <h1 className="text-2xl font-bold mb-6 text-center tracking-wide text-gray-800">
+        <aside className="w-52 min-h-screen bg-gray-50 border-r border-gray-200 p-4 flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-6 text-center tracking-wide text-gray-800 w-full">
                 行测每日记录
             </h1>
             {/* 使用 Accordion 替换自定义 Collapsible */}
             <Accordion type="single" collapsible defaultValue="analysis" className="w-full">
                 {/* 分析分组 */}
                 <AccordionItem value="analysis">
-                    <AccordionTrigger>分析</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">分析</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'overview' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('overview')}
                         >
                             数据图表
                         </Button>
                         <Button
                             variant={activeTab === 'charts' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('charts')}
                         >
                             数据概览
                         </Button>
                         <Button
                             variant={activeTab === 'best' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('best')}
                         >
                             最佳成绩
-                        </Button>
-                        <Button
-                            variant={activeTab === 'modules' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
-                            onClick={() => setActiveTab('modules')}
-                        >
-                            模块知识点
                         </Button>
                     </AccordionContent>
                 </AccordionItem>
 
                 {/* 管理分组 */}
                 <AccordionItem value="management">
-                    <AccordionTrigger>管理</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">管理</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'form' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('form')}
                         >
                             新的记录
                         </Button>
                         <Button
                             variant={activeTab === 'history' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('history')}
                         >
                             历史记录
@@ -79,18 +72,18 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 学习计划分组 */}
                 <AccordionItem value="study-plan">
-                    <AccordionTrigger>学习计划</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">学习计划</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'plan' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('plan')}
                         >
                             制定计划
                         </Button>
                         <Button
                             variant={activeTab === 'progress' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('progress')}
                         >
                             进度追踪
@@ -100,32 +93,39 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 知识点录入分组 */}
                 <AccordionItem value="knowledge-entry">
-                    <AccordionTrigger>知识点录入</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">知识点录入</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'knowledge-entry' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('knowledge-entry')}
                         >
                             知识点录入
+                        </Button>
+                        <Button
+                            variant={activeTab === 'modules' ? 'default' : 'ghost'}
+                            className="w-full justify-center"
+                            onClick={() => setActiveTab('modules')}
+                        >
+                            知识点汇总
                         </Button>
                     </AccordionContent>
                 </AccordionItem>
 
                 {/* 系统设置分组 */}
                 <AccordionItem value="settings">
-                    <AccordionTrigger>系统设置</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">系统设置</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'settings-basic' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('settings-basic')}
                         >
                             基础设置
                         </Button>
                         <Button
                             variant={activeTab === 'settings-advanced' ? 'default' : 'ghost'}
-                            className="w-full justify-start"
+                            className="w-full justify-center"
                             onClick={() => setActiveTab('settings-advanced')}
                         >
                             高级设置

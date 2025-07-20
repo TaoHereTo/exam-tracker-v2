@@ -7,6 +7,8 @@ import { HistoryTable } from "@/components/tables/HistoryTable";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { SettingsView } from "@/components/views/SettingsView";
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
+import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
+import { toast } from "sonner";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -58,10 +60,29 @@ export default function Home() {
 
   const addRecord = (newRecord: RecordItem) => {
     setRecords(prevRecords => [newRecord, ...prevRecords]);
+    toast.success("记录已保存", {
+      description: `模块 "${newRecord.module}" 的新记录已添加。`,
+    });
   };
 
   const deleteRecord = (idToDelete: number) => {
     setRecords(prevRecords => prevRecords.filter(record => record.id !== idToDelete));
+  };
+
+  const handleClearAllData = () => {
+    setRecords([]);
+    setKnowledge([]);
+    toast.success("操作成功", {
+      description: "您的所有应用数据已被清空。",
+    });
+  };
+
+  const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+
+  const handleBatchDelete = () => {
+    setRecords(prev => prev.filter(r => !selectedRecordIds.includes(r.id)));
+    setSelectedRecordIds([]);
+    toast.success("批量删除成功", { description: `已删除 ${selectedRecordIds.length} 条记录。` });
   };
 
   // 导出数据到 JSON 文件
@@ -76,6 +97,9 @@ export default function Home() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    toast.success("导出成功", {
+      description: "您的所有数据已成功导出到本地JSON文件。",
+    });
   };
 
   // 从 JSON 文件导入数据
@@ -112,7 +136,9 @@ export default function Home() {
               duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
             }));
             setRecords(normalized);
-            alert(`成功导入 ${normalized.length} 条刷题记录！`);
+            toast.success("导入成功", {
+              description: `成功导入 ${normalized.length} 条刷题记录！`,
+            });
           } catch (err) {
             alert('导入失败，文件内容不是有效的 JSON！');
           }
@@ -144,16 +170,36 @@ export default function Home() {
             </div>
           </div>
         )}
-        {activeTab === 'charts' && <div><h1>数据图表</h1></div>}
-        {activeTab === 'best' && <div><h1>最佳成绩</h1></div>}
-        {activeTab === 'modules' && <div><h1>模块知识点</h1></div>}
-        {activeTab === 'form' && <NewRecordForm onAddRecord={addRecord} />}
-        {activeTab === 'history' && <HistoryTable records={records} onDeleteRecord={deleteRecord} />}
-        {activeTab === 'plan' && <div><h1>制定计划</h1></div>}
-        {activeTab === 'progress' && <div><h1>进度追踪</h1></div>}
-        {activeTab === 'settings-basic' && <SettingsView onExport={handleExportData} onImport={handleImportData} />}
-        {activeTab === 'settings-advanced' && <div><h1>高级设置</h1></div>}
-        {activeTab === 'knowledge-entry' && <KnowledgeEntryView onAddKnowledge={addKnowledge} />}
+        {activeTab === 'charts' && <div><h1 className="text-3xl font-bold mb-4">数据图表</h1></div>}
+        {activeTab === 'best' && <div><h1 className="text-3xl font-bold mb-4">最佳成绩</h1></div>}
+        {activeTab === 'modules' && <div><h1 className="text-3xl font-bold mb-4">知识点汇总</h1><KnowledgeSummaryView knowledge={knowledge} /></div>}
+        {activeTab === 'form' && <div><h1 className="text-3xl font-bold mb-4">新增刷题记录</h1><NewRecordForm onAddRecord={addRecord} /></div>}
+        {activeTab === 'history' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">历史记录</h1>
+            <HistoryTable
+              records={records}
+              selectedIds={selectedRecordIds}
+              onSelectIds={setSelectedRecordIds}
+              onDeleteRecord={deleteRecord}
+              onBatchDelete={handleBatchDelete}
+            />
+          </div>
+        )}
+        {activeTab === 'plan' && <div><h1 className="text-3xl font-bold mb-4">制定计划</h1></div>}
+        {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
+        {activeTab === 'settings-basic' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">基础设置</h1>
+            <SettingsView
+              onExport={handleExportData}
+              onImport={handleImportData}
+              onClearAllData={handleClearAllData}
+            />
+          </div>
+        )}
+        {activeTab === 'settings-advanced' && <div><h1 className="text-3xl font-bold mb-4">高级设置</h1></div>}
+        {activeTab === 'knowledge-entry' && <div><h1 className="text-3xl font-bold mb-4">知识点录入</h1><KnowledgeEntryView onAddKnowledge={addKnowledge} /></div>}
       </div>
     </div>
   );

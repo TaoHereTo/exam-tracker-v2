@@ -14,8 +14,8 @@ interface KnowledgeEntryViewProps {
 
 const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge, defaultTab = 'data-analysis' }) => {
     return (
-        <Tabs defaultValue={defaultTab} className="max-w-2xl mx-auto">
-            <TabsList className="mb-4 flex flex-wrap gap-2">
+        <Tabs defaultValue={defaultTab} className="w-full max-w-2xl mx-auto">
+            <TabsList className="mb-4 flex flex-wrap gap-2 w-full justify-center">
                 <TabsTrigger value="data-analysis">资料分析</TabsTrigger>
                 <TabsTrigger value="politics">政治理论</TabsTrigger>
                 <TabsTrigger value="math">数量关系</TabsTrigger>
