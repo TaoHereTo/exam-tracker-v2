@@ -37,8 +37,16 @@ export function TrendChart({ records }: { records: RecordItem[] }) {
             // 日期格式统一为 yyyy-MM-dd
             const date = new Date(r.date);
             const dateStr = date.toLocaleDateString('zh-CN');
-            // 计算每分钟得分
-            const minutes = parseInt(r.duration.split(':')[0]) + (parseInt(r.duration.split(':')[1]) || 0) / 60;
+            // 兼容 duration 不是字符串的情况
+            let minutes = 0;
+            if (typeof r.duration === 'string' && r.duration.includes(':')) {
+                const [min, sec] = r.duration.split(':');
+                minutes = parseInt(min) + (parseInt(sec) || 0) / 60;
+            } else if (typeof r.duration === 'number') {
+                minutes = r.duration;
+            } else {
+                minutes = 0;
+            }
             const scorePerMin = minutes > 0 ? r.correct / minutes : 0;
             if (!dateMap[dateStr]) {
                 dateMap[dateStr] = { totalScore: 0, totalMinutes: 0, count: 0 };

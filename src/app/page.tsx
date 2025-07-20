@@ -57,31 +57,45 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
-  // 从 JSON 文件导入数据
+  // 从 JSON 文件导入数据（新版，兼容旧结构）
   const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = async (e: any) => {
-      const file = e.target.files[0];
-      if (!file) return;
+    // 1. 创建一个隐藏的文件输入框
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.json'; // 只允许选择JSON文件
+    // 2. 当用户选择文件后，触发此事件
+    fileInput.onchange = (event: any) => {
+      const file = event.target.files[0];
+      if (!file) {
+        return; // 用户取消了选择
+      }
       const reader = new FileReader();
-      reader.onload = (event) => {
+      // 3. 文件读取成功后
+      reader.onload = (e) => {
         try {
-          const text = event.target?.result as string;
-          const arr = JSON.parse(text);
-          if (Array.isArray(arr)) {
-            setRecords(arr.map(r => ({ id: r.id ?? Date.now() + Math.random(), ...r })));
+          const fileContent = e.target?.result as string;
+          const importedObject = JSON.parse(fileContent);
+          // 4. 核心逻辑：检查文件结构，找到真正的记录数组
+          // 检查是否存在 data.records 并且它是一个数组
+          if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
+            const recordsToImport = importedObject.data.records;
+            setRecords(recordsToImport);
+            alert(`成功导入 ${recordsToImport.length} 条刷题记录！`);
           } else {
-            alert('导入的文件格式不正确！');
+            // 如果文件结构不认识，则提示错误
+            alert('错误：无法识别的文件格式。请确保您选择的是正确的备份文件。');
           }
-        } catch (err) {
-          alert('导入失败，文件内容不是有效的 JSON！');
+        } catch (error: any) {
+          // 如果JSON解析失败，提示错误
+          console.error("导入失败:", error);
+          alert(`导入失败：文件解析错误。请检查文件是否损坏。\n错误信息: ${error.message}`);
         }
       };
+      // 5. 读取文件内容
       reader.readAsText(file);
     };
-    input.click();
+    // 6. 模拟点击，弹出文件选择窗口
+    fileInput.click();
   };
 
   return (
