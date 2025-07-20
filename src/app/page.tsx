@@ -78,7 +78,14 @@ export default function Home() {
           // 4. 核心逻辑：检查文件结构，找到真正的记录数组
           // 检查是否存在 data.records 并且它是一个数组
           if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
-            const recordsToImport = importedObject.data.records;
+            const recordsToImport = importedObject.data.records.map((r: any) => ({
+              id: r.id ?? Date.now() + Math.random(),
+              date: r.date,
+              module: r.module,
+              total: r.total ?? r.totalCount ?? 0,
+              correct: r.correct ?? r.correctCount ?? 0,
+              duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
+            }));
             setRecords(recordsToImport);
             alert(`成功导入 ${recordsToImport.length} 条刷题记录！`);
           } else {
@@ -108,7 +115,12 @@ export default function Home() {
           <div>
             <h1 className="text-3xl font-bold mb-4">数据趋势图</h1>
             <div style={{ height: '400px' }}>
-              <TrendChart records={records} />
+              <TrendChart data={records.map(r => ({
+                date: r.date,
+                module: r.module,
+                score: r.total ? Math.round((r.correct / r.total) * 100) : 0,
+                duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration,
+              }))} />
             </div>
           </div>
         )}
