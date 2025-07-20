@@ -30,14 +30,14 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                             className="w-full justify-center"
                             onClick={() => setActiveTab('overview')}
                         >
-                            数据图表
+                            数据概览
                         </Button>
                         <Button
                             variant={activeTab === 'charts' ? 'default' : 'ghost'}
                             className="w-full justify-center"
                             onClick={() => setActiveTab('charts')}
                         >
-                            数据概览
+                            数据图表
                         </Button>
                         <Button
                             variant={activeTab === 'best' ? 'default' : 'ghost'}

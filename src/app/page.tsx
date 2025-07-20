@@ -9,6 +9,8 @@ import { SettingsView } from "@/components/views/SettingsView";
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { toast } from "sonner";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -159,19 +161,124 @@ export default function Home() {
       <div className="flex-1 p-8 bg-white">
         {activeTab === 'overview' && (
           <div>
-            <h1 className="text-3xl font-bold mb-4">数据趋势图</h1>
-            <div style={{ height: '400px' }}>
-              <TrendChart data={records.map(r => ({
-                date: r.date,
-                module: r.module,
-                score: r.total ? Math.round((r.correct / r.total) * 100) : 0,
-                duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration,
-              }))} />
+            <h1 className="text-3xl font-bold mb-4">数据概览</h1>
+          </div>
+        )}
+        {activeTab === 'charts' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">数据图表</h1>
+            <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
+              <TabsList className="w-full justify-center mb-4">
+                <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
+                <TabsTrigger value="accuracy">正确率</TabsTrigger>
+              </TabsList>
+              <TabsContent value="perMinute">
+                <div style={{ height: '500px' }}>
+                  {/* 按模块和日期统计每分钟得分 */}
+                  {(() => {
+                    const moduleScoreMap: Record<string, number> = {
+                      '政治理论': 0.7,
+                      '常识判断': 0.8,
+                      '言语理解': 0.8,
+                      '判断推理': 0.8,
+                      '数量关系': 0.8,
+                      '资料分析': 0.7,
+                    };
+                    // 按日期+模块分组
+                    const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
+                    records.forEach(r => {
+                      const key = `${r.date}__${r.module}`;
+                      const correct = Number(r.correct) || 0;
+                      const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
+                      if (!groupMap[key]) {
+                        groupMap[key] = { date: r.date, module: r.module, correct: 0, duration: 0 };
+                      }
+                      groupMap[key].correct += correct;
+                      groupMap[key].duration += duration;
+                    });
+                    const chartData = Object.values(groupMap).map(item => ({
+                      date: item.date,
+                      module: item.module,
+                      score: item.duration > 0 ? (moduleScoreMap[item.module] || 1) * item.correct / item.duration : 0,
+                      duration: item.duration,
+                    }));
+                    return <TrendChart data={chartData} />;
+                  })()}
+                </div>
+              </TabsContent>
+              <TabsContent value="accuracy">
+                <div style={{ height: '500px' }}>
+                  {/* 按模块和日期统计正确率 */}
+                  {(() => {
+                    // 按日期+模块分组
+                    const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
+                    records.forEach(r => {
+                      const key = `${r.date}__${r.module}`;
+                      const correct = Number(r.correct) || 0;
+                      const total = Number(r.total) || 0;
+                      if (!groupMap[key]) {
+                        groupMap[key] = { date: r.date, module: r.module, correct: 0, total: 0 };
+                      }
+                      groupMap[key].correct += correct;
+                      groupMap[key].total += total;
+                    });
+                    const chartData = Object.values(groupMap).map(item => ({
+                      date: item.date,
+                      module: item.module,
+                      score: item.total > 0 ? (item.correct / item.total) * 100 : 0,
+                      duration: 0,
+                    }));
+                    return <TrendChart data={chartData} />;
+                  })()}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
+        {activeTab === 'best' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { key: 'politics', label: '政治理论' },
+                { key: 'common', label: '常识判断' },
+                { key: 'logic', label: '判断推理' },
+                { key: 'verbal', label: '言语理解' },
+                { key: 'math', label: '数量关系' },
+                { key: 'data-analysis', label: '资料分析' },
+              ].map(module => {
+                // 过滤出该模块的所有记录
+                const moduleRecords = records.filter(r => r.module === module.label);
+                // 计算每分钟得分（正确数/时长），并找出最高的
+                const best = moduleRecords.reduce<{ record: RecordItem; perMinute: number } | null>((acc, cur) => {
+                  const duration = parseFloat(cur.duration) || 0;
+                  const perMinute = duration > 0 ? cur.correct / duration : 0;
+                  if (!acc || perMinute > acc.perMinute) {
+                    return { record: cur, perMinute };
+                  }
+                  return acc;
+                }, null);
+                return (
+                  <Card key={module.key} className="shadow-md">
+                    <CardHeader>
+                      <CardTitle>{module.label}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {best ? (
+                        <div>
+                          <div className="text-2xl font-bold mb-2">{best.perMinute.toFixed(2)} 分/分钟</div>
+                          <div className="text-sm text-gray-500">日期：{best.record.date}</div>
+                        </div>
+                      ) : (
+                        <div className="text-gray-400">暂无记录</div>
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         )}
-        {activeTab === 'charts' && <div><h1 className="text-3xl font-bold mb-4">数据图表</h1></div>}
-        {activeTab === 'best' && <div><h1 className="text-3xl font-bold mb-4">最佳成绩</h1></div>}
         {activeTab === 'modules' && <div><h1 className="text-3xl font-bold mb-4">知识点汇总</h1><KnowledgeSummaryView knowledge={knowledge} /></div>}
         {activeTab === 'form' && <div><h1 className="text-3xl font-bold mb-4">新增刷题记录</h1><NewRecordForm onAddRecord={addRecord} /></div>}
         {activeTab === 'history' && (
