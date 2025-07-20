@@ -6,6 +6,7 @@ import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import { HistoryTable } from "@/components/tables/HistoryTable";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { SettingsView } from "@/components/views/SettingsView";
+import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -21,6 +22,14 @@ export default function Home() {
   };
   const [records, setRecords] = useState<RecordItem[]>([]);
 
+  // 新增知识点状态
+  const [knowledge, setKnowledge] = useState<any[]>([]);
+
+  // 新增知识点添加函数
+  const addKnowledge = (newKnowledge: any) => {
+    setKnowledge(prev => [newKnowledge, ...prev]);
+  };
+
   // 当组件第一次加载时，尝试从 localStorage 读取数据
   useEffect(() => {
     const savedRecords = localStorage.getItem('exam-tracker-records-v2');
@@ -34,6 +43,18 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem('exam-tracker-records-v2', JSON.stringify(records));
   }, [records]);
+
+  // 当组件第一次加载时，尝试从 localStorage 读取知识点
+  useEffect(() => {
+    const savedKnowledge = localStorage.getItem('exam-tracker-knowledge-v2');
+    if (savedKnowledge) {
+      setKnowledge(JSON.parse(savedKnowledge));
+    }
+  }, []);
+  // 当 knowledge 状态发生变化时，自动将其保存到 localStorage
+  useEffect(() => {
+    localStorage.setItem('exam-tracker-knowledge-v2', JSON.stringify(knowledge));
+  }, [knowledge]);
 
   const addRecord = (newRecord: RecordItem) => {
     setRecords(prevRecords => [newRecord, ...prevRecords]);
@@ -132,6 +153,7 @@ export default function Home() {
         {activeTab === 'progress' && <div><h1>进度追踪</h1></div>}
         {activeTab === 'settings-basic' && <SettingsView onExport={handleExportData} onImport={handleImportData} />}
         {activeTab === 'settings-advanced' && <div><h1>高级设置</h1></div>}
+        {activeTab === 'knowledge-entry' && <KnowledgeEntryView onAddKnowledge={addKnowledge} />}
       </div>
     </div>
   );
