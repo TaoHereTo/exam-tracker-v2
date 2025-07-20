@@ -24,12 +24,12 @@ interface TrendChartProps {
 
 // 颜色分配
 const moduleColors: Record<string, string> = {
-    '政治理论': '#8884d8',
-    '常识判断': '#82ca9d',
-    '言语理解': '#ffc658',
-    '判断推理': '#ff7300',
-    '数量关系': '#0088fe',
-    '资料分析': '#00c49f',
+    '政治理论': '#3366FF',    // 亮蓝
+    '常识判断': '#FFB300',    // 亮橙
+    '言语理解': '#FF4C4C',    // 亮红
+    '判断推理': '#00B8D9',    // 青色
+    '数量关系': '#43D854',    // 亮绿
+    '资料分析': '#A259FF',    // 亮紫
     '全部': '#888888',
 };
 
@@ -74,7 +74,7 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
                         key={module}
                         type="monotone"
                         dataKey={module}
-                        stroke={moduleColors[module] ? darkenColor(moduleColors[module], 0.7) : undefined}
+                        stroke={moduleColors[module] || undefined}
                         name={module}
                         dot={false}
                         strokeWidth={3}
@@ -84,15 +84,4 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
             </LineChart>
         </ResponsiveContainer>
     );
-};
-
-function darkenColor(hex: string, factor = 0.7) {
-    // hex: #RRGGBB
-    let r = parseInt(hex.slice(1, 3), 16);
-    let g = parseInt(hex.slice(3, 5), 16);
-    let b = parseInt(hex.slice(5, 7), 16);
-    r = Math.floor(r * factor);
-    g = Math.floor(g * factor);
-    b = Math.floor(b * factor);
-    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
-} 
+}; 

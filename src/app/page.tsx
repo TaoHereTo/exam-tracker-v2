@@ -11,6 +11,7 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -153,6 +154,8 @@ export default function Home() {
     input.click();
   };
 
+  const [chartModuleFilter, setChartModuleFilter] = useState<string>('全部');
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
@@ -167,6 +170,22 @@ export default function Home() {
         {activeTab === 'charts' && (
           <div>
             <h1 className="text-3xl font-bold mb-4">数据图表</h1>
+            <div className="mb-4 flex justify-end">
+              <Select value={chartModuleFilter} onValueChange={setChartModuleFilter}>
+                <SelectTrigger className="w-48">
+                  <SelectValue placeholder="筛选模块" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="全部">全部模块</SelectItem>
+                  <SelectItem value="政治理论">政治理论</SelectItem>
+                  <SelectItem value="常识判断">常识判断</SelectItem>
+                  <SelectItem value="言语理解">言语理解</SelectItem>
+                  <SelectItem value="判断推理">判断推理</SelectItem>
+                  <SelectItem value="数量关系">数量关系</SelectItem>
+                  <SelectItem value="资料分析">资料分析</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
               <TabsList className="w-full justify-center mb-4">
                 <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
@@ -184,9 +203,9 @@ export default function Home() {
                       '数量关系': 0.8,
                       '资料分析': 0.7,
                     };
-                    // 按日期+模块分组
                     const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
                     records.forEach(r => {
+                      if (chartModuleFilter !== '全部' && r.module !== chartModuleFilter) return;
                       const key = `${r.date}__${r.module}`;
                       const correct = Number(r.correct) || 0;
                       const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
@@ -210,9 +229,9 @@ export default function Home() {
                 <div style={{ height: '500px' }}>
                   {/* 按模块和日期统计正确率 */}
                   {(() => {
-                    // 按日期+模块分组
                     const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
                     records.forEach(r => {
+                      if (chartModuleFilter !== '全部' && r.module !== chartModuleFilter) return;
                       const key = `${r.date}__${r.module}`;
                       const correct = Number(r.correct) || 0;
                       const total = Number(r.total) || 0;
@@ -249,10 +268,18 @@ export default function Home() {
               ].map(module => {
                 // 过滤出该模块的所有记录
                 const moduleRecords = records.filter(r => r.module === module.label);
-                // 计算每分钟得分（正确数/时长），并找出最高的
+                // 计算每分钟得分（模块分值*正确数/用时），并找出最高的
+                const moduleScoreMap: Record<string, number> = {
+                  '政治理论': 0.7,
+                  '常识判断': 0.8,
+                  '言语理解': 0.8,
+                  '判断推理': 0.8,
+                  '数量关系': 0.8,
+                  '资料分析': 0.7,
+                };
                 const best = moduleRecords.reduce<{ record: RecordItem; perMinute: number } | null>((acc, cur) => {
                   const duration = parseFloat(cur.duration) || 0;
-                  const perMinute = duration > 0 ? cur.correct / duration : 0;
+                  const perMinute = duration > 0 ? (moduleScoreMap[cur.module] || 1) * cur.correct / duration : 0;
                   if (!acc || perMinute > acc.perMinute) {
                     return { record: cur, perMinute };
                   }
