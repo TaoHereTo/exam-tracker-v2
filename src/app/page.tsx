@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import { HistoryTable } from "@/components/tables/HistoryTable";
 import { TrendChart } from "@/components/charts/TrendChart";
+import { SettingsView } from "@/components/views/SettingsView";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -42,6 +43,47 @@ export default function Home() {
     setRecords(prevRecords => prevRecords.filter(record => record.id !== idToDelete));
   };
 
+  // 导出数据到 JSON 文件
+  const handleExportData = () => {
+    const json = JSON.stringify(records, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'records-backup.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // 从 JSON 文件导入数据
+  const handleImportData = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const text = event.target?.result as string;
+          const arr = JSON.parse(text);
+          if (Array.isArray(arr)) {
+            setRecords(arr.map(r => ({ id: r.id ?? Date.now() + Math.random(), ...r })));
+          } else {
+            alert('导入的文件格式不正确！');
+          }
+        } catch (err) {
+          alert('导入失败，文件内容不是有效的 JSON！');
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
@@ -63,7 +105,7 @@ export default function Home() {
         {activeTab === 'history' && <HistoryTable records={records} onDeleteRecord={deleteRecord} />}
         {activeTab === 'plan' && <div><h1>制定计划</h1></div>}
         {activeTab === 'progress' && <div><h1>进度追踪</h1></div>}
-        {activeTab === 'settings-basic' && <div><h1>基础设置</h1></div>}
+        {activeTab === 'settings-basic' && <SettingsView onExport={handleExportData} onImport={handleImportData} />}
         {activeTab === 'settings-advanced' && <div><h1>高级设置</h1></div>}
       </div>
     </div>
