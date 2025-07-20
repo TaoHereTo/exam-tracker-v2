@@ -23,7 +23,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             <Accordion type="single" collapsible defaultValue="analysis" className="w-full">
                 {/* 分析分组 */}
                 <AccordionItem value="analysis">
-                    <AccordionTrigger className="justify-center w-full text-center">分析</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">可视化</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'overview' ? 'default' : 'ghost'}
@@ -51,7 +51,7 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 管理分组 */}
                 <AccordionItem value="management">
-                    <AccordionTrigger className="justify-center w-full text-center">管理</AccordionTrigger>
+                    <AccordionTrigger className="justify-center w-full text-center">记录管理</AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'form' ? 'default' : 'ghost'}

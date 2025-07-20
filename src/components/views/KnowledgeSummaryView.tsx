@@ -93,7 +93,23 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge }
                                 filtered.map((row, idx) => (
                                     <tr key={idx}>
                                         {columns.map(col => (
-                                            <td key={col.key} className="border px-4 py-2">{row[col.key] || ''}</td>
+                                            <td key={col.key} className="border px-4 py-2">
+                                                {(() => {
+                                                    const value = row[col.key];
+                                                    if (value instanceof Date) {
+                                                        return value.toLocaleDateString();
+                                                    } else if (typeof value === 'string') {
+                                                        // 尝试解析为日期字符串
+                                                        const d = new Date(value);
+                                                        if (col.key === 'date' && !isNaN(d.getTime()) && value.length > 6) {
+                                                            return d.toLocaleDateString();
+                                                        }
+                                                        return value;
+                                                    } else {
+                                                        return value ?? '';
+                                                    }
+                                                })()}
+                                            </td>
                                         ))}
                                     </tr>
                                 ))

@@ -13,9 +13,13 @@ interface KnowledgeEntryViewProps {
 }
 
 const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge, defaultTab = 'data-analysis' }) => {
+    // 包装函数，自动加上 module 字段
+    const handleAdd = (module: string) => (data: any) => {
+        onAddKnowledge({ ...data, module });
+    };
     return (
         <Tabs defaultValue={defaultTab} className="w-full max-w-2xl mx-auto">
-            <TabsList className="mb-4 flex flex-wrap gap-2 w-full justify-center">
+            <TabsList className="mb-4 flex flex-wrap gap-2 w-full justify-center text-base h-12">
                 <TabsTrigger value="data-analysis">资料分析</TabsTrigger>
                 <TabsTrigger value="politics">政治理论</TabsTrigger>
                 <TabsTrigger value="math">数量关系</TabsTrigger>
@@ -24,22 +28,22 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 <TabsTrigger value="logic">判断推理</TabsTrigger>
             </TabsList>
             <TabsContent value="data-analysis">
-                <DataAnalysisForm onAddKnowledge={onAddKnowledge} />
+                <DataAnalysisForm onAddKnowledge={handleAdd('data-analysis')} />
             </TabsContent>
             <TabsContent value="politics">
-                <PoliticsForm onAddKnowledge={onAddKnowledge} />
+                <PoliticsForm onAddKnowledge={handleAdd('politics')} />
             </TabsContent>
             <TabsContent value="math">
-                <MathForm onAddKnowledge={onAddKnowledge} />
+                <MathForm onAddKnowledge={handleAdd('math')} />
             </TabsContent>
             <TabsContent value="common">
-                <CommonForm onAddKnowledge={onAddKnowledge} />
+                <CommonForm onAddKnowledge={handleAdd('common')} />
             </TabsContent>
             <TabsContent value="verbal">
-                <VerbalForm onAddKnowledge={onAddKnowledge} />
+                <VerbalForm onAddKnowledge={handleAdd('verbal')} />
             </TabsContent>
             <TabsContent value="logic">
-                <LogicForm onAddKnowledge={onAddKnowledge} />
+                <LogicForm onAddKnowledge={handleAdd('logic')} />
             </TabsContent>
         </Tabs>
     );

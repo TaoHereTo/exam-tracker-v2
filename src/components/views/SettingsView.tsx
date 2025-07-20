@@ -17,6 +17,7 @@ import { useState } from "react";
 import { AppearanceSetting } from "./settings/AppearanceSetting";
 import { PaginationSetting } from "./settings/PaginationSetting";
 import { ExportFormatSetting } from "./settings/ExportFormatSetting";
+import { DataImportExport } from "@/components/features/DataImportExport";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
@@ -49,10 +50,7 @@ export function SettingsView({
                                 将所有数据导出到文件，或从文件中恢复。
                             </p>
                         </div>
-                        <div className="flex gap-2">
-                            <Button variant="outline" onClick={onImport}>导入数据</Button>
-                            <Button variant="outline" onClick={onExport}>导出数据</Button>
-                        </div>
+                        <DataImportExport onImport={onImport!} onExport={onExport!} />
                     </div>
                     <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
                         <div>

@@ -23,6 +23,11 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { OverviewView } from "@/components/views/OverviewView";
+import { ChartsView } from "@/components/views/ChartsView";
+import { HistoryView } from "@/components/views/HistoryView";
+import { NewRecordView } from "@/components/views/NewRecordView";
+import { KnowledgeEntryTabView } from "@/components/views/KnowledgeEntryTabView";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -45,6 +50,9 @@ export default function Home() {
   const addKnowledge = (newKnowledge: any) => {
     setKnowledge(prev => [newKnowledge, ...prev]);
   };
+
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
 
   // 当组件第一次加载时，尝试从 localStorage 读取数据
   useEffect(() => {
@@ -99,24 +107,30 @@ export default function Home() {
     toast.success("批量删除成功", { description: `已删除 ${selectedRecordIds.length} 条记录。` });
   };
 
-  // 导出数据到 JSON 文件
+  // 导出数据到 JSON 文件（支持知识点）
   const handleExportData = () => {
-    const json = JSON.stringify(records, null, 2);
+    const exportData = {
+      records,
+      knowledge,
+      exportedAt: new Date().toISOString(),
+      version: 2,
+    };
+    const json = JSON.stringify(exportData, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'records-backup.json';
+    a.download = 'exam-tracker-backup.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast.success("导出成功", {
-      description: "您的所有数据已成功导出到本地JSON文件。",
+      description: "您的所有数据（包括知识点）已成功导出到本地JSON文件。",
     });
   };
 
-  // 从 JSON 文件导入数据
+  // 从 JSON 文件导入数据（支持知识点）
   const handleImportData = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -130,18 +144,24 @@ export default function Home() {
           const fileContent = event.target?.result as string;
           try {
             const importedObject = JSON.parse(fileContent);
-            // 兼容两种结构：数组 或 { data: { records: [...] } }
-            let recordsToImport: any[] = [];
+            // 兼容多种结构
+            let importedRecords: any[] = [];
+            let importedKnowledge: any[] = [];
             if (Array.isArray(importedObject)) {
-              recordsToImport = importedObject;
+              importedRecords = importedObject;
+            } else if (importedObject && importedObject.records) {
+              importedRecords = importedObject.records;
+              if (Array.isArray(importedObject.knowledge)) {
+                importedKnowledge = importedObject.knowledge;
+              }
             } else if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
-              recordsToImport = importedObject.data.records;
+              importedRecords = importedObject.data.records;
             } else {
               alert('导入的文件格式不正确！');
               return;
             }
-            // 标准化字段
-            const normalized = recordsToImport.map((r: any) => ({
+            // 标准化刷题记录
+            const normalizedRecords = importedRecords.map((r: any) => ({
               id: r.id ?? Date.now() + Math.random(),
               date: r.date,
               module: r.module,
@@ -149,9 +169,13 @@ export default function Home() {
               correct: r.correct ?? r.correctCount ?? 0,
               duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
             }));
-            setRecords(normalized);
+            setRecords(normalizedRecords);
+            // 标准化知识点（直接存储各模块原始结构，便于表格展示）
+            if (importedKnowledge.length > 0) {
+              setKnowledge(importedKnowledge);
+            }
             toast.success("导入成功", {
-              description: `成功导入 ${normalized.length} 条刷题记录！`,
+              description: `成功导入 ${normalizedRecords.length} 条刷题记录${importedKnowledge.length > 0 ? `，${importedKnowledge.length} 条知识点` : ''}！`,
             });
           } catch (err) {
             alert('导入失败，文件内容不是有效的 JSON！');
@@ -167,6 +191,8 @@ export default function Home() {
 
   const [chartModuleFilter, setChartModuleFilter] = useState<string>('全部');
 
+  // 按日期降序排序
+  const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   // 历史记录分页
   const [historyPage, setHistoryPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -175,8 +201,8 @@ export default function Home() {
     toast.success("设置已保存");
     // 可在此处将设置同步到 localStorage 或后端
   };
-  const totalPages = Math.ceil(records.length / pageSize);
-  const pagedRecords = records.slice((historyPage - 1) * pageSize, historyPage * pageSize);
+  const totalPages = Math.ceil(sortedRecords.length / pageSize);
+  const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
 
   return (
     <div className="flex min-h-screen">
@@ -184,89 +210,13 @@ export default function Home() {
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* 右侧主内容区，占据剩余空间 */}
       <div className="flex-1 p-8 bg-white dark:bg-gray-950 dark:text-gray-100">
-        {activeTab === 'overview' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">数据概览</h1>
-          </div>
-        )}
+        {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
         {activeTab === 'charts' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">数据图表</h1>
-            <div className="mb-4 flex justify-end">
-              <Select value={chartModuleFilter} onValueChange={setChartModuleFilter}>
-                <SelectTrigger className="w-48">
-                  <SelectValue placeholder="筛选模块" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="全部">全部模块</SelectItem>
-                  <SelectItem value="政治理论">政治理论</SelectItem>
-                  <SelectItem value="常识判断">常识判断</SelectItem>
-                  <SelectItem value="言语理解">言语理解</SelectItem>
-                  <SelectItem value="判断推理">判断推理</SelectItem>
-                  <SelectItem value="数量关系">数量关系</SelectItem>
-                  <SelectItem value="资料分析">资料分析</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
-              <TabsList className="w-full justify-center mb-4">
-                <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
-                <TabsTrigger value="accuracy">正确率</TabsTrigger>
-              </TabsList>
-              <TabsContent value="perMinute">
-                <div style={{ height: '500px' }}>
-                  {/* 按模块和日期统计每分钟得分 */}
-                  {(() => {
-                    const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
-                    records.forEach(r => {
-                      if (chartModuleFilter !== '全部' && r.module !== chartModuleFilter) return;
-                      const key = `${r.date}__${r.module}`;
-                      const correct = Number(r.correct) || 0;
-                      const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
-                      if (!groupMap[key]) {
-                        groupMap[key] = { date: r.date, module: r.module, correct: 0, duration: 0 };
-                      }
-                      groupMap[key].correct += correct;
-                      groupMap[key].duration += duration;
-                    });
-                    const chartData = Object.values(groupMap).map(item => ({
-                      date: item.date,
-                      module: item.module,
-                      score: item.duration > 0 ? (MODULE_SCORES[item.module as keyof typeof MODULE_SCORES] || 1) * item.correct / item.duration : 0,
-                      duration: item.duration,
-                    }));
-                    return <TrendChart data={chartData} />;
-                  })()}
-                </div>
-              </TabsContent>
-              <TabsContent value="accuracy">
-                <div style={{ height: '500px' }}>
-                  {/* 按模块和日期统计正确率 */}
-                  {(() => {
-                    const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
-                    records.forEach(r => {
-                      if (chartModuleFilter !== '全部' && r.module !== chartModuleFilter) return;
-                      const key = `${r.date}__${r.module}`;
-                      const correct = Number(r.correct) || 0;
-                      const total = Number(r.total) || 0;
-                      if (!groupMap[key]) {
-                        groupMap[key] = { date: r.date, module: r.module, correct: 0, total: 0 };
-                      }
-                      groupMap[key].correct += correct;
-                      groupMap[key].total += total;
-                    });
-                    const chartData = Object.values(groupMap).map(item => ({
-                      date: item.date,
-                      module: item.module,
-                      score: item.total > 0 ? (item.correct / item.total) * 100 : 0,
-                      duration: 0,
-                    }));
-                    return <TrendChart data={chartData} />;
-                  })()}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
+          <ChartsView
+            records={records}
+            chartModuleFilter={chartModuleFilter}
+            setChartModuleFilter={setChartModuleFilter}
+          />
         )}
         {activeTab === 'best' && (
           <div>
@@ -275,59 +225,18 @@ export default function Home() {
           </div>
         )}
         {activeTab === 'modules' && <div><h1 className="text-3xl font-bold mb-4">知识点汇总</h1><KnowledgeSummaryView knowledge={knowledge} /></div>}
-        {activeTab === 'form' && <div><h1 className="text-3xl font-bold mb-4">新增刷题记录</h1><NewRecordForm onAddRecord={addRecord} /></div>}
+        {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}
         {activeTab === 'history' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">历史记录</h1>
-            <HistoryTable
-              records={pagedRecords}
-              selectedIds={selectedRecordIds}
-              onSelectIds={setSelectedRecordIds}
-              onDeleteRecord={deleteRecord}
-              onBatchDelete={handleBatchDelete}
-            />
-            {/* 分页组件 */}
-            {totalPages > 1 && (
-              <Pagination className="mt-6">
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      onClick={e => {
-                        e.preventDefault();
-                        setHistoryPage(p => Math.max(1, p - 1));
-                      }}
-                      href="#"
-                      aria-disabled={historyPage === 1}
-                    />
-                  </PaginationItem>
-                  {Array.from({ length: totalPages }).map((_, idx) => (
-                    <PaginationItem key={idx}>
-                      <PaginationLink
-                        isActive={historyPage === idx + 1}
-                        onClick={e => {
-                          e.preventDefault();
-                          setHistoryPage(idx + 1);
-                        }}
-                        href="#"
-                      >
-                        {idx + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      onClick={e => {
-                        e.preventDefault();
-                        setHistoryPage(p => Math.min(totalPages, p + 1));
-                      }}
-                      href="#"
-                      aria-disabled={historyPage === totalPages}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            )}
-          </div>
+          <HistoryView
+            records={pagedRecords}
+            selectedRecordIds={selectedRecordIds}
+            onSelectIds={setSelectedRecordIds}
+            onDeleteRecord={deleteRecord}
+            onBatchDelete={handleBatchDelete}
+            historyPage={historyPage}
+            setHistoryPage={setHistoryPage}
+            totalPages={totalPages}
+          />
         )}
         {activeTab === 'plan' && <div><h1 className="text-3xl font-bold mb-4">制定计划</h1></div>}
         {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
@@ -347,7 +256,7 @@ export default function Home() {
           </div>
         )}
         {activeTab === 'settings-advanced' && <div><h1 className="text-3xl font-bold mb-4">高级设置</h1></div>}
-        {activeTab === 'knowledge-entry' && <div><h1 className="text-3xl font-bold mb-4">知识点录入</h1><KnowledgeEntryView onAddKnowledge={addKnowledge} /></div>}
+        {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
       </div>
     </div>
   );

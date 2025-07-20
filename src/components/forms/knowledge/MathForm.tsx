@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface MathFormProps {
     onAddKnowledge: (knowledge: { type: string; note: string }) => void;
@@ -18,6 +19,7 @@ const MathForm: React.FC<MathFormProps> = ({ onAddKnowledge }) => {
     const handleSubmit = () => {
         if (!type.trim() && !note.trim()) return;
         onAddKnowledge({ type, note });
+        toast.success("保存成功");
         setType('');
         setNote('');
     };

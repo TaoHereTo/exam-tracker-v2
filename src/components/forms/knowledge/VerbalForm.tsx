@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface VerbalFormProps {
     onAddKnowledge: (knowledge: { idiom: string; meaning: string }) => void;
@@ -18,6 +19,7 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge }) => {
     const handleSubmit = () => {
         if (!idiom.trim() && !meaning.trim()) return;
         onAddKnowledge({ idiom, meaning });
+        toast.success("保存成功");
         setIdiom('');
         setMeaning('');
     };

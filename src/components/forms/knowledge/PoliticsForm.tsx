@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { toast } from "sonner";
 
 interface PoliticsFormProps {
     onAddKnowledge: (knowledge: { date: Date | null; source: string; note: string }) => void;
@@ -21,6 +22,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge }) => {
     const handleSubmit = () => {
         if (!source.trim() && !note.trim()) return;
         onAddKnowledge({ date, source, note });
+        toast.success("保存成功");
         setDate(null);
         setSource('');
         setNote('');
