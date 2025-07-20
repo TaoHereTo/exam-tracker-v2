@@ -82,7 +82,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge }
                         <thead>
                             <tr>
                                 {columns.map(col => (
-                                    <th key={col.key} className="border px-4 py-2 bg-gray-100">{col.label}</th>
+                                    <th key={col.key} className="border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100">{col.label}</th>
                                 ))}
                             </tr>
                         </thead>

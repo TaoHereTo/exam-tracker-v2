@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download, Upload } from "lucide-react";
 import {
@@ -13,8 +13,24 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { AppearanceSetting } from "./settings/AppearanceSetting";
+import { PaginationSetting } from "./settings/PaginationSetting";
+import { ExportFormatSetting } from "./settings/ExportFormatSetting";
 
-export function SettingsView({ onExport, onImport, onClearAllData }: { onExport?: () => void; onImport?: () => void; onClearAllData?: () => void }) {
+export function SettingsView({
+    onExport, onImport, onClearAllData,
+    pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings
+}: {
+    onExport?: () => void;
+    onImport?: () => void;
+    onClearAllData?: () => void;
+    pageSize: number;
+    setPageSize: (n: number) => void;
+    exportFormat: string;
+    setExportFormat: (f: string) => void;
+    onSaveSettings: () => void;
+}) {
     return (
         <div className="space-y-6">
             <h1 className="text-3xl font-bold">基础设置</h1>
@@ -67,7 +83,13 @@ export function SettingsView({ onExport, onImport, onClearAllData }: { onExport?
                     </div>
                 </CardContent>
             </Card>
-            {/* 这里可以放其他的设置卡片，比如外观设置等 */}
+            {/* 新增设置卡片 */}
+            <AppearanceSetting />
+            <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} onSave={onSaveSettings} />
+            <ExportFormatSetting exportFormat={exportFormat} setExportFormat={setExportFormat} onSave={onSaveSettings} />
+            <div className="flex justify-end mt-4">
+                <Button onClick={onSaveSettings} variant="default">保存所有设置</Button>
+            </div>
         </div>
     );
 } 

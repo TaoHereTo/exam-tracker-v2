@@ -15,8 +15,8 @@ type SidebarProps = {
 
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     return (
-        <aside className="w-52 min-h-screen bg-gray-50 border-r border-gray-200 p-4 flex flex-col items-center">
-            <h1 className="text-2xl font-bold mb-6 text-center tracking-wide text-gray-800 w-full">
+        <aside className="w-52 min-h-screen bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 flex flex-col items-center">
+            <h1 className="text-2xl font-bold mb-6 text-center tracking-wide text-gray-800 dark:text-gray-100 w-full">
                 行测每日记录
             </h1>
             {/* 使用 Accordion 替换自定义 Collapsible */}

@@ -12,6 +12,17 @@ import { toast } from "sonner";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { MODULE_SCORES } from "@/config/exam";
+import { PersonalBestView } from "@/components/views/PersonalBestView";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -156,12 +167,23 @@ export default function Home() {
 
   const [chartModuleFilter, setChartModuleFilter] = useState<string>('全部');
 
+  // 历史记录分页
+  const [historyPage, setHistoryPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [exportFormat, setExportFormat] = useState("json");
+  const handleSaveSettings = () => {
+    toast.success("设置已保存");
+    // 可在此处将设置同步到 localStorage 或后端
+  };
+  const totalPages = Math.ceil(records.length / pageSize);
+  const pagedRecords = records.slice((historyPage - 1) * pageSize, historyPage * pageSize);
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* 右侧主内容区，占据剩余空间 */}
-      <div className="flex-1 p-8 bg-white">
+      <div className="flex-1 p-8 bg-white dark:bg-gray-950 dark:text-gray-100">
         {activeTab === 'overview' && (
           <div>
             <h1 className="text-3xl font-bold mb-4">数据概览</h1>
@@ -195,14 +217,6 @@ export default function Home() {
                 <div style={{ height: '500px' }}>
                   {/* 按模块和日期统计每分钟得分 */}
                   {(() => {
-                    const moduleScoreMap: Record<string, number> = {
-                      '政治理论': 0.7,
-                      '常识判断': 0.8,
-                      '言语理解': 0.8,
-                      '判断推理': 0.8,
-                      '数量关系': 0.8,
-                      '资料分析': 0.7,
-                    };
                     const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
                     records.forEach(r => {
                       if (chartModuleFilter !== '全部' && r.module !== chartModuleFilter) return;
@@ -218,7 +232,7 @@ export default function Home() {
                     const chartData = Object.values(groupMap).map(item => ({
                       date: item.date,
                       module: item.module,
-                      score: item.duration > 0 ? (moduleScoreMap[item.module] || 1) * item.correct / item.duration : 0,
+                      score: item.duration > 0 ? (MODULE_SCORES[item.module as keyof typeof MODULE_SCORES] || 1) * item.correct / item.duration : 0,
                       duration: item.duration,
                     }));
                     return <TrendChart data={chartData} />;
@@ -257,53 +271,7 @@ export default function Home() {
         {activeTab === 'best' && (
           <div>
             <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { key: 'politics', label: '政治理论' },
-                { key: 'common', label: '常识判断' },
-                { key: 'logic', label: '判断推理' },
-                { key: 'verbal', label: '言语理解' },
-                { key: 'math', label: '数量关系' },
-                { key: 'data-analysis', label: '资料分析' },
-              ].map(module => {
-                // 过滤出该模块的所有记录
-                const moduleRecords = records.filter(r => r.module === module.label);
-                // 计算每分钟得分（模块分值*正确数/用时），并找出最高的
-                const moduleScoreMap: Record<string, number> = {
-                  '政治理论': 0.7,
-                  '常识判断': 0.8,
-                  '言语理解': 0.8,
-                  '判断推理': 0.8,
-                  '数量关系': 0.8,
-                  '资料分析': 0.7,
-                };
-                const best = moduleRecords.reduce<{ record: RecordItem; perMinute: number } | null>((acc, cur) => {
-                  const duration = parseFloat(cur.duration) || 0;
-                  const perMinute = duration > 0 ? (moduleScoreMap[cur.module] || 1) * cur.correct / duration : 0;
-                  if (!acc || perMinute > acc.perMinute) {
-                    return { record: cur, perMinute };
-                  }
-                  return acc;
-                }, null);
-                return (
-                  <Card key={module.key} className="shadow-md">
-                    <CardHeader>
-                      <CardTitle>{module.label}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {best ? (
-                        <div>
-                          <div className="text-2xl font-bold mb-2">{best.perMinute.toFixed(2)} 分/分钟</div>
-                          <div className="text-sm text-gray-500">日期：{best.record.date}</div>
-                        </div>
-                      ) : (
-                        <div className="text-gray-400">暂无记录</div>
-                      )}
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+            <PersonalBestView records={records.map(r => ({ ...r, module: r.module as keyof typeof MODULE_SCORES }))} />
           </div>
         )}
         {activeTab === 'modules' && <div><h1 className="text-3xl font-bold mb-4">知识点汇总</h1><KnowledgeSummaryView knowledge={knowledge} /></div>}
@@ -312,12 +280,53 @@ export default function Home() {
           <div>
             <h1 className="text-3xl font-bold mb-4">历史记录</h1>
             <HistoryTable
-              records={records}
+              records={pagedRecords}
               selectedIds={selectedRecordIds}
               onSelectIds={setSelectedRecordIds}
               onDeleteRecord={deleteRecord}
               onBatchDelete={handleBatchDelete}
             />
+            {/* 分页组件 */}
+            {totalPages > 1 && (
+              <Pagination className="mt-6">
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={e => {
+                        e.preventDefault();
+                        setHistoryPage(p => Math.max(1, p - 1));
+                      }}
+                      href="#"
+                      aria-disabled={historyPage === 1}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }).map((_, idx) => (
+                    <PaginationItem key={idx}>
+                      <PaginationLink
+                        isActive={historyPage === idx + 1}
+                        onClick={e => {
+                          e.preventDefault();
+                          setHistoryPage(idx + 1);
+                        }}
+                        href="#"
+                      >
+                        {idx + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={e => {
+                        e.preventDefault();
+                        setHistoryPage(p => Math.min(totalPages, p + 1));
+                      }}
+                      href="#"
+                      aria-disabled={historyPage === totalPages}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
           </div>
         )}
         {activeTab === 'plan' && <div><h1 className="text-3xl font-bold mb-4">制定计划</h1></div>}
@@ -329,6 +338,11 @@ export default function Home() {
               onExport={handleExportData}
               onImport={handleImportData}
               onClearAllData={handleClearAllData}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              exportFormat={exportFormat}
+              setExportFormat={setExportFormat}
+              onSaveSettings={handleSaveSettings}
             />
           </div>
         )}
