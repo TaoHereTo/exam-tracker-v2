@@ -2,6 +2,59 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { MODULE_SCORES } from "@/config/exam";
+import { ModulePieChart } from "@/components/charts/ModulePieChart";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+
+const moduleColors: Record<string, string> = {
+    '政治理论': '#3366FF',    // 亮蓝
+    '常识判断': '#FFB300',    // 亮橙
+    '言语理解': '#FF4C4C',    // 亮红
+    '判断推理': '#00B8D9',    // 青色
+    '数量关系': '#43D854',    // 亮绿
+    '资料分析': '#A259FF',    // 亮紫
+};
+
+function ModuleRadarChart({ data }: { data: any[] }) {
+    // 统计每个模块的正确率
+    const moduleStats: Record<string, { correct: number; total: number }> = {};
+    data.forEach(item => {
+        if (!moduleStats[item.module]) {
+            moduleStats[item.module] = { correct: 0, total: 0 };
+        }
+        moduleStats[item.module].correct += Number(item.correct) || 0;
+        moduleStats[item.module].total += Number(item.total) || 0;
+    });
+    const modules = Object.keys(moduleColors);
+    const radarData = modules.map(module => {
+        const stat = moduleStats[module] || { correct: 0, total: 0 };
+        return {
+            module,
+            [module]: stat.total > 0 ? (stat.correct / stat.total) * 100 : 0,
+        };
+    });
+    return (
+        <ResponsiveContainer width="100%" height={400}>
+            <RadarChart data={radarData}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="module" />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                {modules.map(module => (
+                    <Radar
+                        key={module}
+                        name={module}
+                        dataKey={module}
+                        stroke={moduleColors[module]}
+                        fill={moduleColors[module]}
+                        fillOpacity={0.5}
+                        isAnimationActive
+                    />
+                ))}
+                <Tooltip formatter={v => typeof v === 'number' ? `${v.toFixed(2)}%` : v} />
+                <Legend />
+            </RadarChart>
+        </ResponsiveContainer>
+    );
+}
 
 interface ChartsViewProps {
     records: any[];
@@ -33,6 +86,8 @@ export function ChartsView({ records, chartModuleFilter, setChartModuleFilter }:
                 <TabsList className="w-full justify-center mb-4">
                     <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
                     <TabsTrigger value="accuracy">正确率</TabsTrigger>
+                    <TabsTrigger value="pie">模块耗时分布</TabsTrigger>
+                    <TabsTrigger value="radar">模块能力雷达图</TabsTrigger>
                 </TabsList>
                 <TabsContent value="perMinute">
                     <div style={{ height: '500px' }}>
@@ -82,6 +137,19 @@ export function ChartsView({ records, chartModuleFilter, setChartModuleFilter }:
                             }));
                             return <TrendChart data={chartData} />;
                         })()}
+                    </div>
+                </TabsContent>
+                <TabsContent value="pie">
+                    <div style={{ height: '500px' }}>
+                        <ModulePieChart data={records.map(r => ({
+                            ...r,
+                            duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
+                        }))} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="radar">
+                    <div style={{ height: '500px' }}>
+                        <ModuleRadarChart data={records} />
                     </div>
                 </TabsContent>
             </Tabs>
