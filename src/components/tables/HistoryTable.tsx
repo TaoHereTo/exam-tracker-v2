@@ -21,7 +21,7 @@ export function HistoryTable({
     const indeterminate = selectedIds.length > 0 && selectedIds.length < records.length;
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl w-full mx-auto">
             <div className="mb-2 flex justify-between items-center">
                 <span className="text-gray-500 text-sm">共 {records.length} 条记录</span>
                 <Button

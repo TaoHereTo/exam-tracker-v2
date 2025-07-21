@@ -32,13 +32,15 @@ export function HistoryView({
     return (
         <div>
             <h1 className="text-3xl font-bold mb-4">历史记录</h1>
-            <HistoryTable
-                records={records}
-                selectedIds={selectedRecordIds}
-                onSelectIds={onSelectIds}
-                onDeleteRecord={onDeleteRecord}
-                onBatchDelete={onBatchDelete}
-            />
+            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full max-w-5xl">
+                <HistoryTable
+                    records={records}
+                    selectedIds={selectedRecordIds}
+                    onSelectIds={onSelectIds}
+                    onDeleteRecord={onDeleteRecord}
+                    onBatchDelete={onBatchDelete}
+                />
+            </div>
             {/* 分页组件 */}
             {totalPages > 1 && (
                 <Pagination className="mt-6">

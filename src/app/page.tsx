@@ -214,8 +214,6 @@ export default function Home() {
         {activeTab === 'charts' && (
           <ChartsView
             records={records}
-            chartModuleFilter={chartModuleFilter}
-            setChartModuleFilter={setChartModuleFilter}
           />
         )}
         {activeTab === 'best' && (

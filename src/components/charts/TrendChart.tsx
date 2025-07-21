@@ -24,20 +24,33 @@ const moduleColors: Record<string, string> = {
     '全部': '#888888',
 };
 
-export const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
-    // 获取所有日期，所有模块
-    const allDates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-    const allModules = Array.from(new Set(data.map(item => item.module)));
+export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule }) => {
+    let allModules: string[] = [];
+    let allDates: string[] = [];
+    let chartData: any[] = [];
 
-    // 构造多模块折线数据结构
-    const chartData = allDates.map(date => {
-        const row: any = { date };
-        allModules.forEach(module => {
-            const found = data.find(item => item.date === date && item.module === module);
-            row[module] = found ? found.score : null;
-        });
-        return row;
-    });
+    if (data.length > 0) {
+        if (onlyModule) {
+            allModules = [onlyModule];
+            allDates = data.map(item => item.date);
+            chartData = data;
+        } else if ('module' in data[0]) {
+            allModules = Array.from(new Set(data.map(item => (item as any).module)));
+            allDates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            chartData = allDates.map(date => {
+                const row: any = { date };
+                allModules.forEach(module => {
+                    const found = data.find(item => item.date === date && item.module === module);
+                    row[module] = found ? found.score : null;
+                });
+                return row;
+            });
+        } else {
+            allModules = Object.keys(data[0]).filter(k => k !== 'date' && k !== 'duration');
+            allDates = data.map(item => item.date);
+            chartData = data;
+        }
+    }
 
     const option = {
         backgroundColor: '#fff',

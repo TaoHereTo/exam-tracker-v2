@@ -18,8 +18,8 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
         onAddKnowledge({ ...data, module });
     };
     return (
-        <Tabs defaultValue={defaultTab} className="w-full max-w-2xl mx-auto">
-            <TabsList className="mb-4 flex flex-wrap gap-2 w-full justify-center text-base h-12">
+        <Tabs defaultValue={defaultTab} className="w-full max-w-2xl mx-auto flex flex-col">
+            <TabsList className="mb-10 flex flex-wrap gap-2 w-full justify-center text-base h-10">
                 <TabsTrigger value="data-analysis">资料分析</TabsTrigger>
                 <TabsTrigger value="politics">政治理论</TabsTrigger>
                 <TabsTrigger value="math">数量关系</TabsTrigger>
@@ -27,24 +27,26 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 <TabsTrigger value="verbal">言语理解</TabsTrigger>
                 <TabsTrigger value="logic">判断推理</TabsTrigger>
             </TabsList>
-            <TabsContent value="data-analysis">
-                <DataAnalysisForm onAddKnowledge={handleAdd('data-analysis')} />
-            </TabsContent>
-            <TabsContent value="politics">
-                <PoliticsForm onAddKnowledge={handleAdd('politics')} />
-            </TabsContent>
-            <TabsContent value="math">
-                <MathForm onAddKnowledge={handleAdd('math')} />
-            </TabsContent>
-            <TabsContent value="common">
-                <CommonForm onAddKnowledge={handleAdd('common')} />
-            </TabsContent>
-            <TabsContent value="verbal">
-                <VerbalForm onAddKnowledge={handleAdd('verbal')} />
-            </TabsContent>
-            <TabsContent value="logic">
-                <LogicForm onAddKnowledge={handleAdd('logic')} />
-            </TabsContent>
+            <div className="min-h-[400px]">
+                <TabsContent value="data-analysis">
+                    <DataAnalysisForm onAddKnowledge={handleAdd('data-analysis')} />
+                </TabsContent>
+                <TabsContent value="politics">
+                    <PoliticsForm onAddKnowledge={handleAdd('politics')} />
+                </TabsContent>
+                <TabsContent value="math">
+                    <MathForm onAddKnowledge={handleAdd('math')} />
+                </TabsContent>
+                <TabsContent value="common">
+                    <CommonForm onAddKnowledge={handleAdd('common')} />
+                </TabsContent>
+                <TabsContent value="verbal">
+                    <VerbalForm onAddKnowledge={handleAdd('verbal')} />
+                </TabsContent>
+                <TabsContent value="logic">
+                    <LogicForm onAddKnowledge={handleAdd('logic')} />
+                </TabsContent>
+            </div>
         </Tabs>
     );
 };
