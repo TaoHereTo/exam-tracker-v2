@@ -28,6 +28,17 @@ import { ChartsView } from "@/components/views/ChartsView";
 import { HistoryView } from "@/components/views/HistoryView";
 import { NewRecordView } from "@/components/views/NewRecordView";
 import { KnowledgeEntryTabView } from "@/components/views/KnowledgeEntryTabView";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -130,6 +141,9 @@ export default function Home() {
     });
   };
 
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [pendingImport, setPendingImport] = useState<{ records: any[], knowledge: any[] }>();
+
   // 从 JSON 文件导入数据（支持知识点）
   const handleImportData = () => {
     const input = document.createElement('input');
@@ -169,14 +183,8 @@ export default function Home() {
               correct: r.correct ?? r.correctCount ?? 0,
               duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
             }));
-            setRecords(normalizedRecords);
-            // 标准化知识点（直接存储各模块原始结构，便于表格展示）
-            if (importedKnowledge.length > 0) {
-              setKnowledge(importedKnowledge);
-            }
-            toast.success("导入成功", {
-              description: `成功导入 ${normalizedRecords.length} 条刷题记录${importedKnowledge.length > 0 ? `，${importedKnowledge.length} 条知识点` : ''}！`,
-            });
+            setPendingImport({ records: normalizedRecords, knowledge: importedKnowledge });
+            setImportDialogOpen(true);
           } catch (err) {
             alert('导入失败，文件内容不是有效的 JSON！');
           }
@@ -272,6 +280,42 @@ export default function Home() {
         )}
         {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
       </div>
+      <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>确认导入数据</AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingImport && (
+                <>
+                  即将导入 <b>{pendingImport.records.length}</b> 条刷题记录
+                  {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
+                    <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
+                  )}
+                  。是否确认导入？
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>取消</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              if (pendingImport) {
+                setRecords(pendingImport.records);
+                if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
+                  setKnowledge(pendingImport.knowledge);
+                }
+                setTimeout(() => {
+                  setPendingImport(undefined);
+                }, 100);
+              }
+              setImportDialogOpen(false);
+              toast.success("导入成功", {
+                description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！`,
+              });
+            }}>确认导入</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

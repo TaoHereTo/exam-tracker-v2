@@ -1,6 +1,4 @@
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -16,23 +14,21 @@ export function ExportFormatSetting({ exportFormat, setExportFormat }: { exportF
         }
     };
     return (
-        <Card>
-            <CardHeader>
-                <CardTitle>导出格式</CardTitle>
-                <CardDescription>选择数据导出的文件格式。</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Select value={tempFormat} onValueChange={handleChange}>
-                    <SelectTrigger className="w-32">
-                        <SelectValue placeholder="导出格式" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="json">JSON</SelectItem>
-                        <SelectItem value="csv">CSV</SelectItem>
-                        <SelectItem value="xlsx">Excel (xlsx)</SelectItem>
-                    </SelectContent>
-                </Select>
-            </CardContent>
-        </Card>
+        <div className="flex items-center justify-between p-4 border rounded-lg mt-2">
+            <div>
+                <div className="font-medium mb-1">导出格式</div>
+                <div className="text-sm text-muted-foreground mb-2">选择数据导出的文件格式。</div>
+            </div>
+            <Select value={tempFormat} onValueChange={handleChange}>
+                <SelectTrigger className="w-32">
+                    <SelectValue placeholder="导出格式" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="json">JSON</SelectItem>
+                    <SelectItem value="csv">CSV</SelectItem>
+                    <SelectItem value="xlsx">Excel (xlsx)</SelectItem>
+                </SelectContent>
+            </Select>
+        </div>
     );
 } 

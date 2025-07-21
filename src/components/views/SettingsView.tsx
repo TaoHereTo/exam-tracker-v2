@@ -38,7 +38,46 @@ export function SettingsView({
     activeTab?: string;
 }) {
     if (activeTab === 'settings-advanced') {
-        return <AdvancedSetting onExport={onExport} />;
+        return (
+            <>
+                <AdvancedSetting onExport={onExport} />
+                <Card className="mt-6">
+                    <CardHeader>
+                        <CardTitle>危险操作</CardTitle>
+                        <CardDescription>此处操作不可逆，请谨慎使用！</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
+                            <div>
+                                <h3 className="font-medium text-destructive">清空所有数据</h3>
+                                <p className="text-sm text-muted-foreground text-destructive/90">
+                                    此操作将永久删除所有刷题记录和知识点，无法撤销。
+                                </p>
+                            </div>
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button variant="destructive">清空数据</Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                        <AlertDialogTitle>您确定要这么做吗？</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            这个操作无法撤销。这将永久删除您的所有刷题记录和知识点数据。
+                                        </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                        <AlertDialogCancel>取消</AlertDialogCancel>
+                                        <AlertDialogAction onClick={onClearAllData}>
+                                            确认清空
+                                        </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        </div>
+                    </CardContent>
+                </Card>
+            </>
+        );
     }
     // 已彻底移除自动备份相关内容
 
@@ -62,39 +101,14 @@ export function SettingsView({
                         </div>
                         <DataImportExport onImport={onImport!} onExport={onExport!} />
                     </div>
-                    <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
-                        <div>
-                            <h3 className="font-medium text-destructive">清空所有数据</h3>
-                            <p className="text-sm text-muted-foreground text-destructive/90">
-                                此操作将永久删除所有刷题记录和知识点，无法撤销。
-                            </p>
-                        </div>
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive">清空数据</Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>您确定要这么做吗？</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                        这个操作无法撤销。这将永久删除您的所有刷题记录和知识点数据。
-                                    </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>取消</AlertDialogCancel>
-                                    <AlertDialogAction onClick={onClearAllData}>
-                                        确认清空
-                                    </AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
+                    <div>
+                        <ExportFormatSetting exportFormat={exportFormat} setExportFormat={setExportFormat} />
                     </div>
                 </CardContent>
             </Card>
             {/* 新增设置卡片 */}
             <AppearanceSetting />
             <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} />
-            <ExportFormatSetting exportFormat={exportFormat} setExportFormat={setExportFormat} />
             <div className="flex justify-end mt-4">
                 <Button onClick={onSaveSettings} variant="default">保存所有设置</Button>
             </div>
