@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import ReactECharts from 'echarts-for-react';
 import {
     PieChart,
     Pie,
@@ -49,51 +50,59 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         const avg = stat.questions > 0 ? stat.duration / stat.questions : 0;
         return {
             name,
-            value: standardQuestions * avg, // 标准题数 × 平均用时
-            avg,
+            value: Number((standardQuestions * avg).toFixed(2)), // 标准题数 × 平均用时
+            avg: Number(avg.toFixed(2)),
             standardQuestions
         };
     });
-
-    // 鼠标悬停高亮
-    const [activeIndex, setActiveIndex] = useState<number | null>(null);
-    const onPieEnter = (_: any, index: number) => setActiveIndex(index);
-    const onPieLeave = () => setActiveIndex(null);
-
-    return (
-        <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-                <Pie
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={120}
-                    label={({ name, value }) => `${name}（${value.toFixed(2)}分钟）`}
-                    activeIndex={activeIndex ?? undefined}
-                    activeShape={props => (
-                        <g>
-                            <Sector {...props} outerRadius={130} />
-                        </g>
-                    )}
-                    onMouseEnter={onPieEnter}
-                    onMouseLeave={onPieLeave}
-                    isAnimationActive={true}
-                    animationDuration={400}
-                >
-                    {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={moduleColors[entry.name] || '#888888'} />
-                    ))}
-                </Pie>
-                <Tooltip formatter={(_v, _n, { payload }) => {
-                    if (!payload) return '';
-                    const d = payload as any;
-                    return [
-                        `${d.standardQuestions}题 × ${d.avg.toFixed(2)}分钟/题 = ${(d.value).toFixed(2)}分钟`,
-                        d.name
-                    ];
-                }} />
-                <Legend />
-            </PieChart>
-        </ResponsiveContainer>
-    );
+    // 颜色与模块一一对应
+    const moduleColors: Record<string, string> = {
+        '政治理论': '#3366FF',
+        '常识判断': '#FFB300',
+        '言语理解': '#FF4C4C',
+        '判断推理': '#00B8D9',
+        '数量关系': '#43D854',
+        '资料分析': '#A259FF',
+    };
+    const option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: (params: any) => {
+                return `${params.name}<br/>${params.data.standardQuestions}题 × ${params.data.avg}分钟/题 = <b>${params.value}分钟</b>`;
+            }
+        },
+        legend: {
+            orient: 'vertical',
+            left: 10,
+        },
+        series: [
+            {
+                name: '模块耗时分布',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#fff',
+                    borderWidth: 2,
+                },
+                label: {
+                    show: true,
+                    formatter: '{b} ({d}%)',
+                },
+                emphasis: {
+                    scale: true,
+                    scaleSize: 12,
+                    itemStyle: {
+                        shadowBlur: 20,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                    }
+                },
+                color: pieData.map(d => moduleColors[d.name] || '#888'),
+                data: pieData,
+            }
+        ]
+    };
+    return <ReactECharts option={option} style={{ height: 400, width: '100%' }} />;
 }; 

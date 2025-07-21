@@ -1,16 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer
-} from "recharts";
+import ReactECharts from 'echarts-for-react';
 
 // data: 做题记录数组，score 字段为百分比（如 85 表示 85%）或每分钟得分
 interface TrendChartProps {
@@ -43,45 +34,119 @@ export const TrendChart: React.FC<TrendChartProps> = ({ data }) => {
         const row: any = { date };
         allModules.forEach(module => {
             const found = data.find(item => item.date === date && item.module === module);
-            row[module] = found ? found.score : undefined;
+            row[module] = found ? found.score : null;
         });
         return row;
     });
 
+    const option = {
+        backgroundColor: '#fff',
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'line' },
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#e0e6f1',
+            borderWidth: 1,
+            textStyle: { color: '#333', fontSize: 14 },
+            extraCssText: 'box-shadow: 0 4px 16px rgba(51,102,255,0.08); border-radius: 8px;',
+            formatter: function (params: any) {
+                let res = `<b>${params[0].axisValueLabel}</b><br/>`;
+                params.forEach((item: any) => {
+                    let val = (typeof item.value === 'number' && !isNaN(item.value))
+                        ? item.value
+                        : (item.data && typeof item.data[item.seriesName] === 'number' && !isNaN(item.data[item.seriesName]))
+                            ? item.data[item.seriesName]
+                            : null;
+                    res += `<span style='display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background:${item.color}'></span>${item.seriesName}：<b>${val !== null ? val.toFixed(2) : '--'}</b><br/>`;
+                });
+                return res;
+            }
+        },
+        legend: {
+            data: allModules,
+            top: 20,
+            left: 0,
+            orient: 'vertical',
+            itemWidth: 18,
+            itemHeight: 12,
+            borderRadius: 6,
+            textStyle: { fontWeight: 'bold', fontSize: 14 },
+            icon: 'roundRect',
+            backgroundColor: 'rgba(255,255,255,0.7)',
+            borderColor: '#e0e6f1',
+            borderWidth: 1,
+            padding: [8, 12],
+            shadowColor: 'rgba(51,102,255,0.08)',
+            shadowBlur: 8
+        },
+        grid: {
+            left: 130,
+            right: 80,
+            top: 40,
+            bottom: 60,
+            borderColor: '#e0e6f1',
+            borderWidth: 1,
+            containLabel: true,
+        },
+        xAxis: {
+            type: 'category',
+            data: allDates,
+            axisLabel: {
+                formatter: function (value: string) {
+                    const d = new Date(value);
+                    return `${d.getMonth() + 1}/${d.getDate()}`;
+                },
+                rotate: -45,
+                fontSize: 13,
+                color: '#333',
+                fontWeight: 500
+            },
+            axisTick: { alignWithLabel: true },
+            axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
+            splitLine: { show: false }
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: { fontSize: 13, color: '#333', fontWeight: 500 },
+            axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
+            splitLine: { lineStyle: { color: '#f5f7fa', width: 1, type: 'dashed' } }
+        },
+        series: allModules.map(module => ({
+            name: module,
+            type: 'line',
+            data: chartData.map(row => row[module]),
+            smooth: false,
+            showSymbol: true,
+            symbol: 'circle',
+            symbolSize: 10,
+            lineStyle: {
+                width: 5,
+                color: moduleColors[module] || '#888',
+                shadowColor: moduleColors[module] || '#888',
+                shadowBlur: 10,
+                shadowOffsetY: 2,
+                cap: 'round',
+                join: 'round'
+            },
+            itemStyle: {
+                color: moduleColors[module] || '#888',
+                borderColor: '#fff',
+                borderWidth: 2,
+                shadowColor: moduleColors[module] || '#888',
+                shadowBlur: 8
+            },
+            connectNulls: true,
+            emphasis: {
+                focus: 'series',
+                lineStyle: { width: 7 },
+                itemStyle: { borderWidth: 4 }
+            }
+        }))
+    };
+
     return (
-        <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                    dataKey="date"
-                    interval={0}
-                    tickFormatter={date => {
-                        // 只显示月日
-                        const d = new Date(date);
-                        return `${d.getMonth() + 1}/${d.getDate()}`;
-                    }}
-                    angle={-45}
-                    textAnchor="end"
-                    tick={{ fontSize: 12 }}
-                />
-                <YAxis
-                    tick={{ fontSize: 12 }}
-                />
-                <Tooltip formatter={(value) => typeof value === 'number' ? value.toFixed(2) : value} />
-                <Legend />
-                {allModules.map(module => (
-                    <Line
-                        key={module}
-                        type="monotone"
-                        dataKey={module}
-                        stroke={moduleColors[module] || undefined}
-                        name={module}
-                        dot={false}
-                        strokeWidth={3}
-                        connectNulls={true}
-                    />
-                ))}
-            </LineChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: '100%' }}>
+            <ReactECharts option={option} style={{ height: 400, width: '100%' }} />
+        </div>
     );
 }; 

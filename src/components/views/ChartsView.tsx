@@ -3,7 +3,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { TrendChart } from "@/components/charts/TrendChart";
 import { MODULE_SCORES } from "@/config/exam";
 import { ModulePieChart } from "@/components/charts/ModulePieChart";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import ReactECharts from 'echarts-for-react';
 
 const moduleColors: Record<string, string> = {
     '政治理论': '#3366FF',    // 亮蓝
@@ -25,35 +25,116 @@ function ModuleRadarChart({ data }: { data: any[] }) {
         moduleStats[item.module].total += Number(item.total) || 0;
     });
     const modules = Object.keys(moduleColors);
-    const radarData = modules.map(module => {
+    const indicator = modules.map(module => ({
+        name: module,
+        max: 100
+    }));
+    const values = modules.map(module => {
         const stat = moduleStats[module] || { correct: 0, total: 0 };
-        return {
-            module,
-            [module]: stat.total > 0 ? (stat.correct / stat.total) * 100 : 0,
-        };
+        return stat.total > 0 ? Number(((stat.correct / stat.total) * 100).toFixed(2)) : 0;
     });
-    return (
-        <ResponsiveContainer width="100%" height={400}>
-            <RadarChart data={radarData}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="module" />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                {modules.map(module => (
-                    <Radar
-                        key={module}
-                        name={module}
-                        dataKey={module}
-                        stroke={moduleColors[module]}
-                        fill={moduleColors[module]}
-                        fillOpacity={0.5}
-                        isAnimationActive
-                    />
-                ))}
-                <Tooltip formatter={v => typeof v === 'number' ? `${v.toFixed(2)}%` : v} />
-                <Legend />
-            </RadarChart>
-        </ResponsiveContainer>
-    );
+    // 构造点颜色数组
+    const pointColors = modules.map(m => moduleColors[m]);
+    // 构造线条渐变色
+    const lineGradient = {
+        type: 'linear',
+        x: 0,
+        y: 0,
+        x2: 1,
+        y2: 1,
+        colorStops: modules.map((m, i) => ({
+            offset: i / (modules.length - 1),
+            color: moduleColors[m]
+        }))
+    };
+    const option = {
+        tooltip: {
+            trigger: 'item',
+            formatter: function (params: any) {
+                // params.value 是一个数组，依次对应各模块
+                // params.name 是系列名
+                // params.marker 是颜色小圆点
+                let res = `${params.marker}${params.seriesName}<br/>`;
+                modules.forEach((module, idx) => {
+                    res += `${module}：${values[idx] !== undefined ? values[idx].toFixed(2) : '--'}%<br/>`;
+                });
+                return res;
+            }
+        },
+        radar: {
+            indicator,
+            splitNumber: 5,
+            radius: '70%',
+            axisName: {
+                color: '#333',
+                fontWeight: 'bold',
+                fontSize: 15
+            },
+            splitLine: {
+                lineStyle: {
+                    color: '#e0e6f1',
+                    type: 'solid'
+                }
+            },
+            splitArea: {
+                areaStyle: {
+                    color: ['#f5f7fa', '#fff']
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#aaa'
+                }
+            }
+        },
+        series: [
+            {
+                name: '模块正确率',
+                type: 'radar',
+                data: [
+                    {
+                        value: values,
+                        name: '正确率',
+                        areaStyle: {
+                            color: 'rgba(51,102,255,0.10)'
+                        },
+                        lineStyle: {
+                            color: lineGradient,
+                            width: 4,
+                            shadowColor: '#3366FF',
+                            shadowBlur: 10
+                        },
+                        symbol: 'circle',
+                        symbolSize: 14,
+                        itemStyle: {
+                            color: function (params: any) {
+                                return pointColors[params.dataIndex] || '#3366FF';
+                            },
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            shadowColor: function (params: any) {
+                                return pointColors[params.dataIndex] || '#3366FF';
+                            },
+                            shadowBlur: 8
+                        },
+                        markPoint: {
+                            symbol: 'circle',
+                            symbolSize: 18,
+                            label: { show: false },
+                            data: values.map((v, i) => ({
+                                coord: [modules[i], v],
+                                value: v,
+                                itemStyle: { color: pointColors[i] }
+                            })),
+                            tooltip: { show: true }
+                        }
+                    }
+                ],
+                animation: true
+            }
+        ]
+    };
+    return <ReactECharts option={option} style={{ height: 400, width: '100%' }} />;
 }
 
 interface ChartsViewProps {
