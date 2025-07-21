@@ -8,40 +8,63 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
-interface Plan {
+interface StudyPlan {
     id: string;
     name: string;
+    module: string;
+    type: "题量" | "正确率" | "错题数";
     startDate: string;
     endDate: string;
+    target: number;
+    progress: number;
+    status: "未开始" | "进行中" | "已完成" | "未达成";
     description?: string;
-    progress: number; // 0-100
 }
 
+const MODULES = [
+    { value: 'data-analysis', label: '资料分析' },
+    { value: 'politics', label: '政治理论' },
+    { value: 'math', label: '数量关系' },
+    { value: 'common', label: '常识判断' },
+    { value: 'verbal', label: '言语理解' },
+    { value: 'logic', label: '判断推理' },
+];
+const PLAN_TYPES = [
+    { value: '题量', label: '题量计划' },
+    { value: '正确率', label: '正确率计划' },
+    { value: '错题数', label: '错题数计划' },
+];
+
 interface PlanListViewProps {
-    plans: Plan[];
-    onCreate: (plan: Plan) => void;
-    onUpdate: (plan: Plan) => void;
+    plans: StudyPlan[];
+    onCreate: (plan: StudyPlan) => void;
+    onUpdate: (plan: StudyPlan) => void;
     onDelete: (id: string) => void;
     onShowDetail: (id: string) => void;
 }
 
 export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onShowDetail }: PlanListViewProps) {
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState<Partial<Plan>>({});
+    const [form, setForm] = useState<Partial<StudyPlan>>({});
     const [editId, setEditId] = useState<string | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<Date | undefined>();
     const [endDate, setEndDate] = useState<Date | undefined>();
 
-    const handleOpenForm = (plan?: Plan) => {
+    const handleOpenForm = (plan?: StudyPlan) => {
         setShowForm(true);
         if (plan) {
             setForm(plan);
             setEditId(plan.id);
+            setStartDate(plan.startDate ? new Date(plan.startDate) : undefined);
+            setEndDate(plan.endDate ? new Date(plan.endDate) : undefined);
         } else {
             setForm({});
             setEditId(null);
+            setStartDate(undefined);
+            setEndDate(undefined);
         }
     };
     const handleCloseForm = () => {
@@ -49,7 +72,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         setForm({});
         setEditId(null);
     };
-    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
     const handleStartDateChange = (date?: Date) => {
@@ -62,11 +85,23 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     };
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.startDate || !form.endDate) return;
+        if (!form.name || !form.startDate || !form.endDate || !form.type || !form.module || !form.target) return;
+        const plan: StudyPlan = {
+            id: editId || Date.now().toString(),
+            name: form.name!,
+            module: form.module!,
+            type: form.type as any,
+            startDate: form.startDate!,
+            endDate: form.endDate!,
+            target: Number(form.target),
+            progress: 0,
+            status: "未开始",
+            description: form.description || '',
+        };
         if (editId) {
-            onUpdate({ ...form, id: editId, progress: form.progress ?? 0 } as Plan);
+            onUpdate(plan);
         } else {
-            onCreate({ ...form, id: Date.now().toString(), progress: 0 } as Plan);
+            onCreate(plan);
         }
         handleCloseForm();
     };
@@ -110,9 +145,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                         <CardContent>
                             <div className="text-sm text-muted-foreground">{plan.startDate} ~ {plan.endDate}</div>
                             <div className="mt-2 text-xs text-gray-400">{plan.description}</div>
-                            <div className="mt-2 text-xs text-gray-400">进度：{plan.progress}%</div>
+                            <div className="mt-2 text-xs text-gray-400">进度：{plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}</div>
                             <div className="w-full h-2 bg-gray-200 rounded mt-2">
-                                <div className="h-2 bg-primary rounded" style={{ width: `${plan.progress}%` }} />
+                                <div className="h-2 bg-primary rounded" style={{ width: `${Math.min(100, plan.type === '正确率' ? plan.progress : Math.round((plan.progress / plan.target) * 100))}%` }} />
                             </div>
                         </CardContent>
                     </Card>
@@ -165,6 +200,38 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                             </PopoverContent>
                                         </Popover>
                                     </div>
+                                </div>
+                                <div className="mb-4 flex gap-4">
+                                    <div className="flex-1">
+                                        <Label htmlFor="module">板块</Label>
+                                        <Select value={form.module || ''} onValueChange={v => setForm(f => ({ ...f, module: v }))}>
+                                            <SelectTrigger className="w-full mt-2">
+                                                <SelectValue placeholder="请选择板块" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {MODULES.map(m => (
+                                                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex-1">
+                                        <Label htmlFor="type">计划类型</Label>
+                                        <Select value={form.type || ''} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                                            <SelectTrigger className="w-full mt-2">
+                                                <SelectValue placeholder="请选择类型" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {PLAN_TYPES.map(t => (
+                                                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <div className="mb-4">
+                                    <Label htmlFor="target">目标{form.type === '正确率' ? '(%)' : form.type === '错题数' ? '(道)' : '(题)'}</Label>
+                                    <Input id="target" name="target" type="number" value={form.target || ''} onChange={handleFormChange} required className="mt-2" min={1} />
                                 </div>
                                 <div className="mb-4">
                                     <Label htmlFor="description">描述</Label>

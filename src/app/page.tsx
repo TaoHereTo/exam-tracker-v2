@@ -41,23 +41,76 @@ import {
 } from "@/components/ui/alert-dialog";
 import PlanListView from "@/components/views/PlanListView";
 import PlanDetailView from "@/components/views/PlanDetailView";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { usePlanProgress } from "@/hooks/usePlanProgress";
+import { DataImportExport } from "@/components/features/DataImportExport";
+import { MODULES as MODULES_CONFIG } from "@/config/exam";
+
+// 定义刷题记录类型
+type RecordItem = {
+  id: number;
+  date: string;
+  module: string;
+  total: number;
+  correct: number;
+  duration: string;
+  // 可根据需要扩展字段
+};
+// 计划类型
+type PlanType = "题量" | "正确率" | "错题数";
+interface StudyPlan {
+  id: string;
+  name: string;
+  module: string; // 板块
+  type: PlanType;
+  startDate: string;
+  endDate: string;
+  target: number; // 目标值（题量/正确率/错题数）
+  progress: number; // 当前进度（自动计算）
+  status: "未开始" | "进行中" | "已完成" | "未达成";
+  description?: string;
+}
+
+// 统计计划进度
+function calcPlanProgress(plan: StudyPlan, records: RecordItem[]): { progress: number; status: StudyPlan["status"] } {
+  // 只统计在计划时间范围内、指定板块的记录
+  const start = new Date(plan.startDate).getTime();
+  const end = new Date(plan.endDate).getTime();
+  const filtered = records.filter(r => {
+    const t = new Date(r.date).getTime();
+    return r.module === plan.module && t >= start && t <= end;
+  });
+  if (plan.type === "题量") {
+    const total = filtered.reduce((sum, r) => sum + (r.total || 0), 0);
+    let status: StudyPlan["status"] = "进行中";
+    if (filtered.length === 0) status = "未开始";
+    else if (total >= plan.target) status = "已完成";
+    else if (new Date().getTime() > end) status = "未达成";
+    return { progress: total, status };
+  } else if (plan.type === "正确率") {
+    const totalQ = filtered.reduce((sum, r) => sum + (r.total || 0), 0);
+    const totalC = filtered.reduce((sum, r) => sum + (r.correct || 0), 0);
+    const rate = totalQ > 0 ? Math.round((totalC / totalQ) * 100) : 0;
+    let status: StudyPlan["status"] = "进行中";
+    if (filtered.length === 0) status = "未开始";
+    else if (rate >= plan.target) status = "已完成";
+    else if (new Date().getTime() > end) status = "未达成";
+    return { progress: rate, status };
+  } else if (plan.type === "错题数") {
+    const wrong = filtered.reduce((sum, r) => sum + ((r.total || 0) - (r.correct || 0)), 0);
+    let status: StudyPlan["status"] = "进行中";
+    if (filtered.length === 0) status = "未开始";
+    else if (wrong <= plan.target) status = "已完成";
+    else if (new Date().getTime() > end) status = "未达成";
+    return { progress: wrong, status };
+  }
+  return { progress: 0, status: "未开始" };
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
-  // 定义刷题记录类型
-  type RecordItem = {
-    id: number;
-    date: string;
-    module: string;
-    total: number;
-    correct: number;
-    duration: string;
-    // 可根据需要扩展字段
-  };
-  const [records, setRecords] = useState<RecordItem[]>([]);
-
-  // 新增知识点状态
-  const [knowledge, setKnowledge] = useState<any[]>([]);
+  const [records, setRecords] = useLocalStorageState<RecordItem[]>("exam-tracker-records-v2", []);
+  const [knowledge, setKnowledge] = useLocalStorageState<any[]>("exam-tracker-knowledge-v2", []);
 
   // 新增知识点添加函数
   const addKnowledge = (newKnowledge: any) => {
@@ -66,32 +119,6 @@ export default function Home() {
 
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
-
-  // 当组件第一次加载时，尝试从 localStorage 读取数据
-  useEffect(() => {
-    const savedRecords = localStorage.getItem('exam-tracker-records-v2');
-    if (savedRecords) {
-      const parsed: any[] = JSON.parse(savedRecords);
-      // 兼容旧数据，补全 id 字段
-      setRecords(parsed.map(r => ({ id: r.id ?? Date.now() + Math.random(), ...r })));
-    }
-  }, []);
-  // 当 records 状态发生变化时，自动将其保存到 localStorage
-  useEffect(() => {
-    localStorage.setItem('exam-tracker-records-v2', JSON.stringify(records));
-  }, [records]);
-
-  // 当组件第一次加载时，尝试从 localStorage 读取知识点
-  useEffect(() => {
-    const savedKnowledge = localStorage.getItem('exam-tracker-knowledge-v2');
-    if (savedKnowledge) {
-      setKnowledge(JSON.parse(savedKnowledge));
-    }
-  }, []);
-  // 当 knowledge 状态发生变化时，自动将其保存到 localStorage
-  useEffect(() => {
-    localStorage.setItem('exam-tracker-knowledge-v2', JSON.stringify(knowledge));
-  }, [knowledge]);
 
   const addRecord = (newRecord: RecordItem) => {
     setRecords(prevRecords => [newRecord, ...prevRecords]);
@@ -176,11 +203,37 @@ export default function Home() {
               alert('导入的文件格式不正确！');
               return;
             }
-            // 标准化刷题记录
+            // 建立中英文模块映射
+            const moduleMap: Record<string, string> = {
+              '资料分析': 'data-analysis',
+              '政治理论': 'politics',
+              '数量关系': 'math',
+              '常识判断': 'common',
+              '言语理解': 'verbal',
+              '判断推理': 'logic',
+              'data-analysis': 'data-analysis',
+              'politics': 'politics',
+              'math': 'math',
+              'common': 'common',
+              'verbal': 'verbal',
+              'logic': 'logic',
+            };
+            function normalizeDate(date: any) {
+              if (!date) return '';
+              if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
+              const d = new Date(date);
+              if (!isNaN(d.getTime())) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+              }
+              return '';
+            }
             const normalizedRecords = importedRecords.map((r: any) => ({
               id: r.id ?? Date.now() + Math.random(),
-              date: r.date,
-              module: r.module,
+              date: normalizeDate(r.date),
+              module: moduleMap[r.module] ?? r.module,
               total: r.total ?? r.totalCount ?? 0,
               correct: r.correct ?? r.correctCount ?? 0,
               duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
@@ -227,7 +280,7 @@ export default function Home() {
   };
 
   // 学习计划相关状态
-  const [plans, setPlans] = useState<any[]>([]); // Plan[]
+  const [plans, setPlans] = useState<StudyPlan[]>([]); // Plan[]
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
 
   // 新建/编辑/删除计划
@@ -239,6 +292,9 @@ export default function Home() {
   const handleShowDetail = (id: string) => setActivePlanId(id);
   // 返回列表
   const handleBackToList = () => setActivePlanId(null);
+
+  // plans和records变化时自动统计进度
+  usePlanProgress(plans, setPlans, records, calcPlanProgress);
 
   return (
     <div className="flex min-h-screen">
@@ -280,14 +336,16 @@ export default function Home() {
         {activeTab === 'plan' && (
           activePlanId
             ? (
-              plans.find(p => p.id === activePlanId)
-                ? <PlanDetailView
-                  plan={plans.find(p => p.id === activePlanId)}
+              (() => {
+                const plan = plans.find(p => p.id === activePlanId);
+                if (!plan) return <div className="text-gray-400">未找到该计划</div>;
+                return <PlanDetailView
+                  plan={plan}
                   onBack={handleBackToList}
                   onEdit={() => { /* 可弹窗编辑 */ }}
                   onUpdate={handleUpdatePlan}
                 />
-                : <div className="text-gray-400">未找到该计划</div>
+              })()
             )
             : (
               <PlanListView

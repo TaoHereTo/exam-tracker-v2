@@ -94,9 +94,9 @@ export function SettingsView({
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div>
-                            <h3 className="font-medium">备份与恢复</h3>
+                            <h3 className="font-medium">备份、恢复与清空</h3>
                             <p className="text-sm text-muted-foreground">
-                                将所有数据导出到文件，或从文件中恢复。
+                                将所有数据导出到文件、从文件恢复，或清空所有数据。
                             </p>
                         </div>
                         <DataImportExport onImport={onImport!} onExport={onExport!} />

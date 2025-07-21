@@ -5,45 +5,27 @@ import { Calendar } from "@/components/ui/calendar";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface PlanTask {
-    date: string;
-    content: string;
-    remark?: string;
-    completed: boolean;
+interface StudyPlan {
+    id: string;
+    name: string;
+    module: string;
+    type: "题量" | "正确率" | "错题数";
+    startDate: string;
+    endDate: string;
+    target: number;
+    progress: number;
+    status: "未开始" | "进行中" | "已完成" | "未达成";
+    description?: string;
 }
 
 interface PlanDetailProps {
-    plan: {
-        id: string;
-        name: string;
-        startDate: string;
-        endDate: string;
-        description?: string;
-        progress: number;
-        tasks: PlanTask[];
-    };
+    plan: StudyPlan;
     onBack: () => void;
     onEdit: () => void;
-    onUpdate: (plan: any) => void;
+    onUpdate: (plan: StudyPlan) => void;
 }
 
-export default function PlanDetailView({ plan, onBack, onEdit, onUpdate }: PlanDetailProps) {
-    const [tasks, setTasks] = useState<PlanTask[]>(plan.tasks);
-    useEffect(() => { setTasks(plan.tasks); }, [plan.tasks]);
-    // 计算已完成天数
-    const completedCount = tasks.filter(t => t.completed).length;
-    const totalCount = tasks.length;
-    const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-    // 日历高亮已打卡日期
-    const completedDates = tasks.filter(t => t.completed).map(t => t.date);
-
-    const handleCheck = (idx: number) => {
-        const newTasks = tasks.map((t, i) => i === idx ? { ...t, completed: !t.completed } : t);
-        setTasks(newTasks);
-        onUpdate({ ...plan, tasks: newTasks });
-    };
-
+export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps) {
     return (
         <div className="max-w-3xl mx-auto">
             <Card>
@@ -57,40 +39,13 @@ export default function PlanDetailView({ plan, onBack, onEdit, onUpdate }: PlanD
                 <CardContent>
                     <div className="text-sm text-muted-foreground">{plan.startDate} ~ {plan.endDate}</div>
                     <div className="mt-2 text-xs text-gray-400">{plan.description}</div>
-                    <div className="mt-2 text-xs text-gray-400">进度：{progress}%（{completedCount}/{totalCount} 天）</div>
+                    <div className="mt-2 text-xs text-gray-400">类型：{plan.type}</div>
+                    <div className="mt-2 text-xs text-gray-400">板块：{plan.module}</div>
+                    <div className="mt-2 text-xs text-gray-400">目标：{plan.type === '题量' ? `${plan.target}题` : plan.type === '正确率' ? `${plan.target}%` : `${plan.target}道错题`}</div>
+                    <div className="mt-2 text-xs text-gray-400">进度：{plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}</div>
+                    <div className="mt-2 text-xs text-gray-400">状态：{plan.status}</div>
                     <div className="w-full h-2 bg-gray-200 rounded mt-2">
-                        <div className="h-2 bg-primary rounded" style={{ width: `${progress}%` }} />
-                    </div>
-                    <div className="mt-6">
-                        <Calendar
-                            mode="multiple"
-                            selected={completedDates.map(d => new Date(d))}
-                            disabled
-                        />
-                    </div>
-                    <div className="mt-6">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>日期</TableHead>
-                                    <TableHead>任务</TableHead>
-                                    <TableHead>备注</TableHead>
-                                    <TableHead>打卡</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {tasks.map((task, idx) => (
-                                    <TableRow key={task.date}>
-                                        <TableCell>{task.date}</TableCell>
-                                        <TableCell>{task.content}</TableCell>
-                                        <TableCell>{task.remark || '-'}</TableCell>
-                                        <TableCell>
-                                            <Checkbox checked={task.completed} onCheckedChange={() => handleCheck(idx)} />
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <div className="h-2 bg-primary rounded" style={{ width: `${Math.min(100, plan.type === '正确率' ? plan.progress : Math.round((plan.progress / plan.target) * 100))}%` }} />
                     </div>
                 </CardContent>
             </Card>
