@@ -296,6 +296,22 @@ export default function Home() {
   // plans和records变化时自动统计进度
   usePlanProgress(plans, setPlans, records, calcPlanProgress);
 
+  // 英文key转中文
+  const moduleLabelMap: Record<string, string> = {
+    'data-analysis': '资料分析',
+    'politics': '政治理论',
+    'math': '数量关系',
+    'common': '常识判断',
+    'verbal': '言语理解',
+    'logic': '判断推理',
+    '资料分析': '资料分析',
+    '政治理论': '政治理论',
+    '数量关系': '数量关系',
+    '常识判断': '常识判断',
+    '言语理解': '言语理解',
+    '判断推理': '判断推理',
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
@@ -311,7 +327,7 @@ export default function Home() {
         {activeTab === 'best' && (
           <div>
             <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
-            <PersonalBestView records={records.map(r => ({ ...r, module: r.module as keyof typeof MODULE_SCORES }))} />
+            <PersonalBestView records={records.map(r => ({ ...r, module: (typeof r.module === 'string' && moduleLabelMap[r.module]) ? moduleLabelMap[r.module] : r.module }))} />
           </div>
         )}
         {activeTab === 'modules' && (

@@ -4,34 +4,78 @@ import { TrendChart } from "@/components/charts/TrendChart";
 import { MODULE_SCORES } from "@/config/exam";
 import { ModulePieChart } from "@/components/charts/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
+const moduleLabelMap: Record<string, string> = {
+    'data-analysis': '资料分析',
+    'politics': '政治理论',
+    'math': '数量关系',
+    'common': '常识判断',
+    'verbal': '言语理解',
+    'logic': '判断推理',
+    '资料分析': '资料分析',
+    '政治理论': '政治理论',
+    '数量关系': '数量关系',
+    '常识判断': '常识判断',
+    '言语理解': '言语理解',
+    '判断推理': '判断推理',
+};
 const moduleColors: Record<string, string> = {
-    '政治理论': '#3366FF',    // 亮蓝
-    '常识判断': '#FFB300',    // 亮橙
-    '言语理解': '#FF4C4C',    // 亮红
-    '判断推理': '#00B8D9',    // 青色
-    '数量关系': '#43D854',    // 亮绿
-    '资料分析': '#A259FF',    // 亮紫
+    'data-analysis': '#A259FF',
+    'politics': '#3366FF',
+    'math': '#43D854',
+    'common': '#FFB300',
+    'verbal': '#FF4C4C',
+    'logic': '#00B8D9',
+    '资料分析': '#A259FF',
+    '政治理论': '#3366FF',
+    '数量关系': '#43D854',
+    '常识判断': '#FFB300',
+    '言语理解': '#FF4C4C',
+    '判断推理': '#00B8D9',
 };
 
+// 能力指数计算函数
+function calcAbilityIndex({ accuracy, perMinute, total }: { accuracy: number; perMinute: number; total: number }, weights = { accuracy: 0.5, perMinute: 0.3, total: 0.2 }) {
+    // 参数均已归一化到0~1
+    return (
+        (accuracy * (weights.accuracy ?? 0)) +
+        (perMinute * (weights.perMinute ?? 0)) +
+        (total * (weights.total ?? 0))
+    );
+}
+
 function ModuleRadarChart({ data }: { data: any[] }) {
-    // 统计每个模块的正确率
-    const moduleStats: Record<string, { correct: number; total: number }> = {};
+    // 统计每个模块的参数
+    const moduleStats: Record<string, { correct: number; total: number; duration: number }> = {};
     data.forEach(item => {
-        if (!moduleStats[item.module]) {
-            moduleStats[item.module] = { correct: 0, total: 0 };
+        const key = moduleLabelMap[item.module] || item.module;
+        if (!moduleStats[key]) {
+            moduleStats[key] = { correct: 0, total: 0, duration: 0 };
         }
-        moduleStats[item.module].correct += Number(item.correct) || 0;
-        moduleStats[item.module].total += Number(item.total) || 0;
+        moduleStats[key].correct += Number(item.correct) || 0;
+        moduleStats[key].total += Number(item.total) || 0;
+        moduleStats[key].duration += Number(item.duration) || 0;
     });
-    const modules = Object.keys(moduleColors);
-    const indicator = modules.map(module => ({
-        name: module,
-        max: 100
-    }));
+    const modules = Object.keys(moduleColors).filter(m => !m.match(/^[a-z-]+$/));
+    // 归一化参数
+    let maxTotal = 1, maxPerMinute = 1;
+    const perMinuteMap: Record<string, number> = {};
+    modules.forEach(module => {
+        const stat = moduleStats[module] || { correct: 0, total: 0, duration: 0 };
+        const scorePerQ = (module as keyof typeof MODULE_SCORES) in MODULE_SCORES ? MODULE_SCORES[module as keyof typeof MODULE_SCORES] : 1;
+        const perMinute = stat.duration > 0 ? (scorePerQ * stat.correct) / stat.duration : 0;
+        perMinuteMap[module] = perMinute;
+        if (stat.total > maxTotal) maxTotal = stat.total;
+        if (perMinute > maxPerMinute) maxPerMinute = perMinute;
+    });
+    // 能力指数=加权（归一化正确率、每分钟得分、做题量）
     const values = modules.map(module => {
-        const stat = moduleStats[module] || { correct: 0, total: 0 };
-        return stat.total > 0 ? Number(((stat.correct / stat.total) * 100).toFixed(2)) : 0;
+        const stat = moduleStats[module] || { correct: 0, total: 0, duration: 0 };
+        const accuracy = stat.total > 0 ? stat.correct / stat.total : 0;
+        const perMinute = perMinuteMap[module] / maxPerMinute; // 归一化
+        const totalNorm = stat.total / maxTotal; // 归一化
+        return Number((calcAbilityIndex({ accuracy, perMinute, total: totalNorm }) * 100).toFixed(2));
     });
     // 构造点颜色数组
     const pointColors = modules.map(m => moduleColors[m]);
@@ -47,18 +91,15 @@ function ModuleRadarChart({ data }: { data: any[] }) {
             color: moduleColors[m]
         }))
     };
+    const indicator = modules.map(module => ({
+        name: module,
+        max: 100
+    }));
     const option = {
         tooltip: {
             trigger: 'item',
             formatter: function (params: any) {
-                // params.value 是一个数组，依次对应各模块
-                // params.name 是系列名
-                // params.marker 是颜色小圆点
-                let res = `${params.marker}${params.seriesName}<br/>`;
-                modules.forEach((module, idx) => {
-                    res += `${module}：${values[idx] !== undefined ? values[idx].toFixed(2) : '--'}%<br/>`;
-                });
-                return res;
+                return `${params.marker}${params.seriesName}<br/>${params.value.map((v: number, idx: number) => `${modules[idx]}：${v}`).join('<br/>')}`;
             }
         },
         radar: {
@@ -134,7 +175,24 @@ function ModuleRadarChart({ data }: { data: any[] }) {
             }
         ]
     };
-    return <ReactECharts option={option} style={{ height: 400, width: '100%' }} />;
+    return (
+        <div style={{ width: '100%', height: '100%' }}>
+            <ReactECharts option={option} style={{ height: 400, width: '100%' }} />
+            <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
+                能力值 =
+                <span className="mx-1 font-bold">正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2</span>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <span className="inline-block cursor-pointer ml-1 text-primary" style={{ fontSize: '1.1em' }}>？</span>
+                    </TooltipTrigger>
+                    <TooltipContent sideOffset={4}>
+                        能力值为归一化后的加权和，权重可调整。<br />
+                        正确率、每分钟得分、做题量均归一化到0~1后加权。
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </div>
+    );
 }
 
 interface ChartsViewProps {

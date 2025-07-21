@@ -23,13 +23,33 @@ interface ModulePieChartProps {
     }>;
 }
 
+const moduleLabelMap: Record<string, string> = {
+    'data-analysis': '资料分析',
+    'politics': '政治理论',
+    'math': '数量关系',
+    'common': '常识判断',
+    'verbal': '言语理解',
+    'logic': '判断推理',
+    '资料分析': '资料分析',
+    '政治理论': '政治理论',
+    '数量关系': '数量关系',
+    '常识判断': '常识判断',
+    '言语理解': '言语理解',
+    '判断推理': '判断推理',
+};
 const moduleColors: Record<string, string> = {
-    '政治理论': '#3366FF',    // 亮蓝
-    '常识判断': '#FFB300',    // 亮橙
-    '言语理解': '#FF4C4C',    // 亮红
-    '判断推理': '#00B8D9',    // 青色
-    '数量关系': '#43D854',    // 亮绿
-    '资料分析': '#A259FF',    // 亮紫
+    'data-analysis': '#A259FF',
+    'politics': '#3366FF',
+    'math': '#43D854',
+    'common': '#FFB300',
+    'verbal': '#FF4C4C',
+    'logic': '#00B8D9',
+    '资料分析': '#A259FF',
+    '政治理论': '#3366FF',
+    '数量关系': '#43D854',
+    '常识判断': '#FFB300',
+    '言语理解': '#FF4C4C',
+    '判断推理': '#00B8D9',
 };
 
 export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
@@ -46,24 +66,15 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         moduleStats[item.module].questions += total;
     });
     const pieData = Object.entries(moduleStats).map(([name, stat]) => {
-        const standardQuestions = FULL_EXAM_CONFIG.modules[name]?.questions || 1;
+        const standardQuestions = FULL_EXAM_CONFIG.modules[moduleLabelMap[name]]?.questions || 1;
         const avg = stat.questions > 0 ? stat.duration / stat.questions : 0;
         return {
-            name,
+            name: moduleLabelMap[name] || name,
             value: Number((standardQuestions * avg).toFixed(2)), // 标准题数 × 平均用时
             avg: Number(avg.toFixed(2)),
             standardQuestions
         };
     });
-    // 颜色与模块一一对应
-    const moduleColors: Record<string, string> = {
-        '政治理论': '#3366FF',
-        '常识判断': '#FFB300',
-        '言语理解': '#FF4C4C',
-        '判断推理': '#00B8D9',
-        '数量关系': '#43D854',
-        '资料分析': '#A259FF',
-    };
     const option = {
         tooltip: {
             trigger: 'item',
@@ -74,6 +85,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         legend: {
             orient: 'vertical',
             left: 10,
+            formatter: (name: string) => name,
         },
         series: [
             {

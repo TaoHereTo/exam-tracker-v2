@@ -14,13 +14,33 @@ interface TrendChartProps {
 }
 
 // 颜色分配
+const moduleLabelMap: Record<string, string> = {
+    'data-analysis': '资料分析',
+    'politics': '政治理论',
+    'math': '数量关系',
+    'common': '常识判断',
+    'verbal': '言语理解',
+    'logic': '判断推理',
+    '资料分析': '资料分析',
+    '政治理论': '政治理论',
+    '数量关系': '数量关系',
+    '常识判断': '常识判断',
+    '言语理解': '言语理解',
+    '判断推理': '判断推理',
+};
 const moduleColors: Record<string, string> = {
-    '政治理论': '#3366FF',    // 亮蓝
-    '常识判断': '#FFB300',    // 亮橙
-    '言语理解': '#FF4C4C',    // 亮红
-    '判断推理': '#00B8D9',    // 青色
-    '数量关系': '#43D854',    // 亮绿
-    '资料分析': '#A259FF',    // 亮紫
+    'data-analysis': '#A259FF',
+    'politics': '#3366FF',
+    'math': '#43D854',
+    'common': '#FFB300',
+    'verbal': '#FF4C4C',
+    'logic': '#00B8D9',
+    '资料分析': '#A259FF',
+    '政治理论': '#3366FF',
+    '数量关系': '#43D854',
+    '常识判断': '#FFB300',
+    '言语理解': '#FF4C4C',
+    '判断推理': '#00B8D9',
     '全部': '#888888',
 };
 
@@ -41,10 +61,11 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 const row: any = { date };
                 allModules.forEach(module => {
                     const found = data.find(item => item.date === date && item.module === module);
-                    row[module] = found ? found.score : null;
+                    row[moduleLabelMap[module] || module] = found ? found.score : null;
                 });
                 return row;
             });
+            allModules = allModules.map(m => moduleLabelMap[m] || m);
         } else {
             allModules = Object.keys(data[0]).filter(k => k !== 'date' && k !== 'duration');
             allDates = data.map(item => item.date);
