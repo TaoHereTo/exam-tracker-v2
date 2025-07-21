@@ -53,7 +53,7 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                 })}
             </div>
             {/* 预测成绩分析 */}
-            <div className="mt-8 max-w-6xl mx-auto w-full">
+            <div className="mt-8 max-w-7xl mx-auto w-full">
                 <ScorePredictor records={records.map(r => ({
                     module: r.module,
                     correctCount: r.correct,
