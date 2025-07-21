@@ -83,7 +83,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
     };
 
     return (
-        <Card className="max-w-5xl mx-auto">
+        <Card className="max-w-full mx-auto">
             <CardHeader>
                 <CardTitle>预期成绩分析</CardTitle>
                 <CardDescription>
