@@ -39,6 +39,8 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import PlanListView from "@/components/views/PlanListView";
+import PlanDetailView from "@/components/views/PlanDetailView";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -59,7 +61,7 @@ export default function Home() {
 
   // 新增知识点添加函数
   const addKnowledge = (newKnowledge: any) => {
-    setKnowledge(prev => [newKnowledge, ...prev]);
+    setKnowledge(prev => [{ ...newKnowledge, id: Date.now().toString() + Math.random().toString(16).slice(2) }, ...prev]);
   };
 
   const [isClient, setIsClient] = useState(false);
@@ -183,7 +185,15 @@ export default function Home() {
               correct: r.correct ?? r.correctCount ?? 0,
               duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
             }));
-            setPendingImport({ records: normalizedRecords, knowledge: importedKnowledge });
+            // 补全知识点id，保证id为字符串且唯一
+            const normalizedKnowledge = importedKnowledge.map((k: any) => {
+              let id = k.id;
+              if (!id || typeof id !== 'string') {
+                id = Date.now().toString() + Math.random().toString(16).slice(2);
+              }
+              return { ...k, id };
+            });
+            setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge });
             setImportDialogOpen(true);
           } catch (err) {
             alert('导入失败，文件内容不是有效的 JSON！');
@@ -212,6 +222,24 @@ export default function Home() {
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
 
+  const handleBatchDeleteKnowledge = (ids: string[]) => {
+    setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
+  };
+
+  // 学习计划相关状态
+  const [plans, setPlans] = useState<any[]>([]); // Plan[]
+  const [activePlanId, setActivePlanId] = useState<string | null>(null);
+
+  // 新建/编辑/删除计划
+  const handleCreatePlan = (plan: any) => setPlans(prev => [plan, ...prev]);
+  const handleUpdatePlan = (plan: any) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
+  const handleDeletePlan = (id: string) => setPlans(prev => prev.filter(p => p.id !== id));
+
+  // 进入详情
+  const handleShowDetail = (id: string) => setActivePlanId(id);
+  // 返回列表
+  const handleBackToList = () => setActivePlanId(null);
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
@@ -230,7 +258,12 @@ export default function Home() {
             <PersonalBestView records={records.map(r => ({ ...r, module: r.module as keyof typeof MODULE_SCORES }))} />
           </div>
         )}
-        {activeTab === 'modules' && <div><h1 className="text-3xl font-bold mb-4">知识点汇总</h1><KnowledgeSummaryView knowledge={knowledge} /></div>}
+        {activeTab === 'modules' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">知识点汇总</h1>
+            <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} />
+          </div>
+        )}
         {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}
         {activeTab === 'history' && (
           <HistoryView
@@ -244,7 +277,28 @@ export default function Home() {
             totalPages={totalPages}
           />
         )}
-        {activeTab === 'plan' && <div><h1 className="text-3xl font-bold mb-4">制定计划</h1></div>}
+        {activeTab === 'plan' && (
+          activePlanId
+            ? (
+              plans.find(p => p.id === activePlanId)
+                ? <PlanDetailView
+                  plan={plans.find(p => p.id === activePlanId)}
+                  onBack={handleBackToList}
+                  onEdit={() => { /* 可弹窗编辑 */ }}
+                  onUpdate={handleUpdatePlan}
+                />
+                : <div className="text-gray-400">未找到该计划</div>
+            )
+            : (
+              <PlanListView
+                plans={plans}
+                onCreate={handleCreatePlan}
+                onUpdate={handleUpdatePlan}
+                onDelete={handleDeletePlan}
+                onShowDetail={handleShowDetail}
+              />
+            )
+        )}
         {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
         {activeTab === 'settings-basic' && (
           <div>
