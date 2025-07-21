@@ -27,21 +27,21 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'overview' ? 'default' : 'ghost'}
-                            className="w-full justify-center"
+                            className="w-full justify-center sidebar-btn"
                             onClick={() => setActiveTab('overview')}
                         >
                             数据概览
                         </Button>
                         <Button
                             variant={activeTab === 'charts' ? 'default' : 'ghost'}
-                            className="w-full justify-center"
+                            className="w-full justify-center sidebar-btn"
                             onClick={() => setActiveTab('charts')}
                         >
                             数据图表
                         </Button>
                         <Button
                             variant={activeTab === 'best' ? 'default' : 'ghost'}
-                            className="w-full justify-center"
+                            className="w-full justify-center sidebar-btn"
                             onClick={() => setActiveTab('best')}
                         >
                             最佳成绩

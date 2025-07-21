@@ -112,11 +112,50 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* 修正sonner提示框深色模式下主内容颜色 */
+.dark .toaster .toast-title,
+.dark .toaster .sonner-title,
+.dark .toaster [data-title] {
+  color: #fff !important;
+}
+
+/* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */
+.sidebar-btn:hover,
+.sidebar-btn:focus-visible {
+  text-decoration: none !important;
+  background: rgba(59, 130, 246, 0.08);
+  /* 浅蓝色高亮，可根据主题调整 */
+  border-radius: 0.5rem;
+  color: #2563eb;
+}
+
+.dark .sidebar-btn:hover,
+.dark .sidebar-btn:focus-visible {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+body,
+html,
+#__next,
+[data-slot],
+.unselectable,
+.app-root,
+.flex,
+.min-h-screen,
+.p-8,
+.bg-white,
+.dark\:bg-gray-950,
+.dark\:text-gray-100 {
+  user-select: none !important;
 }

@@ -252,10 +252,26 @@ export default function Home() {
               exportFormat={exportFormat}
               setExportFormat={setExportFormat}
               onSaveSettings={handleSaveSettings}
+              activeTab={activeTab}
             />
           </div>
         )}
-        {activeTab === 'settings-advanced' && <div><h1 className="text-3xl font-bold mb-4">高级设置</h1></div>}
+        {activeTab === 'settings-advanced' && (
+          <div>
+            <h1 className="text-3xl font-bold mb-4">高级设置</h1>
+            <SettingsView
+              onExport={handleExportData}
+              onImport={handleImportData}
+              onClearAllData={handleClearAllData}
+              pageSize={pageSize}
+              setPageSize={setPageSize}
+              exportFormat={exportFormat}
+              setExportFormat={setExportFormat}
+              onSaveSettings={handleSaveSettings}
+              activeTab={activeTab}
+            />
+          </div>
+        )}
         {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
       </div>
     </div>

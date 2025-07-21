@@ -2,9 +2,19 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
 
-export function PaginationSetting({ pageSize, setPageSize, onSave }: { pageSize: number; setPageSize: (n: number) => void; onSave: () => void }) {
+export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number; setPageSize: (n: number) => void; }) {
     const [tempSize, setTempSize] = useState(pageSize.toString());
+    const handleChange = (v: string) => {
+        setTempSize(v);
+        try {
+            setPageSize(Number(v));
+            toast.success("分页设置已更新", { description: `每页${v}条` });
+        } catch (e) {
+            toast.error("分页设置失败", { description: String(e) });
+        }
+    };
     return (
         <Card>
             <CardHeader>
@@ -12,7 +22,7 @@ export function PaginationSetting({ pageSize, setPageSize, onSave }: { pageSize:
                 <CardDescription>设置历史记录每页显示的条数。</CardDescription>
             </CardHeader>
             <CardContent>
-                <Select value={tempSize} onValueChange={setTempSize}>
+                <Select value={tempSize} onValueChange={handleChange}>
                     <SelectTrigger className="w-32">
                         <SelectValue placeholder="每页条数" />
                     </SelectTrigger>
@@ -24,9 +34,6 @@ export function PaginationSetting({ pageSize, setPageSize, onSave }: { pageSize:
                     </SelectContent>
                 </Select>
             </CardContent>
-            <CardFooter>
-                <Button onClick={() => { setPageSize(Number(tempSize)); onSave(); }}>保存</Button>
-            </CardFooter>
         </Card>
     );
 } 

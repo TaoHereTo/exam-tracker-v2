@@ -15,6 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
           "--normal-bg": "var(--popover)",
           "--normal-text": "#000",
           "--normal-border": "var(--border)",
+          "--dark-normal-text": "#fff", // 新增：深色模式下主文本为白色
         } as React.CSSProperties
       }
       {...props}

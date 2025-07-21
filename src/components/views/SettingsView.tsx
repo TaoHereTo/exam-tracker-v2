@@ -18,10 +18,14 @@ import { AppearanceSetting } from "./settings/AppearanceSetting";
 import { PaginationSetting } from "./settings/PaginationSetting";
 import { ExportFormatSetting } from "./settings/ExportFormatSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { AdvancedSetting } from "./settings/AdvancedSetting";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
-    pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings
+    pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings,
+    activeTab
 }: {
     onExport?: () => void;
     onImport?: () => void;
@@ -31,10 +35,16 @@ export function SettingsView({
     exportFormat: string;
     setExportFormat: (f: string) => void;
     onSaveSettings: () => void;
+    activeTab?: string;
 }) {
+    if (activeTab === 'settings-advanced') {
+        return <AdvancedSetting onExport={onExport} />;
+    }
+    // 已彻底移除自动备份相关内容
+
     return (
         <div className="space-y-6">
-            <h1 className="text-3xl font-bold">基础设置</h1>
+            {/* <h1 className="text-3xl font-bold">基础设置</h1> */}
             <Card>
                 <CardHeader>
                     <CardTitle>数据管理</CardTitle>
@@ -83,8 +93,8 @@ export function SettingsView({
             </Card>
             {/* 新增设置卡片 */}
             <AppearanceSetting />
-            <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} onSave={onSaveSettings} />
-            <ExportFormatSetting exportFormat={exportFormat} setExportFormat={setExportFormat} onSave={onSaveSettings} />
+            <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} />
+            <ExportFormatSetting exportFormat={exportFormat} setExportFormat={setExportFormat} />
             <div className="flex justify-end mt-4">
                 <Button onClick={onSaveSettings} variant="default">保存所有设置</Button>
             </div>
