@@ -46,6 +46,7 @@ import { usePlanProgress } from "@/hooks/usePlanProgress";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
 
+
 // 定义刷题记录类型
 type RecordItem = {
   id: number;
@@ -312,6 +313,20 @@ export default function Home() {
     '判断推理': '判断推理',
   };
 
+  // 批量清空各类数据
+  const handleClearRecords = () => {
+    setRecords([]);
+    toast.success("历史记录已清空");
+  };
+  const handleClearKnowledge = () => {
+    setKnowledge([]);
+    toast.success("知识点已清空");
+  };
+  const handleClearPlans = () => {
+    setPlans([]);
+    toast.success("学习计划已清空");
+  };
+
   return (
     <div className="flex min-h-screen">
       {/* 左侧侧边栏，宽度固定 */}
@@ -350,28 +365,31 @@ export default function Home() {
           />
         )}
         {activeTab === 'plan' && (
-          activePlanId
-            ? (
-              (() => {
-                const plan = plans.find(p => p.id === activePlanId);
-                if (!plan) return <div className="text-gray-400">未找到该计划</div>;
-                return <PlanDetailView
-                  plan={plan}
-                  onBack={handleBackToList}
-                  onEdit={() => { /* 可弹窗编辑 */ }}
+          <div>
+            {activePlanId
+              ? (
+                (() => {
+                  const plan = plans.find(p => p.id === activePlanId);
+                  if (!plan) return <div className="text-gray-400">未找到该计划</div>;
+                  return <PlanDetailView
+                    plan={plan}
+                    onBack={handleBackToList}
+                    onEdit={() => { /* 可弹窗编辑 */ }}
+                    onUpdate={handleUpdatePlan}
+                  />
+                })()
+              )
+              : (
+                <PlanListView
+                  plans={plans}
+                  onCreate={handleCreatePlan}
                   onUpdate={handleUpdatePlan}
+                  onDelete={handleDeletePlan}
+                  onShowDetail={handleShowDetail}
                 />
-              })()
-            )
-            : (
-              <PlanListView
-                plans={plans}
-                onCreate={handleCreatePlan}
-                onUpdate={handleUpdatePlan}
-                onDelete={handleDeletePlan}
-                onShowDetail={handleShowDetail}
-              />
-            )
+              )
+            }
+          </div>
         )}
         {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
         {activeTab === 'settings-basic' && (
@@ -403,7 +421,11 @@ export default function Home() {
               setExportFormat={setExportFormat}
               onSaveSettings={handleSaveSettings}
               activeTab={activeTab}
+              onClearRecords={handleClearRecords}
+              onClearKnowledge={handleClearKnowledge}
+              onClearPlans={handleClearPlans}
             />
+
           </div>
         )}
         {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}

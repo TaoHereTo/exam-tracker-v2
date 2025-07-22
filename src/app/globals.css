@@ -135,6 +135,34 @@
   color: #60a5fa;
 }
 
+.sidebar-parent {
+  @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-normal transition-all duration-150 border-none;
+}
+
+.sidebar-parent:hover {
+  @apply font-bold;
+}
+
+.sidebar-child {
+  @apply pl-11 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start;
+}
+
+.sidebar-child.bg-primary,
+.sidebar-child[data-variant="default"],
+.sidebar-child[data-state="active"],
+.sidebar-child.active,
+.sidebar-child:active {
+  @apply text-white dark:text-white bg-primary dark:bg-primary;
+}
+
+.sidebar-child.bg-primary:hover,
+.sidebar-child[data-variant="default"]:hover,
+.sidebar-child[data-state="active"]:hover,
+.sidebar-child.active:hover,
+.sidebar-child:active:hover {
+  @apply text-white dark:text-white bg-primary dark:bg-primary;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
 import type { RecordItem } from "@/components/forms/NewRecordForm";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 export function HistoryTable({
     records,
@@ -37,20 +38,47 @@ export function HistoryTable({
         { key: 'correctRate', label: '正确率', render: row => row.total > 0 ? `${Math.round((row.correct / row.total) * 100)}%` : '-' },
         { key: 'duration', label: '时长(分)' },
     ];
+    const [showBatchDeleteDialog, setShowBatchDeleteDialog] = useState(false);
     return (
         <div className="max-w-6xl w-full mx-auto">
-            <DataTable
-                columns={columns}
-                data={records}
-                selected={selectedIds}
-                onSelect={onSelectIds}
-                onBatchDelete={onBatchDelete}
-                rowKey={row => row.id}
-                renderActions={row => (
-                    <Button variant="destructive" size="sm" onClick={() => onDeleteRecord(row.id)}>删除</Button>
-                )}
-                batchDeleteText="批量删除"
-            />
+            <AlertDialog open={showBatchDeleteDialog} onOpenChange={setShowBatchDeleteDialog}>
+                <DataTable
+                    columns={columns}
+                    data={records}
+                    selected={selectedIds}
+                    onSelect={onSelectIds}
+                    onBatchDelete={() => setShowBatchDeleteDialog(true)}
+                    rowKey={row => row.id}
+                    renderActions={row => (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive" size="sm">删除</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>确认删除？</AlertDialogTitle>
+                                    <AlertDialogDescription>删除后无法恢复，确定要删除这条历史记录吗？</AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>取消</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => onDeleteRecord(row.id)}>确认删除</AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
+                    batchDeleteText="批量删除"
+                />
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认批量删除？</AlertDialogTitle>
+                        <AlertDialogDescription>删除后无法恢复，确定要删除选中的历史记录吗？</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { setShowBatchDeleteDialog(false); onBatchDelete(); }}>确认删除</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 } 

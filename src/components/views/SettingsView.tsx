@@ -25,7 +25,8 @@ import { AdvancedSetting } from "./settings/AdvancedSetting";
 export function SettingsView({
     onExport, onImport, onClearAllData,
     pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings,
-    activeTab
+    activeTab,
+    onClearRecords, onClearKnowledge, onClearPlans
 }: {
     onExport?: () => void;
     onImport?: () => void;
@@ -36,11 +37,14 @@ export function SettingsView({
     setExportFormat: (f: string) => void;
     onSaveSettings: () => void;
     activeTab?: string;
+    onClearRecords?: () => void;
+    onClearKnowledge?: () => void;
+    onClearPlans?: () => void;
 }) {
     if (activeTab === 'settings-advanced') {
         return (
             <>
-                <AdvancedSetting onExport={onExport} />
+                <AdvancedSetting onExport={onExport} onClearAllData={onClearAllData} onClearRecords={onClearRecords} onClearKnowledge={onClearKnowledge} onClearPlans={onClearPlans} />
                 <Card className="mt-6">
                     <CardHeader>
                         <CardTitle>危险操作</CardTitle>
