@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import { HistoryTable } from "@/components/tables/HistoryTable";
@@ -44,6 +44,8 @@ import PlanDetailView from "@/components/views/PlanDetailView";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
+import { Dock, DockIcon } from "@/components/magicui/dock";
+import { Home as HomeIcon, BarChart2, BookOpen, ClipboardList, Settings, Target } from "lucide-react";
 
 
 // 定义刷题记录类型
@@ -106,6 +108,8 @@ function calcPlanProgress(plan: StudyPlan, records: RecordItem[]): { progress: n
   }
   return { progress: 0, status: "未开始" };
 }
+
+export const NavModeContext = createContext<'sidebar' | 'dock'>("sidebar");
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
@@ -322,142 +326,171 @@ export default function Home() {
     notify({ type: "success", message: "学习计划已清空" });
   };
 
+  const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
+  if (!isClient) return null;
+  // Dock 一级导航配置
+  const dockNavs = [
+    { key: 'overview', icon: <BarChart2 />, label: '数据概览' },
+    { key: 'charts', icon: <BarChart2 />, label: '数据图表' },
+    { key: 'history', icon: <ClipboardList />, label: '历史记录' },
+    { key: 'knowledge-entry', icon: <BookOpen />, label: '知识点录入' },
+    { key: 'settings-basic', icon: <Settings />, label: '设置' },
+  ];
   return (
-    <div className="flex min-h-screen">
-      {/* 左侧侧边栏，宽度固定 */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-      {/* 右侧主内容区，占据剩余空间 */}
-      <div className="flex-1 p-8 bg-white dark:bg-gray-950 dark:text-gray-100">
-        {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
-        {activeTab === 'charts' && (
-          <ChartsView
-            records={records}
-          />
-        )}
-        {activeTab === 'best' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
-            <PersonalBestView records={records.map(r => ({ ...r, module: (typeof r.module === 'string' && moduleLabelMap[r.module]) ? moduleLabelMap[r.module] : r.module }))} />
+    <NavModeContext.Provider value={navMode}>
+      <div className="flex min-h-screen">
+        {/* 左侧侧边栏或底部Dock，宽度固定 */}
+        {navMode === 'sidebar' ? (
+          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        ) : (
+          <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center bg-transparent">
+            <Dock>
+              {dockNavs.map(nav => (
+                <DockIcon
+                  key={nav.key}
+                  onClick={() => setActiveTab(nav.key)}
+                  className="pointer-events-auto"
+                  title={nav.label}
+                >
+                  {nav.icon}
+                </DockIcon>
+              ))}
+            </Dock>
           </div>
         )}
-        {activeTab === 'modules' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">知识点汇总</h1>
-            <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} />
-          </div>
-        )}
-        {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}
-        {activeTab === 'history' && (
-          <HistoryView
-            records={pagedRecords}
-            selectedRecordIds={selectedRecordIds}
-            onSelectIds={setSelectedRecordIds}
-            onDeleteRecord={deleteRecord}
-            onBatchDelete={handleBatchDelete}
-            historyPage={historyPage}
-            setHistoryPage={setHistoryPage}
-            totalPages={totalPages}
-          />
-        )}
-        {activeTab === 'plan' && (
-          <div>
-            {activePlanId
-              ? (
-                (() => {
-                  const plan = plans.find(p => p.id === activePlanId);
-                  if (!plan) return <div className="text-gray-400">未找到该计划</div>;
-                  return <PlanDetailView
-                    plan={plan}
-                    onBack={handleBackToList}
-                    onEdit={() => { /* 可弹窗编辑 */ }}
+        {/* 右侧主内容区，占据剩余空间 */}
+        <div className="flex-1 p-8 bg-white dark:bg-gray-950 dark:text-gray-100">
+          {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
+          {activeTab === 'charts' && (
+            <ChartsView
+              records={records}
+            />
+          )}
+          {activeTab === 'best' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
+              <PersonalBestView records={records.map(r => ({ ...r, module: (typeof r.module === 'string' && moduleLabelMap[r.module]) ? moduleLabelMap[r.module] : r.module }))} />
+            </div>
+          )}
+          {activeTab === 'modules' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">知识点汇总</h1>
+              <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} />
+            </div>
+          )}
+          {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}
+          {activeTab === 'history' && (
+            <HistoryView
+              records={pagedRecords}
+              selectedRecordIds={selectedRecordIds}
+              onSelectIds={setSelectedRecordIds}
+              onDeleteRecord={deleteRecord}
+              onBatchDelete={handleBatchDelete}
+              historyPage={historyPage}
+              setHistoryPage={setHistoryPage}
+              totalPages={totalPages}
+            />
+          )}
+          {activeTab === 'plan' && (
+            <div>
+              {activePlanId
+                ? (
+                  (() => {
+                    const plan = plans.find(p => p.id === activePlanId);
+                    if (!plan) return <div className="text-gray-400">未找到该计划</div>;
+                    return <PlanDetailView
+                      plan={plan}
+                      onBack={handleBackToList}
+                      onEdit={() => { /* 可弹窗编辑 */ }}
+                      onUpdate={handleUpdatePlan}
+                    />
+                  })()
+                )
+                : (
+                  <PlanListView
+                    plans={plans}
+                    onCreate={handleCreatePlan}
                     onUpdate={handleUpdatePlan}
+                    onDelete={handleDeletePlan}
+                    onShowDetail={handleShowDetail}
                   />
-                })()
-              )
-              : (
-                <PlanListView
-                  plans={plans}
-                  onCreate={handleCreatePlan}
-                  onUpdate={handleUpdatePlan}
-                  onDelete={handleDeletePlan}
-                  onShowDetail={handleShowDetail}
-                />
-              )
-            }
-          </div>
-        )}
-        {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
-        {activeTab === 'settings-basic' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">基础设置</h1>
-            <SettingsView
-              onExport={handleExportData}
-              onImport={handleImportData}
-              onClearAllData={handleClearAllData}
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              exportFormat={exportFormat}
-              setExportFormat={setExportFormat}
-              onSaveSettings={handleSaveSettings}
-              activeTab={activeTab}
-            />
-          </div>
-        )}
-        {activeTab === 'settings-advanced' && (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">高级设置</h1>
-            <SettingsView
-              onExport={handleExportData}
-              onImport={handleImportData}
-              onClearAllData={handleClearAllData}
-              pageSize={pageSize}
-              setPageSize={setPageSize}
-              exportFormat={exportFormat}
-              setExportFormat={setExportFormat}
-              onSaveSettings={handleSaveSettings}
-              activeTab={activeTab}
-              onClearRecords={handleClearRecords}
-              onClearKnowledge={handleClearKnowledge}
-              onClearPlans={handleClearPlans}
-            />
-          </div>
-        )}
-        {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
-      </div>
-      <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>确认导入数据</AlertDialogTitle>
-            <AlertDialogDescription>
-              {pendingImport && (
-                <>
-                  即将导入 <b>{pendingImport.records.length}</b> 条刷题记录
-                  {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
-                    <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
-                  )}
-                  。是否确认导入？
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>取消</AlertDialogCancel>
-            <AlertDialogAction onClick={() => {
-              if (pendingImport) {
-                setRecords(pendingImport.records);
-                if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
-                  setKnowledge(pendingImport.knowledge);
-                }
-                setTimeout(() => {
-                  setPendingImport(undefined);
-                }, 100);
+                )
               }
-              setImportDialogOpen(false);
-              notify({ type: "success", message: "导入成功", description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！` });
-            }}>确认导入</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+            </div>
+          )}
+          {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
+          {activeTab === 'settings-basic' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">基础设置</h1>
+              <SettingsView
+                onExport={handleExportData}
+                onImport={handleImportData}
+                onClearAllData={handleClearAllData}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                exportFormat={exportFormat}
+                setExportFormat={setExportFormat}
+                onSaveSettings={handleSaveSettings}
+                activeTab={activeTab}
+              />
+            </div>
+          )}
+          {activeTab === 'settings-advanced' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">高级设置</h1>
+              <SettingsView
+                onExport={handleExportData}
+                onImport={handleImportData}
+                onClearAllData={handleClearAllData}
+                pageSize={pageSize}
+                setPageSize={setPageSize}
+                exportFormat={exportFormat}
+                setExportFormat={setExportFormat}
+                onSaveSettings={handleSaveSettings}
+                activeTab={activeTab}
+                onClearRecords={handleClearRecords}
+                onClearKnowledge={handleClearKnowledge}
+                onClearPlans={handleClearPlans}
+              />
+            </div>
+          )}
+          {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
+        </div>
+        <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>确认导入数据</AlertDialogTitle>
+              <AlertDialogDescription>
+                {pendingImport && (
+                  <>
+                    即将导入 <b>{pendingImport.records.length}</b> 条刷题记录
+                    {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
+                      <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
+                    )}
+                    。是否确认导入？
+                  </>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>取消</AlertDialogCancel>
+              <AlertDialogAction onClick={() => {
+                if (pendingImport) {
+                  setRecords(pendingImport.records);
+                  if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
+                    setKnowledge(pendingImport.knowledge);
+                  }
+                  setTimeout(() => {
+                    setPendingImport(undefined);
+                  }, 100);
+                }
+                setImportDialogOpen(false);
+                notify({ type: "success", message: "导入成功", description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！` });
+              }}>确认导入</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </NavModeContext.Provider>
   );
 }
