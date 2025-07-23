@@ -47,6 +47,7 @@ import { DataImportExport } from "@/components/features/DataImportExport";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
 import { StudyReport } from "@/components/features/StudyReport";
 
+
 // 定义刷题记录类型
 type RecordItem = {
   id: number;
@@ -361,28 +362,31 @@ export default function Home() {
           />
         )}
         {activeTab === 'plan' && (
-          activePlanId
-            ? (
-              (() => {
-                const plan = plans.find(p => p.id === activePlanId);
-                if (!plan) return <div className="text-gray-400">未找到该计划</div>;
-                return <PlanDetailView
-                  plan={plan}
-                  onBack={handleBackToList}
-                  onEdit={() => { /* 可弹窗编辑 */ }}
+          <div>
+            {activePlanId
+              ? (
+                (() => {
+                  const plan = plans.find(p => p.id === activePlanId);
+                  if (!plan) return <div className="text-gray-400">未找到该计划</div>;
+                  return <PlanDetailView
+                    plan={plan}
+                    onBack={handleBackToList}
+                    onEdit={() => { /* 可弹窗编辑 */ }}
+                    onUpdate={handleUpdatePlan}
+                  />
+                })()
+              )
+              : (
+                <PlanListView
+                  plans={plans}
+                  onCreate={handleCreatePlan}
                   onUpdate={handleUpdatePlan}
+                  onDelete={handleDeletePlan}
+                  onShowDetail={handleShowDetail}
                 />
-              })()
-            )
-            : (
-              <PlanListView
-                plans={plans}
-                onCreate={handleCreatePlan}
-                onUpdate={handleUpdatePlan}
-                onDelete={handleDeletePlan}
-                onShowDetail={handleShowDetail}
-              />
-            )
+              )
+            }
+          </div>
         )}
         {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
         {activeTab === 'settings-basic' && (

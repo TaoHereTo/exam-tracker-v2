@@ -111,9 +111,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     };
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold">学习计划</h1>
+        <div>
+            <h1 className="text-3xl font-bold mb-4">制定计划</h1>
+            <div className="mb-6">
                 <Button onClick={() => handleOpenForm()}>新建计划</Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
