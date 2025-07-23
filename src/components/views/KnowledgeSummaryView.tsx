@@ -112,7 +112,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                             selected={selectedRows.filter(id => typeof id === 'string') as string[]}
                             onSelect={v => setSelectedRows(v as (string | number)[])}
                             onBatchDelete={selectedRows.length > 0 ? () => setDeleteDialogOpen(true) : undefined}
-                            rowKey={row => row.id}
+                            rowKey={(row, idx) => `${row.id}-${row.module || ''}-${idx}`}
                             batchDeleteText="批量删除"
                         />
                     </div>

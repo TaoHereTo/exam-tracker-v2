@@ -83,8 +83,7 @@ const Dock = React.forwardRef<HTMLDivElement, DockProps>(
 
 Dock.displayName = "Dock";
 
-export interface DockIconProps
-  extends Omit<MotionProps & React.HTMLAttributes<HTMLDivElement>, "children"> {
+export interface DockIconProps extends Omit<MotionProps & React.HTMLAttributes<HTMLDivElement>, "children"> {
   size?: number;
   magnification?: number;
   distance?: number;
@@ -92,52 +91,59 @@ export interface DockIconProps
   className?: string;
   children?: React.ReactNode;
   props?: PropsWithChildren;
+  // 支持 ref
+  ref?: React.Ref<HTMLDivElement>;
 }
 
-const DockIcon = ({
-  size = DEFAULT_SIZE,
-  magnification = DEFAULT_MAGNIFICATION,
-  distance = DEFAULT_DISTANCE,
-  mouseX,
-  className,
-  children,
-  ...props
-}: DockIconProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const padding = Math.max(6, size * 0.2);
-  const defaultMouseX = useMotionValue(Infinity);
+const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
+  ({
+    size = DEFAULT_SIZE,
+    magnification = DEFAULT_MAGNIFICATION,
+    distance = DEFAULT_DISTANCE,
+    mouseX,
+    className,
+    children,
+    ...props
+  }, ref) => {
+    const innerRef = useRef<HTMLDivElement>(null);
+    const padding = Math.max(6, size * 0.2);
+    const defaultMouseX = useMotionValue(Infinity);
 
-  const distanceCalc = useTransform(mouseX ?? defaultMouseX, (val: number) => {
-    const bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-    return val - bounds.x - bounds.width / 2;
-  });
+    // 合并 ref
+    React.useImperativeHandle(ref, () => innerRef.current as HTMLDivElement, []);
 
-  const sizeTransform = useTransform(
-    distanceCalc,
-    [-distance, 0, distance],
-    [size, magnification, size],
-  );
+    const distanceCalc = useTransform(mouseX ?? defaultMouseX, (val: number) => {
+      const bounds = innerRef.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
+      return val - bounds.x - bounds.width / 2;
+    });
 
-  const scaleSize = useSpring(sizeTransform, {
-    mass: 0.1,
-    stiffness: 150,
-    damping: 12,
-  });
+    const sizeTransform = useTransform(
+      distanceCalc,
+      [-distance, 0, distance],
+      [size, magnification, size],
+    );
 
-  return (
-    <motion.div
-      ref={ref}
-      style={{ width: scaleSize, height: scaleSize, padding }}
-      className={cn(
-        "flex aspect-square cursor-pointer items-center justify-center rounded-full",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </motion.div>
-  );
-};
+    const scaleSize = useSpring(sizeTransform, {
+      mass: 0.1,
+      stiffness: 150,
+      damping: 12,
+    });
+
+    return (
+      <motion.div
+        ref={innerRef}
+        style={{ width: scaleSize, height: scaleSize, padding }}
+        className={cn(
+          "flex aspect-square cursor-pointer items-center justify-center rounded-full",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+);
 
 DockIcon.displayName = "DockIcon";
 

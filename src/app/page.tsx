@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, useEffect, createContext, useContext, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import { HistoryTable } from "@/components/tables/HistoryTable";
@@ -45,7 +45,9 @@ import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { Home as HomeIcon, BarChart2, BookOpen, ClipboardList, Settings, Target } from "lucide-react";
+import { Home as HomeIcon, BarChart2, BookOpen, ClipboardList, Settings, Target, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks, SlidersHorizontal } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 
 
 // 定义刷题记录类型
@@ -268,9 +270,17 @@ export default function Home() {
   const [historyPage, setHistoryPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [exportFormat, setExportFormat] = useState("json");
+  // navMode 必须先声明，再用 useRef(navMode)
+  const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
+  const lastSavedNavMode = useRef(navMode);
   const handleSaveSettings = () => {
-    notify({ type: "success", message: "设置已保存" });
-    // 可在此处将设置同步到 localStorage 或后端
+    if (lastSavedNavMode.current !== navMode) {
+      notify({ type: "success", message: "设置已保存，正在切换外观模式..." });
+      setTimeout(() => window.location.reload(), 600);
+    } else {
+      notify({ type: "success", message: "设置已保存" });
+    }
+    lastSavedNavMode.current = navMode;
   };
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
@@ -326,16 +336,88 @@ export default function Home() {
     notify({ type: "success", message: "学习计划已清空" });
   };
 
-  const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
-  if (!isClient) return null;
-  // Dock 一级导航配置
+  const [prevNavMode, setPrevNavMode] = useState(navMode);
+  useEffect(() => { setPrevNavMode(navMode); }, [navMode]);
+
+  // Dock 母项和子项结构与 Sidebar 完全一致
   const dockNavs = [
-    { key: 'overview', icon: <BarChart2 />, label: '数据概览' },
-    { key: 'charts', icon: <BarChart2 />, label: '数据图表' },
-    { key: 'history', icon: <ClipboardList />, label: '历史记录' },
-    { key: 'knowledge-entry', icon: <BookOpen />, label: '知识点录入' },
-    { key: 'settings-basic', icon: <Settings />, label: '设置' },
+    {
+      key: 'analysis',
+      icon: <BarChart2 />, label: '可视化',
+      children: [
+        { key: 'overview', label: '数据概览' },
+        { key: 'charts', label: '数据图表' },
+        { key: 'best', label: '最佳成绩' },
+      ]
+    },
+    {
+      key: 'management',
+      icon: <ClipboardList />, label: '记录管理',
+      children: [
+        { key: 'form', label: '新的记录' },
+        { key: 'history', label: '历史记录' },
+      ]
+    },
+    {
+      key: 'study-plan',
+      icon: <Target />, label: '学习计划',
+      children: [
+        { key: 'plan', label: '制定计划' },
+        { key: 'progress', label: '进度追踪' },
+      ]
+    },
+    {
+      key: 'knowledge-entry',
+      icon: <BookOpen />, label: '知识点录入',
+      children: [
+        { key: 'knowledge-entry', label: '知识点录入' },
+        { key: 'modules', label: '知识点汇总' },
+      ]
+    },
+    {
+      key: 'settings',
+      icon: <Settings />, label: '系统设置',
+      children: [
+        { key: 'settings-basic', label: '基础设置' },
+        { key: 'settings-advanced', label: '高级设置' },
+      ]
+    },
   ];
+
+  // Dock 母项悬停展开子项弹窗
+  const [dockHover, setDockHover] = useState<string | null>(null);
+  const [dockPos, setDockPos] = useState<{ left: number, width: number } | null>(null);
+  const dockRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  const handleDockMouseEnter = (key: string) => {
+    setDockHover(key);
+    const ref = dockRefs.current[key];
+    if (ref) {
+      const rect = ref.getBoundingClientRect();
+      setDockPos({ left: rect.left + rect.width / 2, width: rect.width });
+    }
+  };
+  const handleDockMouseLeave = () => {
+    setDockHover(null);
+    setDockPos(null);
+  };
+
+  // 子项 key 到唯一图标的映射
+  const dockChildIcons: Record<string, React.ReactNode> = {
+    overview: <BarChart2 />,
+    charts: <LineChart />,
+    best: <Trophy />,
+    form: <PlusSquare />,
+    history: <HistoryIcon />,
+    plan: <CalendarCheck />,
+    progress: <TrendingUp />,
+    "knowledge-entry": <FileEdit />,
+    modules: <ListChecks />,
+    "settings-basic": <Settings />,
+    "settings-advanced": <SlidersHorizontal />,
+  };
+
+  if (!isClient) return null;
   return (
     <NavModeContext.Provider value={navMode}>
       <div className="flex min-h-screen">
@@ -345,16 +427,19 @@ export default function Home() {
         ) : (
           <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center bg-transparent">
             <Dock>
-              {dockNavs.map(nav => (
-                <DockIcon
-                  key={nav.key}
-                  onClick={() => setActiveTab(nav.key)}
-                  className="pointer-events-auto"
-                  title={nav.label}
-                >
-                  {nav.icon}
-                </DockIcon>
-              ))}
+              {/* 只显示所有子项，每个用图标，title 作为提示，保证 DockIcon 是 Dock 的直接子元素 */}
+              {dockNavs.flatMap(nav =>
+                nav.children ? nav.children.map(child => (
+                  <DockIcon
+                    key={`dock-child-${nav.key}-${child.key}`}
+                    onClick={() => setActiveTab(child.key)}
+                    className="pointer-events-auto"
+                    title={child.label}
+                  >
+                    {dockChildIcons[child.key] || <Settings />}
+                  </DockIcon>
+                )) : []
+              )}
             </Dock>
           </div>
         )}
