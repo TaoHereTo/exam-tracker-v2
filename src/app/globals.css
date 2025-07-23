@@ -41,6 +41,28 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
 }
 
 :root {
@@ -186,4 +208,57 @@ html,
 .dark\:bg-gray-950,
 .dark\:text-gray-100 {
   user-select: none !important;
+}
+
+/* ========== Marquee 动画 ========== */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration, 40s) linear infinite;
+}
+
+@keyframes marquee-vertical-reverse {
+  0% {
+    transform: translateY(0);
+  }
+
+  100% {
+    transform: translateY(50%);
+  }
+}
+
+.animate-marquee-vertical-reverse {
+  animation: marquee-vertical-reverse var(--duration, 40s) linear infinite;
 }

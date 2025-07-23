@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, createContext, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import { HistoryTable } from "@/components/tables/HistoryTable";
@@ -8,7 +8,7 @@ import { TrendChart } from "@/components/charts/TrendChart";
 import { SettingsView } from "@/components/views/SettingsView";
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
-import { useNotification } from "@/components/magicui/NotificationProvider";
+import { useImportExport } from "@/hooks/useImportExport";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -44,78 +44,20 @@ import PlanDetailView from "@/components/views/PlanDetailView";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
-import { Dock, DockIcon } from "@/components/magicui/dock";
-import { Home as HomeIcon, BarChart2, BookOpen, ClipboardList, Settings, Target, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks, SlidersHorizontal } from "lucide-react";
+import DockNavigation from "@/components/layout/DockNavigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { usePlans } from "@/hooks/usePlans";
+import { useRecords } from "@/hooks/useRecords";
+import PageTitle from "@/components/ui/PageTitle";
+import type { RecordItem, PlanType, StudyPlan } from "@/types/record";
+import { calcPlanProgress } from "@/lib/planUtils";
+import NavModeContext from "@/contexts/NavModeContext";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
-
-// 定义刷题记录类型
-type RecordItem = {
-  id: number;
-  date: string;
-  module: string;
-  total: number;
-  correct: number;
-  duration: string;
-  // 可根据需要扩展字段
-};
-// 计划类型
-type PlanType = "题量" | "正确率" | "错题数";
-interface StudyPlan {
-  id: string;
-  name: string;
-  module: string; // 板块
-  type: PlanType;
-  startDate: string;
-  endDate: string;
-  target: number; // 目标值（题量/正确率/错题数）
-  progress: number; // 当前进度（自动计算）
-  status: "未开始" | "进行中" | "已完成" | "未达成";
-  description?: string;
-}
-
-// 统计计划进度
-function calcPlanProgress(plan: StudyPlan, records: RecordItem[]): { progress: number; status: StudyPlan["status"] } {
-  // 只统计在计划时间范围内、指定板块的记录
-  const start = new Date(plan.startDate).getTime();
-  const end = new Date(plan.endDate).getTime();
-  const filtered = records.filter(r => {
-    const t = new Date(r.date).getTime();
-    return r.module === plan.module && t >= start && t <= end;
-  });
-  if (plan.type === "题量") {
-    const total = filtered.reduce((sum, r) => sum + (r.total || 0), 0);
-    let status: StudyPlan["status"] = "进行中";
-    if (filtered.length === 0) status = "未开始";
-    else if (total >= plan.target) status = "已完成";
-    else if (new Date().getTime() > end) status = "未达成";
-    return { progress: total, status };
-  } else if (plan.type === "正确率") {
-    const totalQ = filtered.reduce((sum, r) => sum + (r.total || 0), 0);
-    const totalC = filtered.reduce((sum, r) => sum + (r.correct || 0), 0);
-    const rate = totalQ > 0 ? Math.round((totalC / totalQ) * 100) : 0;
-    let status: StudyPlan["status"] = "进行中";
-    if (filtered.length === 0) status = "未开始";
-    else if (rate >= plan.target) status = "已完成";
-    else if (new Date().getTime() > end) status = "未达成";
-    return { progress: rate, status };
-  } else if (plan.type === "错题数") {
-    const wrong = filtered.reduce((sum, r) => sum + ((r.total || 0) - (r.correct || 0)), 0);
-    let status: StudyPlan["status"] = "进行中";
-    if (filtered.length === 0) status = "未开始";
-    else if (wrong <= plan.target) status = "已完成";
-    else if (new Date().getTime() > end) status = "未达成";
-    return { progress: wrong, status };
-  }
-  return { progress: 0, status: "未开始" };
-}
-
-export const NavModeContext = createContext<'sidebar' | 'dock'>("sidebar");
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
-  const [records, setRecords] = useLocalStorageState<RecordItem[]>("exam-tracker-records-v2", []);
   const [knowledge, setKnowledge] = useLocalStorageState<any[]>("exam-tracker-knowledge-v2", []);
 
   // 新增知识点添加函数
@@ -126,141 +68,31 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
-  const { notify } = useNotification();
+  // 替换计划相关逻辑
+  const {
+    plans,
+    setPlans,
+    createPlan,
+    updatePlan,
+    deletePlan,
+  } = usePlans([]);
+  // 替换记录相关逻辑
+  const {
+    records,
+    setRecords,
+    addRecord,
+    deleteRecord,
+    batchDeleteRecords,
+  } = useRecords([]);
 
-  const addRecord = (newRecord: RecordItem) => {
-    setRecords(prevRecords => [newRecord, ...prevRecords]);
-    notify({ type: "success", message: "记录已保存", description: `模块 \"${newRecord.module}\" 的新记录已添加。` });
-  };
-
-  const deleteRecord = (idToDelete: number) => {
-    setRecords(prevRecords => prevRecords.filter(record => record.id !== idToDelete));
-  };
-
-  const handleClearAllData = () => {
-    setRecords([]);
-    setKnowledge([]);
-    notify({ type: "success", message: "操作成功", description: "您的所有应用数据已被清空。" });
-  };
-
-  const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
-
-  const handleBatchDelete = () => {
-    setRecords(prev => prev.filter(r => !selectedRecordIds.includes(r.id)));
-    setSelectedRecordIds([]);
-    notify({ type: "success", message: "批量删除成功", description: `已删除 ${selectedRecordIds.length} 条记录。` });
-  };
-
-  // 导出数据到 JSON 文件（支持知识点）
-  const handleExportData = () => {
-    const exportData = {
-      records,
-      knowledge,
-      exportedAt: new Date().toISOString(),
-      version: 2,
-    };
-    const json = JSON.stringify(exportData, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'exam-tracker-backup.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点）已成功导出到本地JSON文件。" });
-  };
-
-  const [importDialogOpen, setImportDialogOpen] = useState(false);
-  const [pendingImport, setPendingImport] = useState<{ records: any[], knowledge: any[] }>();
-
-  // 从 JSON 文件导入数据（支持知识点）
-  const handleImportData = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json,application/json';
-    input.onchange = async (e: any) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const fileContent = event.target?.result as string;
-          try {
-            const importedObject = JSON.parse(fileContent);
-            // 兼容多种结构
-            let importedRecords: any[] = [];
-            let importedKnowledge: any[] = [];
-            if (Array.isArray(importedObject)) {
-              importedRecords = importedObject;
-            } else if (importedObject && importedObject.records) {
-              importedRecords = importedObject.records;
-              if (Array.isArray(importedObject.knowledge)) {
-                importedKnowledge = importedObject.knowledge;
-              }
-            } else if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
-              importedRecords = importedObject.data.records;
-            } else {
-              alert('导入的文件格式不正确！');
-              return;
-            }
-            // 建立中英文模块映射
-            const moduleMap: Record<string, string> = {
-              '资料分析': 'data-analysis',
-              '政治理论': 'politics',
-              '数量关系': 'math',
-              '常识判断': 'common',
-              '言语理解': 'verbal',
-              '判断推理': 'logic',
-              'data-analysis': 'data-analysis',
-              'politics': 'politics',
-              'math': 'math',
-              'common': 'common',
-              'verbal': 'verbal',
-              'logic': 'logic',
-            };
-            function normalizeDate(date: any) {
-              if (!date) return '';
-              if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
-              const d = new Date(date);
-              if (!isNaN(d.getTime())) {
-                const y = d.getFullYear();
-                const m = String(d.getMonth() + 1).padStart(2, '0');
-                const day = String(d.getDate()).padStart(2, '0');
-                return `${y}-${m}-${day}`;
-              }
-              return '';
-            }
-            const normalizedRecords = importedRecords.map((r: any) => ({
-              id: r.id ?? Date.now() + Math.random(),
-              date: normalizeDate(r.date),
-              module: moduleMap[r.module] ?? r.module,
-              total: r.total ?? r.totalCount ?? 0,
-              correct: r.correct ?? r.correctCount ?? 0,
-              duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
-            }));
-            // 补全知识点id，保证id为字符串且唯一
-            const normalizedKnowledge = importedKnowledge.map((k: any) => {
-              let id = k.id;
-              if (!id || typeof id !== 'string') {
-                id = Date.now().toString() + Math.random().toString(16).slice(2);
-              }
-              return { ...k, id };
-            });
-            setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge });
-            setImportDialogOpen(true);
-          } catch (err) {
-            alert('导入失败，文件内容不是有效的 JSON！');
-          }
-        } catch (err) {
-          alert('导入失败，文件内容不是有效的 JSON！');
-        }
-      };
-      reader.readAsText(file);
-    };
-    input.click();
-  };
+  const {
+    handleExportData,
+    handleImportData,
+    importDialogOpen,
+    setImportDialogOpen,
+    pendingImport,
+    setPendingImport,
+  } = useImportExport(records, setRecords, knowledge, setKnowledge);
 
   const [chartModuleFilter, setChartModuleFilter] = useState<string>('全部');
 
@@ -273,10 +105,8 @@ export default function Home() {
   // navMode 必须先声明，再用 useRef(navMode)
   const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
   const lastSavedNavMode = useRef(navMode);
-  const handleSaveSettings = () => {
-    notify({ type: "success", message: "设置已保存" });
-    lastSavedNavMode.current = navMode;
-  };
+
+  // 移除handleSaveSettings相关代码
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
 
@@ -285,13 +115,7 @@ export default function Home() {
   };
 
   // 学习计划相关状态
-  const [plans, setPlans] = useState<StudyPlan[]>([]); // Plan[]
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
-
-  // 新建/编辑/删除计划
-  const handleCreatePlan = (plan: any) => setPlans(prev => [plan, ...prev]);
-  const handleUpdatePlan = (plan: any) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
-  const handleDeletePlan = (id: string) => setPlans(prev => prev.filter(p => p.id !== id));
 
   // 进入详情
   const handleShowDetail = (id: string) => setActivePlanId(id);
@@ -331,86 +155,27 @@ export default function Home() {
     notify({ type: "success", message: "学习计划已清空" });
   };
 
+  // 清空所有数据
+  const handleClearAllData = () => {
+    setRecords([]);
+    setKnowledge([]);
+    notify({ type: "success", message: "操作成功", description: "您的所有应用数据已被清空。" });
+  };
+
+  // 选中记录 id
+  const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+
+  // 批量删除
+  const handleBatchDelete = () => {
+    setRecords(prev => prev.filter(r => !selectedRecordIds.includes(r.id)));
+    setSelectedRecordIds([]);
+    notify({ type: "success", message: "批量删除成功", description: `已删除 ${selectedRecordIds.length} 条记录。` });
+  };
+
   const [prevNavMode, setPrevNavMode] = useState(navMode);
   useEffect(() => { setPrevNavMode(navMode); }, [navMode]);
 
-  // Dock 母项和子项结构与 Sidebar 完全一致
-  const dockNavs = [
-    {
-      key: 'analysis',
-      icon: <BarChart2 />, label: '可视化',
-      children: [
-        { key: 'overview', label: '数据概览' },
-        { key: 'charts', label: '数据图表' },
-        { key: 'best', label: '最佳成绩' },
-      ]
-    },
-    {
-      key: 'management',
-      icon: <ClipboardList />, label: '记录管理',
-      children: [
-        { key: 'form', label: '新的记录' },
-        { key: 'history', label: '历史记录' },
-      ]
-    },
-    {
-      key: 'study-plan',
-      icon: <Target />, label: '学习计划',
-      children: [
-        { key: 'plan', label: '制定计划' },
-        { key: 'progress', label: '进度追踪' },
-      ]
-    },
-    {
-      key: 'knowledge-entry',
-      icon: <BookOpen />, label: '知识点录入',
-      children: [
-        { key: 'knowledge-entry', label: '知识点录入' },
-        { key: 'modules', label: '知识点汇总' },
-      ]
-    },
-    {
-      key: 'settings',
-      icon: <Settings />, label: '系统设置',
-      children: [
-        { key: 'settings-basic', label: '基础设置' },
-        { key: 'settings-advanced', label: '高级设置' },
-      ]
-    },
-  ];
-
-  // Dock 母项悬停展开子项弹窗
-  const [dockHover, setDockHover] = useState<string | null>(null);
-  const [dockPos, setDockPos] = useState<{ left: number, width: number } | null>(null);
-  const dockRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  const handleDockMouseEnter = (key: string) => {
-    setDockHover(key);
-    const ref = dockRefs.current[key];
-    if (ref) {
-      const rect = ref.getBoundingClientRect();
-      setDockPos({ left: rect.left + rect.width / 2, width: rect.width });
-    }
-  };
-  const handleDockMouseLeave = () => {
-    setDockHover(null);
-    setDockPos(null);
-  };
-
-  // 子项 key 到唯一图标的映射
-  const dockChildIcons: Record<string, React.ReactNode> = {
-    overview: <BarChart2 />,
-    charts: <LineChart />,
-    best: <Trophy />,
-    form: <PlusSquare />,
-    history: <HistoryIcon />,
-    plan: <CalendarCheck />,
-    progress: <TrendingUp />,
-    "knowledge-entry": <FileEdit />,
-    modules: <ListChecks />,
-    "settings-basic": <Settings />,
-    "settings-advanced": <SlidersHorizontal />,
-  };
+  const { notify } = useNotification();
 
   if (!isClient) return null;
   return (
@@ -420,23 +185,7 @@ export default function Home() {
         {navMode === 'sidebar' ? (
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
         ) : (
-          <div className="fixed bottom-0 left-0 w-full z-50 flex justify-center bg-transparent">
-            <Dock>
-              {/* 只显示所有子项，每个用图标，title 作为提示，保证 DockIcon 是 Dock 的直接子元素 */}
-              {dockNavs.flatMap(nav =>
-                nav.children ? nav.children.map(child => (
-                  <DockIcon
-                    key={`dock-child-${nav.key}-${child.key}`}
-                    onClick={() => setActiveTab(child.key)}
-                    className="pointer-events-auto"
-                    title={child.label}
-                  >
-                    {dockChildIcons[child.key] || <Settings />}
-                  </DockIcon>
-                )) : []
-              )}
-            </Dock>
-          </div>
+          <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} navMode={navMode} />
         )}
         {/* 右侧主内容区，占据剩余空间 */}
         <div className="flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100">
@@ -482,26 +231,25 @@ export default function Home() {
                       plan={plan}
                       onBack={handleBackToList}
                       onEdit={() => { /* 可弹窗编辑 */ }}
-                      onUpdate={handleUpdatePlan}
+                      onUpdate={updatePlan}
                     />
                   })()
                 )
                 : (
                   <PlanListView
                     plans={plans}
-                    onCreate={handleCreatePlan}
-                    onUpdate={handleUpdatePlan}
-                    onDelete={handleDeletePlan}
+                    onCreate={createPlan}
+                    onUpdate={updatePlan}
+                    onDelete={deletePlan}
                     onShowDetail={handleShowDetail}
                   />
                 )
               }
             </div>
           )}
-          {activeTab === 'progress' && <div><h1 className="text-3xl font-bold mb-4">进度追踪</h1></div>}
           {activeTab === 'settings-basic' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">基础设置</h1>
+              <PageTitle>基础设置</PageTitle>
               <SettingsView
                 onExport={handleExportData}
                 onImport={handleImportData}
@@ -510,7 +258,7 @@ export default function Home() {
                 setPageSize={setPageSize}
                 exportFormat={exportFormat}
                 setExportFormat={setExportFormat}
-                onSaveSettings={handleSaveSettings}
+                navMode={navMode}
                 activeTab={activeTab}
               />
             </div>
@@ -526,7 +274,7 @@ export default function Home() {
                 setPageSize={setPageSize}
                 exportFormat={exportFormat}
                 setExportFormat={setExportFormat}
-                onSaveSettings={handleSaveSettings}
+                onSaveSettings={() => { }} // 移除handleSaveSettings
                 activeTab={activeTab}
                 onClearRecords={handleClearRecords}
                 onClearKnowledge={handleClearKnowledge}

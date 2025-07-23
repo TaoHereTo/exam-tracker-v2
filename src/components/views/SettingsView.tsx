@@ -20,12 +20,14 @@ import { ExportFormatSetting } from "./settings/ExportFormatSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { Switch } from "@/components/ui/switch";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
+import SaveSettingsButton from "./settings/SaveSettingsButton";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
     pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings,
     activeTab,
-    onClearRecords, onClearKnowledge, onClearPlans
+    onClearRecords, onClearKnowledge, onClearPlans,
+    navMode
 }: {
     onExport?: () => void;
     onImport?: () => void;
@@ -34,11 +36,12 @@ export function SettingsView({
     setPageSize: (n: number) => void;
     exportFormat: string;
     setExportFormat: (f: string) => void;
-    onSaveSettings: () => void;
+    onSaveSettings?: () => void;
     activeTab?: string;
     onClearRecords?: () => void;
     onClearKnowledge?: () => void;
     onClearPlans?: () => void;
+    navMode?: string;
 }) {
     if (activeTab === 'settings-advanced') {
         return (
@@ -113,7 +116,7 @@ export function SettingsView({
             <AppearanceSetting />
             <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} />
             <div className="flex justify-end mt-4">
-                <Button onClick={onSaveSettings} variant="default">保存所有设置</Button>
+                {navMode && <SaveSettingsButton navMode={navMode as 'sidebar' | 'dock'} />}
             </div>
         </div>
     );

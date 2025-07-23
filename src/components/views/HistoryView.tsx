@@ -32,7 +32,7 @@ export function HistoryView({
     return (
         <div>
             <h1 className="text-3xl font-bold mb-4">历史记录</h1>
-            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full max-w-5xl">
+            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full max-w-5xl mx-auto">
                 <HistoryTable
                     records={records}
                     selectedIds={selectedRecordIds}

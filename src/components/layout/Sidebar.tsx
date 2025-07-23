@@ -91,13 +91,6 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
                         >
                             制定计划
                         </Button>
-                        <Button
-                            variant={activeTab === 'progress' ? 'default' : 'ghost'}
-                            className="sidebar-child"
-                            onClick={() => setActiveTab('progress')}
-                        >
-                            进度追踪
-                        </Button>
                     </AccordionContent>
                 </AccordionItem>
 
