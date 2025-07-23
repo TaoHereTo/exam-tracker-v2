@@ -274,12 +274,7 @@ export default function Home() {
   const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
   const lastSavedNavMode = useRef(navMode);
   const handleSaveSettings = () => {
-    if (lastSavedNavMode.current !== navMode) {
-      notify({ type: "success", message: "设置已保存，正在切换外观模式..." });
-      setTimeout(() => window.location.reload(), 600);
-    } else {
-      notify({ type: "success", message: "设置已保存" });
-    }
+    notify({ type: "success", message: "设置已保存" });
     lastSavedNavMode.current = navMode;
   };
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
@@ -444,7 +439,7 @@ export default function Home() {
           </div>
         )}
         {/* 右侧主内容区，占据剩余空间 */}
-        <div className="flex-1 p-8 bg-white dark:bg-gray-950 dark:text-gray-100">
+        <div className="flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100">
           {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
           {activeTab === 'charts' && (
             <ChartsView

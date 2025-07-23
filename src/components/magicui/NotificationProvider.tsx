@@ -21,7 +21,10 @@ const NotificationContext = createContext<NotificationContextProps | undefined>(
 
 export const useNotification = () => {
     const ctx = useContext(NotificationContext);
-    if (!ctx) throw new Error("useNotification must be used within NotificationProvider");
+    if (!ctx) {
+        console.error("[NotificationProvider] useNotification context 丢失");
+        throw new Error("useNotification must be used within NotificationProvider");
+    }
     return ctx;
 };
 
@@ -39,6 +42,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const notify = useCallback((n: Omit<Notification, "id">) => {
         const id = Date.now().toString() + Math.random().toString(16).slice(2);
+        console.log("[NotificationProvider] notify called", n, id);
         setNotifications((prev) => [{ ...n, id }, ...prev]);
         timerRef.current[id] = setTimeout(() => remove(id), 3000);
     }, [remove]);
@@ -46,7 +50,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     return (
         <NotificationContext.Provider value={{ notify }}>
             {children}
-            <div className="fixed top-6 right-6 z-[9999] w-[320px] max-w-full pointer-events-none">
+            <div className="fixed top-6 right-6 z-[99999] w-[320px] max-w-full pointer-events-none">
                 <AnimatedList delay={200} className="items-end">
                     {notifications.map((n) => (
                         <div
