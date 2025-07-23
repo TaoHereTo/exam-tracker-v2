@@ -4,9 +4,10 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
+import type { KnowledgeItem } from "@/types/record";
 
 interface KnowledgeSummaryViewProps {
-    knowledge: any[];
+    knowledge: KnowledgeItem[];
     onBatchDeleteKnowledge?: (ids: string[]) => void;
 }
 

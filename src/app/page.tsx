@@ -50,7 +50,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/comp
 import { usePlans } from "@/hooks/usePlans";
 import { useRecords } from "@/hooks/useRecords";
 import PageTitle from "@/components/ui/PageTitle";
-import type { RecordItem, PlanType, StudyPlan } from "@/types/record";
+import type { RecordItem, PlanType, StudyPlan, KnowledgeItem } from "@/types/record";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -58,10 +58,10 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
-  const [knowledge, setKnowledge] = useLocalStorageState<any[]>("exam-tracker-knowledge-v2", []);
+  const [knowledge, setKnowledge] = useLocalStorageState<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
 
   // 新增知识点添加函数
-  const addKnowledge = (newKnowledge: any) => {
+  const addKnowledge = (newKnowledge: KnowledgeItem) => {
     setKnowledge(prev => [{ ...newKnowledge, id: Date.now().toString() + Math.random().toString(16).slice(2) }, ...prev]);
   };
 

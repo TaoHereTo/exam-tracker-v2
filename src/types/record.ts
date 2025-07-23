@@ -22,4 +22,11 @@ export interface StudyPlan {
     progress: number; // 当前进度（自动计算）
     status: "未开始" | "进行中" | "已完成" | "未达成";
     description?: string;
-} 
+}
+
+// 知识点类型定义
+export type KnowledgeItem = (
+    { id: string; module: 'data-analysis' | 'math' | 'common' | 'logic'; type: string; note: string } |
+    { id: string; module: 'politics'; date: string | null; source: string; note: string } |
+    { id: string; module: 'verbal'; idiom: string; meaning: string }
+); 

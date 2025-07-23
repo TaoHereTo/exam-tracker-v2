@@ -5,6 +5,7 @@ import { MODULE_SCORES } from "@/config/exam";
 import { ModulePieChart } from "@/components/charts/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import type { RecordItem } from "@/types/record";
 
 const moduleLabelMap: Record<string, string> = {
     'data-analysis': '资料分析',
@@ -196,7 +197,7 @@ function ModuleRadarChart({ data }: { data: any[] }) {
 }
 
 interface ChartsViewProps {
-    records: any[];
+    records: RecordItem[];
 }
 
 export function ChartsView({ records }: ChartsViewProps) {

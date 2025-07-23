@@ -9,6 +9,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import type { PlanType } from "@/types/record";
 
 interface StudyPlan {
     id: string;
@@ -90,7 +91,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
             id: editId || Date.now().toString(),
             name: form.name!,
             module: form.module!,
-            type: form.type as any,
+            type: form.type as PlanType,
             startDate: form.startDate!,
             endDate: form.endDate!,
             target: Number(form.target),

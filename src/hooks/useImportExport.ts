@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import type { RecordItem, KnowledgeItem } from "@/types/record";
 
-export function useImportExport(records: any[], setRecords: (r: any[]) => void, knowledge: any[], setKnowledge: (k: any[]) => void) {
+export function useImportExport(
+    records: RecordItem[],
+    setRecords: (r: RecordItem[]) => void,
+    knowledge: KnowledgeItem[],
+    setKnowledge: (k: KnowledgeItem[]) => void
+) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
-    const [pendingImport, setPendingImport] = useState<{ records: any[], knowledge: any[] }>();
+    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[] }>();
 
     // 导出数据到 JSON 文件（支持知识点）
     const handleExportData = () => {
@@ -32,7 +38,7 @@ export function useImportExport(records: any[], setRecords: (r: any[]) => void, 
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json,application/json';
-        input.onchange = async (e: any) => {
+        input.onchange = async (e: React.ChangeEvent<HTMLInputElement>) => {
             const file = e.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -42,8 +48,8 @@ export function useImportExport(records: any[], setRecords: (r: any[]) => void, 
                     try {
                         const importedObject = JSON.parse(fileContent);
                         // 兼容多种结构
-                        let importedRecords: any[] = [];
-                        let importedKnowledge: any[] = [];
+                        let importedRecords: RecordItem[] = [];
+                        let importedKnowledge: KnowledgeItem[] = [];
                         if (Array.isArray(importedObject)) {
                             importedRecords = importedObject;
                         } else if (importedObject && importedObject.records) {
@@ -84,7 +90,7 @@ export function useImportExport(records: any[], setRecords: (r: any[]) => void, 
                             }
                             return '';
                         }
-                        const normalizedRecords = importedRecords.map((r: any) => ({
+                        const normalizedRecords = importedRecords.map((r: RecordItem) => ({
                             id: r.id ?? Date.now() + Math.random(),
                             date: normalizeDate(r.date),
                             module: moduleMap[r.module] ?? r.module,
@@ -93,7 +99,7 @@ export function useImportExport(records: any[], setRecords: (r: any[]) => void, 
                             duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
                         }));
                         // 补全知识点id，保证id为字符串且唯一
-                        const normalizedKnowledge = importedKnowledge.map((k: any) => {
+                        const normalizedKnowledge = importedKnowledge.map((k: KnowledgeItem) => {
                             let id = k.id;
                             if (!id || typeof id !== 'string') {
                                 id = Date.now().toString() + Math.random().toString(16).slice(2);

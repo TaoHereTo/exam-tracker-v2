@@ -15,9 +15,10 @@ import {
     CarouselApi,
 } from "@/components/ui/carousel";
 import { useRef, useState } from 'react';
+import type { KnowledgeItem } from "@/types/record";
 
 interface KnowledgeEntryViewProps {
-    onAddKnowledge: (knowledge: any) => void;
+    onAddKnowledge: (knowledge: KnowledgeItem) => void;
     defaultTab?: string;
 }
 

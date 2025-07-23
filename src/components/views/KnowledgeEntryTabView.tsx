@@ -1,6 +1,11 @@
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
+import type { KnowledgeItem } from "@/types/record";
 
-export function KnowledgeEntryTabView({ onAddKnowledge }: { onAddKnowledge: (k: any) => void }) {
+interface KnowledgeEntryTabViewProps {
+    onAddKnowledge: (knowledge: KnowledgeItem) => void;
+}
+
+export function KnowledgeEntryTabView({ onAddKnowledge }: KnowledgeEntryTabViewProps) {
     return (
         <div>
             <h1 className="text-3xl font-bold mb-4">知识点录入</h1>

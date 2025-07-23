@@ -7,9 +7,10 @@ import {
     PaginationPrevious,
     PaginationNext,
 } from "@/components/ui/pagination";
+import type { RecordItem } from "@/types/record";
 
 interface HistoryViewProps {
-    records: any[];
+    records: RecordItem[];
     selectedRecordIds: number[];
     onSelectIds: (ids: number[]) => void;
     onDeleteRecord: (id: number) => void;
