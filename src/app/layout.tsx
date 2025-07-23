@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
+import { NotificationProvider } from "@/components/magicui/NotificationProvider";
 import { ThemeProvider } from "next-themes";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 
@@ -30,8 +30,9 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ThemeToggle />
-          {children}
-          <Toaster />
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

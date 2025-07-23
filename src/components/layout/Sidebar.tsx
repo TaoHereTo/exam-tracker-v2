@@ -6,6 +6,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
+import { BarChart2, BookOpen, ClipboardList, Settings, Target } from "lucide-react";
 
 // 定义 Sidebar 组件的 props 类型
 type SidebarProps = {
@@ -23,25 +24,28 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
             <Accordion type="single" collapsible defaultValue="analysis" className="w-full">
                 {/* 分析分组 */}
                 <AccordionItem value="analysis">
-                    <AccordionTrigger className="justify-start w-full text-left">可视化</AccordionTrigger>
+                    <AccordionTrigger className="sidebar-parent w-full">
+                        <BarChart2 className="inline-block mr-2 size-5 text-primary" />
+                        可视化
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'overview' ? 'default' : 'ghost'}
-                            className="w-full justify-start sidebar-btn text-left"
+                            className="sidebar-child sidebar-btn"
                             onClick={() => setActiveTab('overview')}
                         >
                             数据概览
                         </Button>
                         <Button
                             variant={activeTab === 'charts' ? 'default' : 'ghost'}
-                            className="w-full justify-start sidebar-btn text-left"
+                            className="sidebar-child sidebar-btn"
                             onClick={() => setActiveTab('charts')}
                         >
                             数据图表
                         </Button>
                         <Button
                             variant={activeTab === 'best' ? 'default' : 'ghost'}
-                            className="w-full justify-start sidebar-btn text-left"
+                            className="sidebar-child sidebar-btn"
                             onClick={() => setActiveTab('best')}
                         >
                             最佳成绩
@@ -51,18 +55,21 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 管理分组 */}
                 <AccordionItem value="management">
-                    <AccordionTrigger className="justify-start w-full text-left">记录管理</AccordionTrigger>
+                    <AccordionTrigger className="sidebar-parent w-full">
+                        <ClipboardList className="inline-block mr-2 size-5 text-primary" />
+                        记录管理
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'form' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('form')}
                         >
                             新的记录
                         </Button>
                         <Button
                             variant={activeTab === 'history' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('history')}
                         >
                             历史记录
@@ -72,18 +79,21 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 学习计划分组 */}
                 <AccordionItem value="study-plan">
-                    <AccordionTrigger className="justify-start w-full text-left">学习计划</AccordionTrigger>
+                    <AccordionTrigger className="sidebar-parent w-full">
+                        <Target className="inline-block mr-2 size-5 text-primary" />
+                        学习计划
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'plan' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('plan')}
                         >
                             制定计划
                         </Button>
                         <Button
                             variant={activeTab === 'progress' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('progress')}
                         >
                             进度追踪
@@ -93,18 +103,21 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 知识点录入分组 */}
                 <AccordionItem value="knowledge-entry">
-                    <AccordionTrigger className="justify-start w-full text-left">知识点录入</AccordionTrigger>
+                    <AccordionTrigger className="sidebar-parent w-full">
+                        <BookOpen className="inline-block mr-2 size-5 text-primary" />
+                        知识点录入
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'knowledge-entry' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('knowledge-entry')}
                         >
                             知识点录入
                         </Button>
                         <Button
                             variant={activeTab === 'modules' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('modules')}
                         >
                             知识点汇总
@@ -114,18 +127,21 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
 
                 {/* 系统设置分组 */}
                 <AccordionItem value="settings">
-                    <AccordionTrigger className="justify-start w-full text-left">系统设置</AccordionTrigger>
+                    <AccordionTrigger className="sidebar-parent w-full">
+                        <Settings className="inline-block mr-2 size-5 text-primary" />
+                        系统设置
+                    </AccordionTrigger>
                     <AccordionContent className="space-y-1">
                         <Button
                             variant={activeTab === 'settings-basic' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('settings-basic')}
                         >
                             基础设置
                         </Button>
                         <Button
                             variant={activeTab === 'settings-advanced' ? 'default' : 'ghost'}
-                            className="w-full justify-start text-left"
+                            className="sidebar-child"
                             onClick={() => setActiveTab('settings-advanced')}
                         >
                             高级设置

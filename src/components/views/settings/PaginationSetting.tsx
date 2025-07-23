@@ -2,17 +2,18 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { toast } from "sonner";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number; setPageSize: (n: number) => void; }) {
     const [tempSize, setTempSize] = useState(pageSize.toString());
+    const { notify } = useNotification();
     const handleChange = (v: string) => {
         setTempSize(v);
         try {
             setPageSize(Number(v));
-            toast.success("分页设置已更新", { description: `每页${v}条` });
+            notify({ type: "success", message: "分页设置已更新", description: `每页${v}条` });
         } catch (e) {
-            toast.error("分页设置失败", { description: String(e) });
+            notify({ type: "error", message: "分页设置失败", description: String(e) });
         }
     };
     return (

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 interface KnowledgeFormProps {
     title: string;
@@ -21,11 +21,12 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
 }) => {
     const [type, setType] = useState('');
     const [note, setNote] = useState('');
+    const { notify } = useNotification();
 
     const handleSubmit = () => {
         if (!type.trim() && !note.trim()) return;
         onAddKnowledge({ type, note });
-        toast.success("保存成功");
+        notify({ type: "success", message: "保存成功" });
         setType('');
         setNote('');
     };

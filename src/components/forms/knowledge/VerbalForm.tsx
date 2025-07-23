@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 interface VerbalFormProps {
     onAddKnowledge: (knowledge: { idiom: string; meaning: string }) => void;
@@ -15,11 +15,12 @@ interface VerbalFormProps {
 const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge }) => {
     const [idiom, setIdiom] = useState('');
     const [meaning, setMeaning] = useState('');
+    const { notify } = useNotification();
 
     const handleSubmit = () => {
         if (!idiom.trim() && !meaning.trim()) return;
         onAddKnowledge({ idiom, meaning });
-        toast.success("保存成功");
+        notify({ type: "success", message: "保存成功" });
         setIdiom('');
         setMeaning('');
     };

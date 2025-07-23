@@ -8,7 +8,7 @@ import { TrendChart } from "@/components/charts/TrendChart";
 import { SettingsView } from "@/components/views/SettingsView";
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
-import { toast } from "sonner";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -45,6 +45,7 @@ import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
+import { StudyReport } from "@/components/features/StudyReport";
 
 // 定义刷题记录类型
 type RecordItem = {
@@ -120,11 +121,11 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
+  const { notify } = useNotification();
+
   const addRecord = (newRecord: RecordItem) => {
     setRecords(prevRecords => [newRecord, ...prevRecords]);
-    toast.success("记录已保存", {
-      description: `模块 "${newRecord.module}" 的新记录已添加。`,
-    });
+    notify({ type: "success", message: "记录已保存", description: `模块 \"${newRecord.module}\" 的新记录已添加。` });
   };
 
   const deleteRecord = (idToDelete: number) => {
@@ -134,9 +135,7 @@ export default function Home() {
   const handleClearAllData = () => {
     setRecords([]);
     setKnowledge([]);
-    toast.success("操作成功", {
-      description: "您的所有应用数据已被清空。",
-    });
+    notify({ type: "success", message: "操作成功", description: "您的所有应用数据已被清空。" });
   };
 
   const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
@@ -144,7 +143,7 @@ export default function Home() {
   const handleBatchDelete = () => {
     setRecords(prev => prev.filter(r => !selectedRecordIds.includes(r.id)));
     setSelectedRecordIds([]);
-    toast.success("批量删除成功", { description: `已删除 ${selectedRecordIds.length} 条记录。` });
+    notify({ type: "success", message: "批量删除成功", description: `已删除 ${selectedRecordIds.length} 条记录。` });
   };
 
   // 导出数据到 JSON 文件（支持知识点）
@@ -165,9 +164,7 @@ export default function Home() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success("导出成功", {
-      description: "您的所有数据（包括知识点）已成功导出到本地JSON文件。",
-    });
+    notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点）已成功导出到本地JSON文件。" });
   };
 
   const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -269,7 +266,7 @@ export default function Home() {
   const [pageSize, setPageSize] = useState(10);
   const [exportFormat, setExportFormat] = useState("json");
   const handleSaveSettings = () => {
-    toast.success("设置已保存");
+    notify({ type: "success", message: "设置已保存" });
     // 可在此处将设置同步到 localStorage 或后端
   };
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
@@ -310,6 +307,20 @@ export default function Home() {
     '常识判断': '常识判断',
     '言语理解': '言语理解',
     '判断推理': '判断推理',
+  };
+
+  // 批量清空各类数据
+  const handleClearRecords = () => {
+    setRecords([]);
+    notify({ type: "success", message: "历史记录已清空" });
+  };
+  const handleClearKnowledge = () => {
+    setKnowledge([]);
+    notify({ type: "success", message: "知识点已清空" });
+  };
+  const handleClearPlans = () => {
+    setPlans([]);
+    notify({ type: "success", message: "学习计划已清空" });
   };
 
   return (
@@ -403,7 +414,11 @@ export default function Home() {
               setExportFormat={setExportFormat}
               onSaveSettings={handleSaveSettings}
               activeTab={activeTab}
+              onClearRecords={handleClearRecords}
+              onClearKnowledge={handleClearKnowledge}
+              onClearPlans={handleClearPlans}
             />
+            <StudyReport records={records} plans={plans} knowledge={knowledge} />
           </div>
         )}
         {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
@@ -437,9 +452,7 @@ export default function Home() {
                 }, 100);
               }
               setImportDialogOpen(false);
-              toast.success("导入成功", {
-                description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！`,
-              });
+              notify({ type: "success", message: "导入成功", description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！` });
             }}>确认导入</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
