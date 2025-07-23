@@ -43,9 +43,7 @@ import PlanListView from "@/components/views/PlanListView";
 import PlanDetailView from "@/components/views/PlanDetailView";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
-import { DataImportExport } from "@/components/features/DataImportExport";
 import { MODULES as MODULES_CONFIG } from "@/config/exam";
-import { StudyReport } from "@/components/features/StudyReport";
 
 
 // 定义刷题记录类型
@@ -422,7 +420,6 @@ export default function Home() {
               onClearKnowledge={handleClearKnowledge}
               onClearPlans={handleClearPlans}
             />
-            <StudyReport records={records} plans={plans} knowledge={knowledge} />
           </div>
         )}
         {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}

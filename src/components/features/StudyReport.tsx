@@ -1,6 +1,5 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 interface StudyReportProps {
     records: any[];
@@ -10,7 +9,6 @@ interface StudyReportProps {
 
 export const StudyReport: React.FC<StudyReportProps> = ({ records, plans, knowledge }) => {
     const reportRef = useRef<HTMLDivElement>(null);
-    const [exporting, setExporting] = useState(false);
 
     // 总做题量、正确率、时长
     const total = records.reduce((sum, r) => sum + (r.total || 0), 0);
@@ -49,67 +47,16 @@ export const StudyReport: React.FC<StudyReportProps> = ({ records, plans, knowle
         accuracy: stat.total > 0 ? (stat.correct / stat.total) * 100 : 0,
     }));
 
-    // 亮点：最佳模块、进步最大模块
-    const bestModule = moduleStats.reduce((best, cur) => (cur.accuracy > (best?.accuracy || 0) ? cur : best), null as any);
-    const progressModule = (() => {
-        // 近30天与历史平均对比
-        const historyMap: Record<string, { total: number; correct: number }> = {};
-        records.forEach(r => {
-            if (!historyMap[r.module]) historyMap[r.module] = { total: 0, correct: 0 };
-            historyMap[r.module].total += r.total || 0;
-            historyMap[r.module].correct += r.correct || 0;
-        });
-        const last30Map: Record<string, { total: number; correct: number }> = {};
-        last30.forEach(r => {
-            if (!last30Map[r.module]) last30Map[r.module] = { total: 0, correct: 0 };
-            last30Map[r.module].total += r.total || 0;
-            last30Map[r.module].correct += r.correct || 0;
-        });
-        let maxDelta = -Infinity;
-        let result = null;
-        for (const m in last30Map) {
-            const hist = historyMap[m] || { total: 0, correct: 0 };
-            const histAcc = hist.total > 0 ? hist.correct / hist.total : 0;
-            const lastAcc = last30Map[m].total > 0 ? last30Map[m].correct / last30Map[m].total : 0;
-            const delta = lastAcc - histAcc;
-            if (delta > maxDelta) {
-                maxDelta = delta;
-                result = { module: m, delta: delta * 100 };
-            }
-        }
-        return result;
-    })();
-
-    // 修正 lab() 颜色为兼容色
-    const fixLabColors = (el: HTMLElement) => {
-        const all = el.querySelectorAll("*");
-        all.forEach(node => {
-            const style = window.getComputedStyle(node as Element);
-            if (style.backgroundColor && style.backgroundColor.startsWith("lab(")) {
-                (node as HTMLElement).style.backgroundColor = "#fff";
-            }
-            if (style.color && style.color.startsWith("lab(")) {
-                (node as HTMLElement).style.color = "#222";
-            }
-        });
-    };
-
-    // 导出PDF
-    const handleExportPDF = async () => {
-        if (!reportRef.current) return;
-        if (typeof window === "undefined") return;
-        setExporting(true);
-        // 修正 lab() 颜色
-        fixLabColors(reportRef.current);
-        const html2pdf = (await import("html2pdf.js")).default;
-        await html2pdf().set({
-            margin: 0.5,
-            filename: `学习报告_${new Date().toISOString().slice(0, 10)}.pdf`,
-            html2canvas: { scale: 1 }, // 降低scale提升速度
-            jsPDF: { unit: "in", format: "a4", orientation: "portrait" },
-        }).from(reportRef.current).save();
-        setExporting(false);
-    };
+    // 亮点总结
+    const bestModule = moduleStats.length > 0 ? moduleStats.reduce((a, b) => (a.accuracy > b.accuracy ? a : b)) : null;
+    // 进步最大模块（近30天与总正确率差值最大）
+    const progressModule = moduleStats.length > 0 ? moduleStats.map(m => {
+        const last30Module = last30.filter(r => r.module === m.module);
+        const last30Total = last30Module.reduce((sum, r) => sum + (r.total || 0), 0);
+        const last30Correct = last30Module.reduce((sum, r) => sum + (r.correct || 0), 0);
+        const last30Accuracy = last30Total > 0 ? (last30Correct / last30Total) * 100 : 0;
+        return { ...m, delta: last30Accuracy - m.accuracy };
+    }).reduce((a, b) => (a.delta > b.delta ? a : b)) : null;
 
     return (
         <Card className="max-w-3xl mx-auto my-8">
@@ -150,9 +97,6 @@ export const StudyReport: React.FC<StudyReportProps> = ({ records, plans, knowle
                     </ul>
                     <div className="text-xs text-gray-400">报告生成时间：{new Date().toLocaleString()}</div>
                 </div>
-                <Button className="mt-6" onClick={handleExportPDF} disabled={exporting}>
-                    {exporting ? '正在生成PDF...' : '导出为PDF'}
-                </Button>
             </CardContent>
         </Card>
     );
