@@ -1,7 +1,7 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { TrendChart } from "@/components/charts/TrendChart";
+import { TrendChart } from "@/components/ui/TrendChart";
 import { MODULE_SCORES } from "@/config/exam";
-import { ModulePieChart } from "@/components/charts/ModulePieChart";
+import { ModulePieChart } from "@/components/ui/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { RecordItem } from "@/types/record";

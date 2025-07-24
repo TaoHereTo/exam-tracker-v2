@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { MODULES } from '@/config/exam';
 
 interface StudyPlan {
     id: string;
@@ -23,14 +24,6 @@ interface PlanDetailProps {
 }
 
 export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps) {
-    const MODULES = [
-        { value: 'data-analysis', label: '资料分析' },
-        { value: 'politics', label: '政治理论' },
-        { value: 'math', label: '数量关系' },
-        { value: 'common', label: '常识判断' },
-        { value: 'verbal', label: '言语理解' },
-        { value: 'logic', label: '判断推理' },
-    ];
     return (
         <div className="max-w-3xl mx-auto">
             <Card>

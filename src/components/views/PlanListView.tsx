@@ -10,6 +10,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { format } from "date-fns";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import type { PlanType } from "@/types/record";
+import { MODULES } from '@/config/exam';
 
 interface StudyPlan {
     id: string;
@@ -24,14 +25,6 @@ interface StudyPlan {
     description?: string;
 }
 
-const MODULES = [
-    { value: 'data-analysis', label: '资料分析' },
-    { value: 'politics', label: '政治理论' },
-    { value: 'math', label: '数量关系' },
-    { value: 'common', label: '常识判断' },
-    { value: 'verbal', label: '言语理解' },
-    { value: 'logic', label: '判断推理' },
-];
 const PLAN_TYPES = [
     { value: '题量', label: '题量计划' },
     { value: '正确率', label: '正确率计划' },
@@ -129,7 +122,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 <Button size="sm" variant="ghost" className="ml-2" onClick={() => handleOpenForm(plan)}>编辑</Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button size="sm" variant="destructive" className="ml-2" onClick={() => handleDelete(plan.id)}>删除</Button>
+                                        <Button size="sm" variant="destructive" className="ml-2">删除</Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>

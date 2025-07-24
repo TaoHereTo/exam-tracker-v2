@@ -1,4 +1,4 @@
-import { HistoryTable } from "@/components/tables/HistoryTable";
+import { HistoryTable } from "@/components/ui/HistoryTable";
 import {
     Pagination,
     PaginationContent,

@@ -8,6 +8,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import { MODULES } from '@/config/exam';
 
 export type RecordItem = {
     id: number;
@@ -75,12 +76,9 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                                 <SelectValue placeholder="请选择模块" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="政治理论">政治理论</SelectItem>
-                                <SelectItem value="常识判断">常识判断</SelectItem>
-                                <SelectItem value="判断推理">判断推理</SelectItem>
-                                <SelectItem value="言语理解">言语理解</SelectItem>
-                                <SelectItem value="数量关系">数量关系</SelectItem>
-                                <SelectItem value="资料分析">资料分析</SelectItem>
+                                {MODULES.map(m => (
+                                    <SelectItem key={m.value} value={m.label}>{m.label}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

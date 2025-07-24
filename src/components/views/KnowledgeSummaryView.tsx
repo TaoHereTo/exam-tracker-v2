@@ -7,7 +7,6 @@ import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
     Pagination,
     PaginationContent,
@@ -18,20 +17,12 @@ import {
     PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { format } from 'date-fns';
+import { MODULES } from '@/config/exam';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
     onBatchDeleteKnowledge?: (ids: string[]) => void;
 }
-
-const MODULES = [
-    { value: 'data-analysis', label: '资料分析' },
-    { value: 'politics', label: '政治理论' },
-    { value: 'math', label: '数量关系' },
-    { value: 'common', label: '常识判断' },
-    { value: 'verbal', label: '言语理解' },
-    { value: 'logic', label: '判断推理' },
-];
 
 const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
     switch (module) {
@@ -71,8 +62,8 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             return {
                 ...col,
                 render: (row: KnowledgeItem) => {
-                    const value = (row as any).date;
-                    if (!value) return '';
+                    const value = (row as Record<string, unknown>)[col.key];
+                    if (!value || typeof value !== 'string') return '';
                     const d = new Date(value);
                     if (!isNaN(d.getTime())) {
                         return format(d, 'yyyy-MM-dd');

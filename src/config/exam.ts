@@ -1,4 +1,11 @@
-export const MODULES = ['政治理论', '常识判断', '判断推理', '言语理解', '数量关系', '资料分析'];
+export const MODULES = [
+    { value: 'data-analysis', label: '资料分析' },
+    { value: 'politics', label: '政治理论' },
+    { value: 'math', label: '数量关系' },
+    { value: 'common', label: '常识判断' },
+    { value: 'verbal', label: '言语理解' },
+    { value: 'logic', label: '判断推理' },
+];
 export const MODULE_SCORES = {
     '政治理论': 0.7, '常识判断': 0.8, '判断推理': 0.8,
     '言语理解': 0.8, '数量关系': 0.8, '资料分析': 0.7

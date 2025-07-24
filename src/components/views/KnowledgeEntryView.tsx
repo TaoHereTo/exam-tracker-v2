@@ -1,11 +1,11 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import DataAnalysisForm from '../forms/knowledge/DataAnalysisForm';
-import PoliticsForm from '../forms/knowledge/PoliticsForm';
-import MathForm from '../forms/knowledge/MathForm';
-import CommonForm from '../forms/knowledge/CommonForm';
-import VerbalForm from '../forms/knowledge/VerbalForm';
-import LogicForm from '../forms/knowledge/LogicForm';
+import DataAnalysisForm from '../forms/DataAnalysisForm';
+import PoliticsForm from '../forms/PoliticsForm';
+import MathForm from '../forms/MathForm';
+import CommonForm from '../forms/CommonForm';
+import VerbalForm from '../forms/VerbalForm';
+import LogicForm from '../forms/LogicForm';
 import {
     Carousel,
     CarouselContent,
