@@ -79,7 +79,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
 
     if (navMode !== 'dock') return null;
     return (
-        <div className="fixed bottom-[70px] left-0 w-full z-50 flex justify-center bg-transparent">
+        <div className="fixed bottom-[70px] left-0 w-full z-50 flex justify-center bg-transparent pointer-events-none">
             <TooltipProvider>
                 <Dock>
                     {dockNavs.flatMap(nav =>
@@ -91,7 +91,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
                                             type="button"
                                             aria-label={child.label}
                                             onClick={() => setActiveTab(child.key)}
-                                            className={"size-12 rounded-full flex items-center justify-center " + (activeTab === child.key ? "bg-gray-200/70 dark:bg-gray-700/60" : "")}
+                                            className={"size-12 rounded-full flex items-center justify-center pointer-events-auto " + (activeTab === child.key ? "bg-gray-200/70 dark:bg-gray-700/60" : "")}
                                         >
                                             {dockChildIcons[child.key] || <Settings />}
                                         </button>

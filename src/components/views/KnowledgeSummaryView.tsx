@@ -5,6 +5,7 @@ import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader,
 import { Button } from "@/components/ui/button";
 import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
 import type { KnowledgeItem } from "@/types/record";
+import * as XLSX from "xlsx";
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -64,10 +65,40 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         setDeleteDialogOpen(false);
     };
 
+    // 导出为Excel
+    const handleExportExcel = () => {
+        if (filtered.length === 0) return;
+        // 只导出当前模块的知识点
+        const ws = XLSX.utils.json_to_sheet(filtered.map(item => {
+            // 只导出主要字段
+            if (selectedModule === 'politics') {
+                return {
+                    '发布日期': (item as any).date,
+                    '文件来源': (item as any).source,
+                    '相关重点': (item as any).note,
+                };
+            } else if (selectedModule === 'verbal') {
+                return {
+                    '成语': (item as any).idiom,
+                    '含义': (item as any).meaning,
+                };
+            } else {
+                return {
+                    '类型': (item as any).type,
+                    '技巧记录': (item as any).note,
+                };
+            }
+        }));
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, MODULES.find(m => m.value === selectedModule)?.label || selectedModule);
+        XLSX.writeFile(wb, `知识点_${MODULES.find(m => m.value === selectedModule)?.label || selectedModule}.xlsx`);
+    };
+
     return (
         <div className="flex flex-col items-center justify-center min-h-[80vh]">
             <Card className="max-w-3xl w-full relative">
-                <div className="absolute top-4 right-4 z-10">
+                <div className="absolute top-4 right-4 z-10 flex gap-2">
+                    <Button variant="outline" onClick={handleExportExcel}>导出为Excel</Button>
                     <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                         <AlertDialogTrigger asChild>
                             <Button

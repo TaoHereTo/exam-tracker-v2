@@ -49,23 +49,6 @@ export function HistoryTable({
                     onSelect={v => onSelectIds(v as number[])}
                     onBatchDelete={() => setShowBatchDeleteDialog(true)}
                     rowKey={row => row.id}
-                    renderActions={row => (
-                        <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                                <Button variant="destructive" size="sm">删除</Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                                <AlertDialogHeader>
-                                    <AlertDialogTitle>确认删除？</AlertDialogTitle>
-                                    <AlertDialogDescription>删除后无法恢复，确定要删除这条历史记录吗？</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                    <AlertDialogCancel>取消</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => onDeleteRecord(row.id)}>确认删除</AlertDialogAction>
-                                </AlertDialogFooter>
-                            </AlertDialogContent>
-                        </AlertDialog>
-                    )}
                     batchDeleteText="批量删除"
                 />
                 <AlertDialogContent>
