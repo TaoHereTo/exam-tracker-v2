@@ -46,7 +46,7 @@ function calcAbilityIndex({ accuracy, perMinute, total }: { accuracy: number; pe
     );
 }
 
-function ModuleRadarChart({ data }: { data: any[] }) {
+function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     // 统计每个模块的参数
     const moduleStats: Record<string, { correct: number; total: number; duration: number }> = {};
     data.forEach(item => {
@@ -99,8 +99,8 @@ function ModuleRadarChart({ data }: { data: any[] }) {
     const option = {
         tooltip: {
             trigger: 'item',
-            formatter: function (params: any) {
-                return `${params.marker}${params.seriesName}<br/>${params.value.map((v: number, idx: number) => `${modules[idx]}：${v}`).join('<br/>')}`;
+            formatter: function (params: Record<string, unknown>) {
+                return `${params.marker}${params.seriesName}<br/>${(params.value as number[]).map((v: number, idx: number) => `${modules[idx]}：${v}`).join('<br/>')}`;
             }
         },
         radar: {

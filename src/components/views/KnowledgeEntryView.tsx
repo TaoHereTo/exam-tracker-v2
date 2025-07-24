@@ -35,8 +35,8 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
     const [tab, setTab] = useState(defaultTab);
     const carouselApi = useRef<CarouselApi | null>(null);
     // 包装函数，自动加上 module 字段
-    const handleAdd = (module: string) => (data: any) => {
-        onAddKnowledge({ ...data, module });
+    const handleAdd = (module: string) => (data: Partial<KnowledgeItem>) => {
+        onAddKnowledge({ ...data, module } as KnowledgeItem);
     };
     // tab 切换时，carousel 跳转
     const handleTabChange = (v: string) => {

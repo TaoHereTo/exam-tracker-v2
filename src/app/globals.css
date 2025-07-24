@@ -262,3 +262,40 @@ html,
 .animate-marquee-vertical-reverse {
   animation: marquee-vertical-reverse var(--duration, 40s) linear infinite;
 }
+
+/* ========== 全局字体设置优化 ========== */
+body,
+html {
+  font-family: "Century", serif;
+}
+
+/* 只针对中文字符，强制新宋体 */
+:lang(zh),
+.zh,
+[lang="zh"],
+[lang^="zh-"] {
+  font-family: "NSimSun", "新宋体", serif !important;
+}
+
+/* 针对所有英文，强制 Century */
+:lang(en),
+.en,
+[lang="en"],
+[lang^="en-"] {
+  font-family: "Century", serif !important;
+}
+
+/* 针对所有数字，强制 Century */
+.number,
+.num,
+[data-font="number"] {
+  font-family: "Century", serif !important;
+}
+
+/* 输入控件也用 Century，避免被新宋体影响 */
+input,
+textarea,
+select,
+button {
+  font-family: "Century", serif;
+}

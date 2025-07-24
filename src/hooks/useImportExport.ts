@@ -6,19 +6,49 @@ export function useImportExport(
     records: RecordItem[],
     setRecords: (r: RecordItem[]) => void,
     knowledge: KnowledgeItem[],
-    setKnowledge: (k: KnowledgeItem[]) => void
+    setKnowledge: (k: KnowledgeItem[]) => void,
+    plans?: any[],
+    setPlans?: (p: any[]) => void
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
-    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[] }>();
+    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[]; plans?: any[]; settings?: Record<string, any> }>();
 
-    // 导出数据到 JSON 文件（支持知识点）
+    // 获取所有相关设置
+    function getAllSettings() {
+        const keys = [
+            'exam-tracker-nav-mode',
+            'eye-care-enabled',
+            'notify-change-enabled',
+            'page-size',
+            'theme',
+        ];
+        const settings: Record<string, any> = {};
+        keys.forEach(key => {
+            const value = localStorage.getItem(key);
+            if (value !== null) settings[key] = value;
+        });
+        return settings;
+    }
+    // 写入所有相关设置
+    function setAllSettings(settings: Record<string, any>) {
+        if (!settings) return;
+        Object.entries(settings).forEach(([key, value]) => {
+            if (typeof value === 'string') {
+                localStorage.setItem(key, value);
+            }
+        });
+    }
+
+    // 导出数据到 JSON 文件（支持知识点、学习计划、设置）
     const handleExportData = () => {
         const exportData = {
             records,
             knowledge,
+            plans: plans || [],
+            settings: getAllSettings(),
             exportedAt: new Date().toISOString(),
-            version: 2,
+            version: 3,
         };
         const json = JSON.stringify(exportData, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
@@ -30,10 +60,10 @@ export function useImportExport(
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点）已成功导出到本地JSON文件。" });
+        notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点、学习计划、设置）已成功导出到本地JSON文件。" });
     };
 
-    // 从 JSON 文件导入数据（支持知识点）
+    // 从 JSON 文件导入数据（支持知识点、学习计划、设置）
     const handleImportData = () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -50,12 +80,20 @@ export function useImportExport(
                         // 兼容多种结构
                         let importedRecords: RecordItem[] = [];
                         let importedKnowledge: KnowledgeItem[] = [];
+                        let importedPlans: any[] = [];
+                        let importedSettings: Record<string, any> = {};
                         if (Array.isArray(importedObject)) {
                             importedRecords = importedObject;
                         } else if (importedObject && importedObject.records) {
                             importedRecords = importedObject.records;
                             if (Array.isArray(importedObject.knowledge)) {
                                 importedKnowledge = importedObject.knowledge;
+                            }
+                            if (Array.isArray(importedObject.plans)) {
+                                importedPlans = importedObject.plans;
+                            }
+                            if (importedObject.settings && typeof importedObject.settings === 'object') {
+                                importedSettings = importedObject.settings;
                             }
                         } else if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
                             importedRecords = importedObject.data.records;
@@ -78,7 +116,7 @@ export function useImportExport(
                             'verbal': 'verbal',
                             'logic': 'logic',
                         };
-                        function normalizeDate(date: any) {
+                        function normalizeDate(date: unknown) {
                             if (!date) return '';
                             if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
                             const d = new Date(date);
@@ -106,7 +144,13 @@ export function useImportExport(
                             }
                             return { ...k, id };
                         });
-                        setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge });
+                        // plans 不做特殊处理，直接导入
+                        if (setPlans && Array.isArray(importedPlans)) {
+                            setPlans(importedPlans);
+                        }
+                        // settings 写入 localStorage
+                        setAllSettings(importedSettings);
+                        setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge, plans: importedPlans, settings: importedSettings });
                         setImportDialogOpen(true);
                     } catch (err) {
                         alert('导入失败，文件内容不是有效的 JSON！');

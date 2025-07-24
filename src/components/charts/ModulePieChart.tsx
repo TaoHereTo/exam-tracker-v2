@@ -56,8 +56,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     // 统计每个模块的总耗时和总题数（只统计有效记录，单位均为分钟）
     const moduleStats: Record<string, { duration: number; questions: number }> = {};
     data.forEach(item => {
-        let duration = Number(item.duration); // 你的 duration 单位就是分钟
-        let total = Number((item as any).total);
+        const duration = Number(item.duration); // 你的 duration 单位就是分钟
+        const total = Number((item as { total: number }).total);
         if (!item.module || !isFinite(duration) || !isFinite(total) || total <= 0 || duration <= 0) return;
         if (!moduleStats[item.module]) {
             moduleStats[item.module] = { duration: 0, questions: 0 };
@@ -78,7 +78,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     const option = {
         tooltip: {
             trigger: 'item',
-            formatter: (params: any) => {
+            formatter: (params: Record<string, any>) => {
                 return `${params.name}<br/>${params.data.standardQuestions}题 × ${params.data.avg}分钟/题 = <b>${params.value}分钟</b>`;
             }
         },

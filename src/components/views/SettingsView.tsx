@@ -94,15 +94,15 @@ export function SettingsView({
                 <CardHeader>
                     <CardTitle>数据管理</CardTitle>
                     <CardDescription>
-                        备份、恢复或清空您的应用数据。请谨慎操作。
+                        备份、恢复您的应用数据。请及时保存。
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div>
-                            <h3 className="font-medium">备份、恢复与清空</h3>
+                            <h3 className="font-medium">备份与恢复</h3>
                             <p className="text-sm text-muted-foreground">
-                                将所有数据导出到文件、从文件恢复，或清空所有数据。
+                                将所有数据导出到文件、或从文件恢复。
                             </p>
                         </div>
                         <DataImportExport onImport={onImport!} onExport={onExport!} />

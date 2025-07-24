@@ -134,7 +134,7 @@ const DockIcon = React.forwardRef<HTMLDivElement, DockIconProps>(
         ref={innerRef}
         style={{ width: scaleSize, height: scaleSize, padding }}
         className={cn(
-          "flex aspect-square cursor-pointer items-center justify-center rounded-full",
+          "flex aspect-square cursor-pointer items-center justify-center rounded-full transition-colors duration-150 hover:bg-gray-200/70 dark:hover:bg-gray-700/60",
           className,
         )}
         {...props}

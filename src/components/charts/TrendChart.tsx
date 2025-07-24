@@ -47,7 +47,7 @@ const moduleColors: Record<string, string> = {
 export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule }) => {
     let allModules: string[] = [];
     let allDates: string[] = [];
-    let chartData: any[] = [];
+    let chartData: Record<string, any>[] = [];
 
     if (data.length > 0) {
         if (onlyModule) {
@@ -83,9 +83,9 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             borderWidth: 1,
             textStyle: { color: '#333', fontSize: 14 },
             extraCssText: 'box-shadow: 0 4px 16px rgba(51,102,255,0.08); border-radius: 8px;',
-            formatter: function (params: any) {
+            formatter: function (params: Array<Record<string, any>>) {
                 let res = `<b>${params[0].axisValueLabel}</b><br/>`;
-                params.forEach((item: any) => {
+                params.forEach((item: Record<string, any>) => {
                     let val = (typeof item.value === 'number' && !isNaN(item.value))
                         ? item.value
                         : (item.data && typeof item.data[item.seriesName] === 'number' && !isNaN(item.data[item.seriesName]))

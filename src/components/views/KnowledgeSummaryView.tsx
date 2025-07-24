@@ -20,7 +20,7 @@ const MODULES = [
     { value: 'logic', label: '判断推理' },
 ];
 
-const getColumns = (module: string): DataTableColumn<any>[] => {
+const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
     switch (module) {
         case 'data-analysis':
         case 'math':

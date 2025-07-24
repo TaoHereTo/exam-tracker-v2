@@ -93,7 +93,7 @@ export function DataTable<T>({
                                     )}
                                     {columns.map(col => (
                                         <td key={col.key} className="border px-4 py-2">
-                                            {col.render ? col.render(row) : (row as any)[col.key] ?? ''}
+                                            {col.render ? col.render(row) : (row as Record<string, unknown>)[col.key] ?? ''}
                                         </td>
                                     ))}
                                     {renderActions && (
