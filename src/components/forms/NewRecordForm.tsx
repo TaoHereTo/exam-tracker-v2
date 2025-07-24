@@ -62,7 +62,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                                     {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
                                 </Button>
                             </PopoverTrigger>
-                            <PopoverContent className="p-0" align="start">
+                            <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
                                 <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
                             </PopoverContent>
                         </Popover>

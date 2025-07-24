@@ -23,6 +23,14 @@ interface PlanDetailProps {
 }
 
 export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps) {
+    const MODULES = [
+        { value: 'data-analysis', label: '资料分析' },
+        { value: 'politics', label: '政治理论' },
+        { value: 'math', label: '数量关系' },
+        { value: 'common', label: '常识判断' },
+        { value: 'verbal', label: '言语理解' },
+        { value: 'logic', label: '判断推理' },
+    ];
     return (
         <div className="max-w-3xl mx-auto">
             <Card>
@@ -37,7 +45,7 @@ export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps
                     <div className="text-sm text-muted-foreground">{plan.startDate} ~ {plan.endDate}</div>
                     <div className="mt-2 text-xs text-gray-400">{plan.description}</div>
                     <div className="mt-2 text-xs text-gray-400">类型：{plan.type}</div>
-                    <div className="mt-2 text-xs text-gray-400">板块：{plan.module}</div>
+                    <div className="mt-2 text-xs text-gray-400">板块：{MODULES.find(m => m.value === plan.module)?.label || plan.module}</div>
                     <div className="mt-2 text-xs text-gray-400">目标：{plan.type === '题量' ? `${plan.target}题` : plan.type === '正确率' ? `${plan.target}%` : `${plan.target}道错题`}</div>
                     <div className="mt-2 text-xs text-gray-400">进度：{plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}</div>
                     <div className="mt-2 text-xs text-gray-400">状态：{plan.status}</div>
@@ -48,4 +56,4 @@ export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps
             </Card>
         </div>
     );
-} 
+}

@@ -43,7 +43,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge }) => {
                                 {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
                             </Button>
                         </PopoverTrigger>
-                        <PopoverContent className="p-0" align="start">
+                        <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
                             <Calendar mode="single" selected={date ?? undefined} onSelect={v => setDate(v ?? null)} initialFocus required={false} />
                         </PopoverContent>
                     </Popover>

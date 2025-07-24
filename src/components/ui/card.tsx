@@ -39,7 +39,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="card"
       onMouseEnter={checkInteractive}
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-all duration-200",
+        "card bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-all duration-200",
         canHover && "hover:shadow-lg hover:-translate-y-1",
         className
       )}

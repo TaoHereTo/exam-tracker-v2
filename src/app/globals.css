@@ -303,3 +303,24 @@ select,
 button {
   font-family: "Century", serif;
 }
+
+body.eye-care {
+  background: #f7f3e8 !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care .card,
+body.eye-care .bg-background,
+body.eye-care .bg-white {
+  background: #f9f6ee !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care .border,
+body.eye-care .border-input {
+  border-color: #e2d9c3 !important;
+}
+
+body.eye-care .text-muted-foreground {
+  color: #b0a98b !important;
+}

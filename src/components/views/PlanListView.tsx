@@ -116,7 +116,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                 <Button onClick={() => handleOpenForm()}>新建计划</Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {plans.length === 0 && <div className="text-gray-400 col-span-2">暂无计划</div>}
+                {plans.length === 0 && <div className="flex flex-col items-center justify-center col-span-2 py-16 text-gray-400 text-xl">
+                    <svg width="48" height="48" fill="none" viewBox="0 0 48 48" className="mb-4 opacity-60"><circle cx="24" cy="24" r="22" stroke="currentColor" strokeWidth="2" fill="none" /><path d="M16 24h16M16 30h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+                    暂无计划
+                </div>}
                 {plans.map(plan => (
                     <Card key={plan.id}>
                         <CardHeader>

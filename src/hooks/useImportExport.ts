@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import type { RecordItem, KnowledgeItem, StudyPlan } from "@/types/record";
+import { format } from 'date-fns';
 
 export function useImportExport(
     records: RecordItem[],
@@ -54,8 +55,9 @@ export function useImportExport(
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
+        const today = format(new Date(), 'yyyyMMdd');
         a.href = url;
-        a.download = 'exam-tracker-backup.json';
+        a.download = `exam-tracker-backup_${today}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

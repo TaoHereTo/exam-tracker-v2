@@ -17,6 +17,7 @@ import {
     PaginationNext,
     PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { format } from 'date-fns';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -65,7 +66,23 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const pageSize = 10;
-    const columns = getColumns(selectedModule);
+    const columns = getColumns(selectedModule).map(col => {
+        if (selectedModule === 'politics' && col.key === 'date') {
+            return {
+                ...col,
+                render: (row: KnowledgeItem) => {
+                    const value = (row as any).date;
+                    if (!value) return '';
+                    const d = new Date(value);
+                    if (!isNaN(d.getTime())) {
+                        return format(d, 'yyyy-MM-dd');
+                    }
+                    return value;
+                }
+            };
+        }
+        return col;
+    });
     // 先按模块过滤
     let filtered = knowledge.filter(item => item.module === selectedModule);
     // 再按关键词过滤
@@ -96,12 +113,22 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     // 导出为Excel
     const handleExportExcel = () => {
         if (filtered.length === 0) return;
-        // 只导出当前模块的知识点
+        const today = format(new Date(), 'yyyyMMdd');
         const ws = XLSX.utils.json_to_sheet(filtered.map(item => {
             if (selectedModule === 'politics') {
                 const k = item as { date?: string; source?: string; note?: string };
+                // 格式化日期
+                let dateStr = '';
+                if (k.date) {
+                    const d = new Date(k.date);
+                    if (!isNaN(d.getTime())) {
+                        dateStr = format(d, 'yyyy-MM-dd');
+                    } else {
+                        dateStr = k.date;
+                    }
+                }
                 return {
-                    '发布日期': k.date ?? '',
+                    '发布日期': dateStr,
                     '文件来源': k.source ?? '',
                     '相关重点': k.note ?? '',
                 };
@@ -121,7 +148,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         }));
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, MODULES.find(m => m.value === selectedModule)?.label || selectedModule);
-        XLSX.writeFile(wb, `知识点_${MODULES.find(m => m.value === selectedModule)?.label || selectedModule}.xlsx`);
+        XLSX.writeFile(wb, `知识点_${MODULES.find(m => m.value === selectedModule)?.label || selectedModule}_${today}.xlsx`);
     };
 
     return (
