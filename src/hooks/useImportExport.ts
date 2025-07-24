@@ -142,14 +142,19 @@ export function useImportExport(
                                 duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration).toString() : String(r.duration)) : '',
                             };
                         });
-                        // 补全知识点id，保证id为字符串且唯一
-                        const normalizedKnowledge = importedKnowledge.map((k: KnowledgeItem) => {
-                            let id = k.id;
-                            if (!id || typeof id !== 'string') {
-                                id = Date.now().toString() + Math.random().toString(16).slice(2);
-                            }
-                            return { ...k, id };
-                        });
+                        // 补全知识点id，保证id为字符串且唯一，只保留有module字段的知识点
+                        function hasModuleField(k: unknown): k is KnowledgeItem {
+                            return typeof k === 'object' && k !== null && 'module' in k && typeof (k as KnowledgeItem).module === 'string' && (k as KnowledgeItem).module.length > 0;
+                        }
+                        const normalizedKnowledge = importedKnowledge
+                            .filter(hasModuleField)
+                            .map((k: KnowledgeItem) => {
+                                let id = k.id;
+                                if (!id || typeof id !== 'string') {
+                                    id = Date.now().toString() + Math.random().toString(16).slice(2);
+                                }
+                                return { ...k, id };
+                            });
                         // plans 不做特殊处理，直接导入
                         if (setPlans && Array.isArray(importedPlans)) {
                             setPlans(importedPlans);

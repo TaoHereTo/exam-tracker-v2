@@ -11,9 +11,7 @@ import { NewRecordView } from "@/components/views/NewRecordView";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import DockNavigation from "@/components/layout/DockNavigation";
-import { usePlans } from "@/hooks/usePlans";
-import { useRecords } from "@/hooks/useRecords";
-import type { KnowledgeItem } from "@/types/record";
+import type { RecordItem, StudyPlan, KnowledgeItem } from "@/types/record";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -47,21 +45,9 @@ export default function Home() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
 
-  // 替换计划相关逻辑
-  const {
-    plans,
-    setPlans,
-    createPlan,
-    updatePlan,
-    deletePlan,
-  } = usePlans([]);
-  // 替换记录相关逻辑
-  const {
-    records,
-    setRecords,
-    addRecord,
-    deleteRecord,
-  } = useRecords([]);
+  // 计划和刷题记录持久化到localStorage
+  const [plans, setPlans] = useLocalStorageState<StudyPlan[]>("exam-tracker-plans-v2", []);
+  const [records, setRecords] = useLocalStorageState<RecordItem[]>("exam-tracker-records-v2", []);
 
   const {
     handleExportData,
@@ -92,6 +78,13 @@ export default function Home() {
   const handleShowDetail = (id: string) => setActivePlanId(id);
   // 返回列表
   const handleBackToList = () => setActivePlanId(null);
+
+  // 新增增删改逻辑
+  const addRecord = (record: RecordItem) => setRecords(prev => [record, ...prev]);
+  const deleteRecord = (id: number) => setRecords(prev => prev.filter(r => r.id !== id));
+  const createPlan = (plan: StudyPlan) => setPlans(prev => [plan, ...prev]);
+  const updatePlan = (plan: StudyPlan) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
+  const deletePlan = (id: string) => setPlans(prev => prev.filter(p => p.id !== id));
 
   // plans和records变化时自动统计进度
   usePlanProgress(plans, setPlans, records, calcPlanProgress);

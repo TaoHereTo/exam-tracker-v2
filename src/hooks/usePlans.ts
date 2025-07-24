@@ -13,18 +13,4 @@ export interface StudyPlan {
     description?: string;
 }
 
-export function usePlans(initialPlans: StudyPlan[] = []) {
-    const [plans, setPlans] = useState<StudyPlan[]>(initialPlans);
-
-    const createPlan = (plan: StudyPlan) => setPlans(prev => [plan, ...prev]);
-    const updatePlan = (plan: StudyPlan) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
-    const deletePlan = (id: string) => setPlans(prev => prev.filter(p => p.id !== id));
-
-    return {
-        plans,
-        setPlans,
-        createPlan,
-        updatePlan,
-        deletePlan,
-    };
-} 
+// usePlans 已被移除，全部由 useLocalStorageState 取代 

@@ -9,18 +9,4 @@ export interface RecordItem {
     duration: string;
 }
 
-export function useRecords(initialRecords: RecordItem[] = []) {
-    const [records, setRecords] = useState<RecordItem[]>(initialRecords);
-
-    const addRecord = (record: RecordItem) => setRecords(prev => [record, ...prev]);
-    const deleteRecord = (id: number) => setRecords(prev => prev.filter(r => r.id !== id));
-    const batchDeleteRecords = (ids: number[]) => setRecords(prev => prev.filter(r => !ids.includes(r.id)));
-
-    return {
-        records,
-        setRecords,
-        addRecord,
-        deleteRecord,
-        batchDeleteRecords,
-    };
-} 
+// useRecords 已被移除，全部由 useLocalStorageState 取代 
