@@ -6,6 +6,7 @@ export interface DataTableColumn<T> {
     key: string;
     label: string;
     render?: (row: T) => React.ReactNode;
+    className?: string;
 }
 
 export interface DataTableProps<T, K extends string | number = string | number> {
@@ -18,6 +19,7 @@ export interface DataTableProps<T, K extends string | number = string | number> 
     rowKey: (row: T, idx: number) => K;
     selectable?: boolean;
     batchDeleteText?: string;
+    checkboxColClassName?: string;
 }
 
 export function DataTable<T, K extends string | number = string | number>({
@@ -30,6 +32,7 @@ export function DataTable<T, K extends string | number = string | number>({
     rowKey,
     selectable = true,
     batchDeleteText = "批量删除",
+    checkboxColClassName = "",
 }: DataTableProps<T, K>) {
     const allSelected = data.length > 0 && selected.length === data.length;
     const indeterminate = selected.length > 0 && selected.length < data.length;
@@ -53,7 +56,7 @@ export function DataTable<T, K extends string | number = string | number>({
                 <thead>
                     <tr>
                         {selectable && (
-                            <th className="border px-4 py-2 text-center bg-gray-100 dark:bg-gray-800 dark:text-gray-100">
+                            <th className={`border px-4 py-2 text-center bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${checkboxColClassName}`}>
                                 <Checkbox
                                     checked={allSelected}
                                     indeterminate={indeterminate}
@@ -65,7 +68,7 @@ export function DataTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className="border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100">{col.label}</th>
+                            <th key={col.key} className={`border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${col.className || ''}`}>{col.label}</th>
                         ))}
                         {renderActions && <th className="border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100">操作</th>}
                     </tr>
@@ -81,7 +84,7 @@ export function DataTable<T, K extends string | number = string | number>({
                             return (
                                 <tr key={key}>
                                     {selectable && (
-                                        <td className="border px-4 py-2 text-center">
+                                        <td className={`border px-4 py-2 text-center ${checkboxColClassName}`}>
                                             <Checkbox
                                                 checked={selected.includes(key)}
                                                 onCheckedChange={checked => {
@@ -92,7 +95,7 @@ export function DataTable<T, K extends string | number = string | number>({
                                         </td>
                                     )}
                                     {columns.map(col => (
-                                        <td key={col.key} className="border px-4 py-2">
+                                        <td key={col.key} className={`border px-4 py-2 ${col.className || ''}`}>
                                             {col.render ? col.render(row) : (() => {
                                                 const value = (row as Record<string, unknown>)[col.key];
                                                 if (
