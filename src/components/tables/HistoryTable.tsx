@@ -42,11 +42,11 @@ export function HistoryTable({
     return (
         <div className="max-w-6xl w-full mx-auto">
             <AlertDialog open={showBatchDeleteDialog} onOpenChange={setShowBatchDeleteDialog}>
-                <DataTable
+                <DataTable<RecordItem, number>
                     columns={columns}
                     data={records}
                     selected={selectedIds}
-                    onSelect={onSelectIds}
+                    onSelect={v => onSelectIds(v as number[])}
                     onBatchDelete={() => setShowBatchDeleteDialog(true)}
                     rowKey={row => row.id}
                     renderActions={row => (

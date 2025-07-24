@@ -68,8 +68,8 @@ export function useImportExport(
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.json,application/json';
-        input.onchange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-            const file = e.target.files[0];
+        input.onchange = async (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (event) => {
@@ -119,23 +119,29 @@ export function useImportExport(
                         function normalizeDate(date: unknown) {
                             if (!date) return '';
                             if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
-                            const d = new Date(date);
-                            if (!isNaN(d.getTime())) {
-                                const y = d.getFullYear();
-                                const m = String(d.getMonth() + 1).padStart(2, '0');
-                                const day = String(d.getDate()).padStart(2, '0');
-                                return `${y}-${m}-${day}`;
+                            if (typeof date === 'string' || typeof date === 'number' || date instanceof Date) {
+                                const d = new Date(date);
+                                if (!isNaN(d.getTime())) {
+                                    const y = d.getFullYear();
+                                    const m = String(d.getMonth() + 1).padStart(2, '0');
+                                    const day = String(d.getDate()).padStart(2, '0');
+                                    return `${y}-${m}-${day}`;
+                                }
                             }
                             return '';
                         }
-                        const normalizedRecords = importedRecords.map((r: RecordItem) => ({
-                            id: r.id ?? Date.now() + Math.random(),
-                            date: normalizeDate(r.date),
-                            module: moduleMap[r.module] ?? r.module,
-                            total: r.total ?? r.totalCount ?? 0,
-                            correct: r.correct ?? r.correctCount ?? 0,
-                            duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration.toFixed(1)).toString() : r.duration) : '',
-                        }));
+                        const normalizedRecords = importedRecords.map((r: RecordItem | (Record<string, unknown> & { totalCount?: number; correctCount?: number })) => {
+                            const total = 'total' in r ? r.total : ('totalCount' in r ? (r as { totalCount?: number }).totalCount ?? 0 : 0);
+                            const correct = 'correct' in r ? r.correct : ('correctCount' in r ? (r as { correctCount?: number }).correctCount ?? 0 : 0);
+                            return {
+                                id: typeof r.id === 'number' ? r.id : Date.now() + Math.floor(Math.random() * 10000),
+                                date: normalizeDate(r.date),
+                                module: moduleMap[String((r as Record<string, unknown>).module)] ?? (r as Record<string, unknown>).module,
+                                total: typeof total === 'number' ? total : Number(total) || 0,
+                                correct: typeof correct === 'number' ? correct : Number(correct) || 0,
+                                duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration).toString() : String(r.duration)) : '',
+                            };
+                        });
                         // 补全知识点id，保证id为字符串且唯一
                         const normalizedKnowledge = importedKnowledge.map((k: KnowledgeItem) => {
                             let id = k.id;

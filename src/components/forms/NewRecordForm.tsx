@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export type RecordItem = {
     id: number;
@@ -23,6 +24,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
     const [correct, setCorrect] = useState("");
     const [total, setTotal] = useState("");
     const [duration, setDuration] = useState("");
+    const { notify } = useNotification();
 
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -36,6 +38,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
             duration,
         };
         onAddRecord?.(newRecord);
+        notify({ type: "success", message: "保存成功" });
         setDate(undefined);
         setModule("");
         setCorrect("");

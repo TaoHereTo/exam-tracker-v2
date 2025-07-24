@@ -48,7 +48,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
 
 const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, onBatchDeleteKnowledge }) => {
     const [selectedModule, setSelectedModule] = useState('data-analysis');
-    const [selectedRows, setSelectedRows] = useState<(string | number)[]>([]);
+    const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const columns = getColumns(selectedModule);
     const filtered = knowledge.filter(item => item.module === selectedModule);
@@ -59,8 +59,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
 
     const handleDeleteSelected = () => {
         if (!onBatchDeleteKnowledge) return;
-        // 只传递string类型的id
-        onBatchDeleteKnowledge(selectedRows.filter(id => typeof id === 'string') as string[]);
+        onBatchDeleteKnowledge(selectedRows);
         setSelectedRows([]);
         setDeleteDialogOpen(false);
     };
@@ -107,14 +106,12 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         </Select>
                     </div>
                     <div className="overflow-x-auto">
-                        <DataTable
+                        <DataTable<KnowledgeItem, string>
                             columns={columns}
                             data={filtered}
-                            selected={selectedRows.filter(id => typeof id === 'string') as string[]}
-                            onSelect={v => setSelectedRows(v as (string | number)[])}
-                            onBatchDelete={selectedRows.length > 0 ? () => setDeleteDialogOpen(true) : undefined}
-                            rowKey={(row, idx) => `${row.id}-${row.module || ''}-${idx}`}
-                            batchDeleteText="批量删除"
+                            selected={selectedRows}
+                            onSelect={v => setSelectedRows(v as string[])}
+                            rowKey={row => row.id}
                         />
                     </div>
                 </CardContent>

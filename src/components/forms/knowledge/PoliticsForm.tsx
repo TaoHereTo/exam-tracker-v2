@@ -44,7 +44,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge }) => {
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="p-0" align="start">
-                            <Calendar mode="single" selected={date!} onSelect={setDate} initialFocus />
+                            <Calendar mode="single" selected={date ?? undefined} onSelect={v => setDate(v ?? null)} initialFocus required={false} />
                         </PopoverContent>
                     </Popover>
                 </div>

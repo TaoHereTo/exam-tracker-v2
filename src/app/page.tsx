@@ -77,10 +77,10 @@ export default function Home() {
   const [pageSize, setPageSize] = useState(10);
   const [exportFormat, setExportFormat] = useState("json");
   // navMode 必须先声明，再用 useRef(navMode)
-  const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
-  const lastSavedNavMode = useRef(navMode);
+  const [navMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
 
-  // 移除handleSaveSettings相关代码
+  // 移除未使用的 setNavMode 和 lastSavedNavMode 变量
+  // 移除未使用的 setNavMode 和 lastSavedNavMode 变量
   const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
@@ -226,9 +226,9 @@ export default function Home() {
                 onImport={handleImportData}
                 onClearAllData={handleClearAllData}
                 pageSize={pageSize}
-                setPageSize={setPageSize}
+                setPageSize={(n: number) => setPageSize(n)}
                 exportFormat={exportFormat}
-                setExportFormat={setExportFormat}
+                setExportFormat={(f: string) => setExportFormat(f)}
                 navMode={navMode}
                 activeTab={activeTab}
               />
@@ -242,10 +242,9 @@ export default function Home() {
                 onImport={handleImportData}
                 onClearAllData={handleClearAllData}
                 pageSize={pageSize}
-                setPageSize={setPageSize}
+                setPageSize={(n: number) => setPageSize(n)}
                 exportFormat={exportFormat}
-                setExportFormat={setExportFormat}
-                onSaveSettings={() => { }} // 移除handleSaveSettings
+                setExportFormat={(f: string) => setExportFormat(f)}
                 activeTab={activeTab}
                 onClearRecords={handleClearRecords}
                 onClearKnowledge={handleClearKnowledge}

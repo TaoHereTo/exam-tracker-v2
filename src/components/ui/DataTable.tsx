@@ -8,19 +8,19 @@ export interface DataTableColumn<T> {
     render?: (row: T) => React.ReactNode;
 }
 
-interface DataTableProps<T> {
+export interface DataTableProps<T, K extends string | number = string | number> {
     columns: DataTableColumn<T>[];
     data: T[];
-    selected: number[] | string[];
-    onSelect: (selected: (number | string)[]) => void;
+    selected: K[];
+    onSelect: (selected: K[]) => void;
     onBatchDelete?: () => void;
     renderActions?: (row: T) => React.ReactNode;
-    rowKey: (row: T, idx: number) => string | number;
+    rowKey: (row: T, idx: number) => K;
     selectable?: boolean;
     batchDeleteText?: string;
 }
 
-export function DataTable<T>({
+export function DataTable<T, K extends string | number = string | number>({
     columns,
     data,
     selected,
@@ -30,7 +30,7 @@ export function DataTable<T>({
     rowKey,
     selectable = true,
     batchDeleteText = "批量删除",
-}: DataTableProps<T>) {
+}: DataTableProps<T, K>) {
     const allSelected = data.length > 0 && selected.length === data.length;
     const indeterminate = selected.length > 0 && selected.length < data.length;
 
@@ -93,7 +93,19 @@ export function DataTable<T>({
                                     )}
                                     {columns.map(col => (
                                         <td key={col.key} className="border px-4 py-2">
-                                            {col.render ? col.render(row) : (row as Record<string, unknown>)[col.key] ?? ''}
+                                            {col.render ? col.render(row) : (() => {
+                                                const value = (row as Record<string, unknown>)[col.key];
+                                                if (
+                                                    typeof value === 'string' ||
+                                                    typeof value === 'number' ||
+                                                    typeof value === 'boolean' ||
+                                                    value === null ||
+                                                    value === undefined
+                                                ) {
+                                                    return value ?? '';
+                                                }
+                                                return '';
+                                            })()}
                                         </td>
                                     ))}
                                     {renderActions && (

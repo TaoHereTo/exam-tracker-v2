@@ -21,7 +21,7 @@ import SaveSettingsButton from "./settings/SaveSettingsButton";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
-    pageSize, setPageSize, exportFormat, setExportFormat, onSaveSettings,
+    pageSize, setPageSize, exportFormat, setExportFormat,
     activeTab,
     onClearRecords, onClearKnowledge, onClearPlans,
     navMode
@@ -33,7 +33,7 @@ export function SettingsView({
     setPageSize: (n: number) => void;
     exportFormat: string;
     setExportFormat: (f: string) => void;
-    onSaveSettings?: () => void;
+    // onSaveSettings?: () => void; // 移除未使用的props
     activeTab?: string;
     onClearRecords?: () => void;
     onClearKnowledge?: () => void;

@@ -56,7 +56,8 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                     const moduleRecords = records.filter(r => moduleLabelMap[r.module] === module.label || r.module === module.label);
                     const best = moduleRecords.reduce<{ record: RecordItem; perMinute: number } | null>((acc, cur) => {
                         const duration = parseFloat(cur.duration) || 0;
-                        const perMinute = duration > 0 ? (MODULE_SCORES[cur.module] || 1) * cur.correct / duration : 0;
+                        const score = (MODULE_SCORES as Record<string, number>)[cur.module];
+                        const perMinute = duration > 0 ? (score ?? 1) * cur.correct / duration : 0;
                         if (!acc || perMinute > acc.perMinute) {
                             return { record: cur, perMinute };
                         }
@@ -84,7 +85,7 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
             {/* 预测成绩分析 */}
             <div className="mt-8 max-w-7xl mx-auto w-full">
                 <ScorePredictor records={records.map(r => ({
-                    module: r.module,
+                    module: (r.module as keyof typeof MODULE_SCORES),
                     correctCount: r.correct,
                     duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration,
                 }))} />

@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 
-interface KnowledgeFormProps {
+export interface KnowledgeFormProps {
     title: string;
     typePlaceholder: string;
     notePlaceholder: string;

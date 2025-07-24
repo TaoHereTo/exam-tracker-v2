@@ -216,7 +216,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                     </div>
                                     <div className="flex-1">
                                         <Label htmlFor="type">计划类型</Label>
-                                        <Select value={form.type || ''} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                                        <Select value={form.type || ''} onValueChange={v => setForm(f => ({ ...f, type: v as PlanType }))}>
                                             <SelectTrigger className="w-full mt-2">
                                                 <SelectValue placeholder="请选择类型" />
                                             </SelectTrigger>

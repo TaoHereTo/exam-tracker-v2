@@ -149,12 +149,14 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                         symbolSize: 14,
                         itemStyle: {
                             color: function (params: unknown) {
-                                return pointColors[params.dataIndex] || '#3366FF';
+                                const idx = (params as { dataIndex: number }).dataIndex;
+                                return pointColors[idx] || '#3366FF';
                             },
                             borderColor: '#fff',
                             borderWidth: 2,
                             shadowColor: function (params: unknown) {
-                                return pointColors[params.dataIndex] || '#3366FF';
+                                const idx = (params as { dataIndex: number }).dataIndex;
+                                return pointColors[idx] || '#3366FF';
                             },
                             shadowBlur: 8
                         },
@@ -262,7 +264,9 @@ export function ChartsView({ records }: ChartsViewProps) {
                     <TabsContent value="pie">
                         <div style={{ height: '500px' }}>
                             <ModulePieChart data={records.map(r => ({
-                                ...r,
+                                date: r.date,
+                                module: r.module,
+                                score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
                                 duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
                             }))} />
                         </div>

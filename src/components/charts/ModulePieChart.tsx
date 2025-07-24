@@ -71,7 +71,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         tooltip: {
             trigger: 'item',
             formatter: (params: Record<string, unknown>) => {
-                return `${params.name}<br/>${params.data.standardQuestions}题 × ${params.data.avg}分钟/题 = <b>${params.value}分钟</b>`;
+                const data = params.data as { standardQuestions: number; avg: number };
+                return `${params.name}<br/>${data.standardQuestions}题 × ${data.avg}分钟/题 = <b>${params.value}分钟</b>`;
             }
         },
         legend: {
