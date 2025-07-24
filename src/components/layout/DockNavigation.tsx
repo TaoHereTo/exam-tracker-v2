@@ -1,6 +1,12 @@
 import React, { useRef, useState } from "react";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { BarChart2, ClipboardList, Target, BookOpen, Settings, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks, SlidersHorizontal } from "lucide-react";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DockNavigationProps {
     activeTab: string;
@@ -74,20 +80,31 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
     if (navMode !== 'dock') return null;
     return (
         <div className="fixed bottom-[70px] left-0 w-full z-50 flex justify-center bg-transparent">
-            <Dock>
-                {dockNavs.flatMap(nav =>
-                    nav.children ? nav.children.map(child => (
-                        <DockIcon
-                            key={`dock-child-${nav.key}-${child.key}`}
-                            onClick={() => setActiveTab(child.key)}
-                            className="pointer-events-auto"
-                            title={child.label}
-                        >
-                            {dockChildIcons[child.key] || <Settings />}
-                        </DockIcon>
-                    )) : []
-                )}
-            </Dock>
+            <TooltipProvider>
+                <Dock>
+                    {dockNavs.flatMap(nav =>
+                        nav.children ? nav.children.map(child => (
+                            <DockIcon key={`dock-child-${nav.key}-${child.key}`}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            type="button"
+                                            aria-label={child.label}
+                                            onClick={() => setActiveTab(child.key)}
+                                            className={"size-12 rounded-full flex items-center justify-center " + (activeTab === child.key ? "bg-gray-200/70 dark:bg-gray-700/60" : "")}
+                                        >
+                                            {dockChildIcons[child.key] || <Settings />}
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{child.label}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </DockIcon>
+                        )) : []
+                    )}
+                </Dock>
+            </TooltipProvider>
         </div>
     );
 } 
