@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { Dock, DockIcon } from "@/components/magicui/dock";
 import { BarChart2, ClipboardList, Target, BookOpen, Settings, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks, SlidersHorizontal } from "lucide-react";
 import {

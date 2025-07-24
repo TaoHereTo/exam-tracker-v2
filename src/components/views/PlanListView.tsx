@@ -50,7 +50,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     const [showForm, setShowForm] = useState(false);
     const [form, setForm] = useState<Partial<StudyPlan>>({});
     const [editId, setEditId] = useState<string | null>(null);
-    const [deleteId, setDeleteId] = useState<string | null>(null);
     const [startDate, setStartDate] = useState<Date | undefined>();
     const [endDate, setEndDate] = useState<Date | undefined>();
 
@@ -108,7 +107,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     };
     const handleDelete = (id: string) => {
         onDelete(id);
-        setDeleteId(null);
     };
 
     return (
@@ -128,7 +126,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 <Button size="sm" variant="ghost" className="ml-2" onClick={() => handleOpenForm(plan)}>编辑</Button>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button size="sm" variant="destructive" className="ml-2" onClick={() => setDeleteId(plan.id)}>删除</Button>
+                                        <Button size="sm" variant="destructive" className="ml-2" onClick={() => handleDelete(plan.id)}>删除</Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
@@ -136,7 +134,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                             <AlertDialogDescription>删除后无法恢复。</AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                            <AlertDialogCancel onClick={() => setDeleteId(null)}>取消</AlertDialogCancel>
+                                            <AlertDialogCancel onClick={() => { }}>取消</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => handleDelete(plan.id)}>确认删除</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>

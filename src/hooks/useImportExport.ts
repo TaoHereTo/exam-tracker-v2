@@ -152,10 +152,10 @@ export function useImportExport(
                         setAllSettings(importedSettings);
                         setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge, plans: importedPlans, settings: importedSettings });
                         setImportDialogOpen(true);
-                    } catch (err) {
+                    } catch {
                         alert('导入失败，文件内容不是有效的 JSON！');
                     }
-                } catch (err) {
+                } catch {
                     alert('导入失败，文件内容不是有效的 JSON！');
                 }
             };

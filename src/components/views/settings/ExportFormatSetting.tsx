@@ -7,7 +7,7 @@ export function ExportFormatSetting({ exportFormat, setExportFormat }: { exportF
         setTempFormat(v);
         try {
             setExportFormat(v);
-        } catch (e) {
+        } catch {
         }
     };
     return (

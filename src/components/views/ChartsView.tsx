@@ -1,5 +1,4 @@
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { TrendChart } from "@/components/charts/TrendChart";
 import { MODULE_SCORES } from "@/config/exam";
 import { ModulePieChart } from "@/components/charts/ModulePieChart";

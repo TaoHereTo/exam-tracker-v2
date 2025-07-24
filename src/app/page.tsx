@@ -1,32 +1,28 @@
 "use client";
 
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { NewRecordForm } from "@/components/forms/NewRecordForm";
-import { HistoryTable } from "@/components/tables/HistoryTable";
-import { TrendChart } from "@/components/charts/TrendChart";
 import { SettingsView } from "@/components/views/SettingsView";
-import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
-import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { useImportExport } from "@/hooks/useImportExport";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { MODULE_SCORES } from "@/config/exam";
-import { PersonalBestView } from "@/components/views/PersonalBestView";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from "@/components/ui/pagination";
 import { OverviewView } from "@/components/views/OverviewView";
 import { ChartsView } from "@/components/views/ChartsView";
 import { HistoryView } from "@/components/views/HistoryView";
 import { NewRecordView } from "@/components/views/NewRecordView";
+import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { usePlanProgress } from "@/hooks/usePlanProgress";
+import DockNavigation from "@/components/layout/DockNavigation";
+import { usePlans } from "@/hooks/usePlans";
+import { useRecords } from "@/hooks/useRecords";
+import type { KnowledgeItem } from "@/types/record";
+import { calcPlanProgress } from "@/lib/planUtils";
+import NavModeContext from "@/contexts/NavModeContext";
+import { useNotification } from "@/components/magicui/NotificationProvider";
+import { PersonalBestView } from "@/components/views/PersonalBestView";
+import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
+import PlanListView from "@/components/views/PlanListView";
+import PlanDetailView from "@/components/views/PlanDetailView";
+import PageTitle from "@/components/ui/PageTitle";
+import { MODULES as MODULES_CONFIG, MODULE_SCORES } from "@/config/exam";
 import { KnowledgeEntryTabView } from "@/components/views/KnowledgeEntryTabView";
 import {
   AlertDialog,
@@ -39,21 +35,6 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import PlanListView from "@/components/views/PlanListView";
-import PlanDetailView from "@/components/views/PlanDetailView";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
-import { usePlanProgress } from "@/hooks/usePlanProgress";
-import { MODULES as MODULES_CONFIG } from "@/config/exam";
-import DockNavigation from "@/components/layout/DockNavigation";
-import { AnimatePresence, motion } from "motion/react";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { usePlans } from "@/hooks/usePlans";
-import { useRecords } from "@/hooks/useRecords";
-import PageTitle from "@/components/ui/PageTitle";
-import type { RecordItem, PlanType, StudyPlan, KnowledgeItem } from "@/types/record";
-import { calcPlanProgress } from "@/lib/planUtils";
-import NavModeContext from "@/contexts/NavModeContext";
-import { useNotification } from "@/components/magicui/NotificationProvider";
 
 
 export default function Home() {
@@ -94,10 +75,6 @@ export default function Home() {
     setPendingImport,
   } = useImportExport(records, setRecords, knowledge, setKnowledge);
 
-  const [chartModuleFilter, setChartModuleFilter] = useState<string>('全部');
-
-  // 按日期降序排序
-  const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   // 历史记录分页
   const [historyPage, setHistoryPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -107,12 +84,9 @@ export default function Home() {
   const lastSavedNavMode = useRef(navMode);
 
   // 移除handleSaveSettings相关代码
+  const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
-
-  const handleBatchDeleteKnowledge = (ids: string[]) => {
-    setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
-  };
 
   // 学习计划相关状态
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
@@ -124,22 +98,6 @@ export default function Home() {
 
   // plans和records变化时自动统计进度
   usePlanProgress(plans, setPlans, records, calcPlanProgress);
-
-  // 英文key转中文
-  const moduleLabelMap: Record<string, string> = {
-    'data-analysis': '资料分析',
-    'politics': '政治理论',
-    'math': '数量关系',
-    'common': '常识判断',
-    'verbal': '言语理解',
-    'logic': '判断推理',
-    '资料分析': '资料分析',
-    '政治理论': '政治理论',
-    '数量关系': '数量关系',
-    '常识判断': '常识判断',
-    '言语理解': '言语理解',
-    '判断推理': '判断推理',
-  };
 
   // 批量清空各类数据
   const handleClearRecords = () => {
@@ -176,6 +134,25 @@ export default function Home() {
   useEffect(() => { setPrevNavMode(navMode); }, [navMode]);
 
   const { notify } = useNotification();
+
+  // 恢复 moduleLabelMap 和 handleBatchDeleteKnowledge
+  const moduleLabelMap: Record<string, string> = {
+    'data-analysis': '资料分析',
+    'politics': '政治理论',
+    'math': '数量关系',
+    'common': '常识判断',
+    'verbal': '言语理解',
+    'logic': '判断推理',
+    '资料分析': '资料分析',
+    '政治理论': '政治理论',
+    '数量关系': '数量关系',
+    '常识判断': '常识判断',
+    '言语理解': '言语理解',
+    '判断推理': '判断推理',
+  };
+  const handleBatchDeleteKnowledge = (ids: string[]) => {
+    setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
+  };
 
   if (!isClient) return null;
   return (

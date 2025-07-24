@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface StudyPlan {
     id: string;

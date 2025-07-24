@@ -86,12 +86,12 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             formatter: function (params: Array<Record<string, unknown>>) {
                 let res = `<b>${params[0].axisValueLabel}</b><br/>`;
                 params.forEach((item: Record<string, unknown>) => {
-                    let val = (typeof item.value === 'number' && !isNaN(item.value))
+                    const val = (typeof item.value === 'number' && !isNaN(item.value))
                         ? item.value
-                        : (item.data && typeof item.data[item.seriesName] === 'number' && !isNaN(item.data[item.seriesName]))
-                            ? item.data[item.seriesName]
-                            : null;
-                    res += `<span style='display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background:${item.color}'></span>${item.seriesName}：<b>${val !== null ? val.toFixed(2) : '--'}</b><br/>`;
+                        : (Array.isArray(item.value) && typeof item.value[1] === 'number' ? item.value[1] : null);
+                    if (val !== null) {
+                        res += `${item.marker}${item.seriesName}：<b>${val}</b><br/>`;
+                    }
                 });
                 return res;
             }
