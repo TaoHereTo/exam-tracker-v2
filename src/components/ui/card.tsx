@@ -3,11 +3,44 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 function Card({ className, ...props }: React.ComponentProps<"div">) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const [canHover, setCanHover] = React.useState(true);
+
+  // 检查内容是否包含交互控件
+  const checkInteractive = React.useCallback(() => {
+    if (!ref.current) return;
+    const selectors = [
+      "input",
+      "select",
+      "textarea",
+      "button",
+      '[role="combobox"]',
+      '[data-slot="calendar"]',
+      '[data-slot="select-trigger"]',
+      '[data-slot="popover-content"]',
+      '[data-slot="date-picker"]',
+    ];
+    for (const sel of selectors) {
+      if (ref.current.querySelector(sel)) {
+        setCanHover(false);
+        return;
+      }
+    }
+    setCanHover(true);
+  }, []);
+
+  React.useEffect(() => {
+    checkInteractive();
+  }, [props.children, checkInteractive]);
+
   return (
     <div
+      ref={ref}
       data-slot="card"
+      onMouseEnter={checkInteractive}
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-all duration-200 hover:shadow-lg hover:-translate-y-1",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm transition-all duration-200",
+        canHover && "hover:shadow-lg hover:-translate-y-1",
         className
       )}
       {...props}

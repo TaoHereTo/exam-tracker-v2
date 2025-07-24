@@ -91,9 +91,19 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
                                             type="button"
                                             aria-label={child.label}
                                             onClick={() => setActiveTab(child.key)}
-                                            className={"size-12 rounded-full flex items-center justify-center pointer-events-auto " + (activeTab === child.key ? "bg-gray-200/70 dark:bg-gray-700/60" : "")}
+                                            className={
+                                                "size-12 rounded-full flex items-center justify-center pointer-events-auto relative transition-colors duration-150 " +
+                                                (activeTab === child.key ? "" : "hover:bg-gray-200/70 dark:hover:bg-gray-700/60")
+                                            }
                                         >
                                             {dockChildIcons[child.key] || <Settings />}
+                                            {/* 当前页面底部主色小圆点 */}
+                                            {activeTab === child.key && (
+                                                <span
+                                                    className="absolute left-1/2 -translate-x-1/2 bottom-1 w-1.5 h-1.5 rounded-full bg-green-500 shadow"
+                                                    aria-hidden="true"
+                                                />
+                                            )}
                                         </button>
                                     </TooltipTrigger>
                                     <TooltipContent>

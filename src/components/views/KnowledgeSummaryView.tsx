@@ -147,7 +147,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                                     placeholder="输入关键词搜索..."
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
-                                    className="w-full max-w-xs mt-1"
+                                    className="w-full max-w-xs h-9 py-2"
                                 />
                             </div>
                         </div>
