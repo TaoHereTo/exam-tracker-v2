@@ -6,9 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 
-export function AdvancedSetting({ onExport, onClearAllData, onClearRecords, onClearKnowledge, onClearPlans }: {
-    onExport?: () => void;
-    onClearAllData?: () => void;
+export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans }: {
     onClearRecords?: () => void;
     onClearKnowledge?: () => void;
     onClearPlans?: () => void;

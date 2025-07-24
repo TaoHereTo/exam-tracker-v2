@@ -1,7 +1,6 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Upload } from "lucide-react";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,12 +12,10 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
 import { AppearanceSetting } from "./settings/AppearanceSetting";
 import { PaginationSetting } from "./settings/PaginationSetting";
 import { ExportFormatSetting } from "./settings/ExportFormatSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
-import { Switch } from "@/components/ui/switch";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
 
@@ -46,7 +43,7 @@ export function SettingsView({
     if (activeTab === 'settings-advanced') {
         return (
             <>
-                <AdvancedSetting onExport={onExport} onClearAllData={onClearAllData} onClearRecords={onClearRecords} onClearKnowledge={onClearKnowledge} onClearPlans={onClearPlans} />
+                <AdvancedSetting onClearRecords={onClearRecords} onClearKnowledge={onClearKnowledge} onClearPlans={onClearPlans} />
                 <Card className="mt-6">
                     <CardHeader>
                         <CardTitle>危险操作</CardTitle>

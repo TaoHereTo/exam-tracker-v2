@@ -1,17 +1,13 @@
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
-import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export function ExportFormatSetting({ exportFormat, setExportFormat }: { exportFormat: string; setExportFormat: (f: string) => void; }) {
     const [tempFormat, setTempFormat] = useState(exportFormat);
-    const { notify } = useNotification();
     const handleChange = (v: string) => {
         setTempFormat(v);
         try {
             setExportFormat(v);
-            notify({ type: "success", message: "导出格式已更新", description: `当前格式：${v.toUpperCase()}` });
         } catch (e) {
-            notify({ type: "error", message: "导出格式设置失败", description: String(e) });
         }
     };
     return (

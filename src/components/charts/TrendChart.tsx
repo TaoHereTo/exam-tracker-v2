@@ -47,7 +47,7 @@ const moduleColors: Record<string, string> = {
 export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule }) => {
     let allModules: string[] = [];
     let allDates: string[] = [];
-    let chartData: Record<string, any>[] = [];
+    let chartData: Record<string, unknown>[] = [];
 
     if (data.length > 0) {
         if (onlyModule) {
@@ -55,10 +55,10 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             allDates = data.map(item => item.date);
             chartData = data;
         } else if ('module' in data[0]) {
-            allModules = Array.from(new Set(data.map(item => (item as any).module)));
+            allModules = Array.from(new Set(data.map(item => (item as { module: string }).module)));
             allDates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
             chartData = allDates.map(date => {
-                const row: any = { date };
+                const row: Record<string, unknown> = { date };
                 allModules.forEach(module => {
                     const found = data.find(item => item.date === date && item.module === module);
                     row[moduleLabelMap[module] || module] = found ? found.score : null;
@@ -83,9 +83,9 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             borderWidth: 1,
             textStyle: { color: '#333', fontSize: 14 },
             extraCssText: 'box-shadow: 0 4px 16px rgba(51,102,255,0.08); border-radius: 8px;',
-            formatter: function (params: Array<Record<string, any>>) {
+            formatter: function (params: Array<Record<string, unknown>>) {
                 let res = `<b>${params[0].axisValueLabel}</b><br/>`;
-                params.forEach((item: Record<string, any>) => {
+                params.forEach((item: Record<string, unknown>) => {
                     let val = (typeof item.value === 'number' && !isNaN(item.value))
                         ? item.value
                         : (item.data && typeof item.data[item.seriesName] === 'number' && !isNaN(item.data[item.seriesName]))

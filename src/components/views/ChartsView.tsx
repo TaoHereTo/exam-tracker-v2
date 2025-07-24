@@ -149,12 +149,12 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                         symbol: 'circle',
                         symbolSize: 14,
                         itemStyle: {
-                            color: function (params: any) {
+                            color: function (params: unknown) {
                                 return pointColors[params.dataIndex] || '#3366FF';
                             },
                             borderColor: '#fff',
                             borderWidth: 2,
-                            shadowColor: function (params: any) {
+                            shadowColor: function (params: unknown) {
                                 return pointColors[params.dataIndex] || '#3366FF';
                             },
                             shadowBlur: 8

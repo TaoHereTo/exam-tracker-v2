@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import type { RecordItem, KnowledgeItem } from "@/types/record";
+import type { RecordItem, KnowledgeItem, StudyPlan } from "@/types/record";
 
 export function useImportExport(
     records: RecordItem[],
     setRecords: (r: RecordItem[]) => void,
     knowledge: KnowledgeItem[],
     setKnowledge: (k: KnowledgeItem[]) => void,
-    plans?: any[],
-    setPlans?: (p: any[]) => void
+    plans?: StudyPlan[],
+    setPlans?: (p: StudyPlan[]) => void
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
-    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[]; plans?: any[]; settings?: Record<string, any> }>();
+    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[]; plans?: StudyPlan[]; settings?: Record<string, string> }>();
 
     // 获取所有相关设置
     function getAllSettings() {
@@ -23,7 +23,7 @@ export function useImportExport(
             'page-size',
             'theme',
         ];
-        const settings: Record<string, any> = {};
+        const settings: Record<string, string> = {};
         keys.forEach(key => {
             const value = localStorage.getItem(key);
             if (value !== null) settings[key] = value;
@@ -31,7 +31,7 @@ export function useImportExport(
         return settings;
     }
     // 写入所有相关设置
-    function setAllSettings(settings: Record<string, any>) {
+    function setAllSettings(settings: Record<string, string>) {
         if (!settings) return;
         Object.entries(settings).forEach(([key, value]) => {
             if (typeof value === 'string') {
@@ -80,8 +80,8 @@ export function useImportExport(
                         // 兼容多种结构
                         let importedRecords: RecordItem[] = [];
                         let importedKnowledge: KnowledgeItem[] = [];
-                        let importedPlans: any[] = [];
-                        let importedSettings: Record<string, any> = {};
+                        let importedPlans: StudyPlan[] = [];
+                        let importedSettings: Record<string, string> = {};
                         if (Array.isArray(importedObject)) {
                             importedRecords = importedObject;
                         } else if (importedObject && importedObject.records) {

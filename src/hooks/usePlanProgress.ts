@@ -8,7 +8,7 @@ export function usePlanProgress(
     calcPlanProgress: (plan: StudyPlan, records: RecordItem[]) => { progress: number; status: StudyPlan["status"] }
 ) {
     useEffect(() => {
-        setPlans((prevPlans: any[]) => prevPlans.map(plan => {
+        setPlans((prevPlans: StudyPlan[]) => prevPlans.map(plan => {
             const { progress, status } = calcPlanProgress(plan, records);
             return { ...plan, progress, status };
         }));
