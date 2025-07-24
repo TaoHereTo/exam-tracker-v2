@@ -2,17 +2,7 @@
 
 import React from "react";
 import ReactECharts from 'echarts-for-react';
-import {
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    Sector
-} from "recharts";
 import { FULL_EXAM_CONFIG } from "@/config/exam";
-import { useState } from "react";
 
 interface ModulePieChartProps {
     data: Array<{
@@ -57,7 +47,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     const moduleStats: Record<string, { duration: number; questions: number }> = {};
     data.forEach(item => {
         const duration = Number(item.duration); // 你的 duration 单位就是分钟
-        const total = Number((item as { total: number }).total);
+        // const total = Number((item as { total: number }).total); // 错误：data 没有 total 字段
+        const total = 1; // 或者用其它合适的字段，比如 score，或直接用 1 代表每条记录一题
         if (!item.module || !isFinite(duration) || !isFinite(total) || total <= 0 || duration <= 0) return;
         if (!moduleStats[item.module]) {
             moduleStats[item.module] = { duration: 0, questions: 0 };

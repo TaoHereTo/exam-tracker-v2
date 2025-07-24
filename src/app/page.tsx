@@ -22,11 +22,9 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import PlanListView from "@/components/views/PlanListView";
 import PlanDetailView from "@/components/views/PlanDetailView";
 import PageTitle from "@/components/ui/PageTitle";
-import { MODULES as MODULES_CONFIG, MODULE_SCORES } from "@/config/exam";
 import { KnowledgeEntryTabView } from "@/components/views/KnowledgeEntryTabView";
 import {
   AlertDialog,
-  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -63,7 +61,6 @@ export default function Home() {
     setRecords,
     addRecord,
     deleteRecord,
-    batchDeleteRecords,
   } = useRecords([]);
 
   const {
@@ -129,9 +126,6 @@ export default function Home() {
     setSelectedRecordIds([]);
     notify({ type: "success", message: "批量删除成功", description: `已删除 ${selectedRecordIds.length} 条记录。` });
   };
-
-  const [prevNavMode, setPrevNavMode] = useState(navMode);
-  useEffect(() => { setPrevNavMode(navMode); }, [navMode]);
 
   const { notify } = useNotification();
 
