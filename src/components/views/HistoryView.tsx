@@ -24,7 +24,6 @@ export function HistoryView({
     records,
     selectedRecordIds,
     onSelectIds,
-    onDeleteRecord,
     onBatchDelete,
     historyPage,
     setHistoryPage,
@@ -38,7 +37,6 @@ export function HistoryView({
                     records={records}
                     selectedIds={selectedRecordIds}
                     onSelectIds={onSelectIds}
-                    onDeleteRecord={onDeleteRecord}
                     onBatchDelete={onBatchDelete}
                 />
             </div>

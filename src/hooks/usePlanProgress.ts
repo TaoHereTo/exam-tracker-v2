@@ -17,5 +17,5 @@ export function usePlanProgress(
         if (isChanged) {
             setPlans(updated);
         }
-    }, [plans, records, calcPlanProgress]);
+    }, [plans, records, calcPlanProgress, setPlans]);
 } 

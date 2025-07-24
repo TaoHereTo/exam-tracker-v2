@@ -1,20 +1,17 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
 import type { RecordItem } from "@/components/forms/NewRecordForm";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 export function HistoryTable({
     records,
     selectedIds,
     onSelectIds,
-    onDeleteRecord,
     onBatchDelete
 }: {
     records: RecordItem[];
     selectedIds: number[];
     onSelectIds: (ids: number[]) => void;
-    onDeleteRecord: (id: number) => void;
     onBatchDelete: () => void;
 }) {
     const moduleLabelMap: Record<string, string> = {

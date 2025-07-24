@@ -70,22 +70,24 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         if (filtered.length === 0) return;
         // 只导出当前模块的知识点
         const ws = XLSX.utils.json_to_sheet(filtered.map(item => {
-            // 只导出主要字段
             if (selectedModule === 'politics') {
+                const k = item as { date?: string; source?: string; note?: string };
                 return {
-                    '发布日期': (item as any).date,
-                    '文件来源': (item as any).source,
-                    '相关重点': (item as any).note,
+                    '发布日期': k.date ?? '',
+                    '文件来源': k.source ?? '',
+                    '相关重点': k.note ?? '',
                 };
             } else if (selectedModule === 'verbal') {
+                const k = item as { idiom?: string; meaning?: string };
                 return {
-                    '成语': (item as any).idiom,
-                    '含义': (item as any).meaning,
+                    '成语': k.idiom ?? '',
+                    '含义': k.meaning ?? '',
                 };
             } else {
+                const k = item as { type?: string; note?: string };
                 return {
-                    '类型': (item as any).type,
-                    '技巧记录': (item as any).note,
+                    '类型': k.type ?? '',
+                    '技巧记录': k.note ?? '',
                 };
             }
         }));
