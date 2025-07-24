@@ -57,7 +57,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         moduleStats[item.module].questions += total;
     });
     const pieData = Object.entries(moduleStats).map(([name, stat]) => {
-        const standardQuestions = FULL_EXAM_CONFIG.modules[moduleLabelMap[name]]?.questions || 1;
+        const moduleKey = moduleLabelMap[name] as keyof typeof FULL_EXAM_CONFIG.modules;
+        const standardQuestions = FULL_EXAM_CONFIG.modules[moduleKey]?.questions || 1;
         const avg = stat.questions > 0 ? stat.duration / stat.questions : 0;
         return {
             name: moduleLabelMap[name] || name,
