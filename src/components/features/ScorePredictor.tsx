@@ -54,9 +54,9 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             const moduleRecords = records.filter((r: RecordItem) => r.module === module.value || r.module === module.label);
             if (moduleRecords.length > 0) {
                 const totalSpm = moduleRecords.reduce((sum: number, rec: RecordItem) => sum + getScorePerMinute(rec), 0);
-                moduleStats[module.value] = { avgSpm: totalSpm / moduleRecords.length, recordCount: moduleRecords.length };
+                moduleStats[module.label] = { avgSpm: totalSpm / moduleRecords.length, recordCount: moduleRecords.length };
             } else {
-                moduleStats[module.value] = { avgSpm: 0, recordCount: 0 };
+                moduleStats[module.label] = { avgSpm: 0, recordCount: 0 };
             }
         });
         let totalPredictedScore = 0;
