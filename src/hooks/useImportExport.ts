@@ -13,7 +13,15 @@ export function useImportExport(
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
-    const [pendingImport, setPendingImport] = useState<{ records: RecordItem[]; knowledge: KnowledgeItem[]; plans?: StudyPlan[]; settings?: Record<string, string> }>();
+    type ImportStats = { total: number; added: number; repeated: number };
+    type PendingImport = {
+        records: RecordItem[];
+        knowledge: KnowledgeItem[];
+        plans?: StudyPlan[];
+        settings?: Record<string, string>;
+        importStats?: ImportStats;
+    };
+    const [pendingImport, setPendingImport] = useState<PendingImport>();
 
     // 获取所有相关设置
     function getAllSettings() {
@@ -55,9 +63,9 @@ export function useImportExport(
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        const today = format(new Date(), 'yyyyMMdd');
+        const today = format(new Date(), 'yyyy-MM-dd');
         a.href = url;
-        a.download = `exam-tracker-backup_${today}.json`;
+        a.download = `行测记录_${today}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -161,10 +169,42 @@ export function useImportExport(
                         if (setPlans && Array.isArray(importedPlans)) {
                             setPlans(importedPlans);
                         }
+                        // 现有数据去重 key
+                        function recordKey(r: RecordItem) {
+                            return `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
+                        }
+                        const existingKeys = new Set(records.map(recordKey));
+                        const importKeys = new Set<string>();
+                        const dedupedRecords: RecordItem[] = [];
+                        let repeatCount = 0;
+                        normalizedRecords.forEach(r => {
+                            const key = recordKey(r);
+                            if (existingKeys.has(key)) {
+                                repeatCount++;
+                                return; // 跳过与现有数据重复的
+                            }
+                            if (!importKeys.has(key)) {
+                                dedupedRecords.push(r);
+                                importKeys.add(key);
+                            } else {
+                                repeatCount++;
+                            }
+                        });
                         // settings 写入 localStorage
                         setAllSettings(importedSettings);
-                        setPendingImport({ records: normalizedRecords, knowledge: normalizedKnowledge, plans: importedPlans, settings: importedSettings });
+                        setPendingImport({
+                            records: [...records, ...dedupedRecords],
+                            knowledge: normalizedKnowledge,
+                            plans: importedPlans,
+                            settings: importedSettings,
+                            importStats: {
+                                total: normalizedRecords.length,
+                                added: dedupedRecords.length,
+                                repeated: repeatCount
+                            }
+                        });
                         setImportDialogOpen(true);
+                        // 不再此处 notify
                     } catch {
                         alert('导入失败，文件内容不是有效的 JSON！');
                     }

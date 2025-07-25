@@ -233,7 +233,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                                     score: item.duration > 0 ? (MODULE_SCORES[item.module as keyof typeof MODULE_SCORES] || 1) * item.correct / item.duration : 0,
                                     duration: item.duration,
                                 }));
-                                return <TrendChart data={chartData} />;
+                                return <TrendChart data={chartData} yMax={2} />;
                             })()}
                         </div>
                     </TabsContent>
@@ -257,7 +257,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                                     score: item.total > 0 ? (item.correct / item.total) * 100 : 0,
                                     duration: 0,
                                 }));
-                                return <TrendChart data={chartData} />;
+                                return <TrendChart data={chartData} yMax={100} />;
                             })()}
                         </div>
                     </TabsContent>

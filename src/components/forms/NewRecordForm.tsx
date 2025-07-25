@@ -30,9 +30,13 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
         if (!date || !module || !correct || !total || !duration) return;
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const dateStr = `${y}-${m}-${d}`;
         const newRecord: RecordItem = {
             id: Date.now(),
-            date: date.toLocaleDateString(),
+            date: dateStr,
             module,
             correct: Number(correct),
             total: Number(total),

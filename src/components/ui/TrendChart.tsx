@@ -11,6 +11,7 @@ interface TrendChartProps {
         score: number;
         duration: number;
     }>;
+    yMax?: number;
 }
 
 // 颜色分配
@@ -44,32 +45,42 @@ const moduleColors: Record<string, string> = {
     '全部': '#888888',
 };
 
-export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule }) => {
+export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule, yMax }) => {
+    // 去重
+    const dedupedData = data.filter((item, idx, arr) =>
+        arr.findIndex(other =>
+            other.date === item.date &&
+            other.module === item.module &&
+            other.score === item.score &&
+            other.duration === item.duration
+        ) === idx
+    );
+
     let allModules: string[] = [];
     let allDates: string[] = [];
     let chartData: Record<string, unknown>[] = [];
 
-    if (data.length > 0) {
+    if (dedupedData.length > 0) {
         if (onlyModule) {
             allModules = [onlyModule];
-            allDates = data.map(item => item.date);
-            chartData = data;
-        } else if ('module' in data[0]) {
-            allModules = Array.from(new Set(data.map(item => (item as { module: string }).module)));
-            allDates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+            allDates = dedupedData.map(item => item.date);
+            chartData = dedupedData;
+        } else if ('module' in dedupedData[0]) {
+            allModules = Array.from(new Set(dedupedData.map(item => (item as { module: string }).module)));
+            allDates = Array.from(new Set(dedupedData.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
             chartData = allDates.map(date => {
                 const row: Record<string, unknown> = { date };
                 allModules.forEach(module => {
-                    const found = data.find(item => item.date === date && item.module === module);
+                    const found = dedupedData.find(item => item.date === date && item.module === module);
                     row[moduleLabelMap[module] || module] = found ? found.score : null;
                 });
                 return row;
             });
             allModules = allModules.map(m => moduleLabelMap[m] || m);
         } else {
-            allModules = Object.keys(data[0]).filter(k => k !== 'date' && k !== 'duration');
-            allDates = data.map(item => item.date);
-            chartData = data;
+            allModules = Object.keys(dedupedData[0]).filter(k => k !== 'date' && k !== 'duration');
+            allDates = dedupedData.map(item => item.date);
+            chartData = dedupedData;
         }
     }
 
@@ -90,7 +101,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                         ? item.value
                         : (Array.isArray(item.value) && typeof item.value[1] === 'number' ? item.value[1] : null);
                     if (val !== null) {
-                        res += `${item.marker}${item.seriesName}：<b>${val}</b><br/>`;
+                        res += `${item.marker}${item.seriesName}：<b>${Number(val).toFixed(2)}</b><br/>`;
                     }
                 });
                 return res;
@@ -141,6 +152,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
         },
         yAxis: {
             type: 'value',
+            max: yMax,
             axisLabel: { fontSize: 13, color: '#333', fontWeight: 500 },
             axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
             splitLine: { lineStyle: { color: '#f5f7fa', width: 1, type: 'dashed' } }

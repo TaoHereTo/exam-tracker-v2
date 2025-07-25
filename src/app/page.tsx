@@ -58,6 +58,15 @@ export default function Home() {
     setPendingImport,
   } = useImportExport(records, setRecords, knowledge, setKnowledge);
 
+  type ImportStats = { total: number; added: number; repeated: number };
+  type PendingImport = {
+    records: RecordItem[];
+    knowledge: KnowledgeItem[];
+    plans?: StudyPlan[];
+    settings?: Record<string, string>;
+    importStats?: ImportStats;
+  };
+
   // 历史记录分页
   const [historyPage, setHistoryPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -278,10 +287,20 @@ export default function Home() {
                   setTimeout(() => {
                     setPendingImport(undefined);
                   }, 100);
+                  // 新增：导入统计提示
+                  const pi = pendingImport as PendingImport;
+                  if (pi.importStats) {
+                    notify({
+                      type: "info",
+                      message: `本次导入共${pi.importStats.total}条，去重后新增${pi.importStats.added}条，${pi.importStats.repeated}条与现有数据重复。`
+                    });
+                  }
                 }
                 setImportDialogOpen(false);
                 notify({ type: "success", message: "导入成功", description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！` });
-              }}>确认导入</AlertDialogAction>
+              }}>
+                确认导入
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
