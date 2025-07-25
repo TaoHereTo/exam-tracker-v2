@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -12,13 +12,20 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 
 interface PoliticsFormProps {
     onAddKnowledge: (knowledge: { date: Date | null; source: string; note: string }) => void;
+    initialData?: { date: Date | null; source: string; note: string };
 }
 
-const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge }) => {
-    const [date, setDate] = useState<Date | null>(null);
-    const [source, setSource] = useState('');
-    const [note, setNote] = useState('');
+const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData }) => {
+    const [date, setDate] = useState<Date | null>(initialData?.date ? new Date(initialData.date) : null);
+    const [source, setSource] = useState(initialData?.source || '');
+    const [note, setNote] = useState(initialData?.note || '');
     const { notify } = useNotification();
+
+    useEffect(() => {
+        setDate(initialData?.date ? new Date(initialData.date) : null);
+        setSource(initialData?.source || '');
+        setNote(initialData?.note || '');
+    }, [initialData]);
 
     const handleSubmit = () => {
         if (!source.trim() && !note.trim()) return;
@@ -50,11 +57,15 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge }) => {
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="source">文件来源</Label>
-                    <Input id="source" type="text" placeholder="请输入文件来源" value={source} onChange={e => setSource(e.target.value)} />
+                    <Input id="source" type="text" placeholder="请输入文件来源" value={source} onChange={e => setSource(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                    />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="note">相关重点</Label>
-                    <Textarea id="note" placeholder="请输入相关重点..." value={note} onChange={e => setNote(e.target.value)} />
+                    <Textarea id="note" placeholder="请输入相关重点..." value={note} onChange={e => setNote(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                    />
                 </div>
             </CardContent>
             <CardFooter>

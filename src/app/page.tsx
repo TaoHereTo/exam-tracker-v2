@@ -141,6 +141,10 @@ export default function Home() {
     setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
   };
 
+  const handleEditKnowledge = (item: KnowledgeItem) => {
+    setKnowledge(prev => prev.map(k => k.id === item.id ? { ...k, ...item } : k));
+  };
+
   if (!isClient) return null;
   return (
     <NavModeContext.Provider value={navMode}>
@@ -168,7 +172,7 @@ export default function Home() {
           {activeTab === 'modules' && (
             <div>
               <h1 className="text-3xl font-bold mb-4">知识点汇总</h1>
-              <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} />
+              <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} onEditKnowledge={handleEditKnowledge} />
             </div>
           )}
           {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}

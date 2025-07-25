@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ export interface KnowledgeFormProps {
     typePlaceholder: string;
     notePlaceholder: string;
     onAddKnowledge: (knowledge: { type: string; note: string }) => void;
+    initialData?: { type: string; note: string };
 }
 
 export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
@@ -18,10 +19,16 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
     typePlaceholder,
     notePlaceholder,
     onAddKnowledge,
+    initialData,
 }) => {
-    const [type, setType] = useState('');
-    const [note, setNote] = useState('');
+    const [type, setType] = useState(initialData?.type || '');
+    const [note, setNote] = useState(initialData?.note || '');
     const { notify } = useNotification();
+
+    useEffect(() => {
+        setType(initialData?.type || '');
+        setNote(initialData?.note || '');
+    }, [initialData]);
 
     const handleSubmit = () => {
         if (!type.trim() && !note.trim()) return;
@@ -39,11 +46,15 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
             <CardContent className="space-y-6">
                 <div className="space-y-2">
                     <Label htmlFor="type">类型</Label>
-                    <Input id="type" type="text" placeholder={typePlaceholder} value={type} onChange={e => setType(e.target.value)} />
+                    <Input id="type" type="text" placeholder={typePlaceholder} value={type} onChange={e => setType(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                    />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="note">技巧记录</Label>
-                    <Textarea id="note" placeholder={notePlaceholder} value={note} onChange={e => setNote(e.target.value)} />
+                    <Textarea id="note" placeholder={notePlaceholder} value={note} onChange={e => setNote(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                    />
                 </div>
             </CardContent>
             <CardFooter>

@@ -18,10 +18,16 @@ import {
 } from "@/components/ui/pagination";
 import { format } from 'date-fns';
 import { MODULES } from '@/config/exam';
+import { KnowledgeForm } from "../forms/KnowledgeForm";
+import VerbalForm from "../forms/VerbalForm";
+import PoliticsForm from "../forms/PoliticsForm";
+import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
+import { ArrowUpFromLine, Pencil } from 'lucide-react';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
     onBatchDeleteKnowledge?: (ids: string[]) => void;
+    onEditKnowledge?: (item: KnowledgeItem) => void;
 }
 
 const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
@@ -50,13 +56,16 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
     }
 };
 
-const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, onBatchDeleteKnowledge }) => {
+const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, onBatchDeleteKnowledge, onEditKnowledge }) => {
     const [selectedModule, setSelectedModule] = useState('data-analysis');
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
-    const pageSize = 10;
+    const pageSize = 7;
+    const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [editItem, setEditItem] = useState<KnowledgeItem | null>(null);
+    const [editError, setEditError] = useState("");
     const columns = getColumns(selectedModule).map(col => {
         if (selectedModule === 'politics' && col.key === 'date') {
             return {
@@ -101,6 +110,34 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         setDeleteDialogOpen(false);
     };
 
+    const handleEdit = (item?: KnowledgeItem) => {
+        if (item) {
+            setEditItem(item);
+            setEditDialogOpen(true);
+            setEditError("");
+        } else {
+            if (selectedRows.length !== 1) {
+                setEditError("一次只能编辑一个知识点，请只勾选一个。");
+                setEditDialogOpen(false);
+            } else {
+                const toEdit = filtered.find(i => i.id === selectedRows[0]);
+                if (toEdit) {
+                    setEditItem(toEdit);
+                    setEditDialogOpen(true);
+                    setEditError("");
+                }
+            }
+        }
+    };
+    const handleEditSave = (data: Partial<KnowledgeItem>) => {
+        if (!editItem) return;
+        if (onEditKnowledge) {
+            onEditKnowledge({ ...editItem, ...data } as KnowledgeItem);
+        }
+        setEditDialogOpen(false);
+        setEditItem(null);
+    };
+
     // 导出为Excel
     const handleExportExcel = () => {
         if (filtered.length === 0) return;
@@ -143,7 +180,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] px-2 md:px-8">
+        <div className="flex flex-col items-center pt-4 px-2 md:px-8">
             <Card className="max-w-6xl w-full relative">
                 <CardContent>
                     {/* 顶部操作区：下拉、搜索、按钮一行对齐 */}
@@ -171,7 +208,17 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         </div>
                         {/* 右侧按钮组 */}
                         <div className="flex gap-2 shrink-0 mt-2 md:mt-0">
-                            <Button variant="outline" onClick={handleExportExcel}>导出为Excel</Button>
+                            <Button variant="outline" onClick={handleExportExcel} className="flex items-center gap-1">
+                                <ArrowUpFromLine className="w-4 h-4 mr-1" /> 导出为Excel
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="flex items-center gap-1 border border-gray-300"
+                                disabled={selectedRows.length !== 1}
+                                onClick={() => handleEdit()}
+                            >
+                                <Pencil className="w-4 h-4 mr-1" /> 编辑
+                            </Button>
                             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                                 <AlertDialogTrigger asChild>
                                     <Button
@@ -270,6 +317,50 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     </div>
                 </CardContent>
             </Card>
+            {/* 编辑弹窗 */}
+            <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
+                <SimpleDialogContent>
+                    <SimpleDialogHeader>
+                        <SimpleDialogTitle>编辑知识点</SimpleDialogTitle>
+                    </SimpleDialogHeader>
+                    {editError ? (
+                        <SimpleDialogDescription className="text-red-500">{editError}</SimpleDialogDescription>
+                    ) : editItem ? (
+                        <div className="py-2">
+                            {editItem.module === 'verbal' ? (
+                                <VerbalForm
+                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
+                                    initialData={editItem}
+                                />
+                            ) : editItem.module === 'politics' ? (
+                                <PoliticsForm
+                                    onAddKnowledge={data => handleEditSave({
+                                        ...editItem,
+                                        ...data,
+                                        date: data.date instanceof Date ? (data.date ? data.date.toISOString() : null) : data.date
+                                    })}
+                                    initialData={{
+                                        date: editItem.date ? (typeof editItem.date === 'string' ? (editItem.date ? new Date(editItem.date) : null) : editItem.date) : null,
+                                        source: editItem.source,
+                                        note: editItem.note
+                                    }}
+                                />
+                            ) : (
+                                <KnowledgeForm
+                                    title="编辑知识点"
+                                    typePlaceholder="类型"
+                                    notePlaceholder="技巧记录"
+                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
+                                    initialData={editItem}
+                                />
+                            )}
+                        </div>
+                    ) : null}
+                    <SimpleDialogFooter>
+                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}>取消</SimpleDialogCancel>
+                    </SimpleDialogFooter>
+                </SimpleDialogContent>
+            </SimpleDialog>
         </div>
     );
 };
