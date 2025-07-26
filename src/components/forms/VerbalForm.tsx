@@ -5,8 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface VerbalFormProps {
     onAddKnowledge: (knowledge: { idiom: string; meaning: string }) => void;
@@ -51,7 +51,14 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
                 </div>
             </CardContent>
             <CardFooter>
-                <Button className="w-full" type="button" onClick={handleSubmit}>保存知识点</Button>
+                <ReactBitsButton
+                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+                    type="button"
+                    onClick={handleSubmit}
+                    size="sm"
+                >
+                    保存知识点
+                </ReactBitsButton>
             </CardFooter>
         </Card>
     );

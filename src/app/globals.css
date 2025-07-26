@@ -3,6 +3,187 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ReactBits 风格按钮动画 */
+@keyframes glow-pulse {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1);
+  }
+
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.09828) saturate(1.19655);
+  }
+
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite alternate;
+}
+
+/* 光晕扫过动画 */
+@keyframes shimmer-left {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer-right {
+  0% {
+    transform: translateX(200%) skewX(-15deg);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+/* ReactBits 真实按钮样式 */
+.reactbits-button {
+  color: #fff;
+  cursor: pointer;
+  isolation: isolate;
+  z-index: 15;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
+  border: none;
+  border-radius: 50px;
+  justify-content: center;
+  align-items: center;
+  font-weight: 600;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: 3s ease-in-out infinite alternate glow-pulse;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+}
+
+.reactbits-button:hover {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation-duration: 1.5s;
+  transform: translateY(-2px) scale(1.01);
+  backdrop-filter: blur(20px);
+}
+
+.reactbits-button:active {
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0px) scale(0.98);
+  backdrop-filter: blur(5px);
+}
+
+/* 光晕扫过效果 */
+.shimmer-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.6),
+      transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.reactbits-button:hover .shimmer-effect {
+  animation: shimmer-left 0.6s ease-out;
+}
+
+.reactbits-button:not(:hover) .shimmer-effect {
+  animation: shimmer-right 0.6s ease-out;
+}
+
+/* 玻璃边框效果 */
+.glass-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  /* 只占上半部分 */
+  border-radius: 50px 50px 0 0;
+  /* 只有上半部分圆角 */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(255, 255, 255, 0.3) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.1) 80%,
+      transparent 100%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-bottom: none;
+  /* 移除底部边框 */
+  border-left: none;
+  /* 移除左边框 */
+  border-right: none;
+  /* 移除右边框 */
+}
+
+.reactbits-button:hover .glass-effect {
+  opacity: 1;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-bottom: none;
+  /* 移除底部边框 */
+  border-left: none;
+  /* 移除左边框 */
+  border-right: none;
+  /* 移除右边框 */
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .reactbits-button {
+    gap: 1.2rem;
+    padding: 0.8rem 0.8rem 0.8rem 1.8rem;
+    font-size: 1rem;
+  }
+}
+
+/* 鼠标跟随光晕效果 */
+.glow-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(255, 255, 255, 0.3) 0%,
+      transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.shimmer-button:hover .glow-effect {
+  opacity: 1;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -323,4 +504,94 @@ body.eye-care .border-input {
 
 body.eye-care .text-muted-foreground {
   color: #b0a98b !important;
+}
+
+/* 白色按钮的特殊文字颜色处理 */
+.reactbits-button[class*="from-gray-100"] {
+  color: #374151 !important;
+  /* 深灰色文字 */
+  text-shadow: none;
+}
+
+.reactbits-button[class*="from-gray-100"]:hover {
+  color: #111827 !important;
+  /* 悬停时更深的灰色 */
+}
+
+/* Checkbox 动效 */
+[data-slot="checkbox"] {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: center;
+}
+
+[data-slot="checkbox"]:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-slot="checkbox"]:active {
+  transform: scale(0.95);
+  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+[data-slot="checkbox"][data-state="checked"] {
+  animation: checkbox-check 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+[data-slot="checkbox"][data-state="unchecked"] {
+  animation: checkbox-uncheck 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes checkbox-check {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes checkbox-uncheck {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Checkbox 指示器动效 */
+[data-slot="checkbox-indicator"] {
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+[data-slot="checkbox"][data-state="checked"] [data-slot="checkbox-indicator"] {
+  animation: checkmark-appear 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes checkmark-appear {
+  0% {
+    transform: scale(0) rotate(-45deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.2) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }

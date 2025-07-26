@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { MODULES } from '@/config/exam';
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface StudyPlan {
     id: string;
@@ -30,8 +30,12 @@ export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps
                 <CardHeader>
                     <CardTitle>{plan.name}</CardTitle>
                     <CardAction>
-                        <Button size="sm" variant="outline" onClick={onBack}>返回</Button>
-                        <Button size="sm" variant="ghost" className="ml-2" onClick={onEdit}>编辑</Button>
+                        <ReactBitsButton variant="outline" onClick={onBack} size="sm">
+                            返回
+                        </ReactBitsButton>
+                        <ReactBitsButton variant="outline" className="ml-2" onClick={onEdit} size="sm">
+                            编辑
+                        </ReactBitsButton>
                     </CardAction>
                 </CardHeader>
                 <CardContent>

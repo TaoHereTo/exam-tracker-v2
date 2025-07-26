@@ -7,7 +7,6 @@ import { useImportExport } from "@/hooks/useImportExport";
 import { OverviewView } from "@/components/views/OverviewView";
 import { ChartsView } from "@/components/views/ChartsView";
 import { HistoryView } from "@/components/views/HistoryView";
-import { NewRecordView } from "@/components/views/NewRecordView";
 import { useLocalStorageState } from "@/hooks/useLocalStorageState";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import DockNavigation from "@/components/layout/DockNavigation";
@@ -20,7 +19,6 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import PlanListView from "@/components/views/PlanListView";
 import PlanDetailView from "@/components/views/PlanDetailView";
 import PageTitle from "@/components/ui/PageTitle";
-import { KnowledgeEntryTabView } from "@/components/views/KnowledgeEntryTabView";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -31,6 +29,9 @@ import {
   AlertDialogCancel,
   AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { normalizeModuleName } from "@/config/exam";
+import { NewRecordForm } from "@/components/forms/NewRecordForm";
+import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 
 
 export default function Home() {
@@ -131,21 +132,7 @@ export default function Home() {
 
   const { notify } = useNotification();
 
-  // 恢复 moduleLabelMap 和 handleBatchDeleteKnowledge
-  const moduleLabelMap: Record<string, string> = {
-    'data-analysis': '资料分析',
-    'politics': '政治理论',
-    'math': '数量关系',
-    'common': '常识判断',
-    'verbal': '言语理解',
-    'logic': '判断推理',
-    '资料分析': '资料分析',
-    '政治理论': '政治理论',
-    '数量关系': '数量关系',
-    '常识判断': '常识判断',
-    '言语理解': '言语理解',
-    '判断推理': '判断推理',
-  };
+  // 使用统一的配置，不再需要重复定义
   const handleBatchDeleteKnowledge = (ids: string[]) => {
     setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
   };
@@ -175,7 +162,7 @@ export default function Home() {
           {activeTab === 'best' && (
             <div>
               <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
-              <PersonalBestView records={records.map(r => ({ ...r, module: (typeof r.module === 'string' && moduleLabelMap[r.module]) ? moduleLabelMap[r.module] : r.module }))} />
+              <PersonalBestView records={records.map(r => ({ ...r, module: normalizeModuleName(r.module) }))} />
             </div>
           )}
           {activeTab === 'modules' && (
@@ -184,7 +171,14 @@ export default function Home() {
               <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} onEditKnowledge={handleEditKnowledge} />
             </div>
           )}
-          {activeTab === 'form' && <NewRecordView onAddRecord={addRecord} />}
+          {activeTab === 'form' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">新增刷题记录</h1>
+              <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+                <NewRecordForm onAddRecord={addRecord} />
+              </div>
+            </div>
+          )}
           {activeTab === 'history' && (
             <HistoryView
               records={pagedRecords}
@@ -258,7 +252,14 @@ export default function Home() {
               />
             </div>
           )}
-          {activeTab === 'knowledge-entry' && <KnowledgeEntryTabView onAddKnowledge={addKnowledge} />}
+          {activeTab === 'knowledge-entry' && (
+            <div>
+              <h1 className="text-3xl font-bold mb-4">知识点录入</h1>
+              <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+                <KnowledgeEntryView onAddKnowledge={addKnowledge} />
+              </div>
+            </div>
+          )}
         </div>
         <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
           <AlertDialogContent>

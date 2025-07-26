@@ -4,7 +4,7 @@ import * as React from "react";
 import { useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans }: {
     onClearRecords?: () => void;
@@ -75,7 +75,9 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                         </Select>
                         <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
                             <AlertDialogTrigger asChild>
-                                <Button variant="destructive">清空</Button>
+                                <ReactBitsButton variant="destructive" size="sm">
+                                    清空
+                                </ReactBitsButton>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                                 <AlertDialogHeader>

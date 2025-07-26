@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import type { RecordItem, KnowledgeItem, StudyPlan } from "@/types/record";
 import { format } from 'date-fns';
+import { normalizeModuleName } from "@/config/exam";
 
 export function useImportExport(
     records: RecordItem[],
@@ -111,21 +112,7 @@ export function useImportExport(
                             alert('导入的文件格式不正确！');
                             return;
                         }
-                        // 建立中英文模块映射
-                        const moduleMap: Record<string, string> = {
-                            '资料分析': 'data-analysis',
-                            '政治理论': 'politics',
-                            '数量关系': 'math',
-                            '常识判断': 'common',
-                            '言语理解': 'verbal',
-                            '判断推理': 'logic',
-                            'data-analysis': 'data-analysis',
-                            'politics': 'politics',
-                            'math': 'math',
-                            'common': 'common',
-                            'verbal': 'verbal',
-                            'logic': 'logic',
-                        };
+                        // 使用统一的模块名称映射
                         function normalizeDate(date: unknown) {
                             if (!date) return '';
                             if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
@@ -146,7 +133,7 @@ export function useImportExport(
                             return {
                                 id: typeof r.id === 'number' ? r.id : Date.now() + Math.floor(Math.random() * 10000),
                                 date: normalizeDate(r.date),
-                                module: moduleMap[String((r as Record<string, unknown>).module)] ?? (r as Record<string, unknown>).module,
+                                module: normalizeModuleName(String((r as Record<string, unknown>).module)),
                                 total: typeof total === 'number' ? total : Number(total) || 0,
                                 correct: typeof correct === 'number' ? correct : Number(correct) || 0,
                                 duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration).toString() : String(r.duration)) : '',

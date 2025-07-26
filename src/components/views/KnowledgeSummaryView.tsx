@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
@@ -17,12 +16,13 @@ import {
     PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { format } from 'date-fns';
-import { MODULES } from '@/config/exam';
+import { MODULES, normalizeModuleName } from '@/config/exam';
 import { KnowledgeForm } from "../forms/KnowledgeForm";
 import VerbalForm from "../forms/VerbalForm";
 import PoliticsForm from "../forms/PoliticsForm";
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { ArrowUpFromLine, Pencil } from 'lucide-react';
+import ReactBitsButton from '@/components/ui/ReactBitsButton';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -84,7 +84,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         return col;
     });
     // 先按模块过滤
-    let filtered = knowledge.filter(item => item.module === selectedModule);
+    let filtered = knowledge.filter(item => normalizeModuleName(item.module) === normalizeModuleName(selectedModule));
     // 再按关键词过滤
     const searchLower = search.trim().toLowerCase();
     if (searchLower) {
@@ -208,26 +208,28 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         </div>
                         {/* 右侧按钮组 */}
                         <div className="flex gap-2 shrink-0 mt-2 md:mt-0">
-                            <Button variant="outline" onClick={handleExportExcel} className="flex items-center gap-1">
+                            <ReactBitsButton variant="outline" onClick={handleExportExcel} className="flex items-center gap-1" size="sm">
                                 <ArrowUpFromLine className="w-4 h-4 mr-1" /> 导出为Excel
-                            </Button>
-                            <Button
+                            </ReactBitsButton>
+                            <ReactBitsButton
                                 variant="outline"
                                 className="flex items-center gap-1 border border-gray-300"
                                 disabled={selectedRows.length !== 1}
                                 onClick={() => handleEdit()}
+                                size="sm"
                             >
                                 <Pencil className="w-4 h-4 mr-1" /> 编辑
-                            </Button>
+                            </ReactBitsButton>
                             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                                 <AlertDialogTrigger asChild>
-                                    <Button
+                                    <ReactBitsButton
                                         variant="destructive"
                                         disabled={selectedRows.length === 0}
                                         onClick={() => setDeleteDialogOpen(true)}
+                                        size="sm"
                                     >
                                         批量删除
-                                    </Button>
+                                    </ReactBitsButton>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

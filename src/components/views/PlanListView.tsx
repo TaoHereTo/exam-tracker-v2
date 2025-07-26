@@ -11,6 +11,7 @@ import { format } from "date-fns";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import type { PlanType } from "@/types/record";
 import { MODULES } from '@/config/exam';
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface StudyPlan {
     id: string;
@@ -41,10 +42,12 @@ interface PlanListViewProps {
 
 export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onShowDetail }: PlanListViewProps) {
     const [showForm, setShowForm] = useState(false);
-    const [form, setForm] = useState<Partial<StudyPlan>>({});
     const [editId, setEditId] = useState<string | null>(null);
-    const [startDate, setStartDate] = useState<Date | undefined>();
-    const [endDate, setEndDate] = useState<Date | undefined>();
+    const [form, setForm] = useState<Partial<StudyPlan>>({});
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+    const [startDateOpen, setStartDateOpen] = useState(false);
+    const [endDateOpen, setEndDateOpen] = useState(false);
 
     const handleOpenForm = (plan?: StudyPlan) => {
         setShowForm(true);
@@ -71,10 +74,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     const handleStartDateChange = (date?: Date) => {
         setStartDate(date);
         setForm({ ...form, startDate: date ? format(date, 'yyyy-MM-dd') : '' });
+        setStartDateOpen(false); // 选择日期后关闭Popover
     };
     const handleEndDateChange = (date?: Date) => {
         setEndDate(date);
         setForm({ ...form, endDate: date ? format(date, 'yyyy-MM-dd') : '' });
+        setEndDateOpen(false); // 选择日期后关闭Popover
     };
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,7 +111,13 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         <div>
             <h1 className="text-3xl font-bold mb-4">制定计划</h1>
             <div className="mb-6">
-                <Button onClick={() => handleOpenForm()}>新建计划</Button>
+                <ReactBitsButton
+                    onClick={() => handleOpenForm()}
+                    size="sm"
+                    className="bg-gradient-to-br from-gray-800 to-black"
+                >
+                    新建计划
+                </ReactBitsButton>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {plans.length === 0 && <div className="flex flex-col items-center justify-center col-span-2 py-16 text-gray-400 text-xl">
@@ -118,11 +129,17 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                         <CardHeader>
                             <CardTitle>{plan.name}</CardTitle>
                             <CardAction>
-                                <Button size="sm" variant="outline" onClick={() => onShowDetail(plan.id)}>详情</Button>
-                                <Button size="sm" variant="ghost" className="ml-2" onClick={() => handleOpenForm(plan)}>编辑</Button>
+                                <ReactBitsButton size="sm" variant="outline" onClick={() => onShowDetail(plan.id)}>
+                                    详情
+                                </ReactBitsButton>
+                                <ReactBitsButton size="sm" variant="outline" className="ml-2" onClick={() => handleOpenForm(plan)}>
+                                    编辑
+                                </ReactBitsButton>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button size="sm" variant="destructive" className="ml-2">删除</Button>
+                                        <ReactBitsButton size="sm" variant="destructive" className="ml-2">
+                                            删除
+                                        </ReactBitsButton>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
@@ -163,7 +180,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 <div className="mb-4 flex gap-4">
                                     <div className="flex-1">
                                         <Label>开始日期</Label>
-                                        <Popover>
+                                        <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
                                             <PopoverTrigger asChild>
                                                 <Button variant="outline" className="w-full mt-2 justify-start text-left font-normal">
                                                     {startDate ? format(startDate, 'yyyy-MM-dd') : '选择开始日期'}
@@ -180,7 +197,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                     </div>
                                     <div className="flex-1">
                                         <Label>结束日期</Label>
-                                        <Popover>
+                                        <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                                             <PopoverTrigger asChild>
                                                 <Button variant="outline" className="w-full mt-2 justify-start text-left font-normal">
                                                     {endDate ? format(endDate, 'yyyy-MM-dd') : '选择结束日期'}
@@ -234,8 +251,21 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 </div>
                             </CardContent>
                             <div className="flex justify-end gap-2 px-6 pb-6">
-                                <Button type="button" variant="ghost" onClick={handleCloseForm}>取消</Button>
-                                <Button type="submit" variant="default">{editId ? '保存' : '创建'}</Button>
+                                <ReactBitsButton
+                                    type="button"
+                                    variant="outline"
+                                    onClick={handleCloseForm}
+                                    size="sm"
+                                >
+                                    取消
+                                </ReactBitsButton>
+                                <ReactBitsButton
+                                    type="submit"
+                                    size="sm"
+                                    className="bg-gradient-to-br from-gray-800 to-black"
+                                >
+                                    {editId ? '保存' : '创建'}
+                                </ReactBitsButton>
                             </div>
                         </form>
                     </Card>

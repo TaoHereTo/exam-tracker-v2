@@ -1,6 +1,6 @@
 import { useRef } from "react";
-import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface DataImportExportProps {
     onImport: () => void;
@@ -12,12 +12,18 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
     const clearDialogRef = useRef<HTMLButtonElement>(null);
     return (
         <div className="flex gap-4 mb-6">
-            <Button variant="outline" onClick={onImport}>导入数据</Button>
-            <Button variant="outline" onClick={onExport}>导出数据</Button>
+            <ReactBitsButton variant="outline" onClick={onImport} size="sm">
+                导入数据
+            </ReactBitsButton>
+            <ReactBitsButton variant="outline" onClick={onExport} size="sm">
+                导出数据
+            </ReactBitsButton>
             {onClearAllData && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <Button variant="destructive" ref={clearDialogRef}>清空所有数据</Button>
+                        <ReactBitsButton variant="destructive" ref={clearDialogRef} size="sm">
+                            清空所有数据
+                        </ReactBitsButton>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>

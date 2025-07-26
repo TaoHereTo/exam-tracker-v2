@@ -9,6 +9,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { MODULES } from '@/config/exam';
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 export type RecordItem = {
     id: number;
@@ -25,6 +26,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
     const [correct, setCorrect] = useState("");
     const [total, setTotal] = useState("");
     const [duration, setDuration] = useState("");
+    const [dateOpen, setDateOpen] = useState(false);
     const { notify } = useNotification();
 
     const handleSubmit = (e?: React.FormEvent) => {
@@ -51,6 +53,11 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
         setDuration("");
     };
 
+    const handleDateSelect = (selectedDate: Date | undefined) => {
+        setDate(selectedDate);
+        setDateOpen(false); // 选择日期后关闭Popover
+    };
+
     return (
         <form onSubmit={handleSubmit}>
             <Card className="max-w-md mx-auto">
@@ -61,14 +68,14 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     {/* 日期选择器 */}
                     <div className="flex flex-col gap-2">
                         <Label>日期</Label>
-                        <Popover>
+                        <Popover open={dateOpen} onOpenChange={setDateOpen}>
                             <PopoverTrigger asChild>
                                 <Button variant="outline" className="w-full justify-start text-left font-normal">
                                     {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
-                                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                                <Calendar mode="single" selected={date} onSelect={handleDateSelect} initialFocus />
                             </PopoverContent>
                         </Popover>
                     </div>
@@ -104,7 +111,14 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </div>
                 </CardContent>
                 <CardFooter>
-                    <Button className="w-full" type="submit" onClick={handleSubmit}>保存记录</Button>
+                    <ReactBitsButton
+                        className="w-full bg-gradient-to-br from-gray-800 to-black"
+                        type="submit"
+                        onClick={handleSubmit}
+                        size="sm"
+                    >
+                        保存记录
+                    </ReactBitsButton>
                 </CardFooter>
             </Card>
         </form>

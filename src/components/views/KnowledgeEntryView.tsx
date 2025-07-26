@@ -1,11 +1,5 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import DataAnalysisForm from '../forms/DataAnalysisForm';
-import PoliticsForm from '../forms/PoliticsForm';
-import MathForm from '../forms/MathForm';
-import CommonForm from '../forms/CommonForm';
-import VerbalForm from '../forms/VerbalForm';
-import LogicForm from '../forms/LogicForm';
 import {
     Carousel,
     CarouselContent,
@@ -14,50 +8,48 @@ import {
     CarouselNext,
     CarouselApi,
 } from "@/components/ui/carousel";
-import { useRef, useState } from 'react';
+import ModuleForm from '../forms/ModuleForm';
+import VerbalForm from '../forms/VerbalForm';
+import PoliticsForm from '../forms/PoliticsForm';
 import type { KnowledgeItem } from "@/types/record";
+import { MODULES } from "@/config/exam";
 
 interface KnowledgeEntryViewProps {
     onAddKnowledge: (knowledge: KnowledgeItem) => void;
     defaultTab?: string;
 }
 
-const tabList = [
-    { value: 'data-analysis', label: '资料分析' },
-    { value: 'politics', label: '政治理论' },
-    { value: 'math', label: '数量关系' },
-    { value: 'common', label: '常识判断' },
-    { value: 'verbal', label: '言语理解' },
-    { value: 'logic', label: '判断推理' },
-];
-
 const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge, defaultTab = 'data-analysis' }) => {
     const [tab, setTab] = useState(defaultTab);
     const carouselApi = useRef<CarouselApi | null>(null);
+
     // 包装函数，自动加上 module 字段
     const handleAdd = (module: string) => (data: Partial<KnowledgeItem>) => {
         onAddKnowledge({ ...data, module } as KnowledgeItem);
     };
+
     // tab 切换时，carousel 跳转
     const handleTabChange = (v: string) => {
         setTab(v);
-        const idx = tabList.findIndex(t => t.value === v);
+        const idx = MODULES.findIndex(t => t.value === v);
         if (carouselApi.current) carouselApi.current.scrollTo(idx);
     };
+
     // carousel 滑动时，tab 跟随
     const handleCarouselApi = (api?: CarouselApi) => {
         if (!api) return;
         carouselApi.current = api;
         api.on('select', () => {
             const idx = api.selectedScrollSnap();
-            setTab(tabList[idx].value);
+            setTab(MODULES[idx].value);
         });
     };
+
     return (
         <Tabs value={tab} onValueChange={handleTabChange} className="w-full max-w-2xl mx-auto flex flex-col">
             <div className="relative mb-10">
                 <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full justify-center text-base h-10 px-1">
-                    {tabList.map(({ value, label }) => (
+                    {MODULES.map(({ value, label }) => (
                         <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
                     ))}
                 </TabsList>
@@ -67,7 +59,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 <CarouselContent>
                     <CarouselItem>
                         <TabsContent value="data-analysis" forceMount>
-                            <DataAnalysisForm onAddKnowledge={handleAdd('data-analysis')} />
+                            <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
@@ -77,12 +69,12 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                     </CarouselItem>
                     <CarouselItem>
                         <TabsContent value="math" forceMount>
-                            <MathForm onAddKnowledge={handleAdd('math')} />
+                            <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
                         <TabsContent value="common" forceMount>
-                            <CommonForm onAddKnowledge={handleAdd('common')} />
+                            <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
@@ -92,7 +84,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                     </CarouselItem>
                     <CarouselItem>
                         <TabsContent value="logic" forceMount>
-                            <LogicForm onAddKnowledge={handleAdd('logic')} />
+                            <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
                         </TabsContent>
                     </CarouselItem>
                 </CarouselContent>

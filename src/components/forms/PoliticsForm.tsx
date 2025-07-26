@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface PoliticsFormProps {
     onAddKnowledge: (knowledge: { date: Date | null; source: string; note: string }) => void;
@@ -19,6 +20,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
     const [date, setDate] = useState<Date | null>(initialData?.date ? new Date(initialData.date) : null);
     const [source, setSource] = useState(initialData?.source || '');
     const [note, setNote] = useState(initialData?.note || '');
+    const [dateOpen, setDateOpen] = useState(false);
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -26,6 +28,11 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
         setSource(initialData?.source || '');
         setNote(initialData?.note || '');
     }, [initialData]);
+
+    const handleDateSelect = (selectedDate: Date | undefined) => {
+        setDate(selectedDate ?? null);
+        setDateOpen(false); // 选择日期后关闭Popover
+    };
 
     const handleSubmit = () => {
         if (!source.trim() && !note.trim()) return;
@@ -44,14 +51,14 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
             <CardContent className="space-y-6">
                 <div className="space-y-2">
                     <Label>选择发布日期</Label>
-                    <Popover>
+                    <Popover open={dateOpen} onOpenChange={setDateOpen}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" className="w-full justify-start text-left font-normal">
                                 {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
                             </Button>
                         </PopoverTrigger>
                         <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
-                            <Calendar mode="single" selected={date ?? undefined} onSelect={v => setDate(v ?? null)} initialFocus required={false} />
+                            <Calendar mode="single" selected={date ?? undefined} onSelect={handleDateSelect} initialFocus required={false} />
                         </PopoverContent>
                     </Popover>
                 </div>
@@ -69,7 +76,14 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                 </div>
             </CardContent>
             <CardFooter>
-                <Button className="w-full" type="button" onClick={handleSubmit}>保存知识点</Button>
+                <ReactBitsButton
+                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+                    type="button"
+                    onClick={handleSubmit}
+                    size="sm"
+                >
+                    保存知识点
+                </ReactBitsButton>
             </CardFooter>
         </Card>
     );

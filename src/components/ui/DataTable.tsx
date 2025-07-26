@@ -1,6 +1,6 @@
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 export interface DataTableColumn<T> {
     key: string;
@@ -42,14 +42,14 @@ export function DataTable<T, K extends string | number = string | number>({
             <div className="mb-2 flex justify-between items-center">
                 <span className="text-gray-500 text-sm">共 {data.length} 条</span>
                 {onBatchDelete && (
-                    <Button
+                    <ReactBitsButton
                         variant="destructive"
                         size="sm"
                         disabled={selected.length === 0}
                         onClick={onBatchDelete}
                     >
                         {batchDeleteText}
-                    </Button>
+                    </ReactBitsButton>
                 )}
             </div>
             <table className="min-w-full border text-sm">

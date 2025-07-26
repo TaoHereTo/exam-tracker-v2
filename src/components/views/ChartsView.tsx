@@ -1,39 +1,13 @@
+import React, { useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
 import { TrendChart } from "@/components/ui/TrendChart";
-import { MODULE_SCORES } from "@/config/exam";
 import { ModulePieChart } from "@/components/ui/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { RecordItem } from "@/types/record";
 
-const moduleLabelMap: Record<string, string> = {
-    'data-analysis': '资料分析',
-    'politics': '政治理论',
-    'math': '数量关系',
-    'common': '常识判断',
-    'verbal': '言语理解',
-    'logic': '判断推理',
-    '资料分析': '资料分析',
-    '政治理论': '政治理论',
-    '数量关系': '数量关系',
-    '常识判断': '常识判断',
-    '言语理解': '言语理解',
-    '判断推理': '判断推理',
-};
-const moduleColors: Record<string, string> = {
-    'data-analysis': '#A259FF',
-    'politics': '#3366FF',
-    'math': '#43D854',
-    'common': '#FFB300',
-    'verbal': '#FF4C4C',
-    'logic': '#00B8D9',
-    '资料分析': '#A259FF',
-    '政治理论': '#3366FF',
-    '数量关系': '#43D854',
-    '常识判断': '#FFB300',
-    '言语理解': '#FF4C4C',
-    '判断推理': '#00B8D9',
-};
+// 使用统一的配置，不再需要重复定义
 
 // 能力指数计算函数
 function calcAbilityIndex({ accuracy, perMinute, total }: { accuracy: number; perMinute: number; total: number }, weights = { accuracy: 0.5, perMinute: 0.3, total: 0.2 }) {
@@ -49,7 +23,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     // 统计每个模块的参数
     const moduleStats: Record<string, { correct: number; total: number; duration: number }> = {};
     data.forEach(item => {
-        const key = moduleLabelMap[item.module] || item.module;
+        const key = normalizeModuleName(item.module);
         if (!moduleStats[key]) {
             moduleStats[key] = { correct: 0, total: 0, duration: 0 };
         }
@@ -57,18 +31,22 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         moduleStats[key].total += Number(item.total) || 0;
         moduleStats[key].duration += Number(item.duration) || 0;
     });
-    const modules = Object.keys(moduleColors).filter(m => !m.match(/^[a-z-]+$/));
+
+    // 只使用中文模块名称
+    const modules = Object.keys(moduleStats).filter(m => !m.match(/^[a-z-]+$/));
+
     // 归一化参数
     let maxTotal = 1, maxPerMinute = 1;
     const perMinuteMap: Record<string, number> = {};
     modules.forEach(module => {
         const stat = moduleStats[module] || { correct: 0, total: 0, duration: 0 };
-        const scorePerQ = (module as keyof typeof MODULE_SCORES) in MODULE_SCORES ? MODULE_SCORES[module as keyof typeof MODULE_SCORES] : 1;
+        const scorePerQ = getModuleScore(module);
         const perMinute = stat.duration > 0 ? (scorePerQ * stat.correct) / stat.duration : 0;
         perMinuteMap[module] = perMinute;
         if (stat.total > maxTotal) maxTotal = stat.total;
         if (perMinute > maxPerMinute) maxPerMinute = perMinute;
     });
+
     // 能力指数=加权（归一化正确率、每分钟得分、做题量）
     const values = modules.map(module => {
         const stat = moduleStats[module] || { correct: 0, total: 0, duration: 0 };
@@ -77,8 +55,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         const totalNorm = stat.total / maxTotal; // 归一化
         return Number((calcAbilityIndex({ accuracy, perMinute, total: totalNorm }) * 100).toFixed(2));
     });
+
     // 构造点颜色数组
-    const pointColors = modules.map(m => moduleColors[m]);
+    const pointColors = modules.map(m => getModuleColor(m));
+
     // 构造线条渐变色
     const lineGradient = {
         type: 'linear',
@@ -88,9 +68,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         y2: 1,
         colorStops: modules.map((m, i) => ({
             offset: i / (modules.length - 1),
-            color: moduleColors[m]
+            color: getModuleColor(m)
         }))
     };
+
     const indicator = modules.map(module => ({
         name: module,
         max: 100
@@ -202,6 +183,115 @@ interface ChartsViewProps {
 }
 
 export function ChartsView({ records }: ChartsViewProps) {
+    // 使用useMemo优化数据处理
+    const perMinuteData = useMemo(() => {
+        console.log('ChartsView perMinute - original records:', records);
+
+        // 检查日期格式
+        const dateFormats = records.map(r => r.date).slice(0, 10);
+        console.log('ChartsView perMinute - date formats sample:', dateFormats);
+        console.log('ChartsView perMinute - date formats expanded:', dateFormats.map(d => ({ date: d, parsed: new Date(d) })));
+
+        const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
+        records.forEach(r => {
+            // 使用统一的模块名称映射
+            const normalizedModule = normalizeModuleName(r.module);
+            const key = `${r.date}__${normalizedModule}`;
+            const correct = Number(r.correct) || 0;
+            const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
+            if (!groupMap[key]) {
+                groupMap[key] = { date: r.date, module: normalizedModule, correct: 0, duration: 0 };
+            }
+            groupMap[key].correct += correct;
+            groupMap[key].duration += duration;
+        });
+
+        // 添加调试信息，查看分组情况
+        console.log('ChartsView perMinute - groupMap keys:', Object.keys(groupMap));
+        console.log('ChartsView perMinute - groupMap sample:', Object.entries(groupMap).slice(0, 5));
+        console.log('ChartsView perMinute - groupMap expanded:', Object.entries(groupMap).slice(0, 5).map(([key, value]) => ({
+            key,
+            date: key.split('__')[0],
+            module: key.split('__')[1],
+            value
+        })));
+
+        const chartData = Object.values(groupMap).map(item => ({
+            date: item.date,
+            module: item.module,
+            score: item.duration > 0 ? getModuleScore(item.module) * item.correct / item.duration : 0,
+            duration: item.duration,
+        }));
+
+        // 按日期排序
+        chartData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        console.log('ChartsView perMinute - chartData sorted:', chartData);
+
+        // 分析每个日期的模块分布
+        const dateModuleAnalysis = chartData.reduce((acc, item) => {
+            if (!acc[item.date]) acc[item.date] = [];
+            acc[item.date].push(item.module);
+            return acc;
+        }, {} as Record<string, string[]>);
+        console.log('ChartsView perMinute - date module analysis:', dateModuleAnalysis);
+
+        return chartData;
+    }, [records]);
+
+    const accuracyData = useMemo(() => {
+        console.log('ChartsView accuracy - original records:', records);
+
+        // 检查日期格式
+        const dateFormats = records.map(r => r.date).slice(0, 10);
+        console.log('ChartsView accuracy - date formats sample:', dateFormats);
+        console.log('ChartsView accuracy - date formats expanded:', dateFormats.map(d => ({ date: d, parsed: new Date(d) })));
+
+        const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
+        records.forEach(r => {
+            // 使用统一的模块名称映射
+            const normalizedModule = normalizeModuleName(r.module);
+            const key = `${r.date}__${normalizedModule}`;
+            const correct = Number(r.correct) || 0;
+            const total = Number(r.total) || 0;
+            if (!groupMap[key]) {
+                groupMap[key] = { date: r.date, module: normalizedModule, correct: 0, total: 0 };
+            }
+            groupMap[key].correct += correct;
+            groupMap[key].total += total;
+        });
+
+        // 添加调试信息，查看分组情况
+        console.log('ChartsView accuracy - groupMap keys:', Object.keys(groupMap));
+        console.log('ChartsView accuracy - groupMap sample:', Object.entries(groupMap).slice(0, 5));
+        console.log('ChartsView accuracy - groupMap expanded:', Object.entries(groupMap).slice(0, 5).map(([key, value]) => ({
+            key,
+            date: key.split('__')[0],
+            module: key.split('__')[1],
+            value
+        })));
+
+        const chartData = Object.values(groupMap).map(item => ({
+            date: item.date,
+            module: item.module,
+            score: item.total > 0 ? (item.correct / item.total) * 100 : 0,
+            duration: 0,
+        }));
+
+        // 按日期排序
+        chartData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        console.log('ChartsView accuracy - chartData sorted:', chartData);
+
+        // 分析每个日期的模块分布
+        const dateModuleAnalysis = chartData.reduce((acc, item) => {
+            if (!acc[item.date]) acc[item.date] = [];
+            acc[item.date].push(item.module);
+            return acc;
+        }, {} as Record<string, string[]>);
+        console.log('ChartsView accuracy - date module analysis:', dateModuleAnalysis);
+
+        return chartData;
+    }, [records]);
+
     return (
         <div>
             <h1 className="text-3xl font-bold mb-4">数据图表</h1>
@@ -215,60 +305,24 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </TabsList>
                     <TabsContent value="perMinute">
                         <div style={{ height: '500px' }}>
-                            {(() => {
-                                const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
-                                records.forEach(r => {
-                                    const key = `${r.date}__${r.module}`;
-                                    const correct = Number(r.correct) || 0;
-                                    const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
-                                    if (!groupMap[key]) {
-                                        groupMap[key] = { date: r.date, module: r.module, correct: 0, duration: 0 };
-                                    }
-                                    groupMap[key].correct += correct;
-                                    groupMap[key].duration += duration;
-                                });
-                                const chartData = Object.values(groupMap).map(item => ({
-                                    date: item.date,
-                                    module: item.module,
-                                    score: item.duration > 0 ? (MODULE_SCORES[item.module as keyof typeof MODULE_SCORES] || 1) * item.correct / item.duration : 0,
-                                    duration: item.duration,
-                                }));
-                                return <TrendChart data={chartData} yMax={2} />;
-                            })()}
+                            <TrendChart data={perMinuteData} yMax={2} />
                         </div>
                     </TabsContent>
                     <TabsContent value="accuracy">
                         <div style={{ height: '500px' }}>
-                            {(() => {
-                                const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
-                                records.forEach(r => {
-                                    const key = `${r.date}__${r.module}`;
-                                    const correct = Number(r.correct) || 0;
-                                    const total = Number(r.total) || 0;
-                                    if (!groupMap[key]) {
-                                        groupMap[key] = { date: r.date, module: r.module, correct: 0, total: 0 };
-                                    }
-                                    groupMap[key].correct += correct;
-                                    groupMap[key].total += total;
-                                });
-                                const chartData = Object.values(groupMap).map(item => ({
-                                    date: item.date,
-                                    module: item.module,
-                                    score: item.total > 0 ? (item.correct / item.total) * 100 : 0,
-                                    duration: 0,
-                                }));
-                                return <TrendChart data={chartData} yMax={100} />;
-                            })()}
+                            <TrendChart data={accuracyData} yMax={100} />
                         </div>
                     </TabsContent>
                     <TabsContent value="pie">
                         <div style={{ height: '500px' }}>
-                            <ModulePieChart data={records.map(r => ({
-                                date: r.date,
-                                module: r.module,
-                                score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
-                            }))} />
+                            <ModulePieChart data={records.map(r => {
+                                return {
+                                    date: r.date,
+                                    module: normalizeModuleName(r.module),
+                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                    duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
+                                };
+                            })} />
                         </div>
                     </TabsContent>
                     <TabsContent value="radar">

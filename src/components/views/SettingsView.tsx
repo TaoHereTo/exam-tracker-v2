@@ -1,23 +1,13 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { AppearanceSetting } from "./settings/AppearanceSetting";
 import { PaginationSetting } from "./settings/PaginationSetting";
 import { ExportFormatSetting } from "./settings/ExportFormatSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
@@ -59,7 +49,9 @@ export function SettingsView({
                             </div>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="destructive">清空数据</Button>
+                                    <ReactBitsButton variant="destructive" size="sm">
+                                        清空数据
+                                    </ReactBitsButton>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 
 interface RecordItem {
     module: keyof typeof MODULE_SCORES;
@@ -87,13 +87,19 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             <CardHeader>
                 <CardTitle>预期成绩分析</CardTitle>
                 <CardDescription>
-                    根据您的历史“每分钟得分”数据，结合标准行测考试结构，为您预测理论上的最高得分。
+                    根据您的历史&ldquo;每分钟得分&rdquo;数据，结合标准行测考试结构，为您预测理论上的最高得分。
                 </CardDescription>
             </CardHeader>
             <CardContent className="relative pb-20">
-                <Button className="mb-6" onClick={handlePredictScore}>
-                    预测我的行测总分
-                </Button>
+                <div className="mb-6">
+                    <ReactBitsButton
+                        onClick={handlePredictScore}
+                        size="sm"
+                        className="bg-gradient-to-br from-gray-800 to-black"
+                    >
+                        预测我的行测总分
+                    </ReactBitsButton>
+                </div>
                 {prediction && (
                     <>
                         <Table>

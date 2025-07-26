@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import ReactBitsButton from "@/components/ui/ReactBitsButton";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import React, { useRef } from "react";
 
@@ -20,9 +20,13 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
     };
 
     return (
-        <Button onClick={handleSave} variant="default">
+        <ReactBitsButton
+            onClick={handleSave}
+            size="sm"
+            className="bg-gradient-to-br from-gray-800 to-black"
+        >
             保存所有设置
-        </Button>
+        </ReactBitsButton>
     );
 };
 
