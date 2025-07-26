@@ -32,8 +32,6 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         moduleStats[normalizedModule].questions += total;
     });
 
-    console.log('ModulePieChart - moduleStats:', moduleStats);
-
     const pieData = Object.entries(moduleStats).map(([name, stat]) => {
         const moduleKey = name as keyof typeof FULL_EXAM_CONFIG.modules;
         const standardQuestions = FULL_EXAM_CONFIG.modules[moduleKey]?.questions || 1;
@@ -45,8 +43,6 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             standardQuestions
         };
     });
-
-    console.log('ModulePieChart - pieData:', pieData);
     const option = {
         tooltip: {
             trigger: 'item',

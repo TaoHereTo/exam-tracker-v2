@@ -185,13 +185,6 @@ interface ChartsViewProps {
 export function ChartsView({ records }: ChartsViewProps) {
     // 使用useMemo优化数据处理
     const perMinuteData = useMemo(() => {
-        console.log('ChartsView perMinute - original records:', records);
-
-        // 检查日期格式
-        const dateFormats = records.map(r => r.date).slice(0, 10);
-        console.log('ChartsView perMinute - date formats sample:', dateFormats);
-        console.log('ChartsView perMinute - date formats expanded:', dateFormats.map(d => ({ date: d, parsed: new Date(d) })));
-
         const groupMap: Record<string, { date: string; module: string; correct: number; duration: number }> = {};
         records.forEach(r => {
             // 使用统一的模块名称映射
@@ -206,16 +199,6 @@ export function ChartsView({ records }: ChartsViewProps) {
             groupMap[key].duration += duration;
         });
 
-        // 添加调试信息，查看分组情况
-        console.log('ChartsView perMinute - groupMap keys:', Object.keys(groupMap));
-        console.log('ChartsView perMinute - groupMap sample:', Object.entries(groupMap).slice(0, 5));
-        console.log('ChartsView perMinute - groupMap expanded:', Object.entries(groupMap).slice(0, 5).map(([key, value]) => ({
-            key,
-            date: key.split('__')[0],
-            module: key.split('__')[1],
-            value
-        })));
-
         const chartData = Object.values(groupMap).map(item => ({
             date: item.date,
             module: item.module,
@@ -225,27 +208,11 @@ export function ChartsView({ records }: ChartsViewProps) {
 
         // 按日期排序
         chartData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        console.log('ChartsView perMinute - chartData sorted:', chartData);
-
-        // 分析每个日期的模块分布
-        const dateModuleAnalysis = chartData.reduce((acc, item) => {
-            if (!acc[item.date]) acc[item.date] = [];
-            acc[item.date].push(item.module);
-            return acc;
-        }, {} as Record<string, string[]>);
-        console.log('ChartsView perMinute - date module analysis:', dateModuleAnalysis);
 
         return chartData;
     }, [records]);
 
     const accuracyData = useMemo(() => {
-        console.log('ChartsView accuracy - original records:', records);
-
-        // 检查日期格式
-        const dateFormats = records.map(r => r.date).slice(0, 10);
-        console.log('ChartsView accuracy - date formats sample:', dateFormats);
-        console.log('ChartsView accuracy - date formats expanded:', dateFormats.map(d => ({ date: d, parsed: new Date(d) })));
-
         const groupMap: Record<string, { date: string; module: string; correct: number; total: number }> = {};
         records.forEach(r => {
             // 使用统一的模块名称映射
@@ -260,16 +227,6 @@ export function ChartsView({ records }: ChartsViewProps) {
             groupMap[key].total += total;
         });
 
-        // 添加调试信息，查看分组情况
-        console.log('ChartsView accuracy - groupMap keys:', Object.keys(groupMap));
-        console.log('ChartsView accuracy - groupMap sample:', Object.entries(groupMap).slice(0, 5));
-        console.log('ChartsView accuracy - groupMap expanded:', Object.entries(groupMap).slice(0, 5).map(([key, value]) => ({
-            key,
-            date: key.split('__')[0],
-            module: key.split('__')[1],
-            value
-        })));
-
         const chartData = Object.values(groupMap).map(item => ({
             date: item.date,
             module: item.module,
@@ -279,15 +236,6 @@ export function ChartsView({ records }: ChartsViewProps) {
 
         // 按日期排序
         chartData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        console.log('ChartsView accuracy - chartData sorted:', chartData);
-
-        // 分析每个日期的模块分布
-        const dateModuleAnalysis = chartData.reduce((acc, item) => {
-            if (!acc[item.date]) acc[item.date] = [];
-            acc[item.date].push(item.module);
-            return acc;
-        }, {} as Record<string, string[]>);
-        console.log('ChartsView accuracy - date module analysis:', dateModuleAnalysis);
 
         return chartData;
     }, [records]);

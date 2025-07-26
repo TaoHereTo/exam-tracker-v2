@@ -26,10 +26,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
         setForceUpdate(prev => prev + 1);
     }, [data]);
 
-    // 添加调试信息
-    console.log('TrendChart received data:', data);
-    console.log('TrendChart forceUpdate:', forceUpdate);
-
     // 简化去重逻辑，只基于日期和模块去重，避免误删新记录
     const dedupedData = data.filter((item, idx, arr) =>
         arr.findIndex(other =>
@@ -37,8 +33,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             other.module === item.module
         ) === idx
     );
-
-    console.log('TrendChart deduped data:', dedupedData);
 
     const { allModules, allDates, chartData } = useMemo(() => {
         let modules: string[] = [];
@@ -54,8 +48,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 modules = Array.from(new Set(dedupedData.map(item => (item as { module: string }).module)));
                 // 确保日期按时间顺序排序
                 dates = Array.from(new Set(dedupedData.map(item => item.date))).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-
-                console.log('TrendChart - allDates sorted:', dates);
 
                 data = dates.map(date => {
                     const row: Record<string, unknown> = { date };
@@ -76,17 +68,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
 
         return { allModules: modules, allDates: dates, chartData: data };
     }, [dedupedData, onlyModule]);
-
-    console.log('TrendChart processed data:', { allModules, allDates, chartData });
-    console.log('TrendChart allDates:', allDates);
-    console.log('TrendChart allModules:', allModules);
-    console.log('TrendChart chartData sample:', chartData.slice(0, 3));
-    console.log('TrendChart chartData full:', chartData);
-    console.log('TrendChart chartData expanded:', chartData.map(row => ({
-        date: row.date,
-        modules: Object.keys(row).filter(k => k !== 'date' && k !== 'duration'),
-        values: Object.entries(row).filter(([k]) => k !== 'date' && k !== 'duration').map(([module, value]) => ({ module, value }))
-    })));
 
     const option = useMemo(() => {
         return {
@@ -195,16 +176,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             }))
         };
     }, [allModules, allDates, chartData, yMax]);
-
-    console.log('TrendChart final option:', {
-        xAxisData: option.xAxis.data,
-        seriesCount: option.series.length,
-        seriesData: option.series.map(s => ({
-            name: s.name,
-            dataLength: s.data.length,
-            dataSample: s.data.slice(0, 5) // 显示前5个数据点
-        }))
-    });
 
     return (
         <div style={{ width: '100%', height: '100%' }}>
