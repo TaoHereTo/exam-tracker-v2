@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 
 interface RecordItem {
@@ -94,13 +94,14 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             </CardHeader>
             <CardContent className="relative pb-20">
                 <div className="mb-6">
-                    <ReactBitsButton
+                    <UnifiedButton
+                        variant="reactbits"
                         onClick={handlePredictScore}
                         size="sm"
                         className="bg-gradient-to-br from-gray-800 to-black"
                     >
                         预测我的行测总分
-                    </ReactBitsButton>
+                    </UnifiedButton>
                 </div>
                 {prediction && (
                     <>

@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
-import { ImageUpload } from "@/components/ui/ImageUpload";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { UnifiedImage } from "@/components/ui/UnifiedImage";
+import { ValidationSchema, validateForm } from "@/lib/formValidation";
 
 interface LogicFormProps {
     onAddKnowledge: (knowledge: { type: string; note: string; subCategory: '图形推理' | '定义判断' | '类比推理' | '逻辑判断'; imagePath?: string }) => void;
@@ -41,19 +42,34 @@ export const LogicForm: React.FC<LogicFormProps> = ({
         setErrors({});
     }, [initialData]);
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!type.trim() && !note.trim()) {
-            newErrors.general = "请至少填写类型或技巧记录中的一项";
+    const validationSchema: ValidationSchema = {
+        type: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.note?.toString().trim()) {
+                    return "请至少填写类型或技巧记录中的一项";
+                }
+                return null;
+            }
+        },
+        note: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.type?.toString().trim()) {
+                    return "请至少填写类型或技巧记录中的一项";
+                }
+                return null;
+            }
         }
+    };
 
+    const validateFormLocal = () => {
+        const formData = { type, note };
+        const newErrors = validateForm(formData, validationSchema);
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = () => {
-        if (!validateForm()) {
+        if (!validateFormLocal()) {
             notify({ type: "error", message: "请完善表单信息" });
             return;
         }
@@ -69,12 +85,12 @@ export const LogicForm: React.FC<LogicFormProps> = ({
 
     const handleTypeChange = (value: string) => {
         setType(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, type: "" }));
     };
 
     const handleNoteChange = (value: string) => {
         setNote(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, note: "" }));
     };
 
     return (
@@ -121,27 +137,28 @@ export const LogicForm: React.FC<LogicFormProps> = ({
                 </div>
 
                 {/* 图片上传组件 */}
-                <ImageUpload
+                <UnifiedImage mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />
 
                 {/* 错误提示 */}
-                {errors.general && (
+                {(errors.type || errors.note) && (
                     <div className="text-sm text-red-500 text-center">
-                        {errors.general}
+                        {errors.type || errors.note}
                     </div>
                 )}
             </CardContent>
             <CardFooter>
-                <ReactBitsButton
+                <UnifiedButton
+                    variant="reactbits"
                     className="w-full bg-gradient-to-br from-gray-800 to-black"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </ReactBitsButton>
+                </UnifiedButton>
             </CardFooter>
         </Card>
     );

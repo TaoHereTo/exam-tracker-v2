@@ -1,5 +1,5 @@
 import React from "react";
-import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
+import { UnifiedTable, DataTableColumn } from "@/components/ui/UnifiedTable";
 import type { RecordItem } from "@/components/forms/NewRecordForm";
 import { normalizeModuleName } from "@/config/exam";
 import { Trash2 } from "lucide-react";
@@ -25,7 +25,7 @@ export function HistoryTable({
     ];
 
     return (
-        <DataTable<RecordItem, number>
+        <UnifiedTable<RecordItem, number>
             columns={columns}
             data={records}
             selected={selectedIds}

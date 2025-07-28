@@ -9,8 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
-import { ImageUpload } from "@/components/ui/ImageUpload";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { UnifiedImage } from "@/components/ui/UnifiedImage";
+import { ValidationSchema, validateForm } from "@/lib/formValidation";
 
 interface PoliticsFormProps {
     onAddKnowledge: (knowledge: { date: Date | null; source: string; note: string; imagePath?: string }) => void;
@@ -34,13 +35,28 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
         setErrors({});
     }, [initialData]);
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!source.trim() && !note.trim()) {
-            newErrors.general = "请至少填写文件来源或相关重点中的一项";
+    const validationSchema: ValidationSchema = {
+        source: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.note?.toString().trim()) {
+                    return "请至少填写文件来源或相关重点中的一项";
+                }
+                return null;
+            }
+        },
+        note: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.source?.toString().trim()) {
+                    return "请至少填写文件来源或相关重点中的一项";
+                }
+                return null;
+            }
         }
+    };
 
+    const validateFormLocal = () => {
+        const formData = { source, note };
+        const newErrors = validateForm(formData, validationSchema);
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -51,7 +67,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
     };
 
     const handleSubmit = () => {
-        if (!validateForm()) {
+        if (!validateFormLocal()) {
             notify({ type: "error", message: "请完善表单信息" });
             return;
         }
@@ -67,12 +83,12 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
 
     const handleSourceChange = (value: string) => {
         setSource(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, source: "" }));
     };
 
     const handleNoteChange = (value: string) => {
         setNote(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, note: "" }));
     };
 
     return (
@@ -117,27 +133,28 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                 </div>
 
                 {/* 图片上传组件 */}
-                <ImageUpload
+                <UnifiedImage mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />
 
                 {/* 错误提示 */}
-                {errors.general && (
+                {(errors.source || errors.note) && (
                     <div className="text-sm text-red-500 text-center">
-                        {errors.general}
+                        {errors.source || errors.note}
                     </div>
                 )}
             </CardContent>
             <CardFooter>
-                <ReactBitsButton
+                <UnifiedButton
+                    variant="reactbits"
                     className="w-full bg-gradient-to-br from-gray-800 to-black"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </ReactBitsButton>
+                </UnifiedButton>
             </CardFooter>
         </Card>
     );

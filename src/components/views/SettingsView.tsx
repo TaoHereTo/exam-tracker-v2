@@ -7,7 +7,7 @@ import { PaginationSetting } from "./settings/PaginationSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
@@ -47,13 +47,13 @@ export function SettingsView({
                             </div>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <ReactBitsButton
-                                        variant="outline"
+                                    <UnifiedButton
+                                        variant="reactbits"
                                         size="sm"
                                         className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
                                     >
                                         清空数据
-                                    </ReactBitsButton>
+                                    </UnifiedButton>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

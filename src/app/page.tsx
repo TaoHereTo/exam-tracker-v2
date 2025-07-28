@@ -7,7 +7,7 @@ import { useImportExport } from "@/hooks/useImportExport";
 import { OverviewView } from "@/components/views/OverviewView";
 import { ChartsView } from "@/components/views/ChartsView";
 import { HistoryView } from "@/components/views/HistoryView";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import DockNavigation from "@/components/layout/DockNavigation";
 import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport } from "@/types/record";
@@ -37,7 +37,7 @@ import { staticImageManager } from "@/lib/staticImageManager";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
-  const [knowledge, setKnowledge] = useLocalStorageState<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
+  const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
 
   // 新增知识点添加函数
   const addKnowledge = (newKnowledge: KnowledgeItem) => {
@@ -58,8 +58,8 @@ export default function Home() {
   }, []);
 
   // 计划和刷题记录持久化到localStorage
-  const [plans, setPlans] = useLocalStorageState<StudyPlan[]>("exam-tracker-plans-v2", []);
-  const [records, setRecords] = useLocalStorageState<RecordItem[]>("exam-tracker-records-v2", []);
+  const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
+  const [records, setRecords] = useLocalStorage<RecordItem[]>("exam-tracker-records-v2", []);
 
   const {
     handleExportData,
@@ -75,7 +75,7 @@ export default function Home() {
   const [pageSize, setPageSize] = useState(10);
 
   // navMode 必须先声明，再用 useRef(navMode)
-  const [navMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
+  const [navMode] = useLocalStorage<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
 
   const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const totalPages = Math.ceil(sortedRecords.length / pageSize);

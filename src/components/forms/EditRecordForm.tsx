@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { MODULES } from '@/config/exam';
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
-import { BaseForm, FormField, FormInput, FormSelect, ValidationSchema, FormData } from "./BaseForm";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { BaseForm, FormField, FormInput, FormSelect } from "./BaseForm";
+import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "./NewRecordForm";
 
 interface EditRecordFormProps {
@@ -153,20 +154,21 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                     </div>
                 </CardContent>
                 <CardFooter className="flex gap-2 justify-end">
-                    <ReactBitsButton
-                        variant="outline"
+                    <UnifiedButton
+                        variant="reactbits"
                         onClick={onCancel}
                         size="sm"
                     >
                         取消
-                    </ReactBitsButton>
-                    <ReactBitsButton
+                    </UnifiedButton>
+                    <UnifiedButton
+                        variant="reactbits"
                         type="submit"
                         size="sm"
                         className="bg-blue-500 hover:bg-blue-600 text-white"
                     >
                         保存
-                    </ReactBitsButton>
+                    </UnifiedButton>
                 </CardFooter>
             </BaseForm>
         </Card>

@@ -1,14 +1,14 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTheme } from "next-themes";
-import StyledSwitch from "@/components/ui/StyledSwitch";
-import { useLocalStorageState } from "@/hooks/useLocalStorageState";
+import SwitchRenderer from "@/components/ui/SwitchRenderer";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useState, useEffect } from "react";
 
 export function AppearanceSetting() {
     const { theme, setTheme } = useTheme();
     // 新增：侧边栏/底部Dock切换
-    const [navMode, setNavMode] = useLocalStorageState<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
+    const [navMode, setNavMode] = useLocalStorage<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
 
     // 护眼模式设置
     const [eyeCare, setEyeCare] = useState(() => {
@@ -71,7 +71,7 @@ export function AppearanceSetting() {
                             }
                         </p>
                     </div>
-                    <StyledSwitch
+                    <SwitchRenderer
                         checked={eyeCare}
                         onChange={setEyeCare}
                         disabled={theme === 'dark'}
@@ -86,7 +86,7 @@ export function AppearanceSetting() {
                     </div>
                     <div className="flex items-center gap-2">
                         <span className="text-sm font-medium">侧边栏</span>
-                        <StyledSwitch
+                        <SwitchRenderer
                             checked={navMode === 'dock'}
                             onChange={checked => setNavMode(checked ? 'dock' : 'sidebar')}
                         />

@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { Download, Upload } from "lucide-react";
 
 interface DataImportExportProps {
@@ -13,30 +13,30 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
     const clearDialogRef = useRef<HTMLButtonElement>(null);
     return (
         <div className="flex gap-4 mb-6">
-                        <ReactBitsButton 
-                variant="outline" 
-                onClick={onImport} 
+            <UnifiedButton
+                variant="reactbits"
+                gradient="green"
+                onClick={onImport}
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 hover:border-emerald-700"
             >
-                <Download className="w-4 h-4 mr-2" />
+                <Download className="w-4 h-4 mr-0" />
                 导入数据
-            </ReactBitsButton>
-            <ReactBitsButton 
-                variant="outline" 
-                onClick={onExport} 
+            </UnifiedButton>
+            <UnifiedButton
+                variant="reactbits"
+                gradient="yellow"
+                onClick={onExport}
                 size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white border-amber-600 hover:border-amber-700"
             >
-                <Upload className="w-4 h-4 mr-2" />
+                <Upload className="w-4 h-4 mr-0" />
                 导出数据
-            </ReactBitsButton>
+            </UnifiedButton>
             {onClearAllData && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <ReactBitsButton variant="destructive" ref={clearDialogRef} size="sm">
+                        <UnifiedButton variant="reactbits" gradient="red" ref={clearDialogRef} size="sm">
                             清空所有数据
-                        </ReactBitsButton>
+                        </UnifiedButton>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>

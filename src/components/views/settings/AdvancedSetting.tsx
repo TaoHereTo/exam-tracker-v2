@@ -3,9 +3,9 @@ import * as React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitchSelector";
-import StyledSwitch from "@/components/ui/StyledSwitch";
+import SwitchRenderer from "@/components/ui/SwitchRenderer";
 import PreviewSwitch from "@/components/ui/PreviewSwitch";
 import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
 import { getLocalStorageInfo, formatStorageSize, getLargestStorageItems, type StorageInfo } from "@/lib/storageUtils";
@@ -118,7 +118,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                                 开启后将禁用卡片动画、按钮动效等，提供更简洁的界面体验。
                             </p>
                         </div>
-                        <StyledSwitch
+                        <SwitchRenderer
                             checked={reduceMotion}
                             onChange={setReduceMotion}
                         />
@@ -237,13 +237,13 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                             </Select>
                             <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
                                 <AlertDialogTrigger asChild>
-                                    <ReactBitsButton
-                                        variant="outline"
+                                    <UnifiedButton
+                                        variant="reactbits"
                                         size="sm"
                                         className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
                                     >
                                         清空
-                                    </ReactBitsButton>
+                                    </UnifiedButton>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

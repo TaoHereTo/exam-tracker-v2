@@ -1,8 +1,10 @@
-import { HistoryTable } from "@/components/ui/HistoryTable";
-import { TableContainer } from "@/components/ui/TableContainer";
+import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import type { RecordItem } from "@/types/record";
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
+import { format } from 'date-fns';
+import { normalizeModuleName } from '@/config/exam';
 
 interface HistoryViewProps {
     records: RecordItem[];
@@ -29,7 +31,6 @@ export function HistoryView({
     const [itemToDelete, setItemToDelete] = useState<RecordItem | null>(null);
 
 
-
     const handleSingleDelete = (item: RecordItem) => {
         setItemToDelete(item);
         setSingleDeleteDialogOpen(true);
@@ -49,7 +50,34 @@ export function HistoryView({
 
     return (
         <div className="flex flex-col items-center pt-4 px-2 md:px-8">
-            <TableContainer
+            <UnifiedTable<RecordItem, number>
+                columns={[
+                    {
+                        key: 'date',
+                        label: '日期',
+                        render: (row) => format(new Date(row.date), 'yyyy-MM-dd')
+                    },
+                    {
+                        key: 'module',
+                        label: '模块',
+                        render: (row) => normalizeModuleName(row.module)
+                    },
+                    {
+                        key: 'correct',
+                        label: '正确数',
+                        render: (row) => `${row.correct}/${row.total}`
+                    },
+                    {
+                        key: 'accuracy',
+                        label: '正确率',
+                        render: (row) => `${((row.correct / row.total) * 100).toFixed(1)}%`
+                    },
+                    { key: 'duration', label: '用时' }
+                ]}
+                data={records}
+                selected={selectedRecordIds}
+                onSelect={onSelectIds}
+                rowKey={(row) => row.id}
                 pagination={{
                     currentPage: historyPage,
                     totalPages,
@@ -62,14 +90,15 @@ export function HistoryView({
                 deleteDisabled={selectedRecordIds.length === 0}
                 deleteConfirmText="删除后无法恢复，确定要删除选中的历史记录吗？"
                 className="max-w-6xl w-full"
-            >
-                <HistoryTable
-                    records={records}
-                    selectedIds={selectedRecordIds}
-                    onSelectIds={onSelectIds}
-                    onSingleDelete={handleSingleDelete}
-                />
-            </TableContainer>
+                contextMenuItems={[
+                    {
+                        label: "删除",
+                        icon: <Trash2 className="w-4 h-4" />,
+                        onClick: (item) => handleSingleDelete(item),
+                        variant: "destructive",
+                    },
+                ]}
+            />
             {/* 单个删除确认弹窗 */}
             <AlertDialog open={singleDeleteDialogOpen} onOpenChange={setSingleDeleteDialogOpen}>
                 <AlertDialogContent>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
-import { TableContainer, TableFilter } from "@/components/ui/TableContainer";
+import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
 import { format } from 'date-fns';
@@ -17,7 +16,7 @@ const LogicForm = lazy(() => import("../forms/LogicForm").then(module => ({ defa
 const CommonForm = lazy(() => import("../forms/CommonForm").then(module => ({ default: module.CommonForm })));
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from 'lucide-react';
-import { ImageViewer } from '@/components/ui/ImageViewer';
+import { UnifiedImage } from '@/components/ui/UnifiedImage';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -67,7 +66,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -89,7 +88,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -111,7 +110,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -349,7 +348,26 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
 
     return (
         <div className="flex flex-col items-center pt-4 px-2 md:px-8">
-            <TableContainer
+            <UnifiedTable<KnowledgeItem, string>
+                columns={columns}
+                data={paged}
+                selected={selectedRows}
+                onSelect={(v: string[]) => setSelectedRows(v)}
+                rowKey={(row) => row.id}
+                checkboxColClassName="w-6"
+                contextMenuItems={[
+                    {
+                        label: "编辑",
+                        icon: <Edit className="w-4 h-4" />,
+                        onClick: (item: KnowledgeItem) => handleEdit(item),
+                    },
+                    {
+                        label: "删除",
+                        icon: <Trash2 className="w-4 h-4" />,
+                        onClick: (item: KnowledgeItem) => handleSingleDelete(item),
+                        variant: "destructive",
+                    },
+                ]}
                 filters={filters}
                 pagination={{
                     currentPage: page,
@@ -367,29 +385,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 deleteDisabled={selectedRows.length === 0}
                 deleteConfirmText="此操作将删除所选的知识点，删除后无法恢复。是否确认？"
                 className="max-w-6xl w-full"
-            >
-                <DataTable<KnowledgeItem, string>
-                    columns={columns}
-                    data={paged}
-                    selected={selectedRows}
-                    onSelect={v => setSelectedRows(v as string[])}
-                    rowKey={row => row.id}
-                    checkboxColClassName="w-6"
-                    contextMenuItems={[
-                        {
-                            label: "编辑",
-                            icon: <Edit className="w-4 h-4" />,
-                            onClick: (item) => handleEdit(item),
-                        },
-                        {
-                            label: "删除",
-                            icon: <Trash2 className="w-4 h-4" />,
-                            onClick: (item) => handleSingleDelete(item),
-                            variant: "destructive",
-                        },
-                    ]}
-                />
-            </TableContainer>
+            />
             {/* 编辑弹窗 */}
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <SimpleDialogContent>

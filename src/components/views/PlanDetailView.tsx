@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
 import { MODULES } from '@/config/exam';
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 
 interface StudyPlan {
     id: string;
@@ -30,22 +30,21 @@ export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps
                 <CardHeader>
                     <CardTitle>{plan.name}</CardTitle>
                     <CardAction>
-                        <ReactBitsButton
-                            variant="outline"
+                        <UnifiedButton
+                            variant="reactbits"
                             onClick={onBack}
                             size="sm"
-                            className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
                         >
                             返回
-                        </ReactBitsButton>
-                        <ReactBitsButton
-                            variant="outline"
-                            className="ml-2 bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
+                        </UnifiedButton>
+                        <UnifiedButton
+                            variant="reactbits"
                             onClick={onEdit}
+                            className="ml-2 bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
                             size="sm"
                         >
                             编辑
-                        </ReactBitsButton>
+                        </UnifiedButton>
                     </CardAction>
                 </CardHeader>
                 <CardContent>

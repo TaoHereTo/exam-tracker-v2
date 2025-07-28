@@ -7,8 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
-import { ImageUpload } from "@/components/ui/ImageUpload";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { UnifiedImage } from "@/components/ui/UnifiedImage";
+import { ValidationSchema, validateForm } from "@/lib/formValidation";
 
 interface VerbalFormProps {
     onAddKnowledge: (knowledge: { idiom: string; meaning: string; subCategory: '逻辑填空' | '片段阅读' | '成语积累'; imagePath?: string }) => void;
@@ -55,21 +56,36 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
         }
     };
 
+    const validationSchema: ValidationSchema = {
+        idiom: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.meaning?.toString().trim()) {
+                    return "请至少填写类型或技巧记录中的一项";
+                }
+                return null;
+            }
+        },
+        meaning: {
+            custom: (value, allValues) => {
+                if (!value?.toString().trim() && !allValues?.idiom?.toString().trim()) {
+                    return "请至少填写类型或技巧记录中的一项";
+                }
+                return null;
+            }
+        }
+    };
+
     const fieldConfig = getFieldConfig(subCategory);
 
-    const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!idiom.trim() && !meaning.trim()) {
-            newErrors.general = "请至少填写类型或技巧记录中的一项";
-        }
-
+    const validateFormLocal = () => {
+        const formData = { idiom, meaning };
+        const newErrors = validateForm(formData, validationSchema);
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
 
     const handleSubmit = () => {
-        if (!validateForm()) {
+        if (!validateFormLocal()) {
             notify({ type: "error", message: "请完善表单信息" });
             return;
         }
@@ -85,12 +101,12 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
 
     const handleIdiomChange = (value: string) => {
         setIdiom(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, idiom: "" }));
     };
 
     const handleMeaningChange = (value: string) => {
         setMeaning(value);
-        setErrors(prev => ({ ...prev, general: "" }));
+        setErrors(prev => ({ ...prev, meaning: "" }));
     };
 
     return (
@@ -137,27 +153,28 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
                 </div>
 
                 {/* 图片上传组件 */}
-                <ImageUpload
+                <UnifiedImage mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />
 
                 {/* 错误提示 */}
-                {errors.general && (
+                {(errors.idiom || errors.meaning) && (
                     <div className="text-sm text-red-500 text-center">
-                        {errors.general}
+                        {errors.idiom || errors.meaning}
                     </div>
                 )}
             </CardContent>
             <CardFooter>
-                <ReactBitsButton
+                <UnifiedButton
+                    variant="reactbits"
                     className="w-full bg-gradient-to-br from-gray-800 to-black"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </ReactBitsButton>
+                </UnifiedButton>
             </CardFooter>
         </Card>
     );

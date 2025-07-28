@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import type { PlanType } from "@/types/record";
 import { MODULES } from '@/config/exam';
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
 
 interface StudyPlan {
     id: string;
@@ -111,13 +111,13 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         <div>
             <h1 className="text-3xl font-bold mb-4">制定计划</h1>
             <div className="mb-6">
-                <ReactBitsButton
+                <UnifiedButton variant="reactbits"
                     onClick={() => handleOpenForm()}
                     size="sm"
                     className="bg-gradient-to-br from-gray-800 to-black"
                 >
                     新建计划
-                </ReactBitsButton>
+                </UnifiedButton>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {plans.length === 0 && <div className="flex flex-col items-center justify-center col-span-2 py-16 text-gray-400 text-xl">
@@ -130,31 +130,31 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                             <CardTitle>{plan.name}</CardTitle>
                             <CardAction>
                                 <div className="flex items-center gap-2">
-                                    <ReactBitsButton
+                                    <UnifiedButton
+                                        variant="reactbits"
                                         size="sm"
-                                        variant="outline"
                                         onClick={() => onShowDetail(plan.id)}
                                         className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
                                     >
                                         详情
-                                    </ReactBitsButton>
-                                    <ReactBitsButton
+                                    </UnifiedButton>
+                                    <UnifiedButton
+                                        variant="reactbits"
                                         size="sm"
-                                        variant="outline"
                                         onClick={() => handleOpenForm(plan)}
                                         className="bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
                                     >
                                         编辑
-                                    </ReactBitsButton>
+                                    </UnifiedButton>
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <ReactBitsButton
+                                            <UnifiedButton
+                                                variant="reactbits"
                                                 size="sm"
-                                                variant="outline"
                                                 className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
                                             >
                                                 删除
-                                            </ReactBitsButton>
+                                            </UnifiedButton>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -267,22 +267,22 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 </div>
                             </CardContent>
                             <div className="flex justify-end gap-2 px-6 pb-6">
-                                <ReactBitsButton
+                                <UnifiedButton
+                                    variant="reactbits"
                                     type="button"
-                                    variant="outline"
                                     onClick={handleCloseForm}
                                     size="sm"
                                     className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
                                 >
                                     取消
-                                </ReactBitsButton>
-                                <ReactBitsButton
+                                </UnifiedButton>
+                                <UnifiedButton variant="reactbits"
                                     type="submit"
                                     size="sm"
                                     className="bg-gradient-to-br from-gray-800 to-black"
                                 >
                                     {editId ? '保存' : '创建'}
-                                </ReactBitsButton>
+                                </UnifiedButton>
                             </div>
                         </form>
                     </Card>

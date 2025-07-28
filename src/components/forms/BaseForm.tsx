@@ -2,30 +2,9 @@
 
 import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import { validateField, validateForm, ValidationSchema, FormErrors, FormData } from "@/lib/formValidation";
 
-// 表单数据类型
-export interface FormData {
-    [key: string]: string | number | boolean | undefined;
-}
-
-// 表单验证规则类型
-export interface ValidationRule {
-    required?: boolean;
-    minLength?: number;
-    maxLength?: number;
-    pattern?: RegExp;
-    custom?: (value: string | number | boolean | undefined, allValues?: FormData) => string | null;
-}
-
-// 表单验证模式
-export interface ValidationSchema {
-    [fieldName: string]: ValidationRule;
-}
-
-// 表单错误类型
-export interface FormErrors {
-    [fieldName: string]: string;
-}
+// 使用统一的验证工具类型
 
 // 基础表单属性
 export interface BaseFormProps {
@@ -116,61 +95,24 @@ export function BaseForm({
     };
 
     // 验证单个字段
-    const validateField = (field: string, value: string | number | boolean | undefined): string | null => {
+    const validateFieldLocal = (field: string, value: string | number | boolean | undefined): string | null => {
         const rule = validationSchema[field];
         if (!rule) return null;
-
-        // 必填验证
-        if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
-            return `${field} 是必填项`;
-        }
-
-        // 长度验证
-        if (typeof value === 'string') {
-            if (rule.minLength && value.length < rule.minLength) {
-                return `${field} 最少需要 ${rule.minLength} 个字符`;
-            }
-            if (rule.maxLength && value.length > rule.maxLength) {
-                return `${field} 最多只能有 ${rule.maxLength} 个字符`;
-            }
-        }
-
-        // 正则验证
-        if (rule.pattern && typeof value === 'string' && !rule.pattern.test(value)) {
-            return `${field} 格式不正确`;
-        }
-
-        // 自定义验证
-        if (rule.custom) {
-            const customError = rule.custom(value, values);
-            if (customError) return customError;
-        }
-
-        return null;
+        return validateField(field, value, rule, values);
     };
 
     // 验证整个表单
-    const validateForm = (): boolean => {
-        const newErrors: FormErrors = {};
-        let isValid = true;
-
-        Object.keys(validationSchema).forEach(field => {
-            const error = validateField(field, values[field]);
-            if (error) {
-                newErrors[field] = error;
-                isValid = false;
-            }
-        });
-
+    const validateFormLocal = (): boolean => {
+        const newErrors = validateForm(values, validationSchema);
         setErrors(newErrors);
-        return isValid;
+        return Object.keys(newErrors).length === 0;
     };
 
     // 处理表单提交
     const handleSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
 
-        if (!validateForm()) {
+        if (!validateFormLocal()) {
             notify({ type: "error", message: "请完善表单信息" });
             return;
         }
@@ -195,8 +137,8 @@ export function BaseForm({
         setValue,
         setError,
         clearError,
-        validateField,
-        validateForm,
+        validateField: validateFieldLocal,
+        validateForm: validateFormLocal,
         getValue
     };
 

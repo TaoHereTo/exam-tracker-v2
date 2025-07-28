@@ -58,7 +58,7 @@ export default function SwitchRenderer({
                     disabled={disabled}
                     className={className}
                 />
-            );
+                        );
         case 'plane':
             return (
                 <PlaneSwitch

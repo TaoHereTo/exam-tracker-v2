@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { MODULES } from '@/config/exam';
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
-import { BaseForm, FormField, FormInput, FormSelect, ValidationSchema, FormData } from "./BaseForm";
+import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { BaseForm, FormField, FormInput, FormSelect } from "./BaseForm";
+import { ValidationSchema, FormData } from "@/lib/formValidation";
 
 export type RecordItem = {
     id: number;
@@ -21,6 +22,7 @@ export type RecordItem = {
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 定义验证规则
     const validationSchema: ValidationSchema = {
@@ -46,7 +48,12 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
     };
 
     const handleSubmit = (data: FormData) => {
-        if (!date) return;
+        setIsSubmitting(true);
+        if (!date) {
+            alert('请选择日期');
+            setIsSubmitting(false);
+            return;
+        }
 
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -64,6 +71,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
 
         onAddRecord?.(newRecord);
         setDate(undefined);
+        setIsSubmitting(false);
     };
 
     const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -137,13 +145,13 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </FormField>
                 </CardContent>
                 <CardFooter>
-                    <ReactBitsButton
-                        className="w-full bg-gradient-to-br from-gray-800 to-black"
+                    <UnifiedButton variant="reactbits"
                         type="submit"
-                        size="sm"
+                        className="w-full bg-gradient-to-br from-gray-800 to-black"
+                        disabled={isSubmitting}
                     >
                         保存记录
-                    </ReactBitsButton>
+                    </UnifiedButton>
                 </CardFooter>
             </Card>
         </BaseForm>
