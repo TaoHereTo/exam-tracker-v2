@@ -426,38 +426,102 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                                         tabIndex={page === 1 ? -1 : 0}
                                     />
                                 </PaginationItem>
-                                {/* 页码数字，最多显示7个，超出用... */}
+                                {/* 智能分页显示，最多显示5个页码，超出用省略号 */}
                                 {(() => {
                                     const items = [];
-                                    let start = Math.max(1, page - 3);
-                                    let end = Math.min(totalPages, page + 3);
-                                    if (end - start < 6) {
-                                        if (start === 1) end = Math.min(totalPages, start + 6);
-                                        if (end === totalPages) start = Math.max(1, end - 6);
+                                    const maxVisiblePages = 5; // 最多显示5个页码
+
+                                    if (totalPages <= maxVisiblePages) {
+                                        // 如果总页数不多，直接显示所有页码
+                                        for (let i = 1; i <= totalPages; i++) {
+                                            items.push(
+                                                <PaginationItem key={i}>
+                                                    <PaginationLink
+                                                        isActive={page === i}
+                                                        onClick={e => { e.preventDefault(); setPage(i); }}
+                                                    >
+                                                        {i}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            );
+                                        }
+                                    } else {
+                                        // 总页数较多时，智能显示
+                                        let start = 1;
+                                        let end = totalPages;
+
+                                        if (page <= 3) {
+                                            // 当前页在前3页，显示前5页 + 省略号 + 最后一页
+                                            end = 5;
+                                        } else if (page >= totalPages - 2) {
+                                            // 当前页在后3页，显示第一页 + 省略号 + 后5页
+                                            start = totalPages - 4;
+                                        } else {
+                                            // 当前页在中间，显示当前页前后各2页
+                                            start = page - 2;
+                                            end = page + 2;
+                                        }
+
+                                        // 添加第一页
+                                        if (start > 1) {
+                                            items.push(
+                                                <PaginationItem key={1}>
+                                                    <PaginationLink
+                                                        isActive={page === 1}
+                                                        onClick={e => { e.preventDefault(); setPage(1); }}
+                                                    >
+                                                        1
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            );
+
+                                            // 添加开始省略号
+                                            if (start > 2) {
+                                                items.push(
+                                                    <PaginationItem key="start-ellipsis">
+                                                        <PaginationEllipsis />
+                                                    </PaginationItem>
+                                                );
+                                            }
+                                        }
+
+                                        // 添加中间页码
+                                        for (let i = start; i <= end; i++) {
+                                            items.push(
+                                                <PaginationItem key={i}>
+                                                    <PaginationLink
+                                                        isActive={page === i}
+                                                        onClick={e => { e.preventDefault(); setPage(i); }}
+                                                    >
+                                                        {i}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            );
+                                        }
+
+                                        // 添加结束省略号和最后一页
+                                        if (end < totalPages) {
+                                            if (end < totalPages - 1) {
+                                                items.push(
+                                                    <PaginationItem key="end-ellipsis">
+                                                        <PaginationEllipsis />
+                                                    </PaginationItem>
+                                                );
+                                            }
+
+                                            items.push(
+                                                <PaginationItem key={totalPages}>
+                                                    <PaginationLink
+                                                        isActive={page === totalPages}
+                                                        onClick={e => { e.preventDefault(); setPage(totalPages); }}
+                                                    >
+                                                        {totalPages}
+                                                    </PaginationLink>
+                                                </PaginationItem>
+                                            );
+                                        }
                                     }
-                                    if (start > 1) {
-                                        items.push(
-                                            <PaginationItem key={1}>
-                                                <PaginationLink isActive={page === 1} onClick={e => { e.preventDefault(); setPage(1); }}>1</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                        if (start > 2) items.push(<PaginationItem key="start-ellipsis"><PaginationEllipsis /></PaginationItem>);
-                                    }
-                                    for (let i = start; i <= end; ++i) {
-                                        items.push(
-                                            <PaginationItem key={i}>
-                                                <PaginationLink isActive={page === i} onClick={e => { e.preventDefault(); setPage(i); }}>{i}</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                    }
-                                    if (end < totalPages) {
-                                        if (end < totalPages - 1) items.push(<PaginationItem key="end-ellipsis"><PaginationEllipsis /></PaginationItem>);
-                                        items.push(
-                                            <PaginationItem key={totalPages}>
-                                                <PaginationLink isActive={page === totalPages} onClick={e => { e.preventDefault(); setPage(totalPages); }}>{totalPages}</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                    }
+
                                     return items;
                                 })()}
                                 <PaginationItem>

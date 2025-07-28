@@ -81,12 +81,38 @@ export function DataTable<T, K extends string | number = string | number>({
                     ) : (
                         data.map((row, idx) => {
                             const key = rowKey(row, idx);
+                            const isSelected = selected.includes(key);
+
+                            const handleRowClick = (e: React.MouseEvent) => {
+                                // 如果点击的是checkbox本身，不处理（避免重复触发）
+                                if ((e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                                    return;
+                                }
+
+                                // 如果点击的是操作按钮，不处理
+                                if ((e.target as HTMLElement).closest('button')) {
+                                    return;
+                                }
+
+                                // 切换选中状态
+                                if (isSelected) {
+                                    onSelect(selected.filter(id => id !== key));
+                                } else {
+                                    onSelect([...selected, key]);
+                                }
+                            };
+
                             return (
-                                <tr key={key}>
+                                <tr
+                                    key={key}
+                                    onClick={handleRowClick}
+                                    className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                                        }`}
+                                >
                                     {selectable && (
                                         <td className={`border px-4 py-2 text-center ${checkboxColClassName}`}>
                                             <Checkbox
-                                                checked={selected.includes(key)}
+                                                checked={isSelected}
                                                 onCheckedChange={checked => {
                                                     if (checked) onSelect([...selected, key]);
                                                     else onSelect(selected.filter(id => id !== key));
