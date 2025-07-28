@@ -58,32 +58,32 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 <CarouselPrevious />
                 <CarouselContent>
                     <CarouselItem>
-                        <TabsContent value="data-analysis" forceMount>
+                        <TabsContent value="data-analysis">
                             <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
-                        <TabsContent value="politics" forceMount>
+                        <TabsContent value="politics">
                             <PoliticsForm onAddKnowledge={handleAdd('politics')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
-                        <TabsContent value="math" forceMount>
+                        <TabsContent value="math">
                             <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
-                        <TabsContent value="common" forceMount>
+                        <TabsContent value="common">
                             <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
-                        <TabsContent value="verbal" forceMount>
+                        <TabsContent value="verbal">
                             <VerbalForm onAddKnowledge={handleAdd('verbal')} />
                         </TabsContent>
                     </CarouselItem>
                     <CarouselItem>
-                        <TabsContent value="logic" forceMount>
+                        <TabsContent value="logic">
                             <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
                         </TabsContent>
                     </CarouselItem>

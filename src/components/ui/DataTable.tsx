@@ -1,6 +1,12 @@
 import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 export interface DataTableColumn<T> {
     key: string;
@@ -20,6 +26,14 @@ export interface DataTableProps<T, K extends string | number = string | number> 
     selectable?: boolean;
     batchDeleteText?: string;
     checkboxColClassName?: string;
+    // 右键菜单相关属性
+    contextMenuItems?: {
+        label: string;
+        icon?: React.ReactNode;
+        onClick: (row: T) => void;
+        variant?: "default" | "destructive";
+        disabled?: boolean;
+    }[];
 }
 
 export function DataTable<T, K extends string | number = string | number>({
@@ -33,6 +47,7 @@ export function DataTable<T, K extends string | number = string | number>({
     selectable = true,
     batchDeleteText = "批量删除",
     checkboxColClassName = "",
+    contextMenuItems = [],
 }: DataTableProps<T, K>) {
     const allSelected = data.length > 0 && selected.length === data.length;
     const indeterminate = selected.length > 0 && selected.length < data.length;
@@ -103,44 +118,62 @@ export function DataTable<T, K extends string | number = string | number>({
                             };
 
                             return (
-                                <tr
-                                    key={key}
-                                    onClick={handleRowClick}
-                                    className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
-                                        }`}
-                                >
-                                    {selectable && (
-                                        <td className={`border px-4 py-2 text-center ${checkboxColClassName}`}>
-                                            <Checkbox
-                                                checked={isSelected}
-                                                onCheckedChange={checked => {
-                                                    if (checked) onSelect([...selected, key]);
-                                                    else onSelect(selected.filter(id => id !== key));
-                                                }}
-                                            />
-                                        </td>
+                                <ContextMenu key={key}>
+                                    <ContextMenuTrigger asChild>
+                                        <tr
+                                            onClick={handleRowClick}
+                                            className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                                                }`}
+                                        >
+                                            {selectable && (
+                                                <td className={`border px-4 py-2 text-center ${checkboxColClassName}`}>
+                                                    <Checkbox
+                                                        checked={isSelected}
+                                                        onCheckedChange={checked => {
+                                                            if (checked) onSelect([...selected, key]);
+                                                            else onSelect(selected.filter(id => id !== key));
+                                                        }}
+                                                    />
+                                                </td>
+                                            )}
+                                            {columns.map(col => (
+                                                <td key={col.key} className={`border px-4 py-2 ${col.className || ''}`}>
+                                                    {col.render ? col.render(row) : (() => {
+                                                        const value = (row as Record<string, unknown>)[col.key];
+                                                        if (
+                                                            typeof value === 'string' ||
+                                                            typeof value === 'number' ||
+                                                            typeof value === 'boolean' ||
+                                                            value === null ||
+                                                            value === undefined
+                                                        ) {
+                                                            return value ?? '';
+                                                        }
+                                                        return '';
+                                                    })()}
+                                                </td>
+                                            ))}
+                                            {renderActions && (
+                                                <td className="border px-4 py-2 text-center">{renderActions(row)}</td>
+                                            )}
+                                        </tr>
+                                    </ContextMenuTrigger>
+                                    {contextMenuItems.length > 0 && (
+                                        <ContextMenuContent>
+                                            {contextMenuItems.map((item, index) => (
+                                                <ContextMenuItem
+                                                    key={index}
+                                                    onClick={() => item.onClick(row)}
+                                                    disabled={item.disabled}
+                                                    variant={item.variant}
+                                                >
+                                                    {item.icon}
+                                                    {item.label}
+                                                </ContextMenuItem>
+                                            ))}
+                                        </ContextMenuContent>
                                     )}
-                                    {columns.map(col => (
-                                        <td key={col.key} className={`border px-4 py-2 ${col.className || ''}`}>
-                                            {col.render ? col.render(row) : (() => {
-                                                const value = (row as Record<string, unknown>)[col.key];
-                                                if (
-                                                    typeof value === 'string' ||
-                                                    typeof value === 'number' ||
-                                                    typeof value === 'boolean' ||
-                                                    value === null ||
-                                                    value === undefined
-                                                ) {
-                                                    return value ?? '';
-                                                }
-                                                return '';
-                                            })()}
-                                        </td>
-                                    ))}
-                                    {renderActions && (
-                                        <td className="border px-4 py-2 text-center">{renderActions(row)}</td>
-                                    )}
-                                </tr>
+                                </ContextMenu>
                             );
                         })
                     )}

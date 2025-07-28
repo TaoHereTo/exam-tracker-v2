@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useNotification } from "@/components/magicui/NotificationProvider";
 
 // 表单数据类型
@@ -73,11 +73,18 @@ export function BaseForm({
     const [values, setValues] = useState<FormData>(initialData);
     const [errors, setErrors] = useState<FormErrors>({});
     const { notify } = useNotification();
+    const initialDataRef = useRef(initialData);
 
     // 当初始数据变化时重置表单
     useEffect(() => {
-        setValues(initialData);
-        setErrors({});
+        const currentInitialDataStr = JSON.stringify(initialDataRef.current);
+        const newInitialDataStr = JSON.stringify(initialData);
+
+        if (currentInitialDataStr !== newInitialDataStr) {
+            initialDataRef.current = initialData;
+            setValues(initialData);
+            setErrors({});
+        }
     }, [initialData]);
 
     // 设置字段值

@@ -1,13 +1,8 @@
 import { HistoryTable } from "@/components/ui/HistoryTable";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationPrevious,
-    PaginationNext,
-} from "@/components/ui/pagination";
+import { TableContainer } from "@/components/ui/TableContainer";
 import type { RecordItem } from "@/types/record";
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface HistoryViewProps {
     records: RecordItem[];
@@ -24,63 +19,73 @@ export function HistoryView({
     records,
     selectedRecordIds,
     onSelectIds,
+    onDeleteRecord,
     onBatchDelete,
     historyPage,
     setHistoryPage,
     totalPages,
 }: HistoryViewProps) {
+    const [singleDeleteDialogOpen, setSingleDeleteDialogOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<RecordItem | null>(null);
+
+
+
+    const handleSingleDelete = (item: RecordItem) => {
+        setItemToDelete(item);
+        setSingleDeleteDialogOpen(true);
+    };
+
+    const handleConfirmSingleDelete = () => {
+        if (itemToDelete) {
+            onDeleteRecord(itemToDelete.id);
+            setSingleDeleteDialogOpen(false);
+            setItemToDelete(null);
+        }
+    };
+
+
+
+
+
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">历史记录</h1>
-            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full max-w-5xl mx-auto">
+        <div className="flex flex-col items-center pt-4 px-2 md:px-8">
+            <TableContainer
+                pagination={{
+                    currentPage: historyPage,
+                    totalPages,
+                    onPageChange: setHistoryPage
+                }}
+                showNew={false}
+                showEdit={false}
+                showDelete={true}
+                onDelete={onBatchDelete}
+                deleteDisabled={selectedRecordIds.length === 0}
+                deleteConfirmText="删除后无法恢复，确定要删除选中的历史记录吗？"
+                className="max-w-6xl w-full"
+            >
                 <HistoryTable
                     records={records}
                     selectedIds={selectedRecordIds}
                     onSelectIds={onSelectIds}
-                    onBatchDelete={onBatchDelete}
+                    onSingleDelete={handleSingleDelete}
                 />
-            </div>
-            {/* 分页组件 */}
-            {totalPages > 1 && (
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setHistoryPage(Math.max(1, historyPage - 1));
-                                }}
-                                href="#"
-                                aria-disabled={historyPage === 1}
-                            />
-                        </PaginationItem>
-                        {Array.from({ length: totalPages }).map((_, idx) => (
-                            <PaginationItem key={idx}>
-                                <PaginationLink
-                                    isActive={historyPage === idx + 1}
-                                    onClick={e => {
-                                        e.preventDefault();
-                                        setHistoryPage(idx + 1);
-                                    }}
-                                    href="#"
-                                >
-                                    {idx + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setHistoryPage(Math.min(totalPages, historyPage + 1));
-                                }}
-                                href="#"
-                                aria-disabled={historyPage === totalPages}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            )}
+            </TableContainer>
+            {/* 单个删除确认弹窗 */}
+            <AlertDialog open={singleDeleteDialogOpen} onOpenChange={setSingleDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            您确定要删除这条历史记录吗？此操作无法撤销。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmSingleDelete} className="bg-red-600 hover:bg-red-700">删除</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
         </div>
     );
 } 

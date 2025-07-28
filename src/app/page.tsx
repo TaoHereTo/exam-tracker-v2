@@ -45,7 +45,17 @@ export default function Home() {
   };
 
   const [isClient, setIsClient] = useState(false);
-  useEffect(() => { setIsClient(true); }, []);
+  useEffect(() => {
+    setIsClient(true);
+    // 处理URL参数
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const view = urlParams.get('view');
+      if (view) {
+        setActiveTab(view);
+      }
+    }
+  }, []);
 
   // 计划和刷题记录持久化到localStorage
   const [plans, setPlans] = useLocalStorageState<StudyPlan[]>("exam-tracker-plans-v2", []);
@@ -165,6 +175,10 @@ export default function Home() {
       }, 100);
     }
   };
+
+
+
+
 
   if (!isClient) return null;
   return (
