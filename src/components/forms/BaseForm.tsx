@@ -3,6 +3,8 @@
 import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { validateField, validateForm, ValidationSchema, FormErrors, FormData } from "@/lib/formValidation";
+import { FormError } from "@/components/ui/form-error";
+import { Select, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 
 // 使用统一的验证工具类型
 
@@ -163,11 +165,9 @@ export function FormField({ name, children, className = '' }: FormFieldProps) {
     const error = errors[name];
 
     return (
-        <div className={`space-y-2 ${className}`}>
+        <div className={`relative ${className}`}>
             {children}
-            {error && (
-                <p className="text-sm text-red-500">{error}</p>
-            )}
+            <FormError error={error} />
         </div>
     );
 }
@@ -221,7 +221,7 @@ export function FormInput({ name, type = "text", placeholder, className = '', on
             value={String(value)}
             onChange={(e) => setValue(name, e.target.value)}
             placeholder={placeholder}
-            className={`border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:ring-[3px] ${error ? 'border-red-500' : ''} ${className}`}
+            className={`border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:ring-[3px] ${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}
             onKeyDown={onKeyDown}
         />
     );
@@ -241,14 +241,16 @@ export function FormSelect({ name, placeholder, children, className = '' }: Form
     const error = errors[name];
 
     return (
-        <select
-            name={name}
+        <Select
             value={String(value)}
-            onChange={(e) => setValue(name, e.target.value)}
-            className={`border-input data-[placeholder]:text-muted-foreground [&_svg:not([class*='text-'])]:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 flex w-fit items-center justify-between gap-2 rounded-md border bg-transparent px-3 py-2 text-sm whitespace-nowrap shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 data-[size=default]:h-9 data-[size=sm]:h-8 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-2 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 ${error ? 'border-red-500' : ''} ${className}`}
+            onValueChange={(newValue) => setValue(name, newValue)}
         >
-            <option value="">{placeholder}</option>
-            {children}
-        </select>
+            <SelectTrigger className={`w-full ${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}>
+                <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent>
+                {children}
+            </SelectContent>
+        </Select>
     );
 } 

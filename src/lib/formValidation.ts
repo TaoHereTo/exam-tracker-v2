@@ -31,7 +31,7 @@ export function validateField(
 ): string | null {
     // 必填验证
     if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
-        return `${field} 是必填项`;
+        return `请填写此项`;
     }
 
     // 长度验证

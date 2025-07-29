@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { FormField } from "@/components/ui/FormField";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
@@ -12,6 +12,8 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import type { PlanType } from "@/types/record";
 import { MODULES } from '@/config/exam';
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
+import { FormError } from "@/components/ui/form-error";
 
 interface StudyPlan {
     id: string;
@@ -48,9 +50,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     const [endDate, setEndDate] = useState<Date | undefined>(undefined);
     const [startDateOpen, setStartDateOpen] = useState(false);
     const [endDateOpen, setEndDateOpen] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
 
     const handleOpenForm = (plan?: StudyPlan) => {
         setShowForm(true);
+        setErrors({});
         if (plan) {
             setForm(plan);
             setEditId(plan.id);
@@ -67,23 +71,86 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         setShowForm(false);
         setForm({});
         setEditId(null);
+        setErrors({});
     };
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        // 清除该字段的错误
+        if (errors[e.target.name]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[e.target.name];
+                return newErrors;
+            });
+        }
     };
     const handleStartDateChange = (date?: Date) => {
         setStartDate(date);
         setForm({ ...form, startDate: date ? format(date, 'yyyy-MM-dd') : '' });
         setStartDateOpen(false); // 选择日期后关闭Popover
+        // 清除错误
+        if (errors.startDate) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.startDate;
+                return newErrors;
+            });
+        }
     };
     const handleEndDateChange = (date?: Date) => {
         setEndDate(date);
         setForm({ ...form, endDate: date ? format(date, 'yyyy-MM-dd') : '' });
         setEndDateOpen(false); // 选择日期后关闭Popover
+        // 清除错误
+        if (errors.endDate) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors.endDate;
+                return newErrors;
+            });
+        }
     };
+
+    const validateForm = (): boolean => {
+        const newErrors: Record<string, string> = {};
+
+        if (!form.name?.trim()) {
+            newErrors.name = '请填写此项';
+        }
+
+        if (!form.startDate) {
+            newErrors.startDate = '请填写此项';
+        }
+
+        if (!form.endDate) {
+            newErrors.endDate = '请填写此项';
+        } else if (form.startDate && new Date(form.endDate) <= new Date(form.startDate)) {
+            newErrors.endDate = '结束日期必须晚于开始日期';
+        }
+
+        if (!form.module) {
+            newErrors.module = '请填写此项';
+        }
+
+        if (!form.type) {
+            newErrors.type = '请填写此项';
+        }
+
+        if (!form.target || Number(form.target) <= 0) {
+            newErrors.target = '请填写此项';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!form.name || !form.startDate || !form.endDate || !form.type || !form.module || !form.target) return;
+
+        if (!validateForm()) {
+            return;
+        }
+
         const plan: StudyPlan = {
             id: editId || Date.now().toString(),
             name: form.name!,
@@ -107,34 +174,40 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         onDelete(id);
     };
 
+    // 计算进度百分比
+    const getProgressPercentage = (plan: StudyPlan) => {
+        if (plan.type === '正确率') {
+            return plan.progress; // 正确率本身就是百分比
+        } else {
+            return plan.target > 0 ? Math.min((plan.progress / plan.target) * 100, 100) : 0;
+        }
+    };
+
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">制定计划</h1>
-            <div className="mb-6">
-                <UnifiedButton variant="reactbits"
+        <div className="space-y-6">
+            <div>
+                <h1 className="text-3xl font-bold mb-4">学习计划</h1>
+                <UnifiedButton
+                    variant="reactbits"
+                    gradient="blue"
                     onClick={() => handleOpenForm()}
                     size="sm"
-                    className="bg-gradient-to-br from-gray-800 to-black"
                 >
                     新建计划
                 </UnifiedButton>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {plans.length === 0 && <div className="flex flex-col items-center justify-center col-span-2 py-16 text-gray-400 text-xl">
-                    <svg width="48" height="48" fill="none" viewBox="0 0 48 48" className="mb-4 opacity-60"><circle cx="24" cy="24" r="22" stroke="currentColor" strokeWidth="2" fill="none" /><path d="M16 24h16M16 30h8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
-                    暂无计划
-                </div>}
+            <div className="grid gap-4">
                 {plans.map(plan => (
-                    <Card key={plan.id}>
+                    <Card key={plan.id} className="hover:shadow-md transition-shadow">
                         <CardHeader>
-                            <CardTitle>{plan.name}</CardTitle>
-                            <CardAction>
-                                <div className="flex items-center gap-2">
+                            <CardTitle className="flex justify-between items-start">
+                                <span>{plan.name}</span>
+                                <div className="flex gap-2">
                                     <UnifiedButton
                                         variant="reactbits"
                                         size="sm"
                                         onClick={() => onShowDetail(plan.id)}
-                                        className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
+                                        gradient="green"
                                     >
                                         详情
                                     </UnifiedButton>
@@ -142,7 +215,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                         variant="reactbits"
                                         size="sm"
                                         onClick={() => handleOpenForm(plan)}
-                                        className="bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
+                                        gradient="blue"
                                     >
                                         编辑
                                     </UnifiedButton>
@@ -151,138 +224,208 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                             <UnifiedButton
                                                 variant="reactbits"
                                                 size="sm"
-                                                className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                                                gradient="red"
                                             >
                                                 删除
                                             </UnifiedButton>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
-                                                <AlertDialogTitle>确认删除？</AlertDialogTitle>
-                                                <AlertDialogDescription>删除后无法恢复。</AlertDialogDescription>
+                                                <AlertDialogTitle>确认删除计划？</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    此操作将永久删除该学习计划，无法撤销。
+                                                </AlertDialogDescription>
                                             </AlertDialogHeader>
                                             <AlertDialogFooter>
-                                                <AlertDialogCancel onClick={() => { }}>取消</AlertDialogCancel>
+                                                <AlertDialogCancel>取消</AlertDialogCancel>
                                                 <AlertDialogAction onClick={() => handleDelete(plan.id)}>确认删除</AlertDialogAction>
                                             </AlertDialogFooter>
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 </div>
-                            </CardAction>
+                            </CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="text-sm text-muted-foreground">{plan.startDate} ~ {plan.endDate}</div>
                             <div className="mt-2 text-xs text-gray-400">{plan.description}</div>
                             <div className="mt-2 text-xs text-gray-400">进度：{plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}</div>
-                            <div className="w-full h-2 bg-gray-200 rounded mt-2">
-                                <div className="h-2 bg-primary rounded" style={{ width: `${Math.min(100, plan.type === '正确率' ? plan.progress : Math.round((plan.progress / plan.target) * 100))}%` }} />
+                            <div className="mt-3">
+                                <BeautifulProgress
+                                    value={getProgressPercentage(plan)}
+                                    max={100}
+                                    height={16}
+                                    showText={true}
+                                />
                             </div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
             {showForm && (
-                <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-                    <Card className="w-full max-w-md">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
                         <CardHeader>
                             <CardTitle>{editId ? '编辑计划' : '新建计划'}</CardTitle>
                         </CardHeader>
                         <form onSubmit={handleSubmit}>
                             <CardContent className="space-y-4">
-                                <div className="mb-4">
-                                    <Label htmlFor="name">计划名称</Label>
-                                    <Input id="name" name="name" value={form.name || ''} onChange={handleFormChange} required className="mt-2" />
+                                <div className="relative mb-4">
+                                    <FormField label="计划名称" htmlFor="name" required>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            value={form.name || ''}
+                                            onChange={handleFormChange}
+                                            required
+                                            className={`${errors.name ? 'border-red-500 ring-red-500/20' : ''}`}
+                                        />
+                                    </FormField>
+                                    <FormError error={errors.name} />
                                 </div>
                                 <div className="mb-4 flex gap-4">
-                                    <div className="flex-1">
-                                        <Label>开始日期</Label>
-                                        <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" className="w-full mt-2 justify-start text-left font-normal">
-                                                    {startDate ? format(startDate, 'yyyy-MM-dd') : '选择开始日期'}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={startDate}
-                                                    onSelect={handleStartDateChange}
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
+                                    <div className="flex-1 relative">
+                                        <FormField label="开始日期">
+                                            <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={`w-full justify-start text-left font-normal ${errors.startDate ? 'border-red-500 ring-red-500/20' : ''}`}
+                                                    >
+                                                        {startDate ? format(startDate, 'yyyy-MM-dd') : '选择开始日期'}
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={startDate}
+                                                        onSelect={handleStartDateChange}
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </FormField>
+                                        <FormError error={errors.startDate} />
                                     </div>
-                                    <div className="flex-1">
-                                        <Label>结束日期</Label>
-                                        <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" className="w-full mt-2 justify-start text-left font-normal">
-                                                    {endDate ? format(endDate, 'yyyy-MM-dd') : '选择结束日期'}
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-auto p-0">
-                                                <Calendar
-                                                    mode="single"
-                                                    selected={endDate}
-                                                    onSelect={handleEndDateChange}
-                                                />
-                                            </PopoverContent>
-                                        </Popover>
+                                    <div className="flex-1 relative">
+                                        <FormField label="结束日期">
+                                            <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+                                                <PopoverTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        className={`w-full justify-start text-left font-normal ${errors.endDate ? 'border-red-500 ring-red-500/20' : ''}`}
+                                                    >
+                                                        {endDate ? format(endDate, 'yyyy-MM-dd') : '选择结束日期'}
+                                                    </Button>
+                                                </PopoverTrigger>
+                                                <PopoverContent className="w-auto p-0">
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={endDate}
+                                                        onSelect={handleEndDateChange}
+                                                    />
+                                                </PopoverContent>
+                                            </Popover>
+                                        </FormField>
+                                        <FormError error={errors.endDate} />
                                     </div>
                                 </div>
                                 <div className="mb-4 flex gap-4">
-                                    <div className="flex-1">
-                                        <Label htmlFor="module">板块</Label>
-                                        <Select value={form.module || ''} onValueChange={v => setForm(f => ({ ...f, module: v }))}>
-                                            <SelectTrigger className="w-full mt-2">
-                                                <SelectValue placeholder="请选择板块" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {MODULES.map(m => (
-                                                    <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    <div className="flex-1 relative">
+                                        <FormField label="板块" htmlFor="module">
+                                            <Select
+                                                value={form.module || ''}
+                                                onValueChange={v => {
+                                                    setForm(f => ({ ...f, module: v }));
+                                                    if (errors.module) {
+                                                        setErrors(prev => {
+                                                            const newErrors = { ...prev };
+                                                            delete newErrors.module;
+                                                            return newErrors;
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger className={`w-full ${errors.module ? 'border-red-500 ring-red-500/20' : ''}`}>
+                                                    <SelectValue placeholder="请选择板块" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {MODULES.map(m => (
+                                                        <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormField>
+                                        <FormError error={errors.module} />
                                     </div>
-                                    <div className="flex-1">
-                                        <Label htmlFor="type">计划类型</Label>
-                                        <Select value={form.type || ''} onValueChange={v => setForm(f => ({ ...f, type: v as PlanType }))}>
-                                            <SelectTrigger className="w-full mt-2">
-                                                <SelectValue placeholder="请选择类型" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {PLAN_TYPES.map(t => (
-                                                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
+                                    <div className="flex-1 relative">
+                                        <FormField label="计划类型" htmlFor="type">
+                                            <Select
+                                                value={form.type || ''}
+                                                onValueChange={v => {
+                                                    setForm(f => ({ ...f, type: v as PlanType }));
+                                                    if (errors.type) {
+                                                        setErrors(prev => {
+                                                            const newErrors = { ...prev };
+                                                            delete newErrors.type;
+                                                            return newErrors;
+                                                        });
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger className={`w-full ${errors.type ? 'border-red-500 ring-red-500/20' : ''}`}>
+                                                    <SelectValue placeholder="请选择类型" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {PLAN_TYPES.map(t => (
+                                                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormField>
+                                        <FormError error={errors.type} />
                                     </div>
                                 </div>
-                                <div className="mb-4">
-                                    <Label htmlFor="target">目标{form.type === '正确率' ? '(%)' : form.type === '错题数' ? '(道)' : '(题)'}</Label>
-                                    <Input id="target" name="target" type="number" value={form.target || ''} onChange={handleFormChange} required className="mt-2" min={1} />
+                                <div className="relative mb-4">
+                                    <FormField label={`目标${form.type === '正确率' ? '(%)' : form.type === '错题数' ? '(道)' : '(题)'}`} htmlFor="target" required>
+                                        <Input
+                                            id="target"
+                                            name="target"
+                                            type="number"
+                                            value={form.target || ''}
+                                            onChange={handleFormChange}
+                                            required
+                                            className={`${errors.target ? 'border-red-500 ring-red-500/20' : ''}`}
+                                            min={1}
+                                        />
+                                    </FormField>
+                                    <FormError error={errors.target} />
                                 </div>
                                 <div className="mb-4">
-                                    <Label htmlFor="description">描述</Label>
-                                    <Textarea id="description" name="description" value={form.description || ''} onChange={handleFormChange} className="mt-2" />
+                                    <FormField label="描述" htmlFor="description">
+                                        <Textarea
+                                            id="description"
+                                            name="description"
+                                            value={form.description || ''}
+                                            onChange={handleFormChange}
+                                        />
+                                    </FormField>
                                 </div>
                             </CardContent>
                             <div className="flex justify-end gap-2 px-6 pb-6">
-                                <UnifiedButton
-                                    variant="reactbits"
+                                <Button
                                     type="button"
                                     onClick={handleCloseForm}
                                     size="sm"
-                                    className="bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
+                                    variant="outline"
                                 >
                                     取消
-                                </UnifiedButton>
-                                <UnifiedButton variant="reactbits"
+                                </Button>
+                                <Button
                                     type="submit"
                                     size="sm"
-                                    className="bg-gradient-to-br from-gray-800 to-black"
+                                    className="bg-blue-500 hover:bg-blue-600 text-white"
                                 >
                                     {editId ? '保存' : '创建'}
-                                </UnifiedButton>
+                                </Button>
                             </div>
                         </form>
                     </Card>

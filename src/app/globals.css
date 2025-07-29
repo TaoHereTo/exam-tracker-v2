@@ -72,7 +72,6 @@
   align-items: center;
   font-weight: 600;
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: 3s ease-in-out infinite alternate glow-pulse;
   display: flex;
   position: relative;
   overflow: hidden;

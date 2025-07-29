@@ -208,8 +208,28 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
 
     useEffect(() => {
         setSelectedRows([]);
-        setPage(1); // 切换模块或搜索时重置页码
-    }, [knowledge, selectedModule, selectedSubCategory, search]);
+        // 智能分页：如果当前页超出新的总页数，则跳转到最后一页
+        const newTotalPages = Math.max(1, Math.ceil(
+            knowledge.filter(item => {
+                if (normalizeModuleName(item.module) !== normalizeModuleName(selectedModule)) return false;
+                if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
+                    const subCategory = (item as Record<string, unknown>).subCategory;
+                    if (subCategory !== selectedSubCategory) return false;
+                }
+                const searchLower = search.trim().toLowerCase();
+                if (searchLower) {
+                    return Object.values(item).some(
+                        v => typeof v === 'string' && v.toLowerCase().includes(searchLower)
+                    );
+                }
+                return true;
+            }).length / pageSize
+        ));
+
+        if (page > newTotalPages) {
+            setPage(newTotalPages);
+        }
+    }, [knowledge, selectedModule, selectedSubCategory, search, page, pageSize]);
 
     const handleDeleteSelected = () => {
         if (!onBatchDeleteKnowledge) return;

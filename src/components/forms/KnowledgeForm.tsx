@@ -7,6 +7,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
+import { FormError } from "@/components/ui/form-error";
 
 export interface KnowledgeFormProps {
     title: string;
@@ -40,7 +41,7 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
         type: {
             custom: (value, allValues) => {
                 if (!value?.toString().trim() && !allValues?.note?.toString().trim()) {
-                    return "请至少填写类型或技巧记录中的一项";
+                    return "请填写此项";
                 }
                 return null;
             }
@@ -48,7 +49,7 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
         note: {
             custom: (value, allValues) => {
                 if (!value?.toString().trim() && !allValues?.type?.toString().trim()) {
-                    return "请至少填写类型或技巧记录中的一项";
+                    return "请填写此项";
                 }
                 return null;
             }
@@ -78,12 +79,16 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
 
     const handleTypeChange = (value: string) => {
         setType(value);
-        setErrors(prev => ({ ...prev, type: "" }));
+        if (errors.type) {
+            setErrors(prev => ({ ...prev, type: "" }));
+        }
     };
 
     const handleNoteChange = (value: string) => {
         setNote(value);
-        setErrors(prev => ({ ...prev, note: "" }));
+        if (errors.note) {
+            setErrors(prev => ({ ...prev, note: "" }));
+        }
     };
 
     return (
@@ -92,7 +97,7 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                 <CardTitle>{title}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="space-y-2">
+                <div className="relative flex flex-col gap-2">
                     <Label htmlFor="type">类型</Label>
                     <Input
                         id="type"
@@ -101,9 +106,11 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                         value={type}
                         onChange={e => handleTypeChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.type ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.type} />
                 </div>
-                <div className="space-y-2">
+                <div className="relative flex flex-col gap-2">
                     <Label htmlFor="note">技巧记录</Label>
                     <Textarea
                         id="note"
@@ -111,7 +118,9 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                         value={note}
                         onChange={e => handleNoteChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.note ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.note} />
                 </div>
 
                 {/* 图片上传组件 */}
@@ -119,13 +128,6 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                     value={imagePath}
                     onChange={setImagePath}
                 />
-
-                {/* 错误提示 */}
-                {(errors.type || errors.note) && (
-                    <div className="text-sm text-red-500 text-center">
-                        {errors.type || errors.note}
-                    </div>
-                )}
             </CardContent>
             <CardFooter>
                 <UnifiedButton

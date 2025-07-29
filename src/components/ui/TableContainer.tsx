@@ -3,15 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationPrevious,
-    PaginationNext,
-    PaginationEllipsis,
-} from "@/components/ui/pagination";
+import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
 import { Search, Plus, Edit, Trash2, ArrowUpFromLine } from 'lucide-react';
 import ReactBitsButton from '@/components/ui/ReactBitsButton';
 
@@ -213,124 +205,11 @@ export function TableContainer({
                     {/* 分页组件 */}
                     {pagination && pagination.totalPages > 1 && (
                         <div className="mt-6 flex justify-center">
-                            <Pagination>
-                                <PaginationContent>
-                                    <PaginationItem>
-                                        <PaginationPrevious
-                                            onClick={e => {
-                                                e.preventDefault();
-                                                if (pagination.currentPage > 1) {
-                                                    pagination.onPageChange(pagination.currentPage - 1);
-                                                }
-                                            }}
-                                            aria-disabled={pagination.currentPage === 1}
-                                            tabIndex={pagination.currentPage === 1 ? -1 : 0}
-                                        />
-                                    </PaginationItem>
-
-                                    {/* 智能分页显示，最多显示5个页码，超出用省略号 */}
-                                    {(() => {
-                                        const items = [];
-                                        const maxVisiblePages = 5;
-
-                                        if (pagination.totalPages <= maxVisiblePages) {
-                                            for (let i = 1; i <= pagination.totalPages; i++) {
-                                                items.push(
-                                                    <PaginationItem key={i}>
-                                                        <PaginationLink
-                                                            isActive={pagination.currentPage === i}
-                                                            onClick={e => { e.preventDefault(); pagination.onPageChange(i); }}
-                                                        >
-                                                            {i}
-                                                        </PaginationLink>
-                                                    </PaginationItem>
-                                                );
-                                            }
-                                        } else {
-                                            let start = 1;
-                                            let end = pagination.totalPages;
-
-                                            if (pagination.currentPage <= 3) {
-                                                end = 5;
-                                            } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                                                start = pagination.totalPages - 4;
-                                            } else {
-                                                start = pagination.currentPage - 2;
-                                                end = pagination.currentPage + 2;
-                                            }
-
-                                            if (start > 1) {
-                                                items.push(
-                                                    <PaginationItem key={1}>
-                                                        <PaginationLink
-                                                            isActive={pagination.currentPage === 1}
-                                                            onClick={e => { e.preventDefault(); pagination.onPageChange(1); }}
-                                                        >
-                                                            1
-                                                        </PaginationLink>
-                                                    </PaginationItem>
-                                                );
-
-                                                if (start > 2) {
-                                                    items.push(
-                                                        <PaginationItem key="start-ellipsis">
-                                                            <PaginationEllipsis />
-                                                        </PaginationItem>
-                                                    );
-                                                }
-                                            }
-
-                                            for (let i = start; i <= end; i++) {
-                                                items.push(
-                                                    <PaginationItem key={i}>
-                                                        <PaginationLink
-                                                            isActive={pagination.currentPage === i}
-                                                            onClick={e => { e.preventDefault(); pagination.onPageChange(i); }}
-                                                        >
-                                                            {i}
-                                                        </PaginationLink>
-                                                    </PaginationItem>
-                                                );
-                                            }
-
-                                            if (end < pagination.totalPages) {
-                                                if (end < pagination.totalPages - 1) {
-                                                    items.push(
-                                                        <PaginationItem key="end-ellipsis">
-                                                            <PaginationEllipsis />
-                                                        </PaginationItem>
-                                                    );
-                                                }
-                                                items.push(
-                                                    <PaginationItem key={pagination.totalPages}>
-                                                        <PaginationLink
-                                                            isActive={pagination.currentPage === pagination.totalPages}
-                                                            onClick={e => { e.preventDefault(); pagination.onPageChange(pagination.totalPages); }}
-                                                        >
-                                                            {pagination.totalPages}
-                                                        </PaginationLink>
-                                                    </PaginationItem>
-                                                );
-                                            }
-                                        }
-
-                                        return items;
-                                    })()}
-
-                                    <PaginationItem>
-                                        <PaginationNext
-                                            onClick={e => {
-                                                e.preventDefault();
-                                                if (pagination.currentPage < pagination.totalPages) {
-                                                    pagination.onPageChange(pagination.currentPage + 1);
-                                                }
-                                            }}
-                                            aria-disabled={pagination.currentPage === pagination.totalPages}
-                                            tabIndex={pagination.currentPage === pagination.totalPages ? -1 : 0}
-                                        />
-                                    </PaginationItem>
-                                </PaginationContent>
-                            </Pagination>
+                            <BeautifulPagination
+                                currentPage={pagination.currentPage}
+                                totalPages={pagination.totalPages}
+                                onPageChange={pagination.onPageChange}
+                            />
                         </div>
                     )}
                 </div>

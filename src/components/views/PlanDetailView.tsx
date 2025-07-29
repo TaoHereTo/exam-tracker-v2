@@ -1,7 +1,8 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardContent, CardAction } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MODULES } from '@/config/exam';
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 
 interface StudyPlan {
     id: string;
@@ -23,29 +24,31 @@ interface PlanDetailProps {
     onUpdate: (plan: StudyPlan) => void;
 }
 
-export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps) {
+export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
+    // 计算进度百分比
+    const getProgressPercentage = (plan: StudyPlan) => {
+        if (plan.type === '正确率') {
+            return plan.progress; // 正确率本身就是百分比
+        } else {
+            return plan.target > 0 ? Math.min((plan.progress / plan.target) * 100, 100) : 0;
+        }
+    };
+
     return (
         <div className="max-w-3xl mx-auto">
             <Card>
                 <CardHeader>
-                    <CardTitle>{plan.name}</CardTitle>
-                    <CardAction>
+                    <CardTitle className="flex justify-between items-center">
+                        <span>{plan.name}</span>
                         <UnifiedButton
                             variant="reactbits"
                             onClick={onBack}
                             size="sm"
+                            gradient="gray"
                         >
                             返回
                         </UnifiedButton>
-                        <UnifiedButton
-                            variant="reactbits"
-                            onClick={onEdit}
-                            className="ml-2 bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
-                            size="sm"
-                        >
-                            编辑
-                        </UnifiedButton>
-                    </CardAction>
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="text-sm text-muted-foreground">{plan.startDate} ~ {plan.endDate}</div>
@@ -55,8 +58,13 @@ export default function PlanDetailView({ plan, onBack, onEdit }: PlanDetailProps
                     <div className="mt-2 text-xs text-gray-400">目标：{plan.type === '题量' ? `${plan.target}题` : plan.type === '正确率' ? `${plan.target}%` : `${plan.target}道错题`}</div>
                     <div className="mt-2 text-xs text-gray-400">进度：{plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}</div>
                     <div className="mt-2 text-xs text-gray-400">状态：{plan.status}</div>
-                    <div className="w-full h-2 bg-gray-200 rounded mt-2">
-                        <div className="h-2 bg-primary rounded" style={{ width: `${Math.min(100, plan.type === '正确率' ? plan.progress : Math.round((plan.progress / plan.target) * 100))}%` }} />
+                    <div className="mt-4">
+                        <BeautifulProgress
+                            value={getProgressPercentage(plan)}
+                            max={100}
+                            height={20}
+                            showText={true}
+                        />
                     </div>
                 </CardContent>
             </Card>

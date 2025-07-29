@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { MODULES } from '@/config/exam';
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
-import { BaseForm, FormField, FormInput, FormSelect } from "./BaseForm";
+import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
+import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "./NewRecordForm";
 
@@ -93,8 +93,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* 日期选择器 */}
-                    <div className="flex flex-col gap-2">
-                        <Label>日期</Label>
+                    <FormField label="日期">
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>
                             <PopoverTrigger asChild>
                                 <Button
@@ -108,49 +107,53 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                                 <Calendar mode="single" selected={date} onSelect={handleDateSelect} initialFocus />
                             </PopoverContent>
                         </Popover>
-                    </div>
+                    </FormField>
 
                     {/* 两列布局的表单字段 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* 模块选择器 */}
-                        <FormField name="module">
-                            <Label>模块</Label>
-                            <FormSelect name="module" placeholder="请选择模块">
-                                {MODULES.map(m => (
-                                    <option key={m.value} value={m.value}>{m.label}</option>
-                                ))}
-                            </FormSelect>
-                        </FormField>
+                        <BaseFormField name="module">
+                            <FormField label="模块">
+                                <FormSelect name="module" placeholder="请选择模块">
+                                    {MODULES.map(m => (
+                                        <option key={m.value} value={m.value}>{m.label}</option>
+                                    ))}
+                                </FormSelect>
+                            </FormField>
+                        </BaseFormField>
 
                         {/* 总题数 */}
-                        <FormField name="total">
-                            <Label>总题数</Label>
-                            <FormInput
-                                name="total"
-                                type="number"
-                                placeholder="输入总题数"
-                            />
-                        </FormField>
+                        <BaseFormField name="total">
+                            <FormField label="总题数">
+                                <FormInput
+                                    name="total"
+                                    type="number"
+                                    placeholder="输入总题数"
+                                />
+                            </FormField>
+                        </BaseFormField>
 
                         {/* 正确题数 */}
-                        <FormField name="correct">
-                            <Label>正确题数</Label>
-                            <FormInput
-                                name="correct"
-                                type="number"
-                                placeholder="输入正确题数"
-                            />
-                        </FormField>
+                        <BaseFormField name="correct">
+                            <FormField label="正确题数">
+                                <FormInput
+                                    name="correct"
+                                    type="number"
+                                    placeholder="输入正确题数"
+                                />
+                            </FormField>
+                        </BaseFormField>
 
                         {/* 做题时长 */}
-                        <FormField name="duration">
-                            <Label>做题时长(分钟)</Label>
-                            <FormInput
-                                name="duration"
-                                type="number"
-                                placeholder="输入做题时长"
-                            />
-                        </FormField>
+                        <BaseFormField name="duration">
+                            <FormField label="做题时长(分钟)">
+                                <FormInput
+                                    name="duration"
+                                    type="number"
+                                    placeholder="输入做题时长"
+                                />
+                            </FormField>
+                        </BaseFormField>
                     </div>
                 </CardContent>
                 <CardFooter className="flex gap-2 justify-end">

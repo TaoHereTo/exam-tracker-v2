@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { SelectItem } from "@/components/ui/select";
 import { MODULES } from '@/config/exam';
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
-import { BaseForm, FormField, FormInput, FormSelect } from "./BaseForm";
+import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
+import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 
 export type RecordItem = {
@@ -87,8 +88,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* 日期选择器 */}
-                    <div className="flex flex-col gap-2">
-                        <Label>日期</Label>
+                    <FormField label="日期">
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>
                             <PopoverTrigger asChild>
                                 <Button
@@ -102,47 +102,51 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                                 <Calendar mode="single" selected={date} onSelect={handleDateSelect} initialFocus />
                             </PopoverContent>
                         </Popover>
-                    </div>
+                    </FormField>
 
                     {/* 模块选择器 */}
-                    <FormField name="module">
-                        <Label>模块</Label>
-                        <FormSelect name="module" placeholder="请选择模块">
-                            {MODULES.map(m => (
-                                <option key={m.value} value={m.label}>{m.label}</option>
-                            ))}
-                        </FormSelect>
-                    </FormField>
+                    <BaseFormField name="module">
+                        <FormField label="模块">
+                            <FormSelect name="module" placeholder="请选择模块">
+                                {MODULES.map(m => (
+                                    <SelectItem key={m.value} value={m.label}>{m.label}</SelectItem>
+                                ))}
+                            </FormSelect>
+                        </FormField>
+                    </BaseFormField>
 
                     {/* 正确数和总题数 */}
                     <div className="flex gap-4">
-                        <FormField name="correct" className="flex-1">
-                            <Label>正确数</Label>
-                            <FormInput
-                                name="correct"
-                                type="number"
-                                placeholder="请输入正确数"
-                            />
-                        </FormField>
-                        <FormField name="total" className="flex-1">
-                            <Label>总题数</Label>
-                            <FormInput
-                                name="total"
-                                type="number"
-                                placeholder="请输入总题数"
-                            />
-                        </FormField>
+                        <BaseFormField name="correct" className="flex-1">
+                            <FormField label="正确数">
+                                <FormInput
+                                    name="correct"
+                                    type="number"
+                                    placeholder="请输入正确数"
+                                />
+                            </FormField>
+                        </BaseFormField>
+                        <BaseFormField name="total" className="flex-1">
+                            <FormField label="总题数">
+                                <FormInput
+                                    name="total"
+                                    type="number"
+                                    placeholder="请输入总题数"
+                                />
+                            </FormField>
+                        </BaseFormField>
                     </div>
 
                     {/* 考试时长 */}
-                    <FormField name="duration">
-                        <Label>考试时长</Label>
-                        <FormInput
-                            name="duration"
-                            type="text"
-                            placeholder="例如: 26:15"
-                        />
-                    </FormField>
+                    <BaseFormField name="duration">
+                        <FormField label="考试时长">
+                            <FormInput
+                                name="duration"
+                                type="text"
+                                placeholder="例如: 26:15"
+                            />
+                        </FormField>
+                    </BaseFormField>
                 </CardContent>
                 <CardFooter>
                     <UnifiedButton variant="reactbits"

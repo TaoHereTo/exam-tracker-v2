@@ -79,6 +79,14 @@ export default function Home() {
 
   const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
+  
+  // 智能分页：如果当前页超出新的总页数，则跳转到最后一页
+  useEffect(() => {
+    if (historyPage > totalPages && totalPages > 0) {
+      setHistoryPage(totalPages);
+    }
+  }, [records, historyPage, totalPages, setHistoryPage]);
+  
   const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
 
   // 学习计划相关状态

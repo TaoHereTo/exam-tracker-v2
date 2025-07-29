@@ -13,12 +13,12 @@ const buttonVariants = cva(
                 secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
                 ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
                 link: "text-primary underline-offset-4 hover:underline",
-                // ReactBits风格变体
-                reactbits: "bg-gradient-to-br from-purple-600 to-blue-600 text-white",
-                reactbitsPrimary: "bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 text-white",
-                reactbitsSecondary: "bg-gradient-to-br from-gray-600 to-gray-700 text-white",
-                reactbitsDestructive: "bg-gradient-to-br from-red-500 to-red-700 text-white",
-                reactbitsOutline: "bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 border border-gray-300 hover:text-gray-900",
+                // ReactBits风格变体 - 使用纯色
+                reactbits: "bg-purple-600 text-white",
+                reactbitsPrimary: "bg-purple-600 text-white",
+                reactbitsSecondary: "bg-gray-600 text-white",
+                reactbitsDestructive: "bg-red-600 text-white",
+                reactbitsOutline: "bg-gray-100 text-gray-800 border border-gray-300 hover:text-gray-900",
             },
             size: {
                 default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -52,27 +52,27 @@ const UnifiedButton = forwardRef<HTMLButtonElement, UnifiedButtonProps>(({
     const Comp = asChild ? "button" : "button";
     const isReactBitsStyle = variant?.startsWith('reactbits');
 
-    // 处理reactbits风格的自定义渐变色
-    let gradientClass = '';
+    // 处理reactbits风格的自定义纯色
+    let colorClass = '';
     if (isReactBitsStyle) {
         switch (props.gradient) {
             case 'green':
-                gradientClass = 'bg-gradient-to-br from-green-600 to-emerald-700';
+                colorClass = 'bg-green-600 hover:bg-green-700';
                 break;
             case 'yellow':
-                gradientClass = 'bg-gradient-to-br from-orange-600 to-amber-700';
+                colorClass = 'bg-orange-600 hover:bg-orange-700';
                 break;
             case 'red':
-                gradientClass = 'bg-gradient-to-br from-red-600 to-red-800';
+                colorClass = 'bg-red-600 hover:bg-red-700';
                 break;
             case 'blue':
-                gradientClass = 'bg-gradient-to-br from-blue-600 to-indigo-700';
+                colorClass = 'bg-blue-600 hover:bg-blue-700';
                 break;
             case 'gray':
-                gradientClass = 'bg-gradient-to-br from-gray-500 to-gray-700';
+                colorClass = 'bg-gray-500 hover:bg-gray-600';
                 break;
             default:
-                gradientClass = 'bg-gradient-to-br from-purple-600 to-blue-600';
+                colorClass = 'bg-purple-600 hover:bg-purple-700';
         }
     }
 
@@ -82,7 +82,7 @@ const UnifiedButton = forwardRef<HTMLButtonElement, UnifiedButtonProps>(({
             data-slot="button"
             className={cn(
                 buttonVariants({ variant, size }),
-                isReactBitsStyle && [gradientClass, 'reactbits-button'],
+                isReactBitsStyle && [colorClass, 'reactbits-button'],
                 className
             )}
             {...props}
