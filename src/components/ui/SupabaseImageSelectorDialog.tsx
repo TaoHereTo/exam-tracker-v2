@@ -3,6 +3,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle } from 'lucide-react';
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
@@ -25,6 +35,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [imageLoadErrors, setImageLoadErrors] = useState<Set<string>>(new Set());
     const [connectionStatus, setConnectionStatus] = useState<{ success: boolean; message: string } | null>(null);
+    const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+    const [imageToDelete, setImageToDelete] = useState<{ id: string; name: string } | null>(null);
+
     const { notify } = useNotification();
 
     // 测试连接
@@ -89,32 +102,46 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const handleDeleteImage = async (imageId: string, event: React.MouseEvent) => {
         event.stopPropagation();
 
-        if (confirm('确定要删除这张图片吗？此操作不可撤销。')) {
-            try {
-                const success = await supabaseImageManager.deleteImage(imageId);
-                if (success) {
-                    notify({
-                        type: "success",
-                        message: "删除成功",
-                        description: "图片已从云端删除"
-                    });
-                    // 重新加载图片列表
-                    await loadAvailableImages();
-                } else {
-                    notify({
-                        type: "error",
-                        message: "删除失败",
-                        description: "无法删除图片"
-                    });
-                }
-            } catch (error) {
-                console.error('删除图片失败:', error);
+        // 找到要删除的图片信息
+        const imageToDelete = availableImages.find(img => img.id === imageId);
+        const imageName = imageToDelete?.originalName || '这张图片';
+
+        // 设置要删除的图片信息并打开确认对话框
+        setImageToDelete({ id: imageId, name: imageName });
+        setDeleteConfirmOpen(true);
+    };
+
+    // 确认删除
+    const confirmDelete = async () => {
+        if (!imageToDelete) return;
+
+        try {
+            const success = await supabaseImageManager.deleteImage(imageToDelete.id);
+            if (success) {
+                notify({
+                    type: "success",
+                    message: "删除成功",
+                    description: `"${imageToDelete.name}"已从云端删除`
+                });
+                // 重新加载图片列表
+                await loadAvailableImages();
+            } else {
                 notify({
                     type: "error",
                     message: "删除失败",
-                    description: "删除图片时发生错误"
+                    description: "无法删除图片，请检查网络连接"
                 });
             }
+        } catch (error) {
+            console.error('删除图片失败:', error);
+            notify({
+                type: "error",
+                message: "删除失败",
+                description: "删除图片时发生错误，请稍后重试"
+            });
+        } finally {
+            setDeleteConfirmOpen(false);
+            setImageToDelete(null);
         }
     };
 
@@ -155,6 +182,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         setImageLoadErrors(new Set());
     };
 
+
+
     // 格式化文件大小
     const formatFileSize = (bytes: number): string => {
         if (bytes === 0) return '0 B';
@@ -180,164 +209,194 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-                {trigger || (
-                    <Button variant="outline" size="sm" className="flex items-center gap-2">
-                        <Cloud className="h-4 w-4" />
-                        选择云端图片
-                    </Button>
-                )}
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl h-[85vh] overflow-hidden flex flex-col">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <Cloud className="h-5 w-5" />
-                        选择云端图片
-                    </DialogTitle>
-                    <DialogDescription>
-                        从云端存储桶中选择已上传的图片
-                    </DialogDescription>
-                </DialogHeader>
+        <>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                    {trigger || (
+                        <Button variant="outline" size="sm" className="flex items-center gap-2">
+                            <Cloud className="h-4 w-4" />
+                            选择云端图片
+                        </Button>
+                    )}
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl h-[85vh] overflow-hidden flex flex-col">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Cloud className="h-5 w-5" />
+                            选择云端图片
+                        </DialogTitle>
+                        <DialogDescription>
+                            从云端存储桶中选择已上传的图片
+                        </DialogDescription>
+                    </DialogHeader>
 
-                <div className="flex-1 flex flex-col space-y-4 min-h-0">
-                    {/* 连接状态提示 - 只有在真正有问题且没有图片时才显示 */}
-                    {connectionStatus && !connectionStatus.success && availableImages.length === 0 && (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                            <div className="text-sm text-red-700 dark:text-red-300">
-                                <div className="font-medium">连接问题</div>
-                                <div className="text-xs">{connectionStatus.message}</div>
-                                <div className="text-xs mt-1">
-                                    请检查 Supabase 配置或执行 SUPABASE_RLS_FIX.sql 中的 SQL 命令
+                    <div className="flex-1 flex flex-col space-y-4 min-h-0">
+                        {/* 连接状态提示 - 只有在真正有问题且没有图片时才显示 */}
+                        {connectionStatus && !connectionStatus.success && availableImages.length === 0 && (
+                            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                                <AlertCircle className="h-4 w-4 text-red-500" />
+                                <div className="text-sm text-red-700 dark:text-red-300">
+                                    <div className="font-medium">连接问题</div>
+                                    <div className="text-xs">{connectionStatus.message}</div>
+                                    <div className="text-xs mt-1">
+                                        请检查 Supabase 配置或执行 SUPABASE_RLS_FIX.sql 中的 SQL 命令
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
 
-                    {/* 搜索框和刷新按钮 */}
-                    <div className="flex gap-2 items-center">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input
-                                placeholder="搜索图片..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 h-9"
-                            />
+
+
+                        {/* 搜索框和操作按钮 */}
+                        <div className="flex gap-2 items-center">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Input
+                                    placeholder="搜索图片..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="pl-10 h-9"
+                                />
+                            </div>
+
+                            <Button
+                                variant="outline"
+                                onClick={handleRefresh}
+                                disabled={isLoading}
+                                className="flex items-center gap-2 h-9 px-3"
+                            >
+                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                                刷新
+                            </Button>
+
+
                         </div>
 
+                        {/* 图片列表 */}
+                        <div className="flex-1 overflow-y-auto" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
+                            {isLoading ? (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="flex items-center gap-2 text-gray-500">
+                                        <RefreshCw className="h-5 w-5 animate-spin" />
+                                        正在加载图片列表...
+                                    </div>
+                                </div>
+                            ) : processedImages.length === 0 ? (
+                                <div className="flex items-center justify-center h-full">
+                                    <div className="text-center text-gray-500">
+                                        <Cloud className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                                        <p>{searchTerm ? '没有找到匹配的图片' : '没有已上传的图片'}</p>
+                                        <p className="text-sm mt-1">请先上传图片到云端存储</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                        {processedImages.map((image) => (
+                                            <div
+                                                key={image.id}
+                                                className={`relative border rounded-lg p-2 cursor-pointer transition-all group ${selectedImage === image.id
+                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                                    }`}
+                                                onClick={() => handleImageSelect(image.id)}
+                                            >
+                                                <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
+                                                    {imageLoadErrors.has(image.id) ? (
+                                                        <div className="flex items-center justify-center w-full h-full">
+                                                            <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    ) : (
+                                                        <Image
+                                                            src={image.url}
+                                                            alt={`图片: ${image.originalName}`}
+                                                            className="w-full h-full object-cover"
+                                                            width={200}
+                                                            height={200}
+                                                            onError={() => {
+                                                                setImageLoadErrors(prev => new Set(prev).add(image.id));
+                                                            }}
+                                                        />
+                                                    )}
+                                                </div>
+
+                                                {/* 图片信息 */}
+                                                <div className="space-y-1">
+                                                    <div className="text-xs text-center truncate font-medium">
+                                                        {image.originalName}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 text-center">
+                                                        {formatFileSize(image.size)}
+                                                    </div>
+                                                    <div className="text-xs text-gray-400 text-center">
+                                                        {formatUploadTime(image.uploadedAt)}
+                                                    </div>
+                                                </div>
+
+
+
+                                                {/* 选择指示器 */}
+                                                {selectedImage === image.id && (
+                                                    <div className="absolute top-2 right-2">
+                                                        <Check className="h-4 w-4 text-blue-500" />
+                                                    </div>
+                                                )}
+
+                                                {/* 删除按钮 */}
+                                                <Button
+                                                    variant="destructive"
+                                                    size="sm"
+                                                    className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-red-600"
+                                                    onClick={(e) => handleDeleteImage(image.id, e)}
+                                                    title="删除图片"
+                                                >
+                                                    <Trash2 className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* 操作按钮 */}
+                    <div className="flex justify-end space-x-2 pt-4 border-t">
+                        <Button variant="outline" onClick={handleCancel}>
+                            取消
+                        </Button>
                         <Button
-                            variant="outline"
-                            onClick={handleRefresh}
-                            disabled={isLoading}
-                            className="flex items-center gap-2 h-9 px-3"
+                            onClick={handleConfirm}
+                            disabled={!selectedImage}
                         >
-                            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-                            刷新
+                            确认选择
                         </Button>
                     </div>
+                </DialogContent>
+            </Dialog>
 
-                    {/* 图片列表 */}
-                    <div className="flex-1 overflow-y-auto" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
-                        {isLoading ? (
-                            <div className="flex items-center justify-center h-full">
-                                <div className="flex items-center gap-2 text-gray-500">
-                                    <RefreshCw className="h-5 w-5 animate-spin" />
-                                    正在加载图片列表...
-                                </div>
-                            </div>
-                        ) : processedImages.length === 0 ? (
-                            <div className="flex items-center justify-center h-full">
-                                <div className="text-center text-gray-500">
-                                    <Cloud className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                                    <p>{searchTerm ? '没有找到匹配的图片' : '没有已上传的图片'}</p>
-                                    <p className="text-sm mt-1">请先上传图片到云端存储</p>
-                                </div>
-                            </div>
-                        ) : (
-                            <>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                                    {processedImages.map((image) => (
-                                        <div
-                                            key={image.id}
-                                            className={`relative border rounded-lg p-2 cursor-pointer transition-all group ${selectedImage === image.id
-                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                            onClick={() => handleImageSelect(image.id)}
-                                        >
-                                            <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
-                                                {imageLoadErrors.has(image.id) ? (
-                                                    <div className="flex items-center justify-center w-full h-full">
-                                                        <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                        </svg>
-                                                    </div>
-                                                ) : (
-                                                    <Image
-                                                        src={image.url}
-                                                        alt={`图片: ${image.originalName}`}
-                                                        className="w-full h-full object-cover"
-                                                        width={200}
-                                                        height={200}
-                                                        onError={() => {
-                                                            setImageLoadErrors(prev => new Set(prev).add(image.id));
-                                                        }}
-                                                    />
-                                                )}
-                                            </div>
-
-                                            {/* 图片信息 */}
-                                            <div className="space-y-1">
-                                                <div className="text-xs text-center truncate font-medium">
-                                                    {image.originalName}
-                                                </div>
-                                                <div className="text-xs text-gray-500 text-center">
-                                                    {formatFileSize(image.size)}
-                                                </div>
-                                                <div className="text-xs text-gray-400 text-center">
-                                                    {formatUploadTime(image.uploadedAt)}
-                                                </div>
-                                            </div>
-
-                                            {/* 选择指示器 */}
-                                            {selectedImage === image.id && (
-                                                <div className="absolute top-2 right-2">
-                                                    <Check className="h-4 w-4 text-blue-500" />
-                                                </div>
-                                            )}
-
-                                            {/* 删除按钮 */}
-                                            <Button
-                                                variant="destructive"
-                                                size="sm"
-                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
-                                                onClick={(e) => handleDeleteImage(image.id, e)}
-                                            >
-                                                <Trash2 className="h-3 w-3" />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* 操作按钮 */}
-                <div className="flex justify-end space-x-2 pt-4 border-t">
-                    <Button variant="outline" onClick={handleCancel}>
-                        取消
-                    </Button>
-                    <Button
-                        onClick={handleConfirm}
-                        disabled={!selectedImage}
-                    >
-                        确认选择
-                    </Button>
-                </div>
-            </DialogContent>
-        </Dialog>
+            {/* 删除确认对话框 */}
+            <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            确定要删除&ldquo;{imageToDelete?.name}&rdquo;吗？
+                            <br />
+                            <br />
+                            此操作不可撤销，图片将从云端永久删除。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                            确认删除
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        </>
     );
 }; 

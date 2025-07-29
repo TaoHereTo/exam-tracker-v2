@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { FolderOpen, X, Eye, HardDrive, Image as LucideImage, ZoomIn, ZoomOut, RotateCcw, Cloud } from 'lucide-react';
+import { FolderOpen, X, Eye, HardDrive, Image as LucideImage, ZoomIn, ZoomOut, RotateCcw, Cloud, Upload } from 'lucide-react';
 import {
     Drawer,
     DrawerContent,
@@ -50,7 +50,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     size = 'sm',
     defaultMode = 'upload'
 }) => {
-    const [hasImage, setHasImage] = useState<boolean>(!!value);
+    const [hasImage, setHasImage] = useState<boolean>(false);
+    const [initialized, setInitialized] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isViewerOpen, setIsViewerOpen] = useState(false);
     const [imageData, setImageData] = useState<string | null>(null);
@@ -60,6 +61,10 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
     const [currentMode, setCurrentMode] = useState<'upload' | 'viewer'>(defaultMode);
+    const [userSelectedHasImage, setUserSelectedHasImage] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const dragAreaRef = useRef<HTMLDivElement>(null);
 
     const { notify } = useNotification();
 
@@ -70,13 +75,34 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             setHasImage(true);
         } else {
             setPreviewUrl(null);
-            setHasImage(false);
+            // 只有当用户明确选择"无图片"时才设置为false
+            if (!userSelectedHasImage) {
+                setHasImage(false);
+            }
         }
-    }, [value]);
+    }, [value]); // 移除shouldReloadImage依赖，简化逻辑
+
+    // 确保hasImage状态与value保持同步，但只在value有值时才重置
+    useEffect(() => {
+        if (value) {
+            setHasImage(true);
+            setUserSelectedHasImage(true);
+        }
+        // 注意：当value为undefined时，我们不重置hasImage状态
+        // 这样可以保持用户的选择
+        setInitialized(true);
+    }, [value, setUserSelectedHasImage]);
+
+    // 确保hasImage状态与用户选择保持一致
+    useEffect(() => {
+        if (userSelectedHasImage && initialized) {
+            setHasImage(true);
+        }
+    }, [userSelectedHasImage, initialized]);
 
     const loadPreviewImage = async (imageId: string) => {
         try {
-            // 尝试从云端加载
+            // 优先尝试从云端加载
             const cloudUrl = supabaseImageManager.getImageUrl(imageId);
             if (cloudUrl) {
                 setPreviewUrl(cloudUrl);
@@ -84,7 +110,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 return;
             }
 
-            // 尝试从本地加载
+            // 如果云端没有，再尝试从本地加载
             const localUrl = staticImageManager.getImagePreviewUrl(imageId);
             if (localUrl) {
                 setPreviewUrl(localUrl);
@@ -98,14 +124,106 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     // 处理图片选择
     const handleImageSelected = (imageId: string) => {
-        loadPreviewImage(imageId);
         onChange?.(imageId);
+        setImageSource('cloud');
+        setHasImage(true); // 确保设置为有图片状态
+        setUserSelectedHasImage(true); // 确保用户选择状态
+        // 直接设置预览URL，避免loadPreviewImage函数干扰
+        const cloudUrl = supabaseImageManager.getImageUrl(imageId);
+        if (cloudUrl) {
+            setPreviewUrl(cloudUrl);
+        }
 
         notify({
             type: "success",
             message: "图片选择成功",
-            description: "已从本地文件夹中选择图片"
+            description: "已从云端选择图片"
         });
+    };
+
+    // 处理文件上传（通用函数）
+    const handleFileUpload = async (file: File) => {
+        if (!file) return;
+
+        try {
+            setIsLoading(true);
+            // 上传到Supabase
+            const imageInfo = await supabaseImageManager.uploadImage(file);
+            if (imageInfo) {
+                onChange?.(imageInfo.id);
+                // 保持在本地上传tab，不切换到云端选择
+                setImageSource('local');
+                setHasImage(true); // 确保设置为有图片状态
+                setUserSelectedHasImage(true); // 确保用户选择状态
+                // 直接设置预览URL，避免loadPreviewImage函数切换tab
+                setPreviewUrl(imageInfo.url);
+                notify({ type: "success", message: "图片上传成功" });
+            }
+        } catch (error) {
+            console.error('上传失败:', error);
+            notify({ type: "error", message: "图片上传失败" });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 处理本地上传
+    const handleLocalUpload = async () => {
+        try {
+            // 创建文件输入元素
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.multiple = false;
+
+            input.onchange = async (e) => {
+                const file = (e.target as HTMLInputElement).files?.[0];
+                if (file) {
+                    await handleFileUpload(file);
+                }
+            };
+
+            input.click();
+        } catch (error) {
+            console.error('选择文件失败:', error);
+            notify({ type: "error", message: "选择文件失败" });
+        }
+    };
+
+    // 拖拽相关处理函数
+    const handleDragEnter = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        // 只有当离开拖拽区域时才设置isDragOver为false
+        if (!dragAreaRef.current?.contains(e.relatedTarget as Node)) {
+            setIsDragOver(false);
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = async (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+
+        const files = Array.from(e.dataTransfer.files);
+        const imageFile = files.find(file => file.type.startsWith('image/'));
+
+        if (imageFile) {
+            await handleFileUpload(imageFile);
+        } else {
+            notify({ type: "error", message: "请拖拽图片文件" });
+        }
     };
 
     // 处理图片删除
@@ -134,16 +252,20 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         setPreviewUrl(null);
         onChange?.(undefined);
         setHasImage(false);
+        setUserSelectedHasImage(false);
     };
 
     // 处理是否有图片的选择
     const handleHasImageChange = (newValue: string) => {
         const hasImageNow = newValue === 'yes';
         setHasImage(hasImageNow);
+        setUserSelectedHasImage(hasImageNow);
 
         if (!hasImageNow) {
+            // 当用户选择"无图片"时，清除图片
             handleRemoveImage();
         }
+        // 当用户选择"有图片"时，不立即清除value，让用户有机会选择图片
     };
 
     // 预览图片
@@ -229,21 +351,83 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             {/* 图片选择区域 */}
             {hasImage && (
                 <div className="space-y-3">
+                    {/* Tab切换：本地上传 vs 云端选择 */}
+                    <div className="flex border rounded-lg p-0.5 bg-gray-50 dark:bg-gray-800">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setImageSource('local');
+                                // 保持hasImage状态不变
+                            }}
+                            className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors ${imageSource === 'local'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                }`}
+                        >
+                            <HardDrive className="h-4 w-4 inline mr-2" />
+                            本地上传
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setImageSource('cloud');
+                                // 保持hasImage状态不变
+                            }}
+                            className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors ${imageSource === 'cloud'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
+                                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                }`}
+                        >
+                            <Cloud className="h-4 w-4 inline mr-2" />
+                            云端选择
+                        </button>
+                    </div>
+
                     <div className="flex items-center gap-2">
-                        <SupabaseImageSelectorDialog
-                            onImageSelected={handleImageSelected}
-                            trigger={
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    className="flex items-center gap-2"
-                                >
-                                    <FolderOpen className="h-4 w-4" />
-                                    选择图片
-                                </Button>
-                            }
-                        />
+                        {imageSource === 'local' ? (
+                            // 本地上传功能 - 只在没有预览图片时显示
+                            !previewUrl && (
+                                <div className="w-full flex justify-center">
+                                    <div
+                                        ref={dragAreaRef}
+                                        onDragEnter={handleDragEnter}
+                                        onDragLeave={handleDragLeave}
+                                        onDragOver={handleDragOver}
+                                        onDrop={handleDrop}
+                                        className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer max-w-md ${isDragOver
+                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                            : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+                                            } ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                                        onClick={handleLocalUpload}
+                                    >
+                                        <Upload className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+                                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                            点击选择或拖拽图片上传
+                                        </p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            支持 JPG、PNG、GIF 等格式
+                                        </p>
+                                    </div>
+                                </div>
+                            )
+                        ) : (
+                            // 云端选择功能
+                            <SupabaseImageSelectorDialog
+                                onImageSelected={handleImageSelected}
+                                trigger={
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        disabled={isLoading}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <FolderOpen className="h-4 w-4" />
+                                        选择图片
+                                    </Button>
+                                }
+                            />
+                        )}
 
                         {previewUrl && (
                             <>

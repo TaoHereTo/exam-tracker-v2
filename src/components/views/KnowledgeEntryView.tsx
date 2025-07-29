@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     Carousel,
     CarouselContent,
@@ -8,9 +8,9 @@ import {
     CarouselNext,
     CarouselApi,
 } from "@/components/ui/carousel";
-import ModuleForm from '../forms/ModuleForm';
-import VerbalForm from '../forms/VerbalForm';
-import PoliticsForm from '../forms/PoliticsForm';
+import ModuleForm from '@/components/forms/ModuleForm';
+import VerbalForm from '@/components/forms/VerbalForm';
+import PoliticsForm from '@/components/forms/PoliticsForm';
 import type { KnowledgeItem } from "@/types/record";
 import { MODULES } from "@/config/exam";
 
@@ -24,73 +24,100 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
     const carouselApi = useRef<CarouselApi | null>(null);
 
     // 包装函数，自动加上 module 字段
-    const handleAdd = (module: string) => (data: Partial<KnowledgeItem>) => {
+    const handleAdd = useCallback((module: string) => (data: Partial<KnowledgeItem>) => {
         onAddKnowledge({ ...data, module } as KnowledgeItem);
-    };
+    }, [onAddKnowledge]);
 
     // tab 切换时，carousel 跳转
-    const handleTabChange = (v: string) => {
+    const handleTabChange = useCallback((v: string) => {
         setTab(v);
         const idx = MODULES.findIndex(t => t.value === v);
-        if (carouselApi.current) carouselApi.current.scrollTo(idx);
-    };
+        if (carouselApi.current) {
+            carouselApi.current.scrollTo(idx);
+        }
+    }, []);
 
     // carousel 滑动时，tab 跟随
-    const handleCarouselApi = (api?: CarouselApi) => {
+    const handleCarouselApi = useCallback((api?: CarouselApi) => {
         if (!api) return;
         carouselApi.current = api;
+
         api.on('select', () => {
-            const idx = api.selectedScrollSnap();
-            setTab(MODULES[idx].value);
+            // 使用 requestAnimationFrame 确保在下一帧更新，避免干扰动画
+            requestAnimationFrame(() => {
+                const idx = api.selectedScrollSnap();
+                if (MODULES[idx]) {
+                    setTab(MODULES[idx].value);
+                }
+            });
         });
-    };
+    }, []);
+
+    // 使用 useMemo 优化轮播内容，避免不必要的重新渲染
+    const carouselContent = useMemo(() => (
+        <>
+            <CarouselItem>
+                <div className="p-1">
+                    <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                <div className="p-1">
+                    <PoliticsForm onAddKnowledge={handleAdd('politics')} />
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                <div className="p-1">
+                    <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                <div className="p-1">
+                    <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                <div className="p-1">
+                    <VerbalForm onAddKnowledge={handleAdd('verbal')} />
+                </div>
+            </CarouselItem>
+            <CarouselItem>
+                <div className="p-1">
+                    <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
+                </div>
+            </CarouselItem>
+        </>
+    ), [handleAdd]);
 
     return (
-        <Tabs value={tab} onValueChange={handleTabChange} className="w-full max-w-2xl mx-auto flex flex-col">
+        <div className="w-full max-w-2xl mx-auto flex flex-col">
             <div className="relative mb-10">
-                <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full justify-center text-base h-10 px-1">
-                    {MODULES.map(({ value, label }) => (
-                        <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
-                    ))}
-                </TabsList>
+                <Tabs value={tab} onValueChange={handleTabChange}>
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full justify-center text-base h-10 px-1">
+                        {MODULES.map(({ value, label }) => (
+                            <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
             </div>
-            <Carousel setApi={handleCarouselApi} opts={{ align: 'start', skipSnaps: false, containScroll: 'trimSnaps' }}>
+
+            <Carousel setApi={handleCarouselApi} className="relative px-12" opts={{
+                align: 'start',
+                skipSnaps: false,
+                containScroll: 'trimSnaps',
+                duration: 25,
+                dragFree: false,
+                loop: false,
+                slidesToScroll: 1,
+                startIndex: MODULES.findIndex(t => t.value === defaultTab)
+            }}>
                 <CarouselPrevious />
                 <CarouselContent>
-                    <CarouselItem>
-                        <TabsContent value="data-analysis">
-                            <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
-                        </TabsContent>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <TabsContent value="politics">
-                            <PoliticsForm onAddKnowledge={handleAdd('politics')} />
-                        </TabsContent>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <TabsContent value="math">
-                            <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
-                        </TabsContent>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <TabsContent value="common">
-                            <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
-                        </TabsContent>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <TabsContent value="verbal">
-                            <VerbalForm onAddKnowledge={handleAdd('verbal')} />
-                        </TabsContent>
-                    </CarouselItem>
-                    <CarouselItem>
-                        <TabsContent value="logic">
-                            <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
-                        </TabsContent>
-                    </CarouselItem>
+                    {carouselContent}
                 </CarouselContent>
                 <CarouselNext />
             </Carousel>
-        </Tabs>
+        </div>
     );
 };
 

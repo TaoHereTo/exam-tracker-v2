@@ -508,6 +508,58 @@ button {
   scroll-behavior: auto !important;
 }
 
+/* 轮播组件保持动画效果 */
+.reduce-motion [data-slot="carousel"],
+.reduce-motion [data-slot="carousel-content"],
+.reduce-motion [data-slot="carousel-item"] {
+  animation-duration: unset !important;
+  animation-iteration-count: unset !important;
+  transition-duration: unset !important;
+  scroll-behavior: unset !important;
+}
+
+/* 轮播组件动画优化 */
+[data-slot="carousel"] {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  overflow: hidden;
+}
+
+[data-slot="carousel-content"] {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+[data-slot="carousel-item"] {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+/* 确保轮播内容在动画期间保持稳定 */
+[data-slot="carousel-content"] > * {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+/* 确保轮播动画不受减弱动态效果影响 */
+.reduce-motion [data-slot="carousel-content"] {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.reduce-motion [data-slot="carousel-item"] {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
 /* 减弱动态效果时禁用marquee动画 */
 .reduce-motion .animate-marquee,
 .reduce-motion .animate-marquee-vertical {

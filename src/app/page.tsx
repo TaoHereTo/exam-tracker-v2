@@ -30,10 +30,18 @@ import {
 } from "@/components/ui/alert-dialog";
 import { normalizeModuleName } from "@/config/exam";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
+import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 // 懒加载组件
-const KnowledgeEntryView = lazy(() => import("@/components/views/KnowledgeEntryView"));
-const PlanListView = lazy(() => import("@/components/views/PlanListView"));
-const PlanDetailView = lazy(() => import("@/components/views/PlanDetailView"));
+const PlanListView = lazy(() =>
+  import("@/components/views/PlanListView").then(module => ({
+    default: module.default
+  }))
+);
+const PlanDetailView = lazy(() =>
+  import("@/components/views/PlanDetailView").then(module => ({
+    default: module.default
+  }))
+);
 
 
 
@@ -280,9 +288,7 @@ export default function Home() {
             <div>
               <h1 className="text-3xl font-bold mb-4">知识点录入</h1>
               <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <Suspense fallback={<div className="text-center">加载中...</div>}>
-                  <KnowledgeEntryView onAddKnowledge={addKnowledge} />
-                </Suspense>
+                <KnowledgeEntryView onAddKnowledge={addKnowledge} />
               </div>
             </div>
           )}
