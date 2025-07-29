@@ -16,7 +16,7 @@ const LogicForm = lazy(() => import("../forms/LogicForm").then(module => ({ defa
 const CommonForm = lazy(() => import("../forms/CommonForm").then(module => ({ default: module.CommonForm })));
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from 'lucide-react';
-import { UnifiedImage } from '@/components/ui/UnifiedImage';
+import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -66,7 +66,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -88,7 +88,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -110,7 +110,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{type}</span>
                                     {imagePath && (
-                                        <UnifiedImage mode="viewer" value={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );

@@ -8,7 +8,7 @@ import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitc
 import SwitchRenderer from "@/components/ui/SwitchRenderer";
 import PreviewSwitch from "@/components/ui/PreviewSwitch";
 import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
-import { getLocalStorageInfo, formatStorageSize, getLargestStorageItems, type StorageInfo } from "@/lib/storageUtils";
+import { getLocalStorageInfo, formatStorageSize, getLargestStorageItems, getStorageKeyDisplayName, type StorageInfo } from "@/lib/storageUtils";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 
 // 定义 OtherSwitchType 类型
@@ -209,7 +209,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                             <div className="space-y-1">
                                 {largestItems.map((item, index) => (
                                     <div key={index} className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">{item.key}</span>
+                                        <span className="text-muted-foreground">{getStorageKeyDisplayName(item.key)}</span>
                                         <span>{item.sizeKB.toFixed(1)} KB</span>
                                     </div>
                                 ))}

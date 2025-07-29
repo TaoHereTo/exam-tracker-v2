@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { useNotification } from "@/components/magicui/NotificationProvider";
+import { useFormNotification } from "@/hooks/useFormNotification";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
@@ -32,7 +32,7 @@ export const LogicForm: React.FC<LogicFormProps> = ({
     const [subCategory, setSubCategory] = useState<typeof SUB_CATEGORIES[number]['value']>(initialData?.subCategory || '图形推理');
     const [imagePath, setImagePath] = useState<string | undefined>(initialData?.imagePath);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const { notify } = useNotification();
+    const { showError, showSuccess } = useFormNotification();
 
     useEffect(() => {
         setType(initialData?.type || '');
@@ -70,12 +70,12 @@ export const LogicForm: React.FC<LogicFormProps> = ({
 
     const handleSubmit = () => {
         if (!validateFormLocal()) {
-            notify({ type: "error", message: "请完善表单信息" });
+            showError();
             return;
         }
 
         onAddKnowledge({ type, note, subCategory, imagePath });
-        notify({ type: "success", message: "保存成功" });
+        showSuccess();
         setType('');
         setNote('');
         setSubCategory('图形推理');
@@ -137,7 +137,8 @@ export const LogicForm: React.FC<LogicFormProps> = ({
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage mode="upload"
+                <UnifiedImage
+                    mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />

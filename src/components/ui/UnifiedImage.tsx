@@ -4,18 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { FolderOpen, X, Eye, HardDrive, Image as LucideImage, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { FolderOpen, X, Eye, HardDrive, Image as LucideImage, ZoomIn, ZoomOut, RotateCcw, Cloud } from 'lucide-react';
 import {
     Drawer,
     DrawerContent,
     DrawerHeader,
     DrawerTitle,
+    DrawerDescription,
     DrawerTrigger,
 } from '@/components/ui/drawer';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { staticImageManager } from '@/lib/staticImageManager';
 import { StaticImageInfo } from '@/lib/staticImageManager';
-import { ImageSelectorDialog } from './ImageSelectorDialog';
+import { supabaseImageManager } from '@/lib/supabaseImageManager';
+import { SupabaseImageInfo } from '@/lib/supabaseImageManager';
+import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
 
@@ -51,7 +54,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isViewerOpen, setIsViewerOpen] = useState(false);
     const [imageData, setImageData] = useState<string | null>(null);
-    const [imageInfo, setImageInfo] = useState<StaticImageInfo | null>(null);
+    const [imageInfo, setImageInfo] = useState<StaticImageInfo | SupabaseImageInfo | null>(null);
+    const [imageSource, setImageSource] = useState<'local' | 'cloud'>('local');
     const [isLoading, setIsLoading] = useState(false);
     const [zoom, setZoom] = useState(1);
     const [rotation, setRotation] = useState(0);
@@ -72,9 +76,20 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     const loadPreviewImage = async (imageId: string) => {
         try {
-            const previewUrl = staticImageManager.getImagePreviewUrl(imageId);
-            if (previewUrl) {
-                setPreviewUrl(previewUrl);
+            // 尝试从云端加载
+            const cloudUrl = supabaseImageManager.getImageUrl(imageId);
+            if (cloudUrl) {
+                setPreviewUrl(cloudUrl);
+                setImageSource('cloud');
+                return;
+            }
+
+            // 尝试从本地加载
+            const localUrl = staticImageManager.getImagePreviewUrl(imageId);
+            if (localUrl) {
+                setPreviewUrl(localUrl);
+                setImageSource('local');
+                return;
             }
         } catch (error) {
             console.error('加载预览图片失败:', error);
@@ -96,12 +111,29 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     // 处理图片删除
     const handleRemoveImage = async () => {
         if (value) {
-            staticImageManager.deleteImageSelection(value);
+            try {
+                if (imageSource === 'cloud') {
+                    await supabaseImageManager.deleteImage(value);
+                } else {
+                    staticImageManager.deleteImageSelection(value);
+                }
+                notify({
+                    type: "success",
+                    message: "图片删除成功",
+                    description: `图片已从${imageSource === 'cloud' ? '云端' : '本地'}删除`
+                });
+            } catch (error) {
+                console.error('删除失败:', error);
+                notify({
+                    type: "error",
+                    message: "删除失败",
+                    description: "无法删除图片"
+                });
+            }
         }
         setPreviewUrl(null);
         onChange?.(undefined);
         setHasImage(false);
-        notify({ type: "success", message: "图片选择已删除" });
     };
 
     // 处理是否有图片的选择
@@ -116,10 +148,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     // 预览图片
     const handlePreview = () => {
-        if (value) {
-            staticImageManager.openImageFile(value).catch(error => {
-                notify({ type: "error", message: "无法预览图片", description: error.message });
-            });
+        if (previewUrl) {
+            window.open(previewUrl, '_blank');
         }
     };
 
@@ -129,16 +159,37 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             if (!value) return;
             setIsLoading(true);
             try {
-                const data = staticImageManager.getImagePreviewUrl(value);
-                const info = staticImageManager.getImageInfo(value);
+                // 尝试从云端加载
+                const cloudUrl = supabaseImageManager.getImageUrl(value);
+                const cloudInfo = supabaseImageManager.getImageInfo(value);
 
-                setImageData(data);
-                setImageInfo(info || null);
-                setZoom(1);
-                setRotation(0);
+                if (cloudUrl && cloudInfo) {
+                    setImageData(cloudUrl);
+                    setImageInfo(cloudInfo);
+                    setImageSource('cloud');
+                    setZoom(1);
+                    setRotation(0);
+                    setIsLoading(false);
+                    return;
+                }
+
+                // 尝试从本地加载
+                const localUrl = staticImageManager.getImagePreviewUrl(value);
+                const localInfo = staticImageManager.getImageInfo(value);
+
+                if (localUrl && localInfo) {
+                    setImageData(localUrl);
+                    setImageInfo(localInfo);
+                    setImageSource('local');
+                    setZoom(1);
+                    setRotation(0);
+                    setIsLoading(false);
+                    return;
+                }
+
+                setIsLoading(false);
             } catch (error) {
                 console.error('加载图片失败:', error);
-            } finally {
                 setIsLoading(false);
             }
         };
@@ -179,7 +230,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             {hasImage && (
                 <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                        <ImageSelectorDialog
+                        <SupabaseImageSelectorDialog
                             onImageSelected={handleImageSelected}
                             trigger={
                                 <Button
@@ -233,8 +284,17 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 />
                                 {/* 存储位置指示器 */}
                                 <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
-                                    <HardDrive className="h-4 w-4 text-green-600" />
-                                    <span>图片来源: 本地文件夹</span>
+                                    {imageSource === 'cloud' ? (
+                                        <>
+                                            <Cloud className="h-4 w-4 text-blue-600" />
+                                            <span>图片来源: 云端存储</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <HardDrive className="h-4 w-4 text-green-600" />
+                                            <span>图片来源: 本地文件夹</span>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -272,6 +332,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             <DrawerTitle className="text-center">
                                 {imageInfo?.fileName || imageInfo?.originalName || '图片预览'}
                             </DrawerTitle>
+                            <DrawerDescription className="text-center">
+                                查看和操作图片，支持缩放、旋转等功能
+                            </DrawerDescription>
                         </DrawerHeader>
                         <div className="flex-1 p-6 overflow-hidden">
                             {isLoading ? (
@@ -354,8 +417,17 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 <div className="mt-4 text-center text-sm text-gray-500 pt-4">
                                     <p className="font-medium">{imageInfo.fileName || imageInfo.originalName || '未知文件'}</p>
                                     <div className="flex items-center justify-center gap-2 mt-2">
-                                        <HardDrive className="h-4 w-4 text-green-600" />
-                                        <span>图片来源: 本地文件夹</span>
+                                        {imageSource === 'cloud' ? (
+                                            <>
+                                                <Cloud className="h-4 w-4 text-blue-600" />
+                                                <span>图片来源: 云端存储</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <HardDrive className="h-4 w-4 text-green-600" />
+                                                <span>图片来源: 本地文件夹</span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}

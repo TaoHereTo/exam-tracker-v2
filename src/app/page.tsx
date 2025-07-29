@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SettingsView } from "@/components/views/SettingsView";
 import { useImportExport } from "@/hooks/useImportExport";
@@ -16,8 +16,7 @@ import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { PersonalBestView } from "@/components/views/PersonalBestView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
-import PlanListView from "@/components/views/PlanListView";
-import PlanDetailView from "@/components/views/PlanDetailView";
+
 import PageTitle from "@/components/ui/PageTitle";
 import {
   AlertDialog,
@@ -31,8 +30,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import { normalizeModuleName } from "@/config/exam";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
-import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
-import { staticImageManager } from "@/lib/staticImageManager";
+// 懒加载组件
+const KnowledgeEntryView = lazy(() => import("@/components/views/KnowledgeEntryView"));
+const PlanListView = lazy(() => import("@/components/views/PlanListView"));
+const PlanDetailView = lazy(() => import("@/components/views/PlanDetailView"));
+
 
 
 export default function Home() {
@@ -77,32 +79,38 @@ export default function Home() {
   // navMode 必须先声明，再用 useRef(navMode)
   const [navMode] = useLocalStorage<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
 
-  const sortedRecords = [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedRecords = useMemo(() =>
+    [...records].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    [records]
+  );
   const totalPages = Math.ceil(sortedRecords.length / pageSize);
-  
+
   // 智能分页：如果当前页超出新的总页数，则跳转到最后一页
   useEffect(() => {
     if (historyPage > totalPages && totalPages > 0) {
       setHistoryPage(totalPages);
     }
   }, [records, historyPage, totalPages, setHistoryPage]);
-  
-  const pagedRecords = sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize);
+
+  const pagedRecords = useMemo(() =>
+    sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize),
+    [sortedRecords, historyPage, pageSize]
+  );
 
   // 学习计划相关状态
   const [activePlanId, setActivePlanId] = useState<string | null>(null);
 
   // 进入详情
-  const handleShowDetail = (id: string) => setActivePlanId(id);
+  const handleShowDetail = useCallback((id: string) => setActivePlanId(id), []);
   // 返回列表
-  const handleBackToList = () => setActivePlanId(null);
+  const handleBackToList = useCallback(() => setActivePlanId(null), []);
 
   // 新增增删改逻辑
-  const addRecord = (record: RecordItem) => setRecords(prev => [record, ...prev]);
-  const deleteRecord = (id: number) => setRecords(prev => prev.filter(r => r.id !== id));
-  const createPlan = (plan: StudyPlan) => setPlans(prev => [plan, ...prev]);
-  const updatePlan = (plan: StudyPlan) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p));
-  const deletePlan = (id: string) => setPlans(prev => prev.filter(p => p.id !== id));
+  const addRecord = useCallback((record: RecordItem) => setRecords(prev => [record, ...prev]), [setRecords]);
+  const deleteRecord = useCallback((id: number) => setRecords(prev => prev.filter(r => r.id !== id)), [setRecords]);
+  const createPlan = useCallback((plan: StudyPlan) => setPlans(prev => [plan, ...prev]), [setPlans]);
+  const updatePlan = useCallback((plan: StudyPlan) => setPlans(prev => prev.map(p => p.id === plan.id ? plan : p)), [setPlans]);
+  const deletePlan = useCallback((id: string) => setPlans(prev => prev.filter(p => p.id !== id)), [setPlans]);
 
   // plans和records变化时自动统计进度
   usePlanProgress(plans, setPlans, records, calcPlanProgress);
@@ -114,8 +122,6 @@ export default function Home() {
   };
   const handleClearKnowledge = () => {
     setKnowledge([]);
-    // 清理未使用的图片选择
-    staticImageManager.cleanupUnusedImageSelections([]);
     notify({ type: "success", message: "知识点已清空" });
   };
   const handleClearPlans = () => {
@@ -127,8 +133,6 @@ export default function Home() {
   const handleClearAllData = () => {
     setRecords([]);
     setKnowledge([]);
-    // 清理所有图片选择
-    staticImageManager.cleanupUnusedImageSelections([]);
     notify({ type: "success", message: "操作成功", description: "您的所有应用数据已被清空。" });
   };
 
@@ -148,40 +152,11 @@ export default function Home() {
   const handleBatchDeleteKnowledge = (ids: string[]) => {
     // 删除知识点
     setKnowledge(prev => prev.filter(item => item.id && !ids.includes(item.id)));
-
-    // 延迟清理，确保知识点已经被删除
-    setTimeout(() => {
-      const remainingImageIds = knowledge
-        .filter(item => item.id && !ids.includes(item.id))
-        .map(item => (item as Record<string, unknown>).imagePath)
-        .filter(Boolean);
-      staticImageManager.cleanupUnusedImageSelections(remainingImageIds as string[]);
-    }, 100);
   };
 
   const handleEditKnowledge = (item: KnowledgeItem) => {
-    // 获取原来的知识点
-    const originalItem = knowledge.find(k => k.id === item.id);
-    const originalImagePath = originalItem ? (originalItem as Record<string, unknown>).imagePath : undefined;
-    const newImagePath = (item as Record<string, unknown>).imagePath;
-
     // 更新知识点
     setKnowledge(prev => prev.map(k => k.id === item.id ? { ...k, ...item } : k));
-
-    // 如果图片发生了变化，清理未使用的图片
-    if (originalImagePath !== newImagePath) {
-      // 延迟清理，确保新图片信息已经被保存
-      setTimeout(() => {
-        const allImageIds = knowledge
-          .map(k => (k as Record<string, unknown>).imagePath)
-          .filter(Boolean);
-        // 确保新图片ID也被包含在内
-        if (newImagePath) {
-          allImageIds.push(newImagePath as string);
-        }
-        staticImageManager.cleanupUnusedImageSelections(allImageIds as string[]);
-      }, 100);
-    }
   };
 
 
@@ -245,22 +220,28 @@ export default function Home() {
                   (() => {
                     const plan = plans.find(p => p.id === activePlanId);
                     if (!plan) return <div className="text-gray-400">未找到该计划</div>;
-                    return <PlanDetailView
-                      plan={plan}
-                      onBack={handleBackToList}
-                      onEdit={() => { /* 可弹窗编辑 */ }}
-                      onUpdate={updatePlan}
-                    />
+                    return (
+                      <Suspense fallback={<div className="text-center">加载中...</div>}>
+                        <PlanDetailView
+                          plan={plan}
+                          onBack={handleBackToList}
+                          onEdit={() => { /* 可弹窗编辑 */ }}
+                          onUpdate={updatePlan}
+                        />
+                      </Suspense>
+                    )
                   })()
                 )
                 : (
-                  <PlanListView
-                    plans={plans}
-                    onCreate={createPlan}
-                    onUpdate={updatePlan}
-                    onDelete={deletePlan}
-                    onShowDetail={handleShowDetail}
-                  />
+                  <Suspense fallback={<div className="text-center">加载中...</div>}>
+                    <PlanListView
+                      plans={plans}
+                      onCreate={createPlan}
+                      onUpdate={updatePlan}
+                      onDelete={deletePlan}
+                      onShowDetail={handleShowDetail}
+                    />
+                  </Suspense>
                 )
               }
             </div>
@@ -299,7 +280,9 @@ export default function Home() {
             <div>
               <h1 className="text-3xl font-bold mb-4">知识点录入</h1>
               <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <KnowledgeEntryView onAddKnowledge={addKnowledge} />
+                <Suspense fallback={<div className="text-center">加载中...</div>}>
+                  <KnowledgeEntryView onAddKnowledge={addKnowledge} />
+                </Suspense>
               </div>
             </div>
           )}

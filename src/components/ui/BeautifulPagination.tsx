@@ -112,13 +112,4 @@ export function BeautifulPagination({
     )
 }
 
-// 导出原有的分页器组件，保持向后兼容
-export {
-    Pagination,
-    PaginationContent,
-    PaginationLink,
-    PaginationItem,
-    PaginationPrevious,
-    PaginationNext,
-    PaginationEllipsis,
-} from "./pagination" 
+ 

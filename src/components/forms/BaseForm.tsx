@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
-import { useNotification } from "@/components/magicui/NotificationProvider";
+import { useFormNotification } from "@/hooks/useFormNotification";
 import { validateField, validateForm, ValidationSchema, FormErrors, FormData } from "@/lib/formValidation";
 import { FormError } from "@/components/ui/form-error";
 import { Select, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
@@ -53,7 +53,7 @@ export function BaseForm({
 }: BaseFormProps) {
     const [values, setValues] = useState<FormData>(initialData);
     const [errors, setErrors] = useState<FormErrors>({});
-    const { notify } = useNotification();
+    const { showError, showSuccess } = useFormNotification();
     const initialDataRef = useRef(initialData);
 
     // 当初始数据变化时重置表单
@@ -115,20 +115,20 @@ export function BaseForm({
         if (e) e.preventDefault();
 
         if (!validateFormLocal()) {
-            notify({ type: "error", message: "请完善表单信息" });
+            showError();
             return;
         }
 
         try {
             onSubmit(values);
-            notify({ type: "success", message: "保存成功" });
+            showSuccess();
 
             if (resetOnSubmit) {
                 setValues(initialData);
                 setErrors({});
             }
         } catch (error) {
-            notify({ type: "error", message: "保存失败", description: error instanceof Error ? error.message : '未知错误' });
+            showError(error instanceof Error ? error.message : '保存失败');
         }
     };
 

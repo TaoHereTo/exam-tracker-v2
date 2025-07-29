@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { useNotification } from "@/components/magicui/NotificationProvider";
+import { useFormNotification } from "@/hooks/useFormNotification";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
@@ -25,7 +25,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
     const [imagePath, setImagePath] = useState<string | undefined>(initialData?.imagePath);
     const [dateOpen, setDateOpen] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const { notify } = useNotification();
+    const { showError, showSuccess } = useFormNotification();
 
     useEffect(() => {
         setDate(initialData?.date ? new Date(initialData.date) : null);
@@ -68,12 +68,12 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
 
     const handleSubmit = () => {
         if (!validateFormLocal()) {
-            notify({ type: "error", message: "请完善表单信息" });
+            showError();
             return;
         }
 
         onAddKnowledge({ date, source, note, imagePath });
-        notify({ type: "success", message: "保存成功" });
+        showSuccess();
         setDate(null);
         setSource('');
         setNote('');
@@ -133,7 +133,8 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage mode="upload"
+                <UnifiedImage
+                    mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />

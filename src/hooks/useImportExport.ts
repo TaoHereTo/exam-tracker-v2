@@ -3,7 +3,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import type { RecordItem, KnowledgeItem, StudyPlan, PendingImport } from "@/types/record";
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
-import { staticImageManager } from "@/lib/staticImageManager";
+import { supabaseImageManager } from "@/lib/supabaseImageManager";
 
 export function useImportExport(
     records: RecordItem[],
@@ -46,21 +46,20 @@ export function useImportExport(
         });
     }
 
-    // 导出数据到 JSON 文件（支持知识点、学习计划、设置、图片）
+    // 导出数据到 JSON 文件（支持知识点、学习计划、设置、云端图片）
     const handleExportData = () => {
-        // 获取所有图片选择数据
-        const allImages = staticImageManager.getAllSelectedImages();
+        // 获取所有云端图片数据
+        const cloudImages = supabaseImageManager.getAllLocalImageInfo();
 
         const exportData = {
             records,
             knowledge,
             plans: plans || [],
             settings: getAllSettings(),
-            images: allImages, // 添加图片数据
+            cloudImages, // 云端图片数据
             exportedAt: new Date().toISOString(),
-            version: 4, // 更新版本号以支持图片
+            version: 6, // 更新版本号，移除本地图片支持
         };
-        console.log('导出数据包含图片:', allImages.length, '张图片');
         const json = JSON.stringify(exportData, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
@@ -72,10 +71,10 @@ export function useImportExport(
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点、学习计划、设置、图片）已成功导出到本地JSON文件。" });
+        notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点、学习计划、设置、云端图片）已成功导出到本地JSON文件。" });
     };
 
-    // 从 JSON 文件导入数据（支持知识点、学习计划、设置、图片）
+    // 从 JSON 文件导入数据（支持知识点、学习计划、设置、云端图片）
     const handleImportData = () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -94,7 +93,7 @@ export function useImportExport(
                         let importedKnowledge: KnowledgeItem[] = [];
                         let importedPlans: StudyPlan[] = [];
                         let importedSettings: Record<string, string> = {};
-                        let importedImages: Array<{ id: string; path: string; name?: string; fileName?: string; originalName?: string; localPath?: string; size?: number; type?: string }> = [];
+                        let importedCloudImages: Array<{ id: string; fileName: string; originalName: string; size: number; type: string; url: string; uploadedAt: string; bucket: string }> = [];
 
                         if (Array.isArray(importedObject)) {
                             importedRecords = importedObject;
@@ -109,9 +108,13 @@ export function useImportExport(
                             if (importedObject.settings && typeof importedObject.settings === 'object') {
                                 importedSettings = importedObject.settings;
                             }
-                            // 导入图片数据（版本4+）
-                            if (Array.isArray(importedObject.images)) {
-                                importedImages = importedObject.images;
+                            // 导入云端图片数据（版本5+）
+                            if (Array.isArray(importedObject.cloudImages)) {
+                                importedCloudImages = importedObject.cloudImages;
+                            }
+                            // 兼容旧版本的本地图片数据（版本4-5），但不再处理
+                            if (Array.isArray(importedObject.images) || Array.isArray(importedObject.localImages)) {
+                                // 跳过旧版本本地图片数据
                             }
                         } else if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
                             importedRecords = importedObject.data.records;
@@ -120,21 +123,14 @@ export function useImportExport(
                             return;
                         }
 
-                        // 导入图片数据
-                        if (importedImages.length > 0) {
+
+
+                        // 导入云端图片数据
+                        if (importedCloudImages.length > 0) {
                             try {
-                                const imageInfos = importedImages.map(img => ({
-                                    id: img.id,
-                                    fileName: img.fileName || img.name || 'imported-image',
-                                    originalName: img.originalName || img.name || 'imported-image',
-                                    size: img.size || 0,
-                                    type: img.type || 'image/jpeg',
-                                    localPath: img.localPath || img.path || `/ImageOfKnow/${img.fileName || img.name || 'imported-image'}`
-                                }));
-                                staticImageManager.importImageSelections(imageInfos);
-                                console.log('成功导入图片信息:', imageInfos.length, '张图片');
+                                supabaseImageManager.importImageInfo(importedCloudImages);
                             } catch (error) {
-                                console.warn('导入图片时出错:', error);
+                                console.warn('导入云端图片时出错:', error);
                             }
                         }
 

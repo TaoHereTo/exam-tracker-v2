@@ -187,15 +187,13 @@ export class StaticImageManager {
     // 批量导入图片选择
     public importImageSelections(images: StaticImageInfo[]): void {
         const imageMap = this.getSelectedImageMap();
-        let importedCount = 0;
         images.forEach(img => {
             if (img.id) {
                 imageMap.set(img.id, img);
-                importedCount++;
             }
         });
         this.saveImageMap(imageMap);
-        console.log(`成功导入 ${importedCount} 张图片信息到localStorage`);
+        // 成功导入图片信息到localStorage
     }
 
     // 清理未使用的图片选择
@@ -213,7 +211,7 @@ export class StaticImageManager {
 
         if (deletedCount > 0) {
             this.saveImageMap(imageMap);
-            console.log(`清理了 ${deletedCount} 个未使用的图片选择`);
+            // 清理了未使用的图片选择
         }
     }
 

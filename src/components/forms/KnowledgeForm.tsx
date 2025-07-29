@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useNotification } from "@/components/magicui/NotificationProvider";
+import { useFormNotification } from "@/hooks/useFormNotification";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
@@ -28,7 +28,7 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
     const [note, setNote] = useState(initialData?.note || '');
     const [imagePath, setImagePath] = useState<string | undefined>(initialData?.imagePath);
     const [errors, setErrors] = useState<Record<string, string>>({});
-    const { notify } = useNotification();
+    const { showError, showSuccess } = useFormNotification();
 
     useEffect(() => {
         setType(initialData?.type || '');
@@ -65,12 +65,12 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
 
     const handleSubmit = () => {
         if (!validateFormLocal()) {
-            notify({ type: "error", message: "请完善表单信息" });
+            showError();
             return;
         }
 
         onAddKnowledge({ type, note, imagePath });
-        notify({ type: "success", message: "保存成功" });
+        showSuccess();
         setType('');
         setNote('');
         setImagePath(undefined);
@@ -124,7 +124,8 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage mode="upload"
+                <UnifiedImage
+                    mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
                 />

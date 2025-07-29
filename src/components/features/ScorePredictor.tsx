@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -84,6 +84,31 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
         setPrediction({ total: totalPredictedScore, details });
     };
 
+    // 定义表格列配置
+    const columns = [
+        { key: 'moduleName', label: '模块' },
+        {
+            key: 'avgSpm',
+            label: '平均每分钟得分',
+            render: (row: PredictionDetail) => (
+                <span className="font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    {row.avgSpm}
+                </span>
+            )
+        },
+        {
+            key: 'timeAllocation',
+            label: '分配时间(分钟)',
+            render: (row: PredictionDetail) => (
+                <span className="font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                    {row.timeAllocation}
+                </span>
+            )
+        },
+        { key: 'predictedScore', label: '预测得分' },
+        { key: 'maxScore', label: '满分' }
+    ];
+
     return (
         <Card className="max-w-full mx-auto">
             <CardHeader>
@@ -105,36 +130,17 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                 </div>
                 {prediction && (
                     <>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>模块</TableHead>
-                                    <TableHead>平均每分钟得分</TableHead>
-                                    <TableHead>分配时间(分钟)</TableHead>
-                                    <TableHead>预测得分</TableHead>
-                                    <TableHead>满分</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {prediction.details.map((row: PredictionDetail) => (
-                                    <TableRow key={row.moduleName}>
-                                        <TableCell>{row.moduleName}</TableCell>
-                                        <TableCell>
-                                            <span className="font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                                {row.avgSpm}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                                                {row.timeAllocation}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>{row.predictedScore}</TableCell>
-                                        <TableCell>{row.maxScore}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                        <UnifiedTable
+                            columns={columns}
+                            data={prediction.details}
+                            rowKey={(row) => row.moduleName}
+                            selected={[]}
+                            onSelect={() => { }}
+                            showNew={false}
+                            showEdit={false}
+                            showDelete={false}
+                            showExport={false}
+                        />
                         {/* 预测总分右下角渐变大号数字 */}
                         <div className="absolute right-8 bottom-4 flex flex-row items-end gap-3">
                             <span className="text-2xl font-bold text-gray-700 mb-1">预测总分</span>
