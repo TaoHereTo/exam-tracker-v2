@@ -18,6 +18,7 @@ import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle } from 'lucide-rea
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
+import { smartImageSort } from '@/lib/utils';
 
 interface SupabaseImageSelectorDialogProps {
     onImageSelected: (imageId: string) => void;
@@ -67,6 +68,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const loadAvailableImages = useCallback(async () => {
         setIsLoading(true);
         try {
+            // 先清理无效的图片记录
+            supabaseImageManager.cleanupInvalidImageRecords();
+
             const images = await supabaseImageManager.getAllImages();
             setAvailableImages(images);
         } catch (error) {
@@ -95,6 +99,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         setIsLoading(true);
         await new Promise(resolve => setTimeout(resolve, 500));
         await testConnection();
+        // 清理无效记录并重新加载
+        supabaseImageManager.cleanupInvalidImageRecords();
         await loadAvailableImages();
     };
 
@@ -145,6 +151,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         }
     };
 
+
+
     // 使用useMemo来处理过滤和排序
     const processedImages = useMemo(() => {
         // 过滤图片
@@ -153,16 +161,20 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
             image.fileName.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        // 按上传时间倒序排列
-        filtered.sort((a, b) => {
-            return new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime();
-        });
+        // 使用智能排序
+        filtered.sort(smartImageSort);
 
         return filtered;
     }, [availableImages, searchTerm]);
 
     const handleImageSelect = (imageId: string) => {
-        setSelectedImage(imageId);
+        // 如果点击的是已选中的图片，则取消选中
+        if (selectedImage === imageId) {
+            setSelectedImage(null);
+        } else {
+            // 否则选中新图片
+            setSelectedImage(imageId);
+        }
     };
 
     const handleConfirm = () => {
@@ -304,9 +316,12 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
                                                     {imageLoadErrors.has(image.id) ? (
                                                         <div className="flex items-center justify-center w-full h-full">
-                                                            <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                            </svg>
+                                                            <div className="text-center">
+                                                                <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                                </svg>
+                                                                <p className="text-xs text-gray-500">图片加载失败</p>
+                                                            </div>
                                                         </div>
                                                     ) : (
                                                         <Image
@@ -316,6 +331,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                             width={200}
                                                             height={200}
                                                             onError={() => {
+                                                                console.warn(`图片加载失败: ${image.originalName} (${image.url})`);
                                                                 setImageLoadErrors(prev => new Set(prev).add(image.id));
                                                             }}
                                                         />
@@ -349,7 +365,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                     variant="destructive"
                                                     size="sm"
                                                     className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-red-600"
-                                                    onClick={(e) => handleDeleteImage(image.id, e)}
+                                                    onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
                                                     title="删除图片"
                                                 >
                                                     <Trash2 className="h-3 w-3" />
@@ -391,7 +407,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+                        <AlertDialogAction onClick={confirmDelete} style={{ background: '#EF4444' }}>
                             确认删除
                         </AlertDialogAction>
                     </AlertDialogFooter>

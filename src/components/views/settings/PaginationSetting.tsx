@@ -23,7 +23,7 @@ export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number;
             </CardHeader>
             <CardContent>
                 <Select value={tempSize} onValueChange={handleChange}>
-                    <SelectTrigger className="w-32">
+                    <SelectTrigger>
                         <SelectValue placeholder="每页条数" />
                     </SelectTrigger>
                     <SelectContent>

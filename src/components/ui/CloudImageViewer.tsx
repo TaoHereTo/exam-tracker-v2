@@ -38,6 +38,7 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
         setHasError(false);
         try {
             const url = supabaseImageManager.getImageUrl(imageId);
+
             if (url) {
                 // 直接设置图片URL，不进行额外的验证
                 setImageUrl(url);

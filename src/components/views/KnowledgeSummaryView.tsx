@@ -345,7 +345,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             value: selectedModule,
             onChange: setSelectedModule,
             options: MODULES.map(m => ({ value: m.value, label: m.label })),
-            className: 'w-28'
+            className: 'w-36'
         },
         ...(SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES] ? [{
             type: 'select' as const,
@@ -356,13 +356,14 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 value: category.value,
                 label: category.label
             })),
-            className: 'w-32'
+            className: 'w-36'
         }] : []),
         {
             type: 'search' as const,
-            placeholder: '输入关键词搜索...',
+            placeholder: '输入关键词',
             value: search,
-            onChange: setSearch
+            onChange: setSearch,
+            className: 'w-36'
         }
     ];
 
@@ -473,7 +474,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmSingleDelete} className="bg-red-600 hover:bg-red-700">删除</AlertDialogAction>
+                        <AlertDialogAction onClick={handleConfirmSingleDelete} style={{ background: '#EF4444' }}>删除</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

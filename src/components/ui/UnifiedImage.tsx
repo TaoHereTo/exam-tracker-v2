@@ -80,7 +80,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 setHasImage(false);
             }
         }
-    }, [value]); // 移除shouldReloadImage依赖，简化逻辑
+    }, [value, userSelectedHasImage]); // 添加userSelectedHasImage依赖
 
     // 确保hasImage状态与value保持同步，但只在value有值时才重置
     useEffect(() => {
@@ -412,21 +412,23 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             )
                         ) : (
                             // 云端选择功能
-                            <SupabaseImageSelectorDialog
-                                onImageSelected={handleImageSelected}
-                                trigger={
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        disabled={isLoading}
-                                        className="flex items-center gap-2"
-                                    >
-                                        <FolderOpen className="h-4 w-4" />
-                                        选择图片
-                                    </Button>
-                                }
-                            />
+                            <div className="w-full flex justify-center">
+                                <SupabaseImageSelectorDialog
+                                    onImageSelected={handleImageSelected}
+                                    trigger={
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={isLoading}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <FolderOpen className="h-4 w-4" />
+                                            选择图片
+                                        </Button>
+                                    }
+                                />
+                            </div>
                         )}
 
                         {previewUrl && (

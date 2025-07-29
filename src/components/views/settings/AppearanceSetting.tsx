@@ -49,7 +49,7 @@ export function AppearanceSetting() {
                         <p className="text-sm text-muted-foreground">切换浅色、深色或跟随系统。</p>
                     </div>
                     <Select value={theme} onValueChange={setTheme}>
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger>
                             <SelectValue placeholder="选择外观" />
                         </SelectTrigger>
                         <SelectContent>

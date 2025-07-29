@@ -29,7 +29,7 @@ export class SupabaseImageManager {
     public async testConnection(): Promise<{ success: boolean; message: string }> {
         try {
             // 首先尝试直接访问存储桶，如果成功说明存储桶存在且可访问
-            const { error: filesError } = await supabase.storage
+            const { data: files, error: filesError } = await supabase.storage
                 .from(this.BUCKET_NAME)
                 .list('', { limit: 1 });
 
@@ -61,9 +61,35 @@ export class SupabaseImageManager {
             }
 
             // 如果能成功列出文件，说明连接正常
+            let message = '连接正常，权限配置正确';
+
+            // 检查是否有文件，如果有则测试URL生成
+            if (files && files.length > 0) {
+                const testFile = files[0];
+                const { data: urlData } = supabase.storage
+                    .from(this.BUCKET_NAME)
+                    .getPublicUrl(testFile.name);
+
+
+
+                // 测试URL是否可访问
+                try {
+                    const response = await fetch(urlData.publicUrl, { method: 'HEAD' });
+                    if (response.ok) {
+                        message += '，图片URL可正常访问';
+                    } else {
+                        message += `，但图片URL访问失败 (${response.status})`;
+                    }
+                } catch {
+                    message += '，但图片URL访问失败 (网络错误)';
+                }
+            } else {
+                message += '，存储桶为空';
+            }
+
             return {
                 success: true,
-                message: '连接正常，权限配置正确'
+                message
             };
         } catch (error) {
             return {
@@ -80,14 +106,15 @@ export class SupabaseImageManager {
             const { data: buckets, error: listError } = await supabase.storage.listBuckets();
 
             if (listError) {
+
                 // 无法列出存储桶，可能是权限问题，继续尝试使用现有存储桶
-                // 如果无法列出存储桶，我们假设存储桶可能已存在，继续尝试使用
                 return;
             }
 
             const bucketExists = buckets?.some(bucket => bucket.name === this.BUCKET_NAME);
 
             if (!bucketExists) {
+
                 // 尝试创建存储桶
                 const { error: createError } = await supabase.storage.createBucket(this.BUCKET_NAME, {
                     public: true,
@@ -97,13 +124,11 @@ export class SupabaseImageManager {
 
                 if (createError) {
                     // 存储桶可能已存在，继续使用现有存储桶
-                    // 如果创建失败，可能是因为存储桶已经存在但权限不足无法列出
-                    // 或者存储桶已存在但无法创建，这是正常情况，不显示错误
                     return;
                 }
             }
-        } catch {
-            // 初始化存储桶时出现问题，继续尝试使用
+        } catch (error) {
+            console.error('初始化存储桶时出现问题:', error);
             // 不抛出错误，让程序继续运行
         }
     }
@@ -184,20 +209,51 @@ export class SupabaseImageManager {
                 return this.getAllLocalImageInfo();
             }
 
+            // 过滤掉占位符文件和无效文件
+            const validFiles = (data || []).filter(file => {
+                const invalidPatterns = [
+                    'emptyFolderPlaceholder',
+                    '.emptyFolderPlaceholder',
+                    'undefined',
+                    'null',
+                    '.DS_Store',
+                    'Thumbs.db',
+                    'placeholder',
+                    '.placeholder'
+                ];
+
+                // 检查文件名是否包含无效模式
+                const hasInvalidPattern = invalidPatterns.some(pattern =>
+                    file.name.includes(pattern)
+                );
+
+                // 检查文件大小是否为0（可能是占位符文件）
+                const isZeroSize = file.metadata?.size === 0;
+
+                // 检查文件名是否以点开头（隐藏文件）
+                const isHiddenFile = file.name.startsWith('.');
+
+                return !hasInvalidPattern && !isZeroSize && !isHiddenFile;
+            });
+
             // 获取本地存储的图片信息
             const localImages = this.getAllLocalImageInfo();
             const localImageMap = new Map(localImages.map(img => [img.id, img]));
 
             // 合并远程和本地信息
             const images: SupabaseImageInfo[] = [];
-            for (const file of data || []) {
+            for (const file of validFiles) {
                 const localInfo = localImageMap.get(file.name);
-                if (localInfo) {
-                    // 使用本地信息（包含原始文件名等）
-                    const { data: urlData } = supabase.storage
-                        .from(this.BUCKET_NAME)
-                        .getPublicUrl(file.name);
 
+                // 重新生成公共URL
+                const { data: urlData } = supabase.storage
+                    .from(this.BUCKET_NAME)
+                    .getPublicUrl(file.name);
+
+
+
+                if (localInfo) {
+                    // 使用本地信息（包含原始文件名等），但更新URL
                     images.push({
                         ...localInfo,
                         url: urlData.publicUrl,
@@ -205,10 +261,6 @@ export class SupabaseImageManager {
                     });
                 } else {
                     // 创建新的图片信息
-                    const { data: urlData } = supabase.storage
-                        .from(this.BUCKET_NAME)
-                        .getPublicUrl(file.name);
-
                     images.push({
                         id: file.name,
                         fileName: file.name,
@@ -387,6 +439,48 @@ export class SupabaseImageManager {
             totalImages: images.length,
             totalSize
         };
+    }
+
+    // 清理无效的图片记录
+    public cleanupInvalidImageRecords(): void {
+        try {
+            const images = this.getAllLocalImageInfo();
+            const validImages = images.filter(img => {
+                // 过滤掉无效的图片记录
+                const invalidPatterns = [
+                    'emptyFolderPlaceholder',
+                    '.emptyFolderPlaceholder',
+                    'undefined',
+                    'null',
+                    '.DS_Store',
+                    'Thumbs.db',
+                    'placeholder',
+                    '.placeholder'
+                ];
+
+                // 检查文件名是否包含无效模式
+                const hasInvalidPattern = invalidPatterns.some(pattern =>
+                    img.id.includes(pattern) ||
+                    img.fileName.includes(pattern) ||
+                    img.originalName.includes(pattern)
+                );
+
+                // 检查文件大小是否为0（可能是占位符文件）
+                const isZeroSize = img.size === 0;
+
+                // 检查文件名是否以点开头（隐藏文件）
+                const isHiddenFile = img.fileName.startsWith('.') || img.originalName.startsWith('.');
+
+                return !hasInvalidPattern && !isZeroSize && !isHiddenFile;
+            });
+
+            if (validImages.length !== images.length) {
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(validImages));
+                console.log(`清理了 ${images.length - validImages.length} 个无效的图片记录`);
+            }
+        } catch (error) {
+            console.error('清理无效图片记录失败:', error);
+        }
     }
 }
 

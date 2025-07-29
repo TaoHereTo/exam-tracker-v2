@@ -177,12 +177,14 @@ export default function Home() {
       <div className="flex min-h-screen">
         {/* 左侧侧边栏或底部Dock，宽度固定 */}
         {navMode === 'sidebar' ? (
-          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="fixed left-0 top-0 h-full z-10">
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          </div>
         ) : (
           <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} navMode={navMode} />
         )}
         {/* 右侧主内容区，占据剩余空间 */}
-        <div className="flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100">
+        <div className={`flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100 ${navMode === 'sidebar' ? 'ml-52' : ''}`}>
           {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
           {activeTab === 'charts' && (
             <ChartsView

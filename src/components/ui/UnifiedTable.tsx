@@ -272,12 +272,19 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         {title && <h2 className="text-2xl font-bold">{title}</h2>}
 
                         {/* 左侧过滤器和搜索 */}
-                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-10 flex-1 min-w-0 mr-4">
+                        <div className="flex flex-row mr-4">
                             {filters.map((filter, index) => (
-                                <div key={index} className={filter.className}>
+                                <div
+                                    key={index}
+                                    className={filter.className}
+                                    style={{
+                                        marginRight: index < filters.length - 1 ? '12px' : '0',
+                                        minWidth: 'fit-content'
+                                    }}
+                                >
                                     {filter.type === 'select' && filter.options && (
                                         <Select value={filter.value} onValueChange={filter.onChange}>
-                                            <SelectTrigger className="w-36 border-green-300 focus:border-green-500">
+                                            <SelectTrigger className="w-36">
                                                 <SelectValue placeholder={filter.placeholder} />
                                             </SelectTrigger>
                                             <SelectContent>
@@ -290,7 +297,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </Select>
                                     )}
                                     {filter.type === 'search' && (
-                                        <div className="relative min-w-[160px] max-w-[280px]">
+                                        <div className="relative w-36">
                                             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                             <Input
                                                 placeholder={filter.placeholder || "搜索..."}
@@ -324,9 +331,13 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {/* 新建按钮 */}
                             {showNew && onNew && (
                                 <UnifiedButton
-                                    variant="outline"
+                                    variant="reactbits"
                                     onClick={onNew}
-                                    className="bg-green-500 hover:bg-green-600 text-white border-green-500 hover:border-green-600"
+                                    style={{
+                                        background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
+                                        color: 'white',
+                                        border: 'none'
+                                    }}
                                     size="sm"
                                 >
                                     <Plus className="w-4 h-4 mr-1" />
@@ -338,9 +349,9 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {showExport && onExport && (
                                 <UnifiedButton
                                     variant="reactbits"
-                                    gradient="green"
                                     onClick={onExport}
                                     size="sm"
+                                    style={{ background: '#059669' }}
                                 >
                                     <ArrowUpFromLine className="w-4 h-4 mr-1" />
                                     导出为Excel
@@ -351,10 +362,10 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {showEdit && onEdit && (
                                 <UnifiedButton
                                     variant="reactbits"
-                                    gradient="blue"
                                     onClick={onEdit}
                                     disabled={editDisabled}
                                     size="sm"
+                                    style={{ background: 'rgb(43, 127, 255)' }}
                                 >
                                     <Edit className="w-4 h-4 mr-1" />
                                     编辑
@@ -367,9 +378,9 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     <AlertDialogTrigger asChild>
                                         <UnifiedButton
                                             variant="reactbits"
-                                            gradient="red"
                                             disabled={deleteDisabled}
                                             size="sm"
+                                            style={{ background: '#EF4444' }}
                                         >
                                             <Trash2 className="w-4 h-4 mr-1" />
                                             批量删除
@@ -384,7 +395,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>取消</AlertDialogCancel>
-                                            <AlertDialogAction onClick={onDelete}>确认删除</AlertDialogAction>
+                                            <AlertDialogAction onClick={onDelete} style={{ background: '#EF4444' }}>确认删除</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

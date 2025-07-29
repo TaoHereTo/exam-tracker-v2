@@ -110,7 +110,7 @@ export function HistoryView({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmSingleDelete} className="bg-red-600 hover:bg-red-700">删除</AlertDialogAction>
+                        <AlertDialogAction onClick={handleConfirmSingleDelete} style={{ background: '#EF4444' }}>删除</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

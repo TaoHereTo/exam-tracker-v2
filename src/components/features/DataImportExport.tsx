@@ -15,18 +15,18 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
         <div className="flex gap-4 mb-6">
             <UnifiedButton
                 variant="reactbits"
-                gradient="green"
                 onClick={onImport}
                 size="sm"
+                style={{ background: '#D97706' }}
             >
                 <Download className="w-4 h-4 mr-0" />
                 导入数据
             </UnifiedButton>
             <UnifiedButton
                 variant="reactbits"
-                gradient="yellow"
                 onClick={onExport}
                 size="sm"
+                style={{ background: '#059669' }}
             >
                 <Upload className="w-4 h-4 mr-0" />
                 导出数据
@@ -34,7 +34,7 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
             {onClearAllData && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <UnifiedButton variant="reactbits" gradient="red" ref={clearDialogRef} size="sm">
+                        <UnifiedButton variant="reactbits" ref={clearDialogRef} size="sm" style={{ background: '#EF4444' }}>
                             清空所有数据
                         </UnifiedButton>
                     </AlertDialogTrigger>

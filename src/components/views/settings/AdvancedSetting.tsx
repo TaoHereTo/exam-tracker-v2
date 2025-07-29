@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import * as React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
@@ -10,6 +10,14 @@ import PreviewSwitch from "@/components/ui/PreviewSwitch";
 import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
 import { getLocalStorageInfo, formatStorageSize, getLargestStorageItems, getStorageKeyDisplayName, type StorageInfo } from "@/lib/storageUtils";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
+import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
+import { useNotification } from "@/components/magicui/NotificationProvider";
+import { Input } from "@/components/ui/input";
+import { Search, Upload, Trash2, RefreshCw, Image as ImageIcon, Eye } from "lucide-react";
+import { smartImageSort } from "@/lib/utils";
+import Image from "next/image";
+
+import { Button } from "@/components/ui/button";
 
 // 定义 OtherSwitchType 类型
 type OtherSwitchType = 'default' | 'sparkle' | '3d' | 'glass' | 'plane';
@@ -19,6 +27,8 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
     onClearKnowledge?: () => void;
     onClearPlans?: () => void;
 }) {
+    const { notify } = useNotification();
+
     // 新功能1：减弱动态效果
     const [reduceMotion, setReduceMotion] = React.useState(() => {
         if (typeof window !== 'undefined') {
@@ -42,65 +52,193 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
     const [previewState, setPreviewState] = React.useState(false);
 
     // 新功能4：localStorage使用量监控
-    const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
-    const [largestItems, setLargestItems] = useState<Array<{ key: string; size: number; sizeKB: number }>>([]);
-    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const [storageInfo, setStorageInfo] = React.useState<StorageInfo | null>(null);
+    const [largestItems, setLargestItems] = React.useState<Array<{ key: string; size: number; sizeKB: number }>>([]);
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            updateStorageInfo();
+    // 新功能5：图片管理
+    const [showImageManager, setShowImageManager] = useState(false);
+    const [cloudImages, setCloudImages] = useState<SupabaseImageInfo[]>([]);
+    const [imageSearchTerm, setImageSearchTerm] = useState('');
+    const [isLoadingImages, setIsLoadingImages] = useState(false);
+    const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+    const [imageManagerView, setImageManagerView] = useState<'grid' | 'list'>('grid');
+
+    // 删除选中的图片
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+
+    // 清空数据相关状态
+    const [clearType, setClearType] = React.useState('records');
+    const [showDialog, setShowDialog] = React.useState(false);
+
+    const clearTypeLabels = {
+        records: '历史记录',
+        knowledge: '知识点',
+        plans: '学习计划'
+    };
+
+    // 加载云端图片
+    const loadCloudImages = async () => {
+        setIsLoadingImages(true);
+        try {
+            const images = await supabaseImageManager.getAllImages();
+            setCloudImages(images);
+        } catch (error) {
+            console.error('加载云端图片失败:', error);
+            notify({
+                type: "error",
+                message: "加载失败",
+                description: "无法从云端加载图片列表"
+            });
+        } finally {
+            setIsLoadingImages(false);
         }
+    };
 
-        // 清理函数
-        return () => {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
+    // 上传图片
+    const handleUploadImage = async () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.multiple = true;
+
+        input.onchange = async (e) => {
+            const files = Array.from((e.target as HTMLInputElement).files || []);
+            if (files.length === 0) return;
+
+            let successCount = 0;
+            for (const file of files) {
+                try {
+                    await supabaseImageManager.uploadImage(file);
+                    successCount++;
+                } catch (error) {
+                    console.error(`上传图片失败: ${file.name}`, error);
+                }
+            }
+
+            if (successCount > 0) {
+                notify({
+                    type: "success",
+                    message: "上传成功",
+                    description: `成功上传 ${successCount} 张图片`
+                });
+                await loadCloudImages();
             }
         };
-    }, []);
 
+        input.click();
+    };
+
+    const handleDeleteSelectedImages = async () => {
+        if (selectedImages.size === 0) return;
+
+        setImagesToDelete(Array.from(selectedImages));
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDeleteImages = async () => {
+        let successCount = 0;
+        for (const imageId of imagesToDelete) {
+            try {
+                const success = await supabaseImageManager.deleteImage(imageId);
+                if (success) successCount++;
+            } catch (error) {
+                console.error(`删除图片失败: ${imageId}`, error);
+            }
+        }
+
+        if (successCount > 0) {
+            notify({
+                type: "success",
+                message: "删除成功",
+                description: `成功删除 ${successCount} 张图片`
+            });
+            setSelectedImages(new Set());
+            await loadCloudImages();
+        }
+
+        setDeleteDialogOpen(false);
+        setImagesToDelete([]);
+    };
+
+
+
+    // 过滤和排序图片
+    const filteredImages = cloudImages
+        .filter(img =>
+            img.originalName.toLowerCase().includes(imageSearchTerm.toLowerCase()) ||
+            img.fileName.toLowerCase().includes(imageSearchTerm.toLowerCase())
+        )
+        .sort(smartImageSort);
+
+    // 格式化文件大小
+    const formatFileSize = (bytes: number): string => {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    // 格式化上传时间
+    const formatUploadTime = (dateString: string): string => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+        if (diffInHours < 1) {
+            return '刚刚';
+        } else if (diffInHours < 24) {
+            return `${Math.floor(diffInHours)}小时前`;
+        } else {
+            return date.toLocaleDateString('zh-CN');
+        }
+    };
+
+    // 更新存储信息
     const updateStorageInfo = () => {
         const info = getLocalStorageInfo();
-        const largest = getLargestStorageItems(3);
         setStorageInfo(info);
+        const largest = getLargestStorageItems(3);
         setLargestItems(largest);
     };
 
-    React.useEffect(() => {
-        localStorage.setItem('reduce-motion-enabled', reduceMotion ? 'true' : 'false');
-        if (reduceMotion) {
-            document.documentElement.classList.add('reduce-motion');
-        } else {
-            document.documentElement.classList.remove('reduce-motion');
+    // 处理清空数据
+    const handleClear = () => {
+        switch (clearType) {
+            case 'records':
+                onClearRecords?.();
+                break;
+            case 'knowledge':
+                onClearKnowledge?.();
+                break;
+            case 'plans':
+                onClearPlans?.();
+                break;
         }
-        // 触发自定义事件通知其他组件
-        window.dispatchEvent(new CustomEvent('reduceMotionChanged'));
+        setShowDialog(false);
         updateStorageInfo();
+    };
+
+    useEffect(() => {
+        updateStorageInfo();
+        const interval = setInterval(updateStorageInfo, 5000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // 减弱动态效果
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('reduce-motion-enabled', reduceMotion.toString());
+        }
     }, [reduceMotion]);
 
-    React.useEffect(() => {
-        localStorage.setItem('theme-switch-type', themeSwitchType);
-        updateStorageInfo();
-    }, [themeSwitchType]);
-
-    const [clearType, setClearType] = useState<string>("records");
-    const [showDialog, setShowDialog] = useState(false);
-    const clearTypeLabels = {
-        records: "历史记录",
-        knowledge: "知识点",
-        plans: "学习计划",
-    };
-    const handleClear = () => {
-        if (clearType === "records" && onClearRecords) onClearRecords();
-        if (clearType === "knowledge" && onClearKnowledge) onClearKnowledge();
-        if (clearType === "plans" && onClearPlans) onClearPlans();
-        setShowDialog(false);
-        // 清空后更新存储信息，使用ref管理timeout
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
+    // 主题切换按钮风格
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('theme-switch-type', themeSwitchType);
         }
-        timeoutRef.current = setTimeout(updateStorageInfo, 100);
-    };
+    }, [themeSwitchType]);
 
     return (
         <>
@@ -134,7 +272,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                         </div>
                         <div className="flex items-center gap-3">
                             <Select value={themeSwitchType} onValueChange={(value) => setThemeSwitchType(value as ThemeSwitchType)}>
-                                <SelectTrigger className="w-40">
+                                <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -162,7 +300,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                         </div>
                         <div className="flex items-center gap-3">
                             <Select value={otherSwitchType} onValueChange={(value) => setOtherSwitchType(value as OtherSwitchType)}>
-                                <SelectTrigger className="w-40">
+                                <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -219,6 +357,223 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
 
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
+                            <h3 className="font-medium">云端图片管理</h3>
+                            <p className="text-sm text-muted-foreground">
+                                管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <UnifiedButton
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                    setShowImageManager(!showImageManager);
+                                    if (!showImageManager) {
+                                        loadCloudImages();
+                                    }
+                                }}
+                                className="border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                            >
+                                {showImageManager ? '隐藏管理' : '图片管理'}
+                            </UnifiedButton>
+                        </div>
+                    </div>
+
+                    {/* 图片管理界面 */}
+                    {showImageManager && (
+                        <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 shadow-sm">
+                            {/* 工具栏 */}
+                            <div className="flex items-center justify-between mb-6">
+                                <div className="flex items-center gap-3">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <Input
+                                            placeholder="搜索图片..."
+                                            value={imageSearchTerm}
+                                            onChange={(e) => setImageSearchTerm(e.target.value)}
+                                            className="pl-10 w-72 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
+                                        />
+                                    </div>
+                                    <UnifiedButton
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={loadCloudImages}
+                                        disabled={isLoadingImages}
+                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    >
+                                        <RefreshCw className={`h-4 w-4 ${isLoadingImages ? 'animate-spin' : ''}`} />
+                                        刷新
+                                    </UnifiedButton>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <UnifiedButton
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
+                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    >
+                                        <ImageIcon className="h-4 w-4" />
+                                        {imageManagerView === 'grid' ? '列表' : '网格'}
+                                    </UnifiedButton>
+                                    <UnifiedButton
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={handleUploadImage}
+                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                    >
+                                        <Upload className="h-4 w-4" />
+                                        上传
+                                    </UnifiedButton>
+                                    {selectedImages.size > 0 && (
+                                        <UnifiedButton
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleDeleteSelectedImages}
+                                            className="flex items-center gap-2 border-red-200 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                            删除 ({selectedImages.size})
+                                        </UnifiedButton>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* 图片列表 */}
+                            <div className="space-y-4">
+                                {isLoadingImages ? (
+                                    <div className="flex items-center justify-center py-12">
+                                        <div className="flex items-center gap-3 text-gray-500">
+                                            <RefreshCw className="h-5 w-5 animate-spin" />
+                                            <span className="text-sm">正在加载...</span>
+                                        </div>
+                                    </div>
+                                ) : filteredImages.length === 0 ? (
+                                    <div className="flex items-center justify-center py-12">
+                                        <div className="text-center">
+                                            <ImageIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                                            <p className="text-gray-500 mb-1">
+                                                {imageSearchTerm ? '没有找到匹配的图片' : '暂无图片'}
+                                            </p>
+                                            {!imageSearchTerm && (
+                                                <p className="text-sm text-gray-400">点击&quot;上传&quot;开始添加图片</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`${imageManagerView === 'grid' ? 'grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4' : 'space-y-2'}`}>
+                                        {filteredImages.map((image) => (
+                                            <div
+                                                key={image.id}
+                                                className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
+                                                    ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
+                                                    : 'hover:border-gray-300 dark:hover:border-gray-600'
+                                                    } ${imageManagerView === 'list' ? 'flex items-center gap-3 p-2' : 'p-2'}`}
+                                                onClick={() => {
+                                                    const newSelected = new Set(selectedImages);
+                                                    if (newSelected.has(image.id)) {
+                                                        newSelected.delete(image.id);
+                                                    } else {
+                                                        newSelected.add(image.id);
+                                                    }
+                                                    setSelectedImages(newSelected);
+                                                }}
+                                            >
+                                                {/* 选择框 */}
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedImages.has(image.id)}
+                                                    onChange={(e) => {
+                                                        e.stopPropagation();
+                                                        const newSelected = new Set(selectedImages);
+                                                        if (e.target.checked) {
+                                                            newSelected.add(image.id);
+                                                        } else {
+                                                            newSelected.delete(image.id);
+                                                        }
+                                                        setSelectedImages(newSelected);
+                                                    }}
+                                                    className="absolute top-2 left-2 z-10 w-4 h-4 text-blue-600 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                                                />
+
+                                                {/* 图片预览 */}
+                                                <div
+                                                    className={`${imageManagerView === 'list' ? 'w-20 h-20 flex-shrink-0' : 'w-full aspect-square'} rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
+                                                    style={{
+                                                        border: '1px solid #e5e7eb',
+                                                        backgroundColor: 'white'
+                                                    }}
+                                                >
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={image.originalName}
+                                                        width={200}
+                                                        height={200}
+                                                        className="w-full h-full object-cover"
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            display: 'block'
+                                                        }}
+                                                        onLoad={() => {
+                                                            // 图片加载成功
+                                                        }}
+                                                        onError={(e) => {
+                                                            // 图片加载失败
+                                                            const target = e.target as HTMLImageElement;
+                                                            target.style.backgroundColor = '#f3f4f6';
+                                                            target.style.display = 'flex';
+                                                            target.style.alignItems = 'center';
+                                                            target.style.justifyContent = 'center';
+                                                            target.style.color = '#6b7280';
+                                                            target.style.fontSize = '10px';
+                                                            target.textContent = '加载失败';
+                                                        }}
+                                                    />
+
+                                                    {/* 预览按钮 */}
+                                                    <div className="absolute inset-0 bg-transparent transition-all duration-200 flex items-center justify-center">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={(e: React.MouseEvent) => {
+                                                                e.stopPropagation();
+                                                                // 打开图片预览
+                                                                window.open(image.url, '_blank');
+                                                            }}
+                                                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-sm z-20"
+                                                        >
+                                                            <Eye className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+
+                                                {/* 图片信息 */}
+                                                <div className={`${imageManagerView === 'list' ? 'flex-1 min-w-0' : 'mt-2'} space-y-1`}>
+                                                    <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                                                        {image.originalName}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                        <span>{formatFileSize(image.size)}</span>
+                                                        <span>•</span>
+                                                        <span>{formatUploadTime(image.uploadedAt)}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* 统计信息 */}
+                                {filteredImages.length > 0 && (
+                                    <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">
+                                        共 {filteredImages.length} 张图片{selectedImages.size > 0 && `，选中 ${selectedImages.size} 张`}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex-1">
                             <h3 className="font-medium">清空数据</h3>
                             <p className="text-sm text-muted-foreground">
                                 选择要清空的数据类型，此操作不可逆。
@@ -226,7 +581,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                         </div>
                         <div className="flex items-center gap-2">
                             <Select value={clearType} onValueChange={setClearType}>
-                                <SelectTrigger className="w-32">
+                                <SelectTrigger>
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -237,13 +592,12 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                             </Select>
                             <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
                                 <AlertDialogTrigger asChild>
-                                    <UnifiedButton
-                                        variant="reactbits"
-                                        size="sm"
-                                        className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                                    <Button
+                                        variant="destructive"
+                                        size="default"
                                     >
                                         清空
-                                    </UnifiedButton>
+                                    </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
@@ -262,6 +616,31 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                     </div>
                 </CardContent>
             </Card>
+
+            {/* 删除确认对话框 */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确认删除图片</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            确定要删除以下图片吗？此操作不可撤销！
+                            <br />
+                            <span className="font-medium text-red-600">
+                                {imagesToDelete.map(id => {
+                                    const img = cloudImages.find(img => img.id === id);
+                                    return img?.originalName || id;
+                                }).join('、')}
+                            </span>
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDeleteImages} style={{ background: '#EF4444' }}>
+                            确认删除
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 } 
