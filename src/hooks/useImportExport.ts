@@ -10,8 +10,7 @@ export function useImportExport(
     setRecords: (r: RecordItem[]) => void,
     knowledge: KnowledgeItem[],
     setKnowledge: (k: KnowledgeItem[]) => void,
-    plans?: StudyPlan[],
-    setPlans?: (p: StudyPlan[]) => void
+    plans?: StudyPlan[]
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -31,8 +30,12 @@ export function useImportExport(
         ];
         const settings: Record<string, string> = {};
         keys.forEach(key => {
-            const value = localStorage.getItem(key);
-            if (value !== null) settings[key] = value;
+            try {
+                const value = localStorage.getItem(key);
+                if (value !== null) settings[key] = value;
+            } catch (error) {
+                console.error(`Error reading localStorage key "${key}":`, error);
+            }
         });
         return settings;
     }
@@ -41,7 +44,11 @@ export function useImportExport(
         if (!settings) return;
         Object.entries(settings).forEach(([key, value]) => {
             if (typeof value === 'string') {
-                localStorage.setItem(key, value);
+                try {
+                    localStorage.setItem(key, value);
+                } catch (error) {
+                    console.error(`Error writing localStorage key "${key}":`, error);
+                }
             }
         });
     }
@@ -174,10 +181,7 @@ export function useImportExport(
                                 }
                                 return { ...k, id };
                             });
-                        // plans 不做特殊处理，直接导入
-                        if (setPlans && Array.isArray(importedPlans)) {
-                            setPlans(importedPlans);
-                        }
+                        // plans 不做特殊处理，等待确认对话框确认后再导入
                         // 现有数据去重 key
                         function recordKey(r: RecordItem) {
                             return `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
@@ -214,11 +218,13 @@ export function useImportExport(
                         });
                         setImportDialogOpen(true);
                         // 不再此处 notify
-                    } catch {
+                    } catch (error) {
+                        console.error('JSON parsing error:', error);
                         notify({ type: "error", message: "导入失败", description: "文件内容不是有效的 JSON！" });
                     }
-                } catch {
-                    notify({ type: "error", message: "导入失败", description: "文件内容不是有效的 JSON！" });
+                } catch (error) {
+                    console.error('File reading error:', error);
+                    notify({ type: "error", message: "导入失败", description: "文件读取失败！" });
                 }
             };
             reader.readAsText(file);

@@ -14,6 +14,7 @@ import PoliticsForm from '@/components/forms/PoliticsForm';
 import type { KnowledgeItem } from "@/types/record";
 import { MODULES } from "@/config/exam";
 
+
 interface KnowledgeEntryViewProps {
     onAddKnowledge: (knowledge: KnowledgeItem) => void;
     defaultTab?: string;

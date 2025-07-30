@@ -7,6 +7,7 @@ import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { RecordItem } from "@/types/record";
 
+
 // 使用统一的配置，不再需要重复定义
 
 // 能力指数计算函数
@@ -241,45 +242,42 @@ export function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">数据图表</h1>
-            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
-                    <TabsList className="w-full justify-center mb-4">
-                        <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
-                        <TabsTrigger value="accuracy">正确率</TabsTrigger>
-                        <TabsTrigger value="pie">模块耗时分布</TabsTrigger>
-                        <TabsTrigger value="radar">模块能力雷达图</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="perMinute">
-                        <div style={{ height: '500px' }}>
-                            <TrendChart data={perMinuteData} yMax={2} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="accuracy">
-                        <div style={{ height: '500px' }}>
-                            <TrendChart data={accuracyData} yMax={100} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="pie">
-                        <div style={{ height: '500px' }}>
-                            <ModulePieChart data={records.map(r => {
-                                return {
-                                    date: r.date,
-                                    module: normalizeModuleName(r.module),
-                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                    duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
-                                };
-                            })} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="radar">
-                        <div style={{ height: '500px' }}>
-                            <ModuleRadarChart data={records} />
-                        </div>
-                    </TabsContent>
-                </Tabs>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+            <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
+                <TabsList className="w-full justify-center mb-4">
+                    <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
+                    <TabsTrigger value="accuracy">正确率</TabsTrigger>
+                    <TabsTrigger value="pie">模块耗时分布</TabsTrigger>
+                    <TabsTrigger value="radar">模块能力雷达图</TabsTrigger>
+                </TabsList>
+                <TabsContent value="perMinute">
+                    <div style={{ height: '500px' }}>
+                        <TrendChart data={perMinuteData} yMax={2} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="accuracy">
+                    <div style={{ height: '500px' }}>
+                        <TrendChart data={accuracyData} yMax={100} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="pie">
+                    <div style={{ height: '500px' }}>
+                        <ModulePieChart data={records.map(r => {
+                            return {
+                                date: r.date,
+                                module: normalizeModuleName(r.module),
+                                score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
+                            };
+                        })} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="radar">
+                    <div style={{ height: '500px' }}>
+                        <ModuleRadarChart data={records} />
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 } 

@@ -4,6 +4,7 @@ import { MODULES } from '@/config/exam';
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 
+
 interface StudyPlan {
     id: string;
     name: string;

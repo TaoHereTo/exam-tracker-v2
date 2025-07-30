@@ -1,15 +1,8 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScorePredictor } from "@/components/features/ScorePredictor";
 import { MODULE_SCORES, normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
+import type { RecordItem } from "@/types/record";
 
-export interface RecordItem {
-    id: number;
-    date: string;
-    module: string;
-    total: number;
-    correct: number;
-    duration: string;
-}
 
 export function PersonalBestView({ records }: { records: RecordItem[] }) {
     return (

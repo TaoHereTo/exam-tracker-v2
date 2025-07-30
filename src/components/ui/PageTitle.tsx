@@ -1,12 +1,14 @@
-import React from "react";
+import React from 'react';
 
 interface PageTitleProps {
     children: React.ReactNode;
     className?: string;
 }
 
-const PageTitle: React.FC<PageTitleProps> = ({ children, className }) => (
-    <h1 className={`text-3xl font-bold mb-4 ${className ?? ''}`}>{children}</h1>
-);
-
-export default PageTitle; 
+export function PageTitle({ children, className = "" }: PageTitleProps) {
+    return (
+        <h1 className={`text-3xl font-bold mb-6 ${className}`}>
+            {children}
+        </h1>
+    );
+} 

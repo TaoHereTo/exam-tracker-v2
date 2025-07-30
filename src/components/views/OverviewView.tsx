@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Marquee } from "@/components/magicui/marquee";
 import { normalizeModuleName } from "@/config/exam";
 
+
 interface OverviewViewProps {
     records: Array<{
         id: number;
@@ -17,7 +18,7 @@ interface OverviewViewProps {
 export function OverviewView({ records }: OverviewViewProps) {
     const [reduceMotion, setReduceMotion] = useState(false);
 
-    // 检查减弱动态效果设置
+    // 检查数据概览动画设置
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const checkReduceMotion = () => {
@@ -286,23 +287,20 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
     ];
 
-    // 如果开启减弱动态效果，显示静态网格布局
+    // 如果开启数据概览动画控制，显示静态网格布局
     if (reduceMotion) {
         return (
-            <div>
-                <h1 className="text-3xl font-bold mb-6">数据概览</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                    {cards.map((item, idx) => (
-                        <Card key={item.title + idx} className="min-h-[120px]">
-                            <CardHeader>
-                                <CardTitle className="text-sm">{item.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{item.value}</div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                {cards.map((item, idx) => (
+                    <Card key={item.title + idx} className="min-h-[120px]">
+                        <CardHeader>
+                            <CardTitle className="text-sm">{item.title}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-2xl font-bold">{item.value}</div>
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         );
     }
@@ -314,30 +312,27 @@ export function OverviewView({ records }: OverviewViewProps) {
     const group2 = cards.slice(half);
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-6">数据概览</h1>
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
-                <Marquee className="w-full max-w-5xl" pauseOnHover repeat={2}>
-                    <div className="flex gap-6">
-                        {group1.map((item, idx) => (
-                            <Card className="min-w-[220px]" key={item.title + idx}>
-                                <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                                <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </Marquee>
-                <Marquee className="w-full max-w-5xl" pauseOnHover reverse repeat={2}>
-                    <div className="flex gap-6">
-                        {group2.map((item, idx) => (
-                            <Card className="min-w-[220px]" key={item.title + idx}>
-                                <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                                <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </Marquee>
-            </div>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
+            <Marquee className="w-full max-w-5xl" pauseOnHover repeat={2}>
+                <div className="flex gap-6">
+                    {group1.map((item, idx) => (
+                        <Card className="min-w-[220px]" key={item.title + idx}>
+                            <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
+                            <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </Marquee>
+            <Marquee className="w-full max-w-5xl" pauseOnHover reverse repeat={2}>
+                <div className="flex gap-6">
+                    {group2.map((item, idx) => (
+                        <Card className="min-w-[220px]" key={item.title + idx}>
+                            <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
+                            <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </Marquee>
         </div>
     );
 } 

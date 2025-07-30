@@ -15,6 +15,7 @@ import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 import { FormError } from "@/components/ui/form-error";
 
+
 interface StudyPlan {
     id: string;
     name: string;
@@ -186,12 +187,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold mb-4">学习计划</h1>
                 <UnifiedButton
                     variant="reactbits"
                     onClick={() => handleOpenForm()}
                     size="sm"
-                    style={{ 
+                    style={{
                         background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
                         color: 'white',
                         border: 'none'

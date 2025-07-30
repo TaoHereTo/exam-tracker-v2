@@ -1,14 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import * as React from "react";
 import { useState, useEffect } from "react";
+import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalStorage";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitchSelector";
 import SwitchRenderer from "@/components/ui/SwitchRenderer";
 import PreviewSwitch from "@/components/ui/PreviewSwitch";
 import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
-import { getLocalStorageInfo, formatStorageSize, getLargestStorageItems, getStorageKeyDisplayName, type StorageInfo } from "@/lib/storageUtils";
+import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -16,34 +18,21 @@ import { Input } from "@/components/ui/input";
 import { Search, Upload, Trash2, RefreshCw, Image as ImageIcon, Eye } from "lucide-react";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
+
+
 
 // 定义 OtherSwitchType 类型
 type OtherSwitchType = 'default' | 'sparkle' | '3d' | 'glass' | 'plane';
 
-export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans }: {
-    onClearRecords?: () => void;
-    onClearKnowledge?: () => void;
-    onClearPlans?: () => void;
-}) {
+export function AdvancedSetting() {
     const { notify } = useNotification();
 
-    // 新功能1：减弱动态效果
-    const [reduceMotion, setReduceMotion] = React.useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('reduce-motion-enabled') === 'true';
-        }
-        return false;
-    });
+    // 新功能1：数据概览动画控制
+    const [reduceMotion, setReduceMotion] = useLocalStorageBoolean('reduce-motion-enabled', false);
 
     // 新功能2：深浅色主题切换按钮风格选择
-    const [themeSwitchType, setThemeSwitchType] = React.useState<ThemeSwitchType>(() => {
-        if (typeof window !== 'undefined') {
-            return (localStorage.getItem('theme-switch-type') as ThemeSwitchType) || 'beautiful';
-        }
-        return 'beautiful';
-    });
+    const [themeSwitchType, setThemeSwitchType] = useLocalStorageString('theme-switch-type', 'beautiful') as [ThemeSwitchType, (value: ThemeSwitchType) => void];
 
     // 新功能3：其他开关样式选择
     const { otherSwitchType, setOtherSwitchType } = useSwitchStyle();
@@ -53,7 +42,6 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
 
     // 新功能4：localStorage使用量监控
     const [storageInfo, setStorageInfo] = React.useState<StorageInfo | null>(null);
-    const [largestItems, setLargestItems] = React.useState<Array<{ key: string; size: number; sizeKB: number }>>([]);
 
     // 新功能5：图片管理
     const [showImageManager, setShowImageManager] = useState(false);
@@ -67,15 +55,9 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
 
-    // 清空数据相关状态
-    const [clearType, setClearType] = React.useState('records');
-    const [showDialog, setShowDialog] = React.useState(false);
 
-    const clearTypeLabels = {
-        records: '历史记录',
-        knowledge: '知识点',
-        plans: '学习计划'
-    };
+
+
 
     // 加载云端图片
     const loadCloudImages = async () => {
@@ -199,26 +181,9 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
     const updateStorageInfo = () => {
         const info = getLocalStorageInfo();
         setStorageInfo(info);
-        const largest = getLargestStorageItems(3);
-        setLargestItems(largest);
     };
 
-    // 处理清空数据
-    const handleClear = () => {
-        switch (clearType) {
-            case 'records':
-                onClearRecords?.();
-                break;
-            case 'knowledge':
-                onClearKnowledge?.();
-                break;
-            case 'plans':
-                onClearPlans?.();
-                break;
-        }
-        setShowDialog(false);
-        updateStorageInfo();
-    };
+
 
     useEffect(() => {
         updateStorageInfo();
@@ -226,7 +191,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
         return () => clearInterval(interval);
     }, []);
 
-    // 减弱动态效果
+    // 数据概览动画控制
     useEffect(() => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('reduce-motion-enabled', reduceMotion.toString());
@@ -248,12 +213,12 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                     <CardDescription>自定义界面显示效果和交互体验。</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* 减弱动态效果设置 */}
+                    {/* 数据概览动画设置 */}
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
-                            <h3 className="font-medium">减弱动态效果</h3>
+                            <h3 className="font-medium">数据概览动画</h3>
                             <p className="text-sm text-muted-foreground">
-                                开启后将禁用卡片动画、按钮动效等，提供更简洁的界面体验。
+                                开启后数据概览页面将显示静态网格布局，关闭后将显示动态滚动卡片效果。
                             </p>
                         </div>
                         <SwitchRenderer
@@ -337,20 +302,6 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                                     已使用 {formatStorageSize(storageInfo.usedSize)} / {formatStorageSize(5 * 1024 * 1024)} ({storageInfo.usagePercentage.toFixed(1)}%)
                                 </p>
                                 <BeautifulProgress value={storageInfo.usagePercentage} className="mt-2" />
-                            </div>
-                        </div>
-                    )}
-
-                    {largestItems.length > 0 && (
-                        <div className="p-4 border rounded-lg">
-                            <h4 className="font-medium mb-2">占用空间最大的项目：</h4>
-                            <div className="space-y-1">
-                                {largestItems.map((item, index) => (
-                                    <div key={index} className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">{getStorageKeyDisplayName(item.key)}</span>
-                                        <span>{item.sizeKB.toFixed(1)} KB</span>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     )}
@@ -572,48 +523,7 @@ export function AdvancedSetting({ onClearRecords, onClearKnowledge, onClearPlans
                         </div>
                     )}
 
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                            <h3 className="font-medium">清空数据</h3>
-                            <p className="text-sm text-muted-foreground">
-                                选择要清空的数据类型，此操作不可逆。
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Select value={clearType} onValueChange={setClearType}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="records">{clearTypeLabels.records}</SelectItem>
-                                    <SelectItem value="knowledge">{clearTypeLabels.knowledge}</SelectItem>
-                                    <SelectItem value="plans">{clearTypeLabels.plans}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-                                <AlertDialogTrigger asChild>
-                                    <Button
-                                        variant="destructive"
-                                        size="default"
-                                    >
-                                        清空
-                                    </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>确认清空{clearTypeLabels[clearType as keyof typeof clearTypeLabels]}？</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            此操作将永久删除所有{clearTypeLabels[clearType as keyof typeof clearTypeLabels]}，无法撤销。是否确认？
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>取消</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleClear}>确认清空</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </div>
+
                 </CardContent>
             </Card>
 

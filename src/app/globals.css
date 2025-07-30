@@ -500,7 +500,7 @@ button {
   font-family: "Century", serif;
 }
 
-/* 减弱动态效果样式 */
+/* 数据概览动画控制样式 */
 .reduce-motion * {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
@@ -551,7 +551,7 @@ button {
   -webkit-backface-visibility: hidden;
 }
 
-/* 确保轮播动画不受减弱动态效果影响 */
+/* 确保轮播动画不受数据概览动画控制影响 */
 .reduce-motion [data-slot="carousel-content"] {
   transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
@@ -560,13 +560,13 @@ button {
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
 }
 
-/* 减弱动态效果时禁用marquee动画 */
+/* 数据概览动画控制时禁用marquee动画 */
 .reduce-motion .animate-marquee,
 .reduce-motion .animate-marquee-vertical {
   animation: none !important;
 }
 
-/* 减弱动态效果时禁用ReactBits按钮动画 */
+/* 数据概览动画控制时禁用ReactBits按钮动画 */
 .reduce-motion .reactbits-button {
   animation: none !important;
   transition: none !important;
@@ -583,22 +583,22 @@ button {
   transition: none !important;
 }
 
-/* 减弱动态效果时禁用shimmer效果 */
+/* 数据概览动画控制时禁用shimmer效果 */
 .reduce-motion .shimmer-effect {
   animation: none !important;
 }
 
-/* 减弱动态效果时禁用glass效果 */
+/* 数据概览动画控制时禁用glass效果 */
 .reduce-motion .glass-effect {
   transition: none !important;
 }
 
-/* 减弱动态效果时禁用glow效果 */
+/* 数据概览动画控制时禁用glow效果 */
 .reduce-motion .glow-effect {
   transition: none !important;
 }
 
-/* 减弱动态效果时禁用checkbox动画 */
+/* 数据概览动画控制时禁用checkbox动画 */
 .reduce-motion [data-slot="checkbox"] {
   transition: none !important;
   animation: none !important;
@@ -622,7 +622,7 @@ button {
   animation: none !important;
 }
 
-/* 减弱动态效果时禁用checkbox indicator动画 */
+/* 数据概览动画控制时禁用checkbox indicator动画 */
 .reduce-motion [data-slot="checkbox-indicator"] {
   animation: none !important;
 }

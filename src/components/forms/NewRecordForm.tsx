@@ -10,15 +10,7 @@ import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
-
-export type RecordItem = {
-    id: number;
-    date: string;
-    module: string;
-    total: number;
-    correct: number;
-    duration: string;
-};
+import type { RecordItem } from "@/types/record";
 
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
     const [date, setDate] = useState<Date | undefined>(undefined);

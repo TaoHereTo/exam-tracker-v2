@@ -13,7 +13,6 @@ export function SettingsView({
     onExport, onImport, onClearAllData,
     pageSize, setPageSize,
     activeTab,
-    onClearRecords, onClearKnowledge, onClearPlans,
     navMode
 }: {
     onExport?: () => void;
@@ -23,15 +22,12 @@ export function SettingsView({
     setPageSize: (n: number) => void;
     // onSaveSettings?: () => void; // 移除未使用的props
     activeTab?: string;
-    onClearRecords?: () => void;
-    onClearKnowledge?: () => void;
-    onClearPlans?: () => void;
     navMode?: string;
 }) {
     if (activeTab === 'settings-advanced') {
         return (
             <>
-                <AdvancedSetting onClearRecords={onClearRecords} onClearKnowledge={onClearKnowledge} onClearPlans={onClearPlans} />
+                <AdvancedSetting />
                 <Card className="mt-6">
                     <CardHeader>
                         <CardTitle>危险操作</CardTitle>

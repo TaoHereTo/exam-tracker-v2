@@ -2,8 +2,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useTheme } from "next-themes";
 import SwitchRenderer from "@/components/ui/SwitchRenderer";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { useState, useEffect } from "react";
+import { useLocalStorage, useLocalStorageBoolean } from "@/hooks/useLocalStorage";
+import { useEffect } from "react";
 
 export function AppearanceSetting() {
     const { theme, setTheme } = useTheme();
@@ -11,12 +11,7 @@ export function AppearanceSetting() {
     const [navMode, setNavMode] = useLocalStorage<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
 
     // 护眼模式设置
-    const [eyeCare, setEyeCare] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem('eye-care-enabled') === 'true';
-        }
-        return false;
-    });
+    const [eyeCare, setEyeCare] = useLocalStorageBoolean('eye-care-enabled', false);
 
     // 护眼模式只在浅色模式下生效
     useEffect(() => {
@@ -33,7 +28,7 @@ export function AppearanceSetting() {
         if (theme === 'dark' && eyeCare) {
             setEyeCare(false);
         }
-    }, [theme, eyeCare]);
+    }, [theme, eyeCare, setEyeCare]);
 
     return (
         <Card>

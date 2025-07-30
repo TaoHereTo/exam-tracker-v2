@@ -6,6 +6,7 @@ import { Trash2 } from "lucide-react";
 import { format } from 'date-fns';
 import { normalizeModuleName } from '@/config/exam';
 
+
 interface HistoryViewProps {
     records: RecordItem[];
     selectedRecordIds: number[];
@@ -49,7 +50,7 @@ export function HistoryView({
 
 
     return (
-        <div className="flex flex-col items-center pt-4 px-2 md:px-8">
+        <div className="pt-4 px-2 md:px-8">
             <UnifiedTable<RecordItem, number>
                 columns={[
                     {

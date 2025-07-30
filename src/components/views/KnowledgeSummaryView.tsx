@@ -8,6 +8,7 @@ import { MODULES, normalizeModuleName } from '@/config/exam';
 import { lazy, Suspense } from 'react';
 
 
+
 // 动态导入表单组件
 const KnowledgeForm = lazy(() => import("../forms/KnowledgeForm").then(module => ({ default: module.KnowledgeForm })));
 const VerbalForm = lazy(() => import("../forms/VerbalForm").then(module => ({ default: module.default })));
@@ -368,7 +369,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     ];
 
     return (
-        <div className="flex flex-col items-center pt-4 px-2 md:px-8">
+        <div className="pt-4 px-2 md:px-8">
             <UnifiedTable<KnowledgeItem, string>
                 columns={columns}
                 data={paged}

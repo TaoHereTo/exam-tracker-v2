@@ -9,7 +9,7 @@ import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
-import type { RecordItem } from "./NewRecordForm";
+import type { RecordItem } from "@/types/record";
 
 interface EditRecordFormProps {
     record: RecordItem;

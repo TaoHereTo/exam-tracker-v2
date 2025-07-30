@@ -23,7 +23,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 监听减弱动态效果设置变化
+  // 监听数据概览动画设置变化
   useEffect(() => {
     const handleStorageChange = () => {
       const isReduceMotion = localStorage.getItem('reduce-motion-enabled') === 'true';

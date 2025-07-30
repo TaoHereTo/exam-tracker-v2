@@ -17,7 +17,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { PersonalBestView } from "@/components/views/PersonalBestView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 
-import PageTitle from "@/components/ui/PageTitle";
+import { PageTitle } from "@/components/ui/PageTitle";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -78,7 +78,7 @@ export default function Home() {
     setImportDialogOpen,
     pendingImport,
     setPendingImport,
-  } = useImportExport(records, setRecords, knowledge, setKnowledge);
+  } = useImportExport(records, setRecords, knowledge, setKnowledge, plans);
 
   // 历史记录分页
   const [historyPage, setHistoryPage] = useState(1);
@@ -98,7 +98,7 @@ export default function Home() {
     if (historyPage > totalPages && totalPages > 0) {
       setHistoryPage(totalPages);
     }
-  }, [records, historyPage, totalPages, setHistoryPage]);
+  }, [records, historyPage, totalPages]);
 
   const pagedRecords = useMemo(() =>
     sortedRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize),
@@ -121,21 +121,10 @@ export default function Home() {
   const deletePlan = useCallback((id: string) => setPlans(prev => prev.filter(p => p.id !== id)), [setPlans]);
 
   // plans和records变化时自动统计进度
-  usePlanProgress(plans, setPlans, records, calcPlanProgress);
+  const memoizedCalcPlanProgress = useCallback(calcPlanProgress, []);
+  usePlanProgress(plans, setPlans, records, memoizedCalcPlanProgress);
 
-  // 批量清空各类数据
-  const handleClearRecords = () => {
-    setRecords([]);
-    notify({ type: "success", message: "历史记录已清空" });
-  };
-  const handleClearKnowledge = () => {
-    setKnowledge([]);
-    notify({ type: "success", message: "知识点已清空" });
-  };
-  const handleClearPlans = () => {
-    setPlans([]);
-    notify({ type: "success", message: "学习计划已清空" });
-  };
+
 
   // 清空所有数据
   const handleClearAllData = () => {
@@ -185,46 +174,58 @@ export default function Home() {
         )}
         {/* 右侧主内容区，占据剩余空间 */}
         <div className={`flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100 ${navMode === 'sidebar' ? 'ml-52' : ''}`}>
-          {activeTab === 'overview' && isClient && <OverviewView records={sortedRecords} />}
+          {activeTab === 'overview' && isClient && (
+            <div>
+              <PageTitle>数据概览</PageTitle>
+              <OverviewView records={sortedRecords} />
+            </div>
+          )}
           {activeTab === 'charts' && (
-            <ChartsView
-              records={records}
-            />
+            <div>
+              <PageTitle>数据图表</PageTitle>
+              <ChartsView
+                records={records}
+              />
+            </div>
           )}
           {activeTab === 'best' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">最佳成绩</h1>
+              <PageTitle>个人最佳</PageTitle>
               <PersonalBestView records={records.map(r => ({ ...r, module: normalizeModuleName(r.module) }))} />
             </div>
           )}
           {activeTab === 'modules' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">知识点汇总</h1>
+              <PageTitle>知识点汇总</PageTitle>
               <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} onEditKnowledge={handleEditKnowledge} />
             </div>
           )}
           {activeTab === 'form' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">新增刷题记录</h1>
+              <PageTitle>新增刷题记录</PageTitle>
               <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
                 <NewRecordForm onAddRecord={addRecord} />
               </div>
             </div>
           )}
           {activeTab === 'history' && (
-            <HistoryView
-              records={pagedRecords}
-              selectedRecordIds={selectedRecordIds}
-              onSelectIds={setSelectedRecordIds}
-              onDeleteRecord={deleteRecord}
-              onBatchDelete={handleBatchDelete}
-              historyPage={historyPage}
-              setHistoryPage={setHistoryPage}
-              totalPages={totalPages}
-            />
+            <div>
+              <PageTitle>历史记录</PageTitle>
+              <HistoryView
+                records={pagedRecords}
+                selectedRecordIds={selectedRecordIds}
+                onSelectIds={setSelectedRecordIds}
+                onDeleteRecord={deleteRecord}
+                onBatchDelete={handleBatchDelete}
+                historyPage={historyPage}
+                setHistoryPage={setHistoryPage}
+                totalPages={totalPages}
+              />
+            </div>
           )}
           {activeTab === 'plan' && (
             <div>
+              <PageTitle>学习计划</PageTitle>
               {activePlanId
                 ? (
                   (() => {
@@ -272,7 +273,7 @@ export default function Home() {
           )}
           {activeTab === 'settings-advanced' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">高级设置</h1>
+              <PageTitle>高级设置</PageTitle>
               <SettingsView
                 onExport={handleExportData}
                 onImport={handleImportData}
@@ -280,15 +281,12 @@ export default function Home() {
                 pageSize={pageSize}
                 setPageSize={(n: number) => setPageSize(n)}
                 activeTab={activeTab}
-                onClearRecords={handleClearRecords}
-                onClearKnowledge={handleClearKnowledge}
-                onClearPlans={handleClearPlans}
               />
             </div>
           )}
           {activeTab === 'knowledge-entry' && (
             <div>
-              <h1 className="text-3xl font-bold mb-4">知识点录入</h1>
+              <PageTitle>知识点录入</PageTitle>
               <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
                 <KnowledgeEntryView onAddKnowledge={addKnowledge} />
               </div>
@@ -306,6 +304,9 @@ export default function Home() {
                     {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
                       <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
                     )}
+                    {pendingImport.plans && pendingImport.plans.length > 0 && (
+                      <>，<b>{pendingImport.plans.length}</b> 个学习计划</>
+                    )}
                     。是否确认导入？
                   </>
                 )}
@@ -318,6 +319,9 @@ export default function Home() {
                   setRecords(pendingImport.records);
                   if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
                     setKnowledge(pendingImport.knowledge);
+                  }
+                  if (pendingImport.plans && pendingImport.plans.length > 0) {
+                    setPlans(pendingImport.plans);
                   }
                   setTimeout(() => {
                     setPendingImport(undefined);
@@ -332,7 +336,12 @@ export default function Home() {
                   }
                 }
                 setImportDialogOpen(false);
-                notify({ type: "success", message: "导入成功", description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}！` });
+                const plansCount = pendingImport?.plans?.length ?? 0;
+                notify({
+                  type: "success",
+                  message: "导入成功",
+                  description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}${plansCount > 0 ? `，${plansCount} 个学习计划` : ''}！`
+                });
               }}>
                 确认导入
               </AlertDialogAction>
