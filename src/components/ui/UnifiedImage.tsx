@@ -400,13 +400,27 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             } ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
                                         onClick={handleLocalUpload}
                                     >
-                                        <Upload className="h-8 w-8 mx-auto mb-3 text-gray-400" />
-                                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                            点击选择或拖拽图片上传
-                                        </p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                                            支持 JPG、PNG、GIF 等格式
-                                        </p>
+                                        {isLoading ? (
+                                            <>
+                                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                                <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
+                                                    正在上传图片...
+                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    请稍候，不要关闭页面
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="h-8 w-8 mx-auto mb-3 text-gray-400" />
+                                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                    点击选择或拖拽图片上传
+                                                </p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    支持 JPG、PNG、GIF 等格式
+                                                </p>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )
@@ -423,8 +437,17 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             disabled={isLoading}
                                             className="flex items-center gap-2"
                                         >
-                                            <FolderOpen className="h-4 w-4" />
-                                            选择图片
+                                            {isLoading ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                                                    上传中...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FolderOpen className="h-4 w-4" />
+                                                    选择图片
+                                                </>
+                                            )}
                                         </Button>
                                     }
                                 />
@@ -516,7 +539,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                     <div className="mx-auto w-full max-w-2xl h-[80vh] flex flex-col">
                         <DrawerHeader className="flex-shrink-0">
                             <DrawerTitle className="text-center">
-                                {imageInfo?.fileName || imageInfo?.originalName || '图片预览'}
+                                {imageInfo?.originalName || imageInfo?.fileName || '图片预览'}
                             </DrawerTitle>
                             <DrawerDescription className="text-center">
                                 查看和操作图片，支持缩放、旋转等功能
@@ -601,7 +624,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
                             {imageInfo && (
                                 <div className="mt-4 text-center text-sm text-gray-500 pt-4">
-                                    <p className="font-medium">{imageInfo.fileName || imageInfo.originalName || '未知文件'}</p>
+                                    <p className="font-medium">{imageInfo.originalName || imageInfo.fileName || '未知文件'}</p>
                                     <div className="flex items-center justify-center gap-2 mt-2">
                                         {imageSource === 'cloud' ? (
                                             <>

@@ -1,6 +1,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import React, { useState, useEffect, useMemo } from "react";
 import { Marquee } from "@/components/magicui/marquee";
+import { normalizeModuleName } from "@/config/exam";
 
 interface OverviewViewProps {
     records: Array<{
@@ -155,7 +156,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         Object.entries(moduleMap).forEach(([module, count]) => {
             if (count > mostFrequentCount) {
                 mostFrequentCount = count;
-                mostFrequentModule = module;
+                mostFrequentModule = normalizeModuleName(module);
             }
         });
 

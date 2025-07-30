@@ -18,7 +18,7 @@ type SidebarProps = {
 export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     return (
         <aside className="w-52 h-full bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 flex flex-col items-center">
-            <h1 className="text-xl font-bold mb-6 text-center tracking-wide text-gray-800 dark:text-gray-100 w-full flex items-center justify-center gap-1">
+            <h1 className="text-xl font-bold mb-6 tracking-wide text-gray-800 dark:text-gray-100 w-full flex items-center justify-start gap-1 pl-2">
                 <Image src="/icon.png" alt="应用图标" width={40} height={40} className="w-10 h-10" />
                 行测记录
             </h1>
