@@ -338,7 +338,7 @@
 }
 
 .sidebar-parent {
-  @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-normal transition-all duration-150 border-none;
+  @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-bold transition-all duration-150 border-none;
 }
 
 .sidebar-parent:hover {
@@ -544,7 +544,7 @@ button {
 }
 
 /* 确保轮播内容在动画期间保持稳定 */
-[data-slot="carousel-content"] > * {
+[data-slot="carousel-content"]>* {
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-transform: translateZ(0);
