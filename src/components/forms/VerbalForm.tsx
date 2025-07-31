@@ -157,6 +157,7 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
                     mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
+
                 />
 
                 {/* 错误提示 */}

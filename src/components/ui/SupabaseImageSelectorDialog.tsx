@@ -38,6 +38,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const [connectionStatus, setConnectionStatus] = useState<{ success: boolean; message: string } | null>(null);
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [imageToDelete, setImageToDelete] = useState<{ id: string; name: string } | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const { notify } = useNotification();
 
@@ -121,6 +122,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const confirmDelete = async () => {
         if (!imageToDelete) return;
 
+        setIsDeleting(true);
         try {
             const success = await supabaseImageManager.deleteImage(imageToDelete.id);
             if (success) {
@@ -146,6 +148,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 description: "删除图片时发生错误，请稍后重试"
             });
         } finally {
+            setIsDeleting(false);
             setDeleteConfirmOpen(false);
             setImageToDelete(null);
         }
@@ -398,17 +401,42 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>确认删除</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            确定要删除&ldquo;{imageToDelete?.name}&rdquo;吗？
-                            <br />
-                            <br />
-                            此操作不可撤销，图片将从云端永久删除。
+                        <AlertDialogDescription asChild>
+                            {isDeleting ? (
+                                <div className="space-y-4">
+                                    <p>正在删除图片，请稍候...</p>
+                                    <div className="flex items-center gap-2">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                                            正在删除: {imageToDelete?.name}
+                                        </span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    确定要删除&ldquo;{imageToDelete?.name}&rdquo;吗？
+                                    <br />
+                                    <br />
+                                    此操作不可撤销，图片将从云端永久删除。
+                                </div>
+                            )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} style={{ background: '#EF4444' }}>
-                            确认删除
+                        <AlertDialogCancel disabled={isDeleting}>取消</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={confirmDelete}
+                            disabled={isDeleting}
+                            style={{ background: '#EF4444' }}
+                        >
+                            {isDeleting ? (
+                                <div className="flex items-center gap-2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    删除中...
+                                </div>
+                            ) : (
+                                '确认删除'
+                            )}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

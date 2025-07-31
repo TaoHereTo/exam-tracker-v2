@@ -21,6 +21,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const { notify } = useNotification();
 
     // 加载预览图片
@@ -45,7 +46,11 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
 
     // 处理文件上传
     const handleFileUpload = useCallback(async (file: File) => {
-        if (!file.type.startsWith('image/')) {
+        // 改进的文件类型验证
+        const isImageByMime = file.type.startsWith('image/');
+        const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
+        
+        if (!isImageByMime && !isImageByExtension) {
             notify({
                 type: "error",
                 message: "文件类型错误",
@@ -119,15 +124,34 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragOver(false);
-        const file = e.dataTransfer.files[0];
-        if (file) {
-            handleFileUpload(file);
+        
+        // 如果正在上传，忽略拖拽
+        if (isUploading) {
+            console.log('正在上传中，忽略拖拽操作');
+            return;
+        }
+        
+        const files = Array.from(e.dataTransfer.files);
+        console.log('拖拽的文件:', files.map(f => ({ name: f.name, type: f.type, size: f.size })));
+        
+        // 改进的文件类型检查：不仅检查MIME类型，还检查文件扩展名
+        const imageFile = files.find(file => {
+            const isImageByMime = file.type.startsWith('image/');
+            const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
+            return isImageByMime || isImageByExtension;
+        });
+        
+        if (imageFile) {
+            handleFileUpload(imageFile);
+        } else {
+            notify({ type: "error", message: "请拖拽图片文件" });
         }
     };
 
     // 处理图片删除
     const handleRemoveImage = async () => {
         if (value) {
+            setIsDeleting(true);
             try {
                 await supabaseImageManager.deleteImage(value);
                 notify({
@@ -142,6 +166,8 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                     message: "删除失败",
                     description: "无法删除图片"
                 });
+            } finally {
+                setIsDeleting(false);
             }
         }
         setPreviewUrl(null);
@@ -224,10 +250,20 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                             variant="outline"
                             size="sm"
                             onClick={handleRemoveImage}
+                            disabled={isDeleting}
                             className="flex items-center gap-2 text-red-600 hover:text-red-700"
                         >
-                            <X className="h-4 w-4" />
-                            删除图片
+                            {isDeleting ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                                    删除中...
+                                </>
+                            ) : (
+                                <>
+                                    <X className="h-4 w-4" />
+                                    删除图片
+                                </>
+                            )}
                         </Button>
                     </div>
 

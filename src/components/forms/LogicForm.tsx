@@ -141,6 +141,7 @@ export const LogicForm: React.FC<LogicFormProps> = ({
                     mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
+
                 />
 
                 {/* 错误提示 */}

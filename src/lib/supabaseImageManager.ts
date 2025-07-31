@@ -136,6 +136,9 @@ export class SupabaseImageManager {
     // 上传图片到 Supabase
     public async uploadImage(file: File): Promise<SupabaseImageInfo> {
         try {
+            console.log('开始上传图片:', file.name, file.size, file.type);
+            console.log('Supabase客户端状态:', !!supabase);
+
             // 尝试初始化存储桶（但不强制要求成功）
             await this.initializeBucket();
 
@@ -153,6 +156,10 @@ export class SupabaseImageManager {
 
             if (error) {
                 console.error('上传图片失败:', error);
+                console.error('错误详情:', {
+                    message: error.message,
+                    name: error.name
+                });
 
                 // 如果是权限错误，提供更详细的错误信息
                 if (error.message.includes('row-level security') || error.message.includes('RLS')) {

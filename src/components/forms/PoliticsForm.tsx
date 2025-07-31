@@ -137,6 +137,7 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                     mode="upload"
                     value={imagePath}
                     onChange={setImagePath}
+
                 />
 
                 {/* 错误提示 */}
