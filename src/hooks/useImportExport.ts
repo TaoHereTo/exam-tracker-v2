@@ -34,8 +34,7 @@ export function useImportExport(
                 const value = localStorage.getItem(key);
                 if (value !== null) settings[key] = value;
             } catch (error) {
-                console.error(`Error reading localStorage key "${key}":`, error);
-            }
+                }
         });
         return settings;
     }
@@ -47,8 +46,7 @@ export function useImportExport(
                 try {
                     localStorage.setItem(key, value);
                 } catch (error) {
-                    console.error(`Error writing localStorage key "${key}":`, error);
-                }
+                    }
             }
         });
     }
@@ -137,8 +135,7 @@ export function useImportExport(
                             try {
                                 supabaseImageManager.importImageInfo(importedCloudImages);
                             } catch (error) {
-                                console.warn('导入云端图片时出错:', error);
-                            }
+                                }
                         }
 
                         // 使用统一的模块名称映射
@@ -219,11 +216,9 @@ export function useImportExport(
                         setImportDialogOpen(true);
                         // 不再此处 notify
                     } catch (error) {
-                        console.error('JSON parsing error:', error);
                         notify({ type: "error", message: "导入失败", description: "文件内容不是有效的 JSON！" });
                     }
                 } catch (error) {
-                    console.error('File reading error:', error);
                     notify({ type: "error", message: "导入失败", description: "文件读取失败！" });
                 }
             };

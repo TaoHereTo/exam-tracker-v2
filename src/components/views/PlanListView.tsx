@@ -11,9 +11,11 @@ import { format } from "date-fns";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import type { PlanType } from "@/types/record";
 import { MODULES } from '@/config/exam';
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 import { FormError } from "@/components/ui/form-error";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+
 
 
 interface StudyPlan {
@@ -187,18 +189,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
     return (
         <div className="space-y-6">
             <div>
-                <UnifiedButton
-                    variant="reactbits"
+                <RainbowButton
                     onClick={() => handleOpenForm()}
-                    size="sm"
-                    style={{
-                        background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
-                        color: 'white',
-                        border: 'none'
-                    }}
+                    size="default"
                 >
                     新建计划
-                </UnifiedButton>
+                </RainbowButton>
             </div>
             <div className="grid gap-4">
                 {plans.map(plan => (
@@ -207,31 +203,28 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                             <CardTitle className="flex justify-between items-start">
                                 <span>{plan.name}</span>
                                 <div className="flex gap-2">
-                                    <UnifiedButton
-                                        variant="reactbits"
-                                        size="sm"
+                                    <InteractiveHoverButton
                                         onClick={() => onShowDetail(plan.id)}
-                                        style={{ background: '#059669' }}
+                                        hoverColor="#059669"
+                                        compact={true}
                                     >
                                         详情
-                                    </UnifiedButton>
-                                    <UnifiedButton
-                                        variant="reactbits"
-                                        size="sm"
+                                    </InteractiveHoverButton>
+                                    <InteractiveHoverButton
                                         onClick={() => handleOpenForm(plan)}
-                                        style={{ background: 'rgb(43, 127, 255)' }}
+                                        hoverColor="rgb(43, 127, 255)"
+                                        compact={true}
                                     >
                                         编辑
-                                    </UnifiedButton>
+                                    </InteractiveHoverButton>
                                     <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <UnifiedButton
-                                                variant="reactbits"
-                                                size="sm"
-                                                style={{ background: '#EF4444' }}
+                                            <InteractiveHoverButton
+                                                hoverColor="#EF4444"
+                                                compact={true}
                                             >
                                                 删除
-                                            </UnifiedButton>
+                                            </InteractiveHoverButton>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
                                             <AlertDialogHeader>
@@ -423,13 +416,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 >
                                     取消
                                 </Button>
-                                <Button
+                                <RainbowButton
                                     type="submit"
                                     size="sm"
-                                    className="bg-blue-500 hover:bg-blue-600 text-white"
                                 >
                                     {editId ? '保存' : '创建'}
-                                </Button>
+                                </RainbowButton>
                             </div>
                         </form>
                     </Card>

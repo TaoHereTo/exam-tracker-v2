@@ -7,7 +7,8 @@ import { PaginationSetting } from "./settings/PaginationSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+
 
 export function SettingsView({
     onExport, onImport, onClearAllData,
@@ -43,13 +44,11 @@ export function SettingsView({
                             </div>
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <UnifiedButton
-                                        variant="reactbits"
-                                        size="sm"
-                                        className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                                    <InteractiveHoverButton
+                                        hoverColor="#DC2626"
                                     >
                                         清空数据
-                                    </UnifiedButton>
+                                    </InteractiveHoverButton>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>

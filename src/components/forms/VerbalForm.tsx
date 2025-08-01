@@ -7,9 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useFormNotification } from "@/hooks/useFormNotification";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
+import { FormError } from "@/components/ui/form-error";
 
 interface VerbalFormProps {
     onAddKnowledge: (knowledge: { idiom: string; meaning: string; subCategory: '逻辑填空' | '片段阅读' | '成语积累'; imagePath?: string }) => void;
@@ -139,7 +140,9 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
                         value={idiom}
                         onChange={e => handleIdiomChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.idiom ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.idiom} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="meaning">{fieldConfig.secondField.label}</Label>
@@ -149,34 +152,29 @@ const VerbalForm: React.FC<VerbalFormProps> = ({ onAddKnowledge, initialData }) 
                         value={meaning}
                         onChange={e => handleMeaningChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.meaning ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.meaning} />
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage
-                    mode="upload"
-                    value={imagePath}
-                    onChange={setImagePath}
-
-                />
-
-                {/* 错误提示 */}
-                {(errors.idiom || errors.meaning) && (
-                    <div className="text-sm text-red-500 text-center">
-                        {errors.idiom || errors.meaning}
-                    </div>
-                )}
+                <div className="pt-0">
+                    <UnifiedImage
+                        mode="upload"
+                        value={imagePath}
+                        onChange={setImagePath}
+                    />
+                </div>
             </CardContent>
-            <CardFooter>
-                <UnifiedButton
-                    variant="reactbits"
-                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+            <CardFooter className="pt-1">
+                <RainbowButton
+                    className="w-full"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </UnifiedButton>
+                </RainbowButton>
             </CardFooter>
         </Card>
     );

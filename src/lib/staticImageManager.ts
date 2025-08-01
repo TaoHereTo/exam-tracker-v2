@@ -31,8 +31,7 @@ export class StaticImageManager {
                 return new Map(imageArray.map(img => [img.id, img]));
             }
         } catch (error) {
-            console.error('加载图片映射失败:', error);
-        }
+            }
         return new Map();
     }
 
@@ -42,8 +41,7 @@ export class StaticImageManager {
             const imageArray = Array.from(imageMap.values());
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(imageArray));
         } catch (error) {
-            console.error('保存图片映射失败:', error);
-        }
+            }
     }
 
     // 生成唯一的图片ID
@@ -64,15 +62,10 @@ export class StaticImageManager {
             }
 
             // 如果API不可用，尝试直接读取文件夹（仅开发环境）
-            if (process.env.NODE_ENV === 'development') {
-                // 在开发环境中，我们可以尝试直接访问文件夹
-                // 这里返回一个基本的列表，实际项目中应该通过API获取
-                return ['1.png'];
-            }
+            
 
             return [];
         } catch (error) {
-            console.error('获取可用图片列表失败:', error);
             return [];
         }
     }
@@ -105,7 +98,6 @@ export class StaticImageManager {
 
             return imageId;
         } catch (error) {
-            console.error('选择图片失败:', error);
             throw new Error('选择图片失败');
         }
     }
@@ -162,7 +154,6 @@ export class StaticImageManager {
             // 直接打开静态文件路径
             window.open(imageInfo.localPath, '_blank');
         } catch (error) {
-            console.error('打开图片文件失败:', error);
             throw new Error('无法打开图片文件');
         }
     }

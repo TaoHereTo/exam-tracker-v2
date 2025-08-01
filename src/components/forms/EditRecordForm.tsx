@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { MODULES } from '@/config/exam';
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
 import { TimePicker } from "@/components/ui/TimePicker";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 interface EditRecordFormProps {
     record: RecordItem;
@@ -163,21 +163,19 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                     </div>
                 </CardContent>
                 <CardFooter className="flex gap-2 justify-end">
-                    <UnifiedButton
-                        variant="reactbits"
+                    <RainbowButton
+                        variant="outline"
                         onClick={onCancel}
                         size="sm"
                     >
                         取消
-                    </UnifiedButton>
-                    <UnifiedButton
-                        variant="reactbits"
+                    </RainbowButton>
+                    <RainbowButton
                         type="submit"
                         size="sm"
-                        className="bg-blue-500 hover:bg-blue-600 text-white"
                     >
                         保存
-                    </UnifiedButton>
+                    </RainbowButton>
                 </CardFooter>
             </BaseForm>
         </Card>

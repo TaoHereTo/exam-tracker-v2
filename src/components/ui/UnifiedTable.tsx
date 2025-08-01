@@ -10,8 +10,8 @@ import {
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Search, Plus, Edit, Trash2, ArrowUpFromLine } from 'lucide-react';
-import { UnifiedButton } from './UnifiedButton';
+import { Search } from 'lucide-react';
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Card, CardContent } from "@/components/ui/card";
 
 // 数据表格列定义
@@ -143,14 +143,13 @@ export function UnifiedTable<T, K extends string | number = string | number>({
             <div className="mb-2 flex justify-between items-center">
                 <span className="text-gray-500 text-sm">共 {data.length} 条</span>
                 {onBatchDelete && (
-                    <UnifiedButton
-                        variant="destructive"
-                        size="sm"
+                    <InteractiveHoverButton
+                        hoverColor="#EF4444"
                         disabled={selected.length === 0}
                         onClick={onBatchDelete}
                     >
                         {batchDeleteText}
-                    </UnifiedButton>
+                    </InteractiveHoverButton>
                 )}
             </div>
             <table className="min-w-full border text-sm table-fixed">
@@ -315,76 +314,61 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         <div className="flex gap-2 shrink-0 flex-wrap">
                             {/* 自定义操作按钮 */}
                             {actions.map((action, index) => (
-                                <UnifiedButton
+                                <InteractiveHoverButton
                                     key={index}
-                                    variant={action.variant || "outline"}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
                                     className={action.className}
-                                    size="sm"
+                                    hoverColor={action.variant === "destructive" ? "#EF4444" : "#3B82F6"}
                                 >
                                     {action.icon}
                                     {action.label}
-                                </UnifiedButton>
+                                </InteractiveHoverButton>
                             ))}
 
                             {/* 新建按钮 */}
                             {showNew && onNew && (
-                                <UnifiedButton
-                                    variant="reactbits"
+                                <InteractiveHoverButton
                                     onClick={onNew}
-                                    style={{
-                                        background: 'linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)',
-                                        color: 'white',
-                                        border: 'none'
-                                    }}
-                                    size="sm"
+                                    hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
+                                    compact={true}
                                 >
-                                    <Plus className="w-4 h-4 mr-1" />
                                     新建
-                                </UnifiedButton>
+                                </InteractiveHoverButton>
                             )}
 
                             {/* 导出按钮 */}
                             {showExport && onExport && (
-                                <UnifiedButton
-                                    variant="reactbits"
+                                <InteractiveHoverButton
                                     onClick={onExport}
-                                    size="sm"
-                                    style={{ background: '#059669' }}
+                                    hoverColor="#059669"
                                 >
-                                    <ArrowUpFromLine className="w-4 h-4 mr-1" />
                                     导出为Excel
-                                </UnifiedButton>
+                                </InteractiveHoverButton>
                             )}
 
                             {/* 编辑按钮 */}
                             {showEdit && onEdit && (
-                                <UnifiedButton
-                                    variant="reactbits"
+                                <InteractiveHoverButton
                                     onClick={onEdit}
                                     disabled={editDisabled}
-                                    size="sm"
-                                    style={{ background: 'rgb(43, 127, 255)' }}
+                                    hoverColor="rgb(43, 127, 255)"
+                                    compact={true}
                                 >
-                                    <Edit className="w-4 h-4 mr-1" />
                                     编辑
-                                </UnifiedButton>
+                                </InteractiveHoverButton>
                             )}
 
                             {/* 删除按钮 */}
                             {showDelete && onDelete && (
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <UnifiedButton
-                                            variant="reactbits"
+                                        <InteractiveHoverButton
                                             disabled={deleteDisabled}
-                                            size="sm"
-                                            style={{ background: '#EF4444' }}
+                                            hoverColor="#EF4444"
                                         >
-                                            <Trash2 className="w-4 h-4 mr-1" />
                                             批量删除
-                                        </UnifiedButton>
+                                        </InteractiveHoverButton>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>

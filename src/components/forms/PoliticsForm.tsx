@@ -9,9 +9,10 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { useFormNotification } from "@/hooks/useFormNotification";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { FormError } from "@/components/ui/form-error";
 
 interface PoliticsFormProps {
     onAddKnowledge: (knowledge: { date: Date | null; source: string; note: string; imagePath?: string }) => void;
@@ -119,7 +120,9 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                         value={source}
                         onChange={e => handleSourceChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.source ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.source} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="note">相关重点</Label>
@@ -129,34 +132,29 @@ const PoliticsForm: React.FC<PoliticsFormProps> = ({ onAddKnowledge, initialData
                         value={note}
                         onChange={e => handleNoteChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.note ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.note} />
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage
-                    mode="upload"
-                    value={imagePath}
-                    onChange={setImagePath}
-
-                />
-
-                {/* 错误提示 */}
-                {(errors.source || errors.note) && (
-                    <div className="text-sm text-red-500 text-center">
-                        {errors.source || errors.note}
-                    </div>
-                )}
+                <div className="pt-0">
+                    <UnifiedImage
+                        mode="upload"
+                        value={imagePath}
+                        onChange={setImagePath}
+                    />
+                </div>
             </CardContent>
-            <CardFooter>
-                <UnifiedButton
-                    variant="reactbits"
-                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+            <CardFooter className="pt-1">
+                <RainbowButton
+                    className="w-full"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </UnifiedButton>
+                </RainbowButton>
             </CardFooter>
         </Card>
     );

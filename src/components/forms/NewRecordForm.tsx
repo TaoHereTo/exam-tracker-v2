@@ -6,12 +6,12 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { SelectItem } from "@/components/ui/select";
 import { MODULES } from '@/config/exam';
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
 import { TimePicker } from "@/components/ui/TimePicker";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
     const [date, setDate] = useState<Date | undefined>(undefined);
@@ -147,13 +147,13 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </FormField>
                 </CardContent>
                 <CardFooter>
-                    <UnifiedButton variant="reactbits"
+                    <RainbowButton
                         type="submit"
-                        className="w-full bg-gradient-to-br from-gray-800 to-black"
+                        className="w-full"
                         disabled={isSubmitting}
                     >
                         保存记录
-                    </UnifiedButton>
+                    </RainbowButton>
                 </CardFooter>
             </Card>
         </BaseForm>

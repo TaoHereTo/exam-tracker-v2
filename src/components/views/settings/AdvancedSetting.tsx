@@ -4,7 +4,6 @@ import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalS
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitchSelector";
 import SwitchRenderer from "@/components/ui/SwitchRenderer";
 import PreviewSwitch from "@/components/ui/PreviewSwitch";
@@ -14,10 +13,11 @@ import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Input } from "@/components/ui/input";
-import { Search, Upload, Trash2, RefreshCw, Image as ImageIcon, Eye } from "lucide-react";
+import { Search, RefreshCw, Eye, Image as ImageIcon } from "lucide-react";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
 
 
@@ -69,7 +69,6 @@ export function AdvancedSetting() {
             const images = await supabaseImageManager.getAllImages();
             setCloudImages(images);
         } catch (error) {
-            console.error('加载云端图片失败:', error);
             notify({
                 type: "error",
                 message: "加载失败",
@@ -97,7 +96,6 @@ export function AdvancedSetting() {
                     await supabaseImageManager.uploadImage(file);
                     successCount++;
                 } catch (error) {
-                    console.error(`上传图片失败: ${file.name}`, error);
                 }
             }
 
@@ -124,11 +122,7 @@ export function AdvancedSetting() {
     const confirmDeleteImages = async () => {
         if (imagesToDelete.length === 0) return;
 
-        console.log('=== 开始删除图片 ===');
-        console.log('删除数量:', imagesToDelete.length);
-
         // 立即设置删除状态，确保UI立即响应
-        console.log('设置删除状态为true');
         setIsDeleting(true);
         setDeleteProgress(0);
         setCurrentDeletingImage('准备删除...');
@@ -136,8 +130,6 @@ export function AdvancedSetting() {
 
         // 强制触发UI更新
         await new Promise(resolve => setTimeout(resolve, 100));
-        console.log('删除状态已设置，对话框应该保持打开');
-
         try {
             let successCount = 0;
             const totalImages = imagesToDelete.length;
@@ -147,20 +139,15 @@ export function AdvancedSetting() {
                 const image = cloudImages.find(img => img.id === imageId);
                 const imageName = image?.originalName || `图片${i + 1}`;
 
-                console.log(`正在删除第 ${i + 1}/${totalImages} 张图片: ${imageName}`);
-
                 // 更新当前删除的图片名称和进度
                 setCurrentDeletingImage(imageName);
                 const progress = ((i + 1) / totalImages) * 100;
                 setDeleteProgress(progress);
 
-                console.log(`更新进度 - 图片: ${imageName}, 进度: ${progress}%`);
-
                 try {
                     const success = await supabaseImageManager.deleteImage(imageId);
                     if (success) successCount++;
                 } catch (error) {
-                    console.error(`删除图片失败: ${imageId}`, error);
                 }
 
                 // 添加延迟让用户看到进度变化
@@ -170,8 +157,6 @@ export function AdvancedSetting() {
             // 显示完成状态
             setDeleteProgress(100);
             setCurrentDeletingImage('删除完成');
-            console.log('删除完成，成功删除:', successCount);
-
             // 显示结果通知
             if (successCount > 0) {
                 notify({
@@ -192,7 +177,6 @@ export function AdvancedSetting() {
 
             // 延迟关闭对话框，让用户看到完成状态
             setTimeout(() => {
-                console.log('关闭删除对话框');
                 setIsDeleting(false);
                 setDeleteProgress(0);
                 setCurrentDeletingImage('');
@@ -201,8 +185,6 @@ export function AdvancedSetting() {
             }, 1500);
 
         } catch (error) {
-            console.error('删除过程中发生错误:', error);
-
             // 重置状态
             setIsDeleting(false);
             setDeleteProgress(0);
@@ -389,19 +371,17 @@ export function AdvancedSetting() {
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
-                            <UnifiedButton
-                                variant="outline"
-                                size="sm"
+                            <InteractiveHoverButton
                                 onClick={() => {
                                     setShowImageManager(!showImageManager);
                                     if (!showImageManager) {
                                         loadCloudImages();
                                     }
                                 }}
-                                className="border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                hoverColor="#3B82F6"
                             >
                                 {showImageManager ? '隐藏管理' : '图片管理'}
-                            </UnifiedButton>
+                            </InteractiveHoverButton>
                         </div>
                     </div>
 
@@ -420,46 +400,34 @@ export function AdvancedSetting() {
                                             className="pl-10 w-72 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500"
                                         />
                                     </div>
-                                    <UnifiedButton
-                                        variant="outline"
-                                        size="sm"
+                                    <InteractiveHoverButton
                                         onClick={loadCloudImages}
                                         disabled={isLoadingImages}
-                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        hoverColor="#059669"
                                     >
-                                        <RefreshCw className={`h-4 w-4 ${isLoadingImages ? 'animate-spin' : ''}`} />
                                         刷新
-                                    </UnifiedButton>
+                                    </InteractiveHoverButton>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <UnifiedButton
-                                        variant="outline"
-                                        size="sm"
+                                    <InteractiveHoverButton
                                         onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
-                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        hoverColor="#D97706"
                                     >
-                                        <ImageIcon className="h-4 w-4" />
                                         {imageManagerView === 'grid' ? '列表' : '网格'}
-                                    </UnifiedButton>
-                                    <UnifiedButton
-                                        variant="outline"
-                                        size="sm"
+                                    </InteractiveHoverButton>
+                                    <InteractiveHoverButton
                                         onClick={handleUploadImage}
-                                        className="flex items-center gap-2 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                        hoverColor="#059669"
                                     >
-                                        <Upload className="h-4 w-4" />
                                         上传
-                                    </UnifiedButton>
+                                    </InteractiveHoverButton>
                                     {selectedImages.size > 0 && (
-                                        <UnifiedButton
-                                            variant="outline"
-                                            size="sm"
+                                        <InteractiveHoverButton
                                             onClick={handleDeleteSelectedImages}
-                                            className="flex items-center gap-2 border-red-200 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                                            hoverColor="#EF4444"
                                         >
-                                            <Trash2 className="h-4 w-4" />
                                             删除 ({selectedImages.size})
-                                        </UnifiedButton>
+                                        </InteractiveHoverButton>
                                     )}
                                 </div>
                             </div>
@@ -604,7 +572,6 @@ export function AdvancedSetting() {
 
             {/* 删除确认对话框 */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
-                console.log('删除对话框状态变化:', { open, isDeleting });
                 // 只有在不是删除过程中才允许关闭对话框
                 if (!isDeleting) {
                     if (!open) {
@@ -666,7 +633,6 @@ export function AdvancedSetting() {
                         <AlertDialogCancel
                             disabled={isDeleting}
                             onClick={() => {
-                                console.log('取消删除按钮点击');
                                 if (!isDeleting) {
                                     setDeleteDialogOpen(false);
                                     setImagesToDelete([]);
@@ -679,7 +645,6 @@ export function AdvancedSetting() {
                         </AlertDialogCancel>
                         <Button
                             onClick={() => {
-                                console.log('确认删除按钮点击');
                                 confirmDeleteImages();
                             }}
                             disabled={isDeleting}

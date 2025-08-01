@@ -90,8 +90,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 setImageSource('local');
                 return;
             }
-        } catch (error) {
-            console.error('加载预览图片失败:', error);
+        } catch {
         }
     };
 
@@ -133,21 +132,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
         try {
             setIsLoading(true);
-            console.log('开始上传文件:', file.name, file.type, file.size);
-            console.log('文件详细信息:', {
-                name: file.name,
-                type: file.type,
-                size: file.size,
-                lastModified: file.lastModified
-            });
-
             // 上传到Supabase，保持原始文件名
-            console.log('调用 supabaseImageManager.uploadImage...');
             const imageInfo = await supabaseImageManager.uploadImage(file);
-            console.log('上传结果:', imageInfo);
-
             if (imageInfo) {
-                console.log('上传成功，设置图片信息');
                 onChange?.(imageInfo.id);
                 // 保持在本地上传tab，不切换到云端选择
                 setImageSource('local');
@@ -155,12 +142,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 setPreviewUrl(imageInfo.url);
                 notify({ type: "success", message: "图片上传成功" });
             } else {
-                console.error('上传返回了空结果');
                 notify({ type: "error", message: "图片上传失败", description: "上传返回了空结果" });
             }
         } catch (error) {
-            console.error('上传失败:', error);
-            console.error('错误堆栈:', error instanceof Error ? error.stack : '无堆栈信息');
             const errorMessage = error instanceof Error ? error.message : "图片上传失败";
             notify({ type: "error", message: "图片上传失败", description: errorMessage });
         } finally {
@@ -185,8 +169,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             };
 
             input.click();
-        } catch (error) {
-            console.error('选择文件失败:', error);
+        } catch {
             notify({ type: "error", message: "选择文件失败" });
         }
     };
@@ -202,50 +185,37 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     // 重写的粘贴事件监听 - 简化逻辑，避免重复处理
     const handlePasteEvent = useCallback(async (e: React.ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
-        console.log('=== UnifiedImage 粘贴事件触发 ===');
-
         // 防止重复处理
         if (isProcessingPaste) {
-            console.log('正在处理粘贴事件，跳过重复处理');
             return;
         }
 
         // 检查是否在输入框中粘贴，如果是则不处理
         const target = e.target as HTMLElement;
         if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true')) {
-            console.log('在输入框中粘贴，跳过处理');
             return;
         }
 
         // 获取clipboardData
         const clipboardData = (e as ClipboardEvent).clipboardData;
         if (!clipboardData) {
-            console.log('没有clipboardData，跳过处理');
             return;
         }
 
         // 设置处理状态
         setIsProcessingPaste(true);
 
-        console.log('开始处理图片粘贴');
-        console.log('clipboardData.items:', clipboardData.items?.length || 0);
-        console.log('clipboardData.files:', clipboardData.files?.length || 0);
-
         try {
             let imageFound = false;
 
             // 首先检查传统的 clipboardData.items
             if (clipboardData.items && clipboardData.items.length > 0) {
-                console.log('检查 clipboardData.items...');
                 const items = Array.from(clipboardData.items) as DataTransferItem[];
 
                 for (const item of items) {
-                    console.log('检查item:', item.type, item.kind);
-
                     if (item.kind === 'file' && item.type.startsWith('image/')) {
                         const file = item.getAsFile();
                         if (file && file.size > 0) {
-                            console.log('找到图片文件:', file.name, file.type, file.size);
                             if ('preventDefault' in e) e.preventDefault();
                             await handleFileUpload(file);
                             imageFound = true;
@@ -257,14 +227,10 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
             // 如果items中没有找到，检查files
             if (!imageFound && clipboardData.files && clipboardData.files.length > 0) {
-                console.log('检查 clipboardData.files...');
                 const files = Array.from(clipboardData.files) as File[];
 
                 for (const file of files) {
-                    console.log('检查file:', file.name, file.type, file.size);
-
                     if (file.type.startsWith('image/') && file.size > 0) {
-                        console.log('找到图片文件:', file.name, file.type, file.size);
                         if ('preventDefault' in e) e.preventDefault();
                         await handleFileUpload(file);
                         imageFound = true;
@@ -276,13 +242,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             // 如果传统方法都失败，尝试现代 Clipboard API
             if (!imageFound && navigator.clipboard && navigator.clipboard.read) {
                 try {
-                    console.log('尝试现代 Clipboard API...');
                     const clipboardItems = await navigator.clipboard.read();
-                    console.log('Clipboard API 项目数量:', clipboardItems.length);
-
                     for (const clipboardItem of clipboardItems) {
-                        console.log('Clipboard 项目类型:', clipboardItem.types);
-
                         // 尝试常见的图片类型
                         const imageTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
 
@@ -291,7 +252,6 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 try {
                                     const blob = await clipboardItem.getType(type);
                                     if (blob.size > 0) {
-                                        console.log(`找到图片内容，类型: ${type}，大小: ${blob.size} 字节`);
                                         const extension = type.split('/')[1] || 'png';
                                         const fileName = `pasted-image-${Date.now()}.${extension}`;
                                         const file = new File([blob], fileName, { type });
@@ -302,7 +262,6 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                         break;
                                     }
                                 } catch (error) {
-                                    console.log(`获取类型 ${type} 失败:`, error);
                                 }
                             }
                         }
@@ -310,12 +269,10 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         if (imageFound) break;
                     }
                 } catch (clipboardError) {
-                    console.log('Clipboard API 失败:', clipboardError);
                 }
             }
 
             if (!imageFound) {
-                console.log('没有找到图片内容');
                 // 只在真正没有找到图片时才显示错误通知
                 notify({
                     type: "error",
@@ -324,7 +281,6 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 });
             }
         } catch (error) {
-            console.error('粘贴处理失败:', error);
             notify({
                 type: "error",
                 message: "粘贴失败",
@@ -358,14 +314,12 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const handleDragEnter = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('拖拽进入区域');
         setIsDragOver(true);
     };
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log('拖拽离开区域');
         // 只有当离开拖拽区域时才设置isDragOver为false
         if (!dragAreaRef.current?.contains(e.relatedTarget as Node)) {
             setIsDragOver(false);
@@ -377,57 +331,31 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         e.stopPropagation();
     };
 
+    // 处理拖拽放置
     const handleDrop = async (e: React.DragEvent) => {
         e.preventDefault();
-        e.stopPropagation();
         setIsDragOver(false);
 
-        // 如果正在加载，忽略拖拽
         if (isLoading) {
-            console.log('正在加载中，忽略拖拽操作');
             return;
         }
 
-        console.log('=== 拖拽调试信息 ===');
-        console.log('拖拽事件触发 - 文件数量:', e.dataTransfer.files.length);
-        console.log('当前imageSource:', imageSource);
-        console.log('当前previewUrl:', previewUrl);
-        console.log('拖拽事件对象:', e);
-        console.log('dataTransfer对象:', e.dataTransfer);
-
         const files = Array.from(e.dataTransfer.files);
-        console.log('拖拽的文件:', files.map(f => ({
-            name: f.name,
-            type: f.type,
-            size: f.size,
-            lastModified: f.lastModified
-        })));
 
         // 改进的文件类型检查：不仅检查MIME类型，还检查文件扩展名
         const imageFile = files.find(file => {
             const isImageByMime = file.type.startsWith('image/');
             const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
-            console.log(`文件 ${file.name} 检查结果:`, {
-                isImageByMime,
-                isImageByExtension,
-                mimeType: file.type,
-                extension: file.name.split('.').pop()
-            });
             return isImageByMime || isImageByExtension;
         });
 
-        console.log('找到的图片文件:', imageFile);
-
         if (imageFile) {
-            console.log('开始上传拖拽的图片:', imageFile.name);
             try {
                 await handleFileUpload(imageFile);
-                console.log('拖拽上传完成');
             } catch (error) {
-                console.error('拖拽上传过程中发生错误:', error);
+                // 错误处理已在 handleFileUpload 中完成
             }
         } else {
-            console.log('没有找到有效的图片文件');
             notify({ type: "error", message: "请拖拽图片文件" });
         }
     };
@@ -482,7 +410,6 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
                 setIsLoading(false);
             } catch (error) {
-                console.error('加载图片失败:', error);
                 setIsLoading(false);
             }
         };
@@ -500,13 +427,13 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     // 渲染上传模式
     const renderUploadMode = () => (
         <div
-            className={`space-y-4 ${className}`}
+            className={`${className}`}
             tabIndex={0}
             data-unified-image="true"
             data-component-id={componentId.current}
         >
             {/* 图片选择区域 */}
-            <div className="space-y-3">
+            <div className="space-y-5">
                 {/* Tab切换：本地上传 vs 云端选择 */}
                 <div className="flex border rounded-lg p-0.5 bg-gray-50 dark:bg-gray-800">
                     <button
@@ -514,7 +441,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         onClick={() => {
                             setImageSource('local');
                         }}
-                        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors ${imageSource === 'local'
+                        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-all active:scale-95 ${imageSource === 'local'
                             ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
                             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                             }`}
@@ -527,7 +454,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         onClick={() => {
                             setImageSource('cloud');
                         }}
-                        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-colors ${imageSource === 'cloud'
+                        className={`flex-1 py-1.5 px-3 text-sm font-medium rounded-md transition-all active:scale-95 ${imageSource === 'cloud'
                             ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm'
                             : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
                             }`}
@@ -553,7 +480,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                         dragAreaRef.current?.focus();
                                     }}
                                     tabIndex={0}
-                                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer w-full max-w-md h-32 flex flex-col items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isDragOver
+                                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer w-full max-w-md h-32 flex flex-col items-center justify-center focus:outline-none ${isDragOver
                                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                         : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                                         } ${isLoading ? 'opacity-50' : ''}`}
@@ -592,7 +519,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         <div className="w-full flex justify-center">
                             {!previewUrl && (
                                 <div
-                                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer w-full max-w-md h-32 flex flex-col items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${isLoading ? 'opacity-50' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'}`}
+                                    className={`relative border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer w-full max-w-md h-32 flex flex-col items-center justify-center focus:outline-none ${isLoading ? 'opacity-50' : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'}`}
                                     onClick={handleCloudSelect}
                                     style={{ pointerEvents: isLoading ? 'none' : 'auto' }}
                                 >

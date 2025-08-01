@@ -42,29 +42,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
     const { notify } = useNotification();
 
-    // 测试连接
-    const testConnection = useCallback(async () => {
-        try {
-            const result = await supabaseImageManager.testConnection();
-            setConnectionStatus(result);
-
-            // 只有在连接真正失败时才显示通知
-            if (!result.success && !result.message.includes('连接正常')) {
-                notify({
-                    type: "error",
-                    message: "连接测试失败",
-                    description: result.message
-                });
-            }
-        } catch (error) {
-            console.error('连接测试失败:', error);
-            setConnectionStatus({
-                success: false,
-                message: '连接测试失败'
-            });
-        }
-    }, [notify]);
-
     // 加载可用图片
     const loadAvailableImages = useCallback(async () => {
         setIsLoading(true);
@@ -75,7 +52,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
             const images = await supabaseImageManager.getAllImages();
             setAvailableImages(images);
         } catch (error) {
-            console.error('加载图片列表失败:', error);
             notify({
                 type: "error",
                 message: "加载失败",
@@ -90,16 +66,14 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
     useEffect(() => {
         if (isOpen) {
-            testConnection();
             loadAvailableImages();
         }
-    }, [isOpen, testConnection, loadAvailableImages]);
+    }, [isOpen, loadAvailableImages]);
 
     // 刷新图片列表
     const handleRefresh = async () => {
         setIsLoading(true);
         await new Promise(resolve => setTimeout(resolve, 500));
-        await testConnection();
         // 清理无效记录并重新加载
         supabaseImageManager.cleanupInvalidImageRecords();
         await loadAvailableImages();
@@ -141,7 +115,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 });
             }
         } catch (error) {
-            console.error('删除图片失败:', error);
             notify({
                 type: "error",
                 message: "删除失败",
@@ -154,8 +127,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         }
     };
 
-
-
     // 使用useMemo来处理过滤和排序
     const processedImages = useMemo(() => {
         // 过滤图片
@@ -164,40 +135,30 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
             image.fileName.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        // 使用智能排序
-        filtered.sort(smartImageSort);
-
-        return filtered;
+        // 智能排序
+        return filtered.sort(smartImageSort);
     }, [availableImages, searchTerm]);
 
+    // 处理图片选择
     const handleImageSelect = (imageId: string) => {
-        // 如果点击的是已选中的图片，则取消选中
-        if (selectedImage === imageId) {
-            setSelectedImage(null);
-        } else {
-            // 否则选中新图片
-            setSelectedImage(imageId);
-        }
+        setSelectedImage(imageId);
     };
 
+    // 确认选择
     const handleConfirm = () => {
         if (selectedImage) {
             onImageSelected(selectedImage);
             setIsOpen(false);
             setSelectedImage(null);
-            setSearchTerm('');
-            setImageLoadErrors(new Set());
         }
     };
 
+    // 取消选择
     const handleCancel = () => {
         setIsOpen(false);
         setSelectedImage(null);
         setSearchTerm('');
-        setImageLoadErrors(new Set());
     };
-
-
 
     // 格式化文件大小
     const formatFileSize = (bytes: number): string => {
@@ -205,7 +166,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         const k = 1024;
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     };
 
     // 格式化上传时间
@@ -214,10 +175,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         const now = new Date();
         const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
-        if (diffInHours < 1) {
-            return '刚刚';
-        } else if (diffInHours < 24) {
-            return `${Math.floor(diffInHours)}小时前`;
+        if (diffInHours < 24) {
+            return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
         } else {
             return date.toLocaleDateString('zh-CN');
         }
@@ -227,81 +186,69 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         <>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    {trigger || (
-                        <Button variant="outline" size="sm" className="flex items-center gap-2">
-                            <Cloud className="h-4 w-4" />
-                            选择云端图片
-                        </Button>
-                    )}
+                    {trigger || <Button variant="outline">选择图片</Button>}
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl h-[85vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Cloud className="h-5 w-5" />
-                            选择云端图片
+                            从云端选择图片
                         </DialogTitle>
                         <DialogDescription>
-                            从云端存储桶中选择已上传的图片
+                            从云端存储中选择图片，支持搜索和预览
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="flex-1 flex flex-col space-y-4 min-h-0">
-                        {/* 连接状态提示 - 只有在真正有问题且没有图片时才显示 */}
-                        {connectionStatus && !connectionStatus.success && availableImages.length === 0 && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                                <AlertCircle className="h-4 w-4 text-red-500" />
-                                <div className="text-sm text-red-700 dark:text-red-300">
-                                    <div className="font-medium">连接问题</div>
-                                    <div className="text-xs">{connectionStatus.message}</div>
-                                    <div className="text-xs mt-1">
-                                        请检查 Supabase 配置或执行 SUPABASE_RLS_FIX.sql 中的 SQL 命令
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-
-
-                        {/* 搜索框和操作按钮 */}
-                        <div className="flex gap-2 items-center">
+                        {/* 搜索和操作栏 */}
+                        <div className="flex items-center gap-2">
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                                 <Input
-                                    placeholder="搜索图片..."
+                                    placeholder="搜索图片名称..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10 h-9"
+                                    className="pl-10"
                                 />
                             </div>
-
                             <Button
                                 variant="outline"
+                                size="sm"
                                 onClick={handleRefresh}
                                 disabled={isLoading}
-                                className="flex items-center gap-2 h-9 px-3"
                             >
-                                <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+                                <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                 刷新
                             </Button>
-
-
                         </div>
+
+                        {/* 连接状态提示 */}
+                        {connectionStatus && (
+                            <div className={`flex items-center gap-2 p-3 rounded-lg text-sm ${connectionStatus.success
+                                ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
+                                : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
+                                }`}>
+                                <AlertCircle className="h-4 w-4" />
+                                {connectionStatus.message}
+                            </div>
+                        )}
 
                         {/* 图片列表 */}
                         <div className="flex-1 overflow-y-auto" style={{ height: '400px', display: 'flex', flexDirection: 'column' }}>
                             {isLoading ? (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="flex items-center gap-2 text-gray-500">
-                                        <RefreshCw className="h-5 w-5 animate-spin" />
-                                        正在加载图片列表...
+                                    <div className="text-center">
+                                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-500 mx-auto mb-2"></div>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">正在加载图片...</p>
                                     </div>
                                 </div>
                             ) : processedImages.length === 0 ? (
                                 <div className="flex items-center justify-center h-full">
-                                    <div className="text-center text-gray-500">
-                                        <Cloud className="h-12 w-12 mx-auto mb-2 text-gray-300" />
-                                        <p>{searchTerm ? '没有找到匹配的图片' : '没有已上传的图片'}</p>
-                                        <p className="text-sm mt-1">请先上传图片到云端存储</p>
+                                    <div className="text-center">
+                                        <Cloud className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {searchTerm ? '没有找到匹配的图片' : '云端暂无图片'}
+                                        </p>
                                     </div>
                                 </div>
                             ) : (
@@ -310,40 +257,27 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                         {processedImages.map((image) => (
                                             <div
                                                 key={image.id}
-                                                className={`relative border rounded-lg p-2 cursor-pointer transition-all group ${selectedImage === image.id
+                                                className={`group relative cursor-pointer rounded-lg border-2 transition-all hover:shadow-md ${selectedImage === image.id
                                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                                                     }`}
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
                                                 <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
-                                                    {imageLoadErrors.has(image.id) ? (
-                                                        <div className="flex items-center justify-center w-full h-full">
-                                                            <div className="text-center">
-                                                                <svg className="h-8 w-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                                </svg>
-                                                                <p className="text-xs text-gray-500">图片加载失败</p>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <Image
-                                                            src={image.url}
-                                                            alt={`图片: ${image.originalName}`}
-                                                            className="w-full h-full object-cover"
-                                                            width={200}
-                                                            height={200}
-                                                            onError={() => {
-                                                                console.warn(`图片加载失败: ${image.originalName} (${image.url})`);
-                                                                setImageLoadErrors(prev => new Set(prev).add(image.id));
-                                                            }}
-                                                        />
-                                                    )}
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={image.originalName}
+                                                        width={200}
+                                                        height={200}
+                                                        className="object-cover w-full h-full"
+                                                        onError={() => {
+                                                            setImageLoadErrors(prev => new Set(prev).add(image.id));
+                                                        }}
+                                                    />
                                                 </div>
 
-                                                {/* 图片信息 */}
-                                                <div className="space-y-1">
-                                                    <div className="text-xs text-center truncate font-medium">
+                                                <div className="p-2">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate text-center">
                                                         {image.originalName}
                                                     </div>
                                                     <div className="text-xs text-gray-500 text-center">
@@ -353,8 +287,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                         {formatUploadTime(image.uploadedAt)}
                                                     </div>
                                                 </div>
-
-
 
                                                 {/* 选择指示器 */}
                                                 {selectedImage === image.id && (

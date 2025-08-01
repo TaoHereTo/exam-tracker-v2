@@ -39,17 +39,14 @@ export const PasteProvider: React.FC<PasteProviderProps> = ({ children }) => {
 
                 // 只处理当前激活模块中的UnifiedImage组件
                 if (activeSlide && currentUnifiedImage && activeSlide.contains(currentUnifiedImage)) {
-                    console.log('全局粘贴事件在激活模块的UnifiedImage区域内触发');
                     const componentId = currentUnifiedImage.getAttribute('data-component-id');
                     if (componentId && pasteHandlers.current.has(componentId)) {
                         await pasteHandlers.current.get(componentId)!(e);
                     }
                 } else {
-                    console.log('粘贴事件在非激活模块中，跳过处理');
-                }
+                    }
             } else {
                 // 如果没有轮播容器，则直接处理
-                console.log('全局粘贴事件在UnifiedImage区域内触发（非轮播模式）');
                 const componentId = target?.closest('[data-unified-image="true"]')?.getAttribute('data-component-id');
                 if (componentId && pasteHandlers.current.has(componentId)) {
                     await pasteHandlers.current.get(componentId)!(e);

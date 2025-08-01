@@ -72,6 +72,14 @@ export const TimePicker: React.FC<TimePickerProps> = ({
         setIsOpen(false);
     };
 
+    // 处理键盘事件
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleConfirm();
+        }
+    };
+
     // 重置
     const handleReset = () => {
         setMinutes(0);
@@ -96,9 +104,8 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4" align="start">
-                <div className="space-y-4">
+                <div className="space-y-4" onKeyDown={handleKeyDown}>
                     <div className="text-center">
-                        <h4 className="font-medium leading-none mb-2">选择时间</h4>
                         <div className="text-2xl font-mono text-center py-2">
                             {displayValue}
                         </div>

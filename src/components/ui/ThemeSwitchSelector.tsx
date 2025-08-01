@@ -44,7 +44,7 @@ export function ThemeSwitchSelector({ type, previewOnly = false }: ThemeSwitchSe
                 return (
                     <button
                         onClick={handleThemeToggle}
-                        className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center transition-colors hover:bg-gray-300 dark:hover:bg-gray-600"
+                        className="w-12 h-12 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center transition-all hover:bg-gray-300 dark:hover:bg-gray-600 active:scale-95"
                         aria-label="切换主题"
                     >
                         {isDark ? (

@@ -8,7 +8,6 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
             const saved = localStorage.getItem(key);
             return saved ? JSON.parse(saved) : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     });
@@ -18,8 +17,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
             try {
                 localStorage.setItem(key, JSON.stringify(state));
             } catch (error) {
-                console.error(`Error writing localStorage key "${key}":`, error);
-            }
+                }
         }
     }, [key, state]);
 
@@ -34,7 +32,6 @@ export function useLocalStorageBoolean(key: string, defaultValue: boolean) {
             const saved = localStorage.getItem(key);
             return saved ? saved === 'true' : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     });
@@ -44,8 +41,7 @@ export function useLocalStorageBoolean(key: string, defaultValue: boolean) {
             try {
                 localStorage.setItem(key, state.toString());
             } catch (error) {
-                console.error(`Error writing localStorage key "${key}":`, error);
-            }
+                }
         }
     }, [key, state]);
 
@@ -60,7 +56,6 @@ export function useLocalStorageString(key: string, defaultValue: string) {
             const saved = localStorage.getItem(key);
             return saved !== null ? saved : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     });
@@ -70,8 +65,7 @@ export function useLocalStorageString(key: string, defaultValue: string) {
             try {
                 localStorage.setItem(key, state);
             } catch (error) {
-                console.error(`Error writing localStorage key "${key}":`, error);
-            }
+                }
         }
     }, [key, state]);
 
@@ -86,7 +80,6 @@ export const localStorageUtils = {
             const saved = localStorage.getItem(key);
             return saved ? JSON.parse(saved) : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     },
@@ -96,8 +89,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
-            console.error(`Error writing localStorage key "${key}":`, error);
-        }
+            }
     },
 
     getBoolean: (key: string, defaultValue: boolean): boolean => {
@@ -106,7 +98,6 @@ export const localStorageUtils = {
             const saved = localStorage.getItem(key);
             return saved ? saved === 'true' : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     },
@@ -116,8 +107,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, value.toString());
         } catch (error) {
-            console.error(`Error writing localStorage key "${key}":`, error);
-        }
+            }
     },
 
     getString: (key: string, defaultValue: string): string => {
@@ -126,7 +116,6 @@ export const localStorageUtils = {
             const saved = localStorage.getItem(key);
             return saved !== null ? saved : defaultValue;
         } catch (error) {
-            console.error(`Error reading localStorage key "${key}":`, error);
             return defaultValue;
         }
     },
@@ -136,8 +125,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, value);
         } catch (error) {
-            console.error(`Error writing localStorage key "${key}":`, error);
-        }
+            }
     },
 
     remove: (key: string): void => {
@@ -145,7 +133,6 @@ export const localStorageUtils = {
         try {
             localStorage.removeItem(key);
         } catch (error) {
-            console.error(`Error removing localStorage key "${key}":`, error);
-        }
+            }
     }
 }; 

@@ -1,8 +1,9 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MODULES } from '@/config/exam';
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
+
 
 
 interface StudyPlan {
@@ -41,14 +42,12 @@ export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
                 <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                         <span>{plan.name}</span>
-                        <UnifiedButton
-                            variant="reactbits"
+                        <InteractiveHoverButton
                             onClick={onBack}
-                            size="sm"
-                            gradient="gray"
+                            hoverColor="#6B7280"
                         >
                             返回
-                        </UnifiedButton>
+                        </InteractiveHoverButton>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

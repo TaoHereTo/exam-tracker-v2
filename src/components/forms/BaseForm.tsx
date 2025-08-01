@@ -193,7 +193,7 @@ export function FormButton({
             type={type}
             onClick={onClick}
             disabled={disabled}
-            className={className}
+            className={`transition-all active:scale-95 ${className}`}
         >
             {children}
         </button>

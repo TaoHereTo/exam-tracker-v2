@@ -1,4 +1,4 @@
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import React, { useRef } from "react";
 
@@ -20,13 +20,13 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
     };
 
     return (
-        <UnifiedButton variant="reactbits"
+        <RainbowButton
             onClick={handleSave}
-            size="sm"
-            className="bg-gradient-to-br from-gray-800 to-black"
+            size="default"
+            className="px-6 py-2"
         >
             保存所有设置
-        </UnifiedButton>
+        </RainbowButton>
     );
 };
 

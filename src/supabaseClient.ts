@@ -7,9 +7,3 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 // 创建并导出 Supabase 客户端
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// 添加调试信息
-console.log('Supabase客户端已创建 (TypeScript版本):', {
-    url: supabaseUrl,
-    keyLength: supabaseKey.length,
-    clientCreated: !!supabase
-}) 

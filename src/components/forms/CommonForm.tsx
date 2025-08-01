@@ -1,15 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { useFormNotification } from "@/hooks/useFormNotification";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
+import { useFormNotification } from "@/hooks/useFormNotification";
+import { FormError } from "@/components/ui/form-error";
 
 interface CommonFormProps {
     onAddKnowledge: (knowledge: { type: string; note: string; subCategory: '经济常识' | '法律常识' | '科技常识' | '人文常识' | '地理国情'; imagePath?: string }) => void;
@@ -124,7 +125,9 @@ export const CommonForm: React.FC<CommonFormProps> = ({
                         value={type}
                         onChange={e => handleTypeChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.type ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.type} />
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="note">技巧记录</Label>
@@ -134,33 +137,29 @@ export const CommonForm: React.FC<CommonFormProps> = ({
                         value={note}
                         onChange={e => handleNoteChange(e.target.value)}
                         onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
+                        className={errors.note ? 'border-red-500 ring-red-500/20' : ''}
                     />
+                    <FormError error={errors.note} />
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage
-                    mode="upload"
-                    value={imagePath}
-                    onChange={setImagePath}
-                />
-
-                {/* 错误提示 */}
-                {(errors.type || errors.note) && (
-                    <div className="text-sm text-red-500 text-center">
-                        {errors.type || errors.note}
-                    </div>
-                )}
+                <div className="pt-0">
+                    <UnifiedImage
+                        mode="upload"
+                        value={imagePath}
+                        onChange={setImagePath}
+                    />
+                </div>
             </CardContent>
-            <CardFooter>
-                <UnifiedButton
-                    variant="reactbits"
-                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+            <CardFooter className="pt-1">
+                <RainbowButton
+                    className="w-full"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </UnifiedButton>
+                </RainbowButton>
             </CardFooter>
         </Card>
     );

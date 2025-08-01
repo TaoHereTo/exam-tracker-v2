@@ -25,79 +25,7 @@ export class SupabaseImageManager {
         return SupabaseImageManager.instance;
     }
 
-    // 测试 Supabase 连接和权限
-    public async testConnection(): Promise<{ success: boolean; message: string }> {
-        try {
-            // 首先尝试直接访问存储桶，如果成功说明存储桶存在且可访问
-            const { data: files, error: filesError } = await supabase.storage
-                .from(this.BUCKET_NAME)
-                .list('', { limit: 1 });
 
-            if (filesError) {
-                // 如果无法列出文件，尝试列出存储桶
-                const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-
-                if (listError) {
-                    return {
-                        success: false,
-                        message: `无法访问存储服务: ${listError.message}`
-                    };
-                }
-
-                // 检查目标存储桶是否存在
-                const bucketExists = buckets?.some(bucket => bucket.name === this.BUCKET_NAME);
-
-                if (!bucketExists) {
-                    return {
-                        success: false,
-                        message: `存储桶 '${this.BUCKET_NAME}' 不存在，请手动创建`
-                    };
-                }
-
-                return {
-                    success: false,
-                    message: `存储桶存在但无法访问文件: ${filesError.message}`
-                };
-            }
-
-            // 如果能成功列出文件，说明连接正常
-            let message = '连接正常，权限配置正确';
-
-            // 检查是否有文件，如果有则测试URL生成
-            if (files && files.length > 0) {
-                const testFile = files[0];
-                const { data: urlData } = supabase.storage
-                    .from(this.BUCKET_NAME)
-                    .getPublicUrl(testFile.name);
-
-
-
-                // 测试URL是否可访问
-                try {
-                    const response = await fetch(urlData.publicUrl, { method: 'HEAD' });
-                    if (response.ok) {
-                        message += '，图片URL可正常访问';
-                    } else {
-                        message += `，但图片URL访问失败 (${response.status})`;
-                    }
-                } catch {
-                    message += '，但图片URL访问失败 (网络错误)';
-                }
-            } else {
-                message += '，存储桶为空';
-            }
-
-            return {
-                success: true,
-                message
-            };
-        } catch (error) {
-            return {
-                success: false,
-                message: `连接测试失败: ${error instanceof Error ? error.message : '未知错误'}`
-            };
-        }
-    }
 
     // 初始化存储桶（如果不存在）
     public async initializeBucket(): Promise<void> {
@@ -128,7 +56,6 @@ export class SupabaseImageManager {
                 }
             }
         } catch (error) {
-            console.error('初始化存储桶时出现问题:', error);
             // 不抛出错误，让程序继续运行
         }
     }
@@ -136,9 +63,6 @@ export class SupabaseImageManager {
     // 上传图片到 Supabase
     public async uploadImage(file: File): Promise<SupabaseImageInfo> {
         try {
-            console.log('开始上传图片:', file.name, file.size, file.type);
-            console.log('Supabase客户端状态:', !!supabase);
-
             // 尝试初始化存储桶（但不强制要求成功）
             await this.initializeBucket();
 
@@ -171,12 +95,6 @@ export class SupabaseImageManager {
                 });
 
             if (error) {
-                console.error('上传图片失败:', error);
-                console.error('错误详情:', {
-                    message: error.message,
-                    name: error.name
-                });
-
                 // 如果是权限错误，提供更详细的错误信息
                 if (error.message.includes('row-level security') || error.message.includes('RLS')) {
                     throw new Error('权限不足：请检查 Supabase 存储桶的 RLS 策略设置。请执行 SUPABASE_RLS_FIX.sql 中的 SQL 命令。');
@@ -209,7 +127,6 @@ export class SupabaseImageManager {
 
             return imageInfo;
         } catch (error) {
-            console.error('上传图片失败:', error);
             // 不重新抛出错误，而是返回一个错误对象，避免页面崩溃
             throw new Error(`上传失败: ${error instanceof Error ? error.message : '未知错误'}`);
         }
@@ -227,7 +144,6 @@ export class SupabaseImageManager {
                 });
 
             if (error) {
-                console.error('获取图片列表失败:', error);
                 // 如果远程获取失败，返回本地存储的图片信息
                 return this.getAllLocalImageInfo();
             }
@@ -299,7 +215,6 @@ export class SupabaseImageManager {
 
             return images;
         } catch (error) {
-            console.error('获取图片列表失败:', error);
             // 如果远程获取失败，返回本地存储的图片信息
             return this.getAllLocalImageInfo();
         }
@@ -313,7 +228,6 @@ export class SupabaseImageManager {
                 .remove([imageId]);
 
             if (error) {
-                console.error('删除图片失败:', error);
                 return false;
             }
 
@@ -322,7 +236,6 @@ export class SupabaseImageManager {
 
             return true;
         } catch (error) {
-            console.error('删除图片失败:', error);
             return false;
         }
     }
@@ -366,10 +279,8 @@ export class SupabaseImageManager {
                 return urlData.publicUrl;
             }
 
-            console.warn(`未找到图片信息: ${imageId}`);
             return null;
         } catch (error) {
-            console.error('获取图片URL失败:', error);
             return null;
         }
     }
@@ -380,7 +291,6 @@ export class SupabaseImageManager {
             const response = await fetch(url, { method: 'HEAD' });
             return response.ok;
         } catch (error) {
-            console.error('验证图片URL失败:', error);
             return false;
         }
     }
@@ -399,7 +309,6 @@ export class SupabaseImageManager {
 
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(images));
         } catch (error) {
-            console.error('保存图片信息失败:', error);
         }
     }
 
@@ -409,7 +318,6 @@ export class SupabaseImageManager {
             const stored = localStorage.getItem(this.STORAGE_KEY);
             return stored ? JSON.parse(stored) : [];
         } catch (error) {
-            console.error('获取本地图片信息失败:', error);
             return [];
         }
     }
@@ -421,7 +329,6 @@ export class SupabaseImageManager {
             const filteredImages = images.filter(img => img.id !== imageId);
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredImages));
         } catch (error) {
-            console.error('删除本地图片信息失败:', error);
         }
     }
 
@@ -438,7 +345,6 @@ export class SupabaseImageManager {
             const allImages = Array.from(existingMap.values());
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(allImages));
         } catch (error) {
-            console.error('导入图片信息失败:', error);
         }
     }
 
@@ -450,7 +356,6 @@ export class SupabaseImageManager {
             const filteredImages = images.filter(img => usedSet.has(img.id));
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredImages));
         } catch (error) {
-            console.error('清理未使用的图片信息失败:', error);
         }
     }
 
@@ -499,10 +404,8 @@ export class SupabaseImageManager {
 
             if (validImages.length !== images.length) {
                 localStorage.setItem(this.STORAGE_KEY, JSON.stringify(validImages));
-                console.log(`清理了 ${images.length - validImages.length} 个无效的图片记录`);
             }
         } catch (error) {
-            console.error('清理无效图片记录失败:', error);
         }
     }
 }

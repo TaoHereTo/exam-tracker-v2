@@ -4,10 +4,10 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useFormNotification } from "@/hooks/useFormNotification";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
 import { FormError } from "@/components/ui/form-error";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 export interface KnowledgeFormProps {
     title: string;
@@ -124,22 +124,23 @@ export const KnowledgeForm: React.FC<KnowledgeFormProps> = ({
                 </div>
 
                 {/* 图片上传组件 */}
-                <UnifiedImage
-                    mode="upload"
-                    value={imagePath}
-                    onChange={setImagePath}
-                />
+                <div className="pt-0">
+                    <UnifiedImage
+                        mode="upload"
+                        value={imagePath}
+                        onChange={setImagePath}
+                    />
+                </div>
             </CardContent>
-            <CardFooter>
-                <UnifiedButton
-                    variant="reactbits"
-                    className="w-full bg-gradient-to-br from-gray-800 to-black"
+            <CardFooter className="pt-1">
+                <RainbowButton
+                    className="w-full"
                     type="button"
                     onClick={handleSubmit}
                     size="sm"
                 >
                     保存知识点
-                </UnifiedButton>
+                </RainbowButton>
             </CardFooter>
         </Card>
     );

@@ -92,7 +92,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
                                             aria-label={child.label}
                                             onClick={() => setActiveTab(child.key)}
                                             className={
-                                                "size-12 rounded-full flex items-center justify-center pointer-events-auto relative transition-colors duration-150 " +
+                                                "size-12 rounded-full flex items-center justify-center pointer-events-auto relative transition-all duration-150 active:scale-95 " +
                                                 (activeTab === child.key ? "" : "hover:bg-gray-200/70 dark:hover:bg-gray-700/60")
                                             }
                                         >

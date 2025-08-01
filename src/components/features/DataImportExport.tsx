@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { UnifiedButton } from "@/components/ui/UnifiedButton";
-import { Download, Upload } from "lucide-react";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+
 
 interface DataImportExportProps {
     onImport: () => void;
@@ -13,30 +13,24 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
     const clearDialogRef = useRef<HTMLButtonElement>(null);
     return (
         <div className="flex gap-4 mb-6">
-            <UnifiedButton
-                variant="reactbits"
+            <InteractiveHoverButton
                 onClick={onImport}
-                size="sm"
-                style={{ background: '#D97706' }}
+                hoverColor="#D97706"
             >
-                <Download className="w-4 h-4 mr-0" />
                 导入数据
-            </UnifiedButton>
-            <UnifiedButton
-                variant="reactbits"
+            </InteractiveHoverButton>
+            <InteractiveHoverButton
                 onClick={onExport}
-                size="sm"
-                style={{ background: '#059669' }}
+                hoverColor="#059669"
             >
-                <Upload className="w-4 h-4 mr-0" />
                 导出数据
-            </UnifiedButton>
+            </InteractiveHoverButton>
             {onClearAllData && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <UnifiedButton variant="reactbits" ref={clearDialogRef} size="sm" style={{ background: '#EF4444' }}>
+                        <InteractiveHoverButton ref={clearDialogRef} hoverColor="#EF4444">
                             清空所有数据
-                        </UnifiedButton>
+                        </InteractiveHoverButton>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                         <AlertDialogHeader>
