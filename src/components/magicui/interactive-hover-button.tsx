@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, Edit, Download, Upload, Trash2, Plus, Eye, Settings, FileText, BarChart3, Calendar, Target, BookOpen, History, CheckCircle, XCircle, RefreshCw, Search, Filter, SortAsc, SortDesc, Star, Heart, Share2, Copy, Link, ExternalLink, Home, User, Bell, Mail, Phone, Camera, Video, Music, Image, File, Folder, Database, Cloud, Wifi, Battery, Lock, Unlock, Key, Shield, AlertCircle, Info, HelpCircle, ChevronRight, ChevronLeft, ChevronUp, ChevronDown } from "lucide-react";
+import { ArrowRight, Edit, Download, Upload, Trash2, Plus, Eye, Settings, FileText, BarChart3, Calendar, Target, BookOpen, History, CheckCircle, XCircle, RefreshCw, Search, Filter, SortAsc, SortDesc, Star, Heart, Share2, Copy, Link, ExternalLink, Home, User, Bell, Mail, Phone, Camera, Video, Music, Image, File, Folder, Database, Cloud, Wifi, Battery, Lock, Unlock, Key, Shield, AlertCircle, Info, HelpCircle, ChevronRight, ChevronLeft, ChevronUp, ChevronDown, List, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface InteractiveHoverButtonProps
@@ -30,6 +30,25 @@ export const InteractiveHoverButton = React.forwardRef<
   const getAutoIcon = (text: string) => {
     const lowerText = text.toLowerCase();
 
+    // 图片管理相关 - 需要放在最前面，避免被其他规则匹配
+    if (lowerText.includes('图片管理') || lowerText.includes('image management')) {
+      return <Settings className="w-4 h-4" />;
+    }
+
+    // 隐藏管理相关
+    if (lowerText.includes('隐藏管理') || lowerText.includes('hide management')) {
+      return <XCircle className="w-4 h-4" />;
+    }
+
+    // 列表/网格视图相关
+    if (lowerText.includes('列表') || lowerText.includes('list')) {
+      return <List className="w-4 h-4" />;
+    }
+
+    if (lowerText.includes('网格') || lowerText.includes('grid')) {
+      return <Grid3X3 className="w-4 h-4" />;
+    }
+
     // 编辑相关
     if (lowerText.includes('编辑') || lowerText.includes('修改') || lowerText.includes('edit')) {
       return <Edit className="w-4 h-4" />;
@@ -42,12 +61,12 @@ export const InteractiveHoverButton = React.forwardRef<
 
     // 导出相关
     if (lowerText.includes('导出') || lowerText.includes('下载') || lowerText.includes('export') || lowerText.includes('download')) {
-      return <Download className="w-4 h-4" />;
+      return <Upload className="w-4 h-4" />;
     }
 
     // 导入相关
     if (lowerText.includes('导入') || lowerText.includes('上传') || lowerText.includes('import') || lowerText.includes('upload')) {
-      return <Upload className="w-4 h-4" />;
+      return <Download className="w-4 h-4" />;
     }
 
     // 新建/添加相关
@@ -139,6 +158,8 @@ export const InteractiveHoverButton = React.forwardRef<
     if (lowerText.includes('前进') || lowerText.includes('next') || lowerText.includes('forward')) {
       return <ChevronRight className="w-4 h-4" />;
     }
+
+
 
     // 默认返回箭头
     return <ArrowRight className="w-4 h-4" />;

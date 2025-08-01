@@ -10,10 +10,11 @@ import PreviewSwitch from "@/components/ui/PreviewSwitch";
 import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
 import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Input } from "@/components/ui/input";
-import { Search, RefreshCw, Eye, Image as ImageIcon } from "lucide-react";
+import { Search, RefreshCw, Eye, Image as ImageIcon, Settings, Grid3X3, List, Trash2, Upload } from "lucide-react";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -437,7 +438,7 @@ export function AdvancedSetting() {
                                 {isLoadingImages ? (
                                     <div className="flex items-center justify-center py-12">
                                         <div className="flex items-center gap-3 text-gray-500">
-                                            <RefreshCw className="h-5 w-5 animate-spin" />
+                                            <LoadingSpinner size="md" color="#3B82F6" />
                                             <span className="text-sm">正在加载...</span>
                                         </div>
                                     </div>
@@ -595,10 +596,6 @@ export function AdvancedSetting() {
                                 <div className="space-y-4">
                                     <p>正在删除图片，请稍候...</p>
                                     <div className="space-y-2">
-                                        <div className="flex justify-between text-sm">
-                                            <span>删除进度</span>
-                                            <span>{Math.round(deleteProgress)}%</span>
-                                        </div>
                                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                             <div
                                                 className="bg-red-500 h-2 rounded-full transition-all duration-300 ease-out"
@@ -610,9 +607,6 @@ export function AdvancedSetting() {
                                                 正在删除: {currentDeletingImage}
                                             </p>
                                         )}
-                                        <div className="text-xs text-gray-500 mt-2">
-                                            状态: {isDeleting ? '删除中' : '准备中'} | 进度: {deleteProgress.toFixed(1)}%
-                                        </div>
                                     </div>
                                 </div>
                             ) : (

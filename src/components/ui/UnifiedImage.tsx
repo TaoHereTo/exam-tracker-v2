@@ -588,6 +588,18 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 className="max-w-full max-h-48 object-contain rounded"
                                 width={400}
                                 height={200}
+                                onError={(e) => {
+                                    // 图片加载失败时的处理
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.backgroundColor = '#f3f4f6';
+                                    target.style.display = 'flex';
+                                    target.style.alignItems = 'center';
+                                    target.style.justifyContent = 'center';
+                                    target.style.color = '#6b7280';
+                                    target.style.fontSize = '12px';
+                                    target.textContent = '图片加载失败';
+                                    // 不抛出console.error，避免页面报错
+                                }}
                             />
                             {/* 存储位置指示器 */}
                             <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
@@ -673,6 +685,18 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 }}
                                                 width={600}
                                                 height={400}
+                                                onError={(e) => {
+                                                    // 图片加载失败时的处理
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.style.backgroundColor = '#f3f4f6';
+                                                    target.style.display = 'flex';
+                                                    target.style.alignItems = 'center';
+                                                    target.style.justifyContent = 'center';
+                                                    target.style.color = '#6b7280';
+                                                    target.style.fontSize = '14px';
+                                                    target.textContent = '图片加载失败';
+                                                    // 不抛出console.error，避免页面报错
+                                                }}
                                             />
                                         </div>
                                     </div>

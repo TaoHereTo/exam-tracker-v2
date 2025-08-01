@@ -9,8 +9,6 @@ import {
     CarouselApi,
 } from "@/components/ui/carousel";
 import ModuleForm from '@/components/forms/ModuleForm';
-import VerbalForm from '@/components/forms/VerbalForm';
-import PoliticsForm from '@/components/forms/PoliticsForm';
 import type { KnowledgeItem } from "@/types/record";
 import { MODULES } from "@/config/exam";
 
@@ -64,7 +62,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
             </CarouselItem>
             <CarouselItem data-carousel-item data-active={tab === 'politics'}>
                 <div className="p-1">
-                    <PoliticsForm onAddKnowledge={handleAdd('politics')} />
+                    <ModuleForm module="politics" onAddKnowledge={handleAdd('politics')} />
                 </div>
             </CarouselItem>
             <CarouselItem data-carousel-item data-active={tab === 'math'}>
@@ -79,7 +77,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
             </CarouselItem>
             <CarouselItem data-carousel-item data-active={tab === 'verbal'}>
                 <div className="p-1">
-                    <VerbalForm onAddKnowledge={handleAdd('verbal')} />
+                    <ModuleForm module="verbal" onAddKnowledge={handleAdd('verbal')} />
                 </div>
             </CarouselItem>
             <CarouselItem data-carousel-item data-active={tab === 'logic'}>

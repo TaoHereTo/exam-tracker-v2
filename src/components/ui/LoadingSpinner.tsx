@@ -16,13 +16,25 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   return (
-    <div
-      className={`${sizeClasses[size]} animate-spin rounded-full relative`}
-      style={{
-        background: `conic-gradient(from 0deg, transparent 0deg, ${color} 60deg, ${color} 120deg, transparent 180deg, transparent 360deg)`,
-        mask: 'radial-gradient(circle at center, transparent 30%, black 70%)',
-        WebkitMask: 'radial-gradient(circle at center, transparent 30%, black 70%)'
-      }}
-    />
+    <div className="relative">
+      {/* 外圈旋转动画 */}
+      <div
+        className={`${sizeClasses[size]} animate-spin rounded-full border-2 border-gray-200 dark:border-gray-700`}
+        style={{
+          borderTopColor: color,
+          borderRightColor: color,
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'transparent'
+        }}
+      />
+
+      {/* 内圈脉冲效果 */}
+      <div
+        className={`${sizeClasses[size]} absolute inset-0 rounded-full animate-pulse`}
+        style={{
+          background: `radial-gradient(circle, ${color}20 0%, transparent 70%)`
+        }}
+      />
+    </div>
   );
 };

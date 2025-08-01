@@ -7,14 +7,9 @@ import { format } from 'date-fns';
 import { MODULES, normalizeModuleName } from '@/config/exam';
 import { lazy, Suspense } from 'react';
 
+// 动态导入统一表单组件
+const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
-
-// 动态导入表单组件
-const KnowledgeForm = lazy(() => import("../forms/KnowledgeForm").then(module => ({ default: module.KnowledgeForm })));
-const VerbalForm = lazy(() => import("../forms/VerbalForm").then(module => ({ default: module.default })));
-const PoliticsForm = lazy(() => import("../forms/PoliticsForm").then(module => ({ default: module.default })));
-const LogicForm = lazy(() => import("../forms/LogicForm").then(module => ({ default: module.LogicForm })));
-const CommonForm = lazy(() => import("../forms/CommonForm").then(module => ({ default: module.CommonForm })));
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
@@ -270,7 +265,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         }
     };
 
-    const handleEditSave = (data: Partial<KnowledgeItem>) => {
+    const handleEditSave = (data: Record<string, unknown>) => {
         if (!editItem) return;
         if (onEditKnowledge) {
             onEditKnowledge({ ...editItem, ...data } as KnowledgeItem);
@@ -419,43 +414,11 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     ) : editItem ? (
                         <div className="py-2">
                             <Suspense fallback={<div className="flex items-center justify-center py-8">加载中...</div>}>
-                                {editItem.module === 'verbal' ? (
-                                    <VerbalForm
-                                        onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                        initialData={editItem}
-                                    />
-                                ) : editItem.module === 'politics' ? (
-                                    <PoliticsForm
-                                        onAddKnowledge={data => handleEditSave({
-                                            ...editItem,
-                                            ...data,
-                                            date: data.date instanceof Date ? (data.date ? data.date.toISOString() : null) : data.date
-                                        })}
-                                        initialData={{
-                                            date: editItem.date ? (typeof editItem.date === 'string' ? (editItem.date ? new Date(editItem.date) : null) : editItem.date) : null,
-                                            source: editItem.source,
-                                            note: editItem.note
-                                        }}
-                                    />
-                                ) : editItem.module === 'logic' ? (
-                                    <LogicForm
-                                        onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                        initialData={editItem}
-                                    />
-                                ) : editItem.module === 'common' ? (
-                                    <CommonForm
-                                        onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                        initialData={editItem}
-                                    />
-                                ) : (
-                                    <KnowledgeForm
-                                        title="编辑知识点"
-                                        typePlaceholder="类型"
-                                        notePlaceholder="技巧记录"
-                                        onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                        initialData={editItem}
-                                    />
-                                )}
+                                <ModuleForm
+                                    module={editItem.module}
+                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
+                                    initialData={editItem}
+                                />
                             </Suspense>
                         </div>
                     ) : null}

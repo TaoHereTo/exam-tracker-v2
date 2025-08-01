@@ -149,8 +149,9 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                 <CardFooter>
                     <RainbowButton
                         type="submit"
-                        className="w-full"
+                        className="w-full text-base font-medium"
                         disabled={isSubmitting}
+                        size="default"
                     >
                         保存记录
                     </RainbowButton>

@@ -63,7 +63,9 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
         }
     }, [imageId, loadImage]);
 
-    const handlePreview = () => {
+    const handlePreview = (e: React.MouseEvent) => {
+        // 阻止事件冒泡，避免触发行选择
+        e.stopPropagation();
         if (imageUrl) {
             setDrawerOpen(true);
             // 重置缩放和旋转
@@ -106,7 +108,10 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                     <Button
                         variant="ghost"
                         size="sm"
-                        onClick={handlePreview}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handlePreview(e);
+                        }}
                         className="h-6 w-6 p-0"
                     >
                         <LucideImage className="h-3 w-3" />
@@ -153,7 +158,7 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                                             transition: 'transform 0.2s ease-in-out'
                                         }}
                                         onError={() => {
-                                            console.error('图片加载失败:', imageUrl);
+                                            // 图片加载失败时的处理，不抛出console.error避免页面报错
                                             setHasError(true);
                                         }}
                                     />
