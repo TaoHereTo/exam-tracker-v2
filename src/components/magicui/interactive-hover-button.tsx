@@ -54,19 +54,19 @@ export const InteractiveHoverButton = React.forwardRef<
       return <Edit className="w-4 h-4" />;
     }
 
-    // 删除相关
-    if (lowerText.includes('删除') || lowerText.includes('清空') || lowerText.includes('删除') || lowerText.includes('delete') || lowerText.includes('remove')) {
+    // 删除相关 - 包含数量的删除按钮
+    if (lowerText.includes('删除') || lowerText.includes('清空') || lowerText.includes('delete') || lowerText.includes('remove')) {
       return <Trash2 className="w-4 h-4" />;
     }
 
     // 导出相关
     if (lowerText.includes('导出') || lowerText.includes('下载') || lowerText.includes('export') || lowerText.includes('download')) {
-      return <Upload className="w-4 h-4" />;
+      return <Download className="w-4 h-4" />;
     }
 
     // 导入相关
     if (lowerText.includes('导入') || lowerText.includes('上传') || lowerText.includes('import') || lowerText.includes('upload')) {
-      return <Download className="w-4 h-4" />;
+      return <Upload className="w-4 h-4" />;
     }
 
     // 新建/添加相关

@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { Download, Upload } from "lucide-react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 
@@ -14,16 +15,18 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
     return (
         <div className="flex gap-4 mb-6">
             <InteractiveHoverButton
-                onClick={onImport}
-                hoverColor="#D97706"
-            >
-                导入数据
-            </InteractiveHoverButton>
-            <InteractiveHoverButton
                 onClick={onExport}
                 hoverColor="#059669"
+                icon={<Upload className="w-4 h-4" />}
             >
                 导出数据
+            </InteractiveHoverButton>
+            <InteractiveHoverButton
+                onClick={onImport}
+                hoverColor="#D97706"
+                icon={<Download className="w-4 h-4" />}
+            >
+                导入数据
             </InteractiveHoverButton>
             {onClearAllData && (
                 <AlertDialog>

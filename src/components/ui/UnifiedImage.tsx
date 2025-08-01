@@ -19,6 +19,7 @@ import { SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { LoadingSpinner } from './LoadingSpinner';
+import { ChaseLoader } from './ChaseLoader';
 import Image from 'next/image';
 import { usePasteContext } from '@/contexts/PasteContext';
 
@@ -490,7 +491,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     {isLoading ? (
                                         <>
                                             <div className="mx-auto mb-3">
-                                                <LoadingSpinner size="lg" />
+                                                <ChaseLoader size="medium" />
                                             </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
                                                 正在上传图片...
@@ -526,7 +527,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     {isLoading ? (
                                         <>
                                             <div className="mx-auto mb-3">
-                                                <LoadingSpinner size="lg" />
+                                                <ChaseLoader size="medium" />
                                             </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
                                                 正在加载图片...

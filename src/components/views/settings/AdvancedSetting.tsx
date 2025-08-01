@@ -11,6 +11,7 @@ import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
 import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
 import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { ChaseLoader } from "@/components/ui/ChaseLoader";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Input } from "@/components/ui/input";
@@ -426,6 +427,7 @@ export function AdvancedSetting() {
                                         <InteractiveHoverButton
                                             onClick={handleDeleteSelectedImages}
                                             hoverColor="#EF4444"
+                                            icon={<Trash2 className="w-4 h-4" />}
                                         >
                                             删除 ({selectedImages.size})
                                         </InteractiveHoverButton>
@@ -438,7 +440,7 @@ export function AdvancedSetting() {
                                 {isLoadingImages ? (
                                     <div className="flex items-center justify-center py-12">
                                         <div className="flex items-center gap-3 text-gray-500">
-                                            <LoadingSpinner size="md" color="#3B82F6" />
+                                            <ChaseLoader size="medium" />
                                             <span className="text-sm">正在加载...</span>
                                         </div>
                                     </div>
