@@ -28,7 +28,7 @@ export interface TableAction {
     icon: ReactNode;
     onClick: () => void;
     disabled?: boolean;
-    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'reactbits' | 'reactbitsPrimary' | 'reactbitsSecondary' | 'reactbitsDestructive' | 'reactbitsOutline';
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
     className?: string;
 }
 

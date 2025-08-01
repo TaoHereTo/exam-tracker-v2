@@ -13,12 +13,6 @@ const buttonVariants = cva(
                 secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
                 ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
                 link: "text-primary underline-offset-4 hover:underline",
-                // ReactBits风格变体 - 使用纯色
-                reactbits: "bg-purple-600 text-white",
-                reactbitsPrimary: "bg-purple-600 text-white",
-                reactbitsSecondary: "bg-gray-600 text-white",
-                reactbitsDestructive: "bg-red-600 text-white",
-                reactbitsOutline: "bg-gray-100 text-gray-800 border border-gray-300 hover:text-gray-900",
             },
             size: {
                 default: "h-9 px-4 py-2 has-[>svg]:px-3",
@@ -50,31 +44,6 @@ const UnifiedButton = forwardRef<HTMLButtonElement, UnifiedButtonProps>(({
     ...props
 }, ref) => {
     const Comp = asChild ? "button" : "button";
-    const isReactBitsStyle = variant?.startsWith('reactbits');
-
-    // 处理reactbits风格的自定义纯色
-    let colorClass = '';
-    if (isReactBitsStyle) {
-        switch (props.gradient) {
-            case 'green':
-                colorClass = 'bg-green-600 hover:bg-green-700';
-                break;
-            case 'yellow':
-                colorClass = 'bg-orange-600 hover:bg-orange-700';
-                break;
-            case 'red':
-                colorClass = 'bg-red-600 hover:bg-red-700';
-                break;
-            case 'blue':
-                colorClass = 'bg-blue-600 hover:bg-blue-700';
-                break;
-            case 'gray':
-                colorClass = 'bg-gray-500 hover:bg-gray-600';
-                break;
-            default:
-                colorClass = 'bg-purple-600 hover:bg-purple-700';
-        }
-    }
 
     return (
         <Comp
@@ -82,19 +51,11 @@ const UnifiedButton = forwardRef<HTMLButtonElement, UnifiedButtonProps>(({
             data-slot="button"
             className={cn(
                 buttonVariants({ variant, size }),
-                isReactBitsStyle && [colorClass, 'reactbits-button'],
                 className
             )}
             {...props}
         >
             {children}
-            {/* ReactBits风格的特殊效果 */}
-            {isReactBitsStyle && (
-                <>
-                    <div className="glass-effect" />
-                    <div className="shimmer-effect" />
-                </>
-            )}
         </Comp>
     );
 });
