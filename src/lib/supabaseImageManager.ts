@@ -142,9 +142,25 @@ export class SupabaseImageManager {
             // 尝试初始化存储桶（但不强制要求成功）
             await this.initializeBucket();
 
-            // 生成唯一的文件名
+            // 生成文件名，保持原始文件名，如果存在冲突则添加时间戳
             const fileExtension = file.name.split('.').pop();
-            const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExtension}`;
+            const baseName = file.name.replace(/\.[^/.]+$/, ''); // 移除扩展名
+
+            // 首先尝试使用原始文件名
+            let uniqueFileName = file.name;
+
+            // 检查文件是否已存在
+            const { data: existingFiles } = await supabase.storage
+                .from(this.BUCKET_NAME)
+                .list('', { limit: 1000 });
+
+            const existingFileNames = existingFiles?.map(f => f.name) || [];
+
+            // 如果文件名已存在，则添加时间戳
+            if (existingFileNames.includes(file.name)) {
+                const timestamp = Date.now();
+                uniqueFileName = `${baseName}_${timestamp}.${fileExtension}`;
+            }
 
             // 尝试上传文件
             const { data, error } = await supabase.storage

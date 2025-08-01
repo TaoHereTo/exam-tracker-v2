@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
+import { minutesToTimeString } from "@/lib/utils";
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 
@@ -98,10 +99,10 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
         },
         {
             key: 'timeAllocation',
-            label: '分配时间(分钟)',
+            label: '分配时间',
             render: (row: PredictionDetail) => (
                 <span className="font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                    {row.timeAllocation}
+                    {minutesToTimeString(parseFloat(row.timeAllocation))}
                 </span>
             )
         },

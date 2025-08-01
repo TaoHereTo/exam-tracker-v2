@@ -1,8 +1,53 @@
-import { clsx, type ClassValue } from "clsx"
+import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+// 时间格式转换工具函数
+export function timeStringToMinutes(timeString: string): number {
+  if (!timeString || typeof timeString !== 'string') return 0;
+
+  // 如果是 "MM:SS" 格式
+  if (timeString.includes(':')) {
+    const [minutes, seconds] = timeString.split(':').map(Number);
+    return (minutes || 0) + (seconds || 0) / 60;
+  }
+
+  // 如果是纯数字（旧格式，直接是分钟数）
+  const numValue = parseFloat(timeString);
+  return isNaN(numValue) ? 0 : numValue;
+}
+
+export function minutesToTimeString(minutes: number): string {
+  if (!minutes || minutes <= 0) return '00:00';
+
+  const mins = Math.floor(minutes);
+  const secs = Math.round((minutes - mins) * 60);
+
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+export function formatDuration(duration: string | number): string {
+  if (typeof duration === 'number') {
+    return minutesToTimeString(duration);
+  }
+
+  if (typeof duration === 'string') {
+    // 如果已经是 "MM:SS" 格式，直接返回
+    if (duration.includes(':')) {
+      return duration;
+    }
+
+    // 如果是纯数字字符串，转换为 "MM:SS" 格式
+    const minutes = parseFloat(duration);
+    if (!isNaN(minutes)) {
+      return minutesToTimeString(minutes);
+    }
+  }
+
+  return '00:00';
 }
 
 // 智能排序函数：处理数字命名和非数字命名的图片

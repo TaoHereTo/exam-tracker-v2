@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>粘贴测试</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .paste-area {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+            border-radius: 8px;
+            background: #fafafa;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .paste-area:hover {
+            border-color: #007bff;
+            background: #f0f8ff;
+        }
+
+        .paste-area.dragover {
+            border-color: #007bff;
+            background: #e3f2fd;
+        }
+
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #dc3545;
+        }
+
+        .info {
+            color: #17a2b8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <h1>粘贴图片测试</h1>
+        <p>这个页面用于测试粘贴图片功能是否正常工作。请尝试以下操作：</p>
+
+        <div class="paste-area" id="pasteArea">
+            <h3>粘贴区域</h3>
+            <p>在此区域粘贴图片（Ctrl+V）或拖拽图片到此区域</p>
+            <p><small>支持 JPG、PNG、GIF 等格式</small></p>
+        </div>
+
+        <div>
+            <h3>操作日志</h3>
+            <div class="log" id="log"></div>
+        </div>
+
+        <div>
+            <h3>测试说明</h3>
+            <ul>
+                <li>复制一张图片到剪贴板</li>
+                <li>点击粘贴区域使其获得焦点</li>
+                <li>按 Ctrl+V 粘贴图片</li>
+                <li>观察日志输出，确认只触发一次粘贴事件</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const pasteArea = document.getElementById('pasteArea');
+        const log = document.getElementById('log');
+        let pasteCount = 0;
+
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // 粘贴事件处理
+        pasteArea.addEventListener('paste', async (e) => {
+            e.preventDefault();
+            pasteCount++;
+            addLog(`粘贴事件触发 #${pasteCount}`, 'success');
+
+            const clipboardData = e.clipboardData;
+            if (!clipboardData) {
+                addLog('剪贴板数据为空', 'error');
+                return;
+            }
+
+            // 检查是否有图片文件
+            const files = Array.from(clipboardData.files);
+            if (files.length > 0) {
+                const imageFile = files.find(file => file.type.startsWith('image/'));
+                if (imageFile) {
+                    addLog(`找到图片文件: ${imageFile.name} (${imageFile.type}, ${imageFile.size} bytes)`, 'success');
+
+                    // 创建预览
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '200px';
+                        img.style.maxHeight = '200px';
+                        img.style.margin = '10px';
+                        pasteArea.appendChild(img);
+                    };
+                    reader.readAsDataURL(imageFile);
+                } else {
+                    addLog('剪贴板中没有图片文件', 'error');
+                }
+            } else {
+                addLog('剪贴板中没有文件', 'info');
+            }
+        });
+
+        // 拖拽事件处理
+        pasteArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            pasteArea.classList.add('dragover');
+        });
+
+        pasteArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            pasteArea.classList.remove('dragover');
+        });
+
+        pasteArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            pasteArea.classList.remove('dragover');
+
+            const files = Array.from(e.dataTransfer.files);
+            const imageFile = files.find(file => file.type.startsWith('image/'));
+
+            if (imageFile) {
+                addLog(`拖拽图片: ${imageFile.name} (${imageFile.type}, ${imageFile.size} bytes)`, 'success');
+
+                // 创建预览
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '200px';
+                    img.style.margin = '10px';
+                    pasteArea.appendChild(img);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                addLog('拖拽的文件不是图片', 'error');
+            }
+        });
+
+        // 页面加载完成
+        addLog('页面加载完成，可以开始测试粘贴功能', 'info');
+
+        // 让粘贴区域可以获得焦点
+        pasteArea.tabIndex = 0;
+        pasteArea.addEventListener('click', () => {
+            pasteArea.focus();
+            addLog('粘贴区域获得焦点', 'info');
+        });
+    </script>
+</body>
+
+</html>

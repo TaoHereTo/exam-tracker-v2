@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import React, { useState, useEffect, useMemo } from "react";
 import { Marquee } from "@/components/magicui/marquee";
 import { normalizeModuleName } from "@/config/exam";
+import { timeStringToMinutes, minutesToTimeString } from "@/lib/utils";
 
 
 interface OverviewViewProps {
@@ -71,7 +72,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         const totalSessions = records.length;
         const totalQuestions = records.reduce((sum, r) => sum + (Number(r.total) || 0), 0);
         const totalCorrect = records.reduce((sum, r) => sum + (Number(r.correct) || 0), 0);
-        const totalDuration = records.reduce((sum, r) => sum + (parseFloat(r.duration) || 0), 0);
+        const totalDuration = records.reduce((sum, r) => sum + (timeStringToMinutes(r.duration) || 0), 0);
         const avgAccuracy = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
         const avgDuration = totalSessions > 0 ? totalDuration / totalSessions : 0;
         const avgTimePerQuestion = totalQuestions > 0 ? totalDuration / totalQuestions : 0;
@@ -102,7 +103,7 @@ export function OverviewView({ records }: OverviewViewProps) {
             moduleMap[r.module] = (moduleMap[r.module] || 0) + 1;
 
             // 最长连续刷题时间
-            const duration = parseFloat(r.duration) || 0;
+            const duration = timeStringToMinutes(r.duration);
             if (duration > longestSession) {
                 longestSession = duration;
                 longestSessionDate = r.date;
@@ -238,16 +239,16 @@ export function OverviewView({ records }: OverviewViewProps) {
             value: `${stats.avgAccuracy.toFixed(1)}%`,
         },
         {
-            title: "总用时（分钟）",
-            value: stats.totalDuration.toFixed(1),
+            title: "总用时",
+            value: minutesToTimeString(stats.totalDuration),
         },
         {
-            title: "平均用时（分钟/次）",
-            value: stats.avgDuration.toFixed(1),
+            title: "平均用时/次",
+            value: minutesToTimeString(stats.avgDuration),
         },
         {
-            title: "平均每题用时（分钟）",
-            value: stats.avgTimePerQuestion.toFixed(2),
+            title: "平均每题用时",
+            value: minutesToTimeString(stats.avgTimePerQuestion),
         },
         {
             title: "最近一次刷题时间",
@@ -263,11 +264,11 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
         {
             title: "最长连续刷题时间",
-            value: stats.longestSession > 0 ? `${stats.longestSession.toFixed(1)}分钟` : "暂无记录",
+            value: stats.longestSession > 0 ? minutesToTimeString(stats.longestSession) : "暂无记录",
         },
         {
             title: "最快刷题速度",
-            value: stats.fastestSpeed < Infinity ? `${stats.fastestSpeed.toFixed(2)}分钟/题` : "暂无记录",
+            value: stats.fastestSpeed < Infinity ? `${minutesToTimeString(stats.fastestSpeed)}/题` : "暂无记录",
         },
         {
             title: "最常刷的模块",

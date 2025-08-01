@@ -6,6 +6,7 @@ import { ModulePieChart } from "@/components/ui/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { RecordItem } from "@/types/record";
+import { timeStringToMinutes } from "@/lib/utils";
 
 
 // 使用统一的配置，不再需要重复定义
@@ -30,7 +31,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         }
         moduleStats[key].correct += Number(item.correct) || 0;
         moduleStats[key].total += Number(item.total) || 0;
-        moduleStats[key].duration += Number(item.duration) || 0;
+        moduleStats[key].duration += timeStringToMinutes(item.duration) || 0;
     });
 
     // 只使用中文模块名称
@@ -192,7 +193,7 @@ export function ChartsView({ records }: ChartsViewProps) {
             const normalizedModule = normalizeModuleName(r.module);
             const key = `${r.date}__${normalizedModule}`;
             const correct = Number(r.correct) || 0;
-            const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
+            const duration = timeStringToMinutes(r.duration) || 0;
             if (!groupMap[key]) {
                 groupMap[key] = { date: r.date, module: normalizedModule, correct: 0, duration: 0 };
             }
@@ -267,7 +268,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                                 date: r.date,
                                 module: normalizeModuleName(r.module),
                                 score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
+                                duration: timeStringToMinutes(r.duration) || 0
                             };
                         })} />
                     </div>

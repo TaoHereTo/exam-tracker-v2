@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Eye, Cloud, FileImage, Loader2 } from 'lucide-react';
+import { X, Eye, Cloud, FileImage } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
@@ -49,7 +49,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
         // 改进的文件类型验证
         const isImageByMime = file.type.startsWith('image/');
         const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
-        
+
         if (!isImageByMime && !isImageByExtension) {
             notify({
                 type: "error",
@@ -124,23 +124,23 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragOver(false);
-        
+
         // 如果正在上传，忽略拖拽
         if (isUploading) {
             console.log('正在上传中，忽略拖拽操作');
             return;
         }
-        
+
         const files = Array.from(e.dataTransfer.files);
         console.log('拖拽的文件:', files.map(f => ({ name: f.name, type: f.type, size: f.size })));
-        
+
         // 改进的文件类型检查：不仅检查MIME类型，还检查文件扩展名
         const imageFile = files.find(file => {
             const isImageByMime = file.type.startsWith('image/');
             const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
             return isImageByMime || isImageByExtension;
         });
-        
+
         if (imageFile) {
             handleFileUpload(imageFile);
         } else {
@@ -224,7 +224,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                     {/* 上传进度 */}
                     {isUploading && (
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #2563eb' }}></div>
                             <span>正在上传图片...</span>
                         </div>
                     )}
@@ -255,7 +255,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                         >
                             {isDeleting ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #dc2626' }}></div>
                                     删除中...
                                 </>
                             ) : (

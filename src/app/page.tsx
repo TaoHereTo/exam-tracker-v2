@@ -16,6 +16,7 @@ import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { PersonalBestView } from "@/components/views/PersonalBestView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
+import { PasteProvider } from "@/contexts/PasteContext";
 
 import { PageTitle } from "@/components/ui/PageTitle";
 import {
@@ -162,193 +163,195 @@ export default function Home() {
 
   if (!isClient) return null;
   return (
-    <NavModeContext.Provider value={navMode}>
-      <div className="flex min-h-screen">
-        {/* 左侧侧边栏或底部Dock，宽度固定 */}
-        {navMode === 'sidebar' ? (
-          <div className="fixed left-0 top-0 h-full z-10">
-            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-          </div>
-        ) : (
-          <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} navMode={navMode} />
-        )}
-        {/* 右侧主内容区，占据剩余空间 */}
-        <div className={`flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100 ${navMode === 'sidebar' ? 'ml-52' : ''}`}>
-          {activeTab === 'overview' && isClient && (
-            <div>
-              <PageTitle>数据概览</PageTitle>
-              <OverviewView records={sortedRecords} />
+    <PasteProvider>
+      <NavModeContext.Provider value={navMode}>
+        <div className="flex min-h-screen">
+          {/* 左侧侧边栏或底部Dock，宽度固定 */}
+          {navMode === 'sidebar' ? (
+            <div className="fixed left-0 top-0 h-full z-10">
+              <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
             </div>
+          ) : (
+            <DockNavigation activeTab={activeTab} setActiveTab={setActiveTab} navMode={navMode} />
           )}
-          {activeTab === 'charts' && (
-            <div>
-              <PageTitle>数据图表</PageTitle>
-              <ChartsView
-                records={records}
-              />
-            </div>
-          )}
-          {activeTab === 'best' && (
-            <div>
-              <PageTitle>个人最佳</PageTitle>
-              <PersonalBestView records={records.map(r => ({ ...r, module: normalizeModuleName(r.module) }))} />
-            </div>
-          )}
-          {activeTab === 'modules' && (
-            <div>
-              <PageTitle>知识点汇总</PageTitle>
-              <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} onEditKnowledge={handleEditKnowledge} />
-            </div>
-          )}
-          {activeTab === 'form' && (
-            <div>
-              <PageTitle>新增刷题记录</PageTitle>
-              <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <NewRecordForm onAddRecord={addRecord} />
+          {/* 右侧主内容区，占据剩余空间 */}
+          <div className={`flex-1 p-8 pb-[80px] bg-white dark:bg-gray-950 dark:text-gray-100 ${navMode === 'sidebar' ? 'ml-52' : ''}`}>
+            {activeTab === 'overview' && isClient && (
+              <div>
+                <PageTitle>数据概览</PageTitle>
+                <OverviewView records={sortedRecords} />
               </div>
-            </div>
-          )}
-          {activeTab === 'history' && (
-            <div>
-              <PageTitle>历史记录</PageTitle>
-              <HistoryView
-                records={pagedRecords}
-                selectedRecordIds={selectedRecordIds}
-                onSelectIds={setSelectedRecordIds}
-                onDeleteRecord={deleteRecord}
-                onBatchDelete={handleBatchDelete}
-                historyPage={historyPage}
-                setHistoryPage={setHistoryPage}
-                totalPages={totalPages}
-              />
-            </div>
-          )}
-          {activeTab === 'plan' && (
-            <div>
-              <PageTitle>学习计划</PageTitle>
-              {activePlanId
-                ? (
-                  (() => {
-                    const plan = plans.find(p => p.id === activePlanId);
-                    if (!plan) return <div className="text-gray-400">未找到该计划</div>;
-                    return (
-                      <Suspense fallback={<div className="text-center">加载中...</div>}>
-                        <PlanDetailView
-                          plan={plan}
-                          onBack={handleBackToList}
-                          onEdit={() => { /* 可弹窗编辑 */ }}
-                          onUpdate={updatePlan}
-                        />
-                      </Suspense>
-                    )
-                  })()
-                )
-                : (
-                  <Suspense fallback={<div className="text-center">加载中...</div>}>
-                    <PlanListView
-                      plans={plans}
-                      onCreate={createPlan}
-                      onUpdate={updatePlan}
-                      onDelete={deletePlan}
-                      onShowDetail={handleShowDetail}
-                    />
-                  </Suspense>
-                )
-              }
-            </div>
-          )}
-          {activeTab === 'settings-basic' && (
-            <div>
-              <PageTitle>基础设置</PageTitle>
-              <SettingsView
-                onExport={handleExportData}
-                onImport={handleImportData}
-                onClearAllData={handleClearAllData}
-                pageSize={pageSize}
-                setPageSize={(n: number) => setPageSize(n)}
-                navMode={navMode}
-                activeTab={activeTab}
-              />
-            </div>
-          )}
-          {activeTab === 'settings-advanced' && (
-            <div>
-              <PageTitle>高级设置</PageTitle>
-              <SettingsView
-                onExport={handleExportData}
-                onImport={handleImportData}
-                onClearAllData={handleClearAllData}
-                pageSize={pageSize}
-                setPageSize={(n: number) => setPageSize(n)}
-                activeTab={activeTab}
-              />
-            </div>
-          )}
-          {activeTab === 'knowledge-entry' && (
-            <div>
-              <PageTitle>知识点录入</PageTitle>
-              <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <KnowledgeEntryView onAddKnowledge={addKnowledge} />
+            )}
+            {activeTab === 'charts' && (
+              <div>
+                <PageTitle>数据图表</PageTitle>
+                <ChartsView
+                  records={records}
+                />
               </div>
-            </div>
-          )}
-        </div>
-        <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>确认导入数据</AlertDialogTitle>
-              <AlertDialogDescription>
-                {pendingImport && (
-                  <>
-                    即将导入 <b>{pendingImport.records.length}</b> 条刷题记录
-                    {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
-                      <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
-                    )}
-                    {pendingImport.plans && pendingImport.plans.length > 0 && (
-                      <>，<b>{pendingImport.plans.length}</b> 个学习计划</>
-                    )}
-                    。是否确认导入？
-                  </>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>取消</AlertDialogCancel>
-              <AlertDialogAction onClick={() => {
-                if (pendingImport) {
-                  setRecords(pendingImport.records);
-                  if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
-                    setKnowledge(pendingImport.knowledge);
-                  }
-                  if (pendingImport.plans && pendingImport.plans.length > 0) {
-                    setPlans(pendingImport.plans);
-                  }
-                  setTimeout(() => {
-                    setPendingImport(undefined);
-                  }, 100);
-                  // 新增：导入统计提示
-                  const pi = pendingImport as PendingImport;
-                  if (pi.importStats) {
-                    notify({
-                      type: "info",
-                      message: `本次导入共${pi.importStats.total}条，去重后新增${pi.importStats.added}条，${pi.importStats.repeated}条与现有数据重复。`
-                    });
-                  }
+            )}
+            {activeTab === 'best' && (
+              <div>
+                <PageTitle>个人最佳</PageTitle>
+                <PersonalBestView records={records.map(r => ({ ...r, module: normalizeModuleName(r.module) }))} />
+              </div>
+            )}
+            {activeTab === 'modules' && (
+              <div>
+                <PageTitle>知识点汇总</PageTitle>
+                <KnowledgeSummaryView knowledge={knowledge} onBatchDeleteKnowledge={handleBatchDeleteKnowledge} onEditKnowledge={handleEditKnowledge} />
+              </div>
+            )}
+            {activeTab === 'form' && (
+              <div>
+                <PageTitle>新增刷题记录</PageTitle>
+                <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+                  <NewRecordForm onAddRecord={addRecord} />
+                </div>
+              </div>
+            )}
+            {activeTab === 'history' && (
+              <div>
+                <PageTitle>历史记录</PageTitle>
+                <HistoryView
+                  records={pagedRecords}
+                  selectedRecordIds={selectedRecordIds}
+                  onSelectIds={setSelectedRecordIds}
+                  onDeleteRecord={deleteRecord}
+                  onBatchDelete={handleBatchDelete}
+                  historyPage={historyPage}
+                  setHistoryPage={setHistoryPage}
+                  totalPages={totalPages}
+                />
+              </div>
+            )}
+            {activeTab === 'plan' && (
+              <div>
+                <PageTitle>学习计划</PageTitle>
+                {activePlanId
+                  ? (
+                    (() => {
+                      const plan = plans.find(p => p.id === activePlanId);
+                      if (!plan) return <div className="text-gray-400">未找到该计划</div>;
+                      return (
+                        <Suspense fallback={<div className="text-center">加载中...</div>}>
+                          <PlanDetailView
+                            plan={plan}
+                            onBack={handleBackToList}
+                            onEdit={() => { /* 可弹窗编辑 */ }}
+                            onUpdate={updatePlan}
+                          />
+                        </Suspense>
+                      )
+                    })()
+                  )
+                  : (
+                    <Suspense fallback={<div className="text-center">加载中...</div>}>
+                      <PlanListView
+                        plans={plans}
+                        onCreate={createPlan}
+                        onUpdate={updatePlan}
+                        onDelete={deletePlan}
+                        onShowDetail={handleShowDetail}
+                      />
+                    </Suspense>
+                  )
                 }
-                setImportDialogOpen(false);
-                const plansCount = pendingImport?.plans?.length ?? 0;
-                notify({
-                  type: "success",
-                  message: "导入成功",
-                  description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}${plansCount > 0 ? `，${plansCount} 个学习计划` : ''}！`
-                });
-              }}>
-                确认导入
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    </NavModeContext.Provider>
+              </div>
+            )}
+            {activeTab === 'settings-basic' && (
+              <div>
+                <PageTitle>基础设置</PageTitle>
+                <SettingsView
+                  onExport={handleExportData}
+                  onImport={handleImportData}
+                  onClearAllData={handleClearAllData}
+                  pageSize={pageSize}
+                  setPageSize={(n: number) => setPageSize(n)}
+                  navMode={navMode}
+                  activeTab={activeTab}
+                />
+              </div>
+            )}
+            {activeTab === 'settings-advanced' && (
+              <div>
+                <PageTitle>高级设置</PageTitle>
+                <SettingsView
+                  onExport={handleExportData}
+                  onImport={handleImportData}
+                  onClearAllData={handleClearAllData}
+                  pageSize={pageSize}
+                  setPageSize={(n: number) => setPageSize(n)}
+                  activeTab={activeTab}
+                />
+              </div>
+            )}
+            {activeTab === 'knowledge-entry' && (
+              <div>
+                <PageTitle>知识点录入</PageTitle>
+                <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+                  <KnowledgeEntryView onAddKnowledge={addKnowledge} />
+                </div>
+              </div>
+            )}
+          </div>
+          <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>确认导入数据</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {pendingImport && (
+                    <>
+                      即将导入 <b>{pendingImport.records.length}</b> 条刷题记录
+                      {pendingImport.knowledge && pendingImport.knowledge.length > 0 && (
+                        <>，<b>{pendingImport.knowledge.length}</b> 条知识点</>
+                      )}
+                      {pendingImport.plans && pendingImport.plans.length > 0 && (
+                        <>，<b>{pendingImport.plans.length}</b> 个学习计划</>
+                      )}
+                      。是否确认导入？
+                    </>
+                  )}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>取消</AlertDialogCancel>
+                <AlertDialogAction onClick={() => {
+                  if (pendingImport) {
+                    setRecords(pendingImport.records);
+                    if (pendingImport.knowledge && pendingImport.knowledge.length > 0) {
+                      setKnowledge(pendingImport.knowledge);
+                    }
+                    if (pendingImport.plans && pendingImport.plans.length > 0) {
+                      setPlans(pendingImport.plans);
+                    }
+                    setTimeout(() => {
+                      setPendingImport(undefined);
+                    }, 100);
+                    // 新增：导入统计提示
+                    const pi = pendingImport as PendingImport;
+                    if (pi.importStats) {
+                      notify({
+                        type: "info",
+                        message: `本次导入共${pi.importStats.total}条，去重后新增${pi.importStats.added}条，${pi.importStats.repeated}条与现有数据重复。`
+                      });
+                    }
+                  }
+                  setImportDialogOpen(false);
+                  const plansCount = pendingImport?.plans?.length ?? 0;
+                  notify({
+                    type: "success",
+                    message: "导入成功",
+                    description: `成功导入 ${pendingImport?.records.length ?? 0} 条刷题记录${pendingImport?.knowledge?.length ? `，${pendingImport.knowledge.length} 条知识点` : ''}${plansCount > 0 ? `，${plansCount} 个学习计划` : ''}！`
+                  });
+                }}>
+                  确认导入
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </NavModeContext.Provider>
+    </PasteProvider>
   );
 }

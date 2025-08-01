@@ -1,9 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import * as React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalStorage";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 import { UnifiedButton } from "@/components/ui/UnifiedButton";
 import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitchSelector";
@@ -57,6 +56,7 @@ export function AdvancedSetting() {
     const [isDeleting, setIsDeleting] = useState(false);
     const [deleteProgress, setDeleteProgress] = useState(0);
     const [currentDeletingImage, setCurrentDeletingImage] = useState<string>('');
+    const [deleteDialogKey, setDeleteDialogKey] = useState(0); // 强制重新渲染的key
 
 
 
@@ -122,53 +122,100 @@ export function AdvancedSetting() {
     };
 
     const confirmDeleteImages = async () => {
+        if (imagesToDelete.length === 0) return;
+
+        console.log('=== 开始删除图片 ===');
+        console.log('删除数量:', imagesToDelete.length);
+
+        // 立即设置删除状态，确保UI立即响应
+        console.log('设置删除状态为true');
         setIsDeleting(true);
         setDeleteProgress(0);
+        setCurrentDeletingImage('准备删除...');
+        setDeleteDialogKey(prev => prev + 1); // 强制重新渲染
 
-        let successCount = 0;
-        const totalImages = imagesToDelete.length;
+        // 强制触发UI更新
+        await new Promise(resolve => setTimeout(resolve, 100));
+        console.log('删除状态已设置，对话框应该保持打开');
 
-        for (let i = 0; i < imagesToDelete.length; i++) {
-            const imageId = imagesToDelete[i];
-            const image = cloudImages.find(img => img.id === imageId);
-            setCurrentDeletingImage(image?.originalName || imageId);
+        try {
+            let successCount = 0;
+            const totalImages = imagesToDelete.length;
 
-            try {
-                const success = await supabaseImageManager.deleteImage(imageId);
-                if (success) successCount++;
-            } catch (error) {
-                console.error(`删除图片失败: ${imageId}`, error);
+            for (let i = 0; i < imagesToDelete.length; i++) {
+                const imageId = imagesToDelete[i];
+                const image = cloudImages.find(img => img.id === imageId);
+                const imageName = image?.originalName || `图片${i + 1}`;
+
+                console.log(`正在删除第 ${i + 1}/${totalImages} 张图片: ${imageName}`);
+
+                // 更新当前删除的图片名称和进度
+                setCurrentDeletingImage(imageName);
+                const progress = ((i + 1) / totalImages) * 100;
+                setDeleteProgress(progress);
+
+                console.log(`更新进度 - 图片: ${imageName}, 进度: ${progress}%`);
+
+                try {
+                    const success = await supabaseImageManager.deleteImage(imageId);
+                    if (success) successCount++;
+                } catch (error) {
+                    console.error(`删除图片失败: ${imageId}`, error);
+                }
+
+                // 添加延迟让用户看到进度变化
+                await new Promise(resolve => setTimeout(resolve, 300));
             }
 
-            // 更新进度
-            setDeleteProgress(((i + 1) / totalImages) * 100);
+            // 显示完成状态
+            setDeleteProgress(100);
+            setCurrentDeletingImage('删除完成');
+            console.log('删除完成，成功删除:', successCount);
 
-            // 增加延迟时间，让用户能看到进度变化
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
+            // 显示结果通知
+            if (successCount > 0) {
+                notify({
+                    type: "success",
+                    message: "删除成功",
+                    description: `成功删除 ${successCount} 张图片`
+                });
+                setSelectedImages(new Set());
+                // 重新加载图片列表
+                await loadCloudImages();
+            } else {
+                notify({
+                    type: "error",
+                    message: "删除失败",
+                    description: "没有图片被成功删除"
+                });
+            }
 
-        // 确保显示100%进度
-        setDeleteProgress(100);
-        setCurrentDeletingImage('删除完成');
+            // 延迟关闭对话框，让用户看到完成状态
+            setTimeout(() => {
+                console.log('关闭删除对话框');
+                setIsDeleting(false);
+                setDeleteProgress(0);
+                setCurrentDeletingImage('');
+                setDeleteDialogOpen(false);
+                setImagesToDelete([]);
+            }, 1500);
 
-        if (successCount > 0) {
-            notify({
-                type: "success",
-                message: "删除成功",
-                description: `成功删除 ${successCount} 张图片`
-            });
-            setSelectedImages(new Set());
-            await loadCloudImages();
-        }
+        } catch (error) {
+            console.error('删除过程中发生错误:', error);
 
-        // 延迟重置状态，让用户能看到完整的进度
-        setTimeout(() => {
+            // 重置状态
             setIsDeleting(false);
             setDeleteProgress(0);
             setCurrentDeletingImage('');
             setDeleteDialogOpen(false);
             setImagesToDelete([]);
-        }, 4000); // 延迟4秒，让用户能看到100%的进度
+
+            notify({
+                type: "error",
+                message: "删除失败",
+                description: "删除过程中发生错误，请重试"
+            });
+        }
     };
 
 
@@ -206,27 +253,27 @@ export function AdvancedSetting() {
     };
 
     // 更新存储信息
-    const updateStorageInfo = () => {
+    const updateStorageInfo = useCallback(() => {
         const info = getLocalStorageInfo();
         setStorageInfo(info);
-    };
-
-
-
-    useEffect(() => {
-        updateStorageInfo();
-        const interval = setInterval(updateStorageInfo, 5000);
-        return () => clearInterval(interval);
     }, []);
 
-    // 数据概览动画控制
+    // 初始化存储信息监控
+    useEffect(() => {
+        updateStorageInfo();
+        // 增加刷新间隔，减少频繁更新
+        const interval = setInterval(updateStorageInfo, 30000); // 改为30秒
+        return () => clearInterval(interval);
+    }, [updateStorageInfo]);
+
+    // 减少动画设置持久化
     useEffect(() => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('reduce-motion-enabled', reduceMotion.toString());
         }
     }, [reduceMotion]);
 
-    // 主题切换按钮风格
+    // 主题切换类型持久化
     useEffect(() => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('theme-switch-type', themeSwitchType);
@@ -557,12 +604,23 @@ export function AdvancedSetting() {
 
             {/* 删除确认对话框 */}
             <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
-                // 在删除过程中不允许关闭对话框
+                console.log('删除对话框状态变化:', { open, isDeleting });
+                // 只有在不是删除过程中才允许关闭对话框
                 if (!isDeleting) {
-                    setDeleteDialogOpen(open);
+                    if (!open) {
+                        setDeleteDialogOpen(false);
+                        setImagesToDelete([]);
+                        setDeleteProgress(0);
+                        setCurrentDeletingImage('');
+                    }
+                } else {
+                    // 如果正在删除中，强制保持对话框打开
+                    if (!open) {
+                        setDeleteDialogOpen(true);
+                    }
                 }
             }}>
-                <AlertDialogContent>
+                <AlertDialogContent key={`delete-dialog-${deleteDialogKey}`}>
                     <AlertDialogHeader>
                         <AlertDialogTitle>确认删除图片</AlertDialogTitle>
                         <AlertDialogDescription asChild>
@@ -585,6 +643,9 @@ export function AdvancedSetting() {
                                                 正在删除: {currentDeletingImage}
                                             </p>
                                         )}
+                                        <div className="text-xs text-gray-500 mt-2">
+                                            状态: {isDeleting ? '删除中' : '准备中'} | 进度: {deleteProgress.toFixed(1)}%
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -602,21 +663,37 @@ export function AdvancedSetting() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>取消</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={confirmDeleteImages}
+                        <AlertDialogCancel
                             disabled={isDeleting}
-                            style={{ background: '#EF4444' }}
+                            onClick={() => {
+                                console.log('取消删除按钮点击');
+                                if (!isDeleting) {
+                                    setDeleteDialogOpen(false);
+                                    setImagesToDelete([]);
+                                    setDeleteProgress(0);
+                                    setCurrentDeletingImage('');
+                                }
+                            }}
+                        >
+                            取消
+                        </AlertDialogCancel>
+                        <Button
+                            onClick={() => {
+                                console.log('确认删除按钮点击');
+                                confirmDeleteImages();
+                            }}
+                            disabled={isDeleting}
+                            className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #ffffff' }}></div>
                                     删除中...
                                 </div>
                             ) : (
                                 '确认删除'
                             )}
-                        </AlertDialogAction>
+                        </Button>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

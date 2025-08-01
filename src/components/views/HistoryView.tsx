@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { format } from 'date-fns';
 import { normalizeModuleName } from '@/config/exam';
+import { formatDuration } from '@/lib/utils';
 
 
 interface HistoryViewProps {
@@ -73,7 +74,11 @@ export function HistoryView({
                         label: '正确率',
                         render: (row) => `${((row.correct / row.total) * 100).toFixed(1)}%`
                     },
-                    { key: 'duration', label: '用时' }
+                    {
+                        key: 'duration',
+                        label: '用时',
+                        render: (row) => formatDuration(row.duration)
+                    }
                 ]}
                 data={records}
                 selected={selectedRecordIds}

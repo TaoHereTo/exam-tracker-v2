@@ -1,12 +1,12 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { SwitchStyleProvider } from "@/contexts/SwitchStyleContext";
 import { DynamicThemeSwitch } from "@/components/ui/DynamicThemeSwitch";
 import { NotificationProvider } from "@/components/magicui/NotificationProvider";
-import { useEffect } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

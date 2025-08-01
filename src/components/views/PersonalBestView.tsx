@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScorePredictor } from "@/components/features/ScorePredictor";
 import { MODULE_SCORES, normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
 import type { RecordItem } from "@/types/record";
+import { timeStringToMinutes } from "@/lib/utils";
 
 
 export function PersonalBestView({ records }: { records: RecordItem[] }) {
@@ -19,7 +20,7 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                     // 过滤出该模块的所有记录（使用统一的模块名称映射）
                     const moduleRecords = records.filter(r => normalizeModuleName(r.module) === module.label);
                     const best = moduleRecords.reduce<{ record: RecordItem; perMinute: number } | null>((acc, cur) => {
-                        const duration = parseFloat(cur.duration) || 0;
+                        const duration = timeStringToMinutes(cur.duration);
                         const score = getModuleScore(cur.module);
                         const perMinute = duration > 0 ? score * cur.correct / duration : 0;
                         if (!acc || perMinute > acc.perMinute) {
@@ -51,7 +52,7 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                 <ScorePredictor records={records.map(r => ({
                     module: (r.module as keyof typeof MODULE_SCORES),
                     correctCount: r.correct,
-                    duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration,
+                    duration: timeStringToMinutes(r.duration),
                 }))} />
             </div>
         </div>

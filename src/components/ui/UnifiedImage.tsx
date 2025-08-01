@@ -18,7 +18,9 @@ import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
 import { useNotification } from '@/components/magicui/NotificationProvider';
+import { LoadingSpinner } from './LoadingSpinner';
 import Image from 'next/image';
+import { usePasteContext } from '@/contexts/PasteContext';
 
 interface UnifiedImageProps {
     // 基础属性
@@ -54,10 +56,13 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [rotation, setRotation] = useState(0);
 
     const [isDragOver, setIsDragOver] = useState(false);
+    const [isProcessingPaste, setIsProcessingPaste] = useState(false);
 
     const dragAreaRef = useRef<HTMLDivElement>(null);
+    const componentId = useRef<string>(`unified-image-${Date.now()}-${Math.random()}`);
 
     const { notify } = useNotification();
+    const { registerPasteHandler, unregisterPasteHandler } = usePasteContext();
 
     // 加载预览图片
     useEffect(() => {
@@ -136,7 +141,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                 lastModified: file.lastModified
             });
 
-            // 上传到Supabase
+            // 上传到Supabase，保持原始文件名
             console.log('调用 supabaseImageManager.uploadImage...');
             const imageInfo = await supabaseImageManager.uploadImage(file);
             console.log('上传结果:', imageInfo);
@@ -195,100 +200,159 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         }
     };
 
-    // 处理粘贴功能
-    const handlePaste = async (e: React.KeyboardEvent) => {
-        if (e.ctrlKey && e.key === 'v') {
-            e.preventDefault();
-            try {
-                const items = await navigator.clipboard.read();
-                for (const item of items) {
-                    if (item.types.includes('image/png') || item.types.includes('image/jpeg') || item.types.includes('image/gif')) {
-                        const blob = await item.getType('image/png') || await item.getType('image/jpeg') || await item.getType('image/gif');
-                        const file = new File([blob], `pasted-image-${Date.now()}.png`, { type: blob.type });
-                        await handleFileUpload(file);
-                        notify({ type: "success", message: "图片粘贴成功" });
-                        return;
-                    }
-                }
-                notify({ type: "error", message: "剪贴板中没有图片" });
-            } catch (error) {
-                console.error('粘贴失败:', error);
-                notify({ type: "error", message: "粘贴失败，请检查剪贴板权限" });
-            }
+    // 重写的粘贴事件监听 - 简化逻辑，避免重复处理
+    const handlePasteEvent = useCallback(async (e: React.ClipboardEvent<HTMLDivElement> | ClipboardEvent) => {
+        console.log('=== UnifiedImage 粘贴事件触发 ===');
+
+        // 防止重复处理
+        if (isProcessingPaste) {
+            console.log('正在处理粘贴事件，跳过重复处理');
+            return;
         }
-    };
 
-    // 全局粘贴事件监听
-    useEffect(() => {
-        const handleGlobalPaste = async (e: ClipboardEvent) => {
-            // 检查是否在虚线框区域内或者当前焦点在虚线框上
-            const isInDragArea = dragAreaRef.current && (
-                dragAreaRef.current.contains(e.target as Node) ||
-                dragAreaRef.current === document.activeElement ||
-                dragAreaRef.current.contains(document.activeElement)
-            );
+        // 检查是否在输入框中粘贴，如果是则不处理
+        const target = e.target as HTMLElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.contentEditable === 'true')) {
+            console.log('在输入框中粘贴，跳过处理');
+            return;
+        }
 
-            if (isInDragArea && imageSource === 'local') {
-                e.preventDefault();
-                try {
-                    const items = Array.from(e.clipboardData?.items || []);
-                    let imageFound = false;
+        // 获取clipboardData
+        const clipboardData = (e as ClipboardEvent).clipboardData;
+        if (!clipboardData) {
+            console.log('没有clipboardData，跳过处理');
+            return;
+        }
 
-                    for (const item of items) {
-                        // 改进图片类型检测
-                        if (item.type.startsWith('image/') ||
-                            item.type === 'image/png' ||
-                            item.type === 'image/jpeg' ||
-                            item.type === 'image/gif' ||
-                            item.type === 'image/webp') {
-                            const file = item.getAsFile();
-                            if (file) {
-                                await handleFileUpload(file);
-                                notify({ type: "success", message: "图片粘贴成功" });
-                                imageFound = true;
-                                break;
-                            }
+        // 设置处理状态
+        setIsProcessingPaste(true);
+
+        console.log('开始处理图片粘贴');
+        console.log('clipboardData.items:', clipboardData.items?.length || 0);
+        console.log('clipboardData.files:', clipboardData.files?.length || 0);
+
+        try {
+            let imageFound = false;
+
+            // 首先检查传统的 clipboardData.items
+            if (clipboardData.items && clipboardData.items.length > 0) {
+                console.log('检查 clipboardData.items...');
+                const items = Array.from(clipboardData.items) as DataTransferItem[];
+
+                for (const item of items) {
+                    console.log('检查item:', item.type, item.kind);
+
+                    if (item.kind === 'file' && item.type.startsWith('image/')) {
+                        const file = item.getAsFile();
+                        if (file && file.size > 0) {
+                            console.log('找到图片文件:', file.name, file.type, file.size);
+                            if ('preventDefault' in e) e.preventDefault();
+                            await handleFileUpload(file);
+                            imageFound = true;
+                            break;
                         }
                     }
+                }
+            }
 
-                    if (!imageFound) {
-                        // 尝试使用新的剪贴板API
-                        try {
-                            const clipboardItems = await navigator.clipboard.read();
-                            for (const item of clipboardItems) {
-                                if (item.types.includes('image/png') ||
-                                    item.types.includes('image/jpeg') ||
-                                    item.types.includes('image/gif') ||
-                                    item.types.includes('image/webp')) {
-                                    const blob = await item.getType('image/png') ||
-                                        await item.getType('image/jpeg') ||
-                                        await item.getType('image/gif') ||
-                                        await item.getType('image/webp');
-                                    const file = new File([blob], `pasted-image-${Date.now()}.png`, { type: blob.type });
-                                    await handleFileUpload(file);
-                                    notify({ type: "success", message: "图片粘贴成功" });
-                                    imageFound = true;
-                                    break;
+            // 如果items中没有找到，检查files
+            if (!imageFound && clipboardData.files && clipboardData.files.length > 0) {
+                console.log('检查 clipboardData.files...');
+                const files = Array.from(clipboardData.files) as File[];
+
+                for (const file of files) {
+                    console.log('检查file:', file.name, file.type, file.size);
+
+                    if (file.type.startsWith('image/') && file.size > 0) {
+                        console.log('找到图片文件:', file.name, file.type, file.size);
+                        if ('preventDefault' in e) e.preventDefault();
+                        await handleFileUpload(file);
+                        imageFound = true;
+                        break;
+                    }
+                }
+            }
+
+            // 如果传统方法都失败，尝试现代 Clipboard API
+            if (!imageFound && navigator.clipboard && navigator.clipboard.read) {
+                try {
+                    console.log('尝试现代 Clipboard API...');
+                    const clipboardItems = await navigator.clipboard.read();
+                    console.log('Clipboard API 项目数量:', clipboardItems.length);
+
+                    for (const clipboardItem of clipboardItems) {
+                        console.log('Clipboard 项目类型:', clipboardItem.types);
+
+                        // 尝试常见的图片类型
+                        const imageTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+
+                        for (const type of imageTypes) {
+                            if (clipboardItem.types.includes(type)) {
+                                try {
+                                    const blob = await clipboardItem.getType(type);
+                                    if (blob.size > 0) {
+                                        console.log(`找到图片内容，类型: ${type}，大小: ${blob.size} 字节`);
+                                        const extension = type.split('/')[1] || 'png';
+                                        const fileName = `pasted-image-${Date.now()}.${extension}`;
+                                        const file = new File([blob], fileName, { type });
+
+                                        if ('preventDefault' in e) e.preventDefault();
+                                        await handleFileUpload(file);
+                                        imageFound = true;
+                                        break;
+                                    }
+                                } catch (error) {
+                                    console.log(`获取类型 ${type} 失败:`, error);
                                 }
                             }
-                        } catch {
-                            console.log('新剪贴板API不可用，使用传统方法');
                         }
 
-                        if (!imageFound) {
-                            notify({ type: "error", message: "剪贴板中没有图片" });
-                        }
+                        if (imageFound) break;
                     }
-                } catch (error) {
-                    console.error('粘贴失败:', error);
-                    notify({ type: "error", message: "粘贴失败，请检查剪贴板权限" });
+                } catch (clipboardError) {
+                    console.log('Clipboard API 失败:', clipboardError);
                 }
             }
+
+            if (!imageFound) {
+                console.log('没有找到图片内容');
+                // 只在真正没有找到图片时才显示错误通知
+                notify({
+                    type: "error",
+                    message: "剪贴板中没有图片",
+                    description: "请确保已复制图片文件到剪贴板，或尝试截图后粘贴"
+                });
+            }
+        } catch (error) {
+            console.error('粘贴处理失败:', error);
+            notify({
+                type: "error",
+                message: "粘贴失败",
+                description: "处理粘贴内容时发生错误，请重试"
+            });
+        } finally {
+            // 重置处理状态
+            setIsProcessingPaste(false);
+        }
+    }, [handleFileUpload, notify, isProcessingPaste]);
+
+    // 注册粘贴处理器到Context
+    useEffect(() => {
+        const handleGlobalPaste = async (e: ClipboardEvent) => {
+            // 转换为React事件并处理
+            const reactEvent = e as unknown as React.ClipboardEvent<HTMLDivElement>;
+            await handlePasteEvent(reactEvent);
         };
 
-        document.addEventListener('paste', handleGlobalPaste);
-        return () => document.removeEventListener('paste', handleGlobalPaste);
-    }, [imageSource, handleFileUpload, notify]); // 添加所有必要的依赖
+        const currentComponentId = componentId.current;
+        registerPasteHandler(currentComponentId, handleGlobalPaste);
+
+        return () => {
+            unregisterPasteHandler(currentComponentId);
+        };
+    }, [handlePasteEvent, registerPasteHandler, unregisterPasteHandler]);
+
+
 
     // 拖拽相关处理函数
     const handleDragEnter = (e: React.DragEvent) => {
@@ -370,27 +434,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     // 处理图片删除
     const handleRemoveImage = async () => {
-        if (value) {
-            try {
-                if (imageSource === 'cloud') {
-                    await supabaseImageManager.deleteImage(value);
-                } else {
-                    staticImageManager.deleteImageSelection(value);
-                }
-                notify({
-                    type: "success",
-                    message: "图片删除成功",
-                    description: `图片已从${imageSource === 'cloud' ? '云端' : '本地'}删除`
-                });
-            } catch (error) {
-                console.error('删除失败:', error);
-                notify({
-                    type: "error",
-                    message: "删除失败",
-                    description: "无法删除图片"
-                });
-            }
-        }
+        // 只是取消选择，不删除图片
         setPreviewUrl(null);
         onChange?.(undefined);
     };
@@ -455,7 +499,12 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     // 渲染上传模式
     const renderUploadMode = () => (
-        <div className={`space-y-4 ${className}`}>
+        <div
+            className={`space-y-4 ${className}`}
+            tabIndex={0}
+            data-unified-image="true"
+            data-component-id={componentId.current}
+        >
             {/* 图片选择区域 */}
             <div className="space-y-3">
                 {/* Tab切换：本地上传 vs 云端选择 */}
@@ -499,7 +548,6 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     onDragLeave={handleDragLeave}
                                     onDragOver={handleDragOver}
                                     onDrop={handleDrop}
-                                    onKeyDown={handlePaste}
                                     onMouseEnter={() => {
                                         // 鼠标悬停时让虚线框获得焦点，以便接收粘贴事件
                                         dragAreaRef.current?.focus();
@@ -514,7 +562,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 >
                                     {isLoading ? (
                                         <>
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                            <div className="mx-auto mb-3">
+                                                <LoadingSpinner size="lg" />
+                                            </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
                                                 正在上传图片...
                                             </p>
@@ -529,8 +579,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 点击选择或拖拽图片上传
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                支持 JPG、PNG、GIF 等格式
+                                                支持通过快捷键粘贴上传
                                             </p>
+
                                         </>
                                     )}
                                 </div>
@@ -547,7 +598,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 >
                                     {isLoading ? (
                                         <>
-                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-3"></div>
+                                            <div className="mx-auto mb-3">
+                                                <LoadingSpinner size="lg" />
+                                            </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
                                                 正在加载图片...
                                             </p>

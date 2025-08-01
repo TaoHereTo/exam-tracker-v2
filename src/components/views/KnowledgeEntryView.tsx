@@ -57,38 +57,38 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
     // 使用 useMemo 优化轮播内容，避免不必要的重新渲染
     const carouselContent = useMemo(() => (
         <>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'data-analysis'}>
                 <div className="p-1">
                     <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
                 </div>
             </CarouselItem>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'politics'}>
                 <div className="p-1">
                     <PoliticsForm onAddKnowledge={handleAdd('politics')} />
                 </div>
             </CarouselItem>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'math'}>
                 <div className="p-1">
                     <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
                 </div>
             </CarouselItem>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'common'}>
                 <div className="p-1">
                     <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
                 </div>
             </CarouselItem>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'verbal'}>
                 <div className="p-1">
                     <VerbalForm onAddKnowledge={handleAdd('verbal')} />
                 </div>
             </CarouselItem>
-            <CarouselItem>
+            <CarouselItem data-carousel-item data-active={tab === 'logic'}>
                 <div className="p-1">
                     <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
                 </div>
             </CarouselItem>
         </>
-    ), [handleAdd]);
+    ), [handleAdd, tab]);
 
     return (
         <div className="w-full max-w-2xl mx-auto flex flex-col">
@@ -102,7 +102,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 </Tabs>
             </div>
 
-            <Carousel setApi={handleCarouselApi} className="relative px-12" opts={{
+            <Carousel setApi={handleCarouselApi} className="relative px-12" data-carousel-container opts={{
                 align: 'start',
                 skipSnaps: false,
                 containScroll: 'trimSnaps',

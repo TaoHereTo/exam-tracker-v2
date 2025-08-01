@@ -406,7 +406,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 <div className="space-y-4">
                                     <p>正在删除图片，请稍候...</p>
                                     <div className="flex items-center gap-2">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-red-500"></div>
                                         <span className="text-sm text-gray-600 dark:text-gray-400">
                                             正在删除: {imageToDelete?.name}
                                         </span>
@@ -431,7 +431,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-white"></div>
                                     删除中...
                                 </div>
                             ) : (

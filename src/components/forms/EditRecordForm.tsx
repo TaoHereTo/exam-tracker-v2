@@ -10,6 +10,7 @@ import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./B
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
+import { TimePicker } from "@/components/ui/TimePicker";
 
 interface EditRecordFormProps {
     record: RecordItem;
@@ -20,13 +21,17 @@ interface EditRecordFormProps {
 export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
+    const [duration, setDuration] = useState<string>('');
 
-    // 初始化日期
+    // 初始化日期和时长
     useEffect(() => {
         if (record.date) {
             setDate(new Date(record.date));
         }
-    }, [record.date]);
+        if (record.duration) {
+            setDuration(record.duration);
+        }
+    }, [record.date, record.duration]);
 
     // 定义验证规则
     const validationSchema: ValidationSchema = {
@@ -47,12 +52,16 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                 if (num <= 0) return "总题数必须大于0";
                 return null;
             }
-        },
-        duration: { required: true }
+        }
     };
 
     const handleSubmit = (data: FormData) => {
         if (!date) return;
+
+        if (!duration) {
+            alert('请选择做题时长');
+            return;
+        }
 
         const y = date.getFullYear();
         const m = String(date.getMonth() + 1).padStart(2, '0');
@@ -65,7 +74,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
             module: String(data.module),
             correct: Number(data.correct),
             total: Number(data.total),
-            duration: String(data.duration),
+            duration: duration,
         };
 
         onSave(updatedRecord);
@@ -84,8 +93,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                 initialData={{
                     module: record.module,
                     total: record.total.toString(),
-                    correct: record.correct.toString(),
-                    duration: record.duration
+                    correct: record.correct.toString()
                 }}
             >
                 <CardHeader>
@@ -145,15 +153,13 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                         </BaseFormField>
 
                         {/* 做题时长 */}
-                        <BaseFormField name="duration">
-                            <FormField label="做题时长(分钟)">
-                                <FormInput
-                                    name="duration"
-                                    type="number"
-                                    placeholder="输入做题时长"
-                                />
-                            </FormField>
-                        </BaseFormField>
+                        <FormField label="做题时长">
+                            <TimePicker
+                                value={duration}
+                                onChange={setDuration}
+                                placeholder="选择做题时长"
+                            />
+                        </FormField>
                     </div>
                 </CardContent>
                 <CardFooter className="flex gap-2 justify-end">

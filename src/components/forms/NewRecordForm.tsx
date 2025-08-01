@@ -11,10 +11,12 @@ import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./B
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
+import { TimePicker } from "@/components/ui/TimePicker";
 
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
+    const [duration, setDuration] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // 定义验证规则
@@ -36,14 +38,19 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                 if (num <= 0) return "总题数必须大于0";
                 return null;
             }
-        },
-        duration: { required: true }
+        }
     };
 
     const handleSubmit = (data: FormData) => {
         setIsSubmitting(true);
         if (!date) {
             alert('请选择日期');
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!duration) {
+            alert('请选择做题时长');
             setIsSubmitting(false);
             return;
         }
@@ -59,11 +66,12 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
             module: String(data.module),
             correct: Number(data.correct),
             total: Number(data.total),
-            duration: String(data.duration),
+            duration: duration || '00:00',
         };
 
         onAddRecord?.(newRecord);
         setDate(undefined);
+        setDuration('');
         setIsSubmitting(false);
     };
 
@@ -130,15 +138,13 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </div>
 
                     {/* 考试时长 */}
-                    <BaseFormField name="duration">
-                        <FormField label="考试时长">
-                            <FormInput
-                                name="duration"
-                                type="text"
-                                placeholder="例如: 26:15"
-                            />
-                        </FormField>
-                    </BaseFormField>
+                    <FormField label="考试时长">
+                        <TimePicker
+                            value={duration}
+                            onChange={setDuration}
+                            placeholder="选择做题时长"
+                        />
+                    </FormField>
                 </CardContent>
                 <CardFooter>
                     <UnifiedButton variant="reactbits"
