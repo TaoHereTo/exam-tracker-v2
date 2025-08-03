@@ -131,7 +131,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
 
             {/* 用户信息区域 */}
             {userInfo && (
-                <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 w-full">
+                <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 w-full flex items-center">
                     {userInfo}
                 </div>
             )}

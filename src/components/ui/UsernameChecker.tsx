@@ -189,14 +189,15 @@ export function UsernameChecker({
             )}
 
             {/* 管理员用户名提示 */}
-            {UsernameService.isAdminUsername(value, userEmail) && (
-                <div className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
-                    <AlertCircle className="h-4 w-4 text-yellow-600" />
-                    <span className="text-sm text-yellow-700">
-                        <MixedText text="检测到管理员用户名，请确保您有相应的权限" />
-                    </span>
-                </div>
-            )}
+            {UsernameService.isAdminUsername(value, userEmail) &&
+                !(value.toLowerCase() === 'tao' && userEmail && UsernameService.isAdminEmail(userEmail)) && (
+                    <div className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+                        <AlertCircle className="h-4 w-4 text-yellow-600" />
+                        <span className="text-sm text-yellow-700">
+                            <MixedText text="检测到管理员用户名，请确保您有相应的权限" />
+                        </span>
+                    </div>
+                )}
         </div>
     );
 }

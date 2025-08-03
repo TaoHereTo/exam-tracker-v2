@@ -279,7 +279,7 @@ export function OverviewView({ records }: OverviewViewProps) {
     // 如果开启数据概览动画控制，显示静态网格布局
     if (reduceMotion) {
         return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-6xl mx-auto px-4">
                 {cards.map((item, idx) => (
                     <Card key={item.title + idx} className="min-h-[120px]">
                         <CardHeader>
@@ -304,7 +304,7 @@ export function OverviewView({ records }: OverviewViewProps) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
-            <Marquee className="w-full max-w-5xl" pauseOnHover repeat={2}>
+            <Marquee className="w-full max-w-6xl" pauseOnHover repeat={2}>
                 <div className="flex gap-6">
                     {group1.map((item, idx) => (
                         <Card className="min-w-[220px]" key={item.title + idx}>
@@ -318,7 +318,7 @@ export function OverviewView({ records }: OverviewViewProps) {
                     ))}
                 </div>
             </Marquee>
-            <Marquee className="w-full max-w-5xl" pauseOnHover reverse repeat={2}>
+            <Marquee className="w-full max-w-6xl" pauseOnHover reverse repeat={2}>
                 <div className="flex gap-6">
                     {group2.map((item, idx) => (
                         <Card className="min-w-[220px]" key={item.title + idx}>

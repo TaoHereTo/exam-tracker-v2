@@ -15,12 +15,7 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-                <div className="text-center">
-                    <LoadingSpinner size="lg" />
-                    <p className="mt-4 text-gray-600" style={{ fontFamily: '思源宋体, serif' }}>
-                        正在加载...
-                    </p>
-                </div>
+                <LoadingSpinner size="lg" />
             </div>
         )
     }

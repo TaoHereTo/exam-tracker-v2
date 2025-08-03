@@ -16,7 +16,7 @@ import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
-    const [date, setDate] = useState<Date | undefined>(undefined);
+    const [date, setDate] = useState<Date | undefined>(new Date());
     const [dateOpen, setDateOpen] = useState(false);
     const [duration, setDuration] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -81,7 +81,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
         };
 
         onAddRecord?.(newRecord);
-        setDate(undefined);
+        setDate(new Date());
         setDuration('');
         setIsSubmitting(false);
     };
@@ -165,7 +165,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </div>
 
                     {/* 考试时长 */}
-                    <FormField label={<MixedText text="考试时长" />}>
+                    <FormField label={<MixedText text="用时" />}>
                         <TimePicker
                             value={duration}
                             onChange={setDuration}

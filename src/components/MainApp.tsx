@@ -31,7 +31,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FlowingPAvatar } from "@/components/ui/FlowingPAvatar";
+import { GlobeAvatar } from "@/components/ui/GlobeAvatar";
 import { UserProfileService } from "@/lib/userProfileService";
 import type { UserProfile } from "@/types/user";
 
@@ -84,6 +84,10 @@ export function MainApp() {
     const { notify } = useNotification();
 
     const [showProfileDialog, setShowProfileDialog] = useState(false);
+
+    // 删除确认对话框状态
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [recordsToDelete, setRecordsToDelete] = useState<number[]>([]);
 
     const loadUserProfile = useCallback(async () => {
         try {
@@ -198,122 +202,108 @@ export function MainApp() {
     // 用户信息显示组件 - 侧边栏版本
     const SidebarUserInfo = () => {
         return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-2 w-full group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors">
-                        <FlowingPAvatar size="md" />
-                        <div className="flex flex-col flex-1">
-                            <MixedText
-                                text={userProfile?.display_name || userProfile?.username || user?.email || ''}
-                                className="text-sm font-medium text-gray-900 dark:text-gray-100"
-                            />
-                            <MixedText
-                                text={user?.email || ''}
-                                className="text-xs text-gray-500 dark:text-gray-400"
-                            />
+            <div className="flex items-center gap-0 w-full">
+                <div className="flex-shrink-0 flex items-center">
+                    <GlobeAvatar size="lg" />
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <div className="flex items-center gap-2 flex-1 group cursor-pointer rounded-lg p-2 transition-colors">
+                            <div className="flex flex-col flex-1 justify-center">
+                                <MixedText
+                                    text={userProfile?.display_name || userProfile?.username || user?.email || ''}
+                                    className="text-sm font-medium text-gray-900 dark:text-gray-100"
+                                />
+                                <MixedText
+                                    text={user?.email || ''}
+                                    className="text-xs text-gray-500 dark:text-gray-400"
+                                />
+                            </div>
                         </div>
-                        <div className="flex flex-col gap-0.5 opacity-100">
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                        </div>
-                    </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    align="start"
-                    side="top"
-                    sideOffset={5}
-                    className="w-48"
-                >
-                    <DropdownMenuLabel>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <MixedText text={userProfile?.bio || '座右铭'} />
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                        <User className="h-4 w-4 mr-2" />
-                        <MixedText text="个人资料" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        <MixedText text="基础设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                        <SlidersHorizontal className="h-4 w-4 mr-2" />
-                        <MixedText text="高级设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        <MixedText text="退出登录" />
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="start"
+                        side="top"
+                        sideOffset={5}
+                        className="w-48"
+                    >
+                        <DropdownMenuLabel>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <MixedText text={userProfile?.bio || '座右铭'} />
+                            </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+                            <User className="h-4 w-4 mr-2" />
+                            <MixedText text="个人资料" />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                            <Settings className="h-4 w-4 mr-2" />
+                            <MixedText text="基础设置" />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
+                            <SlidersHorizontal className="h-4 w-4 mr-2" />
+                            <MixedText text="高级设置" />
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                            <LogOut className="h-4 w-4 mr-2" />
+                            <MixedText text="退出登录" />
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         );
     };
 
     // 用户信息显示组件 - Dock版本
     const DockUserInfo = () => {
         return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-2 w-full group cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors">
-                        <FlowingPAvatar size="md" />
-                        <div className="flex flex-col flex-1">
-                            <MixedText
-                                text={userProfile?.display_name || userProfile?.username || user?.email || ''}
-                                className="text-sm font-medium text-gray-900 dark:text-gray-100"
-                            />
-                            <MixedText
-                                text={user?.email || ''}
-                                className="text-xs text-gray-500 dark:text-gray-400"
-                            />
+            <div className="flex items-center justify-center w-full">
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <div className="cursor-pointer rounded-lg p-2 transition-colors">
+                            <GlobeAvatar size="md" />
                         </div>
-                        <div className="flex flex-col gap-0.5 opacity-100">
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                            <div className="w-1 h-1 bg-gray-500 rounded-full"></div>
-                        </div>
-                    </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    align="start"
-                    side="top"
-                    sideOffset={5}
-                    className="w-48"
-                >
-                    <DropdownMenuLabel>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <MixedText text={userProfile?.bio || '座右铭'} />
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                        <User className="h-4 w-4 mr-2" />
-                        <MixedText text="个人资料" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        <MixedText text="基础设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                        <SlidersHorizontal className="h-4 w-4 mr-2" />
-                        <MixedText text="高级设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        <MixedText text="退出登录" />
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                        align="start"
+                        side="top"
+                        sideOffset={5}
+                        className="w-48"
+                    >
+                        <DropdownMenuLabel>
+                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
+                            </div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <MixedText text={userProfile?.bio || '座右铭'} />
+                            </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+                            <User className="h-4 w-4 mr-2" />
+                            <MixedText text="个人资料" />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                            <Settings className="h-4 w-4 mr-2" />
+                            <MixedText text="基础设置" />
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
+                            <SlidersHorizontal className="h-4 w-4 mr-2" />
+                            <MixedText text="高级设置" />
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                            <LogOut className="h-4 w-4 mr-2" />
+                            <MixedText text="退出登录" />
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
         );
     };
 
@@ -349,22 +339,28 @@ export function MainApp() {
             return;
         }
 
-        if (window.confirm(`确定要删除选中的 ${selectedRecordIds.length} 条刷题记录吗？此操作不可恢复。`)) {
-            const recordIds = selectedRecordIds;
-            setRecords(prev => prev.filter(record => !selectedRecordIds.includes(record.id)));
-            setSelectedRecordIds([]); // 清空选中状态
+        setRecordsToDelete(selectedRecordIds);
+        setDeleteDialogOpen(true);
+    };
 
-            // 批量从云端删除选中的记录
-            for (const id of recordIds) {
-                await AutoCloudSync.autoDeleteRecord(id, notify);
-            }
+    const handleConfirmDelete = async () => {
+        const recordIds = recordsToDelete;
+        setRecords(prev => prev.filter(record => !recordsToDelete.includes(record.id)));
+        setSelectedRecordIds([]); // 清空选中状态
 
-            notify({
-                message: "删除成功",
-                description: `已删除 ${selectedRecordIds.length} 条刷题记录`,
-                type: "success"
-            });
+        // 批量从云端删除选中的记录
+        for (const id of recordIds) {
+            await AutoCloudSync.autoDeleteRecord(id, notify);
         }
+
+        notify({
+            message: "删除成功",
+            description: `已删除 ${recordsToDelete.length} 条刷题记录`,
+            type: "success"
+        });
+
+        setDeleteDialogOpen(false);
+        setRecordsToDelete([]);
     };
 
     const handleBatchDeleteKnowledge = async (ids: string[]) => {
@@ -682,8 +678,23 @@ export function MainApp() {
                             </AlertDialogContent>
                         </AlertDialog>
 
-
-
+                        {/* 删除确认对话框 */}
+                        <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
+                                    <AlertDialogDescription asChild>
+                                        <div className="space-y-2">
+                                            <p><MixedText text="确定要删除选中的" /> <MixedText text={`${recordsToDelete.length} 条`} /> <MixedText text="刷题记录吗？此操作不可恢复。" /></p>
+                                        </div>
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleConfirmDelete}><MixedText text="确认删除" /></AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
 
 
                         {/* 用户资料对话框 */}

@@ -261,17 +261,17 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </TabsList>
                 </div>
                 <TabsContent value="perMinute">
-                    <div style={{ height: '500px' }}>
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
                         <TrendChart data={perMinuteData} yMax={2} />
                     </div>
                 </TabsContent>
                 <TabsContent value="accuracy">
-                    <div style={{ height: '500px' }}>
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
                         <TrendChart data={accuracyData} yMax={100} />
                     </div>
                 </TabsContent>
                 <TabsContent value="pie">
-                    <div style={{ height: '500px' }}>
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
                         <ModulePieChart data={records.map(r => {
                             return {
                                 date: r.date,
@@ -283,7 +283,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </div>
                 </TabsContent>
                 <TabsContent value="radar">
-                    <div style={{ height: '500px' }}>
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
                         <ModuleRadarChart data={records} />
                     </div>
                 </TabsContent>

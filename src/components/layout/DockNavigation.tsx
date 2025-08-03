@@ -1,6 +1,6 @@
 import React from "react";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { BarChart2, ClipboardList, Target, BookOpen, Settings, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks, SlidersHorizontal } from "lucide-react";
+import { BarChart2, ClipboardList, Target, BookOpen, LineChart, Trophy, PlusSquare, History as HistoryIcon, CalendarCheck, TrendingUp, FileEdit, ListChecks } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -49,14 +49,6 @@ const dockNavs = [
             { key: 'knowledge-summary', label: '知识点汇总' },
         ]
     },
-    {
-        key: 'settings',
-        icon: <Settings />, label: '系统设置',
-        children: [
-            { key: 'settings', label: '基础设置' },
-            { key: 'settings-advanced', label: '高级设置' },
-        ]
-    },
 ];
 
 const dockChildIcons: Record<string, React.ReactNode> = {
@@ -69,8 +61,6 @@ const dockChildIcons: Record<string, React.ReactNode> = {
     progress: <TrendingUp />,
     "knowledge-entry": <FileEdit />,
     "knowledge-summary": <ListChecks />,
-    settings: <Settings />,
-    "settings-advanced": <SlidersHorizontal />,
 };
 
 export default function DockNavigation({ activeTab, setActiveTab, navMode, userInfo }: DockNavigationProps) {
@@ -98,7 +88,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
                                                 (activeTab === child.key ? "" : "hover:bg-gray-200/70 dark:hover:bg-gray-700/60")
                                             }
                                         >
-                                            {dockChildIcons[child.key] || <Settings />}
+                                            {dockChildIcons[child.key] || <BarChart2 />}
                                             {/* 当前页面底部主色小圆点 */}
                                             {activeTab === child.key && (
                                                 <span

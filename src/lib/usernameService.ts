@@ -55,12 +55,20 @@ export class UsernameService {
                 };
             }
 
-            // 检查是否为保留用户名（移除Tao的限制）
+            // 检查是否为保留用户名
             const reservedUsernames = ['admin', 'administrator', 'root', 'system'];
             if (reservedUsernames.includes(username.toLowerCase())) {
                 return {
                     available: false,
                     message: '该用户名已被保留，请选择其他用户名'
+                };
+            }
+
+            // 特殊处理：管理员邮箱可以使用"Tao"用户名
+            if (username.toLowerCase() === 'tao' && userEmail && this.isAdminEmail(userEmail)) {
+                return {
+                    available: true,
+                    message: '欢迎你，Tao'
                 };
             }
 

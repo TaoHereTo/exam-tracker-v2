@@ -10,6 +10,7 @@ import { type UserProfile } from "@/types/user";
 import { User, Save } from "lucide-react";
 import { UsernameChecker } from "@/components/ui/UsernameChecker";
 import { MixedText } from "@/components/ui/MixedText";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface UserProfileDialogProps {
     isOpen: boolean;
@@ -27,6 +28,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
     });
     const [isUsernameValid, setIsUsernameValid] = useState(true);
     const { notify } = useNotification();
+    const { user } = useAuth();
 
     // 加载用户资料
     useEffect(() => {
@@ -133,6 +135,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             onValidationChange={setIsUsernameValid}
                             placeholder="请输入用户名"
                             label="用户名"
+                            userEmail={user?.email || ''}
                         />
                         <p className="text-xs text-muted-foreground">
                             <MixedText text="用户名用于登录和显示，最多20个字符" />

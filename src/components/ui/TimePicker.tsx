@@ -62,14 +62,18 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     const handleInputChange = (type: 'minutes' | 'seconds', inputValue: string) => {
         const numValue = parseInt(inputValue) || 0;
         if (type === 'minutes') {
-            handleMinutesChange(numValue);
+            const clampedMinutes = Math.max(0, Math.min(999, numValue));
+            setMinutes(clampedMinutes);
         } else {
-            handleSecondsChange(numValue);
+            const clampedSeconds = Math.max(0, Math.min(59, numValue));
+            setSeconds(clampedSeconds);
         }
     };
 
     // 确认选择
     const handleConfirm = () => {
+        const newValue = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        onChange?.(newValue);
         setIsOpen(false);
     };
 
