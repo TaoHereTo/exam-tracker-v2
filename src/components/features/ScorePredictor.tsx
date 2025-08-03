@@ -124,6 +124,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                     <InteractiveHoverButton
                         onClick={handlePredictScore}
                         hoverColor="linear-gradient(to bottom right, #374151, #111827)"
+                        className="h-9"
                     >
                         预测我的行测总分
                     </InteractiveHoverButton>

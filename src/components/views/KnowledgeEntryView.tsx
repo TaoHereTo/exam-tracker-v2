@@ -93,9 +93,9 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
         <div className="w-full max-w-2xl mx-auto flex flex-col">
             <div className="relative mb-10 flex justify-center">
                 <Tabs value={tab} onValueChange={handleTabChange}>
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-10 px-1 w-fit">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-12 px-0 w-fit">
                         {MODULES.map(({ value, label }) => (
-                            <TabsTrigger key={value} value={value}>
+                            <TabsTrigger key={value} value={value} className="py-2">
                                 <MixedText text={label} />
                             </TabsTrigger>
                         ))}
@@ -103,7 +103,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 </Tabs>
             </div>
 
-            <Carousel setApi={handleCarouselApi} className="relative px-12" data-carousel-container opts={{
+            <Carousel setApi={handleCarouselApi} className="relative" data-carousel-container opts={{
                 align: 'start',
                 skipSnaps: false,
                 containScroll: 'trimSnaps',
@@ -113,11 +113,9 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 slidesToScroll: 1,
                 startIndex: MODULES.findIndex(t => t.value === defaultTab)
             }}>
-                <CarouselPrevious />
                 <CarouselContent>
                     {carouselContent}
                 </CarouselContent>
-                <CarouselNext />
             </Carousel>
         </div>
     );

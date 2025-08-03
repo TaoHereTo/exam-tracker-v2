@@ -16,6 +16,7 @@ import { Plus, Edit, Trash2, Eye } from "lucide-react";
 import { useState } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 interface StudyPlan {
     id: string;
@@ -194,15 +195,16 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                         onClick={() => handleOpenForm()}
                         hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
                         icon={<Plus className="w-4 h-4" />}
+                        className="h-9"
                     >
                         <MixedText text="新建计划" />
                     </InteractiveHoverButton>
                 </ButtonGroup>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-none">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-none items-stretch">
                 {plans.map(plan => (
-                    <Card key={plan.id} className="shadow-md hover:shadow-lg transition-shadow min-h-[200px] w-full">
+                    <Card key={plan.id} className="shadow-md hover:shadow-lg transition-all duration-300 min-h-[220px] w-full flex flex-col">
                         <CardHeader className="pb-3">
                             <CardTitle className="flex justify-between items-center gap-3">
                                 <MixedText text={plan.name} className="text-lg font-semibold truncate flex-1" />
@@ -211,6 +213,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                         onClick={() => onShowDetail(plan.id)}
                                         hoverColor="#3B82F6"
                                         icon={<Eye className="w-4 h-4" />}
+                                        className="h-9"
                                     >
                                         <MixedText text="详情" />
                                     </InteractiveHoverButton>
@@ -218,6 +221,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                         onClick={() => handleOpenForm(plan)}
                                         hoverColor="#F59E0B"
                                         icon={<Edit className="w-4 h-4" />}
+                                        className="h-9"
                                     >
                                         <MixedText text="编辑" />
                                     </InteractiveHoverButton>
@@ -226,6 +230,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                             <InteractiveHoverButton
                                                 hoverColor="#EF4444"
                                                 icon={<Trash2 className="w-4 h-4" />}
+                                                className="h-9"
                                             >
                                                 <MixedText text="删除" />
                                             </InteractiveHoverButton>
@@ -246,7 +251,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                 </ButtonGroup>
                             </CardTitle>
                         </CardHeader>
-                        <CardContent className="pt-0">
+                        <CardContent className="pt-0 flex-1 flex flex-col justify-center">
                             <div className="space-y-4">
                                 <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
                                 {plan.description && (
@@ -351,7 +356,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                                 }}
                                             >
                                                 <SelectTrigger className={errors.module ? 'border-red-500 ring-red-500/20' : ''}>
-                                                    <SelectValue placeholder="选择板块" />
+                                                    <SelectValue placeholder="请选择板块" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectItem value="政治理论"><MixedText text="政治理论" /></SelectItem>
@@ -423,9 +428,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                     <Button type="button" variant="outline" onClick={handleCloseForm}>
                                         <MixedText text="取消" />
                                     </Button>
-                                    <Button type="submit">
+                                    <RainbowButton type="submit">
                                         {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
-                                    </Button>
+                                    </RainbowButton>
                                 </ButtonGroup>
                             </CardContent>
                         </form>

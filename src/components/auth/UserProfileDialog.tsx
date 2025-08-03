@@ -11,6 +11,7 @@ import { User, Save } from "lucide-react";
 import { UsernameChecker } from "@/components/ui/UsernameChecker";
 import { MixedText } from "@/components/ui/MixedText";
 import { useAuth } from "@/contexts/AuthContext";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 interface UserProfileDialogProps {
     isOpen: boolean;
@@ -197,7 +198,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                         <Button variant="outline" onClick={onClose}>
                             <MixedText text="取消" />
                         </Button>
-                        <Button
+                        <RainbowButton
                             onClick={handleSaveProfile}
                             disabled={loading || !isUsernameValid}
                             className="min-w-[100px]"
@@ -210,7 +211,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                                     <MixedText text="保存" />
                                 </>
                             )}
-                        </Button>
+                        </RainbowButton>
                     </div>
                 </div>
             </DialogContent>

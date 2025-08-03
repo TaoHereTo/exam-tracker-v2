@@ -182,7 +182,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                         disabled={clearing}
                                                         hoverColor="#DC2626"
                                                         icon={<Trash2 className="w-4 h-4" />}
-                                                        className="text-sm"
+                                                        className="text-sm h-9"
                                                     >
                                                         {clearing ? "清空中..." : "清空云端数据"}
                                                     </InteractiveHoverButton>

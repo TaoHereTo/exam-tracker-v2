@@ -20,6 +20,7 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
                 onClick={onExport}
                 hoverColor="#059669"
                 icon={<Upload className="w-4 h-4" />}
+                className="h-9"
             >
                 <MixedText text="导出数据" />
             </InteractiveHoverButton>
@@ -27,13 +28,14 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
                 onClick={onImport}
                 hoverColor="#D97706"
                 icon={<Download className="w-4 h-4" />}
+                className="h-9"
             >
                 <MixedText text="导入数据" />
             </InteractiveHoverButton>
             {onClearAllData && (
                 <AlertDialog>
                     <AlertDialogTrigger asChild>
-                        <InteractiveHoverButton ref={clearDialogRef} hoverColor="#EF4444">
+                        <InteractiveHoverButton ref={clearDialogRef} hoverColor="#EF4444" className="h-9">
                             <MixedText text="清空所有数据" />
                         </InteractiveHoverButton>
                     </AlertDialogTrigger>

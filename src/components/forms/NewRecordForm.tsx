@@ -96,11 +96,11 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
         const { values, setValue } = useFormContext();
 
         return (
-            <Card className="max-w-md mx-auto mt-8">
+            <Card className="max-w-md mx-auto mt-8 flex flex-col min-h-[500px]">
                 <CardHeader>
                     <CardTitle><MixedText text="新的做题记录" /></CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 flex-1 flex flex-col justify-center">
                     {/* 日期选择器 */}
                     <FormField label={<MixedText text="日期" />}>
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>

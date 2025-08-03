@@ -72,7 +72,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                         <MixedText text="邮箱地址" />
                     </Label>
                     <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
                         <Input
                             id="email"
                             type="email"
@@ -90,7 +90,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                         type="button"
                         onClick={onSwitchToLogin}
                         variant="outline"
-                        className="bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                        className="bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-9"
                     >
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         <MixedText text="返回登录" />

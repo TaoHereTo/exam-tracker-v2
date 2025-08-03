@@ -81,7 +81,16 @@ export const recordService = {
             .eq('id', id)
             .eq('user_id', userId)
 
-        if (error) throw error
+        if (error) {
+            console.error('删除记录数据库错误:', {
+                recordId: id,
+                userId,
+                error: error.message,
+                details: error.details,
+                hint: error.hint
+            });
+            throw error;
+        }
     }
 }
 
@@ -174,7 +183,16 @@ export const planService = {
             .eq('id', id)
             .eq('user_id', userId)
 
-        if (error) throw error
+        if (error) {
+            console.error('删除计划数据库错误:', {
+                planId: id,
+                userId,
+                error: error.message,
+                details: error.details,
+                hint: error.hint
+            });
+            throw error;
+        }
     }
 }
 
@@ -269,7 +287,16 @@ export const knowledgeService = {
             .eq('id', id)
             .eq('user_id', userId)
 
-        if (error) throw error
+        if (error) {
+            console.error('删除知识点数据库错误:', {
+                knowledgeId: id,
+                userId,
+                error: error.message,
+                details: error.details,
+                hint: error.hint
+            });
+            throw error;
+        }
     }
 }
 

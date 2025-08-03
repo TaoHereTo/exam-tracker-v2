@@ -139,8 +139,8 @@ export function SettingsView({
                 <AdvancedSetting />
                 <Card className="mt-6">
                     <CardHeader>
-                                            <CardTitle><MixedText text="危险操作" /></CardTitle>
-                    <CardDescription><MixedText text="此处操作不可逆，请谨慎使用！" /></CardDescription>
+                        <CardTitle><MixedText text="危险操作" /></CardTitle>
+                        <CardDescription><MixedText text="此处操作不可逆，请谨慎使用！" /></CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-center justify-between p-4 border border-destructive/50 rounded-lg bg-destructive/5">
@@ -154,6 +154,7 @@ export function SettingsView({
                                 <AlertDialogTrigger asChild>
                                     <InteractiveHoverButton
                                         hoverColor="#DC2626"
+                                        className="h-9"
                                     >
                                         清空数据
                                     </InteractiveHoverButton>
@@ -212,8 +213,8 @@ export function SettingsView({
                             {uploadProgress && (
                                 <div className="mt-2 space-y-1">
                                     <div className="flex justify-between text-xs text-gray-600">
-                                                                        <span><MixedText text="上传进度" /></span>
-                                <span><MixedText text={`${uploadProgress.current}/${uploadProgress.total}`} /></span>
+                                        <span><MixedText text="上传进度" /></span>
+                                        <span><MixedText text={`${uploadProgress.current}/${uploadProgress.total}`} /></span>
                                     </div>
                                     <Progress
                                         value={(uploadProgress.current / uploadProgress.total) * 100}
@@ -229,7 +230,7 @@ export function SettingsView({
                                 disabled={isUploading}
                                 hoverColor="#059669"
                                 icon={<Upload className="w-4 h-4" />}
-                                className="text-sm"
+                                className="text-sm h-9"
                             >
                                 {isUploading ? "上传中..." : "上传到云端"}
                             </InteractiveHoverButton>
@@ -238,7 +239,7 @@ export function SettingsView({
                                 disabled={isDownloading}
                                 hoverColor="#3B82F6"
                                 icon={<Download className="w-4 h-4" />}
-                                className="text-sm"
+                                className="text-sm h-9"
                             >
                                 {isDownloading ? "下载中..." : "从云端下载"}
                             </InteractiveHoverButton>
@@ -246,7 +247,7 @@ export function SettingsView({
                                 onClick={handleViewCloudData}
                                 hoverColor="#8B5CF6"
                                 icon={<Eye className="w-4 h-4" />}
-                                className="text-sm"
+                                className="text-sm h-9"
                             >
                                 查看云端数据
                             </InteractiveHoverButton>

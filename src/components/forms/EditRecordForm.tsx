@@ -94,7 +94,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
     };
 
     return (
-        <Card className="max-w-2xl mx-auto w-full">
+        <Card className="max-w-2xl mx-auto w-full flex flex-col min-h-[600px]">
             <BaseForm
                 onSubmit={handleSubmit}
                 validationSchema={validationSchema}
@@ -107,7 +107,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                 <CardHeader>
                     <CardTitle><MixedText text="编辑做题记录" /></CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 flex-1 flex flex-col justify-center">
                     {/* 日期选择器 */}
                     <FormField label={<MixedText text="日期" />}>
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>

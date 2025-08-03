@@ -322,6 +322,7 @@ export function AdvancedSetting() {
                                     }
                                 }}
                                 hoverColor="#3B82F6"
+                                className="h-9"
                             >
                                 <MixedText text={showImageManager ? '隐藏管理' : '图片管理'} />
                             </InteractiveHoverButton>
@@ -347,6 +348,7 @@ export function AdvancedSetting() {
                                         onClick={loadCloudImages}
                                         disabled={isLoadingImages}
                                         hoverColor="#059669"
+                                        className="h-9"
                                     >
                                         <MixedText text="刷新" />
                                     </InteractiveHoverButton>
@@ -355,12 +357,14 @@ export function AdvancedSetting() {
                                     <InteractiveHoverButton
                                         onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
                                         hoverColor="#D97706"
+                                        className="h-9"
                                     >
                                         <MixedText text={imageManagerView === 'grid' ? '列表' : '网格'} />
                                     </InteractiveHoverButton>
                                     <InteractiveHoverButton
                                         onClick={handleUploadImage}
                                         hoverColor="#059669"
+                                        className="h-9"
                                     >
                                         <MixedText text="上传" />
                                     </InteractiveHoverButton>
@@ -369,6 +373,7 @@ export function AdvancedSetting() {
                                             onClick={handleDeleteSelectedImages}
                                             hoverColor="#EF4444"
                                             icon={<Trash2 className="w-4 h-4" />}
+                                            className="h-9"
                                         >
                                             <MixedText text={`删除 (${selectedImages.size})`} />
                                         </InteractiveHoverButton>

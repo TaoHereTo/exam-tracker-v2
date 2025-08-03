@@ -44,6 +44,7 @@ export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
                         <InteractiveHoverButton
                             onClick={onBack}
                             hoverColor="#6B7280"
+                            className="h-9"
                         >
                             返回
                         </InteractiveHoverButton>

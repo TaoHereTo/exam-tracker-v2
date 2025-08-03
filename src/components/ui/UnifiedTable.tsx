@@ -319,7 +319,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     key={index}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
-                                    className={action.className}
+                                    className={`${action.className} h-9`}
                                     hoverColor={action.variant === "destructive" ? "#EF4444" : "#3B82F6"}
                                 >
                                     {action.icon}
@@ -333,6 +333,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     onClick={onNew}
                                     hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
                                     compact={true}
+                                    className="h-9"
                                 >
                                     新建
                                 </InteractiveHoverButton>
@@ -344,6 +345,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     onClick={onExport}
                                     hoverColor="#059669"
                                     icon={<Upload className="w-4 h-4" />}
+                                    className="h-9"
                                 >
                                     导出为Excel
                                 </InteractiveHoverButton>
@@ -356,6 +358,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     disabled={editDisabled}
                                     hoverColor="rgb(43, 127, 255)"
                                     compact={true}
+                                    className="h-9"
                                 >
                                     编辑
                                 </InteractiveHoverButton>
@@ -368,6 +371,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <InteractiveHoverButton
                                             disabled={deleteDisabled}
                                             hoverColor="#EF4444"
+                                            className="h-9"
                                         >
                                             批量删除
                                         </InteractiveHoverButton>

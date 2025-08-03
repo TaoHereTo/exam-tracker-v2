@@ -64,7 +64,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         <MixedText text="邮箱地址" />
                     </Label>
                     <div className="relative w-full">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
                         <Input
                             id="email"
                             type="email"
@@ -82,7 +82,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         <MixedText text="密码" />
                     </Label>
                     <div className="relative w-full">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
                         <Input
                             id="password"
                             type={showPassword ? 'text' : 'password'}
@@ -106,7 +106,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <InteractiveHoverButton
                         type="button"
                         onClick={onSwitchToSignUp}
-                        className="flex-1 signup-btn"
+                        className="flex-1 signup-btn h-9"
                         hoverColor="#3B82F6"
                         compact={true}
                         icon={<Plus className="w-4 h-4" />}
@@ -116,7 +116,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <InteractiveHoverButton
                         type="button"
                         onClick={onSwitchToForgotPassword}
-                        className="flex-1 forgot-btn"
+                        className="flex-1 forgot-btn h-9"
                         hoverColor="#059669"
                         compact={true}
                         icon={<Key className="w-4 h-4" />}

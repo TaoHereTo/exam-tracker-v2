@@ -13,6 +13,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MixedText } from "@/components/ui/MixedText";
 import { UsernameChecker } from "@/components/ui/UsernameChecker";
 import { useAuth } from "@/contexts/AuthContext";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 export function UserProfileSetting() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -209,7 +210,7 @@ export function UserProfileSetting() {
 
                 {/* 保存按钮 */}
                 <div className="flex justify-end gap-2">
-                    <Button
+                    <RainbowButton
                         onClick={handleSaveProfile}
                         disabled={loading}
                         className="min-w-[100px]"
@@ -222,7 +223,7 @@ export function UserProfileSetting() {
                                 <MixedText text="保存" />
                             </>
                         )}
-                    </Button>
+                    </RainbowButton>
                 </div>
 
                 {/* 当前信息预览 */}

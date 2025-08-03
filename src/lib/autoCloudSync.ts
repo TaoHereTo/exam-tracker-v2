@@ -181,11 +181,18 @@ export class AutoCloudSync {
                 description: '记录已从云端同步删除'
             });
         } catch (error) {
-            console.error('自动删除记录从云端失败:', error);
+            // 改进错误日志，提供更详细的错误信息
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('自动删除记录从云端失败:', {
+                recordId,
+                error: errorMessage,
+                fullError: error
+            });
+
             notify({
                 type: 'error',
                 message: '云端删除失败',
-                description: '记录已从本地删除，但云端同步失败，请稍后重试'
+                description: `记录已从本地删除，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -202,11 +209,20 @@ export class AutoCloudSync {
                 description: '学习计划已从云端同步删除'
             });
         } catch (error) {
-            console.error('自动删除计划从云端失败:', error);
+            // 改进错误日志，提供更详细的错误信息
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorDetails = error instanceof Error ? error.stack : '未知错误';
+            console.error('自动删除计划从云端失败:', {
+                planId,
+                error: errorMessage,
+                details: errorDetails,
+                fullError: error
+            });
+
             notify({
                 type: 'error',
                 message: '云端删除失败',
-                description: '计划已从本地删除，但云端同步失败，请稍后重试'
+                description: `计划已从本地删除，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -223,11 +239,18 @@ export class AutoCloudSync {
                 description: '知识点已从云端同步删除'
             });
         } catch (error) {
-            console.error('自动删除知识点从云端失败:', error);
+            // 改进错误日志，提供更详细的错误信息
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('自动删除知识点从云端失败:', {
+                knowledgeId,
+                error: errorMessage,
+                fullError: error
+            });
+
             notify({
                 type: 'error',
                 message: '云端删除失败',
-                description: '知识点已从本地删除，但云端同步失败，请稍后重试'
+                description: `知识点已从本地删除，但云端同步失败: ${errorMessage}`
             });
         }
     }

@@ -292,11 +292,11 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const fieldConfig = getFieldConfig();
 
   return (
-    <Card className="max-w-md mx-auto">
+    <Card className="max-w-md mx-auto flex flex-col min-h-[600px]">
       <CardHeader>
         <CardTitle><MixedText text={config.title} /></CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 flex-1 flex flex-col justify-center">
         {/* 子分类选择器 */}
         {config.hasSubCategory && config.subCategories && (
           <div className="space-y-2">

@@ -178,6 +178,13 @@ export function MainApp() {
         setSelectedRecordIds(prev => prev.filter(id => currentPageIds.includes(id)));
     }, [records, historyPage, pageSize]);
 
+    // 退出登录确认对话框状态
+    const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
+
+    const handleSignOutClick = useCallback(() => {
+        setSignOutDialogOpen(true);
+    }, []);
+
     const handleSignOut = useCallback(async () => {
         try {
             await signOut();
@@ -193,6 +200,7 @@ export function MainApp() {
                 type: "error"
             });
         }
+        setSignOutDialogOpen(false);
     }, [signOut, notify]);
 
 
@@ -249,7 +257,7 @@ export function MainApp() {
                             <MixedText text="高级设置" />
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
                             <LogOut className="h-4 w-4 mr-2" />
                             <MixedText text="退出登录" />
                         </DropdownMenuItem>
@@ -297,7 +305,7 @@ export function MainApp() {
                             <MixedText text="高级设置" />
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOut} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
                             <LogOut className="h-4 w-4 mr-2" />
                             <MixedText text="退出登录" />
                         </DropdownMenuItem>
@@ -692,6 +700,24 @@ export function MainApp() {
                                 <AlertDialogFooter>
                                     <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
                                     <AlertDialogAction onClick={handleConfirmDelete}><MixedText text="确认删除" /></AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+
+                        {/* 退出登录确认对话框 */}
+                        <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle><MixedText text="确认退出登录" /></AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        <MixedText text="您确定要退出登录吗？退出后需要重新登录才能使用应用。" />
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                    <AlertDialogAction onClick={handleSignOut} className="bg-red-600 hover:bg-red-700">
+                                        <MixedText text="确认退出" />
+                                    </AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
