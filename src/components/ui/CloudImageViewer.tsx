@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Image as LucideImage, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import Image from 'next/image';
+import { ConfettiLoading } from './LoadingSpinner';
+import { MixedText } from './MixedText';
 import {
     Drawer,
     DrawerContent,
@@ -120,10 +122,10 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                     <div className="flex items-center gap-1">
                         <LucideImage className={sizeClasses[size]} />
                         {isLoading && (
-                            <div className="text-xs text-gray-500">加载中...</div>
+                            <ConfettiLoading />
                         )}
                         {hasError && !isLoading && (
-                            <div className="text-xs text-red-500">加载失败</div>
+                            <div className="text-xs text-red-500"><MixedText text="加载失败" /></div>
                         )}
                     </div>
                 )}

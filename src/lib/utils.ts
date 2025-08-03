@@ -5,6 +5,57 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// 字体处理工具函数
+export function processMixedText(text: string): string {
+  if (!text) return text;
+
+  // 使用正则表达式分割中英文
+  const parts = text.split(/([a-zA-Z0-9\s]+)/);
+
+  return parts.map(part => {
+    // 检查是否为英文、数字或空格
+    if (/^[a-zA-Z0-9\s]+$/.test(part)) {
+      // 英文、数字部分使用 Century 字体
+      return `<span style="font-family: 'Century', serif;">${part}</span>`;
+    } else if (part.trim()) {
+      // 中文部分使用新宋体
+      return `<span style="font-family: '新宋体', serif;">${part}</span>`;
+    }
+    return part;
+  }).join('');
+}
+
+// 获取混合文本的样式对象
+export function getMixedTextStyle(text: string) {
+  if (!text) return {};
+
+  // 如果只包含中文，使用新宋体
+  if (/^[\u4e00-\u9fa5\s]+$/.test(text)) {
+    return { style: { fontFamily: '新宋体, serif' } };
+  }
+
+  // 如果只包含英文和数字，使用 Century
+  if (/^[a-zA-Z0-9\s]+$/.test(text)) {
+    return { style: { fontFamily: 'Century, serif' } };
+  }
+
+  // 混合文本使用特殊处理
+  return {
+    dangerouslySetInnerHTML: { __html: processMixedText(text) },
+    style: { fontFamily: '新宋体, serif' } // 默认字体
+  };
+}
+
+// 检查文本是否包含混合字符
+export function hasMixedCharacters(text: string): boolean {
+  if (!text) return false;
+  const hasChinese = /[\u4e00-\u9fa5]/.test(text);
+  const hasEnglish = /[a-zA-Z]/.test(text);
+  const hasNumbers = /[0-9]/.test(text);
+
+  return (hasChinese && (hasEnglish || hasNumbers)) || (hasEnglish && hasNumbers);
+}
+
 // 时间格式转换工具函数
 export function timeStringToMinutes(timeString: string): number {
   if (!timeString || typeof timeString !== 'string') return 0;

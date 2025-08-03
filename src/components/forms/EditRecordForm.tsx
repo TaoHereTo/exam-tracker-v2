@@ -6,11 +6,14 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { MODULES } from '@/config/exam';
 import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
+import { SelectItem } from "@/components/ui/select";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
 import { TimePicker } from "@/components/ui/TimePicker";
 import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { MixedText } from "@/components/ui/MixedText";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 interface EditRecordFormProps {
     record: RecordItem;
@@ -22,6 +25,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
     const [duration, setDuration] = useState<string>('');
+    const { notify } = useNotification();
 
     // 初始化日期和时长
     useEffect(() => {
@@ -59,7 +63,11 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
         if (!date) return;
 
         if (!duration) {
-            alert('请选择做题时长');
+            notify({
+                type: 'error',
+                message: '请选择做题时长',
+                description: '请选择做题时长'
+            });
             return;
         }
 
@@ -97,18 +105,18 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                 }}
             >
                 <CardHeader>
-                    <CardTitle>编辑做题记录</CardTitle>
+                    <CardTitle><MixedText text="编辑做题记录" /></CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* 日期选择器 */}
-                    <FormField label="日期">
+                    <FormField label={<MixedText text="日期" />}>
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
                                     className="w-full justify-start text-left font-normal"
                                 >
-                                    {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
+                                    {date ? date.toLocaleDateString() : <span className="text-muted-foreground"><MixedText text="选择日期" /></span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
@@ -121,10 +129,10 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* 模块选择器 */}
                         <BaseFormField name="module">
-                            <FormField label="模块">
+                            <FormField label={<MixedText text="模块" />}>
                                 <FormSelect name="module" placeholder="请选择模块">
                                     {MODULES.map(m => (
-                                        <option key={m.value} value={m.value}>{m.label}</option>
+                                        <SelectItem key={m.value} value={m.value}><MixedText text={m.label} /></SelectItem>
                                     ))}
                                 </FormSelect>
                             </FormField>
@@ -132,7 +140,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
 
                         {/* 总题数 */}
                         <BaseFormField name="total">
-                            <FormField label="总题数">
+                            <FormField label={<MixedText text="总题数" />}>
                                 <FormInput
                                     name="total"
                                     type="number"
@@ -143,7 +151,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
 
                         {/* 正确题数 */}
                         <BaseFormField name="correct">
-                            <FormField label="正确题数">
+                            <FormField label={<MixedText text="正确题数" />}>
                                 <FormInput
                                     name="correct"
                                     type="number"
@@ -153,7 +161,7 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                         </BaseFormField>
 
                         {/* 做题时长 */}
-                        <FormField label="做题时长">
+                        <FormField label={<MixedText text="做题时长" />}>
                             <TimePicker
                                 value={duration}
                                 onChange={setDuration}
@@ -168,13 +176,13 @@ export function EditRecordForm({ record, onSave, onCancel }: EditRecordFormProps
                         onClick={onCancel}
                         size="sm"
                     >
-                        取消
+                        <MixedText text="取消" />
                     </RainbowButton>
                     <RainbowButton
                         type="submit"
                         size="sm"
                     >
-                        保存
+                        <MixedText text="保存" />
                     </RainbowButton>
                 </CardFooter>
             </BaseForm>

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Marquee } from "@/components/magicui/marquee";
 import { normalizeModuleName } from "@/config/exam";
 import { timeStringToMinutes, minutesToTimeString } from "@/lib/utils";
-
+import { MixedText } from "@/components/ui/MixedText";
 
 interface OverviewViewProps {
     records: Array<{
@@ -100,54 +100,48 @@ export function OverviewView({ records }: OverviewViewProps) {
             dayMap[r.date].questions += Number(r.total) || 0;
 
             // 按模块分组
-            moduleMap[r.module] = (moduleMap[r.module] || 0) + 1;
+            const moduleName = normalizeModuleName(r.module);
+            moduleMap[moduleName] = (moduleMap[moduleName] || 0) + 1;
 
-            // 最长连续刷题时间
-            const duration = timeStringToMinutes(r.duration);
-            if (duration > longestSession) {
-                longestSession = duration;
+            // 最长单次刷题时间
+            const sessionDuration = timeStringToMinutes(r.duration) || 0;
+            if (sessionDuration > longestSession) {
+                longestSession = sessionDuration;
                 longestSessionDate = r.date;
             }
 
-            // 最快刷题速度
-            const total = Number(r.total) || 0;
-            if (total > 0) {
-                const speed = duration / total;
-                if (speed < fastestSpeed) {
-                    fastestSpeed = speed;
-                    fastestSpeedDate = r.date;
-                }
+            // 最快刷题速度（分钟/题）
+            const speed = sessionDuration / (Number(r.total) || 1);
+            if (speed < fastestSpeed && speed > 0) {
+                fastestSpeed = speed;
+                fastestSpeedDate = r.date;
             }
 
             // 最佳单次正确率
-            if (total > 0) {
-                const accuracy = (Number(r.correct) || 0) / total;
-                if (accuracy > bestSingleAccuracy) {
-                    bestSingleAccuracy = accuracy;
-                    bestSingleAccuracyDate = r.date;
-                }
+            const accuracy = Number(r.correct) / Number(r.total);
+            if (accuracy > bestSingleAccuracy) {
+                bestSingleAccuracy = accuracy;
+                bestSingleAccuracyDate = r.date;
             }
         });
 
-        // 正确率最高的一天
-        let bestAccuracyDay = "暂无记录";
+        // 计算最佳正确率的一天
         let bestAccuracy = 0;
-        Object.entries(dayMap).forEach(([date, { correct, total }]) => {
-            if (total > 0) {
-                const acc = correct / total;
-                if (acc > bestAccuracy) {
-                    bestAccuracy = acc;
-                    bestAccuracyDay = date;
-                }
+        let bestAccuracyDay = "暂无记录";
+        Object.entries(dayMap).forEach(([date, data]) => {
+            const accuracy = data.total > 0 ? data.correct / data.total : 0;
+            if (accuracy > bestAccuracy) {
+                bestAccuracy = accuracy;
+                bestAccuracyDay = date;
             }
         });
 
-        // 刷题最多的一天
-        let mostQuestionsDay = "暂无记录";
+        // 计算刷题最多的一天
         let mostQuestions = 0;
-        Object.entries(dayMap).forEach(([date, { questions }]) => {
-            if (questions > mostQuestions) {
-                mostQuestions = questions;
+        let mostQuestionsDay = "暂无记录";
+        Object.entries(dayMap).forEach(([date, data]) => {
+            if (data.questions > mostQuestions) {
+                mostQuestions = data.questions;
                 mostQuestionsDay = date;
             }
         });
@@ -158,22 +152,21 @@ export function OverviewView({ records }: OverviewViewProps) {
         Object.entries(moduleMap).forEach(([module, count]) => {
             if (count > mostFrequentCount) {
                 mostFrequentCount = count;
-                mostFrequentModule = normalizeModuleName(module);
+                mostFrequentModule = module;
             }
         });
 
-        // 连续刷题天数
+        // 计算连续刷题天数
+        const sortedDates = Object.keys(dayMap).sort();
         let maxConsecutiveDays = 0;
         let currentConsecutiveDays = 0;
-        let lastConsecutiveDate: string | null = null;
-        const sortedDates = [...new Set(records.map(r => r.date))].sort();
-        sortedDates.forEach(date => {
-            if (lastConsecutiveDate) {
-                const lastDateObj = new Date(lastConsecutiveDate);
-                const currentDateObj = new Date(date);
-                const diffTime = currentDateObj.getTime() - lastDateObj.getTime();
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        let lastDate: Date | null = null;
 
+        sortedDates.forEach(dateStr => {
+            const currentDate = new Date(dateStr);
+            if (lastDate) {
+                const diffTime = currentDate.getTime() - lastDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 if (diffDays === 1) {
                     currentConsecutiveDays++;
                 } else {
@@ -182,17 +175,12 @@ export function OverviewView({ records }: OverviewViewProps) {
             } else {
                 currentConsecutiveDays = 1;
             }
-
-            if (currentConsecutiveDays > maxConsecutiveDays) {
-                maxConsecutiveDays = currentConsecutiveDays;
-            }
-
-            lastConsecutiveDate = date;
+            maxConsecutiveDays = Math.max(maxConsecutiveDays, currentConsecutiveDays);
+            lastDate = currentDate;
         });
 
         // 平均每天刷题数
-        const uniqueDays = sortedDates.length;
-        const avgQuestionsPerDay = uniqueDays > 0 ? (totalQuestions / uniqueDays).toFixed(1) : "0";
+        const avgQuestionsPerDay = sortedDates.length > 0 ? (totalQuestions / sortedDates.length).toFixed(1) : "0";
 
         return {
             totalSessions,
@@ -298,7 +286,9 @@ export function OverviewView({ records }: OverviewViewProps) {
                             <CardTitle className="text-sm">{item.title}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">{item.value}</div>
+                            <div className="text-2xl font-bold">
+                                <MixedText text={String(item.value)} />
+                            </div>
                         </CardContent>
                     </Card>
                 ))}
@@ -319,7 +309,11 @@ export function OverviewView({ records }: OverviewViewProps) {
                     {group1.map((item, idx) => (
                         <Card className="min-w-[220px]" key={item.title + idx}>
                             <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                            <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    <MixedText text={String(item.value)} />
+                                </div>
+                            </CardContent>
                         </Card>
                     ))}
                 </div>
@@ -329,7 +323,11 @@ export function OverviewView({ records }: OverviewViewProps) {
                     {group2.map((item, idx) => (
                         <Card className="min-w-[220px]" key={item.title + idx}>
                             <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                            <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
+                            <CardContent>
+                                <div className="text-2xl font-bold">
+                                    <MixedText text={String(item.value)} />
+                                </div>
+                            </CardContent>
                         </Card>
                     ))}
                 </div>

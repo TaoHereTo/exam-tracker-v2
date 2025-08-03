@@ -19,6 +19,7 @@ import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImag
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
 import { smartImageSort } from '@/lib/utils';
+import { MixedText } from './MixedText';
 
 interface SupabaseImageSelectorDialogProps {
     onImageSelected: (imageId: string) => void;
@@ -186,16 +187,16 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         <>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
-                    {trigger || <Button variant="outline">选择图片</Button>}
+                    {trigger || <Button variant="outline"><MixedText text="选择图片" /></Button>}
                 </DialogTrigger>
                 <DialogContent className="max-w-4xl h-[85vh] overflow-hidden flex flex-col">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Cloud className="h-5 w-5" />
-                            从云端选择图片
+                            <MixedText text="从云端选择图片" />
                         </DialogTitle>
                         <DialogDescription>
-                            从云端存储中选择图片，支持搜索和预览
+                            <MixedText text="从云端存储中选择图片，支持搜索和预览" />
                         </DialogDescription>
                     </DialogHeader>
 
@@ -218,7 +219,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 disabled={isLoading}
                             >
                                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                                刷新
+                                <MixedText text="刷新" />
                             </Button>
                         </div>
 
@@ -229,7 +230,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'
                                 }`}>
                                 <AlertCircle className="h-4 w-4" />
-                                {connectionStatus.message}
+                                <MixedText text={connectionStatus.message} />
                             </div>
                         )}
 
@@ -239,7 +240,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 <div className="flex items-center justify-center h-full">
                                     <div className="text-center">
                                         <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-blue-500 mx-auto mb-2"></div>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">正在加载图片...</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            <MixedText text="正在加载图片..." />
+                                        </p>
                                     </div>
                                 </div>
                             ) : processedImages.length === 0 ? (
@@ -247,7 +250,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     <div className="text-center">
                                         <Cloud className="h-12 w-12 text-gray-400 mx-auto mb-2" />
                                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                                            {searchTerm ? '没有找到匹配的图片' : '云端暂无图片'}
+                                            <MixedText text={searchTerm ? '没有找到匹配的图片' : '云端暂无图片'} />
                                         </p>
                                     </div>
                                 </div>
@@ -278,13 +281,13 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                                                 <div className="p-2">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate text-center">
-                                                        {image.originalName}
+                                                        <MixedText text={image.originalName} />
                                                     </div>
                                                     <div className="text-xs text-gray-500 text-center">
-                                                        {formatFileSize(image.size)}
+                                                        <MixedText text={formatFileSize(image.size)} />
                                                     </div>
                                                     <div className="text-xs text-gray-400 text-center">
-                                                        {formatUploadTime(image.uploadedAt)}
+                                                        <MixedText text={formatUploadTime(image.uploadedAt)} />
                                                     </div>
                                                 </div>
 
@@ -316,13 +319,13 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
                         <Button variant="outline" onClick={handleCancel}>
-                            取消
+                            <MixedText text="取消" />
                         </Button>
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
                         >
-                            确认选择
+                            <MixedText text="确认选择" />
                         </Button>
                     </div>
                 </DialogContent>
@@ -332,30 +335,30 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
             <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>确认删除</AlertDialogTitle>
+                        <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
                         <AlertDialogDescription asChild>
                             {isDeleting ? (
                                 <div className="space-y-4">
-                                    <p>正在删除图片，请稍候...</p>
+                                    <p><MixedText text="正在删除图片，请稍候..." /></p>
                                     <div className="flex items-center gap-2">
                                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-red-500"></div>
                                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                                            正在删除: {imageToDelete?.name}
+                                            <MixedText text={`正在删除: ${imageToDelete?.name}`} />
                                         </span>
                                     </div>
                                 </div>
                             ) : (
                                 <div>
-                                    确定要删除&ldquo;{imageToDelete?.name}&rdquo;吗？
+                                    <MixedText text={`确定要删除"${imageToDelete?.name}"吗？`} />
                                     <br />
                                     <br />
-                                    此操作不可撤销，图片将从云端永久删除。
+                                    <MixedText text="此操作不可撤销，图片将从云端永久删除。" />
                                 </div>
                             )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>取消</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isDeleting}><MixedText text="取消" /></AlertDialogCancel>
                         <AlertDialogAction
                             onClick={confirmDelete}
                             disabled={isDeleting}
@@ -364,10 +367,10 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
                                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-white"></div>
-                                    删除中...
+                                    <MixedText text="删除中..." />
                                 </div>
                             ) : (
-                                '确认删除'
+                                <MixedText text="确认删除" />
                             )}
                         </AlertDialogAction>
                     </AlertDialogFooter>

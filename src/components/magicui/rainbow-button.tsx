@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, VariantProps } from "class-variance-authority";
 import React from "react";
+import { MixedText } from "@/components/ui/MixedText";
 
 const rainbowButtonVariants = cva(
   cn(
@@ -39,18 +40,30 @@ interface RainbowButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
   VariantProps<typeof rainbowButtonVariants> {
   asChild?: boolean;
+  children?: React.ReactNode;
 }
 
 const RainbowButton = React.forwardRef<HTMLButtonElement, RainbowButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
+
+    // 处理子元素，确保文字使用MixedText
+    const renderChildren = () => {
+      if (typeof children === 'string') {
+        return <MixedText text={children} />
+      }
+      return children
+    }
+
     return (
       <Comp
         data-slot="button"
         className={cn(rainbowButtonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
-      />
+      >
+        {renderChildren()}
+      </Comp>
     );
   },
 );

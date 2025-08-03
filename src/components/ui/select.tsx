@@ -5,6 +5,7 @@ import * as SelectPrimitive from "@radix-ui/react-select"
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { MixedText } from "./MixedText"
 
 function Select({
   ...props
@@ -19,9 +20,18 @@ function SelectGroup({
 }
 
 function SelectValue({
+  children,
+  placeholder,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  return <SelectPrimitive.Value data-slot="select-value" {...props} />
+  return (
+    <SelectPrimitive.Value
+      data-slot="select-value"
+      {...props}
+    >
+      {children ? children : placeholder}
+    </SelectPrimitive.Value>
+  )
 }
 
 function SelectTrigger({
@@ -87,6 +97,7 @@ function SelectContent({
 
 function SelectLabel({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
@@ -94,7 +105,9 @@ function SelectLabel({
       data-slot="select-label"
       className={cn("text-muted-foreground px-2 py-1.5 text-xs", className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </SelectPrimitive.Label>
   )
 }
 
@@ -117,7 +130,9 @@ function SelectItem({
           <CheckIcon className="size-4" />
         </SelectPrimitive.ItemIndicator>
       </span>
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText>
+        {typeof children === 'string' ? <MixedText text={children} /> : children}
+      </SelectPrimitive.ItemText>
     </SelectPrimitive.Item>
   )
 }

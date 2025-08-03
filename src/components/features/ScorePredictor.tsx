@@ -6,6 +6,7 @@ import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { MixedText } from "@/components/ui/MixedText";
 
 interface RecordItem {
     module: keyof typeof MODULE_SCORES;
@@ -113,7 +114,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
     return (
         <Card className="max-w-full mx-auto">
             <CardHeader>
-                <CardTitle>预期成绩分析</CardTitle>
+                <CardTitle><MixedText text="预期成绩分析" /></CardTitle>
                 <CardDescription>
                     根据您的历史&ldquo;每分钟得分&rdquo;数据，结合标准行测考试结构，为您预测理论上的最高得分。
                 </CardDescription>
@@ -142,7 +143,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                         />
                         {/* 预测总分右下角渐变大号数字 */}
                         <div className="absolute right-8 bottom-4 flex flex-row items-end gap-3">
-                            <span className="text-2xl font-bold text-gray-700 mb-1">预测总分</span>
+                            <span className="text-2xl font-bold text-gray-700 mb-1"><MixedText text="预测总分" /></span>
                             <span
                                 className="text-5xl font-extrabold bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-lg"
                                 style={{ letterSpacing: 2 }}

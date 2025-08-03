@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
+import { ConfettiLoading } from "@/components/ui/LoadingSpinner";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
 import { format } from 'date-fns';
@@ -13,6 +14,7 @@ const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ de
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { Edit, Trash2 } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
+import { MixedText } from '@/components/ui/MixedText';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -60,7 +62,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
@@ -82,7 +84,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
@@ -104,7 +106,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
@@ -180,7 +182,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         // 再按子分类过滤
         if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
             filtered = filtered.filter(item => {
-                const subCategory = (item as Record<string, unknown>).subCategory;
+                const subCategory = (item as Record<string, unknown>).sub_category;
                 return subCategory === selectedSubCategory;
             });
         }
@@ -209,7 +211,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             knowledge.filter(item => {
                 if (normalizeModuleName(item.module) !== normalizeModuleName(selectedModule)) return false;
                 if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
-                    const subCategory = (item as Record<string, unknown>).subCategory;
+                    const subCategory = (item as Record<string, unknown>).sub_category;
                     if (subCategory !== selectedSubCategory) return false;
                 }
                 const searchLower = search.trim().toLowerCase();
@@ -299,23 +301,23 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     '相关重点': k.note ?? '',
                 };
             } else if (selectedModule === 'verbal') {
-                const k = item as { idiom?: string; meaning?: string; subCategory?: string };
+                const k = item as { idiom?: string; meaning?: string; sub_category?: string };
                 return {
-                    '言语类型': k.subCategory ?? '',
+                    '言语类型': k.sub_category ?? '',
                     '成语': k.idiom ?? '',
                     '含义': k.meaning ?? '',
                 };
             } else if (selectedModule === 'logic') {
-                const k = item as { type?: string; note?: string; subCategory?: string };
+                const k = item as { type?: string; note?: string; sub_category?: string };
                 return {
-                    '推理类型': k.subCategory ?? '',
+                    '推理类型': k.sub_category ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
             } else if (selectedModule === 'common') {
-                const k = item as { type?: string; note?: string; subCategory?: string };
+                const k = item as { type?: string; note?: string; sub_category?: string };
                 return {
-                    '常识类型': k.subCategory ?? '',
+                    '常识类型': k.sub_category ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
@@ -407,13 +409,13 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <SimpleDialogContent>
                     <SimpleDialogHeader>
-                        <SimpleDialogTitle>{editError ? "错误" : "编辑知识点"}</SimpleDialogTitle>
+                        <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
                     </SimpleDialogHeader>
                     {editError ? (
-                        <SimpleDialogDescription className="text-red-500">{editError}</SimpleDialogDescription>
+                        <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>
                     ) : editItem ? (
                         <div className="py-2">
-                            <Suspense fallback={<div className="flex items-center justify-center py-8">加载中...</div>}>
+                            <Suspense fallback={<ConfettiLoading className="py-8" />}>
                                 <ModuleForm
                                     module={editItem.module}
                                     onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
@@ -423,7 +425,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         </div>
                     ) : null}
                     <SimpleDialogFooter>
-                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}>取消</SimpleDialogCancel>
+                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}><MixedText text="取消" /></SimpleDialogCancel>
                     </SimpleDialogFooter>
                 </SimpleDialogContent>
             </SimpleDialog>
@@ -431,14 +433,14 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             <AlertDialog open={singleDeleteDialogOpen} onOpenChange={setSingleDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>确认删除</AlertDialogTitle>
+                        <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
                         <AlertDialogDescription>
                             您确定要删除这个知识点吗？此操作无法撤销。
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}>取消</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleConfirmSingleDelete} style={{ background: '#EF4444' }}>删除</AlertDialogAction>
+                        <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}><MixedText text="取消" /></AlertDialogCancel>
+                        <AlertDialogAction onClick={handleConfirmSingleDelete} style={{ background: '#EF4444' }}><MixedText text="删除" /></AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
+import { MixedText } from "./MixedText"
 
 const alertVariants = cva(
     "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
@@ -18,41 +19,28 @@ const alertVariants = cva(
     }
 )
 
-const Alert = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-    <div
-        ref={ref}
-        role="alert"
-        className={cn(alertVariants({ variant }), className)}
-        {...props}
-    />
-))
-Alert.displayName = "Alert"
+function Alert({ className, variant, children, ...props }: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+    return (
+        <div className={cn(alertVariants({ variant }), className)} {...props}>
+            {typeof children === 'string' ? <MixedText text={children} /> : children}
+        </div>
+    )
+}
 
-const AlertTitle = React.forwardRef<
-    HTMLParagraphElement,
-    React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-    <h5
-        ref={ref}
-        className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-        {...props}
-    />
-))
-AlertTitle.displayName = "AlertTitle"
+function AlertTitle({ className, children, ...props }: React.ComponentProps<"h5">) {
+    return (
+        <h5 className={cn("mb-1 font-medium leading-none tracking-tight", className)} {...props}>
+            {typeof children === 'string' ? <MixedText text={children} /> : children}
+        </h5>
+    )
+}
 
-const AlertDescription = React.forwardRef<
-    HTMLParagraphElement,
-    React.HTMLAttributes<HTMLParagraphElement>
->(({ className, ...props }, ref) => (
-    <div
-        ref={ref}
-        className={cn("text-sm [&_p]:leading-relaxed", className)}
-        {...props}
-    />
-))
-AlertDescription.displayName = "AlertDescription"
+function AlertDescription({ className, children, ...props }: React.ComponentProps<"div">) {
+    return (
+        <div className={cn("text-sm [&_p]:leading-relaxed", className)} {...props}>
+            {typeof children === 'string' ? <MixedText text={children} /> : children}
+        </div>
+    )
+}
 
 export { Alert, AlertTitle, AlertDescription } 

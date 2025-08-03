@@ -1,21 +1,38 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
+import { MixedText } from "./MixedText"
+import { generateFontStyle } from "@/lib/fontUtils"
 
-function Textarea({ className, onKeyDown, ...props }: React.ComponentProps<"textarea">) {
+interface TextareaProps extends React.ComponentProps<"textarea"> {
+  placeholder?: string
+}
+
+function Textarea({ className, onKeyDown, value, placeholder, ...props }: TextareaProps) {
+  // 生成字体样式 - 同时考虑placeholder和value
+  const fontStyle = generateFontStyle(placeholder || value || '');
+
   return (
-    <textarea
-      data-slot="textarea"
-      className={cn(
-        "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        className
-      )}
-      onKeyDown={e => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation();
-        if (onKeyDown) onKeyDown(e);
-      }}
-      {...props}
-    />
+    <div className="relative">
+      <textarea
+        data-slot="textarea"
+        className={cn(
+          "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content min-h-16 w-full rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+          className
+        )}
+        onKeyDown={e => {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation();
+          if (onKeyDown) onKeyDown(e);
+        }}
+        value={value}
+        placeholder={placeholder}
+        style={{
+          ...fontStyle,
+          ...props.style
+        }}
+        {...props}
+      />
+    </div>
   )
 }
 

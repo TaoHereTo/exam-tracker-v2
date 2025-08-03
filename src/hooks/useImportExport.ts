@@ -25,7 +25,7 @@ export function useImportExport(
             'notify-change-enabled',
             'page-size',
             'theme',
-            'theme-switch-type',
+            'theme-switch-type', // 主题切换样式（太阳月亮/飞机）
             'other-switch-type',
         ];
         const settings: Record<string, string> = {};
@@ -34,7 +34,7 @@ export function useImportExport(
                 const value = localStorage.getItem(key);
                 if (value !== null) settings[key] = value;
             } catch (error) {
-                }
+            }
         });
         return settings;
     }
@@ -46,7 +46,7 @@ export function useImportExport(
                 try {
                     localStorage.setItem(key, value);
                 } catch (error) {
-                    }
+                }
             }
         });
     }
@@ -135,7 +135,7 @@ export function useImportExport(
                             try {
                                 supabaseImageManager.importImageInfo(importedCloudImages);
                             } catch (error) {
-                                }
+                            }
                         }
 
                         // 使用统一的模块名称映射

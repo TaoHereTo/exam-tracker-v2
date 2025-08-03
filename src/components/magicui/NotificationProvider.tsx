@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import { AnimatedList } from "./animated-list";
 import { CheckCircle2, XCircle, Info, AlertTriangle } from "lucide-react";
+import { MixedText } from "@/components/ui/MixedText";
 
 export type NotificationType = "success" | "error" | "info" | "warning";
 
@@ -62,11 +63,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                                 {n.type === "info" && <Info className="text-blue-500 w-5 h-5" />}
                             </span>
                             <div>
-                                <div className="font-semibold text-base">
-                                    {n.message}
+                                <div className="font-semibold text-base notification-message">
+                                    <MixedText text={n.message} />
                                 </div>
                                 {n.description && (
-                                    <div className="text-xs text-gray-500 mt-1">{n.description}</div>
+                                    <div className="text-xs text-gray-500 mt-1 notification-description"><MixedText text={n.description} /></div>
                                 )}
                             </div>
                         </div>

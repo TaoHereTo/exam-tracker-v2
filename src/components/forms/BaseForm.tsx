@@ -5,6 +5,8 @@ import { useFormNotification } from "@/hooks/useFormNotification";
 import { validateField, validateForm, ValidationSchema, FormErrors, FormData } from "@/lib/formValidation";
 import { FormError } from "@/components/ui/form-error";
 import { Select, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import { MixedText } from "@/components/ui/MixedText";
+import { Input } from "@/components/ui/input";
 
 // 使用统一的验证工具类型
 
@@ -215,13 +217,13 @@ export function FormInput({ name, type = "text", placeholder, className = '', on
     const error = errors[name];
 
     return (
-        <input
+        <Input
             type={type}
             name={name}
             value={String(value)}
             onChange={(e) => setValue(name, e.target.value)}
             placeholder={placeholder}
-            className={`border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm focus-visible:ring-[3px] ${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}
+            className={`${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}
             onKeyDown={onKeyDown}
         />
     );
@@ -230,12 +232,13 @@ export function FormInput({ name, type = "text", placeholder, className = '', on
 // 表单选择组件
 export interface FormSelectProps {
     name: string;
-    placeholder?: string;
+    placeholder?: string | React.ReactNode;
     children: React.ReactNode;
     className?: string;
+    style?: React.CSSProperties;
 }
 
-export function FormSelect({ name, placeholder, children, className = '' }: FormSelectProps) {
+export function FormSelect({ name, placeholder, children, className = '', style }: FormSelectProps) {
     const { values, setValue, errors } = useFormContext();
     const value = values[name] || '';
     const error = errors[name];
@@ -245,7 +248,9 @@ export function FormSelect({ name, placeholder, children, className = '' }: Form
             value={String(value)}
             onValueChange={(newValue) => setValue(name, newValue)}
         >
-            <SelectTrigger className={`w-full ${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}>
+            <SelectTrigger
+                className={`w-full ${error ? 'border-red-500 ring-red-500/20' : ''} ${className}`}
+            >
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>
             <SelectContent>

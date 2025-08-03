@@ -2,6 +2,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
+import { MixedText } from "@/components/ui/MixedText";
 
 export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number; setPageSize: (n: number) => void; }) {
     const [tempSize, setTempSize] = useState(pageSize.toString());
@@ -18,8 +19,8 @@ export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number;
     return (
         <Card>
             <CardHeader>
-                <CardTitle>分页设置</CardTitle>
-                <CardDescription>设置历史记录每页显示的条数。</CardDescription>
+                <CardTitle><MixedText text="分页设置" /></CardTitle>
+                <CardDescription><MixedText text="设置刷题记录每页显示的条数。" /></CardDescription>
             </CardHeader>
             <CardContent>
                 <Select value={tempSize} onValueChange={handleChange}>
@@ -27,10 +28,10 @@ export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number;
                         <SelectValue placeholder="每页条数" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="5">5 条/页</SelectItem>
-                        <SelectItem value="10">10 条/页</SelectItem>
-                        <SelectItem value="20">20 条/页</SelectItem>
-                        <SelectItem value="50">50 条/页</SelectItem>
+                        <SelectItem value="5"><MixedText text="5 条/页" /></SelectItem>
+                        <SelectItem value="10"><MixedText text="10 条/页" /></SelectItem>
+                        <SelectItem value="20"><MixedText text="20 条/页" /></SelectItem>
+                        <SelectItem value="50"><MixedText text="50 条/页" /></SelectItem>
                     </SelectContent>
                 </Select>
             </CardContent>

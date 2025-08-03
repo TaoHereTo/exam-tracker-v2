@@ -7,11 +7,13 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MixedText } from "@/components/ui/MixedText";
 
 interface DockNavigationProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     navMode: 'sidebar' | 'dock';
+    userInfo?: React.ReactNode;
 }
 
 const dockNavs = [
@@ -21,7 +23,7 @@ const dockNavs = [
         children: [
             { key: 'overview', label: '数据概览' },
             { key: 'charts', label: '数据图表' },
-            { key: 'best', label: '最佳成绩' },
+            { key: 'personal-best', label: '最佳成绩' },
         ]
     },
     {
@@ -29,14 +31,14 @@ const dockNavs = [
         icon: <ClipboardList />, label: '记录管理',
         children: [
             { key: 'form', label: '新的记录' },
-            { key: 'history', label: '历史记录' },
+            { key: 'history', label: '刷题记录' },
         ]
     },
     {
         key: 'study-plan',
         icon: <Target />, label: '学习计划',
         children: [
-            { key: 'plan', label: '制定计划' },
+            { key: 'plan-list', label: '制定计划' },
         ]
     },
     {
@@ -44,14 +46,14 @@ const dockNavs = [
         icon: <BookOpen />, label: '知识点录入',
         children: [
             { key: 'knowledge-entry', label: '知识点录入' },
-            { key: 'modules', label: '知识点汇总' },
+            { key: 'knowledge-summary', label: '知识点汇总' },
         ]
     },
     {
         key: 'settings',
         icon: <Settings />, label: '系统设置',
         children: [
-            { key: 'settings-basic', label: '基础设置' },
+            { key: 'settings', label: '基础设置' },
             { key: 'settings-advanced', label: '高级设置' },
         ]
     },
@@ -60,18 +62,18 @@ const dockNavs = [
 const dockChildIcons: Record<string, React.ReactNode> = {
     overview: <BarChart2 />,
     charts: <LineChart />,
-    best: <Trophy />,
+    "personal-best": <Trophy />,
     form: <PlusSquare />,
     history: <HistoryIcon />,
-    plan: <CalendarCheck />,
+    "plan-list": <CalendarCheck />,
     progress: <TrendingUp />,
     "knowledge-entry": <FileEdit />,
-    modules: <ListChecks />,
-    "settings-basic": <Settings />,
+    "knowledge-summary": <ListChecks />,
+    settings: <Settings />,
     "settings-advanced": <SlidersHorizontal />,
 };
 
-export default function DockNavigation({ activeTab, setActiveTab, navMode }: DockNavigationProps) {
+export default function DockNavigation({ activeTab, setActiveTab, navMode, userInfo }: DockNavigationProps) {
     // Dock 母项悬停展开子项弹窗（如后续需要可加）
     // const [dockHover, setDockHover] = useState<string | null>(null);
     // const [dockPos, setDockPos] = useState<{ left: number, width: number } | null>(null);
@@ -107,11 +109,27 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode }: Doc
                                         </button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{child.label}</p>
+                                        <p><MixedText text={child.label} /></p>
                                     </TooltipContent>
                                 </Tooltip>
                             </DockIcon>
                         )) : []
+                    )}
+
+                    {/* 用户信息 */}
+                    {userInfo && (
+                        <DockIcon>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="pointer-events-auto">
+                                        {userInfo}
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p><MixedText text="用户信息" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </DockIcon>
                     )}
                 </Dock>
             </TooltipProvider>

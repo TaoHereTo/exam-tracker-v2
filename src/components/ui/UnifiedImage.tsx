@@ -18,8 +18,8 @@ import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
 import { useNotification } from '@/components/magicui/NotificationProvider';
-import { LoadingSpinner } from './LoadingSpinner';
-import { ChaseLoader } from './ChaseLoader';
+import { ConfettiLoading } from './LoadingSpinner';
+import { MixedText } from './MixedText';
 import Image from 'next/image';
 import { usePasteContext } from '@/contexts/PasteContext';
 
@@ -448,7 +448,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             }`}
                     >
                         <HardDrive className="h-4 w-4 inline mr-2" />
-                        本地上传
+                        <MixedText text="本地上传" />
                     </button>
                     <button
                         type="button"
@@ -461,7 +461,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             }`}
                     >
                         <Cloud className="h-4 w-4 inline mr-2" />
-                        云端选择
+                        <MixedText text="云端选择" />
                     </button>
                 </div>
 
@@ -491,25 +491,24 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     {isLoading ? (
                                         <>
                                             <div className="mx-auto mb-3">
-                                                <ChaseLoader size="medium" />
+                                                <ConfettiLoading />
                                             </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
-                                                正在上传图片...
+                                                <MixedText text="正在上传图片..." />
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                请稍候，不要关闭页面
+                                                <MixedText text="请稍候，不要关闭页面" />
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <Upload className="h-8 w-8 mx-auto mb-3 text-gray-400" />
                                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                点击选择或拖拽图片上传
+                                                <MixedText text="点击选择或拖拽图片上传" />
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                支持通过快捷键粘贴上传
+                                                <MixedText text="支持通过快捷键粘贴上传" />
                                             </p>
-
                                         </>
                                     )}
                                 </div>
@@ -527,23 +526,23 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     {isLoading ? (
                                         <>
                                             <div className="mx-auto mb-3">
-                                                <ChaseLoader size="medium" />
+                                                <ConfettiLoading />
                                             </div>
                                             <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-2">
-                                                正在加载图片...
+                                                <MixedText text="正在加载图片..." />
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                请稍候，不要关闭页面
+                                                <MixedText text="请稍候，不要关闭页面" />
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <LucideImage className="h-8 w-8 mx-auto mb-3 text-gray-400" />
                                             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                                点击从云端选择图片
+                                                <MixedText text="点击从云端选择图片" />
                                             </p>
                                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                从云端存储中选择已有图片
+                                                <MixedText text="从云端存储中选择已有图片" />
                                             </p>
                                         </>
                                     )}
@@ -563,7 +562,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 className="flex items-center gap-2"
                             >
                                 <Eye className="h-4 w-4" />
-                                预览图片
+                                <MixedText text="预览图片" />
                             </Button>
                             <Button
                                 type="button"
@@ -573,7 +572,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 className="flex items-center gap-2 text-red-600 hover:text-red-700"
                             >
                                 <X className="h-4 w-4" />
-                                取消选择
+                                <MixedText text="取消选择" />
                             </Button>
                         </>
                     )}
@@ -607,12 +606,12 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 {imageSource === 'cloud' ? (
                                     <>
                                         <Cloud className="h-4 w-4 text-blue-600" />
-                                        <span>图片来源: 云端存储</span>
+                                        <span><MixedText text="图片来源: 云端存储" /></span>
                                     </>
                                 ) : (
                                     <>
                                         <HardDrive className="h-4 w-4 text-green-600" />
-                                        <span>图片来源: 本地文件夹</span>
+                                        <span><MixedText text="图片来源: 本地文件夹" /></span>
                                     </>
                                 )}
                             </div>
@@ -648,24 +647,24 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         </DrawerTrigger>
                     </TooltipTrigger>
                     <TooltipContent>
-                        <p>查看图片</p>
+                        <p><MixedText text="查看图片" /></p>
                     </TooltipContent>
                 </Tooltip>
                 <DrawerContent>
                     <div className="mx-auto w-full max-w-2xl h-[80vh] flex flex-col">
                         <DrawerHeader className="flex-shrink-0">
                             <DrawerTitle className="text-center">
-                                {imageInfo?.originalName || imageInfo?.fileName || '图片预览'}
+                                <MixedText text={imageInfo?.originalName || imageInfo?.fileName || '图片预览'} />
                             </DrawerTitle>
                             <DrawerDescription className="text-center">
-                                查看和操作图片，支持缩放、旋转等功能
+                                <MixedText text="查看和操作图片，支持缩放、旋转等功能" />
                             </DrawerDescription>
                         </DrawerHeader>
                         <div className="flex-1 p-6 overflow-hidden">
                             {isLoading ? (
                                 <div className="flex flex-col h-full">
                                     <div className="flex-1 flex justify-center items-center">
-                                        <div className="text-gray-500">加载中...</div>
+                                        <ConfettiLoading />
                                     </div>
                                 </div>
                             ) : imageData ? (
@@ -738,31 +737,31 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 setRotation(0);
                                             }}
                                         >
-                                            重置
+                                            <MixedText text="重置" />
                                         </Button>
                                     </div>
                                 </div>
                             ) : (
                                 <div className="flex flex-col h-full">
                                     <div className="flex-1 flex justify-center items-center">
-                                        <div className="text-gray-500">图片信息丢失，请重新选择图片</div>
+                                        <div className="text-gray-500"><MixedText text="图片信息丢失，请重新选择图片" /></div>
                                     </div>
                                 </div>
                             )}
 
                             {imageInfo && (
                                 <div className="mt-4 text-center text-sm text-gray-500 pt-4">
-                                    <p className="font-medium">{imageInfo.originalName || imageInfo.fileName || '未知文件'}</p>
+                                    <p className="font-medium"><MixedText text={imageInfo.originalName || imageInfo.fileName || '未知文件'} /></p>
                                     <div className="flex items-center justify-center gap-2 mt-2">
                                         {imageSource === 'cloud' ? (
                                             <>
                                                 <Cloud className="h-4 w-4 text-blue-600" />
-                                                <span>图片来源: 云端存储</span>
+                                                <span><MixedText text="图片来源: 云端存储" /></span>
                                             </>
                                         ) : (
                                             <>
                                                 <HardDrive className="h-4 w-4 text-green-600" />
-                                                <span>图片来源: 本地文件夹</span>
+                                                <span><MixedText text="图片来源: 本地文件夹" /></span>
                                             </>
                                         )}
                                     </div>

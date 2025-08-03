@@ -6,6 +6,7 @@ import { X, Eye, Cloud, FileImage } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
+import { MixedText } from './MixedText';
 
 interface SupabaseImageUploadProps {
     value?: string; // 当前选中的图片ID
@@ -127,12 +128,12 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
 
         // 如果正在上传，忽略拖拽
         if (isUploading) {
-            console.log('正在上传中，忽略拖拽操作');
+            // 正在上传中，忽略拖拽操作
             return;
         }
 
         const files = Array.from(e.dataTransfer.files);
-        console.log('拖拽的文件:', files.map(f => ({ name: f.name, type: f.type, size: f.size })));
+        // 拖拽的文件信息
 
         // 改进的文件类型检查：不仅检查MIME类型，还检查文件扩展名
         const imageFile = files.find(file => {
@@ -225,7 +226,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                     {isUploading && (
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                             <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #2563eb' }}></div>
-                            <span>正在上传图片...</span>
+                            <span><MixedText text="正在上传图片..." /></span>
                         </div>
                     )}
                 </div>
@@ -280,7 +281,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                             {/* 存储位置指示器 */}
                             <div className="mt-2 flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
                                 <Cloud className="h-4 w-4 text-blue-600" />
-                                <span>图片来源: 云端存储</span>
+                                <span><MixedText text="图片来源: 云端存储" /></span>
                             </div>
                         </div>
                     </div>

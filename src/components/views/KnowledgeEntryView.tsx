@@ -9,6 +9,7 @@ import {
     CarouselApi,
 } from "@/components/ui/carousel";
 import ModuleForm from '@/components/forms/ModuleForm';
+import { MixedText } from '@/components/ui/MixedText';
 import type { KnowledgeItem } from "@/types/record";
 import { MODULES } from "@/config/exam";
 
@@ -92,9 +93,11 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
         <div className="w-full max-w-2xl mx-auto flex flex-col">
             <div className="relative mb-10">
                 <Tabs value={tab} onValueChange={handleTabChange}>
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full justify-center text-base h-10 px-1">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-10 px-1">
                         {MODULES.map(({ value, label }) => (
-                            <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
+                            <TabsTrigger key={value} value={value}>
+                                <MixedText text={label} />
+                            </TabsTrigger>
                         ))}
                     </TabsList>
                 </Tabs>

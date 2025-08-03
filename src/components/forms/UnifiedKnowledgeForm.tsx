@@ -14,6 +14,7 @@ import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm } from "@/lib/formValidation";
 import { FormError } from "@/components/ui/form-error";
 import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { MixedText } from "@/components/ui/MixedText";
 import type { KnowledgeItem } from "@/types/record";
 
 // 模块配置类型定义
@@ -111,7 +112,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     (initialData as Record<string, unknown>)?.meaning as string || ''
   );
   const [imagePath, setImagePath] = useState<string | undefined>(
-    (initialData as Record<string, unknown>)?.imagePath as string | undefined
+    (initialData as Record<string, unknown>)?.image_path as string | undefined
   );
 
   // 特殊字段状态
@@ -139,7 +140,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       (initialData as Record<string, unknown>)?.note as string ||
       (initialData as Record<string, unknown>)?.meaning as string || ''
     );
-    setImagePath((initialData as Record<string, unknown>)?.imagePath as string | undefined);
+    setImagePath((initialData as Record<string, unknown>)?.image_path as string | undefined);
     setSubCategory(
       (initialData as Record<string, unknown>)?.subCategory as string ||
       (config.subCategories?.[0] || '')
@@ -196,7 +197,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           type: firstField,
           note: secondField,
           subCategory: subCategory as '逻辑填空' | '片段阅读' | '成语积累',
-          imagePath
+          imagePath: imagePath
         };
         break;
       case 'politics':
@@ -293,16 +294,18 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   return (
     <Card className="max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{config.title}</CardTitle>
+        <CardTitle><MixedText text={config.title} /></CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* 子分类选择器 */}
         {config.hasSubCategory && config.subCategories && (
           <div className="space-y-2">
             <Label htmlFor="subCategory">
-              {module === 'logic' ? '推理类型' :
-                module === 'common' ? '常识类型' :
-                  module === 'verbal' ? '言语类型' : '子分类'}
+              <MixedText text={
+                module === 'logic' ? '推理类型' :
+                  module === 'common' ? '常识类型' :
+                    module === 'verbal' ? '言语类型' : '子分类'
+              } />
             </Label>
             <Select value={subCategory} onValueChange={setSubCategory}>
               <SelectTrigger className="w-full">
@@ -311,7 +314,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               <SelectContent>
                 {config.subCategories.map((category: string) => (
                   <SelectItem key={category} value={category}>
-                    {category}
+                    <MixedText text={category} />
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -322,11 +325,11 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         {/* 日期选择器 */}
         {config.hasDateField && (
           <div className="space-y-2">
-            <Label>选择发布日期</Label>
+            <Label><MixedText text="选择发布日期" /></Label>
             <Popover open={dateOpen} onOpenChange={setDateOpen}>
               <PopoverTrigger asChild>
                 <Button variant="outline" className="w-full justify-start text-left font-normal">
-                  {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
+                  {date ? date.toLocaleDateString() : <span className="text-muted-foreground"><MixedText text="选择日期" /></span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
@@ -344,7 +347,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
         {/* 第一个字段 */}
         <div className="space-y-2">
-          <Label htmlFor="firstField">{fieldConfig.firstLabel}</Label>
+          <Label htmlFor="firstField"><MixedText text={fieldConfig.firstLabel} /></Label>
           <Input
             id="firstField"
             type="text"
@@ -352,21 +355,21 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             value={firstField}
             onChange={e => handleFirstFieldChange(e.target.value)}
             onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
-            className={errors.firstField ? 'border-red-500 ring-red-500/20' : ''}
+            className={`${errors.firstField ? 'border-red-500 ring-red-500/20' : ''}`}
           />
           <FormError error={errors.firstField} />
         </div>
 
         {/* 第二个字段 */}
         <div className="space-y-2">
-          <Label htmlFor="secondField">{fieldConfig.secondLabel}</Label>
+          <Label htmlFor="secondField"><MixedText text={fieldConfig.secondLabel} /></Label>
           <Textarea
             id="secondField"
             placeholder={fieldConfig.secondPlaceholder}
             value={secondField}
             onChange={e => handleSecondFieldChange(e.target.value)}
             onKeyDown={e => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation(); }}
-            className={errors.secondField ? 'border-red-500 ring-red-500/20' : ''}
+            className={`${errors.secondField ? 'border-red-500 ring-red-500/20' : ''}`}
           />
           <FormError error={errors.secondField} />
         </div>
@@ -387,7 +390,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           onClick={handleSubmit}
           size="default"
         >
-          保存知识点
+          <MixedText text="保存知识点" />
         </RainbowButton>
       </CardFooter>
     </Card>

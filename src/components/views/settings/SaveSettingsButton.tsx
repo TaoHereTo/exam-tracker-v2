@@ -1,6 +1,7 @@
 import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import React, { useRef } from "react";
+import { MixedText } from "@/components/ui/MixedText";
 
 interface SaveSettingsButtonProps {
     navMode: 'sidebar' | 'dock';
@@ -25,7 +26,7 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
             size="default"
             className="px-6 py-2"
         >
-            保存所有设置
+            <MixedText text="保存所有设置" />
         </RainbowButton>
     );
 };

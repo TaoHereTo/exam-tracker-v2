@@ -3,9 +3,147 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ========== 字体管理系统 ========== */
+/* 全局字体设置 */
+body,
+html {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
 
+/* 基础字体类 */
+.font-chinese {
+  font-family: '思源宋体', serif !important;
+  font-weight: 400 !important;
+}
 
-/* 光晕扫过动画 */
+.font-english {
+  font-family: 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+.font-mixed {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+/* MixedText 组件样式 */
+.mixed-text {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+.mixed-text-container {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+.mixed-text-part {
+  font-weight: 400 !important;
+}
+
+/* 增强 MixedText 组件样式 */
+.enhanced-mixed-text {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+.enhanced-mixed-text-container {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+.enhanced-mixed-text-part {
+  font-weight: 400 !important;
+}
+
+/* 输入框字体设置 - 增强优先级 */
+input,
+textarea,
+select,
+button,
+[role="button"],
+[role="textbox"],
+[data-slot="input"],
+[data-slot="textarea"],
+[data-slot="select-trigger"],
+[data-slot="select-value"],
+[data-slot="select-item"] {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
+
+/* 占位符字体设置 */
+input::placeholder,
+textarea::placeholder {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+  font-weight: 400 !important;
+}
+
+/* Radix UI Select 组件字体设置 */
+[data-radix-select-trigger],
+[data-radix-select-value],
+[data-radix-select-item] {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
+
+/* 表格字体设置 */
+table,
+td,
+th {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
+
+/* 标题字体设置 */
+label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
+
+/* 确保所有文本元素都使用正确字体 */
+* {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 特定元素的字体覆盖 */
+.text-sm,
+.text-base,
+.text-lg,
+.text-xl,
+.text-2xl,
+.text-3xl {
+  font-family: '思源宋体', 'Times New Roman', serif !important;
+}
+
+/* ========== 按钮间距系统 ========== */
+.button-spacing-sm {
+  margin: 0.25rem 0;
+}
+
+.button-spacing-md {
+  margin: 0.5rem 0;
+}
+
+.button-spacing-lg {
+  margin: 0.75rem 0;
+}
+
+.button-group-sm {
+  gap: 0.5rem;
+}
+
+.button-group-md {
+  gap: 1rem;
+}
+
+.button-group-lg {
+  gap: 1.5rem;
+}
+
+/* ========== 光晕扫过动画 ========== */
 @keyframes shimmer-left {
   0% {
     transform: translateX(-100%) skewX(-15deg);
@@ -38,19 +176,7 @@
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* 鼠标跟随光晕效果 */
+/* ========== 鼠标跟随光晕效果 ========== */
 .glow-effect {
   position: absolute;
   top: 0;
@@ -69,6 +195,7 @@
   opacity: 1;
 }
 
+/* ========== 主题配置 ========== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -153,6 +280,7 @@
   }
 }
 
+/* ========== 颜色变量 ========== */
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -232,6 +360,38 @@
   --color-5: oklch(90.7% 0.231 133);
 }
 
+/* ========== 基础样式 ========== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* ========== 用户选择控制 ========== */
+body,
+html,
+#__next,
+[data-slot],
+.unselectable,
+.app-root,
+.flex,
+.min-h-screen,
+.p-8,
+.bg-white,
+.dark\:bg-gray-950,
+.dark\:text-gray-100 {
+  user-select: none !important;
+}
+
+.unselectable {
+  user-select: none !important;
+}
+
+/* ========== 侧边栏样式 ========== */
 /* 修正sonner提示框深色模式下主内容颜色 */
 .dark .toaster .toast-title,
 .dark .toaster .sonner-title,
@@ -244,7 +404,6 @@
 .sidebar-btn:focus-visible {
   text-decoration: none !important;
   background: rgba(59, 130, 246, 0.08);
-  /* 浅蓝色高亮，可根据主题调整 */
   border-radius: 0.5rem;
   color: #2563eb;
 }
@@ -264,7 +423,7 @@
 }
 
 .sidebar-child {
-  @apply pl-11 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start;
+  @apply pl-11 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start font-bold;
 }
 
 .sidebar-child.bg-primary,
@@ -299,126 +458,53 @@
   @apply text-gray-900 bg-white;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
+/* 侧边栏图标和箭头样式 */
+.sidebar-parent .lucide-bar-chart-2,
+.sidebar-parent .lucide-clipboard-list,
+.sidebar-parent .lucide-target,
+.sidebar-parent .lucide-book-open {
+  transform: none !important;
+  transition: none !important;
 }
 
-body,
-html,
-#__next,
-[data-slot],
-.unselectable,
-.app-root,
-.flex,
-.min-h-screen,
-.p-8,
-.bg-white,
-.dark\:bg-gray-950,
-.dark\:text-gray-100 {
-  user-select: none !important;
+.sidebar-parent .lucide-chevron-right {
+  transition: transform 0.2s ease !important;
 }
 
-.unselectable {
-  user-select: none !important;
+.sidebar-parent[data-state="open"] .lucide-chevron-right {
+  transform: rotate(90deg) !important;
 }
 
-/* ========== Marquee 动画 ========== */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
+/* 确保没有其他样式覆盖箭头旋转 */
+.sidebar-parent .lucide-chevron-right[class*="rotate-180"] {
+  transform: rotate(90deg) !important;
 }
 
-@keyframes marquee-reverse {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
+/* 强制覆盖Tailwind的group-data状态类 */
+.sidebar-parent.group[data-state="open"] .lucide-chevron-right {
+  transform: rotate(90deg) !important;
 }
 
-.animate-marquee {
-  animation: marquee var(--duration, 40s) linear infinite;
+/* 确保所有可能的旋转状态都被覆盖 */
+.sidebar-parent .lucide-chevron-right.rotate-180 {
+  transform: rotate(90deg) !important;
 }
 
-@keyframes marquee-vertical {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(-50%);
-  }
+.sidebar-parent .lucide-chevron-right.rotate-90 {
+  transform: rotate(90deg) !important;
 }
 
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration, 40s) linear infinite;
+/* 侧边栏箭头唯一旋转规则 */
+.sidebar-parent .sidebar-chevron {
+  transition: transform 0.2s;
+  transform: rotate(0deg);
 }
 
-@keyframes marquee-vertical-reverse {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(50%);
-  }
+.sidebar-parent[data-state="open"] .sidebar-chevron {
+  transform: rotate(90deg);
 }
 
-.animate-marquee-vertical-reverse {
-  animation: marquee-vertical-reverse var(--duration, 40s) linear infinite;
-}
-
-/* ========== 全局字体设置优化 ========== */
-body,
-html {
-  font-family: "Century", serif;
-}
-
-/* 只针对中文字符，强制新宋体 */
-:lang(zh),
-.zh,
-[lang="zh"],
-[lang^="zh-"] {
-  font-family: "NSimSun", "新宋体", serif !important;
-}
-
-/* 针对所有英文，强制 Century */
-:lang(en),
-.en,
-[lang="en"],
-[lang^="en-"] {
-  font-family: "Century", serif !important;
-}
-
-/* 针对所有数字，强制 Century */
-.number,
-.num,
-[data-font="number"] {
-  font-family: "Century", serif !important;
-}
-
-/* 输入控件也用 Century，避免被新宋体影响 */
-input,
-textarea,
-select,
-button {
-  font-family: "Century", serif;
-}
-
-/* 数据概览动画控制样式 */
+/* ========== 数据概览动画控制样式 ========== */
 .reduce-motion * {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
@@ -484,10 +570,6 @@ button {
   animation: none !important;
 }
 
-
-
-
-
 /* 数据概览动画控制时禁用glow效果 */
 .reduce-motion .glow-effect {
   transition: none !important;
@@ -522,6 +604,7 @@ button {
   animation: none !important;
 }
 
+/* ========== 护眼模式 ========== */
 body.eye-care {
   background: #f7f3e8 !important;
   color: #3a3a2a !important;
@@ -578,9 +661,7 @@ body.eye-care.dark .text-muted-foreground,
   color: #b0a98b !important;
 }
 
-
-
-/* Checkbox 动效 */
+/* ========== Checkbox 动效 ========== */
 [data-slot="checkbox"] {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform-origin: center;
@@ -648,7 +729,7 @@ body.eye-care.dark .text-muted-foreground,
   }
 }
 
-/* 响应式设计优化 */
+/* ========== 响应式设计优化 ========== */
 @media (max-width: 640px) {
 
   /* 小屏幕下的侧边栏优化 */
@@ -663,8 +744,6 @@ body.eye-care.dark .text-muted-foreground,
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-
 }
 
 @media (max-width: 480px) {

@@ -1,0 +1,109 @@
+'use client'
+
+import React, { useState } from 'react'
+import { supabase } from '../../supabaseClient'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Alert, AlertDescription } from '../ui/alert'
+import { Mail, ArrowLeft } from 'lucide-react'
+import { RainbowButton } from '../magicui/rainbow-button'
+import { MixedText } from '../ui/MixedText'
+
+interface ForgotPasswordFormProps {
+    onSwitchToLogin: () => void
+}
+
+export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps) {
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [success, setSuccess] = useState('')
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setLoading(true)
+        setError('')
+        setSuccess('')
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/auth?reset=true`,
+        })
+
+        if (error) {
+            setError(error.message)
+        } else {
+            setSuccess('重置密码邮件已发送，请检查您的邮箱')
+        }
+
+        setLoading(false)
+    }
+
+    return (
+        <div className="w-full">
+            <div className="text-left mb-6">
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                    <MixedText text="找回密码" />
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                    <MixedText text="输入您的邮箱地址，我们将发送重置密码的链接" />
+                </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                    <Alert variant="destructive">
+                        <AlertDescription>
+                            <MixedText text={error} />
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                {success && (
+                    <Alert>
+                        <AlertDescription>
+                            <MixedText text={success} />
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                <div className="space-y-2">
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                        <MixedText text="邮箱地址" />
+                    </Label>
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 h-4 w-4" />
+                        <Input
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="请输入邮箱地址"
+                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="flex justify-between items-center pt-4">
+                    <Button
+                        type="button"
+                        onClick={onSwitchToLogin}
+                        variant="outline"
+                        className="bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        <MixedText text="返回登录" />
+                    </Button>
+                    <RainbowButton
+                        type="submit"
+                        disabled={loading}
+                        className="w-auto"
+                    >
+                        <MixedText text={loading ? '发送中...' : '发送重置邮件'} />
+                    </RainbowButton>
+                </div>
+            </form>
+        </div>
+    )
+} 

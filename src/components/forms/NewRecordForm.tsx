@@ -4,20 +4,23 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { SelectItem } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MODULES } from '@/config/exam';
-import { BaseForm, FormField as BaseFormField, FormInput, FormSelect } from "./BaseForm";
+import { BaseForm, FormField as BaseFormField, FormInput, FormSelect, useFormContext } from "./BaseForm";
 import { FormField } from "@/components/ui/FormField";
 import { ValidationSchema, FormData } from "@/lib/formValidation";
 import type { RecordItem } from "@/types/record";
 import { TimePicker } from "@/components/ui/TimePicker";
 import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { MixedText } from "@/components/ui/MixedText";
+import { useNotification } from "@/components/magicui/NotificationProvider";
 
 export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: RecordItem) => void }) {
     const [date, setDate] = useState<Date | undefined>(undefined);
     const [dateOpen, setDateOpen] = useState(false);
     const [duration, setDuration] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { notify } = useNotification();
 
     // 定义验证规则
     const validationSchema: ValidationSchema = {
@@ -44,13 +47,21 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
     const handleSubmit = (data: FormData) => {
         setIsSubmitting(true);
         if (!date) {
-            alert('请选择日期');
+            notify({
+                type: 'error',
+                message: '请选择日期',
+                description: '请选择一个有效的日期'
+            });
             setIsSubmitting(false);
             return;
         }
 
         if (!duration) {
-            alert('请选择做题时长');
+            notify({
+                type: 'error',
+                message: '请选择做题时长',
+                description: '请选择做题时长'
+            });
             setIsSubmitting(false);
             return;
         }
@@ -80,22 +91,25 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
         setDateOpen(false);
     };
 
-    return (
-        <BaseForm onSubmit={handleSubmit} validationSchema={validationSchema}>
-            <Card className="max-w-md mx-auto">
+    // 内部组件，用于访问表单上下文
+    function FormContent() {
+        const { values, setValue } = useFormContext();
+
+        return (
+            <Card className="max-w-md mx-auto mt-8">
                 <CardHeader>
-                    <CardTitle>新的做题记录</CardTitle>
+                    <CardTitle><MixedText text="新的做题记录" /></CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* 日期选择器 */}
-                    <FormField label="日期">
+                    <FormField label={<MixedText text="日期" />}>
                         <Popover open={dateOpen} onOpenChange={setDateOpen}>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant="outline"
                                     className="w-full justify-start text-left font-normal"
                                 >
-                                    {date ? date.toLocaleDateString() : <span className="text-muted-foreground">选择日期</span>}
+                                    {date ? date.toLocaleDateString() : <span className="text-muted-foreground"><MixedText text="选择日期" /></span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="min-w-[260px] flex justify-center p-0" align="center">
@@ -106,19 +120,32 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
 
                     {/* 模块选择器 */}
                     <BaseFormField name="module">
-                        <FormField label="模块">
-                            <FormSelect name="module" placeholder="请选择模块">
-                                {MODULES.map(m => (
-                                    <SelectItem key={m.value} value={m.label}>{m.label}</SelectItem>
-                                ))}
-                            </FormSelect>
+                        <FormField label={<MixedText text="模块" />}>
+                            <Select
+                                value={String(values?.module || '')}
+                                onValueChange={(newValue) => setValue('module', newValue)}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder={<MixedText text="请选择模块" />} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {MODULES.map(m => (
+                                        <SelectItem
+                                            key={m.value}
+                                            value={m.label}
+                                        >
+                                            <MixedText text={m.label} />
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </FormField>
                     </BaseFormField>
 
                     {/* 正确数和总题数 */}
                     <div className="flex gap-4">
                         <BaseFormField name="correct" className="flex-1">
-                            <FormField label="正确数">
+                            <FormField label={<MixedText text="正确数" />}>
                                 <FormInput
                                     name="correct"
                                     type="number"
@@ -127,7 +154,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                             </FormField>
                         </BaseFormField>
                         <BaseFormField name="total" className="flex-1">
-                            <FormField label="总题数">
+                            <FormField label={<MixedText text="总题数" />}>
                                 <FormInput
                                     name="total"
                                     type="number"
@@ -138,7 +165,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                     </div>
 
                     {/* 考试时长 */}
-                    <FormField label="考试时长">
+                    <FormField label={<MixedText text="考试时长" />}>
                         <TimePicker
                             value={duration}
                             onChange={setDuration}
@@ -153,10 +180,16 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                         disabled={isSubmitting}
                         size="default"
                     >
-                        保存记录
+                        <MixedText text="保存记录" />
                     </RainbowButton>
                 </CardFooter>
             </Card>
+        );
+    }
+
+    return (
+        <BaseForm onSubmit={handleSubmit} validationSchema={validationSchema}>
+            <FormContent />
         </BaseForm>
     );
 } 

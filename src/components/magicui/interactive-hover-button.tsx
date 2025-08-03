@@ -194,7 +194,7 @@ export const InteractiveHoverButton = React.forwardRef<
     <button
       ref={ref}
       className={cn(
-        `group relative w-auto ${compact ? 'min-w-[80px]' : 'min-w-[120px]'} cursor-pointer overflow-hidden rounded-sm border border-gray-200 bg-white p-2 px-3 text-center font-semibold text-black transition-all duration-300 hover:border-transparent active:scale-95 active:shadow-inner text-sm`,
+        `group relative w-auto ${compact ? 'min-w-[32px]' : 'min-w-[100px]'} cursor-pointer overflow-hidden rounded-sm border border-gray-200 bg-white p-2 px-4 text-center font-semibold text-black transition-all duration-300 hover:border-transparent active:scale-95 active:shadow-inner text-sm flex items-center justify-center my-1`,
         className,
       )}
       style={{
@@ -204,23 +204,25 @@ export const InteractiveHoverButton = React.forwardRef<
       }}
       {...props}
     >
-      <div className="flex items-center justify-center gap-2">
-        <div className="flex items-center justify-center w-4 h-4 transition-all duration-300 group-hover:scale-[100.8] group-hover:bg-white">
+      <div className="flex items-center justify-center gap-2 w-full">
+        <div className="flex items-center justify-center w-4 h-4 transition-all duration-300 group-hover:scale-[100.8] group-hover:bg-white flex-shrink-0">
           <div
             className="w-2 h-2 rounded-full transition-colors duration-300"
             style={{ backgroundColor: getDotColor() }}
           ></div>
         </div>
-        <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0 text-sm">
+        <span className="inline-block transition-all duration-300 group-hover:translate-x-12 group-hover:opacity-0 text-sm flex-1 text-center">
           {children}
         </span>
       </div>
       <div
-        className="absolute top-0 left-0 z-10 flex h-full w-full translate-x-full items-center justify-center gap-1 text-white opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 px-3"
+        className="absolute top-0 left-0 z-10 flex h-full w-full translate-x-full items-center justify-center gap-2 text-white opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 px-4"
         style={isGradient ? { background: hoverBgColor } : { backgroundColor: hoverBgColor }}
       >
-        <span className="text-sm">{children}</span>
-        {icon || getAutoIcon(typeof children === 'string' ? children : '')}
+        <span className="text-sm flex-1 text-center">{children}</span>
+        <div className="flex-shrink-0">
+          {icon || getAutoIcon(typeof children === 'string' ? children : '')}
+        </div>
       </div>
     </button>
   );

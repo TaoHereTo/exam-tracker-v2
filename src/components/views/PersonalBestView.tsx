@@ -3,6 +3,7 @@ import { ScorePredictor } from "@/components/features/ScorePredictor";
 import { MODULE_SCORES, normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
 import type { RecordItem } from "@/types/record";
 import { timeStringToMinutes } from "@/lib/utils";
+import { MixedText } from "@/components/ui/MixedText";
 
 
 export function PersonalBestView({ records }: { records: RecordItem[] }) {
@@ -31,16 +32,18 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                     return (
                         <Card key={module.key} className="shadow-md" style={{ borderLeft: `6px solid ${getModuleColor(module.label)}` }}>
                             <CardHeader>
-                                <CardTitle>{module.label}</CardTitle>
+                                <CardTitle><MixedText text={module.label} /></CardTitle>
                             </CardHeader>
                             <CardContent>
                                 {best ? (
                                     <div>
-                                        <div className="text-2xl font-bold mb-2">{best.perMinute?.toFixed(2) || '0.00'} 分/分钟</div>
-                                        <div className="text-sm text-gray-500">日期：{best.record.date}</div>
+                                        <div className="text-2xl font-bold mb-2">
+                                            <MixedText text={`${best.perMinute?.toFixed(2) || '0.00'} 分/分钟`} />
+                                        </div>
+                                        <div className="text-sm text-gray-500"><MixedText text={`日期：${best.record.date}`} /></div>
                                     </div>
                                 ) : (
-                                    <div className="text-gray-400">暂无记录</div>
+                                    <div className="text-gray-400"><MixedText text="暂无记录" /></div>
                                 )}
                             </CardContent>
                         </Card>

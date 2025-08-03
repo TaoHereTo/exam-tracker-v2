@@ -1,4 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
+// 防抖函数
+function debounce<T extends (...args: unknown[]) => unknown>(func: T, wait: number): T {
+    let timeout: NodeJS.Timeout;
+    return ((...args: unknown[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func(...args), wait);
+    }) as T;
+}
 
 // 统一的localStorage操作hook
 export function useLocalStorage<T>(key: string, defaultValue: T) {
@@ -12,14 +21,22 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
         }
     });
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem(key, JSON.stringify(state));
-            } catch (error) {
+    const debouncedSetStorage = useRef(
+        debounce((...args: unknown[]) => {
+            const [storageKey, value] = args as [string, T];
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(value));
+                } catch (error) {
+                    console.warn('Failed to save to localStorage:', error);
                 }
-        }
-    }, [key, state]);
+            }
+        }, 300) // 300ms 防抖
+    ).current;
+
+    useEffect(() => {
+        debouncedSetStorage(key, state);
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
@@ -36,14 +53,22 @@ export function useLocalStorageBoolean(key: string, defaultValue: boolean) {
         }
     });
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem(key, state.toString());
-            } catch (error) {
+    const debouncedSetStorage = useRef(
+        debounce((...args: unknown[]) => {
+            const [storageKey, value] = args as [string, boolean];
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem(storageKey, value.toString());
+                } catch (error) {
+                    console.warn('Failed to save to localStorage:', error);
                 }
-        }
-    }, [key, state]);
+            }
+        }, 300) // 300ms 防抖
+    ).current;
+
+    useEffect(() => {
+        debouncedSetStorage(key, state);
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
@@ -60,14 +85,22 @@ export function useLocalStorageString(key: string, defaultValue: string) {
         }
     });
 
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem(key, state);
-            } catch (error) {
+    const debouncedSetStorage = useRef(
+        debounce((...args: unknown[]) => {
+            const [storageKey, value] = args as [string, string];
+            if (typeof window !== 'undefined') {
+                try {
+                    localStorage.setItem(storageKey, value);
+                } catch (error) {
+                    console.warn('Failed to save to localStorage:', error);
                 }
-        }
-    }, [key, state]);
+            }
+        }, 300) // 300ms 防抖
+    ).current;
+
+    useEffect(() => {
+        debouncedSetStorage(key, state);
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
@@ -89,7 +122,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, JSON.stringify(value));
         } catch (error) {
-            }
+        }
     },
 
     getBoolean: (key: string, defaultValue: boolean): boolean => {
@@ -107,7 +140,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, value.toString());
         } catch (error) {
-            }
+        }
     },
 
     getString: (key: string, defaultValue: string): string => {
@@ -125,7 +158,7 @@ export const localStorageUtils = {
         try {
             localStorage.setItem(key, value);
         } catch (error) {
-            }
+        }
     },
 
     remove: (key: string): void => {
@@ -133,6 +166,6 @@ export const localStorageUtils = {
         try {
             localStorage.removeItem(key);
         } catch (error) {
-            }
+        }
     }
 }; 

@@ -5,6 +5,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { MixedText } from "./MixedText";
 
 function AlertDialog({
   ...props
@@ -46,6 +47,7 @@ function AlertDialogOverlay({
 
 function AlertDialogContent({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
   return (
@@ -58,13 +60,16 @@ function AlertDialogContent({
           className
         )}
         {...props}
-      />
+      >
+        {typeof children === 'string' ? <MixedText text={children} /> : children}
+      </AlertDialogPrimitive.Content>
     </AlertDialogPortal>
   )
 }
 
 function AlertDialogHeader({
   className,
+  children,
   ...props
 }: React.ComponentProps<"div">) {
   return (
@@ -72,12 +77,15 @@ function AlertDialogHeader({
       data-slot="alert-dialog-header"
       className={cn("flex flex-col gap-2 text-center sm:text-left", className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </div>
   )
 }
 
 function AlertDialogFooter({
   className,
+  children,
   ...props
 }: React.ComponentProps<"div">) {
   return (
@@ -88,12 +96,15 @@ function AlertDialogFooter({
         className
       )}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </div>
   )
 }
 
 function AlertDialogTitle({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Title>) {
   return (
@@ -101,12 +112,15 @@ function AlertDialogTitle({
       data-slot="alert-dialog-title"
       className={cn("text-lg font-semibold", className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </AlertDialogPrimitive.Title>
   )
 }
 
 function AlertDialogDescription({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Description>) {
   return (
@@ -114,31 +128,39 @@ function AlertDialogDescription({
       data-slot="alert-dialog-description"
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </AlertDialogPrimitive.Description>
   )
 }
 
 function AlertDialogAction({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action>) {
   return (
     <AlertDialogPrimitive.Action
       className={cn(buttonVariants(), className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </AlertDialogPrimitive.Action>
   )
 }
 
 function AlertDialogCancel({
   className,
+  children,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel>) {
   return (
     <AlertDialogPrimitive.Cancel
       className={cn(buttonVariants({ variant: "outline" }), className)}
       {...props}
-    />
+    >
+      {typeof children === 'string' ? <MixedText text={children} /> : children}
+    </AlertDialogPrimitive.Cancel>
   )
 }
 

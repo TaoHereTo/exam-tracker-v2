@@ -1,17 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalStorage";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
-import { ThemeSwitchSelector, ThemeSwitchType } from "@/components/ui/ThemeSwitchSelector";
-import SwitchRenderer from "@/components/ui/SwitchRenderer";
-import PreviewSwitch from "@/components/ui/PreviewSwitch";
-import { useSwitchStyle } from "@/contexts/SwitchStyleContext";
+
+
+
 import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
-import { BeautifulProgress } from "@/components/ui/BeautifulProgress";
+import { Progress } from "@/components/ui/progress";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { ChaseLoader } from "@/components/ui/ChaseLoader";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Input } from "@/components/ui/input";
@@ -20,11 +18,11 @@ import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import PlaneSwitch from "@/components/ui/PlaneSwitch";
+import { MixedText } from "@/components/ui/MixedText";
 
 
 
-// 定义 OtherSwitchType 类型
-type OtherSwitchType = 'default' | 'sparkle' | '3d' | 'glass' | 'plane';
 
 export function AdvancedSetting() {
     const { notify } = useNotification();
@@ -32,14 +30,11 @@ export function AdvancedSetting() {
     // 新功能1：数据概览动画控制
     const [reduceMotion, setReduceMotion] = useLocalStorageBoolean('reduce-motion-enabled', false);
 
-    // 新功能2：深浅色主题切换按钮风格选择
-    const [themeSwitchType, setThemeSwitchType] = useLocalStorageString('theme-switch-type', 'beautiful') as [ThemeSwitchType, (value: ThemeSwitchType) => void];
 
-    // 新功能3：其他开关样式选择
-    const { otherSwitchType, setOtherSwitchType } = useSwitchStyle();
 
-    // 预览状态（独立于实际功能状态）
-    const [previewState, setPreviewState] = React.useState(false);
+
+
+
 
     // 新功能4：localStorage使用量监控
     const [storageInfo, setStorageInfo] = React.useState<StorageInfo | null>(null);
@@ -65,7 +60,7 @@ export function AdvancedSetting() {
 
 
     // 加载云端图片
-    const loadCloudImages = async () => {
+    const loadCloudImages = useCallback(async () => {
         setIsLoadingImages(true);
         try {
             const images = await supabaseImageManager.getAllImages();
@@ -79,10 +74,10 @@ export function AdvancedSetting() {
         } finally {
             setIsLoadingImages(false);
         }
-    };
+    }, [notify]);
 
     // 上传图片
-    const handleUploadImage = async () => {
+    const handleUploadImage = useCallback(async () => {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -112,7 +107,7 @@ export function AdvancedSetting() {
         };
 
         input.click();
-    };
+    }, [notify, loadCloudImages]);
 
     const handleDeleteSelectedImages = async () => {
         if (selectedImages.size === 0) return;
@@ -257,119 +252,65 @@ export function AdvancedSetting() {
         }
     }, [reduceMotion]);
 
-    // 主题切换类型持久化
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('theme-switch-type', themeSwitchType);
-        }
-    }, [themeSwitchType]);
+
 
     return (
         <>
             <Card>
                 <CardHeader>
-                    <CardTitle>界面设置</CardTitle>
-                    <CardDescription>自定义界面显示效果和交互体验。</CardDescription>
+                    <CardTitle><MixedText text="界面设置" /></CardTitle>
+                    <CardDescription><MixedText text="自定义界面显示效果和交互体验。" /></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                     {/* 数据概览动画设置 */}
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
-                            <h3 className="font-medium">数据概览动画</h3>
+                            <h3 className="font-medium"><MixedText text="数据概览动画" /></h3>
                             <p className="text-sm text-muted-foreground">
-                                开启后数据概览页面将显示静态网格布局，关闭后将显示动态滚动卡片效果。
+                                <MixedText text="开启后数据概览页面将显示静态网格布局，关闭后将显示动态滚动卡片效果。" />
                             </p>
                         </div>
-                        <SwitchRenderer
+                        <PlaneSwitch
                             checked={reduceMotion}
                             onChange={setReduceMotion}
                         />
                     </div>
 
-                    {/* 主题切换按钮风格选择 */}
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                            <h3 className="font-medium">主题切换按钮风格</h3>
-                            <p className="text-sm text-muted-foreground">
-                                选择深浅色主题切换按钮的显示风格。
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Select value={themeSwitchType} onValueChange={(value) => setThemeSwitchType(value as ThemeSwitchType)}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="simple">简约风格</SelectItem>
-                                    <SelectItem value="beautiful">太阳月亮</SelectItem>
-                                    <SelectItem value="bb8">星球大战</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <div className="flex-shrink-0">
-                                <ThemeSwitchSelector
-                                    type={themeSwitchType}
-                                    previewOnly={true}
-                                />
-                            </div>
-                        </div>
-                    </div>
 
-                    {/* 其他开关样式选择 */}
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                            <h3 className="font-medium">其他开关样式</h3>
-                            <p className="text-sm text-muted-foreground">
-                                选择其他开关控件的显示样式（如护眼模式、减弱动态效果等开关）。
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <Select value={otherSwitchType} onValueChange={(value) => setOtherSwitchType(value as OtherSwitchType)}>
-                                <SelectTrigger>
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="default">默认样式</SelectItem>
-                                    <SelectItem value="glass">玻璃质感</SelectItem>
-                                    <SelectItem value="plane">飞机主题</SelectItem>
-                                    <SelectItem value="sparkle">闪烁效果</SelectItem>
-                                    <SelectItem value="3d">3D翻转</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <div className="flex-shrink-0">
-                                <PreviewSwitch
-                                    checked={previewState}
-                                    onChange={setPreviewState}
-                                />
-                            </div>
-                        </div>
-                    </div>
+
+
                 </CardContent>
             </Card>
 
             {/* 存储管理 */}
             <Card className="mt-6">
                 <CardHeader>
-                    <CardTitle>存储管理</CardTitle>
-                    <CardDescription>监控和管理本地存储使用情况。</CardDescription>
+                    <CardTitle><MixedText text="存储管理" /></CardTitle>
+                    <CardDescription><MixedText text="监控和管理本地存储使用情况。" /></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {storageInfo && (
                         <div className="flex items-center justify-between p-4 border rounded-lg">
                             <div className="flex-1">
-                                <h3 className="font-medium">本地存储使用情况</h3>
+                                <h3 className="font-medium"><MixedText text="本地存储使用情况" /></h3>
                                 <p className="text-sm text-muted-foreground">
-                                    已使用 {formatStorageSize(storageInfo.usedSize)} / {formatStorageSize(5 * 1024 * 1024)} ({storageInfo.usagePercentage.toFixed(1)}%)
+                                    <MixedText text={`已使用 ${formatStorageSize(storageInfo.usedSize)} / ${formatStorageSize(5 * 1024 * 1024)} (${storageInfo.usagePercentage.toFixed(1)}%)`} />
                                 </p>
-                                <BeautifulProgress value={storageInfo.usagePercentage} className="mt-2" />
+                                <Progress
+                                    value={storageInfo.usagePercentage}
+                                    variant="info"
+                                    showText={true}
+                                    className="mt-2"
+                                />
                             </div>
                         </div>
                     )}
 
                     <div className="flex items-center justify-between p-4 border rounded-lg">
                         <div className="flex-1">
-                            <h3 className="font-medium">云端图片管理</h3>
+                            <h3 className="font-medium"><MixedText text="云端图片管理" /></h3>
                             <p className="text-sm text-muted-foreground">
-                                管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。
+                                <MixedText text="管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。" />
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -382,7 +323,7 @@ export function AdvancedSetting() {
                                 }}
                                 hoverColor="#3B82F6"
                             >
-                                {showImageManager ? '隐藏管理' : '图片管理'}
+                                <MixedText text={showImageManager ? '隐藏管理' : '图片管理'} />
                             </InteractiveHoverButton>
                         </div>
                     </div>
@@ -407,7 +348,7 @@ export function AdvancedSetting() {
                                         disabled={isLoadingImages}
                                         hoverColor="#059669"
                                     >
-                                        刷新
+                                        <MixedText text="刷新" />
                                     </InteractiveHoverButton>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -415,13 +356,13 @@ export function AdvancedSetting() {
                                         onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
                                         hoverColor="#D97706"
                                     >
-                                        {imageManagerView === 'grid' ? '列表' : '网格'}
+                                        <MixedText text={imageManagerView === 'grid' ? '列表' : '网格'} />
                                     </InteractiveHoverButton>
                                     <InteractiveHoverButton
                                         onClick={handleUploadImage}
                                         hoverColor="#059669"
                                     >
-                                        上传
+                                        <MixedText text="上传" />
                                     </InteractiveHoverButton>
                                     {selectedImages.size > 0 && (
                                         <InteractiveHoverButton
@@ -429,7 +370,7 @@ export function AdvancedSetting() {
                                             hoverColor="#EF4444"
                                             icon={<Trash2 className="w-4 h-4" />}
                                         >
-                                            删除 ({selectedImages.size})
+                                            <MixedText text={`删除 (${selectedImages.size})`} />
                                         </InteractiveHoverButton>
                                     )}
                                 </div>
@@ -440,8 +381,8 @@ export function AdvancedSetting() {
                                 {isLoadingImages ? (
                                     <div className="flex items-center justify-center py-12">
                                         <div className="flex items-center gap-3 text-gray-500">
-                                            <ChaseLoader size="medium" />
-                                            <span className="text-sm">正在加载...</span>
+                                            <LoadingSpinner size="md" />
+                                            <span className="text-sm"><MixedText text="正在加载..." /></span>
                                         </div>
                                     </div>
                                 ) : filteredImages.length === 0 ? (
@@ -449,10 +390,10 @@ export function AdvancedSetting() {
                                         <div className="text-center">
                                             <ImageIcon className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                                             <p className="text-gray-500 mb-1">
-                                                {imageSearchTerm ? '没有找到匹配的图片' : '暂无图片'}
+                                                <MixedText text={imageSearchTerm ? '没有找到匹配的图片' : '暂无图片'} />
                                             </p>
                                             {!imageSearchTerm && (
-                                                <p className="text-sm text-gray-400">点击&quot;上传&quot;开始添加图片</p>
+                                                <p className="text-sm text-gray-400"><MixedText text="点击&quot;上传&quot;开始添加图片" /></p>
                                             )}
                                         </div>
                                     </div>
@@ -549,9 +490,9 @@ export function AdvancedSetting() {
                                                         {image.originalName}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                                        <span>{formatFileSize(image.size)}</span>
+                                                        <span><MixedText text={formatFileSize(image.size)} /></span>
                                                         <span>•</span>
-                                                        <span>{formatUploadTime(image.uploadedAt)}</span>
+                                                        <span><MixedText text={formatUploadTime(image.uploadedAt)} /></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -562,7 +503,7 @@ export function AdvancedSetting() {
                                 {/* 统计信息 */}
                                 {filteredImages.length > 0 && (
                                     <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 text-sm text-gray-500 dark:text-gray-400">
-                                        共 {filteredImages.length} 张图片{selectedImages.size > 0 && `，选中 ${selectedImages.size} 张`}
+                                        <MixedText text={`共 ${filteredImages.length} 张图片${selectedImages.size > 0 ? `，选中 ${selectedImages.size} 张` : ''}`} />
                                     </div>
                                 )}
                             </div>
@@ -592,28 +533,27 @@ export function AdvancedSetting() {
             }}>
                 <AlertDialogContent key={`delete-dialog-${deleteDialogKey}`}>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>确认删除图片</AlertDialogTitle>
+                        <AlertDialogTitle><MixedText text="确认删除图片" /></AlertDialogTitle>
                         <AlertDialogDescription asChild>
                             {isDeleting ? (
                                 <div className="space-y-4">
-                                    <p>正在删除图片，请稍候...</p>
+                                    <p><MixedText text="正在删除图片，请稍候..." /></p>
                                     <div className="space-y-2">
-                                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                            <div
-                                                className="bg-red-500 h-2 rounded-full transition-all duration-300 ease-out"
-                                                style={{ width: `${deleteProgress}%` }}
-                                            ></div>
-                                        </div>
+                                        <Progress
+                                            value={deleteProgress}
+                                            variant="danger"
+                                            showText={true}
+                                        />
                                         {currentDeletingImage && (
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                正在删除: {currentDeletingImage}
+                                                <MixedText text={`正在删除: ${currentDeletingImage}`} />
                                             </p>
                                         )}
                                     </div>
                                 </div>
                             ) : (
                                 <div>
-                                    确定要删除以下图片吗？此操作不可撤销！
+                                    <MixedText text="确定要删除以下图片吗？此操作不可撤销！" />
                                     <br />
                                     <span className="font-medium text-red-600">
                                         {imagesToDelete.map(id => {
@@ -637,7 +577,7 @@ export function AdvancedSetting() {
                                 }
                             }}
                         >
-                            取消
+                            <MixedText text="取消" />
                         </AlertDialogCancel>
                         <Button
                             onClick={() => {
@@ -649,10 +589,10 @@ export function AdvancedSetting() {
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
                                     <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #ffffff' }}></div>
-                                    删除中...
+                                    <MixedText text="删除中..." />
                                 </div>
                             ) : (
-                                '确认删除'
+                                <MixedText text="确认删除" />
                             )}
                         </Button>
                     </AlertDialogFooter>

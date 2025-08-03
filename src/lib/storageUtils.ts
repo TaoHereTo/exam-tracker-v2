@@ -119,7 +119,7 @@ export function isStorageNearLimit(threshold: number = 80): boolean {
  */
 export function getStorageKeyDisplayName(key: string): string {
     const keyMap: Record<string, string> = {
-        'exam-tracker-records-v2': '历史记录',
+        'exam-tracker-records-v2': '刷题记录',
         'exam-tracker-knowledge-v2': '知识点',
         'exam-tracker-plans-v2': '学习计划',
         'exam-tracker-nav-mode': '导航模式',
@@ -128,7 +128,7 @@ export function getStorageKeyDisplayName(key: string): string {
         'notify-change-enabled': '通知设置',
         'page-size': '页面大小',
         'theme': '主题设置',
-        'theme-switch-type': '主题切换样式',
+        'theme-switch-type': '主题切换样式（太阳月亮/飞机）',
         'other-switch-type': '开关样式',
         'exam-tracker-knowledge-v1': '知识点(旧版)',
         'exam-tracker-records-v1': '历史记录(旧版)',

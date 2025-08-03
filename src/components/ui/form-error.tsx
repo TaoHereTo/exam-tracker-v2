@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import { AlertCircle } from 'lucide-react';
+import { MixedText } from './MixedText';
 
 interface FormErrorProps {
     error?: string;
@@ -22,7 +23,7 @@ export function FormError({ error, className }: FormErrorProps) {
             className
         )}>
             <AlertCircle className="w-3 h-3 flex-shrink-0" />
-            <span>{error}</span>
+            <span><MixedText text={error} /></span>
         </div>
     );
 } 

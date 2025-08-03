@@ -10,9 +10,10 @@ import {
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Search } from 'lucide-react';
+import { Search, Upload } from 'lucide-react';
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { Card, CardContent } from "@/components/ui/card";
+import { MixedText } from "@/components/ui/MixedText";
 
 // 数据表格列定义
 export interface DataTableColumn<T> {
@@ -141,7 +142,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     const renderTableContent = () => (
         <div className="w-full">
             <div className="mb-2 flex justify-between items-center">
-                <span className="text-gray-500 text-sm">共 {data.length} 条</span>
+                <span className="text-gray-500 text-sm">共 <MixedText text={String(data.length)} /> 条</span>
                 {onBatchDelete && (
                     <InteractiveHoverButton
                         hoverColor="#EF4444"
@@ -160,23 +161,28 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 <Checkbox
                                     checked={allSelected}
                                     indeterminate={indeterminate}
-                                    onCheckedChange={checked => {
-                                        if (checked) onSelect(data.map((row, idx) => rowKey(row, idx)));
-                                        else onSelect([]);
+                                    onCheckedChange={(checked) => {
+                                        if (checked) {
+                                            onSelect(data.map((row, idx) => rowKey(row, idx)));
+                                        } else {
+                                            onSelect([]);
+                                        }
                                     }}
                                 />
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${col.className || ''}`}>{col.label}</th>
+                            <th key={col.key} className={`border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${col.className || ''}`}>
+                                <MixedText text={col.label} />
+                            </th>
                         ))}
-                        {renderActions && <th className="border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100">操作</th>}
+                        {renderActions && <th className="border px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100"><MixedText text="操作" /></th>}
                     </tr>
                 </thead>
                 <tbody>
                     {data.length === 0 ? (
                         <tr>
-                            <td colSpan={columns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)} className="text-center py-4 text-gray-400">暂无数据</td>
+                            <td colSpan={columns.length + (selectable ? 1 : 0) + (renderActions ? 1 : 0)} className="text-center py-4 text-gray-400"><MixedText text="暂无数据" /></td>
                         </tr>
                     ) : (
                         data.map((row, idx) => {
@@ -184,12 +190,17 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             const isSelected = selected.includes(key);
 
                             const handleRowClick = (e: React.MouseEvent) => {
-                                if ((e.target as HTMLElement).closest('input[type="checkbox"]')) {
+                                // 检查是否点击的是按钮或其他交互元素
+                                const target = e.target as HTMLElement;
+                                if (target.closest('button')) {
                                     return;
                                 }
-                                if ((e.target as HTMLElement).closest('button')) {
+                                // 检查是否点击的是 MixedText 组件或其子元素，但允许点击 MixedText 来触发行选择
+                                if (target.closest('input')) {
                                     return;
                                 }
+
+                                // 点击行时切换选择状态
                                 if (isSelected) {
                                     onSelect(selected.filter(id => id !== key));
                                 } else {
@@ -208,28 +219,19 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 <td className={`border px-4 py-2 text-center ${checkboxColClassName}`}>
                                                     <Checkbox
                                                         checked={isSelected}
-                                                        onCheckedChange={checked => {
-                                                            if (checked) onSelect([...selected, key]);
-                                                            else onSelect(selected.filter(id => id !== key));
+                                                        onCheckedChange={(checked) => {
+                                                            if (checked) {
+                                                                onSelect([...selected, key]);
+                                                            } else {
+                                                                onSelect(selected.filter(id => id !== key));
+                                                            }
                                                         }}
                                                     />
                                                 </td>
                                             )}
                                             {columns.map(col => (
                                                 <td key={col.key} className={`border px-4 py-2 ${col.className || ''}`}>
-                                                    {col.render ? col.render(row) : (() => {
-                                                        const value = (row as Record<string, unknown>)[col.key];
-                                                        if (
-                                                            typeof value === 'string' ||
-                                                            typeof value === 'number' ||
-                                                            typeof value === 'boolean' ||
-                                                            value === null ||
-                                                            value === undefined
-                                                        ) {
-                                                            return value ?? '';
-                                                        }
-                                                        return '';
-                                                    })()}
+                                                    {col.render ? col.render(row) : <MixedText text={String((row as Record<string, unknown>)[col.key])} />}
                                                 </td>
                                             ))}
                                             {renderActions && (
@@ -244,7 +246,6 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                     key={index}
                                                     onClick={() => item.onClick(row)}
                                                     disabled={item.disabled}
-                                                    variant={item.variant}
                                                 >
                                                     {item.icon}
                                                     {item.label}
@@ -264,11 +265,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     // 渲染容器包装
     const renderContainer = () => (
         <Card className={className}>
-            <CardContent className="p-6">
-                <div className="flex flex-col gap-4">
+            <CardContent className="p-3">
+                <div className="flex flex-col gap-3">
                     {/* 标题和操作区域 */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        {title && <h2 className="text-2xl font-bold">{title}</h2>}
+                        {title && <h2 className="text-2xl font-bold"><MixedText text={title} /></h2>}
 
                         {/* 左侧过滤器和搜索 */}
                         <div className="flex flex-row mr-4">
@@ -289,7 +290,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                             <SelectContent>
                                                 {filter.options.map(option => (
                                                     <SelectItem key={option.value} value={option.value}>
-                                                        {option.label}
+                                                        <MixedText text={option.label} />
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>
@@ -342,6 +343,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 <InteractiveHoverButton
                                     onClick={onExport}
                                     hoverColor="#059669"
+                                    icon={<Upload className="w-4 h-4" />}
                                 >
                                     导出为Excel
                                 </InteractiveHoverButton>
@@ -372,14 +374,14 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
-                                            <AlertDialogTitle>确认批量删除？</AlertDialogTitle>
+                                            <AlertDialogTitle><MixedText text="确认批量删除？" /></AlertDialogTitle>
                                             <AlertDialogDescription>
                                                 {deleteConfirmText}
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                            <AlertDialogCancel>取消</AlertDialogCancel>
-                                            <AlertDialogAction onClick={onDelete} style={{ background: '#EF4444' }}>确认删除</AlertDialogAction>
+                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                            <AlertDialogAction onClick={onDelete} style={{ background: '#EF4444' }}><MixedText text="确认删除" /></AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>
@@ -394,7 +396,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
                     {/* 分页组件 */}
                     {pagination && pagination.totalPages > 1 && (
-                        <div className="mt-6 flex justify-center">
+                        <div className="mt-4 flex justify-center">
                             <BeautifulPagination
                                 currentPage={pagination.currentPage}
                                 totalPages={pagination.totalPages}

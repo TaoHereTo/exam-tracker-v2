@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MixedText } from './MixedText';
 
 interface TimePickerProps {
     value?: string; // 格式: "MM:SS"
@@ -100,7 +101,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     disabled={disabled}
                 >
                     <Clock className="mr-2 h-4 w-4" />
-                    {value ? displayValue : placeholder}
+                    {value ? displayValue : <MixedText text={placeholder} />}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4" align="start">
@@ -115,7 +116,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                         {/* 分钟选择 */}
                         <div className="text-center">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                                分钟
+                                <MixedText text="分钟" />
                             </label>
                             <Input
                                 type="number"
@@ -132,7 +133,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                         {/* 秒钟选择 */}
                         <div className="text-center">
                             <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                                秒钟
+                                <MixedText text="秒钟" />
                             </label>
                             <Input
                                 type="number"
@@ -152,13 +153,13 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                             size="sm"
                             onClick={handleReset}
                         >
-                            重置
+                            <MixedText text="重置" />
                         </Button>
                         <Button
                             size="sm"
                             onClick={handleConfirm}
                         >
-                            确认
+                            <MixedText text="确认" />
                         </Button>
                     </div>
                 </div>
