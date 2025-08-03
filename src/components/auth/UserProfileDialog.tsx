@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,13 +32,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
     const { user } = useAuth();
 
     // 加载用户资料
-    useEffect(() => {
-        if (isOpen) {
-            loadUserProfile();
-        }
-    }, [isOpen]);
-
-    const loadUserProfile = async () => {
+    const loadUserProfile = useCallback(async () => {
         try {
             setLoading(true);
             const userProfile = await UserProfileService.getUserProfile();
@@ -60,7 +54,13 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
         } finally {
             setLoading(false);
         }
-    };
+    }, [notify]);
+
+    useEffect(() => {
+        if (isOpen) {
+            loadUserProfile();
+        }
+    }, [isOpen, loadUserProfile]);
 
     // 保存用户资料
     const handleSaveProfile = async () => {
@@ -204,7 +204,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             className="min-w-[100px]"
                         >
                             {loading ? (
-                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
                             ) : (
                                 <>
                                     <Save className="h-4 w-4 mr-2" />

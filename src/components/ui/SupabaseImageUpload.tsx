@@ -225,7 +225,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                     {/* 上传进度 */}
                     {isUploading && (
                         <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
-                            <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #2563eb' }}></div>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-500"></div>
                             <span><MixedText text="正在上传图片..." /></span>
                         </div>
                     )}
@@ -256,7 +256,7 @@ export const SupabaseImageUpload: React.FC<SupabaseImageUploadProps> = ({
                         >
                             {isDeleting ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #dc2626' }}></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-red-500"></div>
                                     删除中...
                                 </>
                             ) : (

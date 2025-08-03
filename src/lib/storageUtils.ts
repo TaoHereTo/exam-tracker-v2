@@ -82,7 +82,7 @@ export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'pla
         keysToRemove.push(
             'exam-tracker-nav-mode',
             'eye-care-enabled',
-            'reduce-motion-enabled',
+
             'notify-change-enabled',
             'page-size',
             'theme',
@@ -124,7 +124,7 @@ export function getStorageKeyDisplayName(key: string): string {
         'exam-tracker-plans-v2': '学习计划',
         'exam-tracker-nav-mode': '导航模式',
         'eye-care-enabled': '护眼模式',
-        'reduce-motion-enabled': '减弱动态效果',
+
         'notify-change-enabled': '通知设置',
         'page-size': '页面大小',
         'theme': '主题设置',

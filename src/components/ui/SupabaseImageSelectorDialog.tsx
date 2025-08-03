@@ -366,7 +366,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-white"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-current"></div>
                                     <MixedText text="删除中..." />
                                 </div>
                             ) : (

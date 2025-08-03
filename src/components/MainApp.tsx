@@ -20,7 +20,7 @@ import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { LogOut, User, Settings, SlidersHorizontal, MoreHorizontal } from "lucide-react";
-import { getMixedTextStyle } from "@/lib/utils";
+import { getMixedTextStyle, generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 import { GlobalFontProvider } from "@/components/ui/GlobalFontProvider";
 import {
@@ -101,7 +101,7 @@ export function MainApp() {
 
     // 新增知识点添加函数 - 优化性能
     const addKnowledge = useCallback(async (newKnowledge: KnowledgeItem) => {
-        const knowledgeWithId = { ...newKnowledge, id: Date.now().toString() + Math.random().toString(16).slice(2) };
+        const knowledgeWithId = { ...newKnowledge, id: generateUUID() };
         setKnowledge(prev => [knowledgeWithId, ...prev]);
 
         // 异步保存到云端，不阻塞UI
@@ -330,7 +330,11 @@ export function MainApp() {
             await AutoCloudSync.autoDeleteRecord(id, notify);
         }
         for (const id of knowledgeIds) {
-            await AutoCloudSync.autoDeleteKnowledge(id, notify);
+            if (isUUID(id)) {
+                await AutoCloudSync.autoDeleteKnowledge(id, notify);
+            } else {
+                console.log('跳过旧格式ID的云端删除:', id);
+            }
         }
         for (const id of planIds) {
             await AutoCloudSync.autoDeletePlan(id, notify);
@@ -374,9 +378,14 @@ export function MainApp() {
     const handleBatchDeleteKnowledge = async (ids: string[]) => {
         setKnowledge(prev => prev.filter(item => !ids.includes(item.id)));
 
-        // 批量从云端删除
+        // 批量从云端删除，只删除UUID格式的ID（新格式）
         for (const id of ids) {
-            await AutoCloudSync.autoDeleteKnowledge(id, notify);
+            if (isUUID(id)) {
+                await AutoCloudSync.autoDeleteKnowledge(id, notify);
+            } else {
+                // 对于旧格式的ID，只从本地删除，不尝试从云端删除
+                console.log('跳过旧格式ID的云端删除:', id);
+            }
         }
     };
 
@@ -481,25 +490,23 @@ export function MainApp() {
             <PasteProvider>
                 <NavModeContext.Provider value={navMode}>
                     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative">
-                        {/* LightRays 背景 - 仅在深色模式下显示，添加性能优化 */}
-                        {isDarkMode && (
-                            <div className="fixed inset-0 z-[1]">
-                                <LightRays
-                                    raysOrigin="top-center"
-                                    raysColor="#6366f1"
-                                    raysSpeed={0.6}
-                                    lightSpread={1.5}
-                                    rayLength={3.0}
-                                    pulsating={true}
-                                    fadeDistance={1.5}
-                                    saturation={0.7}
-                                    followMouse={false} // 禁用鼠标跟随以提高性能
-                                    mouseInfluence={0.0} // 禁用鼠标影响
-                                    noiseAmount={0.02} // 减少噪声
-                                    distortion={0.01} // 减少扭曲
-                                />
-                            </div>
-                        )}
+                        {/* LightRays 背景光效 */}
+                        <div className="fixed inset-0 z-[1]">
+                            <LightRays
+                                raysOrigin="top-center"
+                                raysColor="#6366f1"
+                                raysSpeed={1.2}
+                                lightSpread={2.0}
+                                rayLength={4.0}
+                                pulsating={true}
+                                fadeDistance={2.0}
+                                saturation={0.8}
+                                followMouse={true}
+                                mouseInfluence={0.3}
+                                noiseAmount={0.05}
+                                distortion={0.02}
+                            />
+                        </div>
 
                         <LoadingWrapper loading={isLoading}>
                             <div className="flex h-screen relative z-[2]">

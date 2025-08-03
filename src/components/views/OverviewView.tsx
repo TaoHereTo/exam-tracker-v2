@@ -17,27 +17,7 @@ interface OverviewViewProps {
 }
 
 export function OverviewView({ records }: OverviewViewProps) {
-    const [reduceMotion, setReduceMotion] = useState(false);
 
-    // 检查数据概览动画设置
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const checkReduceMotion = () => {
-                const isReduceMotion = localStorage.getItem('reduce-motion-enabled') === 'true';
-                setReduceMotion(isReduceMotion);
-            };
-
-            // 初始化检查
-            checkReduceMotion();
-
-            // 监听设置变化
-            window.addEventListener('reduceMotionChanged', checkReduceMotion);
-
-            return () => {
-                window.removeEventListener('reduceMotionChanged', checkReduceMotion);
-            };
-        }
-    }, []);
 
     // 使用 useMemo 优化所有统计计算，避免重复遍历
     const stats = useMemo(() => {
@@ -276,27 +256,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
     ];
 
-    // 如果开启数据概览动画控制，显示静态网格布局
-    if (reduceMotion) {
-        return (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-6xl mx-auto px-4">
-                {cards.map((item, idx) => (
-                    <Card key={item.title + idx} className="min-h-[120px]">
-                        <CardHeader>
-                            <CardTitle className="text-sm">{item.title}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="text-2xl font-bold">
-                                <MixedText text={String(item.value)} />
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        );
-    }
-
-    // 默认动画布局
+    // 动画布局
     // 均分为两组
     const half = Math.ceil(cards.length / 2);
     const group1 = cards.slice(0, half);

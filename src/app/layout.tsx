@@ -25,31 +25,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // 监听数据概览动画设置变化
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const isReduceMotion = localStorage.getItem('reduce-motion-enabled') === 'true';
-      if (isReduceMotion) {
-        document.documentElement.classList.add('reduce-motion');
-      } else {
-        document.documentElement.classList.remove('reduce-motion');
-      }
-    };
 
-    // 初始化检查
-    handleStorageChange();
-
-    // 监听storage变化
-    window.addEventListener('storage', handleStorageChange);
-
-    // 监听自定义事件（用于同一页面内的设置变化）
-    window.addEventListener('reduceMotionChanged', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('reduceMotionChanged', handleStorageChange);
-    };
-  }, []);
 
   return (
     <html lang="zh-CN" suppressHydrationWarning>

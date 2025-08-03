@@ -4,6 +4,7 @@ import type { RecordItem, KnowledgeItem, StudyPlan, PendingImport } from "@/type
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
 import { supabaseImageManager } from "@/lib/supabaseImageManager";
+import { generateUUID } from "@/lib/utils";
 
 export function useImportExport(
     records: RecordItem[],
@@ -21,7 +22,7 @@ export function useImportExport(
         const keys = [
             'exam-tracker-nav-mode',
             'eye-care-enabled',
-            'reduce-motion-enabled',
+
             'notify-change-enabled',
             'page-size',
             'theme',
@@ -169,12 +170,15 @@ export function useImportExport(
                         function hasModuleField(k: unknown): k is KnowledgeItem {
                             return typeof k === 'object' && k !== null && 'module' in k && typeof (k as KnowledgeItem).module === 'string' && (k as KnowledgeItem).module.length > 0;
                         }
+
+
+
                         const normalizedKnowledge = importedKnowledge
                             .filter(hasModuleField)
                             .map((k: KnowledgeItem) => {
                                 let id = k.id;
                                 if (!id || typeof id !== 'string') {
-                                    id = Date.now().toString() + Math.random().toString(16).slice(2);
+                                    id = generateUUID();
                                 }
                                 return { ...k, id };
                             });

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,6 @@ import { RainbowButton } from "@/components/magicui/rainbow-button";
 
 export function UserProfileSetting() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(false);
     const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
     const [formData, setFormData] = useState({
         username: '',
@@ -28,13 +27,8 @@ export function UserProfileSetting() {
     const { user } = useAuth(); // 获取当前用户信息
 
     // 加载用户资料
-    useEffect(() => {
-        loadUserProfile();
-    }, []);
-
-    const loadUserProfile = async () => {
+    const loadUserProfile = useCallback(async () => {
         try {
-            setLoading(true);
             const userProfile = await UserProfileService.getUserProfile();
             setProfile(userProfile);
             if (userProfile) {
@@ -51,15 +45,16 @@ export function UserProfileSetting() {
                 message: '加载用户资料失败',
                 description: '请稍后重试'
             });
-        } finally {
-            setLoading(false);
         }
-    };
+    }, [notify]);
+
+    useEffect(() => {
+        loadUserProfile();
+    }, [loadUserProfile]);
 
     // 保存用户资料
     const handleSaveProfile = async () => {
         try {
-            setLoading(true);
             await UserProfileService.upsertUserProfile({
                 username: formData.username,
                 display_name: formData.displayName,
@@ -80,15 +75,12 @@ export function UserProfileSetting() {
                 message: '保存失败',
                 description: '请稍后重试'
             });
-        } finally {
-            setLoading(false);
         }
     };
 
     // 选择头像
     const handleSelectAvatar = async (avatar: AvatarOption) => {
         try {
-            setLoading(true);
             await UserProfileService.updateAvatar(avatar.url);
             await loadUserProfile();
             setAvatarDialogOpen(false);
@@ -105,8 +97,6 @@ export function UserProfileSetting() {
                 message: '更新头像失败',
                 description: '请稍后重试'
             });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -212,17 +202,10 @@ export function UserProfileSetting() {
                 <div className="flex justify-end gap-2">
                     <RainbowButton
                         onClick={handleSaveProfile}
-                        disabled={loading}
                         className="min-w-[100px]"
                     >
-                        {loading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        ) : (
-                            <>
-                                <Save className="h-4 w-4 mr-2" />
-                                <MixedText text="保存" />
-                            </>
-                        )}
+                        <Save className="h-4 w-4 mr-2" />
+                        <MixedText text="保存" />
                     </RainbowButton>
                 </div>
 

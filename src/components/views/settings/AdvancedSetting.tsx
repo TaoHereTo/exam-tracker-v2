@@ -27,8 +27,7 @@ import { MixedText } from "@/components/ui/MixedText";
 export function AdvancedSetting() {
     const { notify } = useNotification();
 
-    // 新功能1：数据概览动画控制
-    const [reduceMotion, setReduceMotion] = useLocalStorageBoolean('reduce-motion-enabled', false);
+
 
 
 
@@ -245,12 +244,7 @@ export function AdvancedSetting() {
         return () => clearInterval(interval);
     }, [updateStorageInfo]);
 
-    // 减少动画设置持久化
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('reduce-motion-enabled', reduceMotion.toString());
-        }
-    }, [reduceMotion]);
+
 
 
 
@@ -262,19 +256,7 @@ export function AdvancedSetting() {
                     <CardDescription><MixedText text="自定义界面显示效果和交互体验。" /></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    {/* 数据概览动画设置 */}
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                            <h3 className="font-medium"><MixedText text="数据概览动画" /></h3>
-                            <p className="text-sm text-muted-foreground">
-                                <MixedText text="开启后数据概览页面将显示静态网格布局，关闭后将显示动态滚动卡片效果。" />
-                            </p>
-                        </div>
-                        <PlaneSwitch
-                            checked={reduceMotion}
-                            onChange={setReduceMotion}
-                        />
-                    </div>
+
 
 
 
@@ -593,7 +575,7 @@ export function AdvancedSetting() {
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4" style={{ border: '2px solid #e5e7eb', borderTop: '2px solid #ffffff' }}></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-current"></div>
                                     <MixedText text="删除中..." />
                                 </div>
                             ) : (
