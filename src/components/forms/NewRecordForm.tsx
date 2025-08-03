@@ -126,7 +126,7 @@ export function NewRecordForm({ onAddRecord }: { onAddRecord?: (newRecord: Recor
                                 onValueChange={(newValue) => setValue('module', newValue)}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder={<MixedText text="请选择模块" />} />
+                                    <SelectValue placeholder="请选择模块" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {MODULES.map(m => (

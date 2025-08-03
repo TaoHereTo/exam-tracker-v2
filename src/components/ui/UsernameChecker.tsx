@@ -16,6 +16,7 @@ interface UsernameCheckerProps {
     label?: string;
     disabled?: boolean;
     showSuggestions?: boolean;
+    userEmail?: string; // 添加用户邮箱参数
 }
 
 export function UsernameChecker({
@@ -26,7 +27,8 @@ export function UsernameChecker({
     placeholder = "请输入用户名",
     label = "用户名",
     disabled = false,
-    showSuggestions = true
+    showSuggestions = true,
+    userEmail
 }: UsernameCheckerProps) {
     const [checkResult, setCheckResult] = useState<UsernameCheckResult | null>(null);
     const [isChecking, setIsChecking] = useState(false);
@@ -45,7 +47,7 @@ export function UsernameChecker({
 
                 setIsChecking(true);
                 try {
-                    const result = await UsernameService.checkUsernameAvailability(username);
+                    const result = await UsernameService.checkUsernameAvailability(username, userEmail);
                     setCheckResult(result);
                     setHasChecked(true);
                     onValidationChange?.(result.available);
@@ -64,7 +66,7 @@ export function UsernameChecker({
 
             return () => clearTimeout(timeoutId);
         },
-        [onValidationChange]
+        [onValidationChange, userEmail]
     );
 
     // 当用户名变化时检查
@@ -187,7 +189,7 @@ export function UsernameChecker({
             )}
 
             {/* 管理员用户名提示 */}
-            {UsernameService.isAdminUsername(value) && (
+            {UsernameService.isAdminUsername(value, userEmail) && (
                 <div className="flex items-center gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
                     <AlertCircle className="h-4 w-4 text-yellow-600" />
                     <span className="text-sm text-yellow-700">

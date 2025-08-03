@@ -1,16 +1,6 @@
 // 通用类型定义
 
-// 迁移结果类型
-export interface MigrationResult {
-    success: boolean;
-    totalMigrated: number;
-    results: {
-        records: { success: boolean; count?: number; error?: Error | null };
-        plans: { success: boolean; count?: number; error?: Error | null };
-        knowledge: { success: boolean; count?: number; error?: Error | null };
-        settings: { success: boolean; count?: number; error?: Error | null };
-    };
-}
+
 
 // 通知类型
 export interface NotificationData {

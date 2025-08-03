@@ -11,6 +11,8 @@ import { DEFAULT_AVATARS, type UserProfile, type AvatarOption } from "@/types/us
 import { User, Camera, Save, X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { MixedText } from "@/components/ui/MixedText";
+import { UsernameChecker } from "@/components/ui/UsernameChecker";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function UserProfileSetting() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -22,6 +24,7 @@ export function UserProfileSetting() {
         bio: ''
     });
     const { notify } = useNotification();
+    const { user } = useAuth(); // 获取当前用户信息
 
     // 加载用户资料
     useEffect(() => {
@@ -98,7 +101,7 @@ export function UserProfileSetting() {
             console.error('更新头像失败:', error);
             notify({
                 type: 'error',
-                message: '头像更新失败',
+                message: '更新头像失败',
                 description: '请稍后重试'
             });
         } finally {
@@ -106,51 +109,34 @@ export function UserProfileSetting() {
         }
     };
 
-    // 获取当前头像显示
     const getCurrentAvatar = () => {
-        if (profile?.avatar_url) {
-            return profile.avatar_url;
-        }
-        return '/api/avatars/default-1'; // 默认头像
+        if (!profile?.avatar_url) return DEFAULT_AVATARS[0];
+        return DEFAULT_AVATARS.find(avatar => avatar.url === profile.avatar_url) || DEFAULT_AVATARS[0];
     };
 
-    // 获取显示名称
     const getDisplayName = () => {
-        if (profile?.display_name) {
-            return profile.display_name;
-        }
-        if (profile?.username) {
-            return profile.username;
-        }
-        return '未设置';
+        return profile?.display_name || profile?.username || '未设置';
     };
 
     return (
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    <MixedText text="用户资料" />
-                </CardTitle>
+                <CardTitle><MixedText text="个人资料设置" /></CardTitle>
                 <CardDescription>
-                    <MixedText text="管理您的个人信息、头像和用户名" />
+                    <MixedText text="管理您的个人信息和账户设置" />
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 {/* 头像设置 */}
-                <div className="space-y-4">
+                <div className="space-y-2">
                     <Label><MixedText text="头像" /></Label>
                     <div className="flex items-center gap-4">
-                        <div className="relative">
-                            <Avatar variant="rounded" className="w-16 h-16 rounded-none">
-                                <AvatarImage src={getCurrentAvatar()} alt="用户头像" />
-                                <AvatarFallback className="text-xl rounded-none !rounded-none">
-                                    {profile?.display_name?.charAt(0)?.toUpperCase() ||
-                                        profile?.username?.charAt(0)?.toUpperCase() ||
-                                        'U'}
-                                </AvatarFallback>
-                            </Avatar>
-                        </div>
+                        <Avatar className="h-16 w-16">
+                            <AvatarImage src={getCurrentAvatar().url} alt="用户头像" />
+                            <AvatarFallback>
+                                <User className="h-8 w-8" />
+                            </AvatarFallback>
+                        </Avatar>
                         <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button variant="outline" size="sm">
@@ -162,7 +148,7 @@ export function UserProfileSetting() {
                                 <DialogHeader>
                                     <DialogTitle><MixedText text="选择头像" /></DialogTitle>
                                 </DialogHeader>
-                                <div className="grid grid-cols-3 gap-4">
+                                <div className="grid grid-cols-4 gap-2">
                                     {DEFAULT_AVATARS.map((avatar) => (
                                         <button
                                             key={avatar.id}
@@ -181,17 +167,13 @@ export function UserProfileSetting() {
 
                 {/* 用户名设置 */}
                 <div className="space-y-2">
-                    <Label htmlFor="username"><MixedText text="用户名" /></Label>
-                    <Input
-                        id="username"
+                    <UsernameChecker
                         value={formData.username}
-                        onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+                        onChange={(value) => setFormData(prev => ({ ...prev, username: value }))}
                         placeholder="请输入用户名"
-                        maxLength={20}
+                        label="用户名"
+                        userEmail={user?.email} // 传递用户邮箱
                     />
-                    <p className="text-xs text-muted-foreground">
-                        <MixedText text="用户名用于登录和显示，最多20个字符" />
-                    </p>
                 </div>
 
                 {/* 显示名称设置 */}

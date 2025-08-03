@@ -10,7 +10,7 @@ interface InputProps extends React.ComponentProps<"input"> {
 
 function Input({ className, type, onKeyDown, value, placeholder, ...props }: InputProps) {
   // 生成字体样式 - 同时考虑placeholder和value
-  const fontStyle = generateFontStyle(placeholder || value || '');
+  const fontStyle = generateFontStyle(placeholder || String(value || ''));
 
   return (
     <div className="relative">

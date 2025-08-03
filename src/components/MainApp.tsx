@@ -19,7 +19,7 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Database, Settings, SlidersHorizontal, MoreHorizontal } from "lucide-react";
+import { LogOut, User, Settings, SlidersHorizontal, MoreHorizontal } from "lucide-react";
 import { getMixedTextStyle } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 import { GlobalFontProvider } from "@/components/ui/GlobalFontProvider";
@@ -34,7 +34,7 @@ import {
 import { FlowingPAvatar } from "@/components/ui/FlowingPAvatar";
 import { UserProfileService } from "@/lib/userProfileService";
 import type { UserProfile } from "@/types/user";
-import { DataMigrationDialog } from "./auth/DataMigrationDialog";
+
 import { UserProfileDialog } from "./auth/UserProfileDialog";
 import { AutoCloudSync } from "@/lib/autoCloudSync";
 import { useTheme } from "next-themes";
@@ -82,7 +82,7 @@ export function MainApp() {
     // 认证相关
     const { user, signOut } = useAuth();
     const { notify } = useNotification();
-    const [showMigrationDialog, setShowMigrationDialog] = useState(false);
+
     const [showProfileDialog, setShowProfileDialog] = useState(false);
 
     const loadUserProfile = useCallback(async () => {
@@ -246,10 +246,6 @@ export function MainApp() {
                         <SlidersHorizontal className="h-4 w-4 mr-2" />
                         <MixedText text="高级设置" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowMigrationDialog(true)}>
-                        <Database className="h-4 w-4 mr-2" />
-                        <MixedText text="数据迁移" />
-                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
                         <LogOut className="h-4 w-4 mr-2" />
@@ -310,10 +306,6 @@ export function MainApp() {
                     <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
                         <SlidersHorizontal className="h-4 w-4 mr-2" />
                         <MixedText text="高级设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setShowMigrationDialog(true)}>
-                        <Database className="h-4 w-4 mr-2" />
-                        <MixedText text="数据迁移" />
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut}>
@@ -692,11 +684,7 @@ export function MainApp() {
 
 
 
-                        {/* 数据迁移对话框 */}
-                        <DataMigrationDialog
-                            isOpen={showMigrationDialog}
-                            onClose={() => setShowMigrationDialog(false)}
-                        />
+
 
                         {/* 用户资料对话框 */}
                         <UserProfileDialog

@@ -10,8 +10,19 @@ export interface UsernameCheckResult {
 }
 
 export class UsernameService {
+    // 管理员邮箱列表
+    private static readonly ADMIN_EMAILS = [
+        '1623260701@qq.com',  // 您的主邮箱
+        // 可以添加更多管理员邮箱
+    ];
+
+    // 检查是否为管理员邮箱
+    static isAdminEmail(email: string): boolean {
+        return this.ADMIN_EMAILS.includes(email.toLowerCase());
+    }
+
     // 检查用户名是否可用
-    static async checkUsernameAvailability(username: string): Promise<UsernameCheckResult> {
+    static async checkUsernameAvailability(username: string, userEmail?: string): Promise<UsernameCheckResult> {
         try {
             // 基本验证
             if (!username || username.trim().length === 0) {
@@ -44,8 +55,8 @@ export class UsernameService {
                 };
             }
 
-            // 检查是否为保留用户名
-            const reservedUsernames = ['admin', 'administrator', 'root', 'system', 'tao', 'Tao'];
+            // 检查是否为保留用户名（移除Tao的限制）
+            const reservedUsernames = ['admin', 'administrator', 'root', 'system'];
             if (reservedUsernames.includes(username.toLowerCase())) {
                 return {
                     available: false,
@@ -88,8 +99,13 @@ export class UsernameService {
         }
     }
 
-    // 检查是否为管理员用户名
-    static isAdminUsername(username: string): boolean {
+    // 检查是否为管理员用户名（保留兼容性，但基于邮箱判断）
+    static isAdminUsername(username: string, userEmail?: string): boolean {
+        // 如果提供了邮箱，优先使用邮箱判断
+        if (userEmail && this.isAdminEmail(userEmail)) {
+            return true;
+        }
+        // 保留原有的用户名检查作为备用
         return username.toLowerCase() === 'tao';
     }
 

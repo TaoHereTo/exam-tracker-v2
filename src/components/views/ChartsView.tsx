@@ -252,12 +252,14 @@ export function ChartsView({ records }: ChartsViewProps) {
     return (
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
             <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
-                <TabsList className="mb-4">
-                    <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>
-                    <TabsTrigger value="accuracy"><MixedText text="正确率" /></TabsTrigger>
-                    <TabsTrigger value="pie"><MixedText text="模块耗时分布" /></TabsTrigger>
-                    <TabsTrigger value="radar"><MixedText text="模块能力雷达图" /></TabsTrigger>
-                </TabsList>
+                <div className="flex justify-center mb-4">
+                    <TabsList className="w-fit">
+                        <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar"><MixedText text="模块能力雷达图" /></TabsTrigger>
+                    </TabsList>
+                </div>
                 <TabsContent value="perMinute">
                     <div style={{ height: '500px' }}>
                         <TrendChart data={perMinuteData} yMax={2} />

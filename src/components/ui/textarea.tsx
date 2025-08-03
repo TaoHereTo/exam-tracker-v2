@@ -10,7 +10,7 @@ interface TextareaProps extends React.ComponentProps<"textarea"> {
 
 function Textarea({ className, onKeyDown, value, placeholder, ...props }: TextareaProps) {
   // 生成字体样式 - 同时考虑placeholder和value
-  const fontStyle = generateFontStyle(placeholder || value || '');
+  const fontStyle = generateFontStyle(placeholder || String(value || ''));
 
   return (
     <div className="relative">

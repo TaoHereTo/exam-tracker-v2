@@ -67,7 +67,7 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                     <MixedText text="创建账户" />
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    <MixedText text="开始您的学习之旅" />
+                    <MixedText text="开始行测记录之旅" />
                 </p>
             </div>
 
