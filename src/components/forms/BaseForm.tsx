@@ -296,7 +296,6 @@ export function FormTextarea({ name, placeholder, className = '', rows = 4, onKe
             placeholder={placeholder}
             className={cn(
                 "resize-none",
-                error && "border-red-500 focus:border-red-500",
                 className
             )}
             rows={rows}

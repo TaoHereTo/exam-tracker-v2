@@ -31,6 +31,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [isDragOver, setIsDragOver] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const componentRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const componentId = useRef(`unified-image-${Math.random().toString(36).substr(2, 9)}`);
 
     const { notify } = useNotification();
@@ -237,7 +238,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             ref={componentRef}
             data-unified-image="true"
             data-component-id={componentId.current}
-            className={`space-y-4 ${className}`}
+            className={`space-y-2 ${className}`}
             tabIndex={0}
             onFocus={() => {
                 setActiveHandler(componentId.current);
@@ -245,7 +246,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             onBlur={() => {
                 setActiveHandler(null);
             }}
-            onClick={() => {
+            onClick={(e) => {
+                // 阻止事件冒泡，避免触发表单验证
+                e.stopPropagation();
                 setActiveHandler(componentId.current);
             }}
         >
@@ -255,7 +258,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                     {/* 上传区域 */}
                     {(mode === 'upload' || mode === 'combined') && (
                         <div
-                            className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors relative ${isDragOver
+                            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors relative ${isDragOver
                                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                 : 'border-gray-300 hover:border-gray-400'
                                 }`}
@@ -271,37 +274,47 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     </p>
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center space-y-4">
-                                    <div className="flex flex-col items-center space-y-2">
-                                        <FileImage className="h-8 w-8 text-gray-400" />
+                                <div className="flex flex-col items-center space-y-3">
+                                    <div className="flex flex-col items-center space-y-1">
+                                        <FileImage className="h-6 w-6 text-gray-400" />
                                         <div className="text-center">
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            <p className="text-xs text-gray-600 dark:text-gray-400">
                                                 <MixedText text="拖拽或粘贴图片" />
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* 按钮区域 */}
-                                    <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                                    <div
+                                        className="flex flex-col sm:flex-row gap-2 w-full max-w-80"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
                                         {/* 本地选择按钮 */}
-                                        <label className="flex-1">
+                                        <div className="flex-1">
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleFileSelect}
                                                 className="hidden"
                                                 disabled={isLoading}
+                                                id={`file-input-${componentId.current}`}
                                             />
                                             <div className="w-full">
                                                 <InteractiveHoverButton
                                                     hoverColor="#10B981"
-                                                    className="w-full"
-                                                    icon={<Upload className="w-4 h-4" />}
+                                                    className="w-full text-xs py-1.5"
+                                                    icon={<Upload className="w-3 h-3" />}
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        document.getElementById(`file-input-${componentId.current}`)?.click();
+                                                    }}
                                                 >
                                                     <MixedText text="从本地选择" />
                                                 </InteractiveHoverButton>
                                             </div>
-                                        </label>
+                                        </div>
 
                                         {/* 云端选择按钮 */}
                                         {mode !== 'upload' && (
@@ -311,8 +324,13 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     trigger={
                                                         <InteractiveHoverButton
                                                             hoverColor="#3B82F6"
-                                                            className="w-full"
-                                                            icon={<Cloud className="w-4 h-4" />}
+                                                            className="w-full text-xs py-1.5"
+                                                            icon={<Cloud className="w-3 h-3" />}
+                                                            type="button"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                            }}
                                                         >
                                                             <MixedText text="从云端选择" />
                                                         </InteractiveHoverButton>
@@ -322,9 +340,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                         )}
                                     </div>
 
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        <MixedText text="支持 Ctrl+V 粘贴图片" />
-                                    </p>
+
                                 </div>
                             )}
                         </div>
@@ -389,12 +405,17 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                     </div>
 
                     {/* 重新上传/选择按钮 */}
-                    <div className="flex gap-2 justify-center">
+                    <div
+                        className="flex gap-1 justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {(mode === 'upload' || mode === 'combined') && (
                             <Button
-                                onClick={() => {
-                                    const input = document.querySelector('input[type="file"]') as HTMLInputElement;
-                                    input?.click();
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    fileInputRef.current?.click();
                                 }}
                                 variant="outline"
                                 size="sm"
@@ -409,6 +430,11 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 onImageSelected={handleImageSelected}
                                 trigger={
                                     <Button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                        }}
                                         variant="outline"
                                         size="sm"
                                         className="flex items-center gap-2"
@@ -425,6 +451,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
             {/* 隐藏的文件输入 */}
             <input
+                ref={fileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}

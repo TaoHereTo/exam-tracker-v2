@@ -190,7 +190,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <DialogTrigger asChild>
                     {trigger || (
                         <div className="flex justify-center">
-                            <Button variant="outline" className="w-48">
+                            <Button type="button" variant="outline" className="w-48">
                                 <MixedText text="从云端选择图片" />
                             </Button>
                         </div>
