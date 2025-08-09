@@ -12,7 +12,7 @@ import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
-import { useNotification } from '@/components/magicui/NotificationProvider';
+
 import { MixedText } from '@/components/ui/MixedText';
 import { BaseForm, FormInput, FormSelect, useFormContext, FormField } from './BaseForm';
 import type { RecordItem } from '@/types/record';
@@ -26,7 +26,6 @@ interface NewRecordFormProps {
 export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [dateOpen, setDateOpen] = useState(false);
-    const { notify } = useNotification();
 
     const handleSubmit = (data: Record<string, string | number | boolean | undefined>) => {
         const dateToFormat = date ?? new Date();
@@ -40,7 +39,6 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         };
 
         onAddRecord?.(newRecord);
-        notify({ type: "success", message: "记录添加成功" });
     };
 
     // 日期字段组件

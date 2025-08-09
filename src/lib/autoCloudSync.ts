@@ -1,6 +1,7 @@
 import { recordService, planService, knowledgeService } from './databaseService';
 import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record';
 import { useNotification } from '@/components/magicui/NotificationProvider';
+import { normalizeModuleName } from '@/config/exam';
 
 export class AutoCloudSync {
     /**
@@ -19,7 +20,7 @@ export class AutoCloudSync {
             notify({
                 type: 'success',
                 message: '记录已保存到云端',
-                description: `${record.date} ${record.module} 做题记录已自动同步到云端`
+                description: `${record.date} ${normalizeModuleName(record.module)} 做题记录已自动同步到云端`
             });
         } catch (error) {
             console.error('自动保存记录到云端失败:', error);

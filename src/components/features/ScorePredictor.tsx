@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { UnifiedTable } from "@/components/ui/UnifiedTable";
-import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG } from "@/config/exam";
+import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG, normalizeModuleName } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
@@ -39,7 +39,8 @@ interface PredictionResult {
 // Helper function to calculate score per minute
 const getScorePerMinute = (record: RecordItem): number => {
     if (!record || !record.duration || record.duration === 0) return 0;
-    const score = record.correctCount * (MODULE_SCORES[record.module] || 0.8);
+    const normalizedModule = normalizeModuleName(record.module);
+    const score = record.correctCount * (MODULE_SCORES[normalizedModule as keyof typeof MODULE_SCORES] || 0.8);
     return score / record.duration;
 };
 
