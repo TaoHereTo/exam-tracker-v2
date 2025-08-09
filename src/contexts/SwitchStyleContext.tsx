@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useLocalStorageString } from '@/hooks/useLocalStorage';
 
 type OtherSwitchType = 'default' | 'sparkle' | '3d' | 'glass' | 'plane';
 
@@ -12,23 +13,10 @@ interface SwitchStyleContextType {
 const SwitchStyleContext = createContext<SwitchStyleContextType | undefined>(undefined);
 
 export function SwitchStyleProvider({ children }: { children: React.ReactNode }) {
-    const [otherSwitchType, setOtherSwitchType] = useState<OtherSwitchType>('default');
-
-    useEffect(() => {
-        // 从localStorage读取保存的开关样式
-        const savedType = localStorage.getItem('other-switch-type') as OtherSwitchType;
-        if (savedType) {
-            setOtherSwitchType(savedType);
-        }
-    }, []);
-
-    useEffect(() => {
-        // 保存开关样式到localStorage
-        localStorage.setItem('other-switch-type', otherSwitchType);
-    }, [otherSwitchType]);
+    const [otherSwitchType, setOtherSwitchType] = useLocalStorageString('other-switch-type', 'default');
 
     return (
-        <SwitchStyleContext.Provider value={{ otherSwitchType, setOtherSwitchType }}>
+        <SwitchStyleContext.Provider value={{ otherSwitchType: otherSwitchType as OtherSwitchType, setOtherSwitchType }}>
             {children}
         </SwitchStyleContext.Provider>
     );

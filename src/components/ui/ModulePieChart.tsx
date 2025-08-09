@@ -3,6 +3,7 @@
 import React from "react";
 import ReactECharts from 'echarts-for-react';
 import { FULL_EXAM_CONFIG, normalizeModuleName, getModuleColor } from "@/config/exam";
+import { minutesToTimeString } from "@/lib/utils";
 
 interface ModulePieChartProps {
     data: Array<{
@@ -48,13 +49,18 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             trigger: 'item',
             formatter: (params: Record<string, unknown>) => {
                 const data = params.data as { standardQuestions: number; avg: number };
-                return `${params.name}<br/>${data.standardQuestions}题 × ${data.avg}分钟/题 = <b>${params.value}分钟</b>`;
+                const totalTime = minutesToTimeString(data.avg * data.standardQuestions);
+                const avgTime = minutesToTimeString(data.avg);
+                return `${params.name}<br/>${data.standardQuestions}题 × ${avgTime}/题 = <b>${totalTime}</b>`;
             }
         },
         legend: {
             orient: 'vertical',
             left: 10,
             formatter: (name: string) => name,
+            textStyle: {
+                fontFamily: 'Times New Roman, 思源宋体, serif',
+            },
         },
         series: [
             {
@@ -70,6 +76,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 label: {
                     show: true,
                     formatter: '{b} ({d}%)',
+                    fontFamily: 'Times New Roman, 思源宋体, serif',
                 },
                 emphasis: {
                     scale: true,
@@ -85,5 +92,13 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             }
         ]
     };
-    return <ReactECharts option={option} style={{ height: 400, width: '100%' }} />;
+    const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
+    return (
+        <ReactECharts
+            option={option}
+            style={{ height: 400, width: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
+        />
+    );
 }; 

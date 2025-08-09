@@ -1,81 +1,145 @@
 import { useState } from "react";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import type { RecordItem, KnowledgeItem, StudyPlan, PendingImport } from "@/types/record";
+import type {
+    RecordItem,
+    KnowledgeItem,
+    StudyPlan,
+    PendingImport,
+    UserSettings,
+    CloudImageInfo,
+    ExportDataV7
+} from "@/types/record";
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
-import { staticImageManager } from "@/lib/staticImageManager";
+import { supabaseImageManager } from "@/lib/supabaseImageManager";
+import { generateUUID } from "@/lib/utils";
 
 export function useImportExport(
     records: RecordItem[],
     setRecords: (r: RecordItem[]) => void,
     knowledge: KnowledgeItem[],
     setKnowledge: (k: KnowledgeItem[]) => void,
-    plans?: StudyPlan[],
-    setPlans?: (p: StudyPlan[]) => void
+    plans?: StudyPlan[]
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
     const [pendingImport, setPendingImport] = useState<PendingImport>();
 
     // 获取所有相关设置
-    function getAllSettings() {
+    function getAllSettings(): UserSettings {
         const keys = [
             'exam-tracker-nav-mode',
             'eye-care-enabled',
-            'reduce-motion-enabled',
             'notify-change-enabled',
             'page-size',
             'theme',
             'theme-switch-type',
             'other-switch-type',
         ];
-        const settings: Record<string, string> = {};
+        const settings: UserSettings = {};
         keys.forEach(key => {
-            const value = localStorage.getItem(key);
-            if (value !== null) settings[key] = value;
+            try {
+                const value = localStorage.getItem(key);
+                if (value !== null) settings[key] = value;
+            } catch (error) {
+                // 忽略错误
+            }
         });
         return settings;
     }
+
     // 写入所有相关设置
-    function setAllSettings(settings: Record<string, string>) {
+    function setAllSettings(settings: UserSettings) {
         if (!settings) return;
         Object.entries(settings).forEach(([key, value]) => {
             if (typeof value === 'string') {
-                localStorage.setItem(key, value);
+                try {
+                    localStorage.setItem(key, value);
+                } catch (error) {
+                    // 忽略错误
+                }
             }
         });
     }
 
-    // 导出数据到 JSON 文件（支持知识点、学习计划、设置、图片）
-    const handleExportData = () => {
-        // 获取所有图片选择数据
-        const allImages = staticImageManager.getAllSelectedImages();
-
-        const exportData = {
-            records,
-            knowledge,
-            plans: plans || [],
-            settings: getAllSettings(),
-            images: allImages, // 添加图片数据
-            exportedAt: new Date().toISOString(),
-            version: 4, // 更新版本号以支持图片
+    // 格式化数据以确保一致性
+    function formatRecord(record: RecordItem): RecordItem {
+        return {
+            ...record,
+            module: record.module as RecordItem['module'],
+            createdAt: record.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
         };
-        console.log('导出数据包含图片:', allImages.length, '张图片');
+    }
+
+    function formatKnowledge(knowledge: KnowledgeItem): KnowledgeItem {
+        return {
+            ...knowledge,
+            id: knowledge.id || generateUUID(),
+            module: knowledge.module as KnowledgeItem['module'],
+            createdAt: knowledge.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }
+
+    function formatPlan(plan: StudyPlan): StudyPlan {
+        return {
+            ...plan,
+            id: plan.id || generateUUID(),
+            module: plan.module as StudyPlan['module'],
+            createdAt: plan.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }
+
+    // 导出数据到 JSON 文件（使用新的统一格式）
+    const handleExportData = () => {
+        // 获取所有云端图片数据
+        const cloudImages: CloudImageInfo[] = supabaseImageManager.getAllLocalImageInfo();
+
+        // 格式化所有数据
+        const formattedRecords = records.map(formatRecord);
+        const formattedKnowledge = knowledge.map(formatKnowledge);
+        const formattedPlans = (plans || []).map(formatPlan);
+        const settings = getAllSettings();
+
+        const exportData: ExportDataV7 = {
+            version: 7,
+            exportedAt: new Date().toISOString(),
+            records: formattedRecords,
+            knowledge: formattedKnowledge,
+            plans: formattedPlans,
+            settings,
+            cloudImages,
+            metadata: {
+                totalRecords: formattedRecords.length,
+                totalKnowledge: formattedKnowledge.length,
+                totalPlans: formattedPlans.length,
+                totalImages: cloudImages.length,
+                appVersion: '7.0.0'
+            }
+        };
+
         const json = JSON.stringify(exportData, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         const today = format(new Date(), 'yyyy-MM-dd');
         a.href = url;
-        a.download = `行测记录_${today}.json`;
+        a.download = `行测记录_${today}_v7.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        notify({ type: "success", message: "导出成功", description: "您的所有数据（包括知识点、学习计划、设置、图片）已成功导出到本地JSON文件。" });
+
+        notify({
+            type: "success",
+            message: "导出成功",
+            description: `已导出 ${formattedRecords.length} 条记录、${formattedKnowledge.length} 条知识点、${formattedPlans.length} 个计划、${cloudImages.length} 张图片。`
+        });
     };
 
-    // 从 JSON 文件导入数据（支持知识点、学习计划、设置、图片）
+    // 从 JSON 文件导入数据（支持新格式和向后兼容）
     const handleImportData = () => {
         const input = document.createElement('input');
         input.type = 'file';
@@ -83,146 +147,83 @@ export function useImportExport(
         input.onchange = async (e: Event) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 try {
                     const fileContent = event.target?.result as string;
-                    try {
-                        const importedObject = JSON.parse(fileContent);
-                        // 兼容多种结构
-                        let importedRecords: RecordItem[] = [];
-                        let importedKnowledge: KnowledgeItem[] = [];
-                        let importedPlans: StudyPlan[] = [];
-                        let importedSettings: Record<string, string> = {};
-                        let importedImages: Array<{ id: string; path: string; name?: string; fileName?: string; originalName?: string; localPath?: string; size?: number; type?: string }> = [];
+                    const importedObject = JSON.parse(fileContent);
 
-                        if (Array.isArray(importedObject)) {
-                            importedRecords = importedObject;
-                        } else if (importedObject && importedObject.records) {
-                            importedRecords = importedObject.records;
-                            if (Array.isArray(importedObject.knowledge)) {
-                                importedKnowledge = importedObject.knowledge;
-                            }
-                            if (Array.isArray(importedObject.plans)) {
-                                importedPlans = importedObject.plans;
-                            }
-                            if (importedObject.settings && typeof importedObject.settings === 'object') {
-                                importedSettings = importedObject.settings;
-                            }
-                            // 导入图片数据（版本4+）
-                            if (Array.isArray(importedObject.images)) {
-                                importedImages = importedObject.images;
-                            }
-                        } else if (importedObject && importedObject.data && Array.isArray(importedObject.data.records)) {
-                            importedRecords = importedObject.data.records;
-                        } else {
-                            notify({ type: "error", message: "导入失败", description: "导入的文件格式不正确！" });
-                            return;
-                        }
+                    // 处理不同版本的数据格式
+                    let importedRecords: RecordItem[] = [];
+                    let importedKnowledge: KnowledgeItem[] = [];
+                    let importedPlans: StudyPlan[] = [];
+                    let importedSettings: UserSettings = {};
+                    let importedCloudImages: CloudImageInfo[] = [];
+                    let version = 1;
 
-                        // 导入图片数据
-                        if (importedImages.length > 0) {
-                            try {
-                                const imageInfos = importedImages.map(img => ({
-                                    id: img.id,
-                                    fileName: img.fileName || img.name || 'imported-image',
-                                    originalName: img.originalName || img.name || 'imported-image',
-                                    size: img.size || 0,
-                                    type: img.type || 'image/jpeg',
-                                    localPath: img.localPath || img.path || `/ImageOfKnow/${img.fileName || img.name || 'imported-image'}`
-                                }));
-                                staticImageManager.importImageSelections(imageInfos);
-                                console.log('成功导入图片信息:', imageInfos.length, '张图片');
-                            } catch (error) {
-                                console.warn('导入图片时出错:', error);
-                            }
-                        }
-
-                        // 使用统一的模块名称映射
-                        function normalizeDate(date: unknown) {
-                            if (!date) return '';
-                            if (typeof date === 'string' && /^\d{4}-\d{1,2}-\d{1,2}$/.test(date)) return date;
-                            if (typeof date === 'string' || typeof date === 'number' || date instanceof Date) {
-                                const d = new Date(date);
-                                if (!isNaN(d.getTime())) {
-                                    const y = d.getFullYear();
-                                    const m = String(d.getMonth() + 1).padStart(2, '0');
-                                    const day = String(d.getDate()).padStart(2, '0');
-                                    return `${y}-${m}-${day}`;
-                                }
-                            }
-                            return '';
-                        }
-                        const normalizedRecords = importedRecords.map((r: RecordItem | Record<string, unknown> & { totalCount?: number; correctCount?: number }) => {
-                            const total = 'total' in r ? r.total : ('totalCount' in r ? (r as { totalCount?: number }).totalCount ?? 0 : 0);
-                            const correct = 'correct' in r ? r.correct : ('correctCount' in r ? (r as { correctCount?: number }).correctCount ?? 0 : 0);
-                            return {
-                                id: typeof r.id === 'number' ? r.id : Date.now() + Math.floor(Math.random() * 10000),
-                                date: normalizeDate(r.date),
-                                module: normalizeModuleName(String((r as Record<string, unknown>).module)),
-                                total: typeof total === 'number' ? total : Number(total) || 0,
-                                correct: typeof correct === 'number' ? correct : Number(correct) || 0,
-                                duration: r.duration !== undefined ? (typeof r.duration === 'number' ? Number(r.duration).toString() : String(r.duration)) : '',
-                            };
-                        });
-                        // 补全知识点id，保证id为字符串且唯一，只保留有module字段的知识点
-                        function hasModuleField(k: unknown): k is KnowledgeItem {
-                            return typeof k === 'object' && k !== null && 'module' in k && typeof (k as KnowledgeItem).module === 'string' && (k as KnowledgeItem).module.length > 0;
-                        }
-                        const normalizedKnowledge = importedKnowledge
-                            .filter(hasModuleField)
-                            .map((k: KnowledgeItem) => {
-                                let id = k.id;
-                                if (!id || typeof id !== 'string') {
-                                    id = Date.now().toString() + Math.random().toString(16).slice(2);
-                                }
-                                return { ...k, id };
-                            });
-                        // plans 不做特殊处理，直接导入
-                        if (setPlans && Array.isArray(importedPlans)) {
-                            setPlans(importedPlans);
-                        }
-                        // 现有数据去重 key
-                        function recordKey(r: RecordItem) {
-                            return `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
-                        }
-                        const existingKeys = new Set(records.map(recordKey));
-                        const importKeys = new Set<string>();
-                        const dedupedRecords: RecordItem[] = [];
-                        let repeatCount = 0;
-                        normalizedRecords.forEach(r => {
-                            const key = recordKey(r);
-                            if (existingKeys.has(key)) {
-                                repeatCount++;
-                                return; // 跳过与现有数据重复的
-                            }
-                            if (!importKeys.has(key)) {
-                                dedupedRecords.push(r);
-                                importKeys.add(key);
-                            } else {
-                                repeatCount++;
-                            }
-                        });
-                        // settings 写入 localStorage
-                        setAllSettings(importedSettings);
-                        setPendingImport({
-                            records: [...records, ...dedupedRecords],
-                            knowledge: normalizedKnowledge,
-                            plans: importedPlans,
-                            settings: importedSettings,
-                            importStats: {
-                                total: normalizedRecords.length,
-                                added: dedupedRecords.length,
-                                repeated: repeatCount
-                            }
-                        });
-                        setImportDialogOpen(true);
-                        // 不再此处 notify
-                    } catch {
-                        notify({ type: "error", message: "导入失败", description: "文件内容不是有效的 JSON！" });
+                    if (importedObject.version === 7) {
+                        // 新格式 v7
+                        version = 7;
+                        importedRecords = importedObject.records || [];
+                        importedKnowledge = importedObject.knowledge || [];
+                        importedPlans = importedObject.plans || [];
+                        importedSettings = importedObject.settings || {};
+                        importedCloudImages = importedObject.cloudImages || [];
+                    } else if (importedObject.version === 6) {
+                        // 旧格式 v6
+                        version = 6;
+                        importedRecords = importedObject.records || [];
+                        importedKnowledge = importedObject.knowledge || [];
+                        importedPlans = importedObject.plans || [];
+                        importedSettings = importedObject.settings || {};
+                        importedCloudImages = importedObject.cloudImages || [];
+                    } else {
+                        // 兼容旧格式
+                        importedRecords = importedObject.records || importedObject.data || [];
+                        importedKnowledge = importedObject.knowledge || importedObject.knowledgeItems || [];
+                        importedPlans = importedObject.plans || importedObject.studyPlans || [];
+                        importedSettings = importedObject.settings || {};
+                        importedCloudImages = importedObject.cloudImages || [];
                     }
-                } catch {
-                    notify({ type: "error", message: "导入失败", description: "文件内容不是有效的 JSON！" });
+
+                    // 数据验证和格式化
+                    const validatedRecords = importedRecords
+                        .filter((r: RecordItem | Record<string, unknown>) => r && 'date' in r && 'module' in r && 'total' in r && typeof r.total === 'number')
+                        .map(formatRecord);
+
+                    const validatedKnowledge = importedKnowledge
+                        .filter((k: KnowledgeItem | Record<string, unknown>) => k && 'module' in k && ('type' in k || 'note' in k))
+                        .map(formatKnowledge);
+
+                    const validatedPlans = importedPlans
+                        .filter((p: StudyPlan | Record<string, unknown>) => p && 'name' in p && 'module' in p)
+                        .map(formatPlan);
+
+                    // 导入云端图片
+                    if (importedCloudImages.length > 0) {
+                        supabaseImageManager.importImageInfo(importedCloudImages);
+                    }
+
+                    // 设置待导入数据
+                    setPendingImport({
+                        records: validatedRecords,
+                        knowledge: validatedKnowledge,
+                        plans: validatedPlans,
+                        settings: importedSettings,
+                        cloudImages: importedCloudImages,
+                        version
+                    });
+
+                    setImportDialogOpen(true);
+
+                } catch (error) {
+                    console.error('导入文件解析失败:', error);
+                    notify({
+                        type: "error",
+                        message: "导入失败",
+                        description: "文件格式不正确，请选择有效的JSON文件。"
+                    });
                 }
             };
             reader.readAsText(file);
@@ -230,12 +231,65 @@ export function useImportExport(
         input.click();
     };
 
+    // 确认导入
+    const handleConfirmImport = () => {
+        if (!pendingImport) return;
+
+        try {
+            // 导入设置
+            if (pendingImport.settings) {
+                setAllSettings(pendingImport.settings);
+            }
+
+            // 导入记录（去重）
+            const existingRecordKeys = new Set(records.map(r => `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`));
+            const newRecords = pendingImport.records.filter(r => {
+                const key = `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
+                return !existingRecordKeys.has(key);
+            });
+
+            // 导入知识点（去重）
+            const existingKnowledgeIds = new Set(knowledge.map(k => k.id));
+            const newKnowledge = pendingImport.knowledge.filter(k => !existingKnowledgeIds.has(k.id));
+
+            // 更新状态
+            setRecords([...newRecords, ...records]);
+            setKnowledge([...newKnowledge, ...knowledge]);
+
+            const stats = {
+                total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0),
+                added: newRecords.length + newKnowledge.length,
+                repeated: (pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length),
+                updated: 0,
+                failed: 0
+            };
+
+            notify({
+                type: "success",
+                message: "导入成功",
+                description: `成功导入 ${stats.added} 项数据，跳过 ${stats.repeated} 项重复数据。`
+            });
+
+            setImportDialogOpen(false);
+            setPendingImport(undefined);
+
+        } catch (error) {
+            console.error('导入失败:', error);
+            notify({
+                type: "error",
+                message: "导入失败",
+                description: "导入过程中发生错误，请重试。"
+            });
+        }
+    };
+
     return {
         handleExportData,
         handleImportData,
+        handleConfirmImport,
         importDialogOpen,
         setImportDialogOpen,
         pendingImport,
-        setPendingImport,
+        setPendingImport
     };
 } 

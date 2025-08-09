@@ -12,6 +12,7 @@ import { zhCN } from "date-fns/locale";
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { MixedText } from "./MixedText"
 
 function Calendar({
   className,
@@ -165,7 +166,11 @@ function Calendar({
           return (
             <td {...props}>
               <div className="flex size-(--cell-size) items-center justify-center text-center">
-                {children}
+                {typeof children === 'string' ? (
+                  <MixedText text={children} />
+                ) : (
+                  children
+                )}
               </div>
             </td>
           )

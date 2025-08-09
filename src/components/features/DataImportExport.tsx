@@ -1,7 +1,16 @@
 import { useRef } from "react";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
 import { Download, Upload } from "lucide-react";
+import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { ButtonGroup } from "@/components/ui/ButtonGroup";
+import { MixedText } from "@/components/ui/MixedText";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
 
 interface DataImportExportProps {
     onImport: () => void;
@@ -12,44 +21,63 @@ interface DataImportExportProps {
 export function DataImportExport({ onImport, onExport, onClearAllData }: DataImportExportProps) {
     const clearDialogRef = useRef<HTMLButtonElement>(null);
     return (
-        <div className="flex gap-4 mb-6">
-                        <ReactBitsButton 
-                variant="outline" 
-                onClick={onImport} 
-                size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 hover:border-emerald-700"
-            >
-                <Download className="w-4 h-4 mr-2" />
-                导入数据
-            </ReactBitsButton>
-            <ReactBitsButton 
-                variant="outline" 
-                onClick={onExport} 
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white border-amber-600 hover:border-amber-700"
-            >
-                <Upload className="w-4 h-4 mr-2" />
-                导出数据
-            </ReactBitsButton>
-            {onClearAllData && (
-                <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                        <ReactBitsButton variant="destructive" ref={clearDialogRef} size="sm">
-                            清空所有数据
-                        </ReactBitsButton>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>您确定要清空所有数据吗？</AlertDialogTitle>
-                            <AlertDialogDescription>此操作将永久删除所有刷题记录和知识点，无法撤销。</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <AlertDialogCancel>取消</AlertDialogCancel>
-                            <AlertDialogAction onClick={onClearAllData}>确认清空</AlertDialogAction>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )}
-        </div>
+        <TooltipProvider>
+            <ButtonGroup spacing="md" margin="md">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <InteractiveHoverButton
+                            onClick={onExport}
+                            hoverColor="#059669"
+                            icon={<Upload className="w-4 h-4" />}
+                            className="h-9"
+                        >
+                            <MixedText text="导出数据" />
+                        </InteractiveHoverButton>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p><MixedText text="导出为JSON" /></p>
+                    </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <InteractiveHoverButton
+                            onClick={onImport}
+                            hoverColor="#D97706"
+                            icon={<Download className="w-4 h-4" />}
+                            className="h-9"
+                        >
+                            <MixedText text="导入数据" />
+                        </InteractiveHoverButton>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p><MixedText text="从JSON中恢复" /></p>
+                    </TooltipContent>
+                </Tooltip>
+                {onClearAllData && (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <InteractiveHoverButton ref={clearDialogRef} hoverColor="#EF4444" className="h-9">
+                                <MixedText text="清空所有数据" />
+                            </InteractiveHoverButton>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle><MixedText text="您确定要清空所有数据吗？" /></AlertDialogTitle>
+                                <AlertDialogDescription><MixedText text="此操作将永久删除所有刷题记录和知识点，无法撤销。" /></AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={onClearAllData}
+                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    <MixedText text="确认清空" />
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
+            </ButtonGroup>
+        </TooltipProvider>
     );
 } 

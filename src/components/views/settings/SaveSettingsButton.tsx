@@ -1,6 +1,7 @@
-import ReactBitsButton from "@/components/ui/ReactBitsButton";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import React, { useRef } from "react";
+import { MixedText } from "@/components/ui/MixedText";
 
 interface SaveSettingsButtonProps {
     navMode: 'sidebar' | 'dock';
@@ -20,13 +21,13 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
     };
 
     return (
-        <ReactBitsButton
+        <RainbowButton
             onClick={handleSave}
-            size="sm"
-            className="bg-gradient-to-br from-gray-800 to-black"
+            size="default"
+            className="px-6 py-2"
         >
-            保存所有设置
-        </ReactBitsButton>
+            <MixedText text="保存所有设置" />
+        </RainbowButton>
     );
 };
 

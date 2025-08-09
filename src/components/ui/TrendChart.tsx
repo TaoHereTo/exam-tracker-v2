@@ -78,7 +78,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 backgroundColor: 'rgba(255,255,255,0.95)',
                 borderColor: '#e0e6f1',
                 borderWidth: 1,
-                textStyle: { color: '#333', fontSize: 14 },
+                textStyle: { color: '#333', fontSize: 14, fontFamily: 'Times New Roman, 思源宋体, serif' },
                 extraCssText: 'box-shadow: 0 4px 16px rgba(51,102,255,0.08); border-radius: 8px;',
                 formatter: function (params: Array<Record<string, unknown>>) {
                     let res = `<b>${params[0].axisValueLabel}</b><br/>`;
@@ -101,7 +101,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 itemWidth: 18,
                 itemHeight: 12,
                 borderRadius: 6,
-                textStyle: { fontWeight: 'bold', fontSize: 14 },
+                textStyle: { fontWeight: 'bold', fontSize: 14, fontFamily: 'Times New Roman, 思源宋体, serif' },
                 icon: 'roundRect',
                 backgroundColor: 'rgba(255,255,255,0.7)',
                 borderColor: '#e0e6f1',
@@ -130,7 +130,8 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                     rotate: -45,
                     fontSize: 13,
                     color: '#333',
-                    fontWeight: 500
+                    fontWeight: 500,
+                    fontFamily: 'Times New Roman, 思源宋体, serif'
                 },
                 axisTick: { alignWithLabel: true },
                 axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
@@ -139,7 +140,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             yAxis: {
                 type: 'value',
                 max: yMax,
-                axisLabel: { fontSize: 13, color: '#333', fontWeight: 500 },
+                axisLabel: { fontSize: 13, color: '#333', fontWeight: 500, fontFamily: 'Times New Roman, 思源宋体, serif' },
                 axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
                 splitLine: { lineStyle: { color: '#f5f7fa', width: 1, type: 'dashed' } }
             },
@@ -185,6 +186,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 key={`${forceUpdate}-${allDates.join(',')}-${allModules.join(',')}`}
                 notMerge={true}
                 lazyUpdate={false}
+                opts={{ renderer: 'canvas' }}
             />
         </div>
     );

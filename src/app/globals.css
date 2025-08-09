@@ -3,29 +3,126 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ReactBits 风格按钮动画 */
-@keyframes glow-pulse {
-  0% {
-    background-position: 0% 50%;
-    filter: brightness(1) saturate(1);
-  }
-
-  50% {
-    background-position: 100% 50%;
-    filter: brightness(1.09828) saturate(1.19655);
-  }
-
-  100% {
-    background-position: 0% 50%;
-    filter: brightness(1) saturate(1);
-  }
+/* ========== 字体管理系统 ========== */
+/* 全局字体设置 - 简化版本 */
+body,
+html {
+  font-family: '思源宋体', 'Times New Roman', serif;
 }
 
-.animate-glow-pulse {
-  animation: glow-pulse 3s ease-in-out infinite alternate;
+/* 基础字体类 - 简化 */
+.font-chinese {
+  font-family: '思源宋体', serif;
 }
 
-/* 光晕扫过动画 */
+.font-english {
+  font-family: 'Times New Roman', serif;
+}
+
+.font-mixed {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* MixedText 组件样式 - 简化 */
+.mixed-text {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+.mixed-text-container {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+.mixed-text-part {
+  font-weight: 400;
+}
+
+/* 输入框字体设置 - 简化 */
+input,
+textarea,
+select,
+button,
+[role="button"],
+[role="textbox"],
+[data-slot="input"],
+[data-slot="textarea"],
+[data-slot="select-trigger"],
+[data-slot="select-value"],
+[data-slot="select-item"] {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 占位符字体设置 */
+input::placeholder,
+textarea::placeholder {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* Radix UI Select 组件字体设置 */
+[data-radix-select-trigger],
+[data-radix-select-value],
+[data-radix-select-item] {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 表格字体设置 */
+table,
+td,
+th {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 标题字体设置 */
+label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 确保所有文本元素都使用正确字体 */
+* {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* 特定元素的字体覆盖 */
+.text-sm,
+.text-base,
+.text-lg,
+.text-xl,
+.text-2xl,
+.text-3xl {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
+/* ========== 按钮间距系统 ========== */
+.button-spacing-sm {
+  margin: 0.25rem 0;
+}
+
+.button-spacing-md {
+  margin: 0.5rem 0;
+}
+
+.button-spacing-lg {
+  margin: 0.75rem 0;
+}
+
+.button-group-sm {
+  gap: 0.5rem;
+}
+
+.button-group-md {
+  gap: 1rem;
+}
+
+.button-group-lg {
+  gap: 1.5rem;
+}
+
+/* ========== 光晕扫过动画 ========== */
 @keyframes shimmer-left {
   0% {
     transform: translateX(-100%) skewX(-15deg);
@@ -58,114 +155,7 @@
   }
 }
 
-/* ReactBits 真实按钮样式 */
-.reactbits-button {
-  color: #fff;
-  cursor: pointer;
-  isolation: isolate;
-  z-index: 15;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  letter-spacing: 0.5px;
-  border: none;
-  border-radius: 50px;
-  justify-content: center;
-  align-items: center;
-  font-weight: 600;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation: 3s ease-in-out infinite alternate glow-pulse;
-  display: flex;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-.reactbits-button:hover {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  animation-duration: 1.5s;
-  transform: translateY(-2px) scale(1.01);
-  backdrop-filter: blur(20px);
-}
-
-.reactbits-button:active {
-  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  transform: translateY(0px) scale(0.98);
-  backdrop-filter: blur(5px);
-}
-
-/* 光晕扫过效果 */
-.shimmer-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.6),
-      transparent);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.reactbits-button:hover .shimmer-effect {
-  animation: shimmer-left 0.6s ease-out;
-}
-
-.reactbits-button:not(:hover) .shimmer-effect {
-  animation: shimmer-right 0.6s ease-out;
-}
-
-/* 玻璃边框效果 */
-.glass-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 50%;
-  /* 只占上半部分 */
-  border-radius: 50px 50px 0 0;
-  /* 只有上半部分圆角 */
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.3) 0%,
-      rgba(255, 255, 255, 0.2) 50%,
-      rgba(255, 255, 255, 0.1) 80%,
-      transparent 100%);
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-bottom: none;
-  /* 移除底部边框 */
-  border-left: none;
-  /* 移除左边框 */
-  border-right: none;
-  /* 移除右边框 */
-}
-
-.reactbits-button:hover .glass-effect {
-  opacity: 1;
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-bottom: none;
-  /* 移除底部边框 */
-  border-left: none;
-  /* 移除左边框 */
-  border-right: none;
-  /* 移除右边框 */
-}
-
-/* 响应式设计 */
-@media (max-width: 768px) {
-  .reactbits-button {
-    gap: 1.2rem;
-    padding: 0.8rem 0.8rem 0.8rem 1.8rem;
-    font-size: 1rem;
-  }
-}
-
-/* 鼠标跟随光晕效果 */
+/* ========== 鼠标跟随光晕效果 ========== */
 .glow-effect {
   position: absolute;
   top: 0;
@@ -184,6 +174,7 @@
   opacity: 1;
 }
 
+/* ========== 主题配置 ========== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -244,10 +235,59 @@
       transform: translateY(calc(-100% - var(--gap)));
     }
   }
+
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+
+  --color-color-5: var(--color-5);
+
+  --color-color-4: var(--color-4);
+
+  --color-color-3: var(--color-3);
+
+  --color-color-2: var(--color-2);
+
+  --color-color-1: var(--color-1);
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+
+    100% {
+      background-position: 200%;
+    }
+  }
 }
 
+/* ========== 颜色变量 ========== */
 :root {
   --radius: 0.625rem;
+  /* —— 通用间距刻度（可复用） —— */
+  --space-0: 0px;
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+
+  /* —— 表单/卡片统一间距令牌 —— */
+  --form-gap: var(--space-4);
+  --form-section-gap: var(--space-5);
+  --form-field-gap: var(--space-2);
+  --form-grid-gap: var(--space-4);
+  --form-card-padding-x: 1.5rem;
+  /* 与 Card 的 px-6 对齐 */
+  --form-card-padding-y: 1.25rem;
+  /* 与 CardContent 的 pb-4 对齐 */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -279,6 +319,11 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --color-1: oklch(66.2% 0.225 25.9);
+  --color-2: oklch(60.4% 0.26 302);
+  --color-3: oklch(69.6% 0.165 251);
+  --color-4: oklch(80.2% 0.134 225);
+  --color-5: oklch(90.7% 0.231 133);
 }
 
 .dark {
@@ -313,59 +358,14 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --color-1: oklch(66.2% 0.225 25.9);
+  --color-2: oklch(60.4% 0.26 302);
+  --color-3: oklch(69.6% 0.165 251);
+  --color-4: oklch(80.2% 0.134 225);
+  --color-5: oklch(90.7% 0.231 133);
 }
 
-/* 修正sonner提示框深色模式下主内容颜色 */
-.dark .toaster .toast-title,
-.dark .toaster .sonner-title,
-.dark .toaster [data-title] {
-  color: #fff !important;
-}
-
-/* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */
-.sidebar-btn:hover,
-.sidebar-btn:focus-visible {
-  text-decoration: none !important;
-  background: rgba(59, 130, 246, 0.08);
-  /* 浅蓝色高亮，可根据主题调整 */
-  border-radius: 0.5rem;
-  color: #2563eb;
-}
-
-.dark .sidebar-btn:hover,
-.dark .sidebar-btn:focus-visible {
-  background: rgba(59, 130, 246, 0.18);
-  color: #60a5fa;
-}
-
-.sidebar-parent {
-  @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-normal transition-all duration-150 border-none;
-}
-
-.sidebar-parent:hover {
-  @apply font-bold;
-}
-
-.sidebar-child {
-  @apply pl-11 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start;
-}
-
-.sidebar-child.bg-primary,
-.sidebar-child[data-variant="default"],
-.sidebar-child[data-state="active"],
-.sidebar-child.active,
-.sidebar-child:active {
-  @apply text-white dark:text-white bg-primary dark:bg-primary;
-}
-
-.sidebar-child.bg-primary:hover,
-.sidebar-child[data-variant="default"]:hover,
-.sidebar-child[data-state="active"]:hover,
-.sidebar-child.active:hover,
-.sidebar-child:active:hover {
-  @apply text-white dark:text-white bg-primary dark:bg-primary;
-}
-
+/* ========== 基础样式 ========== */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -376,6 +376,372 @@
   }
 }
 
+/* ========== 统一的表单/卡片布局工具类 ========== */
+@layer utilities {
+
+  /* 整体纵向栈 */
+  .form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-gap);
+  }
+
+  /* 分区块（区块之间更大的间距） */
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-section-gap);
+  }
+
+  /* 单个字段（标签与控件的间距） */
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-field-gap);
+  }
+
+  /* 两列网格 */
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--form-grid-gap);
+  }
+
+  /* 操作按钮区域 */
+  .form-actions {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ========== 主题切换按钮样式 ========== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch #input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2196f3;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.sun-moon {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: yellow;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  -webkit-animation: rotate-center-reverse 0.4s ease-in-out both;
+  animation: rotate-center-reverse 0.4s ease-in-out both;
+}
+
+#input:checked+.slider {
+  background-color: black;
+}
+
+#input:focus+.slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+#input:checked+.slider .sun-moon {
+  -webkit-transform: translateX(22px);
+  -ms-transform: translateX(22px);
+  transform: translateX(22px);
+  background-color: white;
+  -webkit-animation: rotate-center 0.4s ease-in-out both;
+  animation: rotate-center 0.4s ease-in-out both;
+}
+
+.moon-dot {
+  opacity: 0;
+  transition: 0.4s;
+  fill: gray;
+}
+
+#input:checked+.slider .sun-moon .moon-dot {
+  opacity: 1;
+}
+
+.slider.round {
+  border-radius: 28px;
+}
+
+.slider.round .sun-moon {
+  border-radius: 50%;
+}
+
+#moon-dot-1 {
+  left: 10px;
+  top: 3px;
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  z-index: 4;
+}
+
+#moon-dot-2 {
+  left: 2px;
+  top: 10px;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  z-index: 4;
+}
+
+#moon-dot-3 {
+  left: 16px;
+  top: 18px;
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  z-index: 4;
+}
+
+#light-ray-1 {
+  left: -8px;
+  top: -8px;
+  position: absolute;
+  width: 43px;
+  height: 43px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+#light-ray-2 {
+  left: -50%;
+  top: -50%;
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+#light-ray-3 {
+  left: -18px;
+  top: -18px;
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+.light-ray {
+  opacity: 0;
+  transition: 0.4s;
+  fill: yellow;
+}
+
+#input:checked+.slider .sun-moon .light-ray {
+  opacity: 0;
+}
+
+.cloud-light {
+  position: absolute;
+  fill: #eee;
+  animation-name: cloud-move;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+}
+
+.cloud-dark {
+  position: absolute;
+  fill: #ccc;
+  animation-name: cloud-move;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  animation-delay: 1s;
+}
+
+#cloud-1 {
+  left: 20px;
+  top: 8px;
+  width: 40px;
+}
+
+#cloud-2 {
+  left: 34px;
+  top: 3px;
+  width: 20px;
+}
+
+#cloud-3 {
+  left: 8px;
+  top: 17px;
+  width: 30px;
+}
+
+#cloud-4 {
+  left: 26px;
+  top: 11px;
+  width: 40px;
+}
+
+#cloud-5 {
+  left: 38px;
+  top: 7px;
+  width: 20px;
+}
+
+#cloud-6 {
+  left: 12px;
+  top: 19px;
+  width: 30px;
+}
+
+@keyframes cloud-move {
+  0% {
+    transform: translateX(0px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  80% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.stars {
+  transform: translateY(-32px);
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.star {
+  fill: white;
+  position: absolute;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  animation-name: star-twinkle;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+#input:checked+.slider .stars {
+  -webkit-transform: translateY(0);
+  -ms-transform: translateY(0);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#star-1 {
+  width: 20px;
+  top: 2px;
+  left: 3px;
+  animation-delay: 0.3s;
+}
+
+#star-2 {
+  width: 6px;
+  top: 16px;
+  left: 3px;
+}
+
+#star-3 {
+  width: 12px;
+  top: 20px;
+  left: 10px;
+  animation-delay: 0.6s;
+}
+
+#star-4 {
+  width: 18px;
+  top: 0px;
+  left: 18px;
+  animation-delay: 1.3s;
+}
+
+@keyframes star-twinkle {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.2);
+  }
+
+  80% {
+    transform: scale(0.8);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: translateX(0px) rotate(0deg);
+  }
+
+  100% {
+    transform: translateX(22px) rotate(360deg);
+  }
+}
+
+@keyframes rotate-center-reverse {
+  0% {
+    transform: translateX(22px) rotate(360deg);
+  }
+
+  100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+}
+
+/* 悬停效果 */
+.switch:hover .slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.switch:hover .sun-moon {
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.6);
+}
+
+#input:checked+.slider:hover .sun-moon {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+/* 激活状态 */
+.switch:active .sun-moon {
+  transform: scale(0.95);
+}
+
+#input:checked+.slider:active .sun-moon {
+  transform: translateX(26px) rotate(360deg) scale(0.95);
+}
+
+/* ========== 用户选择控制 ========== */
 body,
 html,
 #__next,
@@ -395,171 +761,153 @@ html,
   user-select: none !important;
 }
 
-/* ========== Marquee 动画 ========== */
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(-100%);
-  }
+/* ========== 侧边栏样式 ========== */
+/* 修正sonner提示框深色模式下主内容颜色 */
+.dark .toaster .toast-title,
+.dark .toaster .sonner-title,
+.dark .toaster [data-title] {
+  color: #fff !important;
 }
 
-@keyframes marquee-reverse {
-  0% {
-    transform: translateX(0);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
+/* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */
+.sidebar-btn:hover,
+.sidebar-btn:focus-visible {
+  text-decoration: none !important;
+  background: rgba(59, 130, 246, 0.08);
+  border-radius: 0.5rem;
+  color: #2563eb;
 }
 
-.animate-marquee {
-  animation: marquee var(--duration, 40s) linear infinite;
+.dark .sidebar-btn:hover,
+.dark .sidebar-btn:focus-visible {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
 }
 
-@keyframes marquee-vertical {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(-50%);
-  }
+.sidebar-parent {
+  @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-bold transition-all duration-150 border-none;
 }
 
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration, 40s) linear infinite;
+.sidebar-parent:hover {
+  @apply font-bold;
 }
 
-@keyframes marquee-vertical-reverse {
-  0% {
-    transform: translateY(0);
-  }
-
-  100% {
-    transform: translateY(50%);
-  }
+.sidebar-child {
+  @apply pl-11 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start font-bold;
 }
 
-.animate-marquee-vertical-reverse {
-  animation: marquee-vertical-reverse var(--duration, 40s) linear infinite;
+.sidebar-child.bg-primary,
+.sidebar-child[data-variant="default"],
+.sidebar-child[data-state="active"],
+.sidebar-child.active,
+.sidebar-child:active {
+  @apply text-white bg-primary;
 }
 
-/* ========== 全局字体设置优化 ========== */
-body,
-html {
-  font-family: "Century", serif;
+.dark .sidebar-child.bg-primary,
+.dark .sidebar-child[data-variant="default"],
+.dark .sidebar-child[data-state="active"],
+.dark .sidebar-child.active,
+.dark .sidebar-child:active {
+  @apply text-gray-900 bg-white;
 }
 
-/* 只针对中文字符，强制新宋体 */
-:lang(zh),
-.zh,
-[lang="zh"],
-[lang^="zh-"] {
-  font-family: "NSimSun", "新宋体", serif !important;
+.sidebar-child.bg-primary:hover,
+.sidebar-child[data-variant="default"]:hover,
+.sidebar-child[data-state="active"]:hover,
+.sidebar-child.active:hover,
+.sidebar-child:active:hover {
+  @apply text-white bg-primary;
 }
 
-/* 针对所有英文，强制 Century */
-:lang(en),
-.en,
-[lang="en"],
-[lang^="en-"] {
-  font-family: "Century", serif !important;
+.dark .sidebar-child.bg-primary:hover,
+.dark .sidebar-child[data-variant="default"]:hover,
+.dark .sidebar-child[data-state="active"]:hover,
+.dark .sidebar-child.active:hover,
+.dark .sidebar-child:active:hover {
+  @apply text-gray-900 bg-white;
 }
 
-/* 针对所有数字，强制 Century */
-.number,
-.num,
-[data-font="number"] {
-  font-family: "Century", serif !important;
-}
-
-/* 输入控件也用 Century，避免被新宋体影响 */
-input,
-textarea,
-select,
-button {
-  font-family: "Century", serif;
-}
-
-/* 减弱动态效果样式 */
-.reduce-motion * {
-  animation-duration: 0.01ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0.01ms !important;
-  scroll-behavior: auto !important;
-}
-
-/* 减弱动态效果时禁用marquee动画 */
-.reduce-motion .animate-marquee,
-.reduce-motion .animate-marquee-vertical {
-  animation: none !important;
-}
-
-/* 减弱动态效果时禁用ReactBits按钮动画 */
-.reduce-motion .reactbits-button {
-  animation: none !important;
-  transition: none !important;
-}
-
-.reduce-motion .reactbits-button:hover {
-  transform: none !important;
-  animation: none !important;
-  transition: none !important;
-}
-
-.reduce-motion .reactbits-button:active {
+/* 侧边栏图标和箭头样式 */
+.sidebar-parent .lucide-bar-chart-2,
+.sidebar-parent .lucide-clipboard-list,
+.sidebar-parent .lucide-target,
+.sidebar-parent .lucide-book-open {
   transform: none !important;
   transition: none !important;
 }
 
-/* 减弱动态效果时禁用shimmer效果 */
-.reduce-motion .shimmer-effect {
-  animation: none !important;
+.sidebar-parent .lucide-chevron-right {
+  transition: transform 0.2s ease !important;
 }
 
-/* 减弱动态效果时禁用glass效果 */
-.reduce-motion .glass-effect {
-  transition: none !important;
+.sidebar-parent[data-state="open"] .lucide-chevron-right {
+  transform: rotate(90deg) !important;
 }
 
-/* 减弱动态效果时禁用glow效果 */
-.reduce-motion .glow-effect {
-  transition: none !important;
+/* 确保没有其他样式覆盖箭头旋转 */
+.sidebar-parent .lucide-chevron-right[class*="rotate-180"] {
+  transform: rotate(90deg) !important;
 }
 
-/* 减弱动态效果时禁用checkbox动画 */
-.reduce-motion [data-slot="checkbox"] {
-  transition: none !important;
-  animation: none !important;
+/* 强制覆盖Tailwind的group-data状态类 */
+.sidebar-parent.group[data-state="open"] .lucide-chevron-right {
+  transform: rotate(90deg) !important;
 }
 
-.reduce-motion [data-slot="checkbox"]:hover {
-  transform: none !important;
-  box-shadow: none !important;
+/* 确保所有可能的旋转状态都被覆盖 */
+.sidebar-parent .lucide-chevron-right.rotate-180 {
+  transform: rotate(90deg) !important;
 }
 
-.reduce-motion [data-slot="checkbox"]:active {
-  transform: none !important;
-  transition: none !important;
+.sidebar-parent .lucide-chevron-right.rotate-90 {
+  transform: rotate(90deg) !important;
 }
 
-.reduce-motion [data-slot="checkbox"][data-state="checked"] {
-  animation: none !important;
+/* 侧边栏箭头唯一旋转规则 */
+.sidebar-parent .sidebar-chevron {
+  transition: transform 0.2s;
+  transform: rotate(0deg);
 }
 
-.reduce-motion [data-slot="checkbox"][data-state="unchecked"] {
-  animation: none !important;
+.sidebar-parent[data-state="open"] .sidebar-chevron {
+  transform: rotate(90deg);
 }
 
-/* 减弱动态效果时禁用checkbox indicator动画 */
-.reduce-motion [data-slot="checkbox-indicator"] {
-  animation: none !important;
+/* ========== 轮播组件动画优化 ========== */
+[data-slot="carousel"] {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  overflow: hidden;
 }
 
+[data-slot="carousel-content"] {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+[data-slot="carousel-item"] {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+/* 确保轮播内容在动画期间保持稳定 */
+[data-slot="carousel-content"]>* {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+}
+
+/* ========== 护眼模式 ========== */
 body.eye-care {
   background: #f7f3e8 !important;
   color: #3a3a2a !important;
@@ -616,19 +964,7 @@ body.eye-care.dark .text-muted-foreground,
   color: #b0a98b !important;
 }
 
-/* 白色按钮的特殊文字颜色处理 */
-.reactbits-button[class*="from-gray-100"] {
-  color: #374151 !important;
-  /* 深灰色文字 */
-  text-shadow: none;
-}
-
-.reactbits-button[class*="from-gray-100"]:hover {
-  color: #111827 !important;
-  /* 悬停时更深的灰色 */
-}
-
-/* Checkbox 动效 */
+/* ========== Checkbox 动效 ========== */
 [data-slot="checkbox"] {
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   transform-origin: center;
@@ -696,7 +1032,7 @@ body.eye-care.dark .text-muted-foreground,
   }
 }
 
-/* 响应式设计优化 */
+/* ========== 响应式设计优化 ========== */
 @media (max-width: 640px) {
 
   /* 小屏幕下的侧边栏优化 */
@@ -710,12 +1046,6 @@ body.eye-care.dark .text-muted-foreground,
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  /* 小屏幕下的按钮优化 */
-  .reactbits-button {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
   }
 }
 

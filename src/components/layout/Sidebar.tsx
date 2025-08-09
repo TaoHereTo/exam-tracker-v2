@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import {
     Accordion,
     AccordionContent,
@@ -6,142 +7,198 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { BarChart2, BookOpen, ClipboardList, Settings, Target } from "lucide-react";
+import { BarChart2, BookOpen, ClipboardList, Target, ChevronRight } from "lucide-react";
+import { MixedText } from "@/components/ui/MixedText";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // 定义 Sidebar 组件的 props 类型
 type SidebarProps = {
     activeTab: string;
     setActiveTab: (tab: string) => void;
+    userInfo?: React.ReactNode;
 };
 
-export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     return (
-        <aside className="w-52 min-h-screen bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 p-4 flex flex-col items-center">
-            <h1 className="text-xl font-bold mb-6 text-center tracking-wide text-gray-800 dark:text-gray-100 w-full break-words">
-                行测每日记录
-            </h1>
-            {/* 使用 Accordion 替换自定义 Collapsible */}
-            <Accordion type="single" collapsible defaultValue="analysis" className="w-full">
-                {/* 分析分组 */}
-                <AccordionItem value="analysis">
-                    <AccordionTrigger className="sidebar-parent w-full text-left">
-                        <BarChart2 className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
-                        <span className="truncate">可视化</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-1">
-                        <Button
-                            variant={activeTab === 'overview' ? 'default' : 'ghost'}
-                            className="sidebar-child sidebar-btn w-full justify-start text-left"
-                            onClick={() => setActiveTab('overview')}
-                        >
-                            <span className="truncate">数据概览</span>
-                        </Button>
-                        <Button
-                            variant={activeTab === 'charts' ? 'default' : 'ghost'}
-                            className="sidebar-child sidebar-btn w-full justify-start text-left"
-                            onClick={() => setActiveTab('charts')}
-                        >
-                            <span className="truncate">数据图表</span>
-                        </Button>
-                        <Button
-                            variant={activeTab === 'best' ? 'default' : 'ghost'}
-                            className="sidebar-child sidebar-btn w-full justify-start text-left"
-                            onClick={() => setActiveTab('best')}
-                        >
-                            <span className="truncate">最佳成绩</span>
-                        </Button>
-                    </AccordionContent>
-                </AccordionItem>
+        <TooltipProvider>
+            <aside className="w-52 h-full bg-[#f5f5f5] dark:bg-[rgb(24,24,24)] p-4 flex flex-col items-center">
+                <h1 className="text-xl font-bold mb-6 tracking-wide text-gray-800 dark:text-gray-100 w-full flex items-center justify-start gap-1 pl-2">
+                    <Image src="/icon.png" alt="应用图标" width={40} height={40} className="w-10 h-10" />
+                    <MixedText text="行测记录" />
+                </h1>
+                {/* 使用 Accordion 替换自定义 Collapsible */}
+                <Accordion type="single" collapsible defaultValue="analysis" className="w-full">
+                    {/* 分析分组 */}
+                    <AccordionItem value="analysis">
+                        <AccordionTrigger className="sidebar-parent w-full flex items-center text-left font-bold group">
+                            <BarChart2 className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
+                            <span className="truncate flex-1"><MixedText text="可视化" /></span>
+                            <ChevronRight className="ml-2 h-4 w-4 sidebar-chevron" aria-hidden="true" />
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'overview' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('overview')}
+                                    >
+                                        <span className="truncate"><MixedText text="数据概览" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="查看您的刷题统计概览" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'charts' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('charts')}
+                                    >
+                                        <span className="truncate"><MixedText text="数据图表" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="查看详细的图表分析" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'personal-best' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('personal-best')}
+                                    >
+                                        <span className="truncate"><MixedText text="最佳成绩" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="查看您的最佳成绩记录" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                {/* 管理分组 */}
-                <AccordionItem value="management">
-                    <AccordionTrigger className="sidebar-parent w-full text-left">
-                        <ClipboardList className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
-                        <span className="truncate">记录管理</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-1">
-                        <Button
-                            variant={activeTab === 'form' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('form')}
-                        >
-                            <span className="truncate">新的记录</span>
-                        </Button>
-                        <Button
-                            variant={activeTab === 'history' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('history')}
-                        >
-                            <span className="truncate">历史记录</span>
-                        </Button>
-                    </AccordionContent>
-                </AccordionItem>
+                    {/* 管理分组 */}
+                    <AccordionItem value="management">
+                        <AccordionTrigger className="sidebar-parent w-full flex items-center text-left font-bold group">
+                            <ClipboardList className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
+                            <span className="truncate flex-1"><MixedText text="记录管理" /></span>
+                            <ChevronRight className="ml-2 h-4 w-4 sidebar-chevron" aria-hidden="true" />
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'form' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('form')}
+                                    >
+                                        <span className="truncate"><MixedText text="新的记录" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="添加新的刷题记录" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'history' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('history')}
+                                    >
+                                        <span className="truncate"><MixedText text="刷题记录" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="查看和管理所有刷题记录" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                {/* 学习计划分组 */}
-                <AccordionItem value="study-plan">
-                    <AccordionTrigger className="sidebar-parent w-full text-left">
-                        <Target className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
-                        <span className="truncate">学习计划</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-1">
-                        <Button
-                            variant={activeTab === 'plan' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('plan')}
-                        >
-                            <span className="truncate">制定计划</span>
-                        </Button>
-                    </AccordionContent>
-                </AccordionItem>
+                    {/* 学习计划分组 */}
+                    <AccordionItem value="study-plan">
+                        <AccordionTrigger className="sidebar-parent w-full flex items-center text-left font-bold group">
+                            <Target className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
+                            <span className="truncate flex-1"><MixedText text="学习计划" /></span>
+                            <ChevronRight className="ml-2 h-4 w-4 sidebar-chevron" aria-hidden="true" />
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'plan-list' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('plan-list')}
+                                    >
+                                        <span className="truncate"><MixedText text="制定计划" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="制定和管理学习计划" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                {/* 知识点录入分组 */}
-                <AccordionItem value="knowledge-entry">
-                    <AccordionTrigger className="sidebar-parent w-full text-left">
-                        <BookOpen className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
-                        <span className="truncate">知识点录入</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-1">
-                        <Button
-                            variant={activeTab === 'knowledge-entry' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('knowledge-entry')}
-                        >
-                            <span className="truncate">知识点录入</span>
-                        </Button>
-                        <Button
-                            variant={activeTab === 'modules' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('modules')}
-                        >
-                            <span className="truncate">知识点汇总</span>
-                        </Button>
-                    </AccordionContent>
-                </AccordionItem>
+                    {/* 知识点录入分组 */}
+                    <AccordionItem value="knowledge-entry">
+                        <AccordionTrigger className="sidebar-parent w-full flex items-center text-left font-bold group">
+                            <BookOpen className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
+                            <span className="truncate flex-1"><MixedText text="知识点录入" /></span>
+                            <ChevronRight className="ml-2 h-4 w-4 sidebar-chevron" aria-hidden="true" />
+                        </AccordionTrigger>
+                        <AccordionContent className="space-y-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'knowledge-entry' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('knowledge-entry')}
+                                    >
+                                        <span className="truncate"><MixedText text="知识点录入" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="录入和管理知识点" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant={activeTab === 'knowledge-summary' ? 'default' : 'ghost'}
+                                        className="sidebar-child w-full justify-start text-left"
+                                        onClick={() => setActiveTab('knowledge-summary')}
+                                    >
+                                        <span className="truncate"><MixedText text="知识点汇总" /></span>
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p><MixedText text="查看所有知识点汇总" /></p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </AccordionContent>
+                    </AccordionItem>
 
-                {/* 系统设置分组 */}
-                <AccordionItem value="settings">
-                    <AccordionTrigger className="sidebar-parent w-full text-left">
-                        <Settings className="inline-block mr-2 size-5 text-primary flex-shrink-0" />
-                        <span className="truncate">系统设置</span>
-                    </AccordionTrigger>
-                    <AccordionContent className="space-y-1">
-                        <Button
-                            variant={activeTab === 'settings-basic' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('settings-basic')}
-                        >
-                            <span className="truncate">基础设置</span>
-                        </Button>
-                        <Button
-                            variant={activeTab === 'settings-advanced' ? 'default' : 'ghost'}
-                            className="sidebar-child w-full justify-start text-left"
-                            onClick={() => setActiveTab('settings-advanced')}
-                        >
-                            <span className="truncate">高级设置</span>
-                        </Button>
-                    </AccordionContent>
-                </AccordionItem>
-            </Accordion>
-        </aside>
+
+                </Accordion>
+
+                {/* 用户信息区域 */}
+                {userInfo && (
+                    <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 w-full flex items-center">
+                        {userInfo}
+                    </div>
+                )}
+            </aside>
+        </TooltipProvider>
     );
 } 

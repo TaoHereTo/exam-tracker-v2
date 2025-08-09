@@ -6,6 +6,9 @@ import { ModulePieChart } from "@/components/ui/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import type { RecordItem } from "@/types/record";
+import { timeStringToMinutes } from "@/lib/utils";
+import { MixedText } from "@/components/ui/MixedText";
+
 
 // 使用统一的配置，不再需要重复定义
 
@@ -29,7 +32,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         }
         moduleStats[key].correct += Number(item.correct) || 0;
         moduleStats[key].total += Number(item.total) || 0;
-        moduleStats[key].duration += Number(item.duration) || 0;
+        moduleStats[key].duration += timeStringToMinutes(item.duration) || 0;
     });
 
     // 只使用中文模块名称
@@ -81,7 +84,8 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             trigger: 'item',
             formatter: function (params: Record<string, unknown>) {
                 return `${params.marker}${params.seriesName}<br/>${(params.value as number[]).map((v: number, idx: number) => `${modules[idx]}：${v}`).join('<br/>')}`;
-            }
+            },
+            textStyle: { fontFamily: '思源宋体, Times New Roman, serif' }
         },
         radar: {
             indicator,
@@ -90,7 +94,8 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             axisName: {
                 color: '#333',
                 fontWeight: 'bold',
-                fontSize: 15
+                fontSize: 15,
+                fontFamily: '思源宋体, Times New Roman, serif'
             },
             splitLine: {
                 lineStyle: {
@@ -107,6 +112,9 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                 lineStyle: {
                     color: '#aaa'
                 }
+            },
+            legend: {
+                textStyle: { fontFamily: '思源宋体, Times New Roman, serif' }
             }
         },
         series: [
@@ -151,7 +159,8 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                                 itemStyle: { color: pointColors[i] }
                             })),
                             tooltip: { show: true }
-                        }
+                        },
+                        label: { fontFamily: '思源宋体, Times New Roman, serif' }
                     }
                 ],
                 animation: true
@@ -163,7 +172,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             <ReactECharts option={option} style={{ height: 400, width: '100%' }} />
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
                 能力值 =
-                <span className="mx-1 font-bold">正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2</span>
+                <span className="mx-1 font-bold"><MixedText text="正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2" /></span>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <span className="inline-block cursor-pointer ml-1 text-primary" style={{ fontSize: '1.1em' }}>？</span>
@@ -191,7 +200,7 @@ export function ChartsView({ records }: ChartsViewProps) {
             const normalizedModule = normalizeModuleName(r.module);
             const key = `${r.date}__${normalizedModule}`;
             const correct = Number(r.correct) || 0;
-            const duration = typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration;
+            const duration = timeStringToMinutes(r.duration) || 0;
             if (!groupMap[key]) {
                 groupMap[key] = { date: r.date, module: normalizedModule, correct: 0, duration: 0 };
             }
@@ -241,45 +250,44 @@ export function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">数据图表</h1>
-            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-                <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
-                    <TabsList className="w-full justify-center mb-4">
-                        <TabsTrigger value="perMinute">每分钟得分</TabsTrigger>
-                        <TabsTrigger value="accuracy">正确率</TabsTrigger>
-                        <TabsTrigger value="pie">模块耗时分布</TabsTrigger>
-                        <TabsTrigger value="radar">模块能力雷达图</TabsTrigger>
+        <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+            <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
+                <div className="flex justify-center mb-4">
+                    <TabsList className="w-fit">
+                        <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar"><MixedText text="模块能力雷达图" /></TabsTrigger>
                     </TabsList>
-                    <TabsContent value="perMinute">
-                        <div style={{ height: '500px' }}>
-                            <TrendChart data={perMinuteData} yMax={2} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="accuracy">
-                        <div style={{ height: '500px' }}>
-                            <TrendChart data={accuracyData} yMax={100} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="pie">
-                        <div style={{ height: '500px' }}>
-                            <ModulePieChart data={records.map(r => {
-                                return {
-                                    date: r.date,
-                                    module: normalizeModuleName(r.module),
-                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                    duration: typeof r.duration === 'string' ? parseFloat(r.duration) || 0 : r.duration
-                                };
-                            })} />
-                        </div>
-                    </TabsContent>
-                    <TabsContent value="radar">
-                        <div style={{ height: '500px' }}>
-                            <ModuleRadarChart data={records} />
-                        </div>
-                    </TabsContent>
-                </Tabs>
-            </div>
+                </div>
+                <TabsContent value="perMinute">
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
+                        <TrendChart data={perMinuteData} yMax={2} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="accuracy">
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
+                        <TrendChart data={accuracyData} yMax={100} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="pie">
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
+                        <ModulePieChart data={records.map(r => {
+                            return {
+                                date: r.date,
+                                module: normalizeModuleName(r.module),
+                                score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                duration: timeStringToMinutes(r.duration) || 0
+                            };
+                        })} />
+                    </div>
+                </TabsContent>
+                <TabsContent value="radar">
+                    <div style={{ height: '500px' }} className="flex items-center justify-center">
+                        <ModuleRadarChart data={records} />
+                    </div>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 } 

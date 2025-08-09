@@ -1,6 +1,17 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import React, { useState, useEffect, useMemo } from "react";
 import { Marquee } from "@/components/magicui/marquee";
+import { useLocalStorageBoolean } from "@/hooks/useLocalStorage";
+import { normalizeModuleName } from "@/config/exam";
+import { timeStringToMinutes, minutesToTimeString } from "@/lib/utils";
+import { MixedText } from "@/components/ui/MixedText";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { HelpCircle } from "lucide-react";
 
 interface OverviewViewProps {
     records: Array<{
@@ -14,27 +25,17 @@ interface OverviewViewProps {
 }
 
 export function OverviewView({ records }: OverviewViewProps) {
-    const [reduceMotion, setReduceMotion] = useState(false);
+    const [overviewAnimate] = useLocalStorageBoolean('overview-animate', true);
 
-    // 检查减弱动态效果设置
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const checkReduceMotion = () => {
-                const isReduceMotion = localStorage.getItem('reduce-motion-enabled') === 'true';
-                setReduceMotion(isReduceMotion);
-            };
-
-            // 初始化检查
-            checkReduceMotion();
-
-            // 监听设置变化
-            window.addEventListener('reduceMotionChanged', checkReduceMotion);
-
-            return () => {
-                window.removeEventListener('reduceMotionChanged', checkReduceMotion);
-            };
-        }
-    }, []);
+    // 获取tooltip提示文本
+    const getTooltipText = (title: string): string => {
+        const tooltipMap: Record<string, string> = {
+            "平均每题用时": "平均每道题目的用时",
+            "连续刷题天数": "连续刷题的最长天数",
+            "最佳单次正确率": "单次刷题中正确率最高的一次"
+        };
+        return tooltipMap[title] || "";
+    };
 
     // 使用 useMemo 优化所有统计计算，避免重复遍历
     const stats = useMemo(() => {
@@ -69,7 +70,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         const totalSessions = records.length;
         const totalQuestions = records.reduce((sum, r) => sum + (Number(r.total) || 0), 0);
         const totalCorrect = records.reduce((sum, r) => sum + (Number(r.correct) || 0), 0);
-        const totalDuration = records.reduce((sum, r) => sum + (parseFloat(r.duration) || 0), 0);
+        const totalDuration = records.reduce((sum, r) => sum + (timeStringToMinutes(r.duration) || 0), 0);
         const avgAccuracy = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
         const avgDuration = totalSessions > 0 ? totalDuration / totalSessions : 0;
         const avgTimePerQuestion = totalQuestions > 0 ? totalDuration / totalQuestions : 0;
@@ -89,6 +90,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         let bestSingleAccuracy = 0;
         let bestSingleAccuracyDate = "暂无记录";
 
+        let fastestModule = '';
         records.forEach(r => {
             // 按日期分组
             if (!dayMap[r.date]) dayMap[r.date] = { correct: 0, total: 0, questions: 0 };
@@ -97,54 +99,49 @@ export function OverviewView({ records }: OverviewViewProps) {
             dayMap[r.date].questions += Number(r.total) || 0;
 
             // 按模块分组
-            moduleMap[r.module] = (moduleMap[r.module] || 0) + 1;
+            const moduleName = normalizeModuleName(r.module);
+            moduleMap[moduleName] = (moduleMap[moduleName] || 0) + 1;
 
-            // 最长连续刷题时间
-            const duration = parseFloat(r.duration) || 0;
-            if (duration > longestSession) {
-                longestSession = duration;
+            // 最长单次刷题时间
+            const sessionDuration = timeStringToMinutes(r.duration) || 0;
+            if (sessionDuration > longestSession) {
+                longestSession = sessionDuration;
                 longestSessionDate = r.date;
             }
 
-            // 最快刷题速度
-            const total = Number(r.total) || 0;
-            if (total > 0) {
-                const speed = duration / total;
-                if (speed < fastestSpeed) {
-                    fastestSpeed = speed;
-                    fastestSpeedDate = r.date;
-                }
+            // 最快刷题速度（分钟/题）
+            const speed = sessionDuration / (Number(r.total) || 1);
+            if (speed < fastestSpeed && speed > 0) {
+                fastestSpeed = speed;
+                fastestSpeedDate = r.date;
+                fastestModule = normalizeModuleName(r.module);
             }
 
             // 最佳单次正确率
-            if (total > 0) {
-                const accuracy = (Number(r.correct) || 0) / total;
-                if (accuracy > bestSingleAccuracy) {
-                    bestSingleAccuracy = accuracy;
-                    bestSingleAccuracyDate = r.date;
-                }
+            const accuracy = Number(r.correct) / Number(r.total);
+            if (accuracy > bestSingleAccuracy) {
+                bestSingleAccuracy = accuracy;
+                bestSingleAccuracyDate = r.date;
             }
         });
 
-        // 正确率最高的一天
-        let bestAccuracyDay = "暂无记录";
+        // 计算最佳正确率的一天
         let bestAccuracy = 0;
-        Object.entries(dayMap).forEach(([date, { correct, total }]) => {
-            if (total > 0) {
-                const acc = correct / total;
-                if (acc > bestAccuracy) {
-                    bestAccuracy = acc;
-                    bestAccuracyDay = date;
-                }
+        let bestAccuracyDay = "暂无记录";
+        Object.entries(dayMap).forEach(([date, data]) => {
+            const accuracy = data.total > 0 ? data.correct / data.total : 0;
+            if (accuracy > bestAccuracy) {
+                bestAccuracy = accuracy;
+                bestAccuracyDay = date;
             }
         });
 
-        // 刷题最多的一天
-        let mostQuestionsDay = "暂无记录";
+        // 计算刷题最多的一天
         let mostQuestions = 0;
-        Object.entries(dayMap).forEach(([date, { questions }]) => {
-            if (questions > mostQuestions) {
-                mostQuestions = questions;
+        let mostQuestionsDay = "暂无记录";
+        Object.entries(dayMap).forEach(([date, data]) => {
+            if (data.questions > mostQuestions) {
+                mostQuestions = data.questions;
                 mostQuestionsDay = date;
             }
         });
@@ -159,18 +156,17 @@ export function OverviewView({ records }: OverviewViewProps) {
             }
         });
 
-        // 连续刷题天数
+        // 计算连续刷题天数
+        const sortedDates = Object.keys(dayMap).sort();
         let maxConsecutiveDays = 0;
         let currentConsecutiveDays = 0;
-        let lastConsecutiveDate: string | null = null;
-        const sortedDates = [...new Set(records.map(r => r.date))].sort();
-        sortedDates.forEach(date => {
-            if (lastConsecutiveDate) {
-                const lastDateObj = new Date(lastConsecutiveDate);
-                const currentDateObj = new Date(date);
-                const diffTime = currentDateObj.getTime() - lastDateObj.getTime();
-                const diffDays = diffTime / (1000 * 60 * 60 * 24);
+        let lastDate: Date | null = null;
 
+        sortedDates.forEach(dateStr => {
+            const currentDate = new Date(dateStr);
+            if (lastDate) {
+                const diffTime = currentDate.getTime() - lastDate.getTime();
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 if (diffDays === 1) {
                     currentConsecutiveDays++;
                 } else {
@@ -179,17 +175,12 @@ export function OverviewView({ records }: OverviewViewProps) {
             } else {
                 currentConsecutiveDays = 1;
             }
-
-            if (currentConsecutiveDays > maxConsecutiveDays) {
-                maxConsecutiveDays = currentConsecutiveDays;
-            }
-
-            lastConsecutiveDate = date;
+            maxConsecutiveDays = Math.max(maxConsecutiveDays, currentConsecutiveDays);
+            lastDate = currentDate;
         });
 
         // 平均每天刷题数
-        const uniqueDays = sortedDates.length;
-        const avgQuestionsPerDay = uniqueDays > 0 ? (totalQuestions / uniqueDays).toFixed(1) : "0";
+        const avgQuestionsPerDay = sortedDates.length > 0 ? (totalQuestions / sortedDates.length).toFixed(1) : "0";
 
         return {
             totalSessions,
@@ -208,6 +199,7 @@ export function OverviewView({ records }: OverviewViewProps) {
             longestSessionDate,
             fastestSpeed,
             fastestSpeedDate,
+            fastestModule,
             mostFrequentModule,
             mostFrequentCount,
             maxConsecutiveDays,
@@ -217,8 +209,9 @@ export function OverviewView({ records }: OverviewViewProps) {
         };
     }, [records]);
 
-    // 卡片内容数组
-    const cards = [
+    // 卡片内容数组类型与数据
+    type CardItem = { title: string; value: number | string; tooltip?: string; extra?: string };
+    const cards: CardItem[] = [
         {
             title: "总刷题次数",
             value: stats.totalSessions,
@@ -236,16 +229,16 @@ export function OverviewView({ records }: OverviewViewProps) {
             value: `${stats.avgAccuracy.toFixed(1)}%`,
         },
         {
-            title: "总用时（分钟）",
-            value: stats.totalDuration.toFixed(1),
+            title: "总用时",
+            value: minutesToTimeString(stats.totalDuration),
         },
         {
-            title: "平均用时（分钟/次）",
-            value: stats.avgDuration.toFixed(1),
+            title: "平均用时/次",
+            value: minutesToTimeString(stats.avgDuration),
         },
         {
-            title: "平均每题用时（分钟）",
-            value: stats.avgTimePerQuestion.toFixed(2),
+            title: "平均每题用时",
+            value: minutesToTimeString(stats.avgTimePerQuestion),
         },
         {
             title: "最近一次刷题时间",
@@ -261,11 +254,12 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
         {
             title: "最长连续刷题时间",
-            value: stats.longestSession > 0 ? `${stats.longestSession.toFixed(1)}分钟` : "暂无记录",
+            value: stats.longestSession > 0 ? minutesToTimeString(stats.longestSession) : "暂无记录",
         },
         {
             title: "最快刷题速度",
-            value: stats.fastestSpeed < Infinity ? `${stats.fastestSpeed.toFixed(2)}分钟/题` : "暂无记录",
+            value: stats.fastestSpeed < Infinity ? `${minutesToTimeString(stats.fastestSpeed)}/题` : "暂无记录",
+            tooltip: stats.fastestSpeed < Infinity ? `来源模块：${stats.fastestModule}` : '',
         },
         {
             title: "最常刷的模块",
@@ -285,58 +279,112 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
     ];
 
-    // 如果开启减弱动态效果，显示静态网格布局
-    if (reduceMotion) {
-        return (
-            <div>
-                <h1 className="text-3xl font-bold mb-6">数据概览</h1>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                    {cards.map((item, idx) => (
-                        <Card key={item.title + idx} className="min-h-[120px]">
-                            <CardHeader>
-                                <CardTitle className="text-sm">{item.title}</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-2xl font-bold">{item.value}</div>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
-    // 默认动画布局
+    // 动画布局
     // 均分为两组
     const half = Math.ceil(cards.length / 2);
     const group1 = cards.slice(0, half);
     const group2 = cards.slice(half);
 
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-6">数据概览</h1>
+        <TooltipProvider>
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
-                <Marquee className="w-full max-w-5xl" pauseOnHover repeat={2}>
-                    <div className="flex gap-6">
-                        {group1.map((item, idx) => (
-                            <Card className="min-w-[220px]" key={item.title + idx}>
-                                <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                                <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
+                {overviewAnimate ? (
+                    <Marquee className="w-full max-w-6xl" pauseOnHover repeat={2}>
+                        <div className="flex gap-6">
+                            {group1.map((item, idx) => (
+                                <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
+                                    <CardHeader className="flex flex-row items-center justify-between pb-0">
+                                        <CardTitle>{item.title}</CardTitle>
+                                        {item.tooltip && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text={item.tooltip} /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                    </CardHeader>
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-bold">
+                                            <MixedText text={String(item.value)} />
+                                        </div>
+                                        {item.extra && (
+                                            <div className="text-xs text-muted-foreground mt-1">
+                                                <MixedText text={item.extra} />
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </Marquee>
+                ) : (
+                    <div className="w-full max-w-6xl grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-6">
+                        {cards.map((item, idx) => (
+                            <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
+                                <CardHeader className="flex flex-row items-center justify-between pb-0">
+                                    <CardTitle>{item.title}</CardTitle>
+                                    {item.tooltip && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p><MixedText text={item.tooltip} /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                </CardHeader>
+                                <CardContent className="flex-1 flex flex-col items-center justify-center">
+                                    <div className="text-2xl font-bold">
+                                        <MixedText text={String(item.value)} />
+                                    </div>
+                                    {item.extra && (
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                            <MixedText text={item.extra} />
+                                        </div>
+                                    )}
+                                </CardContent>
                             </Card>
                         ))}
                     </div>
-                </Marquee>
-                <Marquee className="w-full max-w-5xl" pauseOnHover reverse repeat={2}>
-                    <div className="flex gap-6">
-                        {group2.map((item, idx) => (
-                            <Card className="min-w-[220px]" key={item.title + idx}>
-                                <CardHeader><CardTitle>{item.title}</CardTitle></CardHeader>
-                                <CardContent><div className="text-2xl font-bold">{item.value}</div></CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </Marquee>
+                )}
+                {overviewAnimate ? (
+                    <Marquee className="w-full max-w-6xl" pauseOnHover reverse repeat={2}>
+                        <div className="flex gap-6">
+                            {group2.map((item, idx) => (
+                                <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
+                                    <CardHeader className="flex flex-row items-center justify-between pb-0">
+                                        <CardTitle>{item.title}</CardTitle>
+                                        {item.tooltip && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text={item.tooltip} /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                    </CardHeader>
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center">
+                                        <div className="text-2xl font-bold">
+                                            <MixedText text={String(item.value)} />
+                                        </div>
+                                        {item.extra && (
+                                            <div className="text-xs text-muted-foreground mt-1">
+                                                <MixedText text={item.extra} />
+                                            </div>
+                                        )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </Marquee>
+                ) : null}
             </div>
-        </div>
+        </TooltipProvider>
     );
 } 

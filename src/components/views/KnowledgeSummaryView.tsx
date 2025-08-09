@@ -1,31 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { DataTable, DataTableColumn } from "@/components/ui/DataTable";
+import React, { useState, useEffect, useMemo } from 'react';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
+import { SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
-import { Input } from "@/components/ui/input";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationPrevious,
-    PaginationNext,
-    PaginationEllipsis,
-} from "@/components/ui/pagination";
 import { format } from 'date-fns';
 import { MODULES, normalizeModuleName } from '@/config/exam';
-import { KnowledgeForm } from "../forms/KnowledgeForm";
-import VerbalForm from "../forms/VerbalForm";
-import PoliticsForm from "../forms/PoliticsForm";
-import { LogicForm } from "../forms/LogicForm";
-import { CommonForm } from "../forms/CommonForm";
+import { lazy, Suspense } from 'react';
+
+// 动态导入统一表单组件
+const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
+
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
-import { ArrowUpFromLine, Pencil, Search } from 'lucide-react';
-import ReactBitsButton from '@/components/ui/ReactBitsButton';
-import { ImageViewer } from '@/components/ui/ImageViewer';
+import { Edit, Trash2 } from 'lucide-react';
+import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
+import { MixedText } from '@/components/ui/MixedText';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -73,9 +62,9 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -95,9 +84,9 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -117,9 +106,9 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <div className="flex items-center justify-between">
-                                    <span className="flex-1">{type}</span>
+                                    <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <ImageViewer imageId={imagePath} size="sm" />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -136,8 +125,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
             case 'verbal':
                 return [
                     { key: 'subCategory', label: '言语类型', className: 'w-20' },
-                    { key: 'idiom', label: '成语', className: 'w-24' },
-                    { key: 'meaning', label: '含义', className: 'w-52' },
+                    { key: 'type', label: '类型', className: 'w-24' },
+                    { key: 'note', label: '技巧记录', className: 'w-52' },
                 ];
             default:
                 return [];
@@ -151,13 +140,15 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [selectedModule, setSelectedModule] = useState('data-analysis');
     const [selectedSubCategory, setSelectedSubCategory] = useState('all');
     const [selectedRows, setSelectedRows] = useState<string[]>([]);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const pageSize = 7;
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editItem, setEditItem] = useState<KnowledgeItem | null>(null);
     const [editError, setEditError] = useState("");
+    const [singleDeleteDialogOpen, setSingleDeleteDialogOpen] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState<KnowledgeItem | null>(null);
 
     // 当模块改变时，重置子分类选择
     useEffect(() => {
@@ -165,7 +156,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         setPage(1);
     }, [selectedModule]);
 
-    const columns = getColumns(selectedModule).map(col => {
+    const columns = useMemo(() => getColumns(selectedModule).map(col => {
         if (selectedModule === 'politics' && col.key === 'date') {
             return {
                 ...col,
@@ -181,44 +172,79 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             };
         }
         return col;
-    });
+    }), [selectedModule]);
 
-    // 先按模块过滤
-    let filtered = knowledge.filter(item => normalizeModuleName(item.module) === normalizeModuleName(selectedModule));
+    // 使用useMemo优化过滤和分页计算
+    const { filtered, totalPages, paged } = useMemo(() => {
+        // 先按模块过滤
+        let filtered = knowledge.filter(item => normalizeModuleName(item.module) === normalizeModuleName(selectedModule));
 
-    // 再按子分类过滤
-    if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
-        filtered = filtered.filter(item => {
-            const subCategory = (item as Record<string, unknown>).subCategory;
-            return subCategory === selectedSubCategory;
-        });
-    }
+        // 再按子分类过滤
+        if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
+            filtered = filtered.filter(item => {
+                const subCategory = (item as Record<string, unknown>).subCategory;
+                return subCategory === selectedSubCategory;
+            });
+        }
 
-    // 再按关键词过滤
-    const searchLower = search.trim().toLowerCase();
-    if (searchLower) {
-        filtered = filtered.filter(item =>
-            Object.values(item).some(
-                v => typeof v === 'string' && v.toLowerCase().includes(searchLower)
-            )
-        );
-    }
+        // 再按关键词过滤
+        const searchLower = search.trim().toLowerCase();
+        if (searchLower) {
+            filtered = filtered.filter(item =>
+                Object.values(item).some(
+                    v => typeof v === 'string' && v.toLowerCase().includes(searchLower)
+                )
+            );
+        }
 
-    // 分页
-    const total = filtered.length;
-    const totalPages = Math.max(1, Math.ceil(total / pageSize));
-    const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
+        // 分页
+        const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+        const paged = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+        return { filtered, totalPages, paged };
+    }, [knowledge, selectedModule, selectedSubCategory, search, page, pageSize]);
 
     useEffect(() => {
         setSelectedRows([]);
-        setPage(1); // 切换模块或搜索时重置页码
-    }, [knowledge, selectedModule, selectedSubCategory, search]);
+        // 智能分页：如果当前页超出新的总页数，则跳转到最后一页
+        const newTotalPages = Math.max(1, Math.ceil(
+            knowledge.filter(item => {
+                if (normalizeModuleName(item.module) !== normalizeModuleName(selectedModule)) return false;
+                if (selectedSubCategory !== 'all' && SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES]) {
+                    const subCategory = (item as Record<string, unknown>).subCategory;
+                    if (subCategory !== selectedSubCategory) return false;
+                }
+                const searchLower = search.trim().toLowerCase();
+                if (searchLower) {
+                    return Object.values(item).some(
+                        v => typeof v === 'string' && v.toLowerCase().includes(searchLower)
+                    );
+                }
+                return true;
+            }).length / pageSize
+        ));
+
+        if (page > newTotalPages) {
+            setPage(newTotalPages);
+        }
+    }, [knowledge, selectedModule, selectedSubCategory, search, page, pageSize]);
 
     const handleDeleteSelected = () => {
         if (!onBatchDeleteKnowledge) return;
         onBatchDeleteKnowledge(selectedRows);
         setSelectedRows([]);
-        setDeleteDialogOpen(false);
+    };
+
+    const handleSingleDelete = (item: KnowledgeItem) => {
+        setItemToDelete(item);
+        setSingleDeleteDialogOpen(true);
+    };
+
+    const handleConfirmSingleDelete = () => {
+        if (!onBatchDeleteKnowledge || !itemToDelete) return;
+        onBatchDeleteKnowledge([itemToDelete.id]);
+        setSingleDeleteDialogOpen(false);
+        setItemToDelete(null);
     };
 
     const handleEdit = (item?: KnowledgeItem) => {
@@ -231,7 +257,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 setEditError("一次只能编辑一个知识点，请只勾选一个。");
                 setEditDialogOpen(false);
             } else {
-                const toEdit = filtered.find(i => i.id === selectedRows[0]);
+                const toEdit = filtered.find((i: KnowledgeItem) => i.id === selectedRows[0]);
                 if (toEdit) {
                     setEditItem(toEdit);
                     setEditDialogOpen(true);
@@ -241,10 +267,16 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         }
     };
 
-    const handleEditSave = (data: Partial<KnowledgeItem>) => {
+    const handleEditSave = (data: Record<string, unknown>) => {
         if (!editItem) return;
         if (onEditKnowledge) {
-            onEditKnowledge({ ...editItem, ...data } as KnowledgeItem);
+            // 构建更新后的知识点数据，确保字段正确
+            const updatedKnowledge: KnowledgeItem = {
+                ...editItem,
+                ...data
+            } as KnowledgeItem;
+
+            onEditKnowledge(updatedKnowledge);
         }
         setEditDialogOpen(false);
         setEditItem(null);
@@ -256,7 +288,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const handleExportExcel = () => {
         if (filtered.length === 0) return;
         const today = format(new Date(), 'yyyyMMdd');
-        const ws = XLSX.utils.json_to_sheet(filtered.map(item => {
+        const ws = XLSX.utils.json_to_sheet(filtered.map((item: KnowledgeItem) => {
             if (selectedModule === 'politics') {
                 const k = item as { date?: string; source?: string; note?: string };
                 // 格式化日期
@@ -275,23 +307,23 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     '相关重点': k.note ?? '',
                 };
             } else if (selectedModule === 'verbal') {
-                const k = item as { idiom?: string; meaning?: string; subCategory?: string };
+                const k = item as { type?: string; note?: string; sub_category?: string };
                 return {
-                    '言语类型': k.subCategory ?? '',
-                    '成语': k.idiom ?? '',
-                    '含义': k.meaning ?? '',
+                    '言语类型': k.sub_category ?? '',
+                    '类型': k.type ?? '',
+                    '技巧记录': k.note ?? '',
                 };
             } else if (selectedModule === 'logic') {
-                const k = item as { type?: string; note?: string; subCategory?: string };
+                const k = item as { type?: string; note?: string; sub_category?: string };
                 return {
-                    '推理类型': k.subCategory ?? '',
+                    '推理类型': k.sub_category ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
             } else if (selectedModule === 'common') {
-                const k = item as { type?: string; note?: string; subCategory?: string };
+                const k = item as { type?: string; note?: string; sub_category?: string };
                 return {
-                    '常识类型': k.subCategory ?? '',
+                    '常识类型': k.sub_category ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
@@ -308,227 +340,121 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         XLSX.writeFile(wb, `知识点_${MODULES.find(m => m.value === selectedModule)?.label || selectedModule}_${today}.xlsx`);
     };
 
+
+
+    const filters: TableFilter[] = [
+        {
+            type: 'select' as const,
+            placeholder: '选择模块',
+            value: selectedModule,
+            onChange: setSelectedModule,
+            options: MODULES.map(m => ({ value: m.value, label: m.label })),
+            className: 'w-36'
+        },
+        ...(SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES] ? [{
+            type: 'select' as const,
+            placeholder: '选择子分类',
+            value: selectedSubCategory,
+            onChange: setSelectedSubCategory,
+            options: SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES].map(category => ({
+                value: category.value,
+                label: category.label
+            })),
+            className: 'w-36'
+        }] : []),
+        {
+            type: 'search' as const,
+            placeholder: '输入关键词',
+            value: search,
+            onChange: setSearch,
+            className: 'w-36'
+        }
+    ];
+
     return (
-        <div className="flex flex-col items-center pt-4 px-2 md:px-8">
-            <Card className="max-w-6xl w-full relative">
-                <CardContent>
-                    {/* 顶部操作区：下拉、搜索、按钮一行对齐 */}
-                    <div className="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 md:gap-6">
-                        <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 flex-1">
-                            {/* 大模块选择 - 使用蓝色边框区分 */}
-                            <Select value={selectedModule} onValueChange={setSelectedModule}>
-                                <SelectTrigger className="w-36 border-blue-300 focus:border-blue-500">
-                                    <SelectValue placeholder="选择模块" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {MODULES.map(m => (
-                                        <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {/* 子分类选择 - 使用绿色边框区分 */}
-                            {SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES] && (
-                                <Select value={selectedSubCategory} onValueChange={setSelectedSubCategory}>
-                                    <SelectTrigger className="w-40 border-green-300 focus:border-green-500">
-                                        <SelectValue placeholder="选择子分类" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {SUB_CATEGORIES[selectedModule as keyof typeof SUB_CATEGORIES].map(category => (
-                                            <SelectItem key={category.value} value={category.value}>
-                                                {category.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-
-                            {/* 搜索框 - 添加搜索图标 */}
-                            <div className="flex-1 min-w-[120px] max-w-[200px] relative">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <Input
-                                    id="knowledge-search"
-                                    placeholder="输入关键词搜索..."
-                                    value={search}
-                                    onChange={e => setSearch(e.target.value)}
-                                    className="w-full h-9 py-2 pl-10"
-                                />
-                            </div>
-
-                        </div>
-                        {/* 右侧按钮组 */}
-                        <div className="flex gap-2 shrink-0 mt-2 md:mt-0">
-                            <ReactBitsButton
-                                variant="outline"
-                                onClick={handleExportExcel}
-                                className="flex items-center gap-1 bg-gray-500 hover:bg-gray-600 text-white border-gray-500 hover:border-gray-600"
-                                size="sm"
-                            >
-                                <ArrowUpFromLine className="w-4 h-4 mr-1" /> 导出为Excel
-                            </ReactBitsButton>
-                            <ReactBitsButton
-                                variant="outline"
-                                className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 text-white border-blue-400 hover:border-blue-500"
-                                disabled={selectedRows.length !== 1}
-                                onClick={() => handleEdit()}
-                                size="sm"
-                            >
-                                <Pencil className="w-4 h-4 mr-1" /> 编辑
-                            </ReactBitsButton>
-                            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                                <AlertDialogTrigger asChild>
-                                    <ReactBitsButton
-                                        variant="outline"
-                                        disabled={selectedRows.length === 0}
-                                        onClick={() => setDeleteDialogOpen(true)}
-                                        size="sm"
-                                        className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
-                                    >
-                                        批量删除
-                                    </ReactBitsButton>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                        <AlertDialogTitle>确认批量删除？</AlertDialogTitle>
-                                        <AlertDialogDescription>
-                                            此操作将删除所选的知识点，删除后无法恢复。是否确认？
-                                        </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                        <AlertDialogCancel>取消</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDeleteSelected}>确认删除</AlertDialogAction>
-                                    </AlertDialogFooter>
-                                </AlertDialogContent>
-                            </AlertDialog>
-                        </div>
-                    </div>
-                    <div className="overflow-x-auto">
-                        <DataTable<KnowledgeItem, string>
-                            columns={columns}
-                            data={paged}
-                            selected={selectedRows}
-                            onSelect={v => setSelectedRows(v as string[])}
-                            rowKey={row => row.id}
-                            checkboxColClassName="w-6"
-                        />
-                    </div>
-                    {/* 分页组件 */}
-                    <div className="mt-6 flex justify-center">
-                        <Pagination>
-                            <PaginationContent>
-                                <PaginationItem>
-                                    <PaginationPrevious
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            if (page > 1) setPage(page - 1);
-                                        }}
-                                        aria-disabled={page === 1}
-                                        tabIndex={page === 1 ? -1 : 0}
-                                    />
-                                </PaginationItem>
-                                {/* 页码数字，最多显示7个，超出用... */}
-                                {(() => {
-                                    const items = [];
-                                    let start = Math.max(1, page - 3);
-                                    let end = Math.min(totalPages, page + 3);
-                                    if (end - start < 6) {
-                                        if (start === 1) end = Math.min(totalPages, start + 6);
-                                        if (end === totalPages) start = Math.max(1, end - 6);
-                                    }
-                                    if (start > 1) {
-                                        items.push(
-                                            <PaginationItem key={1}>
-                                                <PaginationLink isActive={page === 1} onClick={e => { e.preventDefault(); setPage(1); }}>1</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                        if (start > 2) items.push(<PaginationItem key="start-ellipsis"><PaginationEllipsis /></PaginationItem>);
-                                    }
-                                    for (let i = start; i <= end; ++i) {
-                                        items.push(
-                                            <PaginationItem key={i}>
-                                                <PaginationLink isActive={page === i} onClick={e => { e.preventDefault(); setPage(i); }}>{i}</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                    }
-                                    if (end < totalPages) {
-                                        if (end < totalPages - 1) items.push(<PaginationItem key="end-ellipsis"><PaginationEllipsis /></PaginationItem>);
-                                        items.push(
-                                            <PaginationItem key={totalPages}>
-                                                <PaginationLink isActive={page === totalPages} onClick={e => { e.preventDefault(); setPage(totalPages); }}>{totalPages}</PaginationLink>
-                                            </PaginationItem>
-                                        );
-                                    }
-                                    return items;
-                                })()}
-                                <PaginationItem>
-                                    <PaginationNext
-                                        onClick={e => {
-                                            e.preventDefault();
-                                            if (page < totalPages) setPage(page + 1);
-                                        }}
-                                        aria-disabled={page === totalPages}
-                                        tabIndex={page === totalPages ? -1 : 0}
-                                    />
-                                </PaginationItem>
-                            </PaginationContent>
-                        </Pagination>
-                    </div>
-                </CardContent>
-            </Card>
+        <div className="pt-4 px-2 md:px-8">
+            <UnifiedTable<KnowledgeItem, string>
+                columns={columns}
+                data={paged}
+                selected={selectedRows}
+                onSelect={(v: string[]) => setSelectedRows(v)}
+                rowKey={(row) => row.id}
+                checkboxColClassName="w-6"
+                contextMenuItems={[
+                    {
+                        label: "编辑",
+                        icon: <Edit className="w-4 h-4" />,
+                        onClick: (item: KnowledgeItem) => handleEdit(item),
+                    },
+                    {
+                        label: "删除",
+                        icon: <Trash2 className="w-4 h-4" />,
+                        onClick: (item: KnowledgeItem) => handleSingleDelete(item),
+                        variant: "destructive",
+                    },
+                ]}
+                filters={filters}
+                pagination={{
+                    currentPage: page,
+                    totalPages,
+                    onPageChange: setPage
+                }}
+                showExport={true}
+                onExport={handleExportExcel}
+                showNew={false}
+                showEdit={true}
+                onEdit={() => handleEdit()}
+                editDisabled={selectedRows.length !== 1}
+                showDelete={true}
+                onDelete={handleDeleteSelected}
+                deleteDisabled={selectedRows.length === 0}
+                deleteConfirmText="此操作将删除所选的知识点，删除后无法恢复。是否确认？"
+                className="max-w-6xl w-full"
+            />
             {/* 编辑弹窗 */}
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <SimpleDialogContent>
                     <SimpleDialogHeader>
-                        <SimpleDialogTitle>编辑知识点</SimpleDialogTitle>
+                        <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
                     </SimpleDialogHeader>
                     {editError ? (
-                        <SimpleDialogDescription className="text-red-500">{editError}</SimpleDialogDescription>
+                        <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>
                     ) : editItem ? (
                         <div className="py-2">
-                            {editItem.module === 'verbal' ? (
-                                <VerbalForm
+                            <Suspense fallback={<SimpleLoadingSpinner className="py-8" />}>
+                                <ModuleForm
+                                    module={editItem.module}
                                     onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
                                     initialData={editItem}
                                 />
-                            ) : editItem.module === 'politics' ? (
-                                <PoliticsForm
-                                    onAddKnowledge={data => handleEditSave({
-                                        ...editItem,
-                                        ...data,
-                                        date: data.date instanceof Date ? (data.date ? data.date.toISOString() : null) : data.date
-                                    })}
-                                    initialData={{
-                                        date: editItem.date ? (typeof editItem.date === 'string' ? (editItem.date ? new Date(editItem.date) : null) : editItem.date) : null,
-                                        source: editItem.source,
-                                        note: editItem.note
-                                    }}
-                                />
-                            ) : editItem.module === 'logic' ? (
-                                <LogicForm
-                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                    initialData={editItem}
-                                />
-                            ) : editItem.module === 'common' ? (
-                                <CommonForm
-                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                    initialData={editItem}
-                                />
-                            ) : (
-                                <KnowledgeForm
-                                    title="编辑知识点"
-                                    typePlaceholder="类型"
-                                    notePlaceholder="技巧记录"
-                                    onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
-                                    initialData={editItem}
-                                />
-                            )}
+                            </Suspense>
                         </div>
                     ) : null}
                     <SimpleDialogFooter>
-                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}>取消</SimpleDialogCancel>
+                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}><MixedText text="取消" /></SimpleDialogCancel>
                     </SimpleDialogFooter>
                 </SimpleDialogContent>
             </SimpleDialog>
+            {/* 单个删除确认弹窗 */}
+            <AlertDialog open={singleDeleteDialogOpen} onOpenChange={setSingleDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
+                        <AlertDialogDescription>
+                            您确定要删除这个知识点吗？此操作无法撤销。
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}><MixedText text="取消" /></AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmSingleDelete}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                            <MixedText text="确认删除" />
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };

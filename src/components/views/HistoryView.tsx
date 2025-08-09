@@ -1,26 +1,22 @@
-import { HistoryTable } from "@/components/ui/HistoryTable";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationItem,
-    PaginationLink,
-    PaginationPrevious,
-    PaginationNext,
-} from "@/components/ui/pagination";
+import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import type { RecordItem } from "@/types/record";
+import { format } from 'date-fns';
+import { normalizeModuleName } from '@/config/exam';
+import { formatDuration } from '@/lib/utils';
+import { MixedText } from '@/components/ui/MixedText';
 
-interface HistoryViewProps {
+
+interface ExerciseRecordViewProps {
     records: RecordItem[];
     selectedRecordIds: number[];
     onSelectIds: (ids: number[]) => void;
-    onDeleteRecord: (id: number) => void;
     onBatchDelete: () => void;
     historyPage: number;
     setHistoryPage: (n: number) => void;
     totalPages: number;
 }
 
-export function HistoryView({
+export function ExerciseRecordView({
     records,
     selectedRecordIds,
     onSelectIds,
@@ -28,59 +24,71 @@ export function HistoryView({
     historyPage,
     setHistoryPage,
     totalPages,
-}: HistoryViewProps) {
+}: ExerciseRecordViewProps) {
+
     return (
-        <div>
-            <h1 className="text-3xl font-bold mb-4">历史记录</h1>
-            <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full max-w-5xl mx-auto">
-                <HistoryTable
-                    records={records}
-                    selectedIds={selectedRecordIds}
-                    onSelectIds={onSelectIds}
-                    onBatchDelete={onBatchDelete}
-                />
-            </div>
-            {/* 分页组件 */}
-            {totalPages > 1 && (
-                <Pagination className="mt-6">
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setHistoryPage(Math.max(1, historyPage - 1));
-                                }}
-                                href="#"
-                                aria-disabled={historyPage === 1}
-                            />
-                        </PaginationItem>
-                        {Array.from({ length: totalPages }).map((_, idx) => (
-                            <PaginationItem key={idx}>
-                                <PaginationLink
-                                    isActive={historyPage === idx + 1}
-                                    onClick={e => {
-                                        e.preventDefault();
-                                        setHistoryPage(idx + 1);
-                                    }}
-                                    href="#"
-                                >
-                                    {idx + 1}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={e => {
-                                    e.preventDefault();
-                                    setHistoryPage(Math.min(totalPages, historyPage + 1));
-                                }}
-                                href="#"
-                                aria-disabled={historyPage === totalPages}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            )}
+        <div className="pt-2 px-2 md:px-8">
+            <UnifiedTable<RecordItem, number>
+                columns={[
+                    {
+                        key: 'date',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>日期</span>
+                            </div>
+                        ),
+                        render: (row) => <MixedText text={format(new Date(row.date), 'yyyy-MM-dd')} />
+                    },
+                    {
+                        key: 'module',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>模块</span>
+                            </div>
+                        ),
+                        render: (row) => <MixedText text={normalizeModuleName(row.module)} />
+                    },
+                    {
+                        key: 'correct',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>正确数</span>
+                            </div>
+                        ),
+                        render: (row) => <MixedText text={`${row.correct}/${row.total}`} />
+                    },
+                    {
+                        key: 'accuracy',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>正确率</span>
+                            </div>
+                        ),
+                        render: (row) => <MixedText text={`${((row.correct / row.total) * 100).toFixed(1)}%`} />
+                    },
+                    {
+                        key: 'duration',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>用时</span>
+                            </div>
+                        ),
+                        render: (row) => <MixedText text={formatDuration(row.duration)} />
+                    }
+                ]}
+                data={records}
+                selected={selectedRecordIds}
+                onSelect={onSelectIds}
+                rowKey={(row) => row.id}
+                pagination={{
+                    currentPage: historyPage,
+                    totalPages,
+                    onPageChange: setHistoryPage
+                }}
+                onBatchDelete={onBatchDelete}
+                batchDeleteText="批量删除"
+            />
         </div>
+
     );
 } 

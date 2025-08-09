@@ -17,6 +17,25 @@ export const MODULE_NAME_MAP: Record<string, string> = {
     'logic': '判断推理',
 };
 
+// 页面标题映射（英文到中文）
+export const PAGE_TITLE_MAP: Record<string, string> = {
+    'overview': '数据概览',
+    'charts': '数据图表',
+    'history': '刷题记录',
+    'personal-best': '最佳成绩',
+    'knowledge-summary': '知识点汇总',
+    'knowledge-entry': '知识点录入',
+    'plan-list': '学习计划',
+    'plan-detail': '计划详情',
+    'settings': '基础设置',
+    'form': '新的记录',
+    'best': '最佳成绩',
+    'modules': '知识点汇总',
+    'settings-basic': '基础设置',
+    'settings-advanced': '高级设置',
+    'plan': '制定计划',
+};
+
 // 统一的模块颜色配置
 export const MODULE_COLORS: Record<string, string> = {
     '资料分析': '#A259FF',
@@ -47,6 +66,11 @@ export const FULL_EXAM_CONFIG = {
 // 工具函数：统一模块名称
 export function normalizeModuleName(moduleName: string): string {
     return MODULE_NAME_MAP[moduleName] || moduleName;
+}
+
+// 工具函数：统一页面标题
+export function normalizePageTitle(pageName: string): string {
+    return PAGE_TITLE_MAP[pageName] || pageName;
 }
 
 // 工具函数：获取模块颜色

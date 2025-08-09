@@ -1,20 +1,15 @@
 "use client";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import "./theme-switches/sun-moon-switch.css";
 
 interface BeautifulThemeSwitchProps {
-    previewOnly?: boolean;
-    previewState?: boolean;
-    onPreviewChange?: (state: boolean) => void;
     disabled?: boolean;
+    className?: string;
 }
 
 export function BeautifulThemeSwitch({
-    previewOnly = false,
-    previewState = false,
-    onPreviewChange,
-    disabled = false
+    disabled = false,
+    className = ''
 }: BeautifulThemeSwitchProps) {
     const { setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -25,24 +20,16 @@ export function BeautifulThemeSwitch({
 
     if (!mounted) return null;
 
-    const isDark = previewOnly ? previewState : resolvedTheme === "dark";
-    const inputId = previewOnly ? "preview-theme-switch-input" : "theme-switch-input";
-    const switchClass = previewOnly ? "switch preview-switch" : "switch";
+    const isDark = resolvedTheme === "dark";
 
     const handleThemeToggle = () => {
-        if (previewOnly && onPreviewChange) {
-            // 预览模式：只切换预览状态
-            onPreviewChange(!previewState);
-        } else {
-            // 正常模式：切换实际主题
-            setTheme(isDark ? "light" : "dark");
-        }
+        setTheme(isDark ? "light" : "dark");
     };
 
     return (
-        <label className={switchClass}>
+        <label className={`switch ${className}`}>
             <input
-                id={inputId}
+                id="input"
                 type="checkbox"
                 checked={isDark}
                 onChange={handleThemeToggle}
