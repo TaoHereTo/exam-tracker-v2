@@ -221,7 +221,7 @@ export function MainApp() {
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                     <div
-                        className={`flex items-center gap-2 w-full cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-16 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-16 ${isHovered || isOpen
+                        className={`flex items-center gap-2 w-full cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-16 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-14 ${isHovered || isOpen
                             ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
                             : ''
                             }`}
@@ -236,7 +236,7 @@ export function MainApp() {
                             }, 100);
                         }}
                     >
-                        <GlobeAvatar size="md" />
+                        <GlobeAvatar size="md" className="group-data-[collapsible=icon]:group-data-[state=collapsed]:!w-12 group-data-[collapsible=icon]:group-data-[state=collapsed]:!h-12" />
                         <div className="flex flex-col flex-1 justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
                             <Tooltip>
                                 <TooltipTrigger asChild>
