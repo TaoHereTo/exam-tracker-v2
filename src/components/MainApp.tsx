@@ -126,7 +126,7 @@ export function MainApp() {
 
             return () => clearTimeout(timer);
         }
-    }, [user, userProfile]); // 移除loadUserProfile依赖，避免无限循环
+    }, [user, userProfile, loadUserProfile]);
 
     const [isClient, setIsClient] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -174,7 +174,7 @@ export function MainApp() {
         if (historyPage > newTotalPages && newTotalPages > 0) {
             setHistoryPage(1);
         }
-    }, [pageSize, records.length]); // 移除historyPage依赖，避免无限循环
+    }, [pageSize, records.length, historyPage]);
 
     // 清理无效的选中记录ID（当记录被删除或页面切换时）
     useEffect(() => {

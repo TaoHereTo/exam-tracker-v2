@@ -36,7 +36,7 @@ export function useLocalStorage<T>(key: string, defaultValue: T) {
 
     useEffect(() => {
         debouncedSetStorage(key, state);
-    }, [key, state]); // 移除debouncedSetStorage依赖，避免无限循环
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
@@ -68,7 +68,7 @@ export function useLocalStorageBoolean(key: string, defaultValue: boolean) {
 
     useEffect(() => {
         debouncedSetStorage(key, state);
-    }, [key, state]); // 移除debouncedSetStorage依赖，避免无限循环
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
@@ -100,7 +100,7 @@ export function useLocalStorageString(key: string, defaultValue: string) {
 
     useEffect(() => {
         debouncedSetStorage(key, state);
-    }, [key, state]); // 移除debouncedSetStorage依赖，避免无限循环
+    }, [key, state, debouncedSetStorage]);
 
     return [state, setState] as const;
 }
