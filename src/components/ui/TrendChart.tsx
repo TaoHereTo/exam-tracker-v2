@@ -3,6 +3,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import ReactECharts from 'echarts-for-react';
 import { getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 // data: 做题记录数组，score 字段为百分比（如 85 表示 85%）或每分钟得分
 interface TrendChartProps {
@@ -20,6 +21,7 @@ interface TrendChartProps {
 export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = ({ data, onlyModule, yMax }) => {
     // 添加强制重新渲染的机制
     const [forceUpdate, setForceUpdate] = useState(0);
+    const { isDarkMode } = useThemeMode();
 
     // 当数据变化时强制重新渲染
     useEffect(() => {
@@ -70,15 +72,23 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
     }, [dedupedData, onlyModule]);
 
     const option = useMemo(() => {
+        // 根据主题动态设置颜色
+        const backgroundColor = isDarkMode ? '#1a1a1a' : '#fff';
+        const textColor = isDarkMode ? '#e5e5e5' : '#333';
+        const borderColor = isDarkMode ? '#404040' : '#e0e6f1';
+        const splitLineColor = isDarkMode ? '#2a2a2a' : '#f5f7fa';
+        const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
+        const tooltipBorderColor = isDarkMode ? '#404040' : '#e0e6f1';
+
         return {
-            backgroundColor: '#fff',
+            backgroundColor,
             tooltip: {
                 trigger: 'axis',
                 axisPointer: { type: 'line' },
-                backgroundColor: 'rgba(255,255,255,0.95)',
-                borderColor: '#e0e6f1',
+                backgroundColor: tooltipBgColor,
+                borderColor: tooltipBorderColor,
                 borderWidth: 1,
-                textStyle: { color: '#333', fontSize: 14, fontFamily: 'Times New Roman, 思源宋体, serif' },
+                textStyle: { color: textColor, fontSize: 14, fontFamily: 'Times New Roman, 思源宋体, serif' },
                 extraCssText: 'box-shadow: 0 4px 16px rgba(51,102,255,0.08); border-radius: 8px;',
                 formatter: function (params: Array<Record<string, unknown>>) {
                     let res = `<b>${params[0].axisValueLabel}</b><br/>`;
@@ -98,14 +108,15 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 top: 20,
                 left: 0,
                 orient: 'vertical',
-                ...UNIFIED_LEGEND_STYLE
+                ...UNIFIED_LEGEND_STYLE,
+                textStyle: { color: textColor }
             },
             grid: {
                 left: 130,
                 right: 80,
                 top: 40,
                 bottom: 60,
-                borderColor: '#e0e6f1',
+                borderColor: borderColor,
                 borderWidth: 1,
                 containLabel: true,
             },
@@ -119,20 +130,20 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                     },
                     rotate: -45,
                     fontSize: 13,
-                    color: '#333',
+                    color: textColor,
                     fontWeight: 500,
                     fontFamily: 'Times New Roman, 思源宋体, serif'
                 },
                 axisTick: { alignWithLabel: true },
-                axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
+                axisLine: { lineStyle: { color: borderColor, width: 2 } },
                 splitLine: { show: false }
             },
             yAxis: {
                 type: 'value',
                 max: yMax,
-                axisLabel: { fontSize: 13, color: '#333', fontWeight: 500, fontFamily: 'Times New Roman, 思源宋体, serif' },
-                axisLine: { lineStyle: { color: '#e0e6f1', width: 2 } },
-                splitLine: { lineStyle: { color: '#f5f7fa', width: 1, type: 'dashed' } }
+                axisLabel: { fontSize: 13, color: textColor, fontWeight: 500, fontFamily: 'Times New Roman, 思源宋体, serif' },
+                axisLine: { lineStyle: { color: borderColor, width: 2 } },
+                splitLine: { lineStyle: { color: splitLineColor, width: 1, type: 'dashed' } }
             },
             series: allModules.map(module => ({
                 name: module,
@@ -153,7 +164,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 },
                 itemStyle: {
                     color: getModuleColor(module),
-                    borderColor: '#fff',
+                    borderColor: isDarkMode ? '#1a1a1a' : '#fff',
                     borderWidth: 2,
                     shadowColor: getModuleColor(module),
                     shadowBlur: 8
@@ -166,14 +177,14 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 }
             }))
         };
-    }, [allModules, allDates, chartData, yMax]);
+    }, [allModules, allDates, chartData, yMax, isDarkMode]);
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
-                key={`${forceUpdate}-${allDates.join(',')}-${allModules.join(',')}`}
+                key={`${forceUpdate}-${allDates.join(',')}-${allModules.join(',')}-${isDarkMode}`}
                 notMerge={true}
                 lazyUpdate={false}
                 opts={{ renderer: 'canvas' }}

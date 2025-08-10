@@ -8,6 +8,7 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import type { RecordItem } from "@/types/record";
 import { timeStringToMinutes } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 
 // 使用统一的配置，不再需要重复定义
@@ -23,6 +24,8 @@ function calcAbilityIndex({ accuracy, perMinute, total }: { accuracy: number; pe
 }
 
 function ModuleRadarChart({ data }: { data: RecordItem[] }) {
+    const { isDarkMode } = useThemeMode();
+
     // 统计每个模块的参数
     const moduleStats: Record<string, { correct: number; total: number; duration: number }> = {};
     data.forEach(item => {
@@ -79,52 +82,72 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         name: module,
         max: 100
     }));
+
+    // 根据主题动态设置颜色
+    const backgroundColor = isDarkMode ? '#1a1a1a' : '#fff';
+    const textColor = isDarkMode ? '#e5e5e5' : '#333';
+    const borderColor = isDarkMode ? '#404040' : '#e0e6f1';
+    const splitLineColor = isDarkMode ? '#404040' : '#e0e6f1';
+    const splitAreaColor1 = isDarkMode ? '#2a2a2a' : '#f5f7fa';
+    const splitAreaColor2 = isDarkMode ? '#1a1a1a' : '#fff';
+    const axisLineColor = isDarkMode ? '#666' : '#aaa';
+    const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
+    const tooltipBorderColor = isDarkMode ? '#404040' : '#e0e6f1';
+
     const option = {
+        backgroundColor,
         tooltip: {
             trigger: 'item',
+            backgroundColor: tooltipBgColor,
+            borderColor: tooltipBorderColor,
+            borderWidth: 1,
+            textStyle: {
+                color: textColor,
+                fontFamily: '思源宋体, Times New Roman, serif'
+            },
             formatter: function (params: Record<string, unknown>) {
                 return `${params.marker}${params.seriesName}<br/>${(params.value as number[]).map((v: number, idx: number) => `${modules[idx]}：${v}`).join('<br/>')}`;
-            },
-            textStyle: { fontFamily: '思源宋体, Times New Roman, serif' }
+            }
         },
         radar: {
             indicator,
             splitNumber: 5,
             radius: '70%',
             axisName: {
-                color: '#333',
+                color: textColor,
                 fontWeight: 'bold',
                 fontSize: 15,
                 fontFamily: '思源宋体, Times New Roman, serif'
             },
             splitLine: {
                 lineStyle: {
-                    color: '#e0e6f1',
+                    color: splitLineColor,
                     type: 'solid'
                 }
             },
             splitArea: {
                 areaStyle: {
-                    color: ['#f5f7fa', '#fff']
+                    color: [splitAreaColor1, splitAreaColor2]
                 }
             },
             axisLine: {
                 lineStyle: {
-                    color: '#aaa'
+                    color: axisLineColor
                 }
             },
             legend: {
-                ...UNIFIED_LEGEND_STYLE
+                ...UNIFIED_LEGEND_STYLE,
+                textStyle: { color: textColor }
             }
         },
         series: [
             {
-                name: '模块正确率',
+                name: '模块能力值',
                 type: 'radar',
                 data: [
                     {
                         value: values,
-                        name: '正确率',
+                        name: '能力值',
                         areaStyle: {
                             color: 'rgba(51,102,255,0.10)'
                         },
@@ -141,7 +164,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                                 const idx = (params as { dataIndex: number }).dataIndex;
                                 return pointColors[idx] || '#3366FF';
                             },
-                            borderColor: '#fff',
+                            borderColor: isDarkMode ? '#1a1a1a' : '#fff',
                             borderWidth: 2,
                             shadowColor: function (params: unknown) {
                                 const idx = (params as { dataIndex: number }).dataIndex;
@@ -160,7 +183,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                             })),
                             tooltip: { show: true }
                         },
-                        label: { fontFamily: '思源宋体, Times New Roman, serif' }
+                        label: {
+                            color: textColor,
+                            fontFamily: '思源宋体, Times New Roman, serif'
+                        }
                     }
                 ],
                 animation: true
@@ -170,7 +196,11 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
+                <ReactECharts
+                    option={option}
+                    style={{ height: '100%', width: '100%' }}
+                    key={`radar-${isDarkMode}`}
+                />
             </div>
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
                 能力值 =
@@ -259,7 +289,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                         <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>
                         <TabsTrigger value="accuracy"><MixedText text="正确率" /></TabsTrigger>
                         <TabsTrigger value="pie"><MixedText text="模块耗时分布" /></TabsTrigger>
-                        <TabsTrigger value="radar"><MixedText text="模块能力雷达图" /></TabsTrigger>
+                        <TabsTrigger value="radar"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
                 <TabsContent value="perMinute">

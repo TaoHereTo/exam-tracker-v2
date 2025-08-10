@@ -4,6 +4,7 @@ import React from "react";
 import ReactECharts from 'echarts-for-react';
 import { FULL_EXAM_CONFIG, normalizeModuleName, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 interface ModulePieChartProps {
     data: Array<{
@@ -17,6 +18,8 @@ interface ModulePieChartProps {
 // 使用统一的配置，不再需要重复定义
 
 export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
+    const { isDarkMode } = useThemeMode();
+
     // 统计每个模块的总耗时和总题数（只统计有效记录，单位均为分钟）
     const moduleStats: Record<string, { duration: number; questions: number }> = {};
     data.forEach(item => {
@@ -44,9 +47,22 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             standardQuestions
         };
     });
+
+    // 根据主题动态设置颜色
+    const backgroundColor = isDarkMode ? '#1a1a1a' : '#fff';
+    const textColor = isDarkMode ? '#e5e5e5' : '#333';
+    const borderColor = isDarkMode ? '#1a1a1a' : '#fff';
+    const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
+    const tooltipBorderColor = isDarkMode ? '#404040' : '#e0e6f1';
+
     const option = {
+        backgroundColor,
         tooltip: {
             trigger: 'item',
+            backgroundColor: tooltipBgColor,
+            borderColor: tooltipBorderColor,
+            borderWidth: 1,
+            textStyle: { color: textColor },
             formatter: (params: Record<string, unknown>) => {
                 const data = params.data as { standardQuestions: number; avg: number };
                 const totalTime = minutesToTimeString(data.avg * data.standardQuestions);
@@ -59,7 +75,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             left: 10,
             top: 20,
             formatter: (name: string) => name,
-            ...UNIFIED_LEGEND_STYLE
+            ...UNIFIED_LEGEND_STYLE,
+            textStyle: { color: textColor }
         },
         series: [
             {
@@ -69,12 +86,13 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
-                    borderColor: '#fff',
+                    borderColor: borderColor,
                     borderWidth: 2,
                 },
                 label: {
                     show: true,
                     formatter: '{b} ({d}%)',
+                    color: textColor,
                     fontFamily: 'Times New Roman, 思源宋体, serif',
                 },
                 emphasis: {
@@ -83,7 +101,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                     itemStyle: {
                         shadowBlur: 20,
                         shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.3)'
+                        shadowColor: isDarkMode ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)'
                     }
                 },
                 color: pieData.map(d => getModuleColor(d.name)),
@@ -99,6 +117,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 style={{ height: '100%', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
                 theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
+                key={`pie-${isDarkMode}`}
             />
         </div>
     );
