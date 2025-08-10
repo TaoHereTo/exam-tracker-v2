@@ -409,7 +409,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 onDelete={handleDeleteSelected}
                 deleteDisabled={selectedRows.length === 0}
                 deleteConfirmText="此操作将删除所选的知识点，删除后无法恢复。是否确认？"
-                className="max-w-6xl w-full"
+                className="w-full"
             />
             {/* 编辑弹窗 */}
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>

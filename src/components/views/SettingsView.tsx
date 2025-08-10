@@ -195,7 +195,7 @@ export function SettingsView({
 
     return (
         <TooltipProvider>
-            <div className="space-y-6">
+            <div className="space-y-6 max-w-4xl mx-auto">
                 <Card>
                     <CardHeader>
                         <CardTitle><MixedText text="数据管理" /></CardTitle>

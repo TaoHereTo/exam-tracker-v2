@@ -1,6 +1,6 @@
 import React from "react";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { BarChart2, PlusSquare, History as HistoryIcon, CalendarCheck, FileEdit, ListChecks } from "lucide-react";
+import { LineChart, Plus, History, Calendar, FileText, BookMarked } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -16,14 +16,14 @@ interface DockNavigationProps {
     userInfo?: React.ReactNode;
 }
 
-// 精简 Dock：仅保留用户指定的主要入口
+// 精简 Dock：仅保留用户指定的主要入口，图标与侧边栏保持一致
 const primaryDockItems = [
-    { key: 'charts', label: '数据图表', icon: <BarChart2 /> },
-    { key: 'form', label: '新增做题记录', icon: <PlusSquare /> },
-    { key: 'history', label: '历史做题记录', icon: <HistoryIcon /> },
-    { key: 'knowledge-entry', label: '知识点录入', icon: <FileEdit /> },
-    { key: 'knowledge-summary', label: '知识点汇总', icon: <ListChecks /> },
-    { key: 'plan-list', label: '学习计划', icon: <CalendarCheck /> },
+    { key: 'charts', label: '数据图表', icon: <LineChart /> },
+    { key: 'form', label: '新增做题记录', icon: <Plus /> },
+    { key: 'history', label: '历史做题记录', icon: <History /> },
+    { key: 'knowledge-entry', label: '知识点录入', icon: <FileText /> },
+    { key: 'knowledge-summary', label: '知识点汇总', icon: <BookMarked /> },
+    { key: 'plan-list', label: '学习计划', icon: <Calendar /> },
 ];
 
 // 旧的 dockChildIcons 已废弃

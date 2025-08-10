@@ -8,6 +8,9 @@
 body,
 html {
   font-family: '思源宋体', 'Times New Roman', serif;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* 基础字体类 - 简化 */
@@ -319,6 +322,8 @@ h6 {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-width: 280px;
+  --sidebar-width-icon: 4rem;
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);
@@ -358,6 +363,8 @@ h6 {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-width: 280px;
+  --sidebar-width-icon: 4rem;
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);
@@ -367,6 +374,34 @@ h6 {
 
 /* ========== 基础样式 ========== */
 @layer base {
+  :root {
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar-width: 280px;
+    --sidebar-width-mobile: 20rem;
+    --sidebar-width-icon: 4rem;
+  }
+
+  .dark {
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+    --sidebar-width: 280px;
+    --sidebar-width-mobile: 20rem;
+    --sidebar-width-icon: 4rem;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -769,6 +804,108 @@ html,
   color: #fff !important;
 }
 
+/* 新的 shadcn/ui 侧边栏样式 */
+[data-slot="sidebar"] {
+  min-height: 100vh;
+}
+
+[data-slot="sidebar"] {
+  background-color: hsl(var(--sidebar));
+  color: hsl(var(--sidebar-foreground));
+}
+
+[data-slot="sidebar-inner"] {
+  background-color: hsl(var(--sidebar));
+  color: hsl(var(--sidebar-foreground));
+}
+
+/* 侧边栏宽度和布局样式 */
+[data-slot="sidebar-gap"] {
+  width: var(--sidebar-width);
+  transition: width 0.2s ease-linear;
+}
+
+[data-slot="sidebar-container"] {
+  width: var(--sidebar-width);
+  transition: width 0.2s ease-linear;
+}
+
+/* 当侧边栏处于icon模式时的宽度 */
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-gap"] {
+  width: var(--sidebar-width-icon);
+}
+
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-container"] {
+  width: var(--sidebar-width-icon);
+}
+
+/* 确保侧边栏在收缩时只显示图标 - 使用正确的选择器 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] span,
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] span {
+  display: none;
+}
+
+/* 为侧边栏文字添加平滑过渡 */
+[data-slot="sidebar-group-label"] span,
+[data-slot="sidebar-menu-button"] span {
+  display: inline-block;
+}
+
+/* 增加侧边栏文字大小以提高可读性 */
+[data-slot="sidebar-group-label"] span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+[data-slot="sidebar-menu-button"] span {
+  font-size: 0.9rem;
+}
+
+[data-slot="sidebar-header"] span {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* 增加侧边栏图标大小 */
+[data-slot="sidebar-group-label"] svg,
+[data-slot="sidebar-menu-button"] svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+[data-slot="sidebar-menu-button"] {
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+[data-slot="sidebar-menu-button"]:hover {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-slot="sidebar-menu-button"]:active {
+  transform: translateX(1px) scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-slot="sidebar-menu-button"][data-active="true"] {
+  background-color: hsl(var(--sidebar-accent));
+  color: hsl(var(--sidebar-accent-foreground));
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateX(2px);
+}
+
+[data-slot="sidebar-group-label"] {
+  color: hsl(var(--sidebar-foreground) / 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */
 .sidebar-btn:hover,
 .sidebar-btn:focus-visible {
@@ -905,6 +1042,31 @@ html,
   backface-visibility: hidden;
   -webkit-transform: translateZ(0);
   -webkit-backface-visibility: hidden;
+}
+
+/* 知识点录入轮播的特殊对齐样式 */
+[data-carousel-container] {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+[data-carousel-container] [data-slot="carousel-content"] {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+[data-carousel-container] [data-slot="carousel-item"] {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  flex-shrink: 0;
+  overflow: hidden;
 }
 
 /* ========== 护眼模式 ========== */

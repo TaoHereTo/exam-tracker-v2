@@ -28,7 +28,7 @@ export function FontSettings() {
     };
 
     return (
-        <Card className="w-full max-w-md">
+        <Card className="w-full">
             <CardHeader>
                 <CardTitle>
                     <MixedText text="字体设置" />

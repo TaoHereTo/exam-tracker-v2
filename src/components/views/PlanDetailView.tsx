@@ -24,7 +24,7 @@ export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
     };
 
     return (
-        <div className="max-w-3xl mx-auto">
+        <div className="w-full">
             <Card>
                 <CardHeader>
                     <CardTitle className="flex justify-between items-center">

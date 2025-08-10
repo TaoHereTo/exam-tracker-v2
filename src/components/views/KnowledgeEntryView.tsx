@@ -56,41 +56,53 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
     // 使用 useMemo 优化轮播内容，避免不必要的重新渲染
     const carouselContent = useMemo(() => (
         <>
-            <CarouselItem data-carousel-item data-active={tab === 'data-analysis'}>
-                <div className="p-1">
-                    <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
+            <CarouselItem data-carousel-item data-active={tab === 'data-analysis'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
+                    </div>
                 </div>
             </CarouselItem>
-            <CarouselItem data-carousel-item data-active={tab === 'politics'}>
-                <div className="p-1">
-                    <ModuleForm module="politics" onAddKnowledge={handleAdd('politics')} />
+            <CarouselItem data-carousel-item data-active={tab === 'politics'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="politics" onAddKnowledge={handleAdd('politics')} />
+                    </div>
                 </div>
             </CarouselItem>
-            <CarouselItem data-carousel-item data-active={tab === 'math'}>
-                <div className="p-1">
-                    <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
+            <CarouselItem data-carousel-item data-active={tab === 'math'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
+                    </div>
                 </div>
             </CarouselItem>
-            <CarouselItem data-carousel-item data-active={tab === 'common'}>
-                <div className="p-1">
-                    <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
+            <CarouselItem data-carousel-item data-active={tab === 'common'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
+                    </div>
                 </div>
             </CarouselItem>
-            <CarouselItem data-carousel-item data-active={tab === 'verbal'}>
-                <div className="p-1">
-                    <ModuleForm module="verbal" onAddKnowledge={handleAdd('verbal')} />
+            <CarouselItem data-carousel-item data-active={tab === 'verbal'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="verbal" onAddKnowledge={handleAdd('verbal')} />
+                    </div>
                 </div>
             </CarouselItem>
-            <CarouselItem data-carousel-item data-active={tab === 'logic'}>
-                <div className="p-1">
-                    <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
+            <CarouselItem data-carousel-item data-active={tab === 'logic'} className="!pl-0 !pr-0 flex justify-center items-start w-full">
+                <div className="w-full flex justify-center">
+                    <div className="w-full max-w-2xl">
+                        <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
+                    </div>
                 </div>
             </CarouselItem>
         </>
     ), [handleAdd, tab]);
 
     return (
-        <div className="w-full max-w-2xl mx-auto flex flex-col">
+        <div className="w-full flex flex-col items-center">
             <div className="relative mb-4 flex justify-center">
                 <Tabs value={tab} onValueChange={handleTabChange}>
                     <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-12 px-2 w-fit">
@@ -103,20 +115,22 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 </Tabs>
             </div>
 
-            <Carousel setApi={handleCarouselApi} className="relative" data-carousel-container opts={{
-                align: 'start',
-                skipSnaps: false,
-                containScroll: 'trimSnaps',
-                duration: 25,
-                dragFree: false,
-                loop: false,
-                slidesToScroll: 1,
-                startIndex: MODULES.findIndex(t => t.value === defaultTab)
-            }}>
-                <CarouselContent>
-                    {carouselContent}
-                </CarouselContent>
-            </Carousel>
+            <div className="w-full">
+                <Carousel setApi={handleCarouselApi} className="relative w-full" data-carousel-container opts={{
+                    align: 'center',
+                    skipSnaps: false,
+                    containScroll: 'trimSnaps',
+                    duration: 25,
+                    dragFree: false,
+                    loop: false,
+                    slidesToScroll: 1,
+                    startIndex: MODULES.findIndex(t => t.value === defaultTab)
+                }}>
+                    <CarouselContent className="[&>div]:!-ml-0 [&>div]:!-mr-0 [&>div]:flex [&>div]:justify-center [&>div]:items-start [&>div]:w-full">
+                        {carouselContent}
+                    </CarouselContent>
+                </Carousel>
+            </div>
         </div>
     );
 };

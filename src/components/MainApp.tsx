@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SidebarTrigger, SidebarProvider } from "@/components/ui/sidebar";
 import { SettingsView } from "@/components/views/SettingsView";
 import { useImportExport } from "@/hooks/useImportExport";
 import { OverviewView } from "@/components/views/OverviewView";
@@ -19,7 +20,7 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Settings, SlidersHorizontal, BarChart2, Trophy } from "lucide-react";
+import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy } from "lucide-react";
 import { generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 
@@ -125,7 +126,7 @@ export function MainApp() {
 
             return () => clearTimeout(timer);
         }
-    }, [user, userProfile, loadUserProfile]); // 添加loadUserProfile依赖
+    }, [user, userProfile]); // 移除loadUserProfile依赖，避免无限循环
 
     const [isClient, setIsClient] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -173,7 +174,7 @@ export function MainApp() {
         if (historyPage > newTotalPages && newTotalPages > 0) {
             setHistoryPage(1);
         }
-    }, [pageSize, records.length, historyPage]);
+    }, [pageSize, records.length]); // 移除historyPage依赖，避免无限循环
 
     // 清理无效的选中记录ID（当记录被删除或页面切换时）
     useEffect(() => {
@@ -217,109 +218,105 @@ export function MainApp() {
         const [isOpen, setIsOpen] = useState(false);
 
         return (
-            <div className="flex items-center gap-0 w-full">
-                <div className="flex-shrink-0 flex items-center">
-                    <GlobeAvatar size="lg" />
-                </div>
-                <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-                    <DropdownMenuTrigger asChild>
-                        <div
-                            className={`flex items-center gap-2 flex-1 cursor-pointer rounded-lg p-2 transition-all duration-200 ${isHovered || isOpen
-                                ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
-                                : ''
-                                }`}
-                            onMouseEnter={() => setIsHovered(true)}
-                            onMouseLeave={() => {
-                                setIsHovered(false);
-                                // 延迟关闭，给用户时间移动到下拉菜单
-                                setTimeout(() => {
-                                    if (!isHovered) {
-                                        setIsOpen(false);
-                                    }
-                                }, 100);
-                            }}
-                        >
-                            <div className="flex flex-col flex-1 justify-center">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div className="flex flex-col flex-1 justify-center">
-                                            <MixedText
-                                                text={userProfile?.display_name || userProfile?.username || user?.email || ''}
-                                                className={`text-sm font-medium transition-colors ${isHovered || isOpen
-                                                    ? 'text-gray-700 dark:text-gray-200'
-                                                    : 'text-gray-900 dark:text-gray-100'
-                                                    }`}
-                                            />
-                                            <MixedText
-                                                text={user?.email || ''}
-                                                className={`text-xs transition-colors ${isHovered || isOpen
-                                                    ? 'text-gray-600 dark:text-gray-300'
-                                                    : 'text-gray-500 dark:text-gray-400'
-                                                    }`}
-                                            />
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent side="right">
-                                        <p>点击展开菜单</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        </div>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        align="start"
-                        side="top"
-                        sideOffset={5}
-                        className="w-48"
+            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                <DropdownMenuTrigger asChild>
+                    <div
+                        className={`flex items-center gap-2 w-full cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-16 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-16 ${isHovered || isOpen
+                            ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
+                            : ''
+                            }`}
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => {
                             setIsHovered(false);
-                            setIsOpen(false);
+                            // 延迟关闭，给用户时间移动到下拉菜单
+                            setTimeout(() => {
+                                if (!isHovered) {
+                                    setIsOpen(false);
+                                }
+                            }, 100);
                         }}
                     >
-                        <DropdownMenuLabel>
-                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                <MixedText text={userProfile?.bio || '座右铭'} />
-                            </div>
-                        </DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        {/* 仅在 Dock 模式下显示：数据概览 / 最佳成绩（图标 + 文本） */}
-                        {navMode === 'dock' && (
-                            <>
-                                <DropdownMenuItem onClick={() => setActiveTab('overview')}>
-                                    <BarChart2 className="h-4 w-4 mr-2" />
-                                    <MixedText text="数据概览" />
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
-                                    <Trophy className="h-4 w-4 mr-2" />
-                                    <MixedText text="最佳成绩" />
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                            </>
-                        )}
-                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                            <User className="h-4 w-4 mr-2" />
-                            <MixedText text="个人资料" />
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                            <Settings className="h-4 w-4 mr-2" />
-                            <MixedText text="基础设置" />
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                            <SlidersHorizontal className="h-4 w-4 mr-2" />
-                            <MixedText text="高级设置" />
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
-                            <LogOut className="h-4 w-4 mr-2" />
-                            <MixedText text="退出登录" />
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+                        <GlobeAvatar size="md" />
+                        <div className="flex flex-col flex-1 justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="flex flex-col flex-1 justify-center">
+                                        <MixedText
+                                            text={userProfile?.display_name || userProfile?.username || user?.email || ''}
+                                            className={`text-sm font-medium transition-colors ${isHovered || isOpen
+                                                ? 'text-gray-700 dark:text-gray-200'
+                                                : 'text-gray-900 dark:text-gray-100'
+                                                }`}
+                                        />
+                                        <MixedText
+                                            text={user?.email || ''}
+                                            className={`text-xs transition-colors ${isHovered || isOpen
+                                                ? 'text-gray-600 dark:text-gray-300'
+                                                : 'text-gray-500 dark:text-gray-400'
+                                                }`}
+                                        />
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="right">
+                                    <p>点击展开菜单</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+                    </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                    align="start"
+                    side="top"
+                    sideOffset={5}
+                    className="w-48 group-data-[collapsible=icon]:group-data-[state=collapsed]:ml-16"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => {
+                        setIsHovered(false);
+                        setIsOpen(false);
+                    }}
+                >
+                    <DropdownMenuLabel>
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
+                        </div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <MixedText text={userProfile?.bio || '座右铭'} />
+                        </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    {/* 仅在 Dock 模式下显示：数据概览 / 最佳成绩（图标 + 文本） */}
+                    {navMode === 'dock' && (
+                        <>
+                            <DropdownMenuItem onClick={() => setActiveTab('overview')}>
+                                <PieChart className="h-4 w-4 mr-2" />
+                                <MixedText text="数据概览" />
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
+                                <Trophy className="h-4 w-4 mr-2" />
+                                <MixedText text="最佳成绩" />
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                        </>
+                    )}
+                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+                        <User className="h-4 w-4 mr-2" />
+                        <MixedText text="个人资料" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                        <Settings className="h-4 w-4 mr-2" />
+                        <MixedText text="基础设置" />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
+                        <SlidersHorizontal className="h-4 w-4 mr-2" />
+                        <MixedText text="高级设置" />
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
+                        <LogOut className="h-4 w-4 mr-2" />
+                        <MixedText text="退出登录" />
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         );
     };
 
@@ -383,7 +380,7 @@ export function MainApp() {
                             {navMode === 'dock' && (
                                 <>
                                     <DropdownMenuItem onClick={() => setActiveTab('overview')}>
-                                        <BarChart2 className="h-4 w-4 mr-2" />
+                                        <PieChart className="h-4 w-4 mr-2" />
                                         <MixedText text="数据概览" />
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
@@ -595,181 +592,339 @@ export function MainApp() {
     return (
         <PasteProvider>
             <NavModeContext.Provider value={navMode}>
-                <div className="min-h-screen relative" style={getBackgroundStyle() as React.CSSProperties}>
+                <div className="min-h-screen w-full relative" style={getBackgroundStyle() as React.CSSProperties}>
 
                     <LoadingWrapper loading={isLoading}>
-                        <div className="flex h-screen relative z-[2]">
-                            {navMode === 'sidebar' ? (
-                                <Sidebar
-                                    activeTab={activeTab}
-                                    setActiveTab={setActiveTab}
-                                    userInfo={<SidebarUserInfo />}
-                                />
-                            ) : (
+                        {navMode === 'sidebar' ? (
+                            <SidebarProvider
+                                style={{
+                                    "--sidebar-width": "240px",
+                                    "--sidebar-width-icon": "4rem",
+                                } as React.CSSProperties & {
+                                    "--sidebar-width": string;
+                                    "--sidebar-width-icon": string;
+                                }}
+                            >
+                                <div className="flex h-screen w-full relative z-[2]" data-sidebar="sidebar">
+                                    <Sidebar
+                                        activeTab={activeTab}
+                                        setActiveTab={setActiveTab}
+                                        userInfo={<SidebarUserInfo />}
+                                    />
+                                    <main className="flex-1 w-full overflow-auto bg-[#fafafa] dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
+                                        {/* 侧边栏触发器 */}
+                                        <div className="flex items-center gap-4 p-4 border-b border-border">
+                                            <SidebarTrigger className="size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-6 [&>svg]:!w-6 font-normal" />
+                                            <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
+                                        </div>
+
+                                        <div className={`w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-6'} max-w-7xl mx-auto`}>
+                                            {activeTab === 'overview' && (
+                                                <OverviewView
+                                                    records={records}
+                                                />
+                                            )}
+
+                                            {activeTab === 'charts' && (
+                                                <ChartsView records={records} />
+                                            )}
+
+                                            {activeTab === 'history' && (
+                                                <ExerciseRecordView
+                                                    records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                                    selectedRecordIds={selectedRecordIds}
+                                                    onSelectIds={setSelectedRecordIds}
+                                                    onBatchDelete={handleBatchDelete}
+                                                    historyPage={historyPage}
+                                                    setHistoryPage={setHistoryPage}
+                                                    totalPages={Math.ceil(records.length / pageSize)}
+                                                />
+                                            )}
+
+                                            {activeTab === 'personal-best' && (
+                                                <PersonalBestView records={records} />
+                                            )}
+
+                                            {activeTab === 'knowledge-summary' && (
+                                                <KnowledgeSummaryView
+                                                    knowledge={knowledge}
+                                                    onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
+                                                    onEditKnowledge={handleEditKnowledge}
+                                                />
+                                            )}
+
+                                            {activeTab === 'knowledge-entry' && (
+                                                <KnowledgeEntryView
+                                                    onAddKnowledge={addKnowledge}
+                                                />
+                                            )}
+
+                                            {activeTab === 'form' && (
+                                                <NewRecordForm
+                                                    onAddRecord={async (newRecord) => {
+                                                        setRecords(prev => [newRecord, ...prev]);
+
+                                                        // 自动保存到云端
+                                                        await AutoCloudSync.autoSaveRecord(newRecord, notify);
+                                                    }}
+                                                />
+                                            )}
+
+                                            {activeTab === 'plan-list' && (
+                                                <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                    <PlanListView
+                                                        plans={plansWithProgress}
+                                                        onCreate={async (plan) => {
+                                                            const formattedPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => [formattedPlan, ...prev]);
+
+                                                            // 自动保存到云端
+                                                            await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                        }}
+                                                        onUpdate={async (plan) => {
+                                                            const formattedPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                            // 自动更新到云端
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                        }}
+                                                        onDelete={async (id) => {
+                                                            setPlans(prev => prev.filter(p => p.id !== id));
+
+                                                            // 自动从云端删除
+                                                            await AutoCloudSync.autoDeletePlan(id, notify);
+                                                        }}
+                                                        onShowDetail={(id) => {
+                                                            setActiveTab('plan-detail');
+                                                        }}
+                                                    />
+                                                </Suspense>
+                                            )}
+
+                                            {activeTab === 'plan-detail' && (
+                                                <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                    {plansWithProgress.length > 0 ? (
+                                                        <PlanDetailView
+                                                            plan={plansWithProgress[0]}
+                                                            onBack={() => setActiveTab('plan-list')}
+                                                            onEdit={() => { }}
+                                                            onUpdate={async (plan) => {
+                                                                const formattedPlan = {
+                                                                    ...plan,
+                                                                    module: plan.module as StudyPlan['module']
+                                                                };
+                                                                setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                                // 自动更新到云端
+                                                                await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                            }}
+                                                        />
+                                                    ) : (
+                                                        <div className="flex items-center justify-center h-64">
+                                                            <div className="text-center">
+                                                                <p className="text-gray-500 mb-4"><MixedText text="未找到学习计划" /></p>
+                                                                <button
+                                                                    onClick={() => setActiveTab('plan-list')}
+                                                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                                                                >
+                                                                    <MixedText text="返回计划列表" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </Suspense>
+                                            )}
+
+                                            {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                                <SettingsView
+                                                    onExport={handleExportData}
+                                                    onImport={handleImportData}
+                                                    onClearLocalData={handleClearLocalData}
+                                                    pageSize={pageSize}
+                                                    setPageSize={setPageSize}
+                                                    activeTab={activeTab}
+                                                    navMode={navMode}
+                                                    records={records}
+                                                    plans={plans}
+                                                    knowledge={knowledge}
+                                                    settings={{
+                                                        'page-size': String(pageSize),
+                                                        'exam-tracker-nav-mode': navMode,
+                                                        // 可以添加更多设置项
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    </main>
+                                </div>
+                            </SidebarProvider>
+                        ) : (
+                            <div className="flex h-screen relative z-[2]">
                                 <DockNavigation
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
                                     navMode={navMode}
                                     userInfo={<DockUserInfo />}
                                 />
-                            )}
-
-                            <main className={`flex-1 overflow-auto ${activeTab === 'overview' ? 'p-0' : 'p-6'} w-full max-w-none bg-[#fafafa] dark:bg-background`}>
-                                {activeTab === 'overview' ? (
-                                    <div className="p-6">
+                                <main className={`flex-1 overflow-auto ${activeTab === 'overview' ? 'p-0' : 'p-6'} w-full max-w-7xl mx-auto bg-[#fafafa] dark:bg-background`}>
+                                    {activeTab === 'overview' ? (
+                                        <div className="p-6">
+                                            <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
+                                        </div>
+                                    ) : (
                                         <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
-                                    </div>
-                                ) : (
-                                    <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
-                                )}
+                                    )}
 
+                                    {activeTab === 'overview' && (
+                                        <OverviewView
+                                            records={records}
+                                        />
+                                    )}
 
+                                    {activeTab === 'charts' && (
+                                        <ChartsView records={records} />
+                                    )}
 
-                                {activeTab === 'overview' && (
-                                    <OverviewView
-                                        records={records}
-                                    />
-                                )}
+                                    {activeTab === 'history' && (
+                                        <ExerciseRecordView
+                                            records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                            selectedRecordIds={selectedRecordIds}
+                                            onSelectIds={setSelectedRecordIds}
+                                            onBatchDelete={handleBatchDelete}
+                                            historyPage={historyPage}
+                                            setHistoryPage={setHistoryPage}
+                                            totalPages={Math.ceil(records.length / pageSize)}
+                                        />
+                                    )}
 
-                                {activeTab === 'charts' && (
-                                    <ChartsView records={records} />
-                                )}
+                                    {activeTab === 'personal-best' && (
+                                        <PersonalBestView records={records} />
+                                    )}
 
-                                {activeTab === 'history' && (
-                                    <ExerciseRecordView
-                                        records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
-                                        selectedRecordIds={selectedRecordIds}
-                                        onSelectIds={setSelectedRecordIds}
-                                        onBatchDelete={handleBatchDelete}
-                                        historyPage={historyPage}
-                                        setHistoryPage={setHistoryPage}
-                                        totalPages={Math.ceil(records.length / pageSize)}
-                                    />
-                                )}
+                                    {activeTab === 'knowledge-summary' && (
+                                        <KnowledgeSummaryView
+                                            knowledge={knowledge}
+                                            onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
+                                            onEditKnowledge={handleEditKnowledge}
+                                        />
+                                    )}
 
-                                {activeTab === 'personal-best' && (
-                                    <PersonalBestView records={records} />
-                                )}
+                                    {activeTab === 'knowledge-entry' && (
+                                        <KnowledgeEntryView
+                                            onAddKnowledge={addKnowledge}
+                                        />
+                                    )}
 
-                                {activeTab === 'knowledge-summary' && (
-                                    <KnowledgeSummaryView
-                                        knowledge={knowledge}
-                                        onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
-                                        onEditKnowledge={handleEditKnowledge}
-                                    />
-                                )}
-
-                                {activeTab === 'knowledge-entry' && (
-                                    <KnowledgeEntryView
-                                        onAddKnowledge={addKnowledge}
-                                    />
-                                )}
-
-                                {activeTab === 'form' && (
-                                    <NewRecordForm
-                                        onAddRecord={async (newRecord) => {
-                                            setRecords(prev => [newRecord, ...prev]);
-
-                                            // 自动保存到云端
-                                            await AutoCloudSync.autoSaveRecord(newRecord, notify);
-                                        }}
-                                    />
-                                )}
-
-                                {activeTab === 'plan-list' && (
-                                    <Suspense fallback={<SimpleLoadingSpinner />}>
-                                        <PlanListView
-                                            plans={plansWithProgress}
-                                            onCreate={async (plan) => {
-                                                const formattedPlan = {
-                                                    ...plan,
-                                                    module: plan.module as StudyPlan['module']
-                                                };
-                                                setPlans(prev => [formattedPlan, ...prev]);
+                                    {activeTab === 'form' && (
+                                        <NewRecordForm
+                                            onAddRecord={async (newRecord) => {
+                                                setRecords(prev => [newRecord, ...prev]);
 
                                                 // 自动保存到云端
-                                                await AutoCloudSync.autoSavePlan(formattedPlan, notify);
-                                            }}
-                                            onUpdate={async (plan) => {
-                                                const formattedPlan = {
-                                                    ...plan,
-                                                    module: plan.module as StudyPlan['module']
-                                                };
-                                                setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
-
-                                                // 自动更新到云端
-                                                await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
-                                            }}
-                                            onDelete={async (id) => {
-                                                setPlans(prev => prev.filter(p => p.id !== id));
-
-                                                // 自动从云端删除
-                                                await AutoCloudSync.autoDeletePlan(id, notify);
-                                            }}
-                                            onShowDetail={(id) => {
-                                                setActiveTab('plan-detail');
+                                                await AutoCloudSync.autoSaveRecord(newRecord, notify);
                                             }}
                                         />
-                                    </Suspense>
-                                )}
+                                    )}
 
-                                {activeTab === 'plan-detail' && (
-                                    <Suspense fallback={<SimpleLoadingSpinner />}>
-                                        {plansWithProgress.length > 0 ? (
-                                            <PlanDetailView
-                                                plan={plansWithProgress[0]}
-                                                onBack={() => setActiveTab('plan-list')}
-                                                onEdit={() => { }}
-                                                onUpdate={async (updatedPlan: StudyPlan) => {
+                                    {activeTab === 'plan-list' && (
+                                        <Suspense fallback={<SimpleLoadingSpinner />}>
+                                            <PlanListView
+                                                plans={plansWithProgress}
+                                                onCreate={async (plan) => {
                                                     const formattedPlan = {
-                                                        ...updatedPlan,
-                                                        module: updatedPlan.module as StudyPlan['module']
+                                                        ...plan,
+                                                        module: plan.module as StudyPlan['module']
                                                     };
-                                                    setPlans(prev => prev.map(p => p.id === updatedPlan.id ? formattedPlan : p));
+                                                    setPlans(prev => [formattedPlan, ...prev]);
+
+                                                    // 自动保存到云端
+                                                    await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                }}
+                                                onUpdate={async (plan) => {
+                                                    const formattedPlan = {
+                                                        ...plan,
+                                                        module: plan.module as StudyPlan['module']
+                                                    };
+                                                    setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                     // 自动更新到云端
                                                     await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
                                                 }}
+                                                onDelete={async (id) => {
+                                                    setPlans(prev => prev.filter(p => p.id !== id));
+
+                                                    // 自动从云端删除
+                                                    await AutoCloudSync.autoDeletePlan(id, notify);
+                                                }}
+                                                onShowDetail={(id) => {
+                                                    setActiveTab('plan-detail');
+                                                }}
                                             />
-                                        ) : (
-                                            <div className="flex items-center justify-center h-64">
-                                                <div className="text-center">
-                                                    <p className="text-gray-500 mb-4"><MixedText text="暂无学习计划" /></p>
-                                                    <button
-                                                        onClick={() => setActiveTab('plan-list')}
-                                                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                                    >
-                                                        返回计划列表
-                                                    </button>
+                                        </Suspense>
+                                    )}
+
+                                    {activeTab === 'plan-detail' && (
+                                        <Suspense fallback={<SimpleLoadingSpinner />}>
+                                            {plansWithProgress.length > 0 ? (
+                                                <PlanDetailView
+                                                    plan={plansWithProgress[0]}
+                                                    onBack={() => setActiveTab('plan-list')}
+                                                    onEdit={() => { }}
+                                                    onUpdate={async (plan) => {
+                                                        const formattedPlan = {
+                                                            ...plan,
+                                                            module: plan.module as StudyPlan['module']
+                                                        };
+                                                        setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                        // 自动更新到云端
+                                                        await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                    }}
+                                                />
+                                            ) : (
+                                                <div className="flex items-center justify-center h-64">
+                                                    <div className="text-center">
+                                                        <p className="text-gray-500 mb-4"><MixedText text="未找到学习计划" /></p>
+                                                        <button
+                                                            onClick={() => setActiveTab('plan-list')}
+                                                            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+                                                        >
+                                                            <MixedText text="返回计划列表" />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
-                                    </Suspense>
-                                )}
+                                            )}
+                                        </Suspense>
+                                    )}
 
-                                {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                    <SettingsView
-                                        onExport={handleExportData}
-                                        onImport={handleImportData}
-                                        onClearLocalData={handleClearLocalData}
-                                        pageSize={pageSize}
-                                        setPageSize={setPageSize}
-                                        activeTab={activeTab}
-                                        navMode={navMode}
-                                        records={records}
-                                        plans={plans}
-                                        knowledge={knowledge}
-                                        settings={{
-                                            'page-size': String(pageSize),
-                                            'exam-tracker-nav-mode': navMode,
-                                            // 可以添加更多设置项
-                                        }}
-                                    />
-                                )}
-
-
-                            </main>
-                        </div>
+                                    {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                        <SettingsView
+                                            onExport={handleExportData}
+                                            onImport={handleImportData}
+                                            onClearLocalData={handleClearLocalData}
+                                            pageSize={pageSize}
+                                            setPageSize={setPageSize}
+                                            activeTab={activeTab}
+                                            navMode={navMode}
+                                            records={records}
+                                            plans={plans}
+                                            knowledge={knowledge}
+                                            settings={{
+                                                'page-size': String(pageSize),
+                                                'exam-tracker-nav-mode': navMode,
+                                                // 可以添加更多设置项
+                                            }}
+                                        />
+                                    )}
+                                </main>
+                            </div>
+                        )}
                     </LoadingWrapper>
 
                     {/* 导入确认对话框 */}

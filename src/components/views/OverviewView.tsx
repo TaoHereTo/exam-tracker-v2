@@ -289,7 +289,7 @@ export function OverviewView({ records }: OverviewViewProps) {
         <TooltipProvider>
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
                 {overviewAnimate ? (
-                    <Marquee className="w-full max-w-6xl" pauseOnHover repeat={2}>
+                    <Marquee className="w-full" pauseOnHover repeat={2}>
                         <div className="flex gap-6">
                             {group1.map((item, idx) => (
                                 <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
@@ -321,7 +321,7 @@ export function OverviewView({ records }: OverviewViewProps) {
                         </div>
                     </Marquee>
                 ) : (
-                    <div className="w-full max-w-6xl grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-6">
+                    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-6">
                         {cards.map((item, idx) => (
                             <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
                                 <CardHeader className="flex flex-row items-center justify-between pb-0">
@@ -352,7 +352,7 @@ export function OverviewView({ records }: OverviewViewProps) {
                     </div>
                 )}
                 {overviewAnimate ? (
-                    <Marquee className="w-full max-w-6xl" pauseOnHover reverse repeat={2}>
+                    <Marquee className="w-full" pauseOnHover reverse repeat={2}>
                         <div className="flex gap-6">
                             {group2.map((item, idx) => (
                                 <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>

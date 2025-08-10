@@ -255,7 +255,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     }
 
     onAddKnowledge(knowledgeData);
-    showSuccess();
+    // 移除这里的 showSuccess()，因为 MainApp 中的 addKnowledge 会处理通知
   };
 
   // 获取字段标签和占位符
@@ -310,8 +310,8 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   };
 
   return (
-    <div className="flex items-start justify-center min-h-screen p-4 pt-4">
-      <Card className="w-full max-w-md flex flex-col">
+    <div className="flex items-start justify-center w-full">
+      <Card className="w-full max-w-2xl flex flex-col">
         <CardHeader className="pb-2">
           <CardTitle className="text-2xl">
             <MixedText text={config.title} />

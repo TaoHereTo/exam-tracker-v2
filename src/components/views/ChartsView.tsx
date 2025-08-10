@@ -251,7 +251,7 @@ export function ChartsView({ records }: ChartsViewProps) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
-            <Tabs defaultValue="perMinute" className="w-full max-w-5xl mx-auto mb-6">
+            <Tabs defaultValue="perMinute" className="w-full mb-6">
                 <div className="flex justify-center mb-4">
                     <TabsList className="w-fit">
                         <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>

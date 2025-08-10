@@ -193,7 +193,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                 </ButtonGroup>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full max-w-none items-stretch">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
                 {plans.map(plan => (
                     <Card key={plan.id} className="shadow-md hover:shadow-lg transition-all duration-300 min-h-[220px] w-full flex flex-col">
                         <CardHeader className="pb-3">
@@ -268,7 +268,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
             </div>
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
+                    <Card className="w-full max-h-[90vh] overflow-y-auto">
                         <CardHeader>
                             <CardTitle>{editId ? <MixedText text="编辑计划" /> : <MixedText text="新建计划" />}</CardTitle>
                         </CardHeader>
