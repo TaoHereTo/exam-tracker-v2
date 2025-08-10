@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState, useEffect } from "react";
 import ReactECharts from 'echarts-for-react';
-import { getModuleColor } from "@/config/exam";
+import { getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 
 // data: 做题记录数组，score 字段为百分比（如 85 表示 85%）或每分钟得分
 interface TrendChartProps {
@@ -98,17 +98,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 top: 20,
                 left: 0,
                 orient: 'vertical',
-                itemWidth: 18,
-                itemHeight: 12,
-                borderRadius: 6,
-                textStyle: { fontWeight: 'bold', fontSize: 14, fontFamily: 'Times New Roman, 思源宋体, serif' },
-                icon: 'roundRect',
-                backgroundColor: 'rgba(255,255,255,0.7)',
-                borderColor: '#e0e6f1',
-                borderWidth: 1,
-                padding: [8, 12],
-                shadowColor: 'rgba(51,102,255,0.08)',
-                shadowBlur: 8
+                ...UNIFIED_LEGEND_STYLE
             },
             grid: {
                 left: 130,
@@ -179,10 +169,10 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
     }, [allModules, allDates, chartData, yMax]);
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <ReactECharts
                 option={option}
-                style={{ height: 400, width: '100%' }}
+                style={{ height: '100%', width: '100%' }}
                 key={`${forceUpdate}-${allDates.join(',')}-${allModules.join(',')}`}
                 notMerge={true}
                 lazyUpdate={false}

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
+import { normalizeModuleName, getModuleScore, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { TrendChart } from "@/components/ui/TrendChart";
 import { ModulePieChart } from "@/components/ui/ModulePieChart";
 import ReactECharts from 'echarts-for-react';
@@ -114,7 +114,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                 }
             },
             legend: {
-                textStyle: { fontFamily: '思源宋体, Times New Roman, serif' }
+                ...UNIFIED_LEGEND_STYLE
             }
         },
         series: [
@@ -168,8 +168,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         ]
     };
     return (
-        <div style={{ width: '100%', height: '100%' }}>
-            <ReactECharts option={option} style={{ height: 400, width: '100%' }} />
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
+            </div>
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
                 能力值 =
                 <span className="mx-1 font-bold"><MixedText text="正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2" /></span>

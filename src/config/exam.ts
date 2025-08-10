@@ -46,6 +46,25 @@ export const MODULE_COLORS: Record<string, string> = {
     '判断推理': '#00B8D9',
 };
 
+// 统一的图例样式配置
+export const UNIFIED_LEGEND_STYLE = {
+    itemWidth: 18,
+    itemHeight: 12,
+    borderRadius: 6,
+    textStyle: {
+        fontWeight: 'bold',
+        fontSize: 14,
+        fontFamily: 'Times New Roman, 思源宋体, serif'
+    },
+    icon: 'roundRect' as const,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderColor: '#e0e6f1',
+    borderWidth: 1,
+    padding: [8, 12] as [number, number],
+    shadowColor: 'rgba(51,102,255,0.08)',
+    shadowBlur: 8
+};
+
 export const MODULE_SCORES = {
     '政治理论': 0.7, '常识判断': 0.8, '判断推理': 0.8,
     '言语理解': 0.8, '数量关系': 0.8, '资料分析': 0.7

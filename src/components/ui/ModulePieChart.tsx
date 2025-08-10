@@ -2,7 +2,7 @@
 
 import React from "react";
 import ReactECharts from 'echarts-for-react';
-import { FULL_EXAM_CONFIG, normalizeModuleName, getModuleColor } from "@/config/exam";
+import { FULL_EXAM_CONFIG, normalizeModuleName, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 
 interface ModulePieChartProps {
@@ -57,10 +57,9 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
         legend: {
             orient: 'vertical',
             left: 10,
+            top: 20,
             formatter: (name: string) => name,
-            textStyle: {
-                fontFamily: 'Times New Roman, 思源宋体, serif',
-            },
+            ...UNIFIED_LEGEND_STYLE
         },
         series: [
             {
@@ -94,11 +93,13 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <ReactECharts
-            option={option}
-            style={{ height: 400, width: '100%' }}
-            opts={{ renderer: 'canvas' }}
-            theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
-        />
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <ReactECharts
+                option={option}
+                style={{ height: '100%', width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+                theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
+            />
+        </div>
     );
 }; 

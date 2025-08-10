@@ -312,12 +312,14 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   return (
     <div className="flex items-start justify-center w-full">
       <Card className="w-full max-w-2xl flex flex-col">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-2xl">
-            <MixedText text={config.title} />
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 pb-2">
+        {!initialData && (
+          <CardHeader className="pb-2">
+            <CardTitle className="text-2xl">
+              <MixedText text={config.title} />
+            </CardTitle>
+          </CardHeader>
+        )}
+        <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
           <BaseForm
             className="form-stack"
             validationSchema={getValidationSchema()}

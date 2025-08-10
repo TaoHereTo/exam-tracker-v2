@@ -12,9 +12,10 @@ import { lazy, Suspense } from 'react';
 const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, X } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
+import { Button } from '@/components/ui/button';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -414,9 +415,12 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             {/* 编辑弹窗 */}
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <SimpleDialogContent>
-                    <SimpleDialogHeader>
+                    <div className="flex justify-between items-center">
                         <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
-                    </SimpleDialogHeader>
+                        <Button variant="ghost" size="icon" onClick={() => setEditDialogOpen(false)} className="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6">
+                            <X className="w-3 h-3" />
+                        </Button>
+                    </div>
                     {editError ? (
                         <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>
                     ) : editItem ? (
@@ -430,9 +434,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                             </Suspense>
                         </div>
                     ) : null}
-                    <SimpleDialogFooter>
-                        <SimpleDialogCancel onClick={() => { setEditDialogOpen(false); setEditError(""); }}><MixedText text="取消" /></SimpleDialogCancel>
-                    </SimpleDialogFooter>
                 </SimpleDialogContent>
             </SimpleDialog>
             {/* 单个删除确认弹窗 */}
