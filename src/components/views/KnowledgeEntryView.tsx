@@ -57,32 +57,32 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
     const carouselContent = useMemo(() => (
         <>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="data-analysis" onAddKnowledge={handleAdd('data-analysis')} />
                 </div>
             </CarouselItem>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="politics" onAddKnowledge={handleAdd('politics')} />
                 </div>
             </CarouselItem>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="math" onAddKnowledge={handleAdd('math')} />
                 </div>
             </CarouselItem>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="common" onAddKnowledge={handleAdd('common')} />
                 </div>
             </CarouselItem>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="verbal" onAddKnowledge={handleAdd('verbal')} />
                 </div>
             </CarouselItem>
             <CarouselItem className="basis-full pl-0">
-                <div className="w-full max-w-2xl mx-auto">
+                <div className="w-full max-w-lg mx-auto">
                     <ModuleForm module="logic" onAddKnowledge={handleAdd('logic')} />
                 </div>
             </CarouselItem>
