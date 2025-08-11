@@ -283,7 +283,7 @@ export function SettingsView({
                                         <TooltipTrigger asChild>
                                             <InteractiveHoverButton
                                                 onClick={handleViewCloudData}
-                                                hoverColor="#3730a3"
+                                                hoverColor="#be185d"
                                                 icon={<Eye className="w-4 h-4" />}
                                                 className="text-sm h-9"
                                             >

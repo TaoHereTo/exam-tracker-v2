@@ -228,7 +228,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
                                                         <AlertDialogAction
                                                             onClick={handleClearCloudData}
-                                                            className="bg-destructive text-white hover:bg-destructive/90"
+                                                            style={{ background: '#dc2626' }}
                                                         >
                                                             确认清空
                                                         </AlertDialogAction>

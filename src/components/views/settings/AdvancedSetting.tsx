@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalStorage";
 
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 
 
@@ -309,7 +309,7 @@ export function AdvancedSetting() {
                                         loadCloudImages();
                                     }
                                 }}
-                                hoverColor="#334155"
+                                hoverColor="#4d7c0f"
                                 className="h-9"
                                 icon={showImageManager ? <XCircle className="w-4 h-4" /> : <Settings className="w-4 h-4" />}
                             >
@@ -576,22 +576,22 @@ export function AdvancedSetting() {
                         >
                             <MixedText text="取消" />
                         </AlertDialogCancel>
-                        <CapsuleButton
+                        <AlertDialogAction
                             onClick={() => {
                                 confirmDeleteImages();
                             }}
                             disabled={isDeleting}
-                            className="bg-red-600 hover:bg-red-700 focus:ring-red-500"
+                            style={{ background: '#dc2626' }}
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-current"></div>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-current"></div>
                                     <MixedText text="删除中..." />
                                 </div>
                             ) : (
                                 <MixedText text="确认删除" />
                             )}
-                        </CapsuleButton>
+                        </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

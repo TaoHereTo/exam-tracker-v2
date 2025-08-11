@@ -12,7 +12,7 @@ const rainbowButtonVariants = cva(
     "text-sm font-medium whitespace-nowrap",
     "disabled:pointer-events-none disabled:opacity-50",
     "[&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
-    "active:scale-95 active:shadow-inner",
+    "active:scale-98 active:shadow-inner active:translate-y-0.25 transition-all duration-200 ease-out",
   ),
   {
     variants: {

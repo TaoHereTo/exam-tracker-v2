@@ -194,7 +194,7 @@ export const InteractiveHoverButton = React.forwardRef<
     <button
       ref={ref}
       className={cn(
-        `group relative w-auto ${compact ? 'min-w-[32px]' : 'min-w-[100px]'} cursor-pointer overflow-hidden rounded-sm border border-gray-200 bg-white p-2 px-4 text-center font-semibold text-black transition-all duration-300 hover:border-transparent active:scale-95 active:shadow-inner text-sm flex items-center justify-center my-1`,
+        `group relative w-auto ${compact ? 'min-w-[32px]' : 'min-w-[100px]'} cursor-pointer overflow-hidden rounded-sm border border-gray-200 bg-white p-2 px-4 text-center font-semibold text-black transition-all duration-300 hover:border-transparent active:scale-95 active:shadow-inner active:translate-y-0.5 transition-all duration-150 ease-out text-sm flex items-center justify-center my-1`,
         className,
       )}
       style={{

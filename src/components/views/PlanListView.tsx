@@ -247,7 +247,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                     <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
                                         <InteractiveHoverButton
                                             onClick={() => handleOpenForm(plan)}
-                                            hoverColor="#b45309"
+                                            hoverColor="#0891b2"
                                             icon={<Edit className="w-4 h-4" />}
                                             className="h-9"
                                         >
