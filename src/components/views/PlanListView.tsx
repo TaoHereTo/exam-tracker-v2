@@ -7,14 +7,14 @@ import { Progress } from "@/components/ui/progress";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { FormField } from "@/components/ui/FormField";
 import { FormError } from "@/components/ui/form-error";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { normalizeModuleName } from "@/config/exam";
 import { format } from "date-fns";
 import { Plus, Edit, Trash2, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
-import { CapsuleButton } from "@/components/ui/CapsuleButton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
@@ -203,35 +203,34 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
             <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold"><MixedText text="学习计划列表" /></h2>
                 <ButtonGroup spacing="sm" margin="none">
-                    <InteractiveHoverButton
+                    <Button
                         onClick={() => handleOpenForm()}
-                        hoverColor="#6d28d9"
-                        icon={<Plus className="w-4 h-4" />}
                         className="h-9"
                     >
+                        <Plus className="w-4 h-4 mr-2" />
                         <MixedText text="新建计划" />
-                    </InteractiveHoverButton>
+                    </Button>
                 </ButtonGroup>
             </div>
 
             {/* 切换按钮 */}
             <div className="flex gap-2">
-                <CapsuleButton
+                <Button
                     variant={!showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(false)}
                     className="flex items-center gap-2"
                 >
                     <Clock className="w-4 h-4" />
                     <MixedText text={`进行中的计划 (${activePlans.length})`} />
-                </CapsuleButton>
-                <CapsuleButton
+                </Button>
+                <Button
                     variant={showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(true)}
                     className="flex items-center gap-2"
                 >
                     <CheckCircle className="w-4 h-4" />
                     <MixedText text={`已完成的计划 (${completedPlans.length})`} />
-                </CapsuleButton>
+                </Button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
@@ -245,23 +244,32 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                         <MixedText text={plan.name} className="text-lg font-semibold truncate" />
                                     </div>
                                     <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
-                                        <InteractiveHoverButton
-                                            onClick={() => handleOpenForm(plan)}
-                                            hoverColor="#0891b2"
-                                            icon={<Edit className="w-4 h-4" />}
-                                            className="h-9"
-                                        >
-                                            <MixedText text="编辑" />
-                                        </InteractiveHoverButton>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        onClick={() => handleOpenForm(plan)}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text="编辑" /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <InteractiveHoverButton
-                                                    hoverColor="#EF4444"
-                                                    icon={<Trash2 className="w-4 h-4" />}
-                                                    className="h-9"
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                                                 >
-                                                    <MixedText text="删除" />
-                                                </InteractiveHoverButton>
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
@@ -326,14 +334,13 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             )}
                         </p>
                         {!showCompleted && (
-                            <InteractiveHoverButton
+                            <Button
                                 onClick={() => handleOpenForm()}
-                                hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
-                                icon={<Plus className="w-4 h-4" />}
                                 className="h-9"
                             >
+                                <Plus className="w-4 h-4 mr-2" />
                                 <MixedText text="创建第一个计划" />
-                            </InteractiveHoverButton>
+                            </Button>
                         )}
                     </div>
                 )}
@@ -464,12 +471,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                     </div>
                                     <div className="form-actions">
                                         <ButtonGroup spacing="sm" margin="none" className="justify-end">
-                                            <CapsuleButton type="button" variant="outline" onClick={handleCloseForm}>
+                                            <Button type="button" variant="outline" onClick={handleCloseForm}>
                                                 <MixedText text="取消" />
-                                            </CapsuleButton>
-                                            <CapsuleButton type="submit">
+                                            </Button>
+                                            <Button type="submit" className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
                                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
-                                            </CapsuleButton>
+                                            </Button>
                                         </ButtonGroup>
                                     </div>
                                 </div>

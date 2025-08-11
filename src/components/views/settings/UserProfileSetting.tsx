@@ -11,7 +11,7 @@ import { User, Save } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MixedText } from "@/components/ui/MixedText";
 import { useAuth } from "@/contexts/AuthContext";
-import { CapsuleButton } from "@/components/ui/CapsuleButton";
+
 
 export function UserProfileSetting() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -152,13 +152,13 @@ export function UserProfileSetting() {
 
                 {/* 保存按钮 */}
                 <div className="flex justify-end gap-2">
-                    <CapsuleButton
+                    <Button
                         onClick={handleSaveProfile}
-                        className="min-w-[100px]"
+                        className="min-w-[100px] bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
                     >
                         <Save className="h-4 w-4 mr-2" />
                         <MixedText text="保存" />
-                    </CapsuleButton>
+                    </Button>
                 </div>
 
                 {/* 当前信息预览 */}

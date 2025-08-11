@@ -4,14 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
     ContextMenu,
     ContextMenuContent,
     ContextMenuItem,
     ContextMenuTrigger,
 } from "@/components/ui/context-menu";
-import { Search, Upload } from 'lucide-react';
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { Search, Upload, Trash2, Edit, FileSpreadsheet } from 'lucide-react';
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MixedText } from "@/components/ui/MixedText";
 
@@ -144,13 +145,24 @@ export function UnifiedTable<T, K extends string | number = string | number>({
             <div className="mb-2 flex justify-between items-center">
                 <span className="text-gray-500 text-sm">共 <MixedText text={String(data.length)} /> 条</span>
                 {onBatchDelete && (
-                    <InteractiveHoverButton
-                        hoverColor="#dc2626"
-                        disabled={selected.length === 0}
-                        onClick={onBatchDelete}
-                    >
-                        {batchDeleteText}
-                    </InteractiveHoverButton>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    disabled={selected.length === 0}
+                                    onClick={onBatchDelete}
+                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p><MixedText text={batchDeleteText} /></p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 )}
             </div>
             <table className="min-w-full border-collapse text-sm table-fixed">
@@ -348,66 +360,95 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         <div className="flex gap-2 shrink-0 flex-wrap">
                             {/* 自定义操作按钮 */}
                             {actions.map((action, index) => (
-                                <InteractiveHoverButton
+                                <Button
                                     key={index}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
+                                    variant={action.variant || "default"}
+                                    size="sm"
                                     className={`${action.className} h-9`}
-                                    hoverColor={action.variant === "destructive" ? "#dc2626" : "#3B82F6"}
                                 >
                                     {action.icon}
                                     {action.label}
-                                </InteractiveHoverButton>
+                                </Button>
                             ))}
 
                             {/* 新建按钮 */}
                             {showNew && onNew && (
-                                <InteractiveHoverButton
+                                <Button
                                     onClick={onNew}
-                                    hoverColor="#6d28d9"
-                                    compact={true}
+                                    variant="default"
+                                    size="sm"
                                     className="h-9"
                                 >
                                     新建
-                                </InteractiveHoverButton>
+                                </Button>
                             )}
 
                             {/* 导出按钮 */}
                             {showExport && onExport && (
-                                <InteractiveHoverButton
-                                    onClick={onExport}
-                                    hoverColor="#059669"
-                                    icon={<Upload className="w-4 h-4" />}
-                                    className="h-9"
-                                >
-                                    导出为Excel
-                                </InteractiveHoverButton>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={onExport}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                            >
+                                                <FileSpreadsheet className="w-4 h-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="导出为Excel" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             )}
 
                             {/* 编辑按钮 */}
                             {showEdit && onEdit && (
-                                <InteractiveHoverButton
-                                    onClick={onEdit}
-                                    disabled={editDisabled}
-                                    hoverColor="rgb(43, 127, 255)"
-                                    compact={true}
-                                    className="h-9"
-                                >
-                                    编辑
-                                </InteractiveHoverButton>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={onEdit}
+                                                disabled={editDisabled}
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                            >
+                                                <Edit className="w-4 h-4" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="编辑" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             )}
 
                             {/* 删除按钮 */}
                             {showDelete && onDelete && (
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <InteractiveHoverButton
-                                            disabled={deleteDisabled}
-                                            hoverColor="#dc2626"
-                                            className="h-9"
-                                        >
-                                            批量删除
-                                        </InteractiveHoverButton>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        disabled={deleteDisabled}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                    >
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text="批量删除" /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>

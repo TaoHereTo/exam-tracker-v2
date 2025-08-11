@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CapsuleButton } from './CapsuleButton';
+
 import { X, Eye, Cloud, FileImage, Upload, Image as ImageIcon } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
 import { MixedText } from './MixedText';
 import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
-import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
+import { Button } from '@/components/ui/button';
 import { usePasteContext } from '@/contexts/PasteContext';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface UnifiedImageProps {
     value?: string; // 当前选中的图片ID
@@ -300,19 +301,28 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 id={`file-input-${componentId.current}`}
                                             />
                                             <div className="w-full">
-                                                <InteractiveHoverButton
-                                                    hoverColor="#65a30d"
-                                                    className="w-full text-xs py-1.5"
-                                                    icon={<Upload className="w-3 h-3" />}
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        document.getElementById(`file-input-${componentId.current}`)?.click();
-                                                    }}
-                                                >
-                                                    <MixedText text="从本地选择" />
-                                                </InteractiveHoverButton>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="w-full text-xs py-1.5 h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    e.stopPropagation();
+                                                                    document.getElementById(`file-input-${componentId.current}`)?.click();
+                                                                }}
+                                                            >
+                                                                <i className="bi bi-inbox text-base flex items-center justify-center"></i>
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="从本地选择" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             </div>
                                         </div>
 
@@ -322,14 +332,23 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 <SupabaseImageSelectorDialog
                                                     onImageSelected={handleImageSelected}
                                                     trigger={
-                                                        <InteractiveHoverButton
-                                                            hoverColor="#0284c7"
-                                                            className="w-full text-xs py-1.5"
-                                                            icon={<Cloud className="w-3 h-3" />}
-                                                            type="button"
-                                                        >
-                                                            <MixedText text="从云端选择" />
-                                                        </InteractiveHoverButton>
+                                                        <TooltipProvider>
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        className="w-full text-xs py-1.5 h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                                        type="button"
+                                                                    >
+                                                                        <i className="bi bi-cloud-plus text-base flex items-center justify-center"></i>
+                                                                    </Button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    <p><MixedText text="从云端选择" /></p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
                                                     }
                                                 />
                                             </div>
@@ -380,23 +399,41 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
                         {/* 操作按钮 */}
                         <div className="absolute top-2 right-2 flex gap-1">
-                            <CapsuleButton
-                                size="sm"
-                                variant="secondary"
-                                onClick={handlePreview}
-                                className="h-8 w-8 p-0"
-                            >
-                                <Eye className="h-4 w-4" />
-                            </CapsuleButton>
-                            <CapsuleButton
-                                size="sm"
-                                variant="destructive"
-                                onClick={handleRemoveImage}
-                                disabled={isDeleting}
-                                className="h-8 w-8 p-0"
-                            >
-                                <X className="h-4 w-4" />
-                            </CapsuleButton>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            onClick={handlePreview}
+                                            className="h-8 w-8 p-0"
+                                        >
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="预览图片" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={handleRemoveImage}
+                                            disabled={isDeleting}
+                                            className="h-8 w-8 p-0"
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="移除图片" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         </div>
                     </div>
 
@@ -406,38 +443,54 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         onClick={(e) => e.stopPropagation()}
                     >
                         {(mode === 'upload' || mode === 'combined') && (
-                            <CapsuleButton
-                                type="button"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    fileInputRef.current?.click();
-                                }}
-                                variant="outline"
-                                size="sm"
-                                className="flex items-center gap-2"
-                            >
-                                <Upload className="h-4 w-4" />
-                                <MixedText text="重新上传" />
-                            </CapsuleButton>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                fileInputRef.current?.click();
+                                            }}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                        >
+                                            <i className="bi bi-inbox text-base flex items-center justify-center"></i>
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="重新上传" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                         )}
                         {(mode === 'select' || mode === 'combined') && (
                             <SupabaseImageSelectorDialog
                                 onImageSelected={handleImageSelected}
                                 trigger={
-                                    <CapsuleButton
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                        }}
-                                        variant="outline"
-                                        size="sm"
-                                        className="flex items-center gap-2"
-                                    >
-                                        <ImageIcon className="h-4 w-4" />
-                                        <MixedText text="重新选择" />
-                                    </CapsuleButton>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    type="button"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                    }}
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                >
+                                                    <i className="bi bi-cloud-plus text-base flex items-center justify-center"></i>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p><MixedText text="重新选择" /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 }
                             />
                         )}

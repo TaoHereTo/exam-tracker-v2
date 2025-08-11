@@ -7,8 +7,6 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Alert, AlertDescription } from '../ui/alert'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
-import { CapsuleButton } from '../ui/CapsuleButton'
-import { RainbowButton } from '../magicui/rainbow-button'
 import { MixedText } from '../ui/MixedText'
 import { Checkbox } from '../ui/checkbox'
 
@@ -131,13 +129,13 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
 
                 {/* 登录按钮 */}
                 <div className="w-full mb-4">
-                    <RainbowButton
+                    <Button
                         type="submit"
                         disabled={loading}
                         className="w-full"
                     >
                         <MixedText text={loading ? '登录中...' : '登录'} />
-                    </RainbowButton>
+                    </Button>
                 </div>
 
                 {/* 注册链接 */}

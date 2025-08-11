@@ -19,7 +19,7 @@ import { PersonalBestView } from "@/components/views/PersonalBestView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { CapsuleButton } from "@/components/ui/CapsuleButton";
+
 import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy } from "lucide-react";
 import { generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";

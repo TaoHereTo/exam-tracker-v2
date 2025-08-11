@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MODULES } from '@/config/exam';
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { MixedText } from "@/components/ui/MixedText";
 import { StudyPlan } from "@/types/record";
@@ -29,13 +29,14 @@ export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
                 <CardHeader>
                     <CardTitle className="flex justify-between items-center">
                         <MixedText text={plan.name} />
-                        <InteractiveHoverButton
+                        <Button
                             onClick={onBack}
-                            hoverColor="#6B7280"
+                            variant="outline"
+                            size="sm"
                             className="h-9"
                         >
                             返回
-                        </InteractiveHoverButton>
+                        </Button>
                     </CardTitle>
                 </CardHeader>
                 <CardContent>

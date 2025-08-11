@@ -13,7 +13,7 @@ import { CloudSyncService } from '@/lib/cloudSyncService';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Progress } from '@/components/ui/progress';
-import { InteractiveHoverButton } from '@/components/magicui/interactive-hover-button';
+import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CloudDataOverview as CloudDataOverviewType, ProgressCallback } from '@/types/common';
 import { MixedText } from '@/components/ui/MixedText';
@@ -178,14 +178,14 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                             </div>
                                             <AlertDialog>
                                                 <AlertDialogTrigger asChild>
-                                                    <InteractiveHoverButton
+                                                    <Button
                                                         disabled={clearing}
-                                                        hoverColor="#dc2626"
-                                                        icon={<Trash2 className="w-4 h-4" />}
-                                                        className="text-sm h-9"
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                                                     >
-                                                        {clearing ? "清空中..." : "清空云端数据"}
-                                                    </InteractiveHoverButton>
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </Button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>

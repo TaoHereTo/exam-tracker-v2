@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { CapsuleButton } from '@/components/ui/CapsuleButton';
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import {
     AlertDialog,
@@ -14,6 +14,8 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle } from 'lucide-react';
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
@@ -190,9 +192,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <DialogTrigger asChild>
                     {trigger || (
                         <div className="flex justify-center">
-                            <CapsuleButton type="button" variant="outline" className="w-48">
+                            <Button type="button" variant="outline" className="w-48">
                                 <MixedText text="从云端选择图片" />
-                            </CapsuleButton>
+                            </Button>
                         </div>
                     )}
                 </DialogTrigger>
@@ -219,7 +221,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     className="pl-10"
                                 />
                             </div>
-                            <CapsuleButton
+                            <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={handleRefresh}
@@ -227,7 +229,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                             >
                                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                 <MixedText text="刷新" />
-                            </CapsuleButton>
+                            </Button>
                         </div>
 
                         {/* 连接状态提示 */}
@@ -301,15 +303,23 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 )}
 
                                                 {/* 删除按钮 */}
-                                                <CapsuleButton
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-red-600"
-                                                    onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
-                                                    title="删除图片"
-                                                >
-                                                    <Trash2 className="h-3 w-3" />
-                                                </CapsuleButton>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="sm"
+                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                                onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
+                                                            >
+                                                                <Trash2 className="h-3 w-3" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="删除图片" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
                                             </div>
                                         ))}
                                     </div>
@@ -320,15 +330,16 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <CapsuleButton variant="outline" onClick={handleCancel}>
+                        <Button variant="outline" onClick={handleCancel}>
                             <MixedText text="取消" />
-                        </CapsuleButton>
-                        <CapsuleButton
+                        </Button>
+                        <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
+                            className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
                         >
                             <MixedText text="确认选择" />
-                        </CapsuleButton>
+                        </Button>
                     </div>
                 </DialogContent>
             </Dialog>

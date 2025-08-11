@@ -11,7 +11,7 @@ import { User, Save } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import { InlineLoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuth } from "@/contexts/AuthContext";
-import { CapsuleButton } from "@/components/ui/CapsuleButton";
+
 
 interface UserProfileDialogProps {
     isOpen: boolean;
@@ -189,13 +189,13 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end gap-2 pt-4">
-                        <CapsuleButton variant="outline" onClick={onClose}>
+                        <Button variant="outline" onClick={onClose}>
                             <MixedText text="取消" />
-                        </CapsuleButton>
-                        <CapsuleButton
+                        </Button>
+                        <Button
                             onClick={handleSaveProfile}
                             disabled={loading}
-                            className="min-w-[100px]"
+                            className="min-w-[100px] bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
                         >
                             {loading ? (
                                 <InlineLoadingSpinner />
@@ -205,7 +205,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                                     <MixedText text="保存" />
                                 </>
                             )}
-                        </CapsuleButton>
+                        </Button>
                     </div>
                 </div>
             </DialogContent>

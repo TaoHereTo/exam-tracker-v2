@@ -17,7 +17,7 @@ import { MixedText } from '@/components/ui/MixedText';
 import { BaseForm, FormInput, FormSelect, useFormContext, FormField } from './BaseForm';
 import type { RecordItem } from '@/types/record';
 import { TimePicker } from '@/components/ui/TimePicker';
-import { CapsuleButton } from '@/components/ui/CapsuleButton';
+
 
 interface NewRecordFormProps {
     onAddRecord?: (newRecord: RecordItem) => void;
@@ -195,9 +195,9 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         </FormField>
 
                         <div className="form-actions">
-                            <CapsuleButton type="submit" className="w-full py-4">
+                            <Button type="submit" className="w-full py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
                                 <MixedText text="保存记录" />
-                            </CapsuleButton>
+                            </Button>
                         </div>
                     </BaseForm>
                 </CardContent>

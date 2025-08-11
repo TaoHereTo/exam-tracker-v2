@@ -204,7 +204,7 @@ export function FormButton({
             type={type}
             onClick={onClick}
             disabled={disabled}
-            className={`transition-all active:scale-95 ${className}`}
+            className={`transition-all ${className}`}
         >
             {children}
         </button>

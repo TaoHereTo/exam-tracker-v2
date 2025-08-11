@@ -7,7 +7,7 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Alert, AlertDescription } from '../ui/alert'
 import { Mail, ArrowLeft } from 'lucide-react'
-import { CapsuleButton } from '../ui/CapsuleButton'
+
 import { MixedText } from '../ui/MixedText'
 
 interface ForgotPasswordFormProps {
@@ -96,13 +96,13 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         <MixedText text="返回登录" />
                     </Button>
-                    <CapsuleButton
+                    <Button
                         type="submit"
                         disabled={loading}
-                        className="w-auto"
+                        className="w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
                     >
                         <MixedText text={loading ? '发送中...' : '发送重置邮件'} />
-                    </CapsuleButton>
+                    </Button>
                 </div>
             </form>
         </div>

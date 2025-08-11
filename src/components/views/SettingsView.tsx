@@ -9,7 +9,7 @@ import { PaginationSetting } from "./settings/PaginationSetting";
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { Button } from "@/components/ui/button";
 import { Download, Upload, Eye } from "lucide-react";
 import { useState } from "react";
 import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
@@ -184,12 +184,22 @@ export function SettingsView({
                                 </div>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <InteractiveHoverButton
-                                            hoverColor="#dc2626"
-                                            className="h-9"
-                                        >
-                                            清空本地数据
-                                        </InteractiveHoverButton>
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                    >
+                                                        <i className="bi bi-trash2 text-base flex items-center justify-center"></i>
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text="清空本地数据" /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
@@ -249,15 +259,15 @@ export function SettingsView({
                                 <div className="flex gap-2">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <InteractiveHoverButton
+                                            <Button
                                                 onClick={handleUploadToCloud}
                                                 disabled={isUploading}
-                                                hoverColor="#059669"
-                                                icon={<Upload className="w-4 h-4" />}
-                                                className="text-sm h-9"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
                                             >
-                                                {isUploading ? "上传中..." : "上传到云端"}
-                                            </InteractiveHoverButton>
+                                                <i className="bi bi-cloud-arrow-up text-base flex items-center justify-center"></i>
+                                            </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <p><MixedText text="将本地数据上传到云端备份" /></p>
@@ -265,15 +275,15 @@ export function SettingsView({
                                     </Tooltip>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <InteractiveHoverButton
+                                            <Button
                                                 onClick={handleDownloadFromCloud}
                                                 disabled={isDownloading}
-                                                hoverColor="#4f46e5"
-                                                icon={<Download className="w-4 h-4" />}
-                                                className="text-sm h-9"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
                                             >
-                                                {isDownloading ? "下载中..." : "从云端下载"}
-                                            </InteractiveHoverButton>
+                                                <i className="bi bi-cloud-arrow-down text-base flex items-center justify-center"></i>
+                                            </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <p><MixedText text="从云端下载数据到本地" /></p>
@@ -281,14 +291,14 @@ export function SettingsView({
                                     </Tooltip>
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <InteractiveHoverButton
+                                            <Button
                                                 onClick={handleViewCloudData}
-                                                hoverColor="#be185d"
-                                                icon={<Eye className="w-4 h-4" />}
-                                                className="text-sm h-9"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
                                             >
-                                                查看云端数据
-                                            </InteractiveHoverButton>
+                                                <Eye className="w-4 h-4" />
+                                            </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
                                             <p><MixedText text="查看云端存储的数据详情" /></p>

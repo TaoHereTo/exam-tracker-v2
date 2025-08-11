@@ -5,8 +5,9 @@ import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG, normalizeModuleName } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { Button } from "@/components/ui/button";
 import { MixedText } from "@/components/ui/MixedText";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface RecordItem {
     module: keyof typeof MODULE_SCORES;
@@ -122,12 +123,22 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             </CardHeader>
             <CardContent className="relative pb-20">
                 <div className="mb-6">
-                    <RainbowButton
-                        onClick={handlePredictScore}
-                        className="h-9"
-                    >
-                        预测我的行测总分
-                    </RainbowButton>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    onClick={handlePredictScore}
+                                    variant="ghost"
+                                    className="h-9 w-9 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400"
+                                >
+                                    <i className="bi bi-robot text-base flex items-center justify-center"></i>
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p><MixedText text="预测我的行测总分" /></p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
                 {prediction && (
                     <>
