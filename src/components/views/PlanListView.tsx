@@ -10,13 +10,14 @@ import { FormError } from "@/components/ui/form-error";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { normalizeModuleName } from "@/config/exam";
 import { format } from "date-fns";
-import { Plus, Edit, Trash2, Eye } from "lucide-react";
+import { Plus, Edit, Trash2, CheckCircle, Clock, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
-import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { CapsuleButton } from "@/components/ui/CapsuleButton";
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { DateRange } from "react-day-picker";
+import { generateUUID } from "@/lib/utils";
 
 interface StudyPlan {
     id: string;
@@ -36,15 +37,15 @@ interface PlanListViewProps {
     onCreate: (plan: StudyPlan) => void;
     onUpdate: (plan: StudyPlan) => void;
     onDelete: (id: string) => void;
-    onShowDetail: (id: string) => void;
 }
 
-export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onShowDetail }: PlanListViewProps) {
+export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: PlanListViewProps) {
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [form, setForm] = useState<Partial<StudyPlan>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [dateRange, setDateRange] = useState<DateRange>();
+    const [showCompleted, setShowCompleted] = useState(false);
 
     const handleOpenForm = (plan?: StudyPlan) => {
         if (plan) {
@@ -147,7 +148,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         if (!validateForm()) return;
 
         const planData: StudyPlan = {
-            id: editId || Date.now().toString(),
+            id: editId || generateUUID(),
             name: form.name!,
             module: form.module!,
             type: form.type!,
@@ -177,6 +178,26 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
         return Math.min((plan.progress / plan.target) * 100, 100);
     };
 
+    // 分离进行中和已完成的计划
+    const activePlans = plans.filter(plan => plan.status !== "已完成");
+    const completedPlans = plans.filter(plan => plan.status === "已完成");
+
+    // 获取状态图标
+    const getStatusIcon = (status: StudyPlan["status"]) => {
+        switch (status) {
+            case "已完成":
+                return <CheckCircle className="w-4 h-4 text-green-500" />;
+            case "进行中":
+                return <Clock className="w-4 h-4 text-blue-500" />;
+            case "未开始":
+                return <Clock className="w-4 h-4 text-gray-500" />;
+            case "未达成":
+                return <AlertCircle className="w-4 h-4 text-red-500" />;
+            default:
+                return <Clock className="w-4 h-4 text-gray-500" />;
+        }
+    };
+
     return (
         <div className="space-y-6 w-full">
             <div className="flex justify-between items-center">
@@ -184,7 +205,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                 <ButtonGroup spacing="sm" margin="none">
                     <InteractiveHoverButton
                         onClick={() => handleOpenForm()}
-                        hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
+                        hoverColor="#6d28d9"
                         icon={<Plus className="w-4 h-4" />}
                         className="h-9"
                     >
@@ -193,82 +214,133 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                 </ButtonGroup>
             </div>
 
+            {/* 切换按钮 */}
+            <div className="flex gap-2">
+                <CapsuleButton
+                    variant={!showCompleted ? "default" : "outline"}
+                    onClick={() => setShowCompleted(false)}
+                    className="flex items-center gap-2"
+                >
+                    <Clock className="w-4 h-4" />
+                    <MixedText text={`进行中的计划 (${activePlans.length})`} />
+                </CapsuleButton>
+                <CapsuleButton
+                    variant={showCompleted ? "default" : "outline"}
+                    onClick={() => setShowCompleted(true)}
+                    className="flex items-center gap-2"
+                >
+                    <CheckCircle className="w-4 h-4" />
+                    <MixedText text={`已完成的计划 (${completedPlans.length})`} />
+                </CapsuleButton>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
-                {plans.map(plan => (
-                    <Card key={plan.id} className="shadow-md hover:shadow-lg transition-all duration-300 min-h-[220px] w-full flex flex-col">
-                        <CardHeader className="pb-3">
-                            <CardTitle className="flex justify-between items-center gap-3">
-                                <MixedText text={plan.name} className="text-lg font-semibold truncate flex-1" />
-                                <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
-                                    <InteractiveHoverButton
-                                        onClick={() => onShowDetail(plan.id)}
-                                        hoverColor="#3B82F6"
-                                        icon={<Eye className="w-4 h-4" />}
-                                        className="h-9"
-                                    >
-                                        <MixedText text="详情" />
-                                    </InteractiveHoverButton>
-                                    <InteractiveHoverButton
-                                        onClick={() => handleOpenForm(plan)}
-                                        hoverColor="#F59E0B"
-                                        icon={<Edit className="w-4 h-4" />}
-                                        className="h-9"
-                                    >
-                                        <MixedText text="编辑" />
-                                    </InteractiveHoverButton>
-                                    <AlertDialog>
-                                        <AlertDialogTrigger asChild>
-                                            <InteractiveHoverButton
-                                                hoverColor="#EF4444"
-                                                icon={<Trash2 className="w-4 h-4" />}
-                                                className="h-9"
-                                            >
-                                                <MixedText text="删除" />
-                                            </InteractiveHoverButton>
-                                        </AlertDialogTrigger>
-                                        <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                                <AlertDialogTitle><MixedText text="确认删除计划？" /></AlertDialogTitle>
-                                                <AlertDialogDescription>
-                                                    此操作将永久删除学习计划&quot;{plan.name}&quot;，删除后无法恢复。
-                                                </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                <AlertDialogAction onClick={() => handleDelete(plan.id)} style={{ background: '#EF4444' }}><MixedText text="确认删除" /></AlertDialogAction>
-                                            </AlertDialogFooter>
-                                        </AlertDialogContent>
-                                    </AlertDialog>
-                                </ButtonGroup>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="pt-0 flex-1 flex flex-col justify-center">
-                            <div className="space-y-4">
-                                <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
-                                <div className="text-xs text-gray-500 break-words">
-                                    <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
+                {(showCompleted ? completedPlans : activePlans).length > 0 ? (
+                    (showCompleted ? completedPlans : activePlans).map(plan => (
+                        <Card key={plan.id} className="shadow-md hover:shadow-lg transition-all duration-300 min-h-[220px] w-full flex flex-col">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="flex justify-between items-center gap-3">
+                                    <div className="flex items-center gap-2 flex-1">
+                                        {getStatusIcon(plan.status)}
+                                        <MixedText text={plan.name} className="text-lg font-semibold truncate" />
+                                    </div>
+                                    <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
+                                        <InteractiveHoverButton
+                                            onClick={() => handleOpenForm(plan)}
+                                            hoverColor="#b45309"
+                                            icon={<Edit className="w-4 h-4" />}
+                                            className="h-9"
+                                        >
+                                            <MixedText text="编辑" />
+                                        </InteractiveHoverButton>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <InteractiveHoverButton
+                                                    hoverColor="#EF4444"
+                                                    icon={<Trash2 className="w-4 h-4" />}
+                                                    className="h-9"
+                                                >
+                                                    <MixedText text="删除" />
+                                                </InteractiveHoverButton>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle><MixedText text="确认删除计划？" /></AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        此操作将永久删除学习计划&quot;{plan.name}&quot;，删除后无法恢复。
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(plan.id)} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
+                                    </ButtonGroup>
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-0 flex-1 flex flex-col justify-center">
+                                <div className="space-y-4">
+                                    <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
+                                    <div className="text-xs text-gray-500 break-words">
+                                        <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
+                                    </div>
+                                    {plan.description && (
+                                        <div className="text-xs text-gray-400 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
+                                    )}
+                                    <div className="text-xs text-gray-500 break-words">
+                                        进度：{plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`} />}
+                                    </div>
+                                    <div className="mt-3">
+                                        <Progress
+                                            value={getProgressPercentage(plan)}
+                                            variant="plan"
+                                            showText={true}
+                                        />
+                                    </div>
                                 </div>
-                                {plan.description && (
-                                    <div className="text-xs text-gray-400 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
-                                )}
-                                <div className="text-xs text-gray-500 break-words">
-                                    进度：{plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`} />}
-                                </div>
-                                <div className="mt-3">
-                                    <Progress
-                                        value={getProgressPercentage(plan)}
-                                        variant="plan"
-                                        showText={true}
-                                    />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                ))}
+                            </CardContent>
+                        </Card>
+                    ))
+                ) : (
+                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+                        <div className="text-gray-400 mb-4">
+                            {showCompleted ? (
+                                <CheckCircle className="w-16 h-16" />
+                            ) : (
+                                <Clock className="w-16 h-16" />
+                            )}
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-600 mb-2">
+                            {showCompleted ? (
+                                <MixedText text="暂无已完成的计划" />
+                            ) : (
+                                <MixedText text="暂无进行中的计划" />
+                            )}
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-4">
+                            {showCompleted ? (
+                                <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
+                            ) : (
+                                <MixedText text="创建一个新的学习计划开始您的学习之旅" />
+                            )}
+                        </p>
+                        {!showCompleted && (
+                            <InteractiveHoverButton
+                                onClick={() => handleOpenForm()}
+                                hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
+                                icon={<Plus className="w-4 h-4" />}
+                                className="h-9"
+                            >
+                                <MixedText text="创建第一个计划" />
+                            </InteractiveHoverButton>
+                        )}
+                    </div>
+                )}
             </div>
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <Card className="w-full max-h-[90vh] overflow-y-auto">
+                    <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                         <CardHeader>
                             <CardTitle>{editId ? <MixedText text="编辑计划" /> : <MixedText text="新建计划" />}</CardTitle>
                         </CardHeader>
@@ -392,12 +464,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onSh
                                     </div>
                                     <div className="form-actions">
                                         <ButtonGroup spacing="sm" margin="none" className="justify-end">
-                                            <Button type="button" variant="outline" onClick={handleCloseForm}>
+                                            <CapsuleButton type="button" variant="outline" onClick={handleCloseForm}>
                                                 <MixedText text="取消" />
-                                            </Button>
-                                            <RainbowButton type="submit">
+                                            </CapsuleButton>
+                                            <CapsuleButton type="submit">
                                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
-                                            </RainbowButton>
+                                            </CapsuleButton>
                                         </ButtonGroup>
                                     </div>
                                 </div>

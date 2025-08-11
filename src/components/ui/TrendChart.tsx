@@ -109,7 +109,12 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 left: 0,
                 orient: 'vertical',
                 ...UNIFIED_LEGEND_STYLE,
-                textStyle: { color: textColor }
+                textStyle: {
+                    color: textColor,
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    fontFamily: 'Times New Roman, 思源宋体, serif'
+                }
             },
             grid: {
                 left: 130,
@@ -150,7 +155,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 type: 'line',
                 data: chartData.map(row => row[module]),
                 smooth: false,
-                showSymbol: true,
+                showSymbol: false,
                 symbol: 'circle',
                 symbolSize: 10,
                 lineStyle: {
@@ -172,6 +177,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 connectNulls: true, // 连接null值，保持线条连续
                 emphasis: {
                     focus: 'series',
+                    showSymbol: true,
                     lineStyle: { width: 7 },
                     itemStyle: { borderWidth: 4 }
                 }

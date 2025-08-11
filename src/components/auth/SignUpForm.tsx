@@ -7,7 +7,7 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Alert, AlertDescription } from '../ui/alert'
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
-import { RainbowButton } from '../magicui/rainbow-button'
+import { CapsuleButton } from '../ui/CapsuleButton'
 import { MixedText } from '../ui/MixedText'
 
 interface SignUpFormProps {
@@ -170,13 +170,13 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <ArrowLeft className="h-4 w-4 mr-2" />
                         <MixedText text="返回登录" />
                     </Button>
-                    <RainbowButton
+                    <CapsuleButton
                         type="submit"
                         disabled={loading}
                         className="w-auto"
                     >
                         <MixedText text={loading ? '注册中...' : '注册'} />
-                    </RainbowButton>
+                    </CapsuleButton>
                 </div>
             </form>
         </div>

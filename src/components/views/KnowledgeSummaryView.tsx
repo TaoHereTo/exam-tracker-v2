@@ -15,7 +15,7 @@ import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent,
 import { Edit, Trash2, X } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
-import { Button } from '@/components/ui/button';
+import { CapsuleButton } from '@/components/ui/CapsuleButton';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -417,9 +417,9 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 <SimpleDialogContent>
                     <div className="flex justify-between items-center">
                         <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
-                        <Button variant="ghost" size="icon" onClick={() => setEditDialogOpen(false)} className="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6">
+                        <CapsuleButton variant="ghost" size="icon" onClick={() => setEditDialogOpen(false)} className="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6">
                             <X className="w-3 h-3" />
-                        </Button>
+                        </CapsuleButton>
                     </div>
                     {editError ? (
                         <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>

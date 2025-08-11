@@ -8,8 +8,8 @@ import { MixedText } from '@/components/ui/MixedText';
 
 interface ExerciseRecordViewProps {
     records: RecordItem[];
-    selectedRecordIds: number[];
-    onSelectIds: (ids: number[]) => void;
+    selectedRecordIds: string[];
+    onSelectIds: (ids: string[]) => void;
     onBatchDelete: () => void;
     historyPage: number;
     setHistoryPage: (n: number) => void;
@@ -28,7 +28,7 @@ export function ExerciseRecordView({
 
     return (
         <div className="pt-2 px-2 md:px-8">
-            <UnifiedTable<RecordItem, number>
+            <UnifiedTable<RecordItem, string>
                 columns={[
                     {
                         key: 'date',

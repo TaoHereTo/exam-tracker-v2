@@ -25,6 +25,8 @@ export interface UploadProgress {
     total: number;
     currentItem: string;
     stage: 'checking' | 'uploading-records' | 'uploading-plans' | 'uploading-knowledge' | 'uploading-settings' | 'complete';
+    isPaused?: boolean;
+    isCancelled?: boolean;
 }
 
 export class CloudSyncService {
@@ -38,12 +40,6 @@ export class CloudSyncService {
             localRecord.duration === cloudRecord.duration
             // 注意：id字段不比较，因为本地和云端的id可能不同
         );
-
-        if (isDuplicate) {
-            // 记录完全匹配
-        } else {
-            // 记录不匹配
-        }
 
         return isDuplicate;
     }
@@ -63,12 +59,6 @@ export class CloudSyncService {
             // 注意：id字段不比较，因为本地和云端的id可能不同
         );
 
-        if (isDuplicate) {
-            // 计划完全匹配
-        } else {
-            // 计划不匹配
-        }
-
         return isDuplicate;
     }
 
@@ -83,8 +73,7 @@ export class CloudSyncService {
             return false;
         }
 
-        // 全面比较所有字段，确保真正的重复检测
-        // 注意：不比较 ID 字段，因为本地和云端的 ID 可能不同
+        // 全面比较所有字段
         const isDuplicate = localRecord.type === cloudRecord.type &&
             localRecord.note === cloudRecord.note &&
             localRecord.subCategory === cloudRecord.subCategory &&
@@ -95,26 +84,43 @@ export class CloudSyncService {
         return isDuplicate;
     }
 
+    private static hasKnowledgeChanges(localKnowledge: KnowledgeItem, cloudKnowledge: KnowledgeItem): boolean {
+        // 检查是否有任何字段不同（说明编辑过）
+        const localRecord = localKnowledge as Record<string, unknown>;
+        const cloudRecord = cloudKnowledge as Record<string, unknown>;
+
+        // 比较所有相关字段
+        return localKnowledge.module !== cloudKnowledge.module ||
+            localRecord.type !== cloudRecord.type ||
+            localRecord.note !== cloudRecord.note ||
+            localRecord.subCategory !== cloudRecord.subCategory ||
+            localRecord.date !== cloudRecord.date ||
+            localRecord.source !== cloudRecord.source ||
+            localRecord.imagePath !== cloudRecord.imagePath;
+    }
+
     // 上传本地数据到云端
     static async uploadToCloud(
         localRecords: RecordItem[],
         localPlans: StudyPlan[],
         localKnowledge: KnowledgeItem[],
         localSettings: UserSettings,
-        onProgress?: (progress: UploadProgress) => void
+        onProgress?: (progress: UploadProgress) => void,
+        abortController?: AbortController
     ): Promise<SyncResult> {
-        try {
-            let uploadedRecords = 0;
-            let uploadedPlans = 0;
-            let uploadedKnowledge = 0;
-            let settingsUploaded = false;
+        let uploadedRecords = 0;
+        let uploadedPlans = 0;
+        let uploadedKnowledge = 0;
+        let settingsUploaded = false;
 
-            // 初始化报告
-            const report = {
-                records: [] as SyncReportItem<RecordItem>[],
-                plans: [] as SyncReportItem<StudyPlan>[],
-                knowledge: [] as SyncReportItem<KnowledgeItem>[]
-            };
+        // 初始化报告
+        const report = {
+            records: [] as SyncReportItem<RecordItem>[],
+            plans: [] as SyncReportItem<StudyPlan>[],
+            knowledge: [] as SyncReportItem<KnowledgeItem>[]
+        };
+
+        try {
 
             const totalItems = localRecords.length + localPlans.length + localKnowledge.length + 1; // +1 for settings
             let currentProgress = 0;
@@ -126,23 +132,33 @@ export class CloudSyncService {
                     current: currentProgress,
                     total: totalItems,
                     currentItem,
-                    stage
+                    stage,
+                    isPaused: false,
+                    isCancelled: false
                 });
             };
 
+            // 检查是否取消
+            const checkCancelled = () => {
+                if (abortController?.signal.aborted) {
+                    throw new Error('上传已取消');
+                }
+            };
+
+
+
             // 预先获取云端数据，用于重复检查
-            // 正在获取云端数据用于重复检查...
             updateProgress('checking', '正在检查云端数据...');
             const [cloudRecords, cloudPlans, cloudKnowledge] = await Promise.all([
                 recordService.getRecords().catch(() => []),
                 planService.getPlans().catch(() => []),
                 knowledgeService.getKnowledge().catch(() => [])
             ]);
-            // 云端现有数据统计
 
             // 上传刷题记录
             updateProgress('uploading-records', '正在上传刷题记录...');
             for (const record of localRecords) {
+                checkCancelled();
                 try {
                     // 检查是否已存在相同的记录
                     const recordExists = cloudRecords.some(cloudRecord =>
@@ -166,21 +182,20 @@ export class CloudSyncService {
                     uploadedRecords++;
                     report.records.push({ item: record, action: 'uploaded' });
                     updateProgress('uploading-records', `上传记录: ${record.date} ${record.module}`);
-                    // 记录上传成功
                 } catch (error) {
-                    console.error(`记录上传失败: ${record.date} ${record.module}`, error);
+                    if (error instanceof Error && error.message === '上传已取消') {
+                        throw error;
+                    }
                     report.records.push({ item: record, action: 'failed', reason: error instanceof Error ? error.message : '未知错误' });
                     updateProgress('uploading-records', `上传失败: ${record.date} ${record.module}`);
-                    // 继续处理其他记录，不中断整个上传过程
                 }
             }
 
             // 上传学习计划
             updateProgress('uploading-plans', '正在上传学习计划...');
             for (const plan of localPlans) {
+                checkCancelled();
                 try {
-                    // 正在上传计划
-
                     // 检查是否已存在相同的计划
                     const planExists = cloudPlans.some(cloudPlan =>
                         this.isPlanDuplicate(plan, cloudPlan)
@@ -207,18 +222,19 @@ export class CloudSyncService {
                     uploadedPlans++;
                     report.plans.push({ item: plan, action: 'uploaded' });
                     updateProgress('uploading-plans', `上传计划: ${plan.name}`);
-                    // 计划上传成功
                 } catch (error) {
-                    console.error(`计划上传失败: ${plan.name}`, error);
+                    if (error instanceof Error && error.message === '上传已取消') {
+                        throw error;
+                    }
                     report.plans.push({ item: plan, action: 'failed', reason: error instanceof Error ? error.message : '未知错误' });
                     updateProgress('uploading-plans', `上传失败: ${plan.name}`);
-                    // 继续处理其他计划，不中断整个上传过程
                 }
             }
 
             // 上传知识点
             updateProgress('uploading-knowledge', '正在上传知识点...');
             for (const knowledge of localKnowledge) {
+                checkCancelled();
                 try {
                     const knowledgeRecord = knowledge as Record<string, unknown>;
                     const displayText = (knowledgeRecord.note as string)?.substring(0, 20) ||
@@ -231,23 +247,34 @@ export class CloudSyncService {
                     );
 
                     if (existingKnowledgeWithSameId) {
-                        // 知识点已存在且ID相同，进行更新
-                        const updateData: Record<string, unknown> = {
-                            module: knowledge.module
-                        };
+                        // 检查是否有任何字段不同（说明编辑过）
+                        const hasChanges = this.hasKnowledgeChanges(knowledge, existingKnowledgeWithSameId);
 
-                        // 统一添加字段：所有模块都使用 type 和 note
-                        if ('type' in knowledgeRecord) updateData.type = knowledgeRecord.type;
-                        if ('note' in knowledgeRecord) updateData.note = knowledgeRecord.note;
-                        if ('subCategory' in knowledgeRecord) updateData.subCategory = knowledgeRecord.subCategory;
-                        if ('date' in knowledgeRecord) updateData.date = knowledgeRecord.date;
-                        if ('source' in knowledgeRecord) updateData.source = knowledgeRecord.source;
-                        if ('imagePath' in knowledgeRecord) updateData.imagePath = knowledgeRecord.imagePath;
+                        if (hasChanges) {
+                            // 有变化，进行更新
+                            const updateData: Record<string, unknown> = {
+                                module: knowledge.module
+                            };
 
-                        await knowledgeService.updateKnowledge(knowledge.id, updateData as Partial<KnowledgeItem>);
-                        uploadedKnowledge++;
-                        report.knowledge.push({ item: knowledge, action: 'updated' });
-                        updateProgress('uploading-knowledge', `更新知识点: ${displayText}...`);
+                            // 处理知识点字段
+                            if ('type' in knowledgeRecord) updateData.type = knowledgeRecord.type;
+                            if ('note' in knowledgeRecord) updateData.note = knowledgeRecord.note;
+
+                            // 处理其他字段
+                            if ('subCategory' in knowledgeRecord) updateData["subCategory"] = knowledgeRecord.subCategory;
+                            if ('date' in knowledgeRecord) updateData.date = knowledgeRecord.date;
+                            if ('source' in knowledgeRecord) updateData.source = knowledgeRecord.source;
+                            if ('imagePath' in knowledgeRecord) updateData["imagePath"] = knowledgeRecord.imagePath;
+
+                            await knowledgeService.updateKnowledge(knowledge.id, updateData as Partial<KnowledgeItem>);
+                            uploadedKnowledge++;
+                            report.knowledge.push({ item: knowledge, action: 'updated' });
+                            updateProgress('uploading-knowledge', `更新知识点: ${displayText}...`);
+                        } else {
+                            // 完全相同，跳过
+                            report.knowledge.push({ item: knowledge, action: 'skipped', reason: '知识点内容完全相同' });
+                            updateProgress('uploading-knowledge', `跳过重复知识点: ${displayText}...`);
+                        }
                         continue;
                     }
 
@@ -268,9 +295,11 @@ export class CloudSyncService {
                         module: knowledge.module
                     };
 
-                    // 统一添加字段：所有模块都使用 type 和 note
+                    // 处理知识点字段
                     if ('type' in knowledgeRecord) knowledgeData.type = knowledgeRecord.type;
                     if ('note' in knowledgeRecord) knowledgeData.note = knowledgeRecord.note;
+
+                    // 处理其他字段
                     if ('subCategory' in knowledgeRecord) knowledgeData.subCategory = knowledgeRecord.subCategory;
                     if ('date' in knowledgeRecord) knowledgeData.date = knowledgeRecord.date;
                     if ('source' in knowledgeRecord) knowledgeData.source = knowledgeRecord.source;
@@ -281,19 +310,16 @@ export class CloudSyncService {
                     report.knowledge.push({ item: knowledge, action: 'uploaded' });
                     updateProgress('uploading-knowledge', `上传知识点: ${displayText}...`);
                 } catch (error) {
+                    if (error instanceof Error && error.message === '上传已取消') {
+                        throw error;
+                    }
                     const errorMessage = error instanceof Error ? error.message : '未知错误';
-                    console.error(`知识点上传失败:`, {
-                        error: errorMessage,
-                        knowledge: knowledge,
-                        details: error instanceof Error ? error.stack : '无详细信息'
-                    });
                     report.knowledge.push({ item: knowledge, action: 'failed', reason: errorMessage });
                     const knowledgeRecord = knowledge as Record<string, unknown>;
                     const displayText = (knowledgeRecord.note as string)?.substring(0, 20) ||
                         (knowledgeRecord.type as string) ||
                         'unknown';
                     updateProgress('uploading-knowledge', `上传失败: ${displayText}...`);
-                    // 继续处理其他知识点，不中断整个上传过程
                 }
             }
 
@@ -327,6 +353,23 @@ export class CloudSyncService {
                 report
             };
         } catch (error) {
+            if (error instanceof Error && error.message === '上传已取消') {
+                const skippedRecords = report.records.filter(r => r.action === 'skipped').length;
+                const skippedPlans = report.plans.filter(p => p.action === 'skipped').length;
+                const skippedKnowledge = report.knowledge.filter(k => k.action === 'skipped').length;
+
+                return {
+                    success: false,
+                    message: '上传已取消',
+                    details: {
+                        records: { uploaded: uploadedRecords, downloaded: 0, skipped: skippedRecords },
+                        plans: { uploaded: uploadedPlans, downloaded: 0, skipped: skippedPlans },
+                        knowledge: { uploaded: uploadedKnowledge, downloaded: 0, skipped: skippedKnowledge },
+                        settings: { uploaded: settingsUploaded, downloaded: false }
+                    },
+                    report
+                };
+            }
             return {
                 success: false,
                 message: `上传失败: ${error instanceof Error ? error.message : '未知错误'}`
@@ -523,10 +566,6 @@ export class CloudSyncService {
             clearedPlans = cloudPlans.length;
             clearedKnowledge = cloudKnowledge.length;
 
-            // 清空所有数据 - 使用更可靠的删除方法
-            // 开始清空云端数据...
-            // 准备清空数据
-
             const totalSteps = 4;
             let currentStep = 0;
 
@@ -537,6 +576,10 @@ export class CloudSyncService {
                 currentItem: '正在清空刷题记录...'
             });
             const deleteRecords = await supabase.from('exercise_records').delete().eq('user_id', userId);
+            if (deleteRecords.error) {
+                console.error('清空刷题记录失败:', deleteRecords.error);
+                throw new Error(`清空刷题记录失败: ${deleteRecords.error.message}`);
+            }
 
             // 清空计划
             onProgress?.({
@@ -545,6 +588,10 @@ export class CloudSyncService {
                 currentItem: '正在清空学习计划...'
             });
             const deletePlans = await supabase.from('plans').delete().eq('user_id', userId);
+            if (deletePlans.error) {
+                console.error('清空学习计划失败:', deletePlans.error);
+                throw new Error(`清空学习计划失败: ${deletePlans.error.message}`);
+            }
 
             // 清空知识点
             onProgress?.({
@@ -553,6 +600,10 @@ export class CloudSyncService {
                 currentItem: '正在清空知识点...'
             });
             const deleteKnowledge = await supabase.from('knowledge').delete().eq('user_id', userId);
+            if (deleteKnowledge.error) {
+                console.error('清空知识点失败:', deleteKnowledge.error);
+                throw new Error(`清空知识点失败: ${deleteKnowledge.error.message}`);
+            }
 
             // 清空设置
             onProgress?.({
@@ -561,10 +612,10 @@ export class CloudSyncService {
                 currentItem: '正在清空设置...'
             });
             const deleteSettings = await supabase.from('user_settings').delete().eq('user_id', userId);
-
-            const deleteResults = [deleteRecords, deletePlans, deleteKnowledge, deleteSettings];
-
-            // 删除操作结果
+            if (deleteSettings.error) {
+                console.error('清空设置失败:', deleteSettings.error);
+                throw new Error(`清空设置失败: ${deleteSettings.error.message}`);
+            }
 
             // 验证删除结果
             const [remainingRecords, remainingPlans, remainingKnowledge] = await Promise.all([
@@ -572,8 +623,6 @@ export class CloudSyncService {
                 planService.getPlans().catch(() => []),
                 knowledgeService.getKnowledge().catch(() => [])
             ]);
-
-            // 删除后剩余数据统计
 
             clearedSettings = true;
 

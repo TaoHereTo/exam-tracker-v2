@@ -12,7 +12,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { useFormNotification } from "@/hooks/useFormNotification";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { ValidationSchema, validateForm, FormData } from "@/lib/formValidation";
-import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { CapsuleButton } from "@/components/ui/CapsuleButton";
 import { MixedText } from "@/components/ui/MixedText";
 import type { KnowledgeItem } from "@/types/record";
 import {
@@ -383,9 +383,9 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             <ImageUploadField />
 
             <div className="form-actions">
-              <RainbowButton type="submit" className="w-full py-4">
+              <CapsuleButton type="submit" className="w-full py-4">
                 <MixedText text="保存知识点" />
-              </RainbowButton>
+              </CapsuleButton>
             </div>
           </BaseForm>
         </CardContent>

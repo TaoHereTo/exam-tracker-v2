@@ -11,13 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { zhCN } from 'date-fns/locale';
-import { cn } from '@/lib/utils';
+import { cn, generateUUID } from '@/lib/utils';
 
 import { MixedText } from '@/components/ui/MixedText';
 import { BaseForm, FormInput, FormSelect, useFormContext, FormField } from './BaseForm';
 import type { RecordItem } from '@/types/record';
 import { TimePicker } from '@/components/ui/TimePicker';
-import { RainbowButton } from '@/components/magicui/rainbow-button';
+import { CapsuleButton } from '@/components/ui/CapsuleButton';
 
 interface NewRecordFormProps {
     onAddRecord?: (newRecord: RecordItem) => void;
@@ -30,7 +30,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     const handleSubmit = (data: Record<string, string | number | boolean | undefined>) => {
         const dateToFormat = date ?? new Date();
         const newRecord: RecordItem = {
-            id: Date.now(),
+            id: generateUUID(),
             date: format(dateToFormat, 'yyyy-MM-dd'),
             module: String(data.module) as 'data-analysis' | 'politics' | 'math' | 'common' | 'verbal' | 'logic',
             total: parseInt(String(data.total)),
@@ -195,9 +195,9 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         </FormField>
 
                         <div className="form-actions">
-                            <RainbowButton type="submit" className="w-full py-4">
+                            <CapsuleButton type="submit" className="w-full py-4">
                                 <MixedText text="保存记录" />
-                            </RainbowButton>
+                            </CapsuleButton>
                         </div>
                     </BaseForm>
                 </CardContent>

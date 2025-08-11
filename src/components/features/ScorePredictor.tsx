@@ -5,7 +5,7 @@ import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG, normalizeModuleName } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
+import { RainbowButton } from "@/components/magicui/rainbow-button";
 import { MixedText } from "@/components/ui/MixedText";
 
 interface RecordItem {
@@ -122,13 +122,12 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             </CardHeader>
             <CardContent className="relative pb-20">
                 <div className="mb-6">
-                    <InteractiveHoverButton
+                    <RainbowButton
                         onClick={handlePredictScore}
-                        hoverColor="linear-gradient(to bottom right, #374151, #111827)"
                         className="h-9"
                     >
                         预测我的行测总分
-                    </InteractiveHoverButton>
+                    </RainbowButton>
                 </div>
                 {prediction && (
                     <>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Button } from '@/components/ui/button';
+import { CapsuleButton } from '@/components/ui/CapsuleButton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import {
     AlertDialog,
@@ -190,9 +190,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <DialogTrigger asChild>
                     {trigger || (
                         <div className="flex justify-center">
-                            <Button type="button" variant="outline" className="w-48">
+                            <CapsuleButton type="button" variant="outline" className="w-48">
                                 <MixedText text="从云端选择图片" />
-                            </Button>
+                            </CapsuleButton>
                         </div>
                     )}
                 </DialogTrigger>
@@ -219,7 +219,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     className="pl-10"
                                 />
                             </div>
-                            <Button
+                            <CapsuleButton
                                 variant="outline"
                                 size="sm"
                                 onClick={handleRefresh}
@@ -227,7 +227,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                             >
                                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                 <MixedText text="刷新" />
-                            </Button>
+                            </CapsuleButton>
                         </div>
 
                         {/* 连接状态提示 */}
@@ -301,7 +301,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 )}
 
                                                 {/* 删除按钮 */}
-                                                <Button
+                                                <CapsuleButton
                                                     variant="destructive"
                                                     size="sm"
                                                     className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-red-600"
@@ -309,7 +309,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                     title="删除图片"
                                                 >
                                                     <Trash2 className="h-3 w-3" />
-                                                </Button>
+                                                </CapsuleButton>
                                             </div>
                                         ))}
                                     </div>
@@ -320,15 +320,15 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <Button variant="outline" onClick={handleCancel}>
+                        <CapsuleButton variant="outline" onClick={handleCancel}>
                             <MixedText text="取消" />
-                        </Button>
-                        <Button
+                        </CapsuleButton>
+                        <CapsuleButton
                             onClick={handleConfirm}
                             disabled={!selectedImage}
                         >
                             <MixedText text="确认选择" />
-                        </Button>
+                        </CapsuleButton>
                     </div>
                 </DialogContent>
             </Dialog>

@@ -19,7 +19,7 @@ import { PersonalBestView } from "@/components/views/PersonalBestView";
 import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
+import { CapsuleButton } from "@/components/ui/CapsuleButton";
 import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy } from "lucide-react";
 import { generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
@@ -92,7 +92,7 @@ export function MainApp() {
 
     // 删除确认对话框状态
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [recordsToDelete, setRecordsToDelete] = useState<number[]>([]);
+    const [recordsToDelete, setRecordsToDelete] = useState<string[]>([]);
 
     const loadUserProfile = useCallback(async () => {
         try {
@@ -166,7 +166,7 @@ export function MainApp() {
     const [historyPage, setHistoryPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     // 选中的记录ID
-    const [selectedRecordIds, setSelectedRecordIds] = useState<number[]>([]);
+    const [selectedRecordIds, setSelectedRecordIds] = useState<string[]>([]);
 
     // 当pageSize改变时，如果当前页超出新的总页数，则重置到第一页
     useEffect(() => {
@@ -478,24 +478,37 @@ export function MainApp() {
     };
 
     const handleEditKnowledge = async (item: KnowledgeItem) => {
-
-
+        // 先更新本地数据
         setKnowledge(prev => prev.map(k => k.id === item.id ? item : k));
 
-        // 检查 ID 格式，只有 UUID 格式的才更新到云端
+        // 检查 ID 格式
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
 
         if (!isUUID) {
+            // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
+            const newId = generateUUID();
+            const updatedItem = { ...item, id: newId };
 
+            // 更新本地数据为新ID
+            setKnowledge(prev => prev.map(k => k.id === item.id ? updatedItem : k));
+
+            // 通知用户ID已更新
             notify({
-                type: 'warning',
-                message: '本地更新成功',
-                description: '知识点已更新到本地，但云端同步跳过（旧格式ID）'
+                type: 'info',
+                message: 'ID格式已更新',
+                description: '知识点ID已更新为新格式，正在同步到云端...'
             });
+
+            // 使用新ID同步到云端
+            try {
+                await AutoCloudSync.autoUpdateKnowledge(updatedItem, notify);
+            } catch (error) {
+                console.error('MainApp - 编辑知识点失败:', error);
+            }
             return;
         }
 
-        // 自动更新到云端
+        // 对于新格式ID，直接同步到云端
         try {
             await AutoCloudSync.autoUpdateKnowledge(item, notify);
         } catch (error) {
@@ -517,8 +530,17 @@ export function MainApp() {
         });
     }, [plans, records]);
 
+    // 计划完成回调函数
+    const handlePlanCompleted = useCallback((plan: StudyPlan) => {
+        notify({
+            type: 'success',
+            message: '恭喜！你完成了一项计划！',
+            description: `学习计划"${plan.name}"已完成！继续保持！`
+        });
+    }, [notify]);
+
     // 使用计划进度hook
-    usePlanProgress(plans, setPlans, records, calcPlanProgress);
+    usePlanProgress(plans, setPlans, records, calcPlanProgress, handlePlanCompleted);
 
     // 计算统计数据 - 优化性能
     const stats = useMemo(() => {
@@ -599,7 +621,7 @@ export function MainApp() {
                             <SidebarProvider
                                 style={{
                                     "--sidebar-width": "240px",
-                                    "--sidebar-width-icon": "4rem",
+                                    "--sidebar-width-icon": "5rem",
                                 } as React.CSSProperties & {
                                     "--sidebar-width": string;
                                     "--sidebar-width-icon": string;
@@ -681,27 +703,89 @@ export function MainApp() {
                                                             };
                                                             setPlans(prev => [formattedPlan, ...prev]);
 
+                                                            // 检查 ID 格式，只有 UUID 格式的才保存到云端
+                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
+
+                                                            if (!isUUID) {
+                                                                notify({
+                                                                    type: 'warning',
+                                                                    message: '本地保存成功',
+                                                                    description: '计划已保存到本地，但云端同步跳过（旧格式ID）'
+                                                                });
+                                                                return;
+                                                            }
+
                                                             // 自动保存到云端
-                                                            await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                            try {
+                                                                await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                            } catch (error) {
+                                                                console.error('MainApp - 创建计划失败:', error);
+                                                            }
                                                         }}
                                                         onUpdate={async (plan) => {
                                                             const formattedPlan = {
                                                                 ...plan,
                                                                 module: plan.module as StudyPlan['module']
                                                             };
+
+                                                            // 检查 ID 格式
+                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
+
+                                                            if (!isUUID) {
+                                                                // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
+                                                                const newId = generateUUID();
+                                                                const updatedPlan = { ...formattedPlan, id: newId };
+
+                                                                // 更新本地数据为新ID
+                                                                setPlans(prev => prev.map(p => p.id === plan.id ? updatedPlan : p));
+
+                                                                // 通知用户ID已更新
+                                                                notify({
+                                                                    type: 'info',
+                                                                    message: 'ID格式已更新',
+                                                                    description: '学习计划ID已更新为新格式，正在同步到云端...'
+                                                                });
+
+                                                                // 使用新ID同步到云端
+                                                                try {
+                                                                    await AutoCloudSync.autoUpdatePlan(updatedPlan, notify);
+                                                                } catch (error) {
+                                                                    console.error('MainApp - 编辑计划失败:', error);
+                                                                }
+                                                                return;
+                                                            }
+
+                                                            // 对于新格式ID，直接更新本地和云端
                                                             setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                             // 自动更新到云端
-                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                            try {
+                                                                await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                            } catch (error) {
+                                                                console.error('MainApp - 编辑计划失败:', error);
+                                                            }
                                                         }}
                                                         onDelete={async (id) => {
                                                             setPlans(prev => prev.filter(p => p.id !== id));
 
+                                                            // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                            if (!isUUID) {
+                                                                notify({
+                                                                    type: 'warning',
+                                                                    message: '本地删除成功',
+                                                                    description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
+                                                                });
+                                                                return;
+                                                            }
+
                                                             // 自动从云端删除
-                                                            await AutoCloudSync.autoDeletePlan(id, notify);
-                                                        }}
-                                                        onShowDetail={(id) => {
-                                                            setActiveTab('plan-detail');
+                                                            try {
+                                                                await AutoCloudSync.autoDeletePlan(id, notify);
+                                                            } catch (error) {
+                                                                console.error('MainApp - 删除计划失败:', error);
+                                                            }
                                                         }}
                                                     />
                                                 </Suspense>
@@ -719,22 +803,49 @@ export function MainApp() {
                                                                     ...plan,
                                                                     module: plan.module as StudyPlan['module']
                                                                 };
+
+                                                                // 检查 ID 格式
+                                                                const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
+
+                                                                if (!isUUID) {
+                                                                    // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
+                                                                    const newId = generateUUID();
+                                                                    const updatedPlan = { ...formattedPlan, id: newId };
+
+                                                                    // 更新本地数据为新ID
+                                                                    setPlans(prev => prev.map(p => p.id === plan.id ? updatedPlan : p));
+
+                                                                    // 通知用户ID已更新
+                                                                    notify({
+                                                                        type: 'info',
+                                                                        message: 'ID格式已更新',
+                                                                        description: '学习计划ID已更新为新格式，正在同步到云端...'
+                                                                    });
+
+                                                                    // 使用新ID同步到云端
+                                                                    try {
+                                                                        await AutoCloudSync.autoUpdatePlan(updatedPlan, notify);
+                                                                    } catch (error) {
+                                                                        console.error('MainApp - 编辑计划失败:', error);
+                                                                    }
+                                                                    return;
+                                                                }
+
+                                                                // 对于新格式ID，直接更新本地和云端
                                                                 setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                                 // 自动更新到云端
-                                                                await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                                try {
+                                                                    await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                                } catch (error) {
+                                                                    console.error('MainApp - 编辑计划失败:', error);
+                                                                }
                                                             }}
                                                         />
                                                     ) : (
                                                         <div className="flex items-center justify-center h-64">
                                                             <div className="text-center">
-                                                                <p className="text-gray-500 mb-4"><MixedText text="未找到学习计划" /></p>
-                                                                <button
-                                                                    onClick={() => setActiveTab('plan-list')}
-                                                                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                                                                >
-                                                                    <MixedText text="返回计划列表" />
-                                                                </button>
+                                                                <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
                                                             </div>
                                                         </div>
                                                     )}
@@ -843,8 +954,24 @@ export function MainApp() {
                                                     };
                                                     setPlans(prev => [formattedPlan, ...prev]);
 
+                                                    // 检查 ID 格式，只有 UUID 格式的才保存到云端
+                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
+
+                                                    if (!isUUID) {
+                                                        notify({
+                                                            type: 'warning',
+                                                            message: '本地保存成功',
+                                                            description: '计划已保存到本地，但云端同步跳过（旧格式ID）'
+                                                        });
+                                                        return;
+                                                    }
+
                                                     // 自动保存到云端
-                                                    await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                    try {
+                                                        await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                    } catch (error) {
+                                                        console.error('MainApp - 创建计划失败:', error);
+                                                    }
                                                 }}
                                                 onUpdate={async (plan) => {
                                                     const formattedPlan = {
@@ -859,11 +986,24 @@ export function MainApp() {
                                                 onDelete={async (id) => {
                                                     setPlans(prev => prev.filter(p => p.id !== id));
 
+                                                    // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                    if (!isUUID) {
+                                                        notify({
+                                                            type: 'warning',
+                                                            message: '本地删除成功',
+                                                            description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
+                                                        });
+                                                        return;
+                                                    }
+
                                                     // 自动从云端删除
-                                                    await AutoCloudSync.autoDeletePlan(id, notify);
-                                                }}
-                                                onShowDetail={(id) => {
-                                                    setActiveTab('plan-detail');
+                                                    try {
+                                                        await AutoCloudSync.autoDeletePlan(id, notify);
+                                                    } catch (error) {
+                                                        console.error('MainApp - 删除计划失败:', error);
+                                                    }
                                                 }}
                                             />
                                         </Suspense>
@@ -890,13 +1030,7 @@ export function MainApp() {
                                             ) : (
                                                 <div className="flex items-center justify-center h-64">
                                                     <div className="text-center">
-                                                        <p className="text-gray-500 mb-4"><MixedText text="未找到学习计划" /></p>
-                                                        <button
-                                                            onClick={() => setActiveTab('plan-list')}
-                                                            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-                                                        >
-                                                            <MixedText text="返回计划列表" />
-                                                        </button>
+                                                        <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
                                                     </div>
                                                 </div>
                                             )}

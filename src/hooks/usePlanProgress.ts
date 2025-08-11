@@ -5,7 +5,8 @@ export function usePlanProgress(
     plans: StudyPlan[],
     setPlans: (plans: StudyPlan[]) => void,
     records: RecordItem[],
-    calcPlanProgress: (plan: StudyPlan, records: RecordItem[]) => { progress: number; status: StudyPlan["status"] }
+    calcPlanProgress: (plan: StudyPlan, records: RecordItem[]) => { progress: number; status: StudyPlan["status"] },
+    onPlanCompleted?: (plan: StudyPlan) => void
 ) {
     const plansRef = useRef(plans);
     const recordsRef = useRef(records);
@@ -16,17 +17,17 @@ export function usePlanProgress(
         if (a === b) return true;
         if (typeof a !== typeof b) return false;
         if (typeof a !== 'object' || a === null || b === null) return false;
-        
+
         const keysA = Object.keys(a as Record<string, unknown>);
         const keysB = Object.keys(b as Record<string, unknown>);
-        
+
         if (keysA.length !== keysB.length) return false;
-        
+
         for (const key of keysA) {
             if (!keysB.includes(key)) return false;
             if (!deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])) return false;
         }
-        
+
         return true;
     }, []);
 
@@ -51,6 +52,18 @@ export function usePlanProgress(
             return { ...plan, progress, status };
         });
 
+        // 检查是否有计划完成状态的变化
+        updated.forEach((updatedPlan, index) => {
+            const originalPlan = plans[index];
+            if (originalPlan &&
+                originalPlan.status !== "已完成" &&
+                updatedPlan.status === "已完成" &&
+                onPlanCompleted) {
+                // 计划刚刚完成，触发回调
+                onPlanCompleted(updatedPlan);
+            }
+        });
+
         // 深度比较检查是否有实际变化
         const hasChanges = updated.some((updatedPlan, index) => {
             const originalPlan = plans[index];
@@ -64,5 +77,5 @@ export function usePlanProgress(
             lastUpdateRef.current = currentState;
             setPlans(updated);
         }
-    }, [plans, records, calcPlanProgress, setPlans, deepEqual]);
+    }, [plans, records, calcPlanProgress, setPlans, deepEqual, onPlanCompleted]);
 } 

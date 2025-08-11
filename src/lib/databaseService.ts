@@ -3,9 +3,27 @@ import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record'
 import { UserSettings } from '../types/record'
 
 // 获取当前用户ID
-const getCurrentUserId = () => {
-    const user = supabase.auth.getUser()
-    return user.then(({ data }) => data.user?.id)
+const getCurrentUserId = async () => {
+    try {
+        console.log('getCurrentUserId - 开始获取用户ID');
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+            console.error('getCurrentUserId - 获取用户失败:', error);
+            throw error;
+        }
+
+        console.log('getCurrentUserId - 用户信息:', {
+            userId: data.user?.id,
+            userEmail: data.user?.email,
+            hasUser: !!data.user
+        });
+
+        return data.user?.id;
+    } catch (error) {
+        console.error('getCurrentUserId - 异常:', error);
+        throw error;
+    }
 }
 
 // 刷题记录相关操作
@@ -56,7 +74,7 @@ export const recordService = {
 
 
     // 删除刷题记录
-    async deleteRecord(id: number): Promise<void> {
+    async deleteRecord(id: string | number): Promise<void> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
 
@@ -123,38 +141,96 @@ export const planService = {
             .single()
 
         if (error) {
-            console.error('学习计划上传错误:', error)
-            throw error
+            console.error('学习计划上传错误:', {
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+                code: error.code,
+                planData: planData,
+                userId: userId,
+                fullError: error
+            });
+            throw new Error(`学习计划上传失败: ${error.message || '未知错误'}`);
         }
         return data
     },
 
     // 更新学习计划
     async updatePlan(id: string, updates: Partial<StudyPlan>): Promise<StudyPlan> {
-        const userId = await getCurrentUserId()
-        if (!userId) throw new Error('用户未登录')
+        try {
+            console.log('databaseService.updatePlan - 开始更新:', {
+                planId: id,
+                updates: updates
+            });
 
-        // 处理带有双引号的字段名
-        const updateData: Record<string, unknown> = { ...updates };
-        if ('startDate' in updateData) {
-            updateData["startDate"] = updateData.startDate;
-            delete updateData.startDate;
+            const userId = await getCurrentUserId()
+            if (!userId) throw new Error('用户未登录')
+
+            console.log('databaseService.updatePlan - 用户ID获取成功:', userId);
+
+            // 处理带有双引号的字段名
+            const updateData: Record<string, unknown> = { ...updates };
+            if ('startDate' in updateData) {
+                updateData["startDate"] = updateData.startDate;
+                delete updateData.startDate;
+            }
+            if ('endDate' in updateData) {
+                updateData["endDate"] = updateData.endDate;
+                delete updateData.endDate;
+            }
+
+            console.log('databaseService.updatePlan - 处理后的更新数据:', updateData);
+
+            // 检查 Supabase 客户端状态
+            console.log('databaseService.updatePlan - Supabase 客户端状态:', {
+                hasAuth: !!supabase.auth,
+                hasFrom: !!supabase.from
+            });
+
+            const { data, error } = await supabase
+                .from('plans')
+                .update(updateData)
+                .eq('id', id)
+                .eq('user_id', userId)
+                .select()
+                .single()
+
+            console.log('databaseService.updatePlan - Supabase 响应:', {
+                hasData: !!data,
+                dataKeys: data ? Object.keys(data) : null,
+                hasError: !!error,
+                errorMessage: error?.message,
+                errorCode: error?.code
+            });
+
+            if (error) {
+                console.error('学习计划更新错误 - 详细信息:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code,
+                    updateData: updateData,
+                    planId: id,
+                    userId: userId,
+                    fullError: error,
+                    errorType: typeof error,
+                    errorConstructor: error?.constructor?.name
+                });
+                throw new Error(`学习计划更新失败: ${error.message || '未知错误'}`);
+            }
+
+            console.log('databaseService.updatePlan - 更新成功:', data);
+            return data
+        } catch (error) {
+            console.error('databaseService.updatePlan - 捕获到异常:', {
+                error: error,
+                errorType: typeof error,
+                errorConstructor: error?.constructor?.name,
+                errorMessage: error instanceof Error ? error.message : String(error),
+                errorStack: error instanceof Error ? error.stack : '无堆栈信息'
+            });
+            throw error;
         }
-        if ('endDate' in updateData) {
-            updateData["endDate"] = updateData.endDate;
-            delete updateData.endDate;
-        }
-
-        const { data, error } = await supabase
-            .from('plans')
-            .update(updateData)
-            .eq('id', id)
-            .eq('user_id', userId)
-            .select()
-            .single()
-
-        if (error) throw error
-        return data
     },
 
     // 删除学习计划
@@ -209,9 +285,12 @@ export const knowledgeService = {
             module: knowledge.module
         };
 
-        // 统一添加字段：所有模块都使用 type 和 note
+        // 处理不同类型的知识点字段
+        // 处理知识点字段
         if ('type' in knowledge) knowledgeData.type = knowledge.type;
         if ('note' in knowledge) knowledgeData.note = knowledge.note;
+
+        // 处理其他字段
         if ('subCategory' in knowledge) knowledgeData["subCategory"] = knowledge.subCategory;
         if ('date' in knowledge) knowledgeData.date = knowledge.date;
         if ('source' in knowledge) knowledgeData.source = knowledge.source;
@@ -230,7 +309,8 @@ export const knowledgeService = {
                 hint: error.hint,
                 code: error.code,
                 data: knowledgeData,
-                userId: userId
+                userId: userId,
+                fullError: error
             })
             throw new Error(`知识点上传失败: ${error.message || '未知错误'}`)
         }

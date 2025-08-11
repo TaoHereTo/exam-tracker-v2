@@ -1,0 +1,3282 @@
+{
+  "version": 8,
+  "exportedAt": "2025-08-11T04:35:00.412Z",
+  "records": [
+    {
+      "id": "bf17ef98-4015-4d19-8b74-1fd813607714",
+      "date": "2025-08-11",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "30:00",
+      "createdAt": "2025-08-11T04:30:38.277Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "d9ce48ea-3270-4b70-b8f9-0c5045dd9cba",
+      "date": "2025-08-10",
+      "module": "common",
+      "total": 15,
+      "correct": 6,
+      "duration": "10:12",
+      "createdAt": "2025-08-11T04:30:38.277Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "0ea20bd4-2850-4323-ae0c-0059534eadc0",
+      "date": "2025-08-10",
+      "module": "math",
+      "total": 10,
+      "correct": 4,
+      "duration": "14:57",
+      "createdAt": "2025-08-11T04:30:38.277Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "bd6d8f07-faba-4e0a-9042-e8900f5bed75",
+      "date": "2025-08-10",
+      "module": "politics",
+      "total": 20,
+      "correct": 8,
+      "duration": "01:23",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "ff337b61-0743-49ef-8350-652eb19bf86d",
+      "date": "2025-08-10",
+      "module": "verbal",
+      "total": 30,
+      "correct": 21,
+      "duration": "22:42",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "2be08689-be0d-4da5-b770-ff1b524739b5",
+      "date": "2025-08-10",
+      "module": "logic",
+      "total": 35,
+      "correct": 26,
+      "duration": "45:14",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "089bdeaa-7480-4233-b2e9-84e6c7c8cdcb",
+      "date": "2025-08-10",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "25:31",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "227d3de1-18bd-465a-b608-b181d17831a3",
+      "date": "2025-08-03",
+      "module": "common",
+      "total": 15,
+      "correct": 8,
+      "duration": "00:19",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "b0e11ec8-50f7-40f9-9f36-216ebe6913b1",
+      "date": "2025-08-03",
+      "module": "politics",
+      "total": 20,
+      "correct": 10,
+      "duration": "00:37",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "433950db-ebb9-457d-a67e-436b8e6369d4",
+      "date": "2025-08-03",
+      "module": "verbal",
+      "total": 30,
+      "correct": 17,
+      "duration": "20:36",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "3db343f1-bd59-4547-9950-42895530034c",
+      "date": "2025-08-03",
+      "module": "math",
+      "total": 10,
+      "correct": 8,
+      "duration": "22:48",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "82859336-39a5-483e-9bbb-2a4901336d98",
+      "date": "2025-08-03",
+      "module": "logic",
+      "total": 35,
+      "correct": 23,
+      "duration": "43:07",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "ddf88c52-fb03-4754-bcb9-b42c0c41c60c",
+      "date": "2025-08-03",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "32:30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "1f1da817-5c0b-4b83-a9f9-37f7c05d9697",
+      "date": "2025-08-09",
+      "module": "资料分析",
+      "total": 21,
+      "correct": 20,
+      "duration": "19:55",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "c1dee2c7-bf6e-459c-9a19-8d7167c3e079",
+      "date": "2025-08-09",
+      "module": "资料分析",
+      "total": 20,
+      "correct": 16,
+      "duration": "24:30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.410Z"
+    },
+    {
+      "id": "06b40871-a751-4212-a2cf-7a66cc5e0973",
+      "date": "2025-08-08",
+      "module": "资料分析",
+      "total": 20,
+      "correct": 20,
+      "duration": "30:32",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "79c27c73-077e-4ab1-8dac-36ddf9f49ba1",
+      "date": "2025-08-08",
+      "module": "资料分析",
+      "total": 20,
+      "correct": 17,
+      "duration": "30:53",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "acc8a734-a8c8-4075-99fa-b824e5c82a65",
+      "date": "2025-08-06",
+      "module": "资料分析",
+      "correct": 20,
+      "total": 23,
+      "duration": "40:01",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "53d48bdf-07eb-4351-bb78-d9d8b966a697",
+      "date": "2025-08-07",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "31:49",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a742819d-5f0c-4c2e-b3f5-9e7bf15ff51d",
+      "date": "2025-08-07",
+      "module": "判断推理",
+      "correct": 14,
+      "total": 20,
+      "duration": "33:24",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "f18b1f54-588c-470d-a2d2-1082138ace09",
+      "date": "2025-08-07",
+      "module": "判断推理",
+      "correct": 17,
+      "total": 20,
+      "duration": "31:53",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a1e0a60b-33de-4e18-861b-fcd41d2acf16",
+      "date": "2025-08-02",
+      "module": "判断推理",
+      "correct": 15,
+      "total": 20,
+      "duration": "22:02",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "edea035d-10c7-4568-900f-f26bfed13d05",
+      "date": "2025-08-02",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "22:02",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a9b20079-0e66-4f6d-9a50-d5f5b6fff87c",
+      "date": "2025-08-02",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "32:26",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a4afd607-d9fc-4288-9f86-2e350af765db",
+      "date": "2025-08-02",
+      "module": "资料分析",
+      "correct": 18,
+      "total": 22,
+      "duration": "29:44",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "f00a8ca4-24c5-47c0-8828-d3ecf33accff",
+      "date": "2025-08-01",
+      "module": "资料分析",
+      "correct": 16,
+      "total": 20,
+      "duration": "33:10",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "bd70e2f3-baa0-41c8-a6c9-d5ac926df02c",
+      "date": "2025-08-01",
+      "module": "资料分析",
+      "correct": 21,
+      "total": 224,
+      "duration": "31:33",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "f6cb92ae-1749-43ac-81c9-069b22eb071b",
+      "date": "2025-08-01",
+      "module": "判断推理",
+      "correct": 18,
+      "total": 20,
+      "duration": "22:12",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "05b04c52-5b7f-4226-bdd4-e91031901b8d",
+      "date": "2025-08-01",
+      "module": "判断推理",
+      "correct": 13,
+      "total": 20,
+      "duration": "25:59",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6d061fd9-7a5c-4408-9c7b-a02777e01b12",
+      "date": "2025-07-31",
+      "module": "判断推理",
+      "correct": 15,
+      "total": 20,
+      "duration": "26.08",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "8517146c-c27c-477d-8d39-c76534ecfd6a",
+      "date": "2025-07-31",
+      "module": "判断推理",
+      "correct": 13,
+      "total": 20,
+      "duration": "32.35",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "e4ff63d6-d21c-4da4-8675-7edcbdd83d41",
+      "date": "2025-07-31",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "29.43",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a45b7023-a1ce-402d-858c-40e255451789",
+      "date": "2025-07-31",
+      "module": "资料分析",
+      "correct": 16,
+      "total": 20,
+      "duration": "25.02",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "db0692a1-e255-4f59-977e-08ef0b0586a0",
+      "date": "2025-07-30",
+      "module": "数量关系",
+      "correct": 15,
+      "total": 20,
+      "duration": "40.18",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "1a7aa05c-fb4e-4549-99bf-9611e1f6608b",
+      "date": "2025-07-30",
+      "module": "判断推理",
+      "correct": 18,
+      "total": 20,
+      "duration": "26.59",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "c2f95901-e721-44df-b67f-024f3d769077",
+      "date": "2025-07-30",
+      "module": "判断推理",
+      "correct": 14,
+      "total": 20,
+      "duration": "25.51",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "e2bb217c-5a56-4f5e-ac6b-545fd146a48a",
+      "date": "2025-07-30",
+      "module": "资料分析",
+      "correct": 21,
+      "total": 24,
+      "duration": "35.27",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "d06d31c4-aa3e-4c6a-a6ae-640650d818b9",
+      "date": "2025-07-29",
+      "module": "判断推理",
+      "correct": 17,
+      "total": 20,
+      "duration": "31.15",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6f830701-5fa3-403c-9975-70ff81fb4a8b",
+      "date": "2025-07-29",
+      "module": "判断推理",
+      "correct": 20,
+      "total": 20,
+      "duration": "17.58",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "bb372cf1-cd88-4bed-b569-ed51ccbf93df",
+      "date": "2025-07-29",
+      "module": "资料分析",
+      "correct": 21,
+      "total": 22,
+      "duration": "23.30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "225e9344-061b-4fdb-95be-3f15e9b99b2f",
+      "date": "2025-07-29",
+      "module": "资料分析",
+      "correct": 16,
+      "total": 20,
+      "duration": "28.21",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "b3c93c75-9b7f-4d45-8396-ca6f672249b7",
+      "date": "2025-07-28",
+      "module": "判断推理",
+      "correct": 15,
+      "total": 20,
+      "duration": "33.32",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "27519252-ae14-45ee-ba62-4fdb82416221",
+      "date": "2025-07-28",
+      "module": "判断推理",
+      "correct": 15,
+      "total": 20,
+      "duration": "26.09",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "0abe90f9-2393-4753-af66-07b9d790ba0d",
+      "date": "2025-07-28",
+      "module": "资料分析",
+      "correct": 19,
+      "total": 20,
+      "duration": "22.36",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "60fd06db-5ad2-4d2f-a887-7f06e8f3600a",
+      "date": "2025-07-28",
+      "module": "资料分析",
+      "correct": 21,
+      "total": 23,
+      "duration": "32.16",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "b6f1dc9f-c865-49a1-b334-c94b7f6cdc57",
+      "date": "2025-07-27",
+      "module": "政治理论",
+      "correct": 9,
+      "total": 20,
+      "duration": "0.37",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "d5f52c94-ca81-414b-8477-e0091893bfcf",
+      "date": "2025-07-27",
+      "module": "常识判断",
+      "correct": 5,
+      "total": 15,
+      "duration": "2.39",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "2bab8c25-7781-4d17-9533-12887a9c1ead",
+      "date": "2025-07-27",
+      "module": "言语理解",
+      "correct": 23,
+      "total": 30,
+      "duration": "15.54",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "f459dd49-bf79-4917-966c-815eb07fafb4",
+      "date": "2025-07-27",
+      "module": "数量关系",
+      "correct": 4,
+      "total": 10,
+      "duration": "14.03",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6b571774-178e-4c19-856b-413b7dd08ea7",
+      "date": "2025-07-27",
+      "module": "判断推理",
+      "correct": 27,
+      "total": 35,
+      "duration": "48.08",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "8ebb071f-9275-47b6-ba3e-e0a18ca6783b",
+      "date": "2025-07-27",
+      "module": "资料分析",
+      "correct": 17,
+      "total": 20,
+      "duration": "38.38",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "43a62337-f511-44aa-a9aa-a6e47decb1d4",
+      "date": "2025-07-26",
+      "module": "言语理解",
+      "correct": 17,
+      "total": 20,
+      "duration": "12.30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "e1d50e96-d80a-4a79-adc7-4dbf9771fdf9",
+      "date": "2025-07-26",
+      "module": "判断推理",
+      "correct": 18,
+      "total": 20,
+      "duration": "26.06",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "0a15011b-f67a-4558-b219-ad045a5cc29b",
+      "date": "2025-07-26",
+      "module": "资料分析",
+      "correct": 19,
+      "total": 22,
+      "duration": "29.27",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "41233d87-3a29-4ac8-8607-108772e7d880",
+      "date": "2025-07-26",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "25.45",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "aeebdb9d-f8e2-4c4a-831e-caed73271ea4",
+      "date": "2025-07-26",
+      "module": "判断推理",
+      "correct": 15,
+      "total": 20,
+      "duration": "21.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "1cd84e82-885f-4613-b25b-80c3178d6451",
+      "date": "2025-07-26",
+      "module": "资料分析",
+      "correct": 15,
+      "total": 20,
+      "duration": "25.46",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "124e1757-f88c-43b8-bacc-261a2f9a56d1",
+      "date": "2025-07-20",
+      "module": "common",
+      "total": 15,
+      "correct": 3,
+      "duration": "0.30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "5e42ad2b-468d-4908-9ca2-a710059b3443",
+      "date": "2025-07-20",
+      "module": "politics",
+      "total": 20,
+      "correct": 4,
+      "duration": "0.21",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "0ab74a08-a8c9-4d72-aa1c-617cfbd9492a",
+      "date": "2025-07-20",
+      "module": "verbal",
+      "total": 30,
+      "correct": 22,
+      "duration": "13.51",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "c679c195-65a1-4cee-b6e3-88266fdb5eaa",
+      "date": "2025-07-20",
+      "module": "math",
+      "total": 10,
+      "correct": 7,
+      "duration": "34.24",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "ad4c43d8-7a9b-4243-833f-b7d2c920167d",
+      "date": "2025-07-20",
+      "module": "logic",
+      "total": 35,
+      "correct": 23,
+      "duration": "39.41",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "bbb1b2b4-91f5-4595-8e5f-5de52d15f9bb",
+      "date": "2025-07-20",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 15,
+      "duration": "30.36",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "c5d8c35f-9129-4742-811d-47dede1ae006",
+      "date": "2025-07-13",
+      "module": "math",
+      "total": 10,
+      "correct": 5,
+      "duration": "7.43",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "90ca6e5d-5be7-4281-b433-0b8ea230691f",
+      "date": "2025-07-13",
+      "module": "verbal",
+      "total": 30,
+      "correct": 23,
+      "duration": "21.22",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "416f9cf6-7a0e-440c-ac11-afe8f1a64154",
+      "date": "2025-07-13",
+      "module": "common",
+      "total": 15,
+      "correct": 5,
+      "duration": "5.25",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "36eb9b28-af71-4a88-a493-f8f4348b5bda",
+      "date": "2025-07-13",
+      "module": "politics",
+      "total": 20,
+      "correct": 6,
+      "duration": "2.16",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "9c806b23-579c-4d5d-95f8-979c1f01eb61",
+      "date": "2025-07-13",
+      "module": "logic",
+      "total": 35,
+      "correct": 24,
+      "duration": "52.13",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "47e4523a-f4e1-4eed-9a17-7e618f1651a0",
+      "date": "2025-07-13",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 13,
+      "duration": "31",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "60929147-198b-4577-86f4-ad2477cdf885",
+      "date": "2025-07-25",
+      "module": "logic",
+      "total": 20,
+      "correct": 18,
+      "duration": "28.55",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "7bc1755a-72ad-4b24-9bc1-61eac41cd257",
+      "date": "2025-07-25",
+      "module": "logic",
+      "total": 20,
+      "correct": 18,
+      "duration": "40.53",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "15832924-1e11-4194-9236-92ad6e0ef345",
+      "date": "2025-07-25",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 17,
+      "duration": "26.45",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6192e1c8-78ba-4e1b-a630-4b3db7a2e6bb",
+      "date": "2025-07-25",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 12,
+      "duration": "31.46",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "cfc87832-692c-41c5-97b7-d60cc3935885",
+      "date": "2025-07-23",
+      "module": "data-analysis",
+      "total": 24,
+      "correct": 21,
+      "duration": "30.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "bfe3adb6-8586-48c8-927a-522fdcce6f8b",
+      "date": "2025-07-22",
+      "module": "math",
+      "total": 20,
+      "correct": 15,
+      "duration": "60.16",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "cb0a489e-93f8-4c83-b205-ddff27d7a831",
+      "date": "2025-07-22",
+      "module": "data-analysis",
+      "total": 25,
+      "correct": 24,
+      "duration": "38.53",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6836d3ca-4924-4684-8ca7-bf85b8c1d007",
+      "date": "2025-07-22",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "35.46",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "0416d7f2-05b8-46dd-bc70-fc9ac8061d1b",
+      "date": "2025-07-21",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "28.28",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "36d4ee29-2c94-46e0-a95b-a793bd664963",
+      "date": "2025-07-18",
+      "module": "data-analysis",
+      "total": 23,
+      "correct": 16,
+      "duration": "45.36",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "46224ec8-ef44-40ba-8748-cb08eb2435cf",
+      "date": "2025-07-17",
+      "module": "data-analysis",
+      "total": 23,
+      "correct": 20,
+      "duration": "32.27",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6c429dab-eaa2-4cf4-8cb8-d31c5f0ba203",
+      "date": "2025-07-17",
+      "module": "data-analysis",
+      "total": 22,
+      "correct": 17,
+      "duration": "34.27",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "70bc625d-bec4-4eeb-b747-da36b08b23c0",
+      "date": "2025-07-16",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "39.46",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "bcc3fe8a-09f8-4a91-8689-6b99142d1fd9",
+      "date": "2025-07-16",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 15,
+      "duration": "24.57",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "b3e0d26f-abe4-4093-ada3-2d01a7cdd3e6",
+      "date": "2025-07-15",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "38.27",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "d30d6877-9bed-45e2-81b1-802f113edfff",
+      "date": "2025-07-12",
+      "module": "data-analysis",
+      "total": 22,
+      "correct": 21,
+      "duration": "31.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "66ae3384-dfe4-4289-88e1-cece21a570a8",
+      "date": "2025-07-05",
+      "module": "common",
+      "total": 1,
+      "correct": 1,
+      "duration": "1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "c96bfd2b-1437-47e7-b182-657217c355c0",
+      "date": "2025-06-04",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 14,
+      "duration": "34",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "1351ac59-1d77-4f81-b915-626a3fbdbc38",
+      "date": "2025-06-04",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 19,
+      "duration": "30.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "8a7b0bcc-0f83-49df-913f-e7361222f88d",
+      "date": "2025-06-04",
+      "module": "math",
+      "total": 19,
+      "correct": 17,
+      "duration": "31.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "90ca7f67-8ef0-419d-af5d-5e63a3614806",
+      "date": "2025-06-05",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 14,
+      "duration": "41.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "97b42b39-b27e-4200-a3b7-f559e6147086",
+      "date": "2025-06-05",
+      "module": "data-analysis",
+      "total": 24,
+      "correct": 24,
+      "duration": "38",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "4cb93389-afce-41d6-a0e1-4fa22d1ea36b",
+      "date": "2025-06-05",
+      "module": "common",
+      "total": 40,
+      "correct": 19,
+      "duration": "27.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "6c9845b8-89f4-4d3e-84cf-3a844bfcb36c",
+      "date": "2025-06-06",
+      "module": "data-analysis",
+      "total": 23,
+      "correct": 14,
+      "duration": "47.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "aab3c979-c7ca-4fce-8ffa-5371cf3ea984",
+      "date": "2025-06-06",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "28.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "b6986ad9-698a-4e84-8dcd-fa247b877139",
+      "date": "2025-06-07",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 20,
+      "duration": "36.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "9f332a0a-6af6-4a49-97a4-bcda00abac10",
+      "date": "2025-06-07",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 15,
+      "duration": "27.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "e05c22ac-27bd-47e3-8d11-ad4ec77cb945",
+      "date": "2025-06-07",
+      "module": "verbal",
+      "total": 40,
+      "correct": 33,
+      "duration": "39.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "66a6af6e-ff3d-4d4b-961b-77ea69835d4c",
+      "date": "2025-06-11",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "46.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "beb53402-549f-46ff-b36a-3d7435940883",
+      "date": "2025-06-11",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "38.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "a99c83d7-b6e2-47e3-9349-5cde1fea9de0",
+      "date": "2025-06-12",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 19,
+      "duration": "30.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "2bae2988-4996-465e-b181-03e786da8f4c",
+      "date": "2025-06-12",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 20,
+      "duration": "30.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "060af37b-a9c5-46be-af1f-0a68912de7d8",
+      "date": "2025-06-13",
+      "module": "logic",
+      "total": 40,
+      "correct": 34,
+      "duration": "62.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "0baadac4-3d2c-4d69-a5c7-7d40ee7a9f4b",
+      "date": "2025-06-14",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "26",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.411Z"
+    },
+    {
+      "id": "adebd788-ad1f-4f7c-b936-ab42a5faf8d0",
+      "date": "2025-06-14",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "31.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "b82e4b34-7fe5-4acc-a301-457ebfbceb83",
+      "date": "2025-06-15",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "33",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "5a05e135-e945-4e35-8dbf-ba70a5feb7fd",
+      "date": "2025-06-15",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "34.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "f71b1c98-9f19-4752-8805-3bd52b8dc087",
+      "date": "2025-06-16",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "33.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "e0caf75b-bffc-42aa-9da3-f143ee786ee5",
+      "date": "2025-06-16",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "28.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "13161feb-6c52-4a77-ad06-e60b63d7118e",
+      "date": "2025-06-17",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 20,
+      "duration": "29.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "4b767ae2-56f6-41df-8c3a-1a9f0bfe58d0",
+      "date": "2025-06-17",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 20,
+      "duration": "31.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "cccb484c-92d4-4ed3-a716-4e7cf89b18ac",
+      "date": "2025-06-18",
+      "module": "data-analysis",
+      "total": 40,
+      "correct": 35,
+      "duration": "60.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "805cc98e-20d7-44ed-af18-161938b7858b",
+      "date": "2025-06-18",
+      "module": "math",
+      "total": 40,
+      "correct": 34,
+      "duration": "40.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "f5961177-bf8f-4024-ad36-d7daf65fe075",
+      "date": "2025-06-20",
+      "module": "data-analysis",
+      "total": 40,
+      "correct": 33,
+      "duration": "44.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "a791667f-ae5e-4d88-8285-5244a4c098c7",
+      "date": "2025-06-21",
+      "module": "data-analysis",
+      "total": 40,
+      "correct": 36,
+      "duration": "63.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "e71349ad-89b6-43ab-976e-883ce91264fa",
+      "date": "2025-06-21",
+      "module": "math",
+      "total": 40,
+      "correct": 33,
+      "duration": "154.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "d93e7768-1d06-485b-9709-fc669892e9f6",
+      "date": "2025-06-21",
+      "module": "verbal",
+      "total": 40,
+      "correct": 33,
+      "duration": "26",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "9fde3db3-3c38-4d9e-9573-7df86c8667a5",
+      "date": "2025-06-22",
+      "module": "data-analysis",
+      "total": 23,
+      "correct": 21,
+      "duration": "31.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "617885fa-8008-4067-88b3-dc5a8b135e60",
+      "date": "2025-06-22",
+      "module": "politics",
+      "total": 20,
+      "correct": 9,
+      "duration": "17.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c8dc8e4f-0ea2-4fda-829f-4753cccde7ba",
+      "date": "2025-06-22",
+      "module": "politics",
+      "total": 20,
+      "correct": 8,
+      "duration": "15.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "5e2197de-922a-4bdc-8d3c-63b28d50e480",
+      "date": "2025-06-23",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "32.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "d723171d-b218-4ed6-9031-ebc42a706d00",
+      "date": "2025-06-23",
+      "module": "logic",
+      "total": 35,
+      "correct": 31,
+      "duration": "48.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "3f54da5e-c601-49b1-9478-ddc287fda30a",
+      "date": "2025-06-23",
+      "module": "math",
+      "total": 15,
+      "correct": 10,
+      "duration": "43.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "6440fa6e-0c6f-4c84-8833-67491a6a3c81",
+      "date": "2025-06-23",
+      "module": "verbal",
+      "total": 30,
+      "correct": 24,
+      "duration": "24.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "695c35d5-7894-4c7a-9e1c-e26d0d634bc7",
+      "date": "2025-06-23",
+      "module": "politics",
+      "total": 20,
+      "correct": 9,
+      "duration": "20.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "a9fe7e56-4f9a-4208-abd3-4f8bcab07796",
+      "date": "2025-06-23",
+      "module": "common",
+      "total": 15,
+      "correct": 9,
+      "duration": "18.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "2d5247b5-8580-436b-81a5-ef0d77cb8883",
+      "date": "2025-06-24",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 14,
+      "duration": "49",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c7b59a6c-34f2-4f48-88bf-79fa8000c541",
+      "date": "2025-06-25",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "26.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "315fb696-bdb5-4ab5-9041-befb9fdf7b2e",
+      "date": "2025-06-25",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 18,
+      "duration": "32",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "797c713d-7f1d-47b8-a10d-4ab198574757",
+      "date": "2025-06-26",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 19,
+      "duration": "37.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "4ce37ec5-4dca-4ac0-b17f-f4223ad234ae",
+      "date": "2025-06-26",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 15,
+      "duration": "26.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "7d78826f-d8ae-4d3b-9e0b-6d164990e346",
+      "date": "2025-06-26",
+      "module": "logic",
+      "total": 40,
+      "correct": 38,
+      "duration": "47",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "ff8f76a5-a19f-40a9-91c5-f2509b7d08c3",
+      "date": "2025-06-26",
+      "module": "verbal",
+      "total": 40,
+      "correct": 35,
+      "duration": "38.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "cb5df092-96d2-4bcf-8255-609b901190a3",
+      "date": "2025-06-27",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "33.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "f238a40c-ef6f-491d-8ef8-3b347045727e",
+      "date": "2025-06-27",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 19,
+      "duration": "36.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "e7830759-90d0-4599-8f44-bcbe9af38896",
+      "date": "2025-06-30",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "41.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "e845eeb4-11ec-4ff0-8b50-91676daa0aba",
+      "date": "2025-06-30",
+      "module": "politics",
+      "total": 20,
+      "correct": 9,
+      "duration": "8.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c97e04ab-4486-414c-aebf-f481d0153d40",
+      "date": "2025-06-30",
+      "module": "common",
+      "total": 20,
+      "correct": 5,
+      "duration": "8.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "d9fd8408-dd76-459f-9e71-7784c13fd6e9",
+      "date": "2025-06-30",
+      "module": "verbal",
+      "total": 30,
+      "correct": 22,
+      "duration": "26.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "0fecf8f8-d317-41ef-a248-2c9cde6b2c78",
+      "date": "2025-06-30",
+      "module": "math",
+      "total": 15,
+      "correct": 7,
+      "duration": "3.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "582c0f71-0094-4f1b-9c9c-57c22404ce9f",
+      "date": "2025-06-30",
+      "module": "logic",
+      "total": 35,
+      "correct": 26,
+      "duration": "41.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "f3656777-7908-4dff-863e-04bdc3eb5e9a",
+      "date": "2025-07-01",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 17,
+      "duration": "34.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "98f0febc-551e-4982-a589-0161adb078b9",
+      "date": "2025-07-01",
+      "module": "verbal",
+      "total": 40,
+      "correct": 33,
+      "duration": "34.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "96795186-3857-4c96-88fa-94b78bb6ad7a",
+      "date": "2025-07-02",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "30.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "b18219a5-40c6-4165-a58c-7bf177521235",
+      "date": "2025-07-03",
+      "module": "data-analysis",
+      "total": 24,
+      "correct": 18,
+      "duration": "35.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "b39f06d0-b003-480b-b0c3-04cf40f8b4a0",
+      "date": "2025-07-03",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 17,
+      "duration": "31.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "078331d5-e674-449e-9702-50dcfa2ccbce",
+      "date": "2025-07-04",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 18,
+      "duration": "30.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "1dfa8f08-853a-4785-81dd-3a107218d23f",
+      "date": "2025-07-04",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "32.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "084c67c7-95b6-4990-bd48-7f4d3cf80bd0",
+      "date": "2025-07-04",
+      "module": "math",
+      "total": 20,
+      "correct": 17,
+      "duration": "54.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "0246f522-7613-4fa3-977d-41bd076b128b",
+      "date": "2025-07-05",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 15,
+      "duration": "34",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "69f7c8c9-cd23-4386-bda6-30f3a6f3fa9b",
+      "date": "2025-07-05",
+      "module": "logic",
+      "total": 20,
+      "correct": 18,
+      "duration": "40.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "06481f86-de51-441c-a99c-1f64f925644a",
+      "date": "2025-07-06",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 20,
+      "duration": "26.1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "847ad45c-bf2c-40dc-8391-68fad72dd685",
+      "date": "2025-07-06",
+      "module": "common",
+      "total": 20,
+      "correct": 10,
+      "duration": "13.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c82704b6-13ef-4c20-8f4d-2e3d3baca227",
+      "date": "2025-07-07",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 15,
+      "duration": "30.2",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "8c264fd2-6927-492e-9290-af7d62f01f05",
+      "date": "2025-07-07",
+      "module": "logic",
+      "total": 35,
+      "correct": 25,
+      "duration": "52.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "09b5a1fb-4405-4eb5-a7c1-bddafb3d26b9",
+      "date": "2025-07-07",
+      "module": "math",
+      "total": 10,
+      "correct": 4,
+      "duration": "5.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "6b179d2b-ded1-488e-b095-19357250162c",
+      "date": "2025-07-07",
+      "module": "verbal",
+      "total": 30,
+      "correct": 23,
+      "duration": "23.4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "3496c349-b4fa-4071-b639-22c866a721ef",
+      "date": "2025-07-07",
+      "module": "common",
+      "total": 15,
+      "correct": 7,
+      "duration": "10.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "3ffb13c2-698a-4ced-a9bc-c6706d965691",
+      "date": "2025-07-07",
+      "module": "politics",
+      "total": 20,
+      "correct": 3,
+      "duration": "1.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "6fd8d4de-018d-4ad7-a21b-b43165300cdc",
+      "date": "2025-07-08",
+      "module": "logic",
+      "total": 20,
+      "correct": 20,
+      "duration": "57",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c5798b0d-f1a7-44ca-87d5-a2523a49f842",
+      "date": "2025-07-09",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 14,
+      "duration": "28.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "814a6b95-fa23-49c2-84d5-cd3e77979081",
+      "date": "2025-07-10",
+      "module": "math",
+      "total": 20,
+      "correct": 15,
+      "duration": "71.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "6c899f8c-84c9-4037-b7eb-8100aa49a58d",
+      "date": "2025-07-10",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 16,
+      "duration": "39.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "22dd4f08-b8e2-419a-b953-25dbd395f72a",
+      "date": "2025-07-10",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 12,
+      "duration": "31.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "c6451c41-f39f-484b-bf4b-b5bdc36ba580",
+      "date": "2025-07-10",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 19,
+      "duration": "31.7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "158bb856-a17e-4cf3-822c-547da5b7cc7b",
+      "date": "2025-07-10",
+      "module": "data-analysis",
+      "total": 21,
+      "correct": 20,
+      "duration": "29.8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "f38f3349-7f0f-4a37-b77c-c76807eb7ee1",
+      "date": "2025-07-11",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 19,
+      "duration": "32",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "46700614-6f3d-4600-9475-3b501ddf71bb",
+      "date": "2025-07-11",
+      "module": "common",
+      "total": 20,
+      "correct": 9,
+      "duration": "11.9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "151e30f9-fc8b-47ba-8b7e-0f5db0fa1605",
+      "date": "2025-07-12",
+      "module": "data-analysis",
+      "total": 20,
+      "correct": 16,
+      "duration": "30",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "e4982d5b-1e46-4a3b-93a5-dff39680f232",
+      "date": "2025-07-12",
+      "module": "data-analysis",
+      "total": 22,
+      "correct": 17,
+      "duration": "37.3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "0b36f0e1-af6f-415a-adcb-b38155e915d5",
+      "date": "2025-07-12",
+      "module": "math",
+      "total": 20,
+      "correct": 17,
+      "duration": "55.5",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    },
+    {
+      "id": "cccbd769-34b9-491c-822a-cd745652e0c4",
+      "date": "2025-07-12",
+      "module": "data-analysis",
+      "total": 23,
+      "correct": 19,
+      "duration": "29.6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.412Z"
+    }
+  ],
+  "knowledge": [
+    {
+      "type": "明显有最大面",
+      "note": "最大面边数",
+      "subCategory": "图形推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "07dc4eea-ad3d-4ec0-bf65-da1e09b70945",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "九宫格且面很好数",
+      "note": "1、2面相加=3的面",
+      "subCategory": "图形推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "74d22968-2305-428c-a4ee-3f2ae355a3c9",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "题干问“不能”",
+      "note": "很多题干开始出现“不能形成规律”的字眼，注意读题。",
+      "subCategory": "图形推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "5d3ef40b-9fe3-403d-8983-0d8ec0f0bcc3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "多个数求平均值",
+      "note": "根据选项排除，比如18年广东县级卷，选项是1.07，1.09，1.11，1.13。先看≤1.07的有三个，故≥1.07的有9个，可以排除1.07。同理，≥1.13的有4个，说明＜的有8个，也可以排除。然后看≥1.09和＜1.09的分别是8个和4个，也可以排除。而≥1.11的有6个，＜1.11的有6个，当选。",
+      "imagePath": "",
+      "module": "data-analysis",
+      "id": "3938ebde-50e3-4ea4-be97-185c4d0993b6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "佶屈聱牙",
+      "note": "指文词艰涩生僻、拗口难懂。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "f0a3f753-aaaf-47b6-be33-75b25788b695",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "人浮于事",
+      "note": "指人员过多，超过工作所需。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "f5d5502b-2ff0-4dc5-a0bb-a9cfa0d144cf",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "徒托空言",
+      "note": "指只讲空话，而不实行。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "0197b1cf-63af-403c-bc44-ee620a7ab4ef",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "挂一漏万",
+      "note": "指提到的很少，漏掉的很多。形容列举不周，遗漏太多。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "21968aaa-a9dc-4350-8dbf-7e7db0579821",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "习焉不察",
+      "note": "指经常接触某种事物，反而察觉不到其中的问题。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "bab97666-52aa-4145-949f-9b83b2054608",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "闻鸡起舞",
+      "note": "祖逖和刘琨为报国效力，每日听到鸡叫便起床练剑的典故。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "bee6782a-66c6-4084-a3be-324ce6f4f915",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "缓兵之计/单刀赴会",
+      "note": "孔明和司马懿在祁山作战时候的计策；关羽应鲁肃之邀，仅率少数随从单刀去东吴赴会。",
+      "subCategory": "成语积累",
+      "imagePath": "",
+      "module": "verbal",
+      "id": "ad084b70-3ea6-41b7-91de-3a08bfa9e1f1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "竹扇：蒲扇",
+      "note": "蒲扇是扇子的一种，用的材料是蒲葵。和竹扇并列。",
+      "subCategory": "类比推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "cfe0dc9c-837c-4963-83d6-accc150de770",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "多面体切割",
+      "note": "现在多面体切割不光靠最外一圈的黑白空了，里面的黑白空也得考虑。见模考大赛29季第80题。",
+      "subCategory": "图形推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "98ef74e1-09b2-4f56-b922-7a66509e60e6",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "打撒发",
+      "note": "大发大是",
+      "imagePath": "",
+      "module": "data-analysis",
+      "id": "1cf4cb90-8c88-4a41-8441-fe73d24c5029",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "source": "中共中央国务院关于实施就业优先战略促进高质量充分就业的意见。",
+      "note": "1、发挥民营企业就业引领作用，综合运用财政支持、税收优惠等政策，引导各类主体更好履行稳岗扩岗社会责任。（是国企而非民企）",
+      "date": "2024-09-01",
+      "imagePath": "",
+      "module": "politics",
+      "id": "466d0bb6-dfc3-4beb-8390-bc1f93c06873",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "轴对称",
+      "note": "轴对称的时候要特别注意阴影。因为阴影不是轴对称。",
+      "subCategory": "图形推理",
+      "imagePath": "",
+      "module": "logic",
+      "id": "26052239-cb16-4713-bad6-5c9cca100b22",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "展开图",
+      "note": "展开图是同一个图形，可以稍微移动移动面就能看出来。",
+      "subCategory": "图形推理",
+      "imagePath": "image_1754726173285.png",
+      "module": "logic",
+      "id": "12b34360-ae49-466e-a0c7-47770062d7fa",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "直角个数",
+      "note": "出现正方形缺一角的图形",
+      "subCategory": "图形推理",
+      "imagePath": "image_1754726001837.png",
+      "module": "logic",
+      "id": "abb3cb74-f3fd-4081-987b-14e83ee62420",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "密密麻麻中的特殊",
+      "note": "正方形在中间还是在边缘。",
+      "subCategory": "图形推理",
+      "imagePath": "image_1754563345213.png",
+      "module": "logic",
+      "id": "575a9b32-1b90-49b5-97b8-c2a374c58cc4",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "走投无路笔画数",
+      "note": "笔画数与三角形个数",
+      "subCategory": "图形推理",
+      "imagePath": "image_1754563290876.png",
+      "module": "logic",
+      "id": "c3252348-dd24-4c8d-85fa-bfcea3f68046",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "折线",
+      "note": "首尾线端点连接经过几条线。",
+      "subCategory": "图形推理",
+      "imagePath": "image.png",
+      "module": "logic",
+      "id": "a238db2e-6716-49aa-bea3-f1ea9b5812f3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "圆点在线上",
+      "note": "圆点引出的射线条数",
+      "subCategory": "图形推理",
+      "imagePath": "51.png",
+      "module": "logic",
+      "id": "3d9aad71-2996-432a-9003-0ae9556d7768",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "折线",
+      "note": "折线尾部新增线条的顺时针or逆时针。",
+      "subCategory": "图形推理",
+      "imagePath": "50.png",
+      "module": "logic",
+      "id": "fcf0b311-753c-4561-8bdb-1299efba63ff",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "立体拼合",
+      "note": "看一眼不会直接放弃，感觉难的就蒙A，不难的蒙C。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "9603fd9d-c643-4fe0-b4d9-ecbee0b1ca2c",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "增长量",
+      "note": "增长率大于100%时，增长量就大于现期的一半",
+      "module": "data-analysis",
+      "id": "c87b77af-757f-408f-9ebe-05eb8a0007d3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "撤销婚姻/婚姻效力",
+      "note": "可撤销：婚前有严重遗传、传染病、精神病,被胁迫。能撤销婚姻。其他不能（待补充）。婚姻无效：重婚，近亲，未到年龄。",
+      "subCategory": "法律常识",
+      "module": "common",
+      "id": "1754203155472d642deb56243",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "同比增速与环比增速的关系",
+      "note": "若某月同比高于上月同比，则该月环比高于上年环比；",
+      "module": "data-analysis",
+      "id": "175419799232415d07be1b9c7f",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "高低补足",
+      "note": "高低不足的时候，按照顺时针/逆时针，分别按照高低标号。需要补足的块儿则是逆时针/顺时针，高低相反的。",
+      "subCategory": "图形推理",
+      "imagePath": "49.png",
+      "module": "logic",
+      "id": "17541214938998fd6cfa881a358",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "立方体，数块数。",
+      "note": "数块数的时候，不一定非得从上往下数。有时候从前往后或者从后往前数刚好数。",
+      "subCategory": "图形推理",
+      "imagePath": "48.png",
+      "module": "logic",
+      "id": "175412133012346f29ebac595d",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "部分数",
+      "note": "看题的时候别忘了看方框是一只有还是偶尔有，偶尔没有。否则会漏数部分数。",
+      "subCategory": "图形推理",
+      "imagePath": "47.png",
+      "module": "logic",
+      "id": "1754120888716fb8fa9fa4d26b",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "内部黑白轴对称。",
+      "note": "黑块对称轴与白块对称轴之间的关系。",
+      "subCategory": "图形推理",
+      "imagePath": "46.png",
+      "module": "logic",
+      "id": "17541206302330610b49db888c",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "点相交",
+      "note": "好几个图形点相交，考察是两两相交还是1 3相交",
+      "subCategory": "图形推理",
+      "imagePath": "45.png",
+      "module": "logic",
+      "id": "175412037854188625debefcf8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "看表也得看单位",
+      "note": "这道题的精髓在于他给的中国原油进出口量并不是总量，而是每天的量，此时还涉及到了闰年。其实考试的时候可以判断。因为如果算出来是59，闰年多一天，那么总量就会稍微大一点。所以选C。",
+      "imagePath": "44.png",
+      "module": "data-analysis",
+      "id": "17541039244153714ff7536367",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "下列有几项是对的",
+      "note": "没时间了就：3选1,4选2.",
+      "module": "data-analysis",
+      "id": "1754100141139459de0d1450d18",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "九宫格点线面",
+      "note": "九宫格每一行分别考察点数、线数、面数。",
+      "subCategory": "图形推理",
+      "imagePath": "43.png",
+      "module": "logic",
+      "id": "1754033032804eeacd227bc1668",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "图形重叠3",
+      "note": "特征是由简单图形重叠，有复杂图形重叠+日字变形。可能考察笔画数。两个一模一样的图形重叠，其中一个可以直接去掉。",
+      "subCategory": "图形推理",
+      "imagePath": "42.png",
+      "module": "logic",
+      "id": "175403293221134a6a3741eb29",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "两折线相交",
+      "note": "两折线相交于两边还是相较于中间。",
+      "subCategory": "图形推理",
+      "imagePath": "41.png",
+      "module": "logic",
+      "id": "1754032798877f8db8d27f6421",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "圆和正方",
+      "note": "圆形和正方形互套。当发现横着看没选项的时候试试竖着看。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "175403268322565d3ebf921c49",
+      "imagePath": "41.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "经典日字变形",
+      "note": "糖葫芦是“日”字变形，考察笔画数。",
+      "subCategory": "图形推理",
+      "imagePath": "39.png",
+      "module": "logic",
+      "id": "17540325187091e75e61c69ac7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "白色方块能否一比画出",
+      "note": "数完方块个数，发现没有规律之后，考虑到白色方块的中点能否用一笔连起来。",
+      "subCategory": "图形推理",
+      "imagePath": "38.png",
+      "module": "logic",
+      "id": "1754031687505f0eaf255cb73f8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "曲线直线",
+      "note": "曲线数与直线数",
+      "subCategory": "图形推理",
+      "imagePath": "37.png",
+      "module": "logic",
+      "id": "175403161083120cddef0c235b8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "图形重叠2",
+      "note": "多边形的图形重叠，考察被压在里边的边数。（见简单图形图形重叠1与2）",
+      "subCategory": "图形推理",
+      "imagePath": "36.png",
+      "module": "logic",
+      "id": "1754031172298d4879e99cda5e8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "摇摆不定的展开图",
+      "note": "这种题要做的话，就老老实实的把原本的展开图画出来，保证还原成正常展开图的样子。",
+      "subCategory": "图形推理",
+      "imagePath": "1754030844667_o1uagl7p9.png",
+      "module": "logic",
+      "id": "1754030904019d923e647707978",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "方块图推",
+      "note": "特征是几个方块叠在一起。规律往往是去看这些图的哪一个视图都一样。",
+      "subCategory": "图形推理",
+      "imagePath": "34.png",
+      "module": "logic",
+      "id": "17540274280131009deb9a2e3c8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "内部图形有无交点/边",
+      "note": "黑点所在图形与阴影所在图形有无公共点或公共边。",
+      "subCategory": "图形推理",
+      "imagePath": "1754026737606_ntqy1ugqw.png",
+      "module": "logic",
+      "id": "17540269967767313b1ac69a18",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "间隔增长率",
+      "note": "甜菜产量515.9万吨，增长49.8%，增幅同比提高13.4个百分点。这里是说，上一年的增长率比这一年高了13.4%。而不是说上一年的增长率是13.4%。千万别想当然。",
+      "module": "data-analysis",
+      "id": "1754024190005ef7cb9206cf4b",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "环比下跌",
+      "note": "遇到特别简单的环比下跌的问题时，要特别注意挖坑。如果图像通过折线给了同比增速的话，那么开头的第一个月就得注意它和前一个月的关系",
+      "imagePath": "1754023986172_i55ln3mud.png",
+      "module": "data-analysis",
+      "id": "17540239913378fad85780e10f",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "间隔增长率",
+      "note": "看到间隔增长率，就不要用眼睛看了，拿笔把日期范围写下来，这样比较清晰。混合增长率也是如此。",
+      "module": "data-analysis",
+      "id": "1754023778003cf9f4a0d2522c",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "增长量速算",
+      "note": "当增长率相差10%以内时，增长量之间的倍数关系可以用现期代替基期去列式：Aa/Bb。",
+      "module": "data-analysis",
+      "id": "1754023718330fe159550f9b23",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "比重比较",
+      "note": "很多时候不同时期的比重比较，实际上是可以把某一部分给约分掉的，此时式子可以化简，所以看到不用太虚。",
+      "module": "data-analysis",
+      "id": "1754023614065c57478d701993",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "利润率",
+      "note": "资料中的利润率=利润/收入。数量关系中的利润率=利润/成本。",
+      "module": "data-analysis",
+      "id": "17540235129443e8aca5fb56c68",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "找数",
+      "note": "找数的过程中，重点要放在看主体上，而不是数字上。追着数字看，很容易看乱。",
+      "module": "data-analysis",
+      "id": "175402336248118c42019f44948",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "游离的横竖线",
+      "note": "横竖线条数",
+      "subCategory": "图形推理",
+      "imagePath": "31.png",
+      "module": "logic",
+      "id": "1753946957020b2ea6ab470ed8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "看着像纸盒展开图",
+      "note": "有几个黑块相邻or相对。",
+      "subCategory": "图形推理",
+      "imagePath": "30.png",
+      "module": "logic",
+      "id": "17539467881323f15db79e4ccb",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "俯视图",
+      "note": "俯视图一样",
+      "subCategory": "图形推理",
+      "imagePath": "29.png",
+      "module": "logic",
+      "id": "17539466962824ebe9252bbfcc",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "部分数+白块总和",
+      "note": "总是想不到要去对零散的物体加和看数量规律。",
+      "subCategory": "图形推理",
+      "imagePath": "28.png",
+      "module": "logic",
+      "id": "17539465309774a0f40b541829",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "纸盒展开",
+      "note": "遇到字母的直接画展开图更快",
+      "subCategory": "图形推理",
+      "imagePath": "27.png",
+      "module": "logic",
+      "id": "17539464124346b6379e10a82b8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "图形重叠1",
+      "note": "25年浙江新考点，特征为图形较为简单。考察面的种类",
+      "subCategory": "图形推理",
+      "imagePath": "26.png",
+      "module": "logic",
+      "id": "17539462043208f361552397838",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "切割面",
+      "note": "找到了一些规律，就是一些太正的面和一些看上去就斜的面不可能同时切出来。",
+      "subCategory": "图形推理",
+      "imagePath": "25.png",
+      "module": "logic",
+      "id": "1753945608597a1f268506706f8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "笔画",
+      "note": "当题的图形线条太多太复杂的时候，就别想着吹捏了，数奇点吧。",
+      "subCategory": "图形推理",
+      "imagePath": "24.png",
+      "module": "logic",
+      "id": "1753945312951c2ea993deea8c8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "圆内交点",
+      "note": "有圆和折线。",
+      "subCategory": "图形推理",
+      "imagePath": "23.png",
+      "module": "logic",
+      "id": "1753944780714f898c502e799e",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "曲直相交",
+      "note": "曲直相交于曲线的中点or端点。",
+      "subCategory": "图形推理",
+      "imagePath": "22.png",
+      "module": "logic",
+      "id": "17539440570087e73ca800b01a8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "白多边形+黑多边形",
+      "note": "黑色多边形与白色多边形几条边相交。",
+      "subCategory": "图形推理",
+      "imagePath": "21.png",
+      "module": "logic",
+      "id": "1753943624335a03ea4c22ba948",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "容斥原理",
+      "note": "看上去毫不相关的两个内容，可能考察的是容斥原理。比如说这道题。东北地区仅拥有1处住房的农户比重为93.9%，砖混结构住房的农户比重为47.8%；根据容斥原理：A+B-AB = 总体-都不=100% - 都不。AB是我们要求的，为41.7%+都不，是4成以上，正确。",
+      "imagePath": "20.png",
+      "module": "data-analysis",
+      "id": "1753943295325316122241b8c48",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "平均每问题",
+      "note": "遇到不要慌，题目里给每百户就直接变成每户。每N户拥有1辆汽车，就是拥有汽车的户数/总户数 = 1/N。",
+      "imagePath": "1753931885376_sufosc5rz.png",
+      "module": "data-analysis",
+      "id": "1753931899782fdd7b21a9e7358",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "半圆",
+      "note": "半圆逐渐变大。",
+      "subCategory": "图形推理",
+      "imagePath": "1753856564180_9scjlqgzt.png",
+      "module": "logic",
+      "id": "17538565688330ba37d1a15051",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "分部分求同/异",
+      "note": "两部分，一部分求同，一部分求异。",
+      "subCategory": "图形推理",
+      "imagePath": "1753855984944_a7ao1m3hn.png",
+      "module": "logic",
+      "id": "1753855993709c39025faf8af3",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "交点数",
+      "note": "算交点数的时候，三角形是3个交点，四边形是4个交点。",
+      "subCategory": "图形推理",
+      "imagePath": "1753855786930_0n4l4szu5.png",
+      "module": "logic",
+      "id": "1753855796129f390f9c07a534",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "问平均每月",
+      "note": "找选项中有12倍数关系的，可直接秒",
+      "module": "data-analysis",
+      "id": "17538435053427c1ec41228112",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "超过",
+      "note": "B超过A的2倍：B>2A;B比A多2倍：B>3A。",
+      "module": "data-analysis",
+      "id": "1753775872626027bb08fd8b6a8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "占比缩略",
+      "note": "当题目把占比的主体给缩略的时候，只需要看这句话是处于哪一个分句当中就能知道他说的总体是谁。如图中，“占投诉所有公司投诉总量”指的是财产险公司。",
+      "imagePath": "11.png",
+      "module": "data-analysis",
+      "id": "17537753943924cfb918f97d02",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "黑球笔画数",
+      "note": "当发现既没考部分数，是不是考内外部移动时可以试着想一想黑球的笔画数，特征是所有黑球都连成线。",
+      "subCategory": "图形推理",
+      "imagePath": "15.png",
+      "module": "logic",
+      "id": "1753774118713870b66e301d48",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "考察笔画数",
+      "note": "图形的线条，复杂且凌乱。并且明显不可能考面。走投无路，笔画数！！",
+      "subCategory": "图形推理",
+      "imagePath": "14.png",
+      "module": "logic",
+      "id": "175377355150460b9843b05cbb8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "何时外边框数重要？",
+      "note": "外边框是明显的正五边形，正六边形。",
+      "subCategory": "图形推理",
+      "imagePath": "1753776703892_5b8mg5itj.png",
+      "module": "logic",
+      "id": "17537727847019e5dff217ce",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "增长量计算",
+      "note": "如果用百化分的话，你可千万记得+1或-1啊。",
+      "module": "data-analysis",
+      "id": "17537570691791dd8144b4e0398",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "部分数",
+      "note": "只要没有接触的都算两部分",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753711489687317cf3303ad0d8",
+      "imagePath": "3.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "每幅图都有对称轴，但对称轴又没什么规律。",
+      "note": "整幅图的对称轴可能是以中心图形的对称轴为准。也即米字对称",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "17537114455160d46deff78e38",
+      "imagePath": "8.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "粗线条与方格",
+      "note": "粗线条框起来的方格面积",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "175371124397346d229be7283d8",
+      "imagePath": "6.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "黑白部分数",
+      "note": "每一部分的黑球个数。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "175371108201412bffc967afbb8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "内部黑白多边图形",
+      "note": "与几个白色图形相交。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753711033474c964fbf069d8c8",
+      "imagePath": "10.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "黑白反转",
+      "note": "不光要想到黑白运算，有时候还可以想到颜色反转。",
+      "subCategory": "图形推理",
+      "imagePath": "2.png",
+      "module": "logic",
+      "id": "17537098438332abf408473d178",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "直线条较多",
+      "note": "考察线条数",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753697092869e778431e02e27",
+      "imagePath": "1.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "蜂窝状",
+      "note": "蜂窝状的黑方块儿，很可能考察内圈外圈分别转动。判断内外部旋转，可以通过看：内部黑点个数是否在每个图中保持一致。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "17536833353286850a198df63e8",
+      "imagePath": "4.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "最大面",
+      "note": "最大面边数量与外框边数量相等（见何时外边框数重要）",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "17536753518664708c3b4922e4",
+      "imagePath": "7.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "菱形圆球",
+      "note": "当发现考察的是菱形圆球内黑球的整体平行移动时，按行或者按列来看。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753674065167fa413dc1090798",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "白球宫格有线穿梭",
+      "note": "线把白球分成了几部分。并且每部分的白球分别是多少。如24国考。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753673655654083e8d3eaff228",
+      "imagePath": "9.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "内部黑白多边形",
+      "note": "1、与几个白色相交。2、黑白块与外边框交于几条边。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "1753673279723232ec94f1596f",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "九宫格",
+      "note": "九宫格现在开始考黑点的加和了，不光是黑白块加和了。如23年山东。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "17536731875958e5903a3bf17b8",
+      "imagePath": "5.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "单位换算",
+      "note": "1吨=1000千克=2000市斤；1平方公里=100公顷；",
+      "module": "data-analysis",
+      "id": "175367073657188169048f3dfc8",
+      "imagePath": "",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "除11",
+      "note": "一个数除11，可以错位相减！！",
+      "module": "data-analysis",
+      "id": "17536694959273eccf4aceec81",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "基期比重、基期平均数",
+      "note": "这种分为两部分的公式可以先算出一部分，比如先算出左边的部分，然后看选项。根据右边的部分大于一小于一来排除。",
+      "module": "data-analysis",
+      "id": "1753667469503c1453cae9437e",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "时间抉择",
+      "note": "算我求你了，图推超过一分钟你就放弃吧。",
+      "subCategory": "图形推理",
+      "module": "logic",
+      "id": "175362525816421fd0c33441bb8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "错位重排",
+      "note": "错位重排情况数分别为:D1=0，D2=1，D3=2，D4=9，D5=44，D6=265。",
+      "module": "math",
+      "id": "17536227122771bbefd99069cd",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "胶柱鼓瑟",
+      "note": "比喻固执拘泥，不知变通。",
+      "subCategory": "逻辑填空",
+      "module": "verbal",
+      "id": "1753622544539c745c4746f7918",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "栉风沐雨",
+      "note": "形容奔波劳碌，不避风雨，与筚路蓝缕是近义词。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753622526258250d1cdca3e8c",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "首鼠两端",
+      "note": "指在两者之间犹豫不决或动摇不定。形容迟疑不决，瞻前顾后。其中的首鼠意为踌躇。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753622492916e2fbd8201d3a7",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "差强人意",
+      "note": "褒义词，原意指还算能振奋人的意志。形容大体上能够使人满意。其中差，是指稍微地，差不多。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "17536222985573504877bca8718",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "薪火相传",
+      "note": "当涉及到传承的时候，或者从古代延续到现代的时候，首先去找薪火相传。",
+      "subCategory": "逻辑填空",
+      "module": "verbal",
+      "id": "1753622196500eeec7acc53abd",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "排除选项",
+      "note": "大段文字的逻辑翻译题，可以先根据常识排除一到两个选项，然后再去找原文。",
+      "subCategory": "逻辑判断",
+      "module": "logic",
+      "id": "175362200956028b0d8affa552",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "曲意奉承",
+      "note": "指违背自己的心意去奉承，讨好别人。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753621844693168016913c7a",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "龙章凤姿",
+      "note": "指蛟龙的文采，凤凰的姿容。比喻风采出众。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753621768303a9429a5c43ef",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "谄笑胁肩",
+      "note": "指讨好地强装笑脸，缩敛肩膀形容阿谀逢迎的丑态。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753621459440a7da13bdd3d568",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "首尾乖互",
+      "note": "比喻前后自相矛盾。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "17536207594251372000799811",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "急公好义",
+      "note": "褒义词；形容热心于公益事业，爱帮助人。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753620652272ae384be169345",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "鸟面鹄形",
+      "note": "描述饥民面容枯槁，身体消瘦的形态。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753620612714c161c7968d651",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "獐头鼠目",
+      "note": "形容相貌丑陋猥琐且神情狡猾。",
+      "subCategory": "成语积累",
+      "module": "verbal",
+      "id": "1753620547583ca96b3131944b8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z",
+      "type": "未分类"
+    },
+    {
+      "type": "滤布：捕鼠笼",
+      "note": "根据功能命名",
+      "module": "logic",
+      "id": "1753617805947704a212420eef",
+      "subCategory": "类比推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "看问题",
+      "note": "千万看清楚是问你属于还是不属于。",
+      "module": "logic",
+      "id": "1753617780878f60d2ca49db2d8",
+      "subCategory": "定义判断",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "内部分割面",
+      "note": "第27季行测模考大赛第78题的一种考法：面数+四边形面数。",
+      "module": "logic",
+      "id": "1753617602896fe6d82acb31168",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "图推求同/求异",
+      "note": "当识别出图推是在考察求同或求异时，可以先不看内部复杂的线条，先看外边框来判断是求同还是求异。",
+      "module": "logic",
+      "id": "175361737757155f3a6e43ecba8",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "平均数增长量",
+      "note": "题目给出总用量与人均用量，问你人数变化。要意识到这是在考察平均数增长量。",
+      "module": "data-analysis",
+      "id": "1753617178697a352623de779",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "表格",
+      "note": "表格易遗漏点：单位（吨与亿吨），年份。",
+      "module": "data-analysis",
+      "id": "1753616972131f618274a5d02",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "翻转",
+      "note": "看到旋转，如果发现第一个图与第二个图之间是旋转，而第二个图与第三个图之间不是旋转的话，可以想想翻转。",
+      "module": "logic",
+      "id": "175350181358271cfdee1bc4158",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "图形轮廓",
+      "note": "注意：图形轮廓，这种说法意味着不包含内部线条，只包含最外层一圈。",
+      "module": "logic",
+      "id": "1753501621584547cff091f25d",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "堆叠且对称",
+      "note": "看到堆叠在一起并且对称的图形想到：对称轴穿过的面数。",
+      "module": "logic",
+      "id": "17535014255293c44a681ba8958",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "选项差距极小",
+      "note": "当选项差距极小的时候，就直接截四位精算。不要犹豫太多了。",
+      "module": "data-analysis",
+      "id": "1753493365328453af53ad7ccb",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "生活化图形",
+      "note": "属性：开闭性（伸出的线头，算是半开半闭）；面数量；部分数；笔画数；面与面之间连接方式（特别注意线连接，别误认为点连接）。",
+      "module": "logic",
+      "id": "1753426915967c18b9411b70af",
+      "subCategory": "图形推理",
+      "imagePath": "12.png",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "分割面",
+      "note": "一个图形内分割面很多，又很难数，试着数数三角形或四边形个数。",
+      "module": "logic",
+      "id": "17534262943633c88e77cd81c68",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "汉字",
+      "note": "横线出现较多时，考察横线数量",
+      "module": "logic",
+      "id": "1753423359786a9b9cb8a97556",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "“田”/“日”字及变形",
+      "note": "比如有对角线的方框。考察笔画数",
+      "module": "logic",
+      "id": "17534231706703634848ee95fc8",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "黑白点+对称轴",
+      "note": "对称轴经过的黑点/白点数",
+      "module": "logic",
+      "id": "1753422980414f0384ea42f15b",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "笑脸",
+      "note": "曲直，面数，部分",
+      "module": "logic",
+      "id": "1753422926512743421b8329f1",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "较多端点，伸出线",
+      "note": "考察笔画数",
+      "module": "logic",
+      "id": "17534229011347947510501ddb",
+      "subCategory": "图形推理",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "拉动增长率",
+      "note": "拉动增长率=部分增量/整体基期；增长贡献率=部分增量/整体增量。",
+      "module": "data-analysis",
+      "id": "1753412860391344e2af84f663",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "累计图，当月与累计",
+      "note": "只要增速不滑坡，当月就比累计多：只要累计增长率上升，那么当月增长率就比这几个月累计增长率高。如1-4月累计大于1-3月累计，那么4月增长率大于1-4月累计增长率。",
+      "module": "data-analysis",
+      "id": "1753409677550e04a1235410288",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "单位",
+      "note": "最后一题当有俩选项纠结时，就该看看单位了。尤其是数字正确的题，很可能在单位挖坑。",
+      "module": "data-analysis",
+      "id": "175340864794056790abc1ac238",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "年均增长率",
+      "note": "如果年均增长率r<5%，则原本(1+r)^n=1+nr。比如年均增长率为3%，那么增长4年的增长率为(1+3%)^4=1+4×3%",
+      "module": "data-analysis",
+      "id": "1753407120217bb7c7392350e1",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "把笔扔了",
+      "note": "锻炼根据选项进行判断的思维",
+      "module": "data-analysis",
+      "id": "1753364037862d88180dcb6511",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "混合增长率",
+      "note": "如果C=A+B，则判断C的增长率通过不等式。首先看A和B谁的基期大，如果基期大的增长率也大的话，则称之为“大大匹配”，此时可以得出2r>两个增长率之和；反之，如果大大不匹配，则得出2r<两增长率之和。",
+      "module": "data-analysis",
+      "id": "175335224980676c888344007f",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "增长量计算",
+      "note": "算增长量时，看百化分不好做，或者选项高度接近时，直接用原始公式Ar/1+r来算",
+      "module": "data-analysis",
+      "id": "175335020168379ccbed3ac63f8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    },
+    {
+      "type": "乘积增长率=间隔增长率=a+b+ab",
+      "note": "见到问变化率，并且是A×B=C的形式，可以想到分别去看A和B的增长率。另外，这是平均数变化率的一种变形。",
+      "module": "data-analysis",
+      "id": "17533498965225abf396e7eebf8",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:30:38.278Z"
+    }
+  ],
+  "plans": [
+    {
+      "id": "6aff27db-f73f-436c-a24e-ede836fb2f8c",
+      "name": "30天图推计划",
+      "module": "logic",
+      "type": "题量",
+      "startDate": "2025-07-27",
+      "endDate": "2025-08-28",
+      "target": 1100,
+      "progress": 365,
+      "status": "进行中",
+      "description": "一个月之内，每天刷30-40道图推。",
+      "createdAt": "2025-08-11T04:30:38.278Z",
+      "updatedAt": "2025-08-11T04:35:00.408Z"
+    }
+  ],
+  "settings": {
+    "exam-tracker-nav-mode": "\"sidebar\"",
+    "eye-care-enabled": "false",
+    "notify-change-enabled": "false",
+    "theme": "light",
+    "theme-switch-type": "bb8",
+    "other-switch-type": "default"
+  },
+  "cloudImages": [
+    {
+      "id": "1753776703892_5b8mg5itj.png",
+      "fileName": "1753776703892_5b8mg5itj.png",
+      "originalName": "13.png",
+      "size": 312673,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753776703892_5b8mg5itj.png",
+      "uploadedAt": "2025-07-29T08:11:44.772Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1753855786930_0n4l4szu5.png",
+      "fileName": "1753855786930_0n4l4szu5.png",
+      "originalName": "16.png",
+      "size": 238214,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753855786930_0n4l4szu5.png",
+      "uploadedAt": "2025-07-30T06:09:47.868Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1753855984944_a7ao1m3hn.png",
+      "fileName": "1753855984944_a7ao1m3hn.png",
+      "originalName": "17.png",
+      "size": 218247,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753855984944_a7ao1m3hn.png",
+      "uploadedAt": "2025-07-30T06:13:07.086Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1753856564180_9scjlqgzt.png",
+      "fileName": "1753856564180_9scjlqgzt.png",
+      "originalName": "18.png",
+      "size": 241213,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753856564180_9scjlqgzt.png",
+      "uploadedAt": "2025-07-30T06:22:46.128Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1753931885376_sufosc5rz.png",
+      "fileName": "1753931885376_sufosc5rz.png",
+      "originalName": "19.png",
+      "size": 72709,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753931885376_sufosc5rz.png",
+      "uploadedAt": "2025-07-31T03:18:06.292Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1753943618308_i764t6vpz.png",
+      "fileName": "1753943618308_i764t6vpz.png",
+      "originalName": "21.png",
+      "size": 125346,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1753943618308_i764t6vpz.png",
+      "uploadedAt": "2025-07-31T06:33:39.485Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1754023986172_i55ln3mud.png",
+      "fileName": "1754023986172_i55ln3mud.png",
+      "originalName": "32.png",
+      "size": 604704,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1754023986172_i55ln3mud.png",
+      "uploadedAt": "2025-08-01T04:53:07.297Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1754024352827_9lkf0968r.png",
+      "fileName": "1754024352827_9lkf0968r.png",
+      "originalName": "icon.png",
+      "size": 117058,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1754024352827_9lkf0968r.png",
+      "uploadedAt": "2025-08-01T04:59:13.431Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1754024362522_caa7n448z.png",
+      "fileName": "1754024362522_caa7n448z.png",
+      "originalName": "icon.png",
+      "size": 117058,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1754024362522_caa7n448z.png",
+      "uploadedAt": "2025-08-01T04:59:23.083Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1754026737606_ntqy1ugqw.png",
+      "fileName": "1754026737606_ntqy1ugqw.png",
+      "originalName": "33.png",
+      "size": 335313,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1754026737606_ntqy1ugqw.png",
+      "uploadedAt": "2025-08-01T05:38:58.738Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "1754030844667_o1uagl7p9.png",
+      "fileName": "1754030844667_o1uagl7p9.png",
+      "originalName": "35.png",
+      "size": 141299,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/1754030844667_o1uagl7p9.png",
+      "uploadedAt": "2025-08-01T06:47:25.290Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "41.png",
+      "fileName": "41.png",
+      "originalName": "41.png",
+      "size": 116210,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/41.png",
+      "uploadedAt": "2025-08-01T07:19:55.038Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "40.png",
+      "fileName": "40.png",
+      "originalName": "40.png",
+      "size": 185728,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/40.png",
+      "uploadedAt": "2025-08-01T07:20:12.071Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "42.png",
+      "fileName": "42.png",
+      "originalName": "42.png",
+      "size": 204090,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/42.png",
+      "uploadedAt": "2025-08-01T07:21:52.340Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "43.png",
+      "fileName": "43.png",
+      "originalName": "43.png",
+      "size": 171656,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/43.png",
+      "uploadedAt": "2025-08-01T07:23:49.664Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "icon.png",
+      "fileName": "icon.png",
+      "originalName": "icon.png",
+      "size": 117058,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/icon.png",
+      "uploadedAt": "2025-08-01T17:27:09.874Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "44.png",
+      "fileName": "44.png",
+      "originalName": "44.png",
+      "size": 1092679,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/44.png",
+      "uploadedAt": "2025-08-02T03:04:34.640Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "45.png",
+      "fileName": "45.png",
+      "originalName": "45.png",
+      "size": 212982,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/45.png",
+      "uploadedAt": "2025-08-02T07:39:13.284Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "46.png",
+      "fileName": "46.png",
+      "originalName": "46.png",
+      "size": 115219,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/46.png",
+      "uploadedAt": "2025-08-02T07:43:45.677Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "47.png",
+      "fileName": "47.png",
+      "originalName": "47.png",
+      "size": 146886,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/47.png",
+      "uploadedAt": "2025-08-02T07:47:49.035Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "48.png",
+      "fileName": "48.png",
+      "originalName": "48.png",
+      "size": 165808,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/48.png",
+      "uploadedAt": "2025-08-02T07:54:01.472Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "49.png",
+      "fileName": "49.png",
+      "originalName": "49.png",
+      "size": 93596,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/49.png",
+      "uploadedAt": "2025-08-02T07:58:11.963Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "50.png",
+      "fileName": "50.png",
+      "originalName": "50.png",
+      "size": 167072,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/50.png",
+      "uploadedAt": "2025-08-07T10:33:20.217Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "51.png",
+      "fileName": "51.png",
+      "originalName": "51.png",
+      "size": 190453,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/51.png",
+      "uploadedAt": "2025-08-07T10:38:25.400Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "image.png",
+      "fileName": "image.png",
+      "originalName": "image.png",
+      "size": 124514,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/image.png",
+      "uploadedAt": "2025-08-07T10:39:03.577Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "image_1754563290876.png",
+      "fileName": "image_1754563290876.png",
+      "originalName": "image.png",
+      "size": 186987,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/image_1754563290876.png",
+      "uploadedAt": "2025-08-07T10:41:32.226Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "image_1754563345213.png",
+      "fileName": "image_1754563345213.png",
+      "originalName": "image.png",
+      "size": 205885,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/image_1754563345213.png",
+      "uploadedAt": "2025-08-07T10:42:26.638Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "image_1754726001837.png",
+      "fileName": "image_1754726001837.png",
+      "originalName": "image.png",
+      "size": 116197,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/image_1754726001837.png",
+      "uploadedAt": "2025-08-09T07:53:22.810Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "image_1754726173285.png",
+      "fileName": "image_1754726173285.png",
+      "originalName": "image.png",
+      "size": 272242,
+      "type": "image/png",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/image_1754726173285.png",
+      "uploadedAt": "2025-08-09T07:56:16.376Z",
+      "bucket": "knowledge-images"
+    },
+    {
+      "id": "12.png",
+      "fileName": "12.png",
+      "originalName": "12.png",
+      "size": 0,
+      "type": "image/*",
+      "url": "https://zhzldnhddtukqseqgdtj.supabase.co/storage/v1/object/public/knowledge-images/12.png",
+      "uploadedAt": "2025-08-11T03:36:45.845Z",
+      "bucket": "knowledge-images"
+    }
+  ],
+  "metadata": {
+    "totalRecords": 171,
+    "totalKnowledge": 131,
+    "totalPlans": 1,
+    "totalImages": 30,
+    "appVersion": "7.0.0"
+  }
+}

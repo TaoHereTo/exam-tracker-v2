@@ -175,8 +175,8 @@ export const InteractiveHoverButton = React.forwardRef<
       if (hoverBgColor.includes('#059669') || hoverBgColor.includes('#10b981')) {
         return '#059669'; // 绿色
       }
-      if (hoverBgColor.includes('#EF4444')) {
-        return '#EF4444'; // 红色
+      if (hoverBgColor.includes('#EF4444') || hoverBgColor.includes('#dc2626')) {
+        return '#dc2626'; // 红色
       }
       if (hoverBgColor.includes('#3B82F6')) {
         return '#3B82F6'; // 蓝色

@@ -123,6 +123,12 @@ export class SupabaseImageManager {
     // 从 Supabase 获取所有图片
     public async getAllImages(): Promise<SupabaseImageInfo[]> {
         try {
+            // 检查环境变量
+            if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+                console.warn('Supabase 环境变量未配置，返回本地存储的图片信息');
+                return this.getAllLocalImageInfo();
+            }
+
             const { data, error } = await supabase.storage
                 .from(this.BUCKET_NAME)
                 .list('', {
@@ -132,6 +138,7 @@ export class SupabaseImageManager {
                 });
 
             if (error) {
+                console.warn('从 Supabase 获取图片列表失败:', error);
                 // 如果远程获取失败，返回本地存储的图片信息
                 return this.getAllLocalImageInfo();
             }

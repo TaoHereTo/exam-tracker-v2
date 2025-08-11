@@ -6,7 +6,7 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
 // 验证环境变量是否存在
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('缺少 Supabase 环境变量，请检查 .env.local 文件')
+  console.warn('缺少 Supabase 环境变量，请检查 .env.local 文件。云端功能将不可用。');
 }
 
 // 创建并导出 Supabase 客户端

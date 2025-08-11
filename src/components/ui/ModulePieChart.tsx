@@ -76,7 +76,12 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             top: 20,
             formatter: (name: string) => name,
             ...UNIFIED_LEGEND_STYLE,
-            textStyle: { color: textColor }
+            textStyle: {
+                color: textColor,
+                fontSize: 14,
+                fontWeight: 'bold',
+                fontFamily: 'Times New Roman, 思源宋体, serif'
+            }
         },
         series: [
             {

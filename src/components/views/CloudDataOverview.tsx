@@ -155,7 +155,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                         <CardTitle className="text-sm"><MixedText text="设置" /></CardTitle>
                                     </CardHeader>
                                     <CardContent className="flex-1 flex items-center justify-center">
-                                        <div className="text-2xl font-bold text-orange-600">
+                                        <div className="text-2xl font-bold text-green-600">
                                             {data.settings.hasSettings ? '✓' : '✗'}
                                         </div>
                                         <p className="text-xs text-gray-500">
@@ -180,7 +180,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                 <AlertDialogTrigger asChild>
                                                     <InteractiveHoverButton
                                                         disabled={clearing}
-                                                        hoverColor="#DC2626"
+                                                        hoverColor="#dc2626"
                                                         icon={<Trash2 className="w-4 h-4" />}
                                                         className="text-sm h-9"
                                                     >

@@ -15,7 +15,7 @@ import { HelpCircle } from "lucide-react";
 
 interface OverviewViewProps {
     records: Array<{
-        id: number;
+        id: string;
         date: string;
         module: string;
         total: number;

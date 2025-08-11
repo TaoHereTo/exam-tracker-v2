@@ -210,7 +210,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                         <span className="inline-block cursor-pointer ml-1 text-primary" style={{ fontSize: '1.1em' }}>？</span>
                     </TooltipTrigger>
                     <TooltipContent sideOffset={4}>
-                        能力值为归一化后的加权和，权重可调整。<br />
+                        能力值为归一化后的加权和。<br />
                         正确率、每分钟得分、做题量均归一化到0~1后加权。
                     </TooltipContent>
                 </Tooltip>

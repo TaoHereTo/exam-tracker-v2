@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Search, RefreshCw, Eye, Image as ImageIcon, Settings, Grid3X3, List, Trash2, Upload, XCircle } from "lucide-react";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
+import { CapsuleButton } from "@/components/ui/CapsuleButton";
 import { InteractiveHoverButton } from "@/components/magicui/interactive-hover-button";
 import { BeautifulThemeSwitch } from "@/components/ui/BeautifulThemeSwitch";
 import { Switch } from "@/components/ui/switch";
@@ -309,7 +309,7 @@ export function AdvancedSetting() {
                                         loadCloudImages();
                                     }
                                 }}
-                                hoverColor="#3B82F6"
+                                hoverColor="#334155"
                                 className="h-9"
                                 icon={showImageManager ? <XCircle className="w-4 h-4" /> : <Settings className="w-4 h-4" />}
                             >
@@ -363,7 +363,7 @@ export function AdvancedSetting() {
                                     {selectedImages.size > 0 && (
                                         <InteractiveHoverButton
                                             onClick={handleDeleteSelectedImages}
-                                            hoverColor="#EF4444"
+                                            hoverColor="#dc2626"
                                             icon={<Trash2 className="w-4 h-4" />}
                                             className="h-9"
                                         >
@@ -466,7 +466,7 @@ export function AdvancedSetting() {
 
                                                     {/* 预览按钮 */}
                                                     <div className="absolute inset-0 bg-transparent transition-all duration-200 flex items-center justify-center">
-                                                        <Button
+                                                        <CapsuleButton
                                                             variant="ghost"
                                                             size="sm"
                                                             onClick={(e: React.MouseEvent) => {
@@ -477,7 +477,7 @@ export function AdvancedSetting() {
                                                             className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-sm z-20"
                                                         >
                                                             <Eye className="h-4 w-4" />
-                                                        </Button>
+                                                        </CapsuleButton>
                                                     </div>
                                                 </div>
 
@@ -576,7 +576,7 @@ export function AdvancedSetting() {
                         >
                             <MixedText text="取消" />
                         </AlertDialogCancel>
-                        <Button
+                        <CapsuleButton
                             onClick={() => {
                                 confirmDeleteImages();
                             }}
@@ -591,7 +591,7 @@ export function AdvancedSetting() {
                             ) : (
                                 <MixedText text="确认删除" />
                             )}
-                        </Button>
+                        </CapsuleButton>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

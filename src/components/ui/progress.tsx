@@ -62,15 +62,16 @@ const Progress = React.forwardRef<
         ref={ref}
         data-slot="progress"
         className={cn(
-          "relative h-3 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700",
+          "relative h-4 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700",
           className
         )}
+        value={percentage}
         {...props}
       >
         <ProgressPrimitive.Indicator
           data-slot="progress-indicator"
           className={cn(
-            "h-full w-full flex-1 transition-all duration-300 ease-out",
+            "h-full w-full transition-all duration-300 ease-out",
             currentVariant.indicator
           )}
           style={{ transform: `translateX(-${100 - percentage}%)` }}

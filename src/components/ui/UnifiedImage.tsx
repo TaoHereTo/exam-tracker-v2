@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Button } from './button';
+import { CapsuleButton } from './CapsuleButton';
 import { X, Eye, Cloud, FileImage, Upload, Image as ImageIcon } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
@@ -301,7 +301,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             />
                                             <div className="w-full">
                                                 <InteractiveHoverButton
-                                                    hoverColor="#10B981"
+                                                    hoverColor="#65a30d"
                                                     className="w-full text-xs py-1.5"
                                                     icon={<Upload className="w-3 h-3" />}
                                                     type="button"
@@ -323,14 +323,10 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     onImageSelected={handleImageSelected}
                                                     trigger={
                                                         <InteractiveHoverButton
-                                                            hoverColor="#3B82F6"
+                                                            hoverColor="#0284c7"
                                                             className="w-full text-xs py-1.5"
                                                             icon={<Cloud className="w-3 h-3" />}
                                                             type="button"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                            }}
                                                         >
                                                             <MixedText text="从云端选择" />
                                                         </InteractiveHoverButton>
@@ -384,15 +380,15 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
                         {/* 操作按钮 */}
                         <div className="absolute top-2 right-2 flex gap-1">
-                            <Button
+                            <CapsuleButton
                                 size="sm"
                                 variant="secondary"
                                 onClick={handlePreview}
                                 className="h-8 w-8 p-0"
                             >
                                 <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
+                            </CapsuleButton>
+                            <CapsuleButton
                                 size="sm"
                                 variant="destructive"
                                 onClick={handleRemoveImage}
@@ -400,7 +396,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 className="h-8 w-8 p-0"
                             >
                                 <X className="h-4 w-4" />
-                            </Button>
+                            </CapsuleButton>
                         </div>
                     </div>
 
@@ -410,7 +406,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                         onClick={(e) => e.stopPropagation()}
                     >
                         {(mode === 'upload' || mode === 'combined') && (
-                            <Button
+                            <CapsuleButton
                                 type="button"
                                 onClick={(e) => {
                                     e.preventDefault();
@@ -423,13 +419,13 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             >
                                 <Upload className="h-4 w-4" />
                                 <MixedText text="重新上传" />
-                            </Button>
+                            </CapsuleButton>
                         )}
                         {(mode === 'select' || mode === 'combined') && (
                             <SupabaseImageSelectorDialog
                                 onImageSelected={handleImageSelected}
                                 trigger={
-                                    <Button
+                                    <CapsuleButton
                                         type="button"
                                         onClick={(e) => {
                                             e.preventDefault();
@@ -441,7 +437,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                     >
                                         <ImageIcon className="h-4 w-4" />
                                         <MixedText text="重新选择" />
-                                    </Button>
+                                    </CapsuleButton>
                                 }
                             />
                         )}

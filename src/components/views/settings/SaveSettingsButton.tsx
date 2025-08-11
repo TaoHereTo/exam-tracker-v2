@@ -1,4 +1,4 @@
-import { RainbowButton } from "@/components/magicui/rainbow-button";
+import { CapsuleButton } from "@/components/ui/CapsuleButton";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import React, { useRef } from "react";
 import { MixedText } from "@/components/ui/MixedText";
@@ -21,13 +21,13 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
     };
 
     return (
-        <RainbowButton
+        <CapsuleButton
             onClick={handleSave}
             size="default"
             className="px-6 py-2"
         >
             <MixedText text="保存所有设置" />
-        </RainbowButton>
+        </CapsuleButton>
     );
 };
 

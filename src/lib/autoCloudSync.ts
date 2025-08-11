@@ -55,11 +55,20 @@ export class AutoCloudSync {
                 description: `学习计划"${plan.name}"已自动同步到云端`
             });
         } catch (error) {
-            console.error('自动保存计划到云端失败:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorDetails = error instanceof Error ? error.stack : '无详细信息';
+
+            console.error('自动保存计划到云端失败:', {
+                error: errorMessage,
+                errorDetails: errorDetails,
+                plan: plan,
+                fullError: error
+            });
+
             notify({
                 type: 'error',
                 message: '云端保存失败',
-                description: '计划已保存到本地，但云端同步失败，请稍后重试'
+                description: `计划已保存到本地，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -75,9 +84,12 @@ export class AutoCloudSync {
                 imagePath: knowledgeRecord.imagePath
             };
 
-            // 统一添加字段：所有模块都使用 type 和 note
+            // 处理不同类型的知识点字段
+            // 处理知识点字段
             if ('type' in knowledgeRecord) knowledgeData.type = knowledgeRecord.type;
             if ('note' in knowledgeRecord) knowledgeData.note = knowledgeRecord.note;
+
+            // 处理其他字段
             if ('subCategory' in knowledgeRecord) knowledgeData.subCategory = knowledgeRecord.subCategory;
             if ('date' in knowledgeRecord) knowledgeData.date = knowledgeRecord.date;
             if ('source' in knowledgeRecord) knowledgeData.source = knowledgeRecord.source;
@@ -90,11 +102,20 @@ export class AutoCloudSync {
                 description: '新的知识点已自动同步到云端'
             });
         } catch (error) {
-            console.error('自动保存知识点到云端失败:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorDetails = error instanceof Error ? error.stack : '无详细信息';
+
+            console.error('自动保存知识点到云端失败:', {
+                error: errorMessage,
+                errorDetails: errorDetails,
+                knowledge: knowledge,
+                fullError: error
+            });
+
             notify({
                 type: 'error',
                 message: '云端保存失败',
-                description: '知识点已保存到本地，但云端同步失败，请稍后重试'
+                description: `知识点已保存到本地，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -104,7 +125,37 @@ export class AutoCloudSync {
      */
     static async autoUpdatePlan(plan: StudyPlan, notify: ReturnType<typeof useNotification>['notify']) {
         try {
-            await planService.updatePlan(plan.id, {
+            // 检查计划ID是否为UUID格式
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(plan.id);
+
+            if (!isUUID) {
+                console.log('跳过云端更新 - 非UUID格式的计划ID:', plan.id);
+                notify({
+                    type: 'warning',
+                    message: '本地更新成功',
+                    description: `计划"${plan.name}"已更新到本地，但云端同步跳过（旧格式ID）`
+                });
+                return;
+            }
+
+            console.log('开始更新计划到云端:', {
+                planId: plan.id,
+                planName: plan.name,
+                planData: {
+                    name: plan.name,
+                    module: plan.module,
+                    type: plan.type,
+                    startDate: plan.startDate,
+                    endDate: plan.endDate,
+                    target: plan.target,
+                    progress: plan.progress,
+                    status: plan.status,
+                    description: plan.description
+                }
+            });
+
+            // 直接更新，不进行查重检查
+            const result = await planService.updatePlan(plan.id, {
                 name: plan.name,
                 module: plan.module,
                 type: plan.type,
@@ -116,17 +167,31 @@ export class AutoCloudSync {
                 description: plan.description
             });
 
+            console.log('计划更新成功:', result);
+
             notify({
                 type: 'success',
                 message: '计划已更新到云端',
                 description: `学习计划"${plan.name}"已自动同步更新到云端`
             });
         } catch (error) {
-            console.error('自动更新计划到云端失败:', error);
+            console.error('自动更新计划到云端失败 - 详细错误信息:', {
+                error: error,
+                errorType: typeof error,
+                errorConstructor: error?.constructor?.name,
+                errorMessage: error instanceof Error ? error.message : String(error),
+                errorStack: error instanceof Error ? error.stack : '无堆栈信息',
+                errorString: String(error),
+                plan: plan,
+                planId: plan.id
+            });
+
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
             notify({
                 type: 'error',
                 message: '云端更新失败',
-                description: '计划已更新到本地，但云端同步失败，请稍后重试'
+                description: `计划已更新到本地，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -136,15 +201,19 @@ export class AutoCloudSync {
      */
     static async autoUpdateKnowledge(knowledge: KnowledgeItem, notify: ReturnType<typeof useNotification>['notify']) {
         try {
+            // 直接更新，不进行查重检查
             const knowledgeRecord = knowledge as Record<string, unknown>;
             const updateData: Record<string, unknown> = {
                 module: knowledge.module,
                 imagePath: knowledgeRecord.imagePath
             };
 
-            // 统一添加字段：所有模块都使用 type 和 note
+            // 处理不同类型的知识点字段
+            // 处理知识点字段
             if ('type' in knowledgeRecord) updateData.type = knowledgeRecord.type;
             if ('note' in knowledgeRecord) updateData.note = knowledgeRecord.note;
+
+            // 处理其他字段
             if ('subCategory' in knowledgeRecord) updateData.subCategory = knowledgeRecord.subCategory;
             if ('date' in knowledgeRecord) updateData.date = knowledgeRecord.date;
             if ('source' in knowledgeRecord) updateData.source = knowledgeRecord.source;
@@ -178,7 +247,7 @@ export class AutoCloudSync {
     /**
      * 自动删除记录从云端
      */
-    static async autoDeleteRecord(recordId: number, notify: ReturnType<typeof useNotification>['notify']) {
+    static async autoDeleteRecord(recordId: string | number, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             await recordService.deleteRecord(recordId);
             notify({
@@ -208,6 +277,19 @@ export class AutoCloudSync {
      */
     static async autoDeletePlan(planId: string, notify: ReturnType<typeof useNotification>['notify']) {
         try {
+            // 检查计划ID是否为UUID格式
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(planId);
+
+            if (!isUUID) {
+                console.log('跳过云端删除 - 非UUID格式的计划ID:', planId);
+                notify({
+                    type: 'warning',
+                    message: '本地删除成功',
+                    description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
+                });
+                return;
+            }
+
             await planService.deletePlan(planId);
             notify({
                 type: 'success',

@@ -2,7 +2,7 @@
 
 // 刷题记录类型
 export type RecordItem = {
-    id: number;
+    id: string; // UUID 格式
     date: string;
     module: 'data-analysis' | 'math' | 'logic' | 'common' | 'politics' | 'verbal';
     total: number;

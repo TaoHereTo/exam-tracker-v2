@@ -145,7 +145,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                 <span className="text-gray-500 text-sm">共 <MixedText text={String(data.length)} /> 条</span>
                 {onBatchDelete && (
                     <InteractiveHoverButton
-                        hoverColor="#EF4444"
+                        hoverColor="#dc2626"
                         disabled={selected.length === 0}
                         onClick={onBatchDelete}
                     >
@@ -353,7 +353,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     onClick={action.onClick}
                                     disabled={action.disabled}
                                     className={`${action.className} h-9`}
-                                    hoverColor={action.variant === "destructive" ? "#EF4444" : "#3B82F6"}
+                                    hoverColor={action.variant === "destructive" ? "#dc2626" : "#3B82F6"}
                                 >
                                     {action.icon}
                                     {action.label}
@@ -364,7 +364,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {showNew && onNew && (
                                 <InteractiveHoverButton
                                     onClick={onNew}
-                                    hoverColor="linear-gradient(90deg, #059669 0%, #10b981 50%, #34d399 100%)"
+                                    hoverColor="#6d28d9"
                                     compact={true}
                                     className="h-9"
                                 >
@@ -403,7 +403,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     <AlertDialogTrigger asChild>
                                         <InteractiveHoverButton
                                             disabled={deleteDisabled}
-                                            hoverColor="#EF4444"
+                                            hoverColor="#dc2626"
                                             className="h-9"
                                         >
                                             批量删除
@@ -418,7 +418,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                            <AlertDialogAction onClick={onDelete} style={{ background: '#EF4444' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                            <AlertDialogAction onClick={onDelete} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

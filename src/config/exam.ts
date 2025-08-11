@@ -38,12 +38,12 @@ export const PAGE_TITLE_MAP: Record<string, string> = {
 
 // 统一的模块颜色配置
 export const MODULE_COLORS: Record<string, string> = {
-    '资料分析': '#A259FF',
-    '政治理论': '#3366FF',
-    '数量关系': '#43D854',
-    '常识判断': '#FFB300',
+    '资料分析': '#1e40af',
+    '政治理论': '#22d3ee',
+    '数量关系': '#15803d',
+    '常识判断': '#f59e0b',
     '言语理解': '#FF4C4C',
-    '判断推理': '#00B8D9',
+    '判断推理': '#c026d3',
 };
 
 // 统一的图例样式配置

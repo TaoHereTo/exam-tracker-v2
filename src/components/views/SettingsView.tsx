@@ -4,7 +4,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { AppearanceSetting } from "./settings/AppearanceSetting";
 import { PaginationSetting } from "./settings/PaginationSetting";
 
-import { Progress } from "@/components/ui/progress";
+
 
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
@@ -48,19 +48,23 @@ export function SettingsView({
     knowledge?: KnowledgeItem[];
     settings?: UserSettings;
 }) {
+    const { notify } = useNotification();
     const [isUploading, setIsUploading] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
+    const [syncStatus, setSyncStatus] = useState('');
     const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
-    const [syncStatus, setSyncStatus] = useState<string>('');
     const [syncReport, setSyncReport] = useState<{
         records: SyncReportItem<RecordItem>[];
         plans: SyncReportItem<StudyPlan>[];
         knowledge: SyncReportItem<KnowledgeItem>[];
     } | null>(null);
     const [showCloudOverview, setShowCloudOverview] = useState(false);
-    const { notify } = useNotification();
+    const [abortController, setAbortController] = useState<AbortController | null>(null);
+
 
     const handleUploadToCloud = async () => {
+        const controller = new AbortController();
+        setAbortController(controller);
         setIsUploading(true);
         setSyncStatus('正在检查云端数据...');
         setSyncReport(null);
@@ -75,7 +79,8 @@ export function SettingsView({
                 (progress) => {
                     setUploadProgress(progress);
                     setSyncStatus(progress.currentItem);
-                }
+                },
+                controller
             );
 
             if (result.success) {
@@ -88,11 +93,19 @@ export function SettingsView({
                 });
             } else {
                 setSyncStatus('');
-                notify({
-                    message: "上传失败",
-                    description: result.message,
-                    type: "error"
-                });
+                if (result.message === '上传已取消') {
+                    notify({
+                        message: "上传已取消",
+                        description: "用户取消了上传操作",
+                        type: "warning"
+                    });
+                } else {
+                    notify({
+                        message: "上传失败",
+                        description: result.message,
+                        type: "error"
+                    });
+                }
             }
         } catch (error) {
             setSyncStatus('');
@@ -104,6 +117,7 @@ export function SettingsView({
         } finally {
             setIsUploading(false);
             setUploadProgress(null);
+            setAbortController(null);
         }
     };
 
@@ -140,6 +154,16 @@ export function SettingsView({
         setShowCloudOverview(true);
     };
 
+    const handleCancelUpload = () => {
+        if (abortController) {
+            abortController.abort();
+        }
+    };
+
+
+
+
+
     if (activeTab === 'settings-advanced') {
         return (
             <>
@@ -161,7 +185,7 @@ export function SettingsView({
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <InteractiveHoverButton
-                                            hoverColor="#DC2626"
+                                            hoverColor="#dc2626"
                                             className="h-9"
                                         >
                                             清空本地数据
@@ -214,85 +238,106 @@ export function SettingsView({
                             <DataImportExport onImport={onImport!} onExport={onExport!} />
                         </div>
 
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
-                            <div>
-                                <h3 className="font-medium"><MixedText text="云端数据同步" /></h3>
-                                <p className="text-sm text-muted-foreground">
-                                    将数据同步到云端，实现多设备数据共享和备份。
-                                </p>
-                                {syncStatus && (
-                                    <p className="text-xs text-blue-600 mt-1"><MixedText text={syncStatus} /></p>
-                                )}
-                                {uploadProgress && (
-                                    <div className="mt-2 space-y-1">
-                                        <div className="flex justify-between text-xs text-gray-600">
-                                            <span><MixedText text="上传进度" /></span>
-                                            <span><MixedText text={`${uploadProgress.current}/${uploadProgress.total}`} /></span>
-                                        </div>
-                                        <Progress
-                                            value={(uploadProgress.current / uploadProgress.total) * 100}
-                                            variant="upload"
-                                            showText={true}
-                                        />
+                        <div className="p-4 border rounded-lg">
+                            <div className="flex items-center justify-between mb-3">
+                                <div>
+                                    <h3 className="font-medium"><MixedText text="云端数据同步" /></h3>
+                                    <p className="text-sm text-muted-foreground">
+                                        将数据同步到云端，实现多设备数据共享和备份。
+                                    </p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InteractiveHoverButton
+                                                onClick={handleUploadToCloud}
+                                                disabled={isUploading}
+                                                hoverColor="#059669"
+                                                icon={<Upload className="w-4 h-4" />}
+                                                className="text-sm h-9"
+                                            >
+                                                {isUploading ? "上传中..." : "上传到云端"}
+                                            </InteractiveHoverButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="将本地数据上传到云端备份" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InteractiveHoverButton
+                                                onClick={handleDownloadFromCloud}
+                                                disabled={isDownloading}
+                                                hoverColor="#4f46e5"
+                                                icon={<Download className="w-4 h-4" />}
+                                                className="text-sm h-9"
+                                            >
+                                                {isDownloading ? "下载中..." : "从云端下载"}
+                                            </InteractiveHoverButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="从云端下载数据到本地" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <InteractiveHoverButton
+                                                onClick={handleViewCloudData}
+                                                hoverColor="#3730a3"
+                                                icon={<Eye className="w-4 h-4" />}
+                                                className="text-sm h-9"
+                                            >
+                                                查看云端数据
+                                            </InteractiveHoverButton>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="查看云端存储的数据详情" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </div>
+                            </div>
+
+                            {/* 状态和进度显示 */}
+                            {syncStatus && (
+                                <p className="text-xs text-blue-600 mb-2"><MixedText text={syncStatus} /></p>
+                            )}
+                            {uploadProgress && (
+                                <div className="space-y-2">
+                                    <div className="text-xs text-gray-600 mb-1">
+                                        <span><MixedText text={`上传进度 ${uploadProgress.current}/${uploadProgress.total}`} /></span>
                                     </div>
-                                )}
-                            </div>
-                            <div className="flex gap-2">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InteractiveHoverButton
-                                            onClick={handleUploadToCloud}
-                                            disabled={isUploading}
-                                            hoverColor="#059669"
-                                            icon={<Upload className="w-4 h-4" />}
-                                            className="text-sm h-9"
+
+
+
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+                                            <div
+                                                className="h-full transition-all duration-300"
+                                                style={{
+                                                    width: `${uploadProgress.total > 0 ? Math.round((uploadProgress.current / uploadProgress.total) * 100) : 0}%`,
+                                                    backgroundColor: '#94a3b8'
+                                                }}
+                                            />
+                                        </div>
+                                        <button
+                                            onClick={handleCancelUpload}
+                                            className="w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
+                                            title="取消上传"
                                         >
-                                            {isUploading ? "上传中..." : "上传到云端"}
-                                        </InteractiveHoverButton>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="将本地数据上传到云端备份" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InteractiveHoverButton
-                                            onClick={handleDownloadFromCloud}
-                                            disabled={isDownloading}
-                                            hoverColor="#3B82F6"
-                                            icon={<Download className="w-4 h-4" />}
-                                            className="text-sm h-9"
-                                        >
-                                            {isDownloading ? "下载中..." : "从云端下载"}
-                                        </InteractiveHoverButton>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="从云端下载数据到本地" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InteractiveHoverButton
-                                            onClick={handleViewCloudData}
-                                            hoverColor="#8B5CF6"
-                                            icon={<Eye className="w-4 h-4" />}
-                                            className="text-sm h-9"
-                                        >
-                                            查看云端数据
-                                        </InteractiveHoverButton>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="查看云端存储的数据详情" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
+                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* 同步报告显示 */}
                         {syncReport && (
                             <div className="p-4 border rounded-lg bg-gray-50">
                                 <h4 className="font-medium mb-3"><MixedText text="同步报告" /></h4>
-                                <div className="grid grid-cols-3 gap-4 text-sm">
+                                <div className="grid grid-cols-3 gap-4 text-sm mb-4">
                                     <div className="text-center">
                                         <div className="text-2xl font-bold text-green-600">
                                             <MixedText text={String(syncReport.records.filter(r => r.action === 'uploaded').length)} />
@@ -312,6 +357,34 @@ export function SettingsView({
                                         <div className="text-gray-600"><MixedText text="知识点上传" /></div>
                                     </div>
                                 </div>
+
+
+
+                                {/* 跳过项目统计 */}
+                                {(() => {
+                                    const skippedRecords = syncReport.records.filter(r => r.action === 'skipped');
+                                    const skippedPlans = syncReport.plans.filter(p => p.action === 'skipped');
+                                    const skippedKnowledge = syncReport.knowledge.filter(k => k.action === 'skipped');
+
+                                    if (skippedRecords.length > 0 || skippedPlans.length > 0 || skippedKnowledge.length > 0) {
+                                        return (
+                                            <div className="mt-3 p-3 border border-yellow-200 rounded-lg bg-yellow-50">
+                                                <h5 className="font-medium text-yellow-800 mb-2">
+                                                    <MixedText text="跳过项目" />
+                                                </h5>
+                                                <div className="text-xs text-yellow-700">
+                                                    <div><MixedText text={`记录: ${skippedRecords.length} 条`} /></div>
+                                                    <div><MixedText text={`计划: ${skippedPlans.length} 条`} /></div>
+                                                    <div><MixedText text={`知识点: ${skippedKnowledge.length} 条`} /></div>
+                                                    <div className="mt-1 text-yellow-600">
+                                                        <MixedText text="（已存在于云端，跳过上传）" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return null;
+                                })()}
                             </div>
                         )}
                     </CardContent>
