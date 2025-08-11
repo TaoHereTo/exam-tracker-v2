@@ -29,34 +29,28 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     return (
         <SidebarUI collapsible="icon" className="group" data-side="left">
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild>
-                            <div className="flex items-center gap-3 px-2 py-3 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:px-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:py-0">
-                                <Image
-                                    src="/icon.png"
-                                    alt="应用图标"
-                                    width={40}
-                                    height={40}
-                                    className="w-10 h-10 flex-shrink-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-8 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-8"
-                                />
-                                <span className="text-xl font-bold group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
-                                    <MixedText text="行测记录" />
-                                </span>
-                            </div>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <div className="flex items-center gap-3 px-2 py-3 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:px-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:py-0">
+                    <Image
+                        src="/icon.png"
+                        alt="应用图标"
+                        width={40}
+                        height={40}
+                        className="w-10 h-10 flex-shrink-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-8 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-8"
+                    />
+                    <span className="text-xl font-bold group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
+                        <MixedText text="行测记录" />
+                    </span>
+                </div>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent className="gap-0">
                 {/* 可视化分组 */}
-                <SidebarGroup>
+                <SidebarGroup className="p-0">
                     <SidebarGroupLabel>
                         <MixedText text="可视化" />
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览">
                                     <button onClick={() => setActiveTab('overview')}>
@@ -86,12 +80,12 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                 </SidebarGroup>
 
                 {/* 记录管理分组 */}
-                <SidebarGroup>
+                <SidebarGroup className="p-0">
                     <SidebarGroupLabel>
                         <MixedText text="记录管理" />
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'form'} tooltip="新的记录">
                                     <button onClick={() => setActiveTab('form')}>
@@ -113,12 +107,12 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                 </SidebarGroup>
 
                 {/* 学习计划分组 */}
-                <SidebarGroup>
+                <SidebarGroup className="p-0">
                     <SidebarGroupLabel>
                         <MixedText text="学习计划" />
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'plan-list'} tooltip="制定计划">
                                     <button onClick={() => setActiveTab('plan-list')}>
@@ -132,12 +126,12 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                 </SidebarGroup>
 
                 {/* 知识点录入分组 */}
-                <SidebarGroup>
+                <SidebarGroup className="p-0">
                     <SidebarGroupLabel>
                         <MixedText text="知识点录入" />
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'knowledge-entry'} tooltip="知识点录入">
                                     <button onClick={() => setActiveTab('knowledge-entry')}>

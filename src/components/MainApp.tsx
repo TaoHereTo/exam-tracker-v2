@@ -268,7 +268,7 @@ export function MainApp() {
                     align="start"
                     side="top"
                     sideOffset={5}
-                    className="w-48 group-data-[collapsible=icon]:group-data-[state=collapsed]:ml-16"
+                    className="w-48"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => {
                         setIsHovered(false);
