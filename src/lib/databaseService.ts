@@ -259,6 +259,65 @@ export const planService = {
 
 // 知识点相关操作
 export const knowledgeService = {
+    // 测试数据库连接
+    async testConnection(): Promise<boolean> {
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) return false
+
+            const { data, error } = await supabase
+                .from('knowledge')
+                .select('id')
+                .limit(1)
+
+            if (error) {
+                console.error('数据库连接测试失败:', error);
+                return false;
+            }
+
+            console.log('数据库连接测试成功');
+            return true;
+        } catch (error) {
+            console.error('数据库连接测试异常:', error);
+            return false;
+        }
+    },
+
+    // 检查知识点是否存在
+    async checkKnowledgeExists(id: string): Promise<boolean> {
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) return false
+
+            const { data, error } = await supabase
+                .from('knowledge')
+                .select('id')
+                .eq('id', id)
+                .eq('user_id', userId)
+
+            if (error) {
+                console.log('检查知识点存在性失败:', {
+                    knowledgeId: id,
+                    userId: userId,
+                    error: error.message,
+                    code: error.code
+                });
+                return false;
+            }
+
+            const exists = data && data.length > 0;
+            console.log('知识点存在:', {
+                knowledgeId: id,
+                userId: userId,
+                hasData: exists,
+                count: data?.length || 0
+            });
+            return exists;
+        } catch (error) {
+            console.error('检查知识点存在性异常:', error);
+            return false;
+        }
+    },
     // 获取用户的所有知识点
     async getKnowledge(): Promise<KnowledgeItem[]> {
         const userId = await getCurrentUserId()
@@ -290,11 +349,11 @@ export const knowledgeService = {
         if ('type' in knowledge) knowledgeData.type = knowledge.type;
         if ('note' in knowledge) knowledgeData.note = knowledge.note;
 
-        // 处理其他字段
-        if ('subCategory' in knowledge) knowledgeData["subCategory"] = knowledge.subCategory;
+        // 处理其他字段 - 使用原始字段名
+        if ('subCategory' in knowledge) knowledgeData.subCategory = knowledge.subCategory;
         if ('date' in knowledge) knowledgeData.date = knowledge.date;
         if ('source' in knowledge) knowledgeData.source = knowledge.source;
-        if ('imagePath' in knowledge) knowledgeData["imagePath"] = knowledge.imagePath;
+        if ('imagePath' in knowledge) knowledgeData.imagePath = knowledge.imagePath;
 
         const { data, error } = await supabase
             .from('knowledge')
@@ -322,24 +381,203 @@ export const knowledgeService = {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
 
-        // 处理带有双引号的字段名
-        const updateData: Record<string, unknown> = { ...updates };
-        if ('imagePath' in updateData) {
-            updateData["imagePath"] = updateData.imagePath;
-            delete updateData.imagePath;
-        }
-        if ('subCategory' in updateData) {
-            updateData["subCategory"] = updateData.subCategory;
-            delete updateData.subCategory;
+        // 先测试数据库连接
+        const connectionOk = await this.testConnection();
+        if (!connectionOk) {
+            throw new Error('数据库连接失败，请检查网络连接');
         }
 
-        const { data, error } = await supabase
+        // 检查知识点是否存在
+        const knowledgeExists = await this.checkKnowledgeExists(id);
+        if (!knowledgeExists) {
+            console.log('databaseService.updateKnowledge - 知识点不存在，尝试创建新记录:', {
+                knowledgeId: id,
+                userId: userId
+            });
+
+            // 如果知识点不存在，尝试创建新记录
+            try {
+                const knowledgeData: Record<string, unknown> = {
+                    id: id, // 使用提供的ID
+                    user_id: userId,
+                    module: updates.module
+                };
+
+                // 处理不同类型的知识点字段
+                if ('type' in updates) knowledgeData.type = updates.type;
+                if ('note' in updates) knowledgeData.note = updates.note;
+                if ('subCategory' in updates) knowledgeData.subCategory = updates.subCategory;
+                if ('date' in updates) knowledgeData.date = updates.date;
+                if ('source' in updates) knowledgeData.source = updates.source;
+                if ('imagePath' in updates) knowledgeData.imagePath = updates.imagePath;
+
+                const { data, error } = await supabase
+                    .from('knowledge')
+                    .insert([knowledgeData])
+                    .select()
+                    .single()
+
+                if (error) {
+                    console.error('databaseService.updateKnowledge - 创建知识点失败:', {
+                        error: error.message,
+                        code: error.code,
+                        knowledgeData: knowledgeData
+                    });
+                    throw new Error(`创建知识点失败: ${error.message}`);
+                }
+
+                console.log('databaseService.updateKnowledge - 知识点创建成功:', data);
+                return data;
+            } catch (error) {
+                console.error('databaseService.updateKnowledge - 创建知识点异常:', error);
+                throw new Error(`知识点不存在且无法创建: ${error instanceof Error ? error.message : String(error)}`);
+            }
+        }
+
+        // 数据清理函数
+        const cleanValue = (value: unknown): unknown => {
+            if (typeof value === 'string') {
+                // 移除 null 字符和其他控制字符
+                return value.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+            }
+            return value;
+        };
+
+        // 确保字段名使用正确的格式
+        const updateData: Record<string, unknown> = { ...updates };
+
+        // 清理所有字符串值
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] !== undefined && updateData[key] !== null) {
+                updateData[key] = cleanValue(updateData[key]);
+            }
+        });
+
+        // 确保数据类型正确
+        if ('date' in updateData && updateData.date) {
+            // 确保日期格式正确
+            if (typeof updateData.date === 'string') {
+                const dateValue = new Date(updateData.date);
+                if (!isNaN(dateValue.getTime())) {
+                    updateData.date = dateValue.toISOString().split('T')[0]; // YYYY-MM-DD 格式
+                } else {
+                    console.warn('databaseService.updateKnowledge - 无效的日期格式:', updateData.date);
+                    delete updateData.date;
+                }
+            }
+        }
+
+        // 移除空字符串
+        Object.keys(updateData).forEach(key => {
+            if (updateData[key] === '') {
+                delete updateData[key];
+            }
+        });
+
+        // 简化字段处理 - 直接使用原始字段名
+        // 如果数据库表使用带引号的字段名，这里不做转换
+        // 让 Supabase 客户端自己处理字段映射
+
+        // 添加详细的调试信息
+        console.log('databaseService.updateKnowledge - 开始更新知识点:', {
+            knowledgeId: id,
+            userId: userId,
+            originalUpdates: updates,
+            processedUpdateData: updateData,
+            updateDataKeys: Object.keys(updateData),
+            updateDataValues: Object.values(updateData)
+        });
+
+        // 检查数据中是否有特殊字符或无效值
+        const invalidValues = Object.entries(updateData).filter(([key, value]) => {
+            if (value === undefined || value === null) return false;
+            if (typeof value === 'string' && value.includes('\u0000')) return true;
+            if (typeof value === 'string' && value.length > 10000) return true;
+            return false;
+        });
+
+        if (invalidValues.length > 0) {
+            console.warn('databaseService.updateKnowledge - 发现可能的问题数据:', invalidValues);
+        }
+
+        // 尝试不同的方法来避免 406 错误
+        console.log('databaseService.updateKnowledge - 发送请求到 Supabase:', {
+            table: 'knowledge',
+            updateData: updateData,
+            id: id,
+            userId: userId
+        });
+
+        // 方法1：先检查记录是否存在
+        console.log('databaseService.updateKnowledge - 检查记录是否存在:', {
+            knowledgeId: id,
+            userId: userId
+        });
+
+        const { data: existingRecords, error: checkError } = await supabase
+            .from('knowledge')
+            .select('*')
+            .eq('id', id)
+            .eq('user_id', userId)
+
+        console.log('databaseService.updateKnowledge - 记录检查结果:', {
+            hasData: existingRecords && existingRecords.length > 0,
+            dataKeys: existingRecords && existingRecords.length > 0 ? Object.keys(existingRecords[0]) : null,
+            hasError: !!checkError,
+            errorCode: checkError?.code,
+            errorMessage: checkError?.message,
+            count: existingRecords?.length || 0
+        });
+
+        if (checkError) {
+            throw new Error(`检查知识点失败: ${checkError.message}`);
+        }
+
+        if (!existingRecords || existingRecords.length === 0) {
+            throw new Error(`知识点不存在或不属于当前用户。ID: ${id}`);
+        }
+
+        // 如果记录存在，进行更新
+        let { data, error } = await supabase
             .from('knowledge')
             .update(updateData)
             .eq('id', id)
             .eq('user_id', userId)
             .select()
             .single()
+
+        // 如果方法1失败，尝试方法2：使用更简单的查询
+        if (error && error.code === '406') {
+            console.log('databaseService.updateKnowledge - 方法1失败，尝试方法2');
+
+            // 先检查记录是否存在
+            const { data: existingData, error: checkError } = await supabase
+                .from('knowledge')
+                .select('id')
+                .eq('id', id)
+                .eq('user_id', userId)
+
+            if (checkError) {
+                console.error('databaseService.updateKnowledge - 检查记录存在性失败:', checkError);
+                throw new Error(`知识点不存在或无法访问: ${checkError.message}`);
+            }
+
+            if (!existingData || existingData.length === 0) {
+                throw new Error(`知识点不存在或无法访问: ID ${id}`);
+            }
+
+            // 如果记录存在，再次尝试更新
+            const result = await supabase
+                .from('knowledge')
+                .update(updateData)
+                .eq('id', id)
+                .eq('user_id', userId)
+                .select()
+                .single()
+
+            data = result.data;
+            error = result.error;
+        }
 
         if (error) {
             console.error('知识点更新错误:', {
@@ -354,6 +592,8 @@ export const knowledgeService = {
             });
             throw new Error(`知识点更新失败: ${error.message || '未知错误'}`);
         }
+
+        console.log('databaseService.updateKnowledge - 更新成功:', data);
         return data
     },
 

@@ -79,20 +79,42 @@ export class AutoCloudSync {
     static async autoSaveKnowledge(knowledge: KnowledgeItem, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             const knowledgeRecord = knowledge as Record<string, unknown>;
-            const knowledgeData: Record<string, unknown> = {
-                module: knowledge.module,
-                imagePath: knowledgeRecord.imagePath
+
+            // 数据清理函数
+            const cleanValue = (value: unknown): unknown => {
+                if (typeof value === 'string') {
+                    // 移除 null 字符和其他控制字符
+                    return value.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+                }
+                return value;
             };
 
-            // 处理不同类型的知识点字段
-            // 处理知识点字段
-            if ('type' in knowledgeRecord) knowledgeData.type = knowledgeRecord.type;
-            if ('note' in knowledgeRecord) knowledgeData.note = knowledgeRecord.note;
+            const knowledgeData: Record<string, unknown> = {
+                module: knowledge.module
+            };
 
-            // 处理其他字段
-            if ('subCategory' in knowledgeRecord) knowledgeData.subCategory = knowledgeRecord.subCategory;
-            if ('date' in knowledgeRecord) knowledgeData.date = knowledgeRecord.date;
-            if ('source' in knowledgeRecord) knowledgeData.source = knowledgeRecord.source;
+            // 处理不同类型的知识点字段，并进行数据清理
+            // 处理知识点字段
+            if ('type' in knowledgeRecord && knowledgeRecord.type) {
+                knowledgeData.type = cleanValue(knowledgeRecord.type);
+            }
+            if ('note' in knowledgeRecord && knowledgeRecord.note) {
+                knowledgeData.note = cleanValue(knowledgeRecord.note);
+            }
+
+            // 处理其他字段 - 使用原始字段名
+            if ('subCategory' in knowledgeRecord && knowledgeRecord.subCategory) {
+                knowledgeData.subCategory = cleanValue(knowledgeRecord.subCategory);
+            }
+            if ('date' in knowledgeRecord && knowledgeRecord.date) {
+                knowledgeData.date = cleanValue(knowledgeRecord.date);
+            }
+            if ('source' in knowledgeRecord && knowledgeRecord.source) {
+                knowledgeData.source = cleanValue(knowledgeRecord.source);
+            }
+            if ('imagePath' in knowledgeRecord && knowledgeRecord.imagePath) {
+                knowledgeData.imagePath = cleanValue(knowledgeRecord.imagePath);
+            }
 
             await knowledgeService.addKnowledge(knowledgeData);
 
@@ -109,6 +131,15 @@ export class AutoCloudSync {
                 error: errorMessage,
                 errorDetails: errorDetails,
                 knowledge: knowledge,
+                knowledgeData: {
+                    module: knowledge.module,
+                    type: (knowledge as Record<string, unknown>).type,
+                    note: (knowledge as Record<string, unknown>).note,
+                    subCategory: (knowledge as Record<string, unknown>).subCategory,
+                    date: (knowledge as Record<string, unknown>).date,
+                    source: (knowledge as Record<string, unknown>).source,
+                    imagePath: (knowledge as Record<string, unknown>).imagePath
+                },
                 fullError: error
             });
 
@@ -203,20 +234,42 @@ export class AutoCloudSync {
         try {
             // 直接更新，不进行查重检查
             const knowledgeRecord = knowledge as Record<string, unknown>;
-            const updateData: Record<string, unknown> = {
-                module: knowledge.module,
-                imagePath: knowledgeRecord.imagePath
+
+            // 数据清理函数
+            const cleanValue = (value: unknown): unknown => {
+                if (typeof value === 'string') {
+                    // 移除 null 字符和其他控制字符
+                    return value.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+                }
+                return value;
             };
 
-            // 处理不同类型的知识点字段
-            // 处理知识点字段
-            if ('type' in knowledgeRecord) updateData.type = knowledgeRecord.type;
-            if ('note' in knowledgeRecord) updateData.note = knowledgeRecord.note;
+            const updateData: Record<string, unknown> = {
+                module: knowledge.module
+            };
 
-            // 处理其他字段
-            if ('subCategory' in knowledgeRecord) updateData.subCategory = knowledgeRecord.subCategory;
-            if ('date' in knowledgeRecord) updateData.date = knowledgeRecord.date;
-            if ('source' in knowledgeRecord) updateData.source = knowledgeRecord.source;
+            // 处理不同类型的知识点字段，并进行数据清理
+            // 处理知识点字段
+            if ('type' in knowledgeRecord && knowledgeRecord.type) {
+                updateData.type = cleanValue(knowledgeRecord.type);
+            }
+            if ('note' in knowledgeRecord && knowledgeRecord.note) {
+                updateData.note = cleanValue(knowledgeRecord.note);
+            }
+
+            // 处理其他字段 - 使用原始字段名
+            if ('subCategory' in knowledgeRecord && knowledgeRecord.subCategory) {
+                updateData.subCategory = cleanValue(knowledgeRecord.subCategory);
+            }
+            if ('date' in knowledgeRecord && knowledgeRecord.date) {
+                updateData.date = cleanValue(knowledgeRecord.date);
+            }
+            if ('source' in knowledgeRecord && knowledgeRecord.source) {
+                updateData.source = cleanValue(knowledgeRecord.source);
+            }
+            if ('imagePath' in knowledgeRecord && knowledgeRecord.imagePath) {
+                updateData.imagePath = cleanValue(knowledgeRecord.imagePath);
+            }
 
             await knowledgeService.updateKnowledge(knowledge.id, updateData as Partial<KnowledgeItem>);
 
@@ -233,6 +286,15 @@ export class AutoCloudSync {
                 error: errorMessage,
                 errorDetails: errorDetails,
                 knowledge: knowledge,
+                updateData: {
+                    module: knowledge.module,
+                    type: (knowledge as Record<string, unknown>).type,
+                    note: (knowledge as Record<string, unknown>).note,
+                    subCategory: (knowledge as Record<string, unknown>).subCategory,
+                    date: (knowledge as Record<string, unknown>).date,
+                    source: (knowledge as Record<string, unknown>).source,
+                    imagePath: (knowledge as Record<string, unknown>).imagePath
+                },
                 fullError: error
             });
 

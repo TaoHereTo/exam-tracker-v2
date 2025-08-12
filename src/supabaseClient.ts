@@ -10,5 +10,11 @@ if (!supabaseUrl || !supabaseKey) {
 }
 
 // 创建并导出 Supabase 客户端
-export const supabase = createClient(supabaseUrl, supabaseKey)
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 

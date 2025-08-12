@@ -499,11 +499,16 @@ export function MainApp() {
                 description: '知识点ID已更新为新格式，正在同步到云端...'
             });
 
-            // 使用新ID同步到云端
+            // 对于旧格式ID，应该创建新记录而不是更新
             try {
-                await AutoCloudSync.autoUpdateKnowledge(updatedItem, notify);
+                await AutoCloudSync.autoSaveKnowledge(updatedItem, notify);
             } catch (error) {
-                console.error('MainApp - 编辑知识点失败:', error);
+                console.error('MainApp - 编辑知识点失败 (ID转换):', {
+                    originalId: item.id,
+                    newId: updatedItem.id,
+                    error: error instanceof Error ? error.message : String(error),
+                    fullError: error
+                });
             }
             return;
         }
@@ -512,7 +517,20 @@ export function MainApp() {
         try {
             await AutoCloudSync.autoUpdateKnowledge(item, notify);
         } catch (error) {
-            console.error('MainApp - 编辑知识点失败:', error);
+            console.error('MainApp - 编辑知识点失败 (直接更新):', {
+                knowledgeId: item.id,
+                knowledgeData: {
+                    module: item.module,
+                    type: (item as Record<string, unknown>).type,
+                    note: (item as Record<string, unknown>).note,
+                    subCategory: (item as Record<string, unknown>).subCategory,
+                    date: (item as Record<string, unknown>).date,
+                    source: (item as Record<string, unknown>).source,
+                    imagePath: (item as Record<string, unknown>).imagePath
+                },
+                error: error instanceof Error ? error.message : String(error),
+                fullError: error
+            });
         }
     };
 
