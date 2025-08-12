@@ -186,15 +186,15 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
     const getStatusIcon = (status: StudyPlan["status"]) => {
         switch (status) {
             case "已完成":
-                return <CheckCircle className="w-4 h-4 text-green-500" />;
+                return <CheckCircle className="w-5 h-5 text-green-500" />;
             case "进行中":
-                return <Clock className="w-4 h-4 text-blue-500" />;
+                return <Clock className="w-5 h-5 text-blue-500" />;
             case "未开始":
-                return <Clock className="w-4 h-4 text-gray-500" />;
+                return <Clock className="w-5 h-5 text-gray-500" />;
             case "未达成":
-                return <AlertCircle className="w-4 h-4 text-red-500" />;
+                return <AlertCircle className="w-5 h-5 text-red-500" />;
             default:
-                return <Clock className="w-4 h-4 text-gray-500" />;
+                return <Clock className="w-5 h-5 text-gray-500" />;
         }
     };
 
@@ -207,7 +207,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                         onClick={() => handleOpenForm()}
                         className="h-9"
                     >
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="新建计划" />
                     </Button>
                 </ButtonGroup>
@@ -220,7 +220,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     onClick={() => setShowCompleted(false)}
                     className="flex items-center gap-2"
                 >
-                    <Clock className="w-4 h-4" />
+                    <Clock className="w-5 h-5" />
                     <MixedText text={`进行中的计划 (${activePlans.length})`} />
                 </Button>
                 <Button
@@ -228,7 +228,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     onClick={() => setShowCompleted(true)}
                     className="flex items-center gap-2"
                 >
-                    <CheckCircle className="w-4 h-4" />
+                    <CheckCircle className="w-5 h-5" />
                     <MixedText text={`已完成的计划 (${completedPlans.length})`} />
                 </Button>
             </div>
@@ -249,11 +249,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                 <TooltipTrigger asChild>
                                                     <Button
                                                         onClick={() => handleOpenForm(plan)}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-9 w-9"
                                                     >
-                                                        <Edit className="w-4 h-4" />
+                                                        <Edit className="w-5 h-5" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -263,13 +263,13 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                         </TooltipProvider>
                                         <AlertDialog>
                                             <AlertDialogTrigger asChild>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
+                                                                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-9 w-9"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </Button>
                                             </AlertDialogTrigger>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
@@ -338,7 +338,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                 onClick={() => handleOpenForm()}
                                 className="h-9"
                             >
-                                <Plus className="w-4 h-4 mr-2" />
+                                <Plus className="w-5 h-5 mr-2" />
                                 <MixedText text="创建第一个计划" />
                             </Button>
                         )}

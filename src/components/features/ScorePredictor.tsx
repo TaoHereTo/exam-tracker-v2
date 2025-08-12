@@ -8,6 +8,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Button } from "@/components/ui/button";
 import { MixedText } from "@/components/ui/MixedText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Bot } from "lucide-react";
 
 interface RecordItem {
     module: keyof typeof MODULE_SCORES;
@@ -131,7 +132,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                                     variant="ghost"
                                     className="h-9 w-9 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400"
                                 >
-                                    <i className="bi bi-robot text-base flex items-center justify-center"></i>
+                                    <Bot className="w-5 h-5" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>

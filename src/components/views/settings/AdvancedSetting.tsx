@@ -13,7 +13,7 @@ import { InlineLoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { supabaseImageManager, type SupabaseImageInfo } from "@/lib/supabaseImageManager";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Input } from "@/components/ui/input";
-import { Search, RefreshCw, Eye, Image as ImageIcon, Settings, Grid3X3, List, Trash2, Upload, XCircle } from "lucide-react";
+import { Search, RefreshCw, Eye, Image as ImageIcon, Settings, Grid3X3, List, Trash2, Upload, XCircle, Package, CloudUpload } from "lucide-react";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 
@@ -313,11 +313,11 @@ export function AdvancedSetting() {
                                                     loadCloudImages();
                                                 }
                                             }}
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
                                         >
-                                            {showImageManager ? <XCircle className="w-4 h-4" /> : <i className="bi bi-box-seam text-base flex items-center justify-center"></i>}
+                                            {showImageManager ? <XCircle className="w-5 h-5" /> : <Package className="w-5 h-5" />}
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -349,11 +349,11 @@ export function AdvancedSetting() {
                                                 <Button
                                                     onClick={loadCloudImages}
                                                     disabled={isLoadingImages}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-9 w-9"
                                                 >
-                                                    <RefreshCw className={`w-4 h-4 ${isLoadingImages ? 'animate-spin' : ''}`} />
+                                                    <RefreshCw className={`w-5 h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -368,11 +368,11 @@ export function AdvancedSetting() {
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-9 w-9"
                                                 >
-                                                    {imageManagerView === 'grid' ? <List className="w-4 h-4" /> : <Grid3X3 className="w-4 h-4" />}
+                                                    {imageManagerView === 'grid' ? <List className="w-5 h-5" /> : <Grid3X3 className="w-5 h-5" />}
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -385,11 +385,11 @@ export function AdvancedSetting() {
                                             <TooltipTrigger asChild>
                                                 <Button
                                                     onClick={handleUploadImage}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-9 w-9"
                                                 >
-                                                    <i className="bi bi-cloud-arrow-up text-base flex items-center justify-center"></i>
+                                                    <CloudUpload className="w-5 h-5" />
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -403,11 +403,11 @@ export function AdvancedSetting() {
                                                 <TooltipTrigger asChild>
                                                     <Button
                                                         onClick={handleDeleteSelectedImages}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-9 w-9"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-5 h-5" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -516,16 +516,16 @@ export function AdvancedSetting() {
                                                             <Tooltip>
                                                                 <TooltipTrigger asChild>
                                                                     <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
+                                                                        variant="outline"
+                                                                        size="icon"
                                                                         onClick={(e: React.MouseEvent) => {
                                                                             e.stopPropagation();
                                                                             // 打开图片预览
                                                                             window.open(image.url, '_blank');
                                                                         }}
-                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-sm z-20"
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-sm z-20 h-9 w-9"
                                                                     >
-                                                                        <Eye className="h-4 w-4" />
+                                                                        <Eye className="w-5 h-5" />
                                                                     </Button>
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>

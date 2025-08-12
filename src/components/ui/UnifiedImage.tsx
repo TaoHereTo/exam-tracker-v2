@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
-import { X, Eye, Cloud, FileImage, Upload, Image as ImageIcon } from 'lucide-react';
+import { X, Eye, Cloud, FileImage, Upload, Image as ImageIcon, Inbox, CloudCheck } from 'lucide-react';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
@@ -305,9 +305,9 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="w-full text-xs py-1.5 h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9"
                                                                 type="button"
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
@@ -315,7 +315,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                                     document.getElementById(`file-input-${componentId.current}`)?.click();
                                                                 }}
                                                             >
-                                                                <i className="bi bi-inbox text-base flex items-center justify-center"></i>
+                                                                <Inbox className="w-5 h-5" />
                                                             </Button>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
@@ -332,23 +332,15 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 <SupabaseImageSelectorDialog
                                                     onImageSelected={handleImageSelected}
                                                     trigger={
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                        className="w-full text-xs py-1.5 h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
-                                                                        type="button"
-                                                                    >
-                                                                        <i className="bi bi-cloud-plus text-base flex items-center justify-center"></i>
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p><MixedText text="从云端选择" /></p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-9 w-9"
+                                                            type="button"
+                                                            title="从云端选择"
+                                                        >
+                                                            <CloudCheck className="w-5 h-5" />
+                                                        </Button>
                                                     }
                                                 />
                                             </div>
@@ -408,7 +400,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             onClick={handlePreview}
                                             className="h-8 w-8 p-0"
                                         >
-                                            <Eye className="h-4 w-4" />
+                                            <Eye className="h-5 w-5" />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -453,11 +445,11 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 e.stopPropagation();
                                                 fileInputRef.current?.click();
                                             }}
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
                                         >
-                                            <i className="bi bi-inbox text-base flex items-center justify-center"></i>
+                                            <Inbox className="w-5 h-5" />
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -470,27 +462,15 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             <SupabaseImageSelectorDialog
                                 onImageSelected={handleImageSelected}
                                 trigger={
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    type="button"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                    }}
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
-                                                >
-                                                    <i className="bi bi-cloud-plus text-base flex items-center justify-center"></i>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p><MixedText text="重新选择" /></p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-9 w-9"
+                                        title="重新选择"
+                                    >
+                                        <CloudCheck className="w-5 h-5" />
+                                    </Button>
                                 }
                             />
                         )}

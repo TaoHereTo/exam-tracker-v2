@@ -53,26 +53,26 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览">
-                                    <button onClick={() => setActiveTab('overview')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }} className="flex items-center gap-2">
                                         <PieChart className="w-6 h-6" />
                                         <span><MixedText text="数据概览" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'charts'} tooltip="数据图表">
-                                    <button onClick={() => setActiveTab('charts')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('charts'); }} className="flex items-center gap-2">
                                         <LineChart className="w-6 h-6" />
                                         <span><MixedText text="数据图表" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'personal-best'} tooltip="最佳成绩">
-                                    <button onClick={() => setActiveTab('personal-best')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('personal-best'); }} className="flex items-center gap-2">
                                         <Trophy className="w-6 h-6" />
                                         <span><MixedText text="最佳成绩" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -88,18 +88,18 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'form'} tooltip="新的记录">
-                                    <button onClick={() => setActiveTab('form')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('form'); }} className="flex items-center gap-2">
                                         <Plus className="w-6 h-6" />
                                         <span><MixedText text="新的记录" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题记录">
-                                    <button onClick={() => setActiveTab('history')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('history'); }} className="flex items-center gap-2">
                                         <History className="w-6 h-6" />
                                         <span><MixedText text="刷题记录" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -115,10 +115,10 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'plan-list'} tooltip="制定计划">
-                                    <button onClick={() => setActiveTab('plan-list')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('plan-list'); }} className="flex items-center gap-2">
                                         <Calendar className="w-6 h-6" />
                                         <span><MixedText text="制定计划" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -134,18 +134,18 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'knowledge-entry'} tooltip="知识点录入">
-                                    <button onClick={() => setActiveTab('knowledge-entry')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('knowledge-entry'); }} className="flex items-center gap-2">
                                         <FileText className="w-6 h-6" />
                                         <span><MixedText text="知识点录入" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'knowledge-summary'} tooltip="知识点汇总">
-                                    <button onClick={() => setActiveTab('knowledge-summary')}>
+                                    <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('knowledge-summary'); }} className="flex items-center gap-2">
                                         <BookMarked className="w-6 h-6" />
                                         <span><MixedText text="知识点汇总" /></span>
-                                    </button>
+                                    </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>

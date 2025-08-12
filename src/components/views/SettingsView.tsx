@@ -10,7 +10,7 @@ import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
 import { Button } from "@/components/ui/button";
-import { Download, Upload, Eye } from "lucide-react";
+import { Download, Upload, Eye, Trash2, CloudUpload, CloudDownload } from "lucide-react";
 import { useState } from "react";
 import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -188,11 +188,11 @@ export function SettingsView({
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-9 w-9"
                                                     >
-                                                        <i className="bi bi-trash2 text-base flex items-center justify-center"></i>
+                                                        <Trash2 className="w-5 h-5" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -266,7 +266,7 @@ export function SettingsView({
                                                 size="icon"
                                                 className="h-9 w-9"
                                             >
-                                                <i className="bi bi-cloud-arrow-up text-base flex items-center justify-center"></i>
+                                                <CloudUpload className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -282,7 +282,7 @@ export function SettingsView({
                                                 size="icon"
                                                 className="h-9 w-9"
                                             >
-                                                <i className="bi bi-cloud-arrow-down text-base flex items-center justify-center"></i>
+                                                <CloudDownload className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -297,7 +297,7 @@ export function SettingsView({
                                                 size="icon"
                                                 className="h-9 w-9"
                                             >
-                                                <Eye className="w-4 h-4" />
+                                                <Eye className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>

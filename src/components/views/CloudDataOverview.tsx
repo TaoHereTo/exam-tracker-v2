@@ -184,7 +184,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                         size="sm"
                                                         className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-5 h-5" />
                                                     </Button>
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>

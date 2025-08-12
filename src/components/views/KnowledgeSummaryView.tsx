@@ -385,12 +385,12 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 contextMenuItems={[
                     {
                         label: "编辑",
-                        icon: <Edit className="w-4 h-4" />,
+                        icon: <Edit className="w-5 h-5" />,
                         onClick: (item: KnowledgeItem) => handleEdit(item),
                     },
                     {
                         label: "删除",
-                        icon: <Trash2 className="w-4 h-4" />,
+                        icon: <Trash2 className="w-5 h-5" />,
                         onClick: (item: KnowledgeItem) => handleSingleDelete(item),
                         variant: "destructive",
                     },
@@ -418,8 +418,8 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 <SimpleDialogContent>
                     <div className="flex justify-between items-center">
                         <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
-                        <Button variant="ghost" size="icon" onClick={() => setEditDialogOpen(false)} className="bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6">
-                            <X className="w-3 h-3" />
+                        <Button variant="outline" size="icon" onClick={() => setEditDialogOpen(false)} className="h-9 w-9">
+                            <X className="w-5 h-5" />
                         </Button>
                     </div>
                     {editError ? (

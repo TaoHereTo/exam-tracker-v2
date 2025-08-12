@@ -149,13 +149,13 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
-                                    variant="ghost"
-                                    size="sm"
+                                    variant="outline"
+                                    size="icon"
                                     disabled={selected.length === 0}
                                     onClick={onBatchDelete}
-                                    className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                    className="h-9 w-9"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-5 h-5" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -343,7 +343,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     )}
                                     {filter.type === 'search' && (
                                         <div className="relative w-36">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                             <Input
                                                 placeholder={filter.placeholder || "搜索..."}
                                                 value={filter.value}
@@ -392,11 +392,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <TooltipTrigger asChild>
                                             <Button
                                                 onClick={onExport}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-9 w-9 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
                                             >
-                                                <FileSpreadsheet className="w-4 h-4" />
+                                                <FileSpreadsheet className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -414,11 +414,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                             <Button
                                                 onClick={onEdit}
                                                 disabled={editDisabled}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-9 w-9 p-0 hover:bg-green-100 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
@@ -437,11 +437,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 <TooltipTrigger asChild>
                                                     <Button
                                                         disabled={deleteDisabled}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-9 w-9"
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-5 h-5" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
