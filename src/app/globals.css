@@ -1009,6 +1009,24 @@ html,
   width: calc(100% - 0.5rem) !important;
 }
 
+/* 增加侧边栏菜单按钮的左边距，让图标距离左边更远 */
+[data-slot="sidebar-menu-button"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 展开状态下的菜单按钮样式 */
+[data-slot="sidebar"][data-state="expanded"] [data-slot="sidebar-menu-button"] {
+  padding-left: 1.25rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 收起状态下的菜单按钮样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
 /* 修复footer区域（地球图标）在收起状态下的对齐问题 */
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
   display: flex !important;
@@ -1079,9 +1097,52 @@ html,
   padding-right: 0.25rem;
 }
 
+/* 增加侧边栏组标签的左边距 */
+[data-slot="sidebar-group-label"] {
+  padding-left: 1.25rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 收起状态下的组标签样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  text-align: center !important;
+}
+
 /* 侧边栏容器确保不会产生横向滚动 */
 [data-slot="sidebar-container"] {
   overflow: hidden;
+}
+
+/* 调整侧边栏头部和底部的内边距 */
+[data-slot="sidebar-header"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+[data-slot="sidebar-footer"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 收起状态下的头部和底部样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"],
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+/* 调整侧边栏组内容的内边距 */
+[data-slot="sidebar-group-content"] {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+/* 收起状态下的组内容样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-content"] {
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
 }
 
 /* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */

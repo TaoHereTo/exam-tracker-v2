@@ -129,8 +129,9 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                             <TooltipTrigger asChild>
                                 <Button
                                     onClick={handlePredictScore}
-                                    variant="ghost"
-                                    className="h-9 w-9 p-0 hover:bg-purple-100 dark:hover:bg-purple-900/20 hover:text-purple-600 dark:hover:text-purple-400"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-9 w-9"
                                 >
                                     <Bot className="w-5 h-5" />
                                 </Button>
