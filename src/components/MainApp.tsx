@@ -62,6 +62,7 @@ import {
 import { normalizePageTitle } from "@/config/exam";
 import { NewRecordForm } from "@/components/forms/NewRecordForm";
 import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
+import { clearLocalStorageData } from "@/lib/storageUtils";
 
 // 懒加载组件
 const PlanListView = lazy(() =>
@@ -416,16 +417,34 @@ export function MainApp() {
 
     // 清空本地数据（不影响云端）
     const handleClearLocalData = async () => {
-        setRecords([]);
-        setKnowledge([]);
-        setPlans([]);
-        setSelectedRecordIds([]);
+        console.log('handleClearLocalData 被调用了');
 
-        notify({
-            type: 'success',
-            message: '本地数据已清空',
-            description: '已清空本地的刷题记录、知识点和学习计划'
-        });
+        try {
+            // 清空localStorage中的数据
+            clearLocalStorageData(['records', 'knowledge', 'plans']);
+            console.log('localStorage 已清空');
+
+            // 清空React状态
+            setRecords([]);
+            setKnowledge([]);
+            setPlans([]);
+            setSelectedRecordIds([]);
+            console.log('React状态已清空');
+
+            notify({
+                type: 'success',
+                message: '本地数据已清空',
+                description: '已清空本地的刷题记录、知识点和学习计划'
+            });
+            console.log('通知已发送');
+        } catch (error) {
+            console.error('清空本地数据时出错:', error);
+            notify({
+                type: 'error',
+                message: '清空失败',
+                description: '清空本地数据时发生错误'
+            });
+        }
     };
 
 

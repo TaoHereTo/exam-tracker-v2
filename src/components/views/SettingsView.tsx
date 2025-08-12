@@ -60,6 +60,7 @@ export function SettingsView({
     } | null>(null);
     const [showCloudOverview, setShowCloudOverview] = useState(false);
     const [abortController, setAbortController] = useState<AbortController | null>(null);
+    const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
 
 
     const handleUploadToCloud = async () => {
@@ -164,7 +165,10 @@ export function SettingsView({
 
 
 
+    console.log('SettingsView - activeTab:', activeTab);
+
     if (activeTab === 'settings-advanced') {
+        console.log('显示高级设置页面');
         return (
             <>
                 <AdvancedSetting />
@@ -182,7 +186,7 @@ export function SettingsView({
                                         仅删除本地浏览器中的数据，不影响云端。
                                     </p>
                                 </div>
-                                <AlertDialog>
+                                <AlertDialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
                                     <AlertDialogTrigger asChild>
                                         <TooltipProvider>
                                             <Tooltip>
@@ -191,6 +195,10 @@ export function SettingsView({
                                                         variant="outline"
                                                         size="icon"
                                                         className="h-9 w-9"
+                                                        onClick={() => {
+                                                            console.log('清空本地数据按钮被点击了');
+                                                            setClearDataDialogOpen(true);
+                                                        }}
                                                     >
                                                         <Trash2 className="w-5 h-5" />
                                                     </Button>
@@ -211,7 +219,16 @@ export function SettingsView({
                                         <AlertDialogFooter>
                                             <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
                                             <AlertDialogAction
-                                                onClick={onClearLocalData}
+                                                onClick={() => {
+                                                    console.log('AlertDialogAction onClick 被触发');
+                                                    console.log('onClearLocalData:', onClearLocalData);
+                                                    if (onClearLocalData) {
+                                                        onClearLocalData();
+                                                    } else {
+                                                        console.error('onClearLocalData 是 undefined');
+                                                    }
+                                                    setClearDataDialogOpen(false);
+                                                }}
                                                 className="bg-red-600 hover:bg-red-700 text-white"
                                             >
                                                 确认清空

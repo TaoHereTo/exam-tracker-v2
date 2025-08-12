@@ -329,20 +329,51 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                         {/* 云端选择按钮 */}
                                         {mode !== 'upload' && (
                                             <div className="flex-1">
-                                                <SupabaseImageSelectorDialog
-                                                    onImageSelected={handleImageSelected}
-                                                    trigger={
-                                                        <Button
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-9 w-9"
-                                                            type="button"
-                                                            title="从云端选择"
-                                                        >
-                                                            <CloudCheck className="w-5 h-5" />
-                                                        </Button>
-                                                    }
-                                                />
+                                                <div className="w-full">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    className="h-9 w-9"
+                                                                    type="button"
+                                                                    onClick={(e) => {
+                                                                        e.preventDefault();
+                                                                        e.stopPropagation();
+                                                                        // 手动触发云端选择对话框
+                                                                        const cloudButton = document.querySelector('[data-cloud-selector="true"]');
+                                                                        if (cloudButton) {
+                                                                            (cloudButton as HTMLElement).click();
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <CloudCheck className="w-5 h-5" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p><MixedText text="从云端选择" /></p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                                {/* 隐藏的云端选择对话框触发器 */}
+                                                <div className="hidden">
+                                                    <SupabaseImageSelectorDialog
+                                                        onImageSelected={handleImageSelected}
+                                                        trigger={
+                                                            <Button
+                                                                data-cloud-selector="true"
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9"
+                                                                type="button"
+                                                            >
+                                                                <CloudCheck className="w-5 h-5" />
+                                                            </Button>
+                                                        }
+                                                    />
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -459,20 +490,51 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                             </TooltipProvider>
                         )}
                         {(mode === 'select' || mode === 'combined') && (
-                            <SupabaseImageSelectorDialog
-                                onImageSelected={handleImageSelected}
-                                trigger={
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-9 w-9"
-                                        title="重新选择"
-                                    >
-                                        <CloudCheck className="w-5 h-5" />
-                                    </Button>
-                                }
-                            />
+                            <>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    // 手动触发云端选择对话框
+                                                    const cloudReselectButton = document.querySelector('[data-cloud-reselector="true"]');
+                                                    if (cloudReselectButton) {
+                                                        (cloudReselectButton as HTMLElement).click();
+                                                    }
+                                                }}
+                                            >
+                                                <CloudCheck className="w-5 h-5" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="重新选择" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                                {/* 隐藏的云端选择对话框触发器 */}
+                                <div className="hidden">
+                                    <SupabaseImageSelectorDialog
+                                        onImageSelected={handleImageSelected}
+                                        trigger={
+                                            <Button
+                                                data-cloud-reselector="true"
+                                                type="button"
+                                                variant="outline"
+                                                size="icon"
+                                                className="h-9 w-9"
+                                            >
+                                                <CloudCheck className="w-5 h-5" />
+                                            </Button>
+                                        }
+                                    />
+                                </div>
+                            </>
                         )}
                     </div>
                 </>
