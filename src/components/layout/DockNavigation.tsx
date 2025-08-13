@@ -1,6 +1,6 @@
 import React from "react";
 import { Dock, DockIcon } from "@/components/magicui/dock";
-import { LineChart, Plus, History, Calendar, FileText, BookMarked } from "lucide-react";
+import { LineChart, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline } from "lucide-react";
 import {
     Tooltip,
     TooltipContent,
@@ -18,12 +18,12 @@ interface DockNavigationProps {
 
 // 精简 Dock：仅保留用户指定的主要入口，图标与侧边栏保持一致
 const primaryDockItems = [
-    { key: 'charts', label: '数据图表', icon: <LineChart /> },
-    { key: 'form', label: '新增做题记录', icon: <Plus /> },
-    { key: 'history', label: '历史做题记录', icon: <History /> },
-    { key: 'knowledge-entry', label: '知识点录入', icon: <FileText /> },
+    { key: 'charts', label: '数据图表', icon: <ChartSpline /> },
+    { key: 'form', label: '新增做题记录', icon: <PenTool /> },
+    { key: 'history', label: '历史做题记录', icon: <BookCopy /> },
+    { key: 'knowledge-entry', label: '知识点录入', icon: <NotebookPen /> },
     { key: 'knowledge-summary', label: '知识点汇总', icon: <BookMarked /> },
-    { key: 'plan-list', label: '学习计划', icon: <Calendar /> },
+    { key: 'plan-list', label: '学习计划', icon: <ListTodo /> },
 ];
 
 // 旧的 dockChildIcons 已废弃

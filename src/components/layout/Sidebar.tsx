@@ -1,6 +1,6 @@
 import React from "react";
 import Image from "next/image";
-import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked } from "lucide-react";
+import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     Sidebar as SidebarUI,
@@ -54,7 +54,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('overview'); }}>
-                                        <PieChart />
+                                        <GalleryVerticalEnd />
                                         <span><MixedText text="数据概览" /></span>
                                     </a>
                                 </SidebarMenuButton>
@@ -62,7 +62,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'charts'} tooltip="数据图表">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('charts'); }}>
-                                        <LineChart />
+                                        <ChartSpline />
                                         <span><MixedText text="数据图表" /></span>
                                     </a>
                                 </SidebarMenuButton>
@@ -89,7 +89,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'form'} tooltip="新的记录">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('form'); }}>
-                                        <Plus />
+                                        <PenTool />
                                         <span><MixedText text="新的记录" /></span>
                                     </a>
                                 </SidebarMenuButton>
@@ -97,7 +97,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题记录">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('history'); }}>
-                                        <History />
+                                        <BookCopy />
                                         <span><MixedText text="刷题记录" /></span>
                                     </a>
                                 </SidebarMenuButton>
@@ -116,7 +116,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'plan-list'} tooltip="制定计划">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('plan-list'); }}>
-                                        <Calendar />
+                                        <ListTodo />
                                         <span><MixedText text="制定计划" /></span>
                                     </a>
                                 </SidebarMenuButton>
@@ -135,7 +135,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild isActive={activeTab === 'knowledge-entry'} tooltip="知识点录入">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('knowledge-entry'); }}>
-                                        <FileText />
+                                        <NotebookPen />
                                         <span><MixedText text="知识点录入" /></span>
                                     </a>
                                 </SidebarMenuButton>

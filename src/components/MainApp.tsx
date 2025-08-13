@@ -417,28 +417,22 @@ export function MainApp() {
 
     // 清空本地数据（不影响云端）
     const handleClearLocalData = async () => {
-        console.log('handleClearLocalData 被调用了');
-
         try {
             // 清空localStorage中的数据
             clearLocalStorageData(['records', 'knowledge', 'plans']);
-            console.log('localStorage 已清空');
 
             // 清空React状态
             setRecords([]);
             setKnowledge([]);
             setPlans([]);
             setSelectedRecordIds([]);
-            console.log('React状态已清空');
 
             notify({
                 type: 'success',
                 message: '本地数据已清空',
                 description: '已清空本地的刷题记录、知识点和学习计划'
             });
-            console.log('通知已发送');
         } catch (error) {
-            console.error('清空本地数据时出错:', error);
             notify({
                 type: 'error',
                 message: '清空失败',
@@ -484,26 +478,18 @@ export function MainApp() {
     };
 
     const handleBatchDeleteKnowledge = async (ids: string[]) => {
-        console.log('MainApp - handleBatchDeleteKnowledge called with ids:', ids);
-
         // 先更新本地数据
         setKnowledge(prev => {
             const filtered = prev.filter(item => !ids.includes(item.id));
-            console.log('MainApp - filtered knowledge from', prev.length, 'to', filtered.length);
             return filtered;
         });
 
         // 批量从云端删除，只删除UUID格式的ID（新格式）
         for (const id of ids) {
             if (isUUID(id)) {
-                console.log('MainApp - deleting from cloud:', id);
                 await AutoCloudSync.autoDeleteKnowledge(id, notify);
-            } else {
-                console.log('MainApp - skipping non-UUID id:', id);
             }
         }
-
-        console.log('MainApp - batch delete completed');
     };
 
     const handleEditKnowledge = async (item: KnowledgeItem) => {
@@ -707,6 +693,7 @@ export function MainApp() {
                                                     historyPage={historyPage}
                                                     setHistoryPage={setHistoryPage}
                                                     totalPages={Math.ceil(records.length / pageSize)}
+                                                    totalRecords={records.length}
                                                 />
                                             )}
 
@@ -958,6 +945,7 @@ export function MainApp() {
                                             historyPage={historyPage}
                                             setHistoryPage={setHistoryPage}
                                             totalPages={Math.ceil(records.length / pageSize)}
+                                            totalRecords={records.length}
                                         />
                                     )}
 

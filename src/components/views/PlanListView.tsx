@@ -222,6 +222,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     <Button
                         onClick={() => handleOpenForm()}
                         className="h-9"
+                        style={{ backgroundColor: '#1d4ed8' }}
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="新建计划" />
@@ -369,6 +370,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             <Button
                                 onClick={() => handleOpenForm()}
                                 className="h-9"
+                                style={{ backgroundColor: '#1d4ed8' }}
                             >
                                 <Plus className="w-5 h-5 mr-2" />
                                 <MixedText text="创建第一个计划" />

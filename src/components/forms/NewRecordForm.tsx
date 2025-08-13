@@ -89,7 +89,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
 
     return (
         <div className="flex items-start justify-center min-h-screen p-4 pt-10">
-            <Card className="w-full max-w-lg flex flex-col">
+            <Card className="w-full max-w-md flex flex-col">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-2xl">
                         <MixedText text="新增做题记录" />
@@ -194,7 +194,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                             <DurationField />
                         </FormField>
 
-                        <div className="form-actions">
+                        <div className="form-actions pt-4">
                             <Button type="submit" className="w-full py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
                                 <MixedText text="保存记录" />
                             </Button>

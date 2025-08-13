@@ -5,23 +5,14 @@ import { UserSettings } from '../types/record'
 // 获取当前用户ID
 const getCurrentUserId = async () => {
     try {
-        console.log('getCurrentUserId - 开始获取用户ID');
         const { data, error } = await supabase.auth.getUser();
 
         if (error) {
-            console.error('getCurrentUserId - 获取用户失败:', error);
             throw error;
         }
 
-        console.log('getCurrentUserId - 用户信息:', {
-            userId: data.user?.id,
-            userEmail: data.user?.email,
-            hasUser: !!data.user
-        });
-
         return data.user?.id;
     } catch (error) {
-        console.error('getCurrentUserId - 异常:', error);
         throw error;
     }
 }
@@ -65,7 +56,6 @@ export const recordService = {
             .single()
 
         if (error) {
-            console.error('刷题记录上传错误:', error)
             throw error
         }
         return data
@@ -85,13 +75,6 @@ export const recordService = {
             .eq('user_id', userId)
 
         if (error) {
-            console.error('删除记录数据库错误:', {
-                recordId: id,
-                userId,
-                error: error.message,
-                details: error.details,
-                hint: error.hint
-            });
             throw error;
         }
     }
@@ -158,15 +141,8 @@ export const planService = {
     // 更新学习计划
     async updatePlan(id: string, updates: Partial<StudyPlan>): Promise<StudyPlan> {
         try {
-            console.log('databaseService.updatePlan - 开始更新:', {
-                planId: id,
-                updates: updates
-            });
-
             const userId = await getCurrentUserId()
             if (!userId) throw new Error('用户未登录')
-
-            console.log('databaseService.updatePlan - 用户ID获取成功:', userId);
 
             // 处理带有双引号的字段名
             const updateData: Record<string, unknown> = { ...updates };
@@ -179,14 +155,6 @@ export const planService = {
                 delete updateData.endDate;
             }
 
-            console.log('databaseService.updatePlan - 处理后的更新数据:', updateData);
-
-            // 检查 Supabase 客户端状态
-            console.log('databaseService.updatePlan - Supabase 客户端状态:', {
-                hasAuth: !!supabase.auth,
-                hasFrom: !!supabase.from
-            });
-
             const { data, error } = await supabase
                 .from('plans')
                 .update(updateData)
@@ -195,40 +163,12 @@ export const planService = {
                 .select()
                 .single()
 
-            console.log('databaseService.updatePlan - Supabase 响应:', {
-                hasData: !!data,
-                dataKeys: data ? Object.keys(data) : null,
-                hasError: !!error,
-                errorMessage: error?.message,
-                errorCode: error?.code
-            });
-
             if (error) {
-                console.error('学习计划更新错误 - 详细信息:', {
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code,
-                    updateData: updateData,
-                    planId: id,
-                    userId: userId,
-                    fullError: error,
-                    errorType: typeof error,
-                    errorConstructor: error?.constructor?.name
-                });
                 throw new Error(`学习计划更新失败: ${error.message || '未知错误'}`);
             }
 
-            console.log('databaseService.updatePlan - 更新成功:', data);
             return data
         } catch (error) {
-            console.error('databaseService.updatePlan - 捕获到异常:', {
-                error: error,
-                errorType: typeof error,
-                errorConstructor: error?.constructor?.name,
-                errorMessage: error instanceof Error ? error.message : String(error),
-                errorStack: error instanceof Error ? error.stack : '无堆栈信息'
-            });
             throw error;
         }
     },
@@ -245,13 +185,6 @@ export const planService = {
             .eq('user_id', userId)
 
         if (error) {
-            console.error('删除计划数据库错误:', {
-                planId: id,
-                userId,
-                error: error.message,
-                details: error.details,
-                hint: error.hint
-            });
             throw error;
         }
     }
@@ -275,7 +208,7 @@ export const knowledgeService = {
                 return false;
             }
 
-            console.log('数据库连接测试成功');
+
             return true;
         } catch (error) {
             console.error('数据库连接测试异常:', error);
@@ -362,15 +295,6 @@ export const knowledgeService = {
             .single()
 
         if (error) {
-            console.error('知识点上传错误:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code,
-                data: knowledgeData,
-                userId: userId,
-                fullError: error
-            })
             throw new Error(`知识点上传失败: ${error.message || '未知错误'}`)
         }
         return data
@@ -390,10 +314,7 @@ export const knowledgeService = {
         // 检查知识点是否存在
         const knowledgeExists = await this.checkKnowledgeExists(id);
         if (!knowledgeExists) {
-            console.log('databaseService.updateKnowledge - 知识点不存在，尝试创建新记录:', {
-                knowledgeId: id,
-                userId: userId
-            });
+
 
             // 如果知识点不存在，尝试创建新记录
             try {
@@ -418,18 +339,10 @@ export const knowledgeService = {
                     .single()
 
                 if (error) {
-                    console.error('databaseService.updateKnowledge - 创建知识点失败:', {
-                        error: error.message,
-                        code: error.code,
-                        knowledgeData: knowledgeData
-                    });
                     throw new Error(`创建知识点失败: ${error.message}`);
                 }
-
-                console.log('databaseService.updateKnowledge - 知识点创建成功:', data);
                 return data;
             } catch (error) {
-                console.error('databaseService.updateKnowledge - 创建知识点异常:', error);
                 throw new Error(`知识点不存在且无法创建: ${error instanceof Error ? error.message : String(error)}`);
             }
         }
@@ -461,7 +374,7 @@ export const knowledgeService = {
                 if (!isNaN(dateValue.getTime())) {
                     updateData.date = dateValue.toISOString().split('T')[0]; // YYYY-MM-DD 格式
                 } else {
-                    console.warn('databaseService.updateKnowledge - 无效的日期格式:', updateData.date);
+
                     delete updateData.date;
                 }
             }
@@ -548,8 +461,6 @@ export const knowledgeService = {
 
         // 如果方法1失败，尝试方法2：使用更简单的查询
         if (error && error.code === '406') {
-            console.log('databaseService.updateKnowledge - 方法1失败，尝试方法2');
-
             // 先检查记录是否存在
             const { data: existingData, error: checkError } = await supabase
                 .from('knowledge')
@@ -558,7 +469,6 @@ export const knowledgeService = {
                 .eq('user_id', userId)
 
             if (checkError) {
-                console.error('databaseService.updateKnowledge - 检查记录存在性失败:', checkError);
                 throw new Error(`知识点不存在或无法访问: ${checkError.message}`);
             }
 
@@ -580,20 +490,8 @@ export const knowledgeService = {
         }
 
         if (error) {
-            console.error('知识点更新错误:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code,
-                updateData: updateData,
-                knowledgeId: id,
-                userId: userId,
-                fullError: error
-            });
             throw new Error(`知识点更新失败: ${error.message || '未知错误'}`);
         }
-
-        console.log('databaseService.updateKnowledge - 更新成功:', data);
         return data
     },
 
@@ -609,13 +507,6 @@ export const knowledgeService = {
             .eq('user_id', userId)
 
         if (error) {
-            console.error('删除知识点数据库错误:', {
-                knowledgeId: id,
-                userId,
-                error: error.message,
-                details: error.details,
-                hint: error.hint
-            });
             throw error;
         }
     }

@@ -91,10 +91,21 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
 
     // 定义表格列配置
     const columns = [
-        { key: 'moduleName', label: '模块' },
+        {
+            key: 'moduleName',
+            label: (
+                <div className="flex items-center gap-1">
+                    <span>模块</span>
+                </div>
+            )
+        },
         {
             key: 'avgSpm',
-            label: '平均每分钟得分',
+            label: (
+                <div className="flex items-center gap-1">
+                    <span>平均每分钟得分</span>
+                </div>
+            ),
             render: (row: PredictionDetail) => (
                 <span className="font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                     {row.avgSpm}
@@ -103,15 +114,33 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
         },
         {
             key: 'timeAllocation',
-            label: '分配时间',
+            label: (
+                <div className="flex items-center gap-1">
+                    <span>分配时间</span>
+                </div>
+            ),
             render: (row: PredictionDetail) => (
                 <span className="font-bold bg-gradient-to-r from-green-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent">
                     {minutesToTimeString(parseFloat(row.timeAllocation))}
                 </span>
             )
         },
-        { key: 'predictedScore', label: '预测得分' },
-        { key: 'maxScore', label: '满分' }
+        {
+            key: 'predictedScore',
+            label: (
+                <div className="flex items-center gap-1">
+                    <span>预测得分</span>
+                </div>
+            )
+        },
+        {
+            key: 'maxScore',
+            label: (
+                <div className="flex items-center gap-1">
+                    <span>满分</span>
+                </div>
+            )
+        }
     ];
 
     return (

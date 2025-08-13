@@ -57,7 +57,11 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                 return [
                     {
                         key: 'type',
-                        label: '类型',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>类型</span>
+                            </div>
+                        ),
                         className: 'w-24',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
@@ -72,14 +76,34 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             );
                         }
                     },
-                    { key: 'note', label: '技巧记录', className: 'w-48' },
+                    {
+                        key: 'note',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>技巧记录</span>
+                            </div>
+                        ),
+                        className: 'w-48'
+                    },
                 ];
             case 'logic':
                 return [
-                    { key: 'subCategory', label: '推理类型', className: 'w-20' },
+                    {
+                        key: 'subCategory',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>推理类型</span>
+                            </div>
+                        ),
+                        className: 'w-20'
+                    },
                     {
                         key: 'type',
-                        label: '类型',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>类型</span>
+                            </div>
+                        ),
                         className: 'w-24',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
@@ -94,14 +118,34 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             );
                         }
                     },
-                    { key: 'note', label: '技巧记录', className: 'w-52' },
+                    {
+                        key: 'note',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>技巧记录</span>
+                            </div>
+                        ),
+                        className: 'w-52'
+                    },
                 ];
             case 'common':
                 return [
-                    { key: 'subCategory', label: '常识类型', className: 'w-20' },
+                    {
+                        key: 'subCategory',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>常识类型</span>
+                            </div>
+                        ),
+                        className: 'w-20'
+                    },
                     {
                         key: 'type',
-                        label: '类型',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>类型</span>
+                            </div>
+                        ),
                         className: 'w-24',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
@@ -116,19 +160,75 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             );
                         }
                     },
-                    { key: 'note', label: '技巧记录', className: 'w-52' },
+                    {
+                        key: 'note',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>技巧记录</span>
+                            </div>
+                        ),
+                        className: 'w-52'
+                    },
                 ];
             case 'politics':
                 return [
-                    { key: 'date', label: '发布日期', className: 'w-24' },
-                    { key: 'source', label: '文件来源', className: 'w-32' },
-                    { key: 'note', label: '相关重点', className: 'w-48' },
+                    {
+                        key: 'date',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>发布日期</span>
+                            </div>
+                        ),
+                        className: 'w-24'
+                    },
+                    {
+                        key: 'source',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>文件来源</span>
+                            </div>
+                        ),
+                        className: 'w-32'
+                    },
+                    {
+                        key: 'note',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>相关重点</span>
+                            </div>
+                        ),
+                        className: 'w-48'
+                    },
                 ];
             case 'verbal':
                 return [
-                    { key: 'subCategory', label: '言语类型', className: 'w-20' },
-                    { key: 'type', label: '类型', className: 'w-24' },
-                    { key: 'note', label: '技巧记录', className: 'w-52' },
+                    {
+                        key: 'subCategory',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>言语类型</span>
+                            </div>
+                        ),
+                        className: 'w-20'
+                    },
+                    {
+                        key: 'type',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>类型</span>
+                            </div>
+                        ),
+                        className: 'w-24'
+                    },
+                    {
+                        key: 'note',
+                        label: (
+                            <div className="flex items-center gap-1">
+                                <span>技巧记录</span>
+                            </div>
+                        ),
+                        className: 'w-52'
+                    },
                 ];
             default:
                 return [];
@@ -149,8 +249,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editItem, setEditItem] = useState<KnowledgeItem | null>(null);
     const [editError, setEditError] = useState("");
-    const [singleDeleteDialogOpen, setSingleDeleteDialogOpen] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<KnowledgeItem | null>(null);
 
     // 当模块改变时，重置子分类选择
     useEffect(() => {
@@ -232,29 +330,17 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     }, [knowledge, selectedModule, selectedSubCategory, search, page, pageSize]);
 
     const handleDeleteSelected = () => {
-        console.log('handleDeleteSelected called with selectedRows:', selectedRows);
         if (selectedRows.length === 0) {
             return;
         }
         if (!onBatchDeleteKnowledge) {
-            console.log('onBatchDeleteKnowledge is not provided');
             return;
         }
         onBatchDeleteKnowledge(selectedRows);
         setSelectedRows([]);
     };
 
-    const handleSingleDelete = (item: KnowledgeItem) => {
-        setItemToDelete(item);
-        setSingleDeleteDialogOpen(true);
-    };
 
-    const handleConfirmSingleDelete = () => {
-        if (!onBatchDeleteKnowledge || !itemToDelete) return;
-        onBatchDeleteKnowledge([itemToDelete.id]);
-        setSingleDeleteDialogOpen(false);
-        setItemToDelete(null);
-    };
 
     const handleEdit = (item?: KnowledgeItem) => {
         if (item) {
@@ -389,24 +475,12 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 onSelect={(v: string[]) => setSelectedRows(v)}
                 rowKey={(row) => row.id}
                 checkboxColClassName="w-6"
-                contextMenuItems={[
-                    {
-                        label: "编辑",
-                        icon: <Edit className="w-5 h-5" />,
-                        onClick: (item: KnowledgeItem) => handleEdit(item),
-                    },
-                    {
-                        label: "删除",
-                        icon: <Trash2 className="w-5 h-5" />,
-                        onClick: (item: KnowledgeItem) => handleSingleDelete(item),
-                        variant: "destructive",
-                    },
-                ]}
                 filters={filters}
                 pagination={{
                     currentPage: page,
                     totalPages,
-                    onPageChange: setPage
+                    onPageChange: setPage,
+                    totalItems: knowledge.length
                 }}
                 showExport={true}
                 onExport={handleExportExcel}
@@ -444,26 +518,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     ) : null}
                 </SimpleDialogContent>
             </SimpleDialog>
-            {/* 单个删除确认弹窗 */}
-            <AlertDialog open={singleDeleteDialogOpen} onOpenChange={setSingleDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
-                        <AlertDialogDescription>
-                            您确定要删除这个知识点吗？此操作无法撤销。
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => { setSingleDeleteDialogOpen(false); setItemToDelete(null); }}><MixedText text="取消" /></AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={handleConfirmSingleDelete}
-                            className="bg-red-600 hover:bg-red-700 text-white"
-                        >
-                            <MixedText text="确认删除" />
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+
 
         </div>
     );

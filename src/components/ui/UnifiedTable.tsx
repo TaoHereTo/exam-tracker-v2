@@ -77,6 +77,7 @@ export interface UnifiedTableProps<T, K extends string | number = string | numbe
         currentPage: number;
         totalPages: number;
         onPageChange: (page: number) => void;
+        totalItems?: number;
     };
 
     // 预设操作
@@ -184,7 +185,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border-b px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${col.className || ''}`}>
+                            <th key={col.key} className={`border-b px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 font-semibold ${col.className || ''}`}>
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
@@ -479,6 +480,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 currentPage={pagination.currentPage}
                                 totalPages={pagination.totalPages}
                                 onPageChange={pagination.onPageChange}
+                                totalItems={pagination.totalItems}
                             />
                         </div>
                     )}

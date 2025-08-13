@@ -74,6 +74,16 @@ th {
   font-family: '思源宋体', 'Times New Roman', serif;
 }
 
+/* 表格标题字体粗细设置 */
+th {
+  font-weight: 600 !important;
+}
+
+/* 确保表格标题中的MixedText组件也保持加粗 */
+th .mixed-text-part {
+  font-weight: 600 !important;
+}
+
 /* 标题字体设置 */
 label,
 h1,
@@ -971,7 +981,7 @@ html,
 
 /* 子项按钮样式 - 去掉缩进 */
 [data-slot="sidebar-menu-button"] {
-  transition: all 0.2s ease-in-out;
+  transition: none;
   position: relative;
   border-radius: 0.5rem;
   margin: 0.125rem 0.25rem;
@@ -1066,8 +1076,7 @@ html,
 }
 
 [data-slot="sidebar-menu-button"]:active {
-  transform: translateX(1px) scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  /* 移除按下去的动效 */
 }
 
 /* 浅色模式下的选中状态 */

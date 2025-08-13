@@ -160,7 +160,7 @@ export class AutoCloudSync {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(plan.id);
 
             if (!isUUID) {
-                console.log('跳过云端更新 - 非UUID格式的计划ID:', plan.id);
+
                 notify({
                     type: 'warning',
                     message: '本地更新成功',
@@ -169,21 +169,7 @@ export class AutoCloudSync {
                 return;
             }
 
-            console.log('开始更新计划到云端:', {
-                planId: plan.id,
-                planName: plan.name,
-                planData: {
-                    name: plan.name,
-                    module: plan.module,
-                    type: plan.type,
-                    startDate: plan.startDate,
-                    endDate: plan.endDate,
-                    target: plan.target,
-                    progress: plan.progress,
-                    status: plan.status,
-                    description: plan.description
-                }
-            });
+
 
             // 直接更新，不进行查重检查
             const result = await planService.updatePlan(plan.id, {
@@ -198,7 +184,7 @@ export class AutoCloudSync {
                 description: plan.description
             });
 
-            console.log('计划更新成功:', result);
+
 
             notify({
                 type: 'success',

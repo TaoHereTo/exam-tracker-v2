@@ -15,6 +15,7 @@ interface BeautifulPaginationProps {
     onPageChange: (page: number) => void
     className?: string
     showPageInfo?: boolean
+    totalItems?: number
 }
 
 export function BeautifulPagination({
@@ -23,6 +24,7 @@ export function BeautifulPagination({
     onPageChange,
     className,
     showPageInfo = true,
+    totalItems,
 }: BeautifulPaginationProps) {
     const canGoPrevious = currentPage > 1
     const canGoNext = currentPage < totalPages
@@ -47,14 +49,16 @@ export function BeautifulPagination({
         onPageChange(totalPages)
     }
 
-
-
     return (
         <div className={cn("flex items-center justify-end gap-4 w-full", className)}>
             {/* 页码信息 */}
             {showPageInfo && (
                 <div className="text-sm font-semibold text-muted-foreground">
-                    第 {currentPage} 页，共 {totalPages} 页
+                    {totalItems !== undefined ? (
+                        <>第 {currentPage} 页，共 {totalPages} 页，总计 {totalItems} 条记录</>
+                    ) : (
+                        <>第 {currentPage} 页，共 {totalPages} 页</>
+                    )}
                 </div>
             )}
 

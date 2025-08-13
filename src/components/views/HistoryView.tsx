@@ -14,6 +14,7 @@ interface ExerciseRecordViewProps {
     historyPage: number;
     setHistoryPage: (n: number) => void;
     totalPages: number;
+    totalRecords: number;
 }
 
 export function ExerciseRecordView({
@@ -24,6 +25,7 @@ export function ExerciseRecordView({
     historyPage,
     setHistoryPage,
     totalPages,
+    totalRecords,
 }: ExerciseRecordViewProps) {
 
     return (
@@ -83,7 +85,8 @@ export function ExerciseRecordView({
                 pagination={{
                     currentPage: historyPage,
                     totalPages,
-                    onPageChange: setHistoryPage
+                    onPageChange: setHistoryPage,
+                    totalItems: totalRecords
                 }}
                 onBatchDelete={onBatchDelete}
                 batchDeleteText="批量删除"

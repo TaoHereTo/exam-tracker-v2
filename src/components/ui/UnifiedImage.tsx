@@ -287,7 +287,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
                                     {/* 按钮区域 */}
                                     <div
-                                        className="flex flex-col sm:flex-row gap-2 w-full max-w-80"
+                                        className="flex flex-col sm:flex-row gap-1 w-full max-w-80"
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         {/* 本地选择按钮 */}

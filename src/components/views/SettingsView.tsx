@@ -165,10 +165,7 @@ export function SettingsView({
 
 
 
-    console.log('SettingsView - activeTab:', activeTab);
-
     if (activeTab === 'settings-advanced') {
-        console.log('显示高级设置页面');
         return (
             <>
                 <AdvancedSetting />
@@ -196,7 +193,6 @@ export function SettingsView({
                                                         size="icon"
                                                         className="h-9 w-9"
                                                         onClick={() => {
-                                                            console.log('清空本地数据按钮被点击了');
                                                             setClearDataDialogOpen(true);
                                                         }}
                                                     >
@@ -220,12 +216,8 @@ export function SettingsView({
                                             <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
                                             <AlertDialogAction
                                                 onClick={() => {
-                                                    console.log('AlertDialogAction onClick 被触发');
-                                                    console.log('onClearLocalData:', onClearLocalData);
                                                     if (onClearLocalData) {
                                                         onClearLocalData();
-                                                    } else {
-                                                        console.error('onClearLocalData 是 undefined');
                                                     }
                                                     setClearDataDialogOpen(false);
                                                 }}
@@ -333,8 +325,6 @@ export function SettingsView({
                                     <div className="text-xs text-gray-600 mb-1">
                                         <span><MixedText text={`上传进度 ${uploadProgress.current}/${uploadProgress.total}`} /></span>
                                     </div>
-
-
 
                                     <div className="flex items-center gap-2">
                                         <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
