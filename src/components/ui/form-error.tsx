@@ -33,7 +33,7 @@ export function FormError({ error, className }: FormErrorProps) {
             if (timerRef.current) window.clearTimeout(timerRef.current);
             timerRef.current = window.setTimeout(() => {
                 setVisible(false);
-            }, 3000);
+            }, 5000);
         } else {
             setVisible(false);
         }

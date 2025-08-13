@@ -396,7 +396,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 size="icon"
                                                 className="h-9 w-9"
                                             >
-                                                <FileSpreadsheet className="w-5 h-5" />
+                                                <Upload className="w-5 h-5" />
                                             </Button>
                                         </TooltipTrigger>
                                         <TooltipContent>
