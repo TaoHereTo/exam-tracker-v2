@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { Download, Upload, FileSpreadsheet } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
@@ -31,7 +31,7 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
                             size="icon"
                             className="h-9 w-9"
                         >
-                            <FileSpreadsheet className="w-5 h-5" />
+                            <Upload className="w-5 h-5" />
                         </Button>
                     </TooltipTrigger>
                     <TooltipContent>

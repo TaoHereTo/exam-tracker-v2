@@ -39,7 +39,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, []);
 
     const notify = useCallback((n: Omit<Notification, "id">) => {
-        const id = Date.now().toString() + Math.random().toString(16).slice(2);
+        const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         setNotifications((prev) => [{ ...n, id }, ...prev]);
         timerRef.current[id] = setTimeout(() => remove(id), 3000);
     }, [remove]);

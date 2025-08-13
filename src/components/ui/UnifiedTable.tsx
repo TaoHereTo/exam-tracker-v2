@@ -431,10 +431,10 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {/* 删除按钮 */}
                             {showDelete && onDelete && (
                                 <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <AlertDialogTrigger asChild>
                                                     <Button
                                                         disabled={deleteDisabled}
                                                         variant="outline"
@@ -443,13 +443,13 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                     >
                                                         <Trash2 className="w-5 h-5" />
                                                     </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p><MixedText text="批量删除" /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </AlertDialogTrigger>
+                                                </AlertDialogTrigger>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p><MixedText text="批量删除" /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                     <AlertDialogContent>
                                         <AlertDialogHeader>
                                             <AlertDialogTitle><MixedText text="确认批量删除？" /></AlertDialogTitle>
@@ -459,7 +459,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                            <AlertDialogAction onClick={onDelete} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                            <AlertDialogAction onClick={() => onDelete()} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

@@ -339,19 +339,6 @@ export class AutoCloudSync {
      */
     static async autoDeletePlan(planId: string, notify: ReturnType<typeof useNotification>['notify']) {
         try {
-            // 检查计划ID是否为UUID格式
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(planId);
-
-            if (!isUUID) {
-                console.log('跳过云端删除 - 非UUID格式的计划ID:', planId);
-                notify({
-                    type: 'warning',
-                    message: '本地删除成功',
-                    description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
-                });
-                return;
-            }
-
             await planService.deletePlan(planId);
             notify({
                 type: 'success',

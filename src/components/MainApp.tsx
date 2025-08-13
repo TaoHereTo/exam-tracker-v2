@@ -484,16 +484,26 @@ export function MainApp() {
     };
 
     const handleBatchDeleteKnowledge = async (ids: string[]) => {
-        setKnowledge(prev => prev.filter(item => !ids.includes(item.id)));
+        console.log('MainApp - handleBatchDeleteKnowledge called with ids:', ids);
+
+        // 先更新本地数据
+        setKnowledge(prev => {
+            const filtered = prev.filter(item => !ids.includes(item.id));
+            console.log('MainApp - filtered knowledge from', prev.length, 'to', filtered.length);
+            return filtered;
+        });
 
         // 批量从云端删除，只删除UUID格式的ID（新格式）
         for (const id of ids) {
             if (isUUID(id)) {
+                console.log('MainApp - deleting from cloud:', id);
                 await AutoCloudSync.autoDeleteKnowledge(id, notify);
             } else {
-
+                console.log('MainApp - skipping non-UUID id:', id);
             }
         }
+
+        console.log('MainApp - batch delete completed');
     };
 
     const handleEditKnowledge = async (item: KnowledgeItem) => {

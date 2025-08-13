@@ -182,19 +182,35 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
     const activePlans = plans.filter(plan => plan.status !== "已完成");
     const completedPlans = plans.filter(plan => plan.status === "已完成");
 
-    // 获取状态图标
+    // 获取状态图标和颜色
     const getStatusIcon = (status: StudyPlan["status"]) => {
         switch (status) {
             case "已完成":
-                return <CheckCircle className="w-5 h-5 text-green-500" />;
+                return <CheckCircle className="w-5 h-5" style={{ color: '#0284c7' }} />;
             case "进行中":
-                return <Clock className="w-5 h-5 text-blue-500" />;
+                return <Clock className="w-5 h-5" style={{ color: '#10b981' }} />;
             case "未开始":
                 return <Clock className="w-5 h-5 text-gray-500" />;
             case "未达成":
                 return <AlertCircle className="w-5 h-5 text-red-500" />;
             default:
                 return <Clock className="w-5 h-5 text-gray-500" />;
+        }
+    };
+
+    // 获取状态显示文本
+    const getStatusText = (status: StudyPlan["status"]) => {
+        switch (status) {
+            case "已完成":
+                return "已完成";
+            case "进行中":
+                return "进行中";
+            case "未开始":
+                return "未开始";
+            case "未达成":
+                return "未达成";
+            default:
+                return status;
         }
     };
 
@@ -219,17 +235,19 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     variant={!showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(false)}
                     className="flex items-center gap-2"
+                    style={!showCompleted ? { backgroundColor: '#10b981' } : {}}
                 >
                     <Clock className="w-5 h-5" />
-                    <MixedText text={`进行中的计划 (${activePlans.length})`} />
+                    <MixedText text="进行中" />
                 </Button>
                 <Button
                     variant={showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(true)}
                     className="flex items-center gap-2"
+                    style={showCompleted ? { backgroundColor: '#0284c7' } : {}}
                 >
                     <CheckCircle className="w-5 h-5" />
-                    <MixedText text={`已完成的计划 (${completedPlans.length})`} />
+                    <MixedText text="已完成" />
                 </Button>
             </div>
 
@@ -262,15 +280,24 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                             </Tooltip>
                                         </TooltipProvider>
                                         <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="h-9 w-9"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </Button>
-                                            </AlertDialogTrigger>
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-9 w-9"
+                                                            >
+                                                                <Trash2 className="w-5 h-5" />
+                                                            </Button>
+                                                        </AlertDialogTrigger>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="删除" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
                                             <AlertDialogContent>
                                                 <AlertDialogHeader>
                                                     <AlertDialogTitle><MixedText text="确认删除计划？" /></AlertDialogTitle>
@@ -292,6 +319,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                     <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
                                     <div className="text-xs text-gray-500 break-words">
                                         <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
+                                    </div>
+                                    <div className="text-xs break-words">
+                                        <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
+                                            <MixedText text={`状态：${getStatusText(plan.status)}`} />
+                                        </span>
                                     </div>
                                     {plan.description && (
                                         <div className="text-xs text-gray-400 line-clamp-3 break-words"><MixedText text={plan.description} /></div>

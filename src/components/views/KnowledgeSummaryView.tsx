@@ -232,7 +232,14 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     }, [knowledge, selectedModule, selectedSubCategory, search, page, pageSize]);
 
     const handleDeleteSelected = () => {
-        if (!onBatchDeleteKnowledge) return;
+        console.log('handleDeleteSelected called with selectedRows:', selectedRows);
+        if (selectedRows.length === 0) {
+            return;
+        }
+        if (!onBatchDeleteKnowledge) {
+            console.log('onBatchDeleteKnowledge is not provided');
+            return;
+        }
         onBatchDeleteKnowledge(selectedRows);
         setSelectedRows([]);
     };
@@ -457,6 +464,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+
         </div>
     );
 };
