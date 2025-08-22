@@ -47,7 +47,7 @@ function DropdownMenuGroup({
 
 function DropdownMenuItem({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Item>) {
   return (
-    <DropdownMenuPrimitive.Item className={cn("relative flex cursor-default select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-left", className)} {...props}>
+    <DropdownMenuPrimitive.Item data-slot="dropdown-menu-item" className={cn("relative flex cursor-default select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-left", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </DropdownMenuPrimitive.Item>
   )

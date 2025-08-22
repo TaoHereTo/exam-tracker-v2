@@ -1037,6 +1037,45 @@ html,
   padding-right: 1rem !important;
 }
 
+/* 确保下拉菜单项内图标和文字间距正确 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.375rem 0.5rem !important;
+}
+
+/* 修复下拉菜单中图标占用空间过大的问题 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] svg {
+  width: 1rem !important;
+  height: 1rem !important;
+  flex-shrink: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* 确保下拉菜单中的文本正常显示，不受侧边栏收起状态影响 */
+[data-slot="dropdown-menu-content"] span {
+  opacity: 1 !important;
+  transform: none !important;
+  max-width: none !important;
+  pointer-events: auto !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
+}
+
+/* 强制覆盖任何可能影响下拉菜单图标布局的样式 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] > svg:first-child {
+  min-width: 1rem !important;
+  max-width: 1rem !important;
+}
+
+/* 确保图标后的内容紧贴图标，不留多余空间 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] > svg + * {
+  margin-left: 0.5rem !important;
+  flex: 1 !important;
+}
+
 /* 展开状态下的菜单按钮样式 */
 [data-slot="sidebar"][data-state="expanded"] [data-slot="sidebar-menu-button"] {
   padding-left: 1.25rem !important;

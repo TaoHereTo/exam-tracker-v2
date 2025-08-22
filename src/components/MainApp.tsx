@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
-import { SidebarTrigger, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarTrigger, SidebarProvider, useSidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { SettingsView } from "@/components/views/SettingsView";
 import { useImportExport } from "@/hooks/useImportExport";
 import { OverviewView } from "@/components/views/OverviewView";
@@ -20,7 +20,7 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy } from "lucide-react";
+import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronUp } from "lucide-react";
 import { generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 
@@ -215,109 +215,83 @@ export function MainApp() {
 
     // 用户信息显示组件 - 侧边栏版本
     const SidebarUserInfo = () => {
-        const [isHovered, setIsHovered] = useState(false);
         const [isOpen, setIsOpen] = useState(false);
+        const { state } = useSidebar();
+        const isCollapsed = state === 'collapsed';
 
         return (
-            <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
-                <DropdownMenuTrigger asChild>
-                    <div
-                        className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 ${isHovered || isOpen
-                            ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
-                            : ''
-                            }`}
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => {
-                            setIsHovered(false);
-                            // 延迟关闭，给用户时间移动到下拉菜单
-                            setTimeout(() => {
-                                if (!isHovered) {
-                                    setIsOpen(false);
-                                }
-                            }, 100);
-                        }}
-                    >
-                        <GlobeAvatar size="md" className="group-data-[collapsible=icon]:group-data-[state=collapsed]:!w-12 group-data-[collapsible=icon]:group-data-[state=collapsed]:!h-12" />
-                        <div className="flex flex-col flex-1 justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex flex-col flex-1 justify-center">
-                                        <MixedText
-                                            text={userProfile?.display_name || userProfile?.username || user?.email || ''}
-                                            className={`text-sm font-medium transition-colors ${isHovered || isOpen
-                                                ? 'text-gray-700 dark:text-gray-200'
-                                                : 'text-gray-900 dark:text-gray-100'
-                                                }`}
-                                        />
-                                        <MixedText
-                                            text={user?.email || ''}
-                                            className={`text-xs transition-colors ${isHovered || isOpen
-                                                ? 'text-gray-600 dark:text-gray-300'
-                                                : 'text-gray-500 dark:text-gray-400'
-                                                }`}
-                                        />
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                        <DropdownMenuTrigger asChild>
+                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="truncate font-semibold">
+                                        <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
+                                    </span>
+                                    <span className="truncate text-xs">
+                                        <MixedText text={user?.email || ''} />
+                                    </span>
+                                </div>
+                                <ChevronUp className="ml-auto size-4" />
+                            </SidebarMenuButton>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            className="w-32 min-w-32 rounded-lg"
+                            side={isCollapsed ? "top" : "bottom"}
+                            align={isCollapsed ? "start" : "end"}
+                            sideOffset={isCollapsed ? 8 : 4}
+                            alignOffset={isCollapsed ? 40 : 0}
+                        >
+                            <DropdownMenuLabel className="p-0 font-normal">
+                                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                                    <GlobeAvatar size="sm" />
+                                    <div className="grid flex-1 text-left text-sm leading-tight">
+                                        <span className="truncate font-semibold">
+                                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
+                                        </span>
+                                        <span className="truncate text-xs">
+                                            <MixedText text={userProfile?.bio || '座右铭'} />
+                                        </span>
                                     </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                    <p>点击展开菜单</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
-                    </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    align="start"
-                    side="bottom"
-                    sideOffset={5}
-                    className="w-48 text-left"
-                    onMouseEnter={() => setIsHovered(true)}
-                    onMouseLeave={() => {
-                        setIsHovered(false);
-                        setIsOpen(false);
-                    }}
-                >
-                    <DropdownMenuLabel>
-                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                        </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                            <MixedText text={userProfile?.bio || '座右铭'} />
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    {/* 仅在 Dock 模式下显示：数据概览 / 最佳成绩（图标 + 文本） */}
-                    {navMode === 'dock' && (
-                        <>
-                            <DropdownMenuItem onClick={() => setActiveTab('overview')} className="justify-start">
-                                <PieChart className="h-4 w-4 mr-2 flex-shrink-0" />
-                                <MixedText text="数据概览" />
+                                </div>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {/* 仅在 Dock 模式下显示：数据概览 / 最佳成绩（图标 + 文本） */}
+                            {navMode === 'dock' && (
+                                <>
+                                    <DropdownMenuItem onClick={() => setActiveTab('overview')}>
+                                        <PieChart className="h-4 w-4 mr-2" />
+                                        <MixedText text="数据概览" />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
+                                        <Trophy className="h-4 w-4 mr-2" />
+                                        <MixedText text="最佳成绩" />
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                </>
+                            )}
+                            <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
+                                <User className="h-4 w-4 mr-2" />
+                                <MixedText text="个人资料" />
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setActiveTab('personal-best')} className="justify-start">
-                                <Trophy className="h-4 w-4 mr-2 flex-shrink-0" />
-                                <MixedText text="最佳成绩" />
+                            <DropdownMenuItem onClick={() => setActiveTab('settings')}>
+                                <Settings className="h-4 w-4 mr-2" />
+                                <MixedText text="基础设置" />
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
+                                <SlidersHorizontal className="h-4 w-4 mr-2" />
+                                <MixedText text="高级设置" />
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                        </>
-                    )}
-                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)} className="justify-start">
-                        <User className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <MixedText text="个人资料" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings')} className="justify-start">
-                        <Settings className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <MixedText text="基础设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="justify-start">
-                        <SlidersHorizontal className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <MixedText text="高级设置" />
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 justify-start">
-                        <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
-                        <MixedText text="退出登录" />
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+                            <DropdownMenuItem onClick={handleSignOutClick}>
+                                <LogOut className="h-4 w-4 mr-2" />
+                                <MixedText text="退出登录" />
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </SidebarMenuItem>
+            </SidebarMenu>
         );
     };
 

@@ -156,9 +156,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
             {/* 用户信息区域 */}
             {userInfo && (
                 <SidebarFooter>
-                    <div className="flex items-center gap-3 px-2">
-                        {userInfo}
-                    </div>
+                    {userInfo}
                 </SidebarFooter>
             )}
             <SidebarRail />
