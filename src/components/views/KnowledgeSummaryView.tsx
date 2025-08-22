@@ -83,7 +83,15 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-48'
+                        className: 'w-48',
+                        render: (row: KnowledgeItem) => {
+                            const note = (row as Record<string, unknown>).note as string;
+                            return (
+                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                    <MixedText text={note || ''} />
+                                </div>
+                            );
+                        }
                     },
                 ];
             case 'logic':
@@ -125,7 +133,15 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52'
+                        className: 'w-52',
+                        render: (row: KnowledgeItem) => {
+                            const note = (row as Record<string, unknown>).note as string;
+                            return (
+                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                    <MixedText text={note || ''} />
+                                </div>
+                            );
+                        }
                     },
                 ];
             case 'common':
@@ -167,7 +183,15 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52'
+                        className: 'w-52',
+                        render: (row: KnowledgeItem) => {
+                            const note = (row as Record<string, unknown>).note as string;
+                            return (
+                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                    <MixedText text={note || ''} />
+                                </div>
+                            );
+                        }
                     },
                 ];
             case 'politics':
@@ -197,7 +221,15 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>相关重点</span>
                             </div>
                         ),
-                        className: 'w-48'
+                        className: 'w-48',
+                        render: (row: KnowledgeItem) => {
+                            const note = (row as Record<string, unknown>).note as string;
+                            return (
+                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                    <MixedText text={note || ''} />
+                                </div>
+                            );
+                        }
                     },
                 ];
             case 'verbal':
@@ -227,7 +259,15 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52'
+                        className: 'w-52',
+                        render: (row: KnowledgeItem) => {
+                            const note = (row as Record<string, unknown>).note as string;
+                            return (
+                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                    <MixedText text={note || ''} />
+                                </div>
+                            );
+                        }
                     },
                 ];
             default:

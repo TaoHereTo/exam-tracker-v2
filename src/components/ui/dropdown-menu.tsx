@@ -31,7 +31,7 @@ function DropdownMenuTrigger({ className, children, ...props }: React.ComponentP
 
 function DropdownMenuContent({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
-    <DropdownMenuPrimitive.Content className={cn("z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2", className)} {...props}>
+    <DropdownMenuPrimitive.Content data-slot="dropdown-menu-content" className={cn("z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 text-left", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </DropdownMenuPrimitive.Content>
   )
@@ -47,7 +47,7 @@ function DropdownMenuGroup({
 
 function DropdownMenuItem({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Item>) {
   return (
-    <DropdownMenuPrimitive.Item className={cn("relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className)} {...props}>
+    <DropdownMenuPrimitive.Item className={cn("relative flex cursor-default select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-left", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </DropdownMenuPrimitive.Item>
   )
@@ -89,7 +89,7 @@ function DropdownMenuRadioItem({ className, children, ...props }: React.Componen
 
 function DropdownMenuLabel({ className, children, ...props }: React.ComponentProps<typeof DropdownMenuPrimitive.Label>) {
   return (
-    <DropdownMenuPrimitive.Label className={cn("px-2 py-1.5 text-sm font-semibold", className)} {...props}>
+    <DropdownMenuPrimitive.Label className={cn("px-2 py-1.5 text-sm font-semibold text-left", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </DropdownMenuPrimitive.Label>
   )

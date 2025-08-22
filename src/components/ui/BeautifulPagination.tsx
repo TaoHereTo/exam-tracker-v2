@@ -8,6 +8,7 @@ import {
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface BeautifulPaginationProps {
     currentPage: number
@@ -63,55 +64,85 @@ export function BeautifulPagination({
             )}
 
             {/* 分页按钮组 */}
-            <div className="flex items-center gap-2">
-                {/* 第一页按钮 */}
-                <Button
-                    variant="pagination"
-                    size="icon"
-                    onClick={handleFirst}
-                    disabled={!canGoPrevious}
-                    className="h-8 w-8 p-0"
-                    aria-label="Go to first page"
-                >
-                    <ChevronsLeftIcon className="h-4 w-4" />
-                </Button>
+            <TooltipProvider>
+                <div className="flex items-center gap-2">
+                    {/* 第一页按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="pagination"
+                                size="icon"
+                                onClick={handleFirst}
+                                disabled={!canGoPrevious}
+                                className="h-8 w-8 p-0"
+                                aria-label="Go to first page"
+                            >
+                                <ChevronsLeftIcon className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>第一页</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                {/* 上一页按钮 */}
-                <Button
-                    variant="pagination"
-                    size="icon"
-                    onClick={handlePrevious}
-                    disabled={!canGoPrevious}
-                    className="h-8 w-8 p-0"
-                    aria-label="Go to previous page"
-                >
-                    <ChevronLeftIcon className="h-4 w-4" />
-                </Button>
+                    {/* 上一页按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="pagination"
+                                size="icon"
+                                onClick={handlePrevious}
+                                disabled={!canGoPrevious}
+                                className="h-8 w-8 p-0"
+                                aria-label="Go to previous page"
+                            >
+                                <ChevronLeftIcon className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>上一页</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                {/* 下一页按钮 */}
-                <Button
-                    variant="pagination"
-                    size="icon"
-                    onClick={handleNext}
-                    disabled={!canGoNext}
-                    className="h-8 w-8 p-0"
-                    aria-label="Go to next page"
-                >
-                    <ChevronRightIcon className="h-4 w-4" />
-                </Button>
+                    {/* 下一页按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="pagination"
+                                size="icon"
+                                onClick={handleNext}
+                                disabled={!canGoNext}
+                                className="h-8 w-8 p-0"
+                                aria-label="Go to next page"
+                            >
+                                <ChevronRightIcon className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>下一页</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                {/* 最后一页按钮 */}
-                <Button
-                    variant="pagination"
-                    size="icon"
-                    onClick={handleLast}
-                    disabled={!canGoNext}
-                    className="h-8 w-8 p-0"
-                    aria-label="Go to last page"
-                >
-                    <ChevronsRightIcon className="h-4 w-4" />
-                </Button>
-            </div>
+                    {/* 最后一页按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="pagination"
+                                size="icon"
+                                onClick={handleLast}
+                                disabled={!canGoNext}
+                                className="h-8 w-8 p-0"
+                                aria-label="Go to last page"
+                            >
+                                <ChevronsRightIcon className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>最后一页</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </TooltipProvider>
         </div>
     )
 }

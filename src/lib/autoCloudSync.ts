@@ -5,7 +5,7 @@ import { normalizeModuleName } from '@/config/exam';
 
 export class AutoCloudSync {
     /**
-     * 自动保存刷题记录到云端
+     * 自动保存刷题历史到云端
      */
     static async autoSaveRecord(record: RecordItem, notify: ReturnType<typeof useNotification>['notify']) {
         try {
@@ -58,12 +58,7 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             const errorDetails = error instanceof Error ? error.stack : '无详细信息';
 
-            console.error('自动保存计划到云端失败:', {
-                error: errorMessage,
-                errorDetails: errorDetails,
-                plan: plan,
-                fullError: error
-            });
+            console.error('自动保存计划到云端失败:', error);
 
             notify({
                 type: 'error',
@@ -127,21 +122,7 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             const errorDetails = error instanceof Error ? error.stack : '无详细信息';
 
-            console.error('自动保存知识点到云端失败:', {
-                error: errorMessage,
-                errorDetails: errorDetails,
-                knowledge: knowledge,
-                knowledgeData: {
-                    module: knowledge.module,
-                    type: (knowledge as Record<string, unknown>).type,
-                    note: (knowledge as Record<string, unknown>).note,
-                    subCategory: (knowledge as Record<string, unknown>).subCategory,
-                    date: (knowledge as Record<string, unknown>).date,
-                    source: (knowledge as Record<string, unknown>).source,
-                    imagePath: (knowledge as Record<string, unknown>).imagePath
-                },
-                fullError: error
-            });
+            console.error('自动保存知识点到云端失败:', error);
 
             notify({
                 type: 'error',
@@ -192,16 +173,7 @@ export class AutoCloudSync {
                 description: `学习计划"${plan.name}"已自动同步更新到云端`
             });
         } catch (error) {
-            console.error('自动更新计划到云端失败 - 详细错误信息:', {
-                error: error,
-                errorType: typeof error,
-                errorConstructor: error?.constructor?.name,
-                errorMessage: error instanceof Error ? error.message : String(error),
-                errorStack: error instanceof Error ? error.stack : '无堆栈信息',
-                errorString: String(error),
-                plan: plan,
-                planId: plan.id
-            });
+            console.error('自动更新计划到云端失败:', error);
 
             const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -268,21 +240,7 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             const errorDetails = error instanceof Error ? error.stack : '无详细信息';
 
-            console.error('自动更新知识点到云端失败:', {
-                error: errorMessage,
-                errorDetails: errorDetails,
-                knowledge: knowledge,
-                updateData: {
-                    module: knowledge.module,
-                    type: (knowledge as Record<string, unknown>).type,
-                    note: (knowledge as Record<string, unknown>).note,
-                    subCategory: (knowledge as Record<string, unknown>).subCategory,
-                    date: (knowledge as Record<string, unknown>).date,
-                    source: (knowledge as Record<string, unknown>).source,
-                    imagePath: (knowledge as Record<string, unknown>).imagePath
-                },
-                fullError: error
-            });
+            console.error('自动更新知识点到云端失败:', error);
 
             notify({
                 type: 'error',
@@ -306,11 +264,7 @@ export class AutoCloudSync {
         } catch (error) {
             // 改进错误日志，提供更详细的错误信息
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('自动删除记录从云端失败:', {
-                recordId,
-                error: errorMessage,
-                fullError: error
-            });
+            console.error('自动删除记录从云端失败:', error);
 
             notify({
                 type: 'error',
@@ -335,12 +289,7 @@ export class AutoCloudSync {
             // 改进错误日志，提供更详细的错误信息
             const errorMessage = error instanceof Error ? error.message : String(error);
             const errorDetails = error instanceof Error ? error.stack : '未知错误';
-            console.error('自动删除计划从云端失败:', {
-                planId,
-                error: errorMessage,
-                details: errorDetails,
-                fullError: error
-            });
+            console.error('自动删除计划从云端失败:', error);
 
             notify({
                 type: 'error',
@@ -364,11 +313,7 @@ export class AutoCloudSync {
         } catch (error) {
             // 改进错误日志，提供更详细的错误信息
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('自动删除知识点从云端失败:', {
-                knowledgeId,
-                error: errorMessage,
-                fullError: error
-            });
+            console.error('自动删除知识点从云端失败:', error);
 
             notify({
                 type: 'error',

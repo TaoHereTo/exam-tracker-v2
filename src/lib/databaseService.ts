@@ -8,21 +8,26 @@ const getCurrentUserId = async () => {
         const { data, error } = await supabase.auth.getUser();
 
         if (error) {
-            throw error;
+            console.warn('获取用户信息失败:', error.message);
+            return null;
         }
 
-        return data.user?.id;
+        return data.user?.id || null;
     } catch (error) {
-        throw error;
+        console.warn('获取用户信息异常:', error);
+        return null;
     }
 }
 
-// 刷题记录相关操作
+// 刷题历史相关操作
 export const recordService = {
-    // 获取用户的所有刷题记录
+    // 获取用户的所有刷题历史
     async getRecords(): Promise<RecordItem[]> {
         const userId = await getCurrentUserId()
-        if (!userId) throw new Error('用户未登录')
+        if (!userId) {
+            console.warn('用户未登录，返回空记录列表');
+            return [];
+        }
 
         const { data, error } = await supabase
             .from('exercise_records')
@@ -30,11 +35,14 @@ export const recordService = {
             .eq('user_id', userId)
             .order('date', { ascending: false })
 
-        if (error) throw error
+        if (error) {
+            console.error('获取记录失败:', error);
+            return [];
+        }
         return data || []
     },
 
-    // 添加新的刷题记录
+    // 添加新的刷题历史
     async addRecord(record: Omit<RecordItem, 'id'>): Promise<RecordItem> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
@@ -63,7 +71,7 @@ export const recordService = {
 
 
 
-    // 删除刷题记录
+    // 删除刷题历史
     async deleteRecord(id: string | number): Promise<void> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
@@ -85,7 +93,10 @@ export const planService = {
     // 获取用户的所有学习计划
     async getPlans(): Promise<StudyPlan[]> {
         const userId = await getCurrentUserId()
-        if (!userId) throw new Error('用户未登录')
+        if (!userId) {
+            console.warn('用户未登录，返回空计划列表');
+            return [];
+        }
 
         const { data, error } = await supabase
             .from('plans')
@@ -93,7 +104,10 @@ export const planService = {
             .eq('user_id', userId)
             .order('created_at', { ascending: false })
 
-        if (error) throw error
+        if (error) {
+            console.error('获取计划失败:', error);
+            return [];
+        }
         return data || []
     },
 
@@ -124,15 +138,7 @@ export const planService = {
             .single()
 
         if (error) {
-            console.error('学习计划上传错误:', {
-                message: error.message,
-                details: error.details,
-                hint: error.hint,
-                code: error.code,
-                planData: planData,
-                userId: userId,
-                fullError: error
-            });
+            console.error('学习计划上传错误:', error);
             throw new Error(`学习计划上传失败: ${error.message || '未知错误'}`);
         }
         return data
@@ -254,16 +260,31 @@ export const knowledgeService = {
     // 获取用户的所有知识点
     async getKnowledge(): Promise<KnowledgeItem[]> {
         const userId = await getCurrentUserId()
-        if (!userId) throw new Error('用户未登录')
+        if (!userId) {
+            console.warn('用户未登录，返回空知识点列表');
+            return [];
+        }
 
-        const { data, error } = await supabase
-            .from('knowledge')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
+        console.log('开始获取知识点，用户ID:', userId);
 
-        if (error) throw error
-        return data || []
+        try {
+            // 先尝试简单的查询
+            const { data, error } = await supabase
+                .from('knowledge')
+                .select('*')
+                .eq('user_id', userId)
+
+            if (error) {
+                console.error('知识点查询失败:', error);
+                return [];
+            }
+
+            console.log('知识点查询成功，数量:', data?.length || 0);
+            return data || [];
+        } catch (error) {
+            console.error('知识点查询异常:', error);
+            return [];
+        }
     },
 
     // 添加新的知识点
@@ -517,16 +538,42 @@ export const settingsService = {
     // 获取用户设置
     async getSettings(): Promise<UserSettings> {
         const userId = await getCurrentUserId()
-        if (!userId) throw new Error('用户未登录')
+        if (!userId) {
+            console.warn('用户未登录，返回空设置');
+            return {};
+        }
 
-        const { data, error } = await supabase
-            .from('user_settings')
-            .select('settings')
-            .eq('user_id', userId)
-            .single()
+        console.log('开始获取用户设置，用户ID:', userId);
 
-        if (error && error.code !== 'PGRST116') throw error // PGRST116 表示没有找到记录
-        return data?.settings || {}
+        try {
+            const { data, error } = await supabase
+                .from('user_settings')
+                .select('*')
+                .eq('user_id', userId)
+                .single()
+
+            if (error) {
+                console.warn('获取设置时返回错误:', error);
+
+                // 如果是没有找到记录的错误，返回空对象
+                if (error.code === 'PGRST116') {
+                    console.log('用户设置不存在，返回空对象');
+                    return {};
+                }
+
+                // 如果是其他错误，也返回空对象而不是抛出异常
+                console.warn('获取设置遇到错误，返回空对象:', error.message);
+                return {};
+            }
+
+            console.log('设置查询成功:', data);
+            return data?.settings || {};
+        } catch (error) {
+            console.warn('设置查询异常:', error);
+            // 返回空对象而不是抛出异常
+            console.warn('获取设置遇到异常，返回空对象');
+            return {};
+        }
     },
 
     // 保存用户设置
@@ -534,10 +581,22 @@ export const settingsService = {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
 
-        const { error } = await supabase
-            .from('user_settings')
-            .upsert({ user_id: userId, settings }, { onConflict: 'user_id' })
+        console.log('开始保存用户设置:', { userId, settings });
 
-        if (error) throw error
+        try {
+            const { error } = await supabase
+                .from('user_settings')
+                .upsert({ user_id: userId, settings }, { onConflict: 'user_id' })
+
+            if (error) {
+                console.error('设置保存失败:', error);
+                throw error;
+            }
+
+            console.log('设置保存成功');
+        } catch (error) {
+            console.error('设置保存异常:', error);
+            throw error;
+        }
     }
 } 

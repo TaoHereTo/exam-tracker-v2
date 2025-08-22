@@ -28,6 +28,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
     const [loading, setLoading] = useState(false);
     const [clearing, setClearing] = useState(false);
     const [clearProgress, setClearProgress] = useState<ProgressCallback | null>(null);
+    const [showClearDialog, setShowClearDialog] = useState(false);
     const { notify } = useNotification();
 
     const loadCloudData = useCallback(async () => {
@@ -53,6 +54,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
     }, [isOpen, loadCloudData]);
 
     const handleClearCloudData = async () => {
+        setShowClearDialog(false);
         setClearing(true);
         setClearProgress(null);
         try {
@@ -116,7 +118,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                             <div className="grid grid-cols-2 gap-4">
                                 <Card className="h-[120px] flex flex-col">
                                     <CardHeader className="pb-0">
-                                        <CardTitle className="text-sm"><MixedText text="刷题记录" /></CardTitle>
+                                        <CardTitle className="text-sm"><MixedText text="刷题历史" /></CardTitle>
                                     </CardHeader>
                                     <CardContent className="flex-1 flex items-center justify-center">
                                         <div className="text-2xl font-bold text-blue-600">
@@ -176,7 +178,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                     云端共有 <MixedText text={String(totalDataCount)} /> 项数据
                                                 </p>
                                             </div>
-                                            <AlertDialog>
+                                            <AlertDialog open={showClearDialog || clearing} onOpenChange={setShowClearDialog}>
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         disabled={clearing}
@@ -189,7 +191,9 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                 </AlertDialogTrigger>
                                                 <AlertDialogContent>
                                                     <AlertDialogHeader>
-                                                        <AlertDialogTitle><MixedText text="确认清空云端数据？" /></AlertDialogTitle>
+                                                        <AlertDialogTitle>
+                                                            {clearing ? <MixedText text="正在清空云端数据" /> : <MixedText text="确认清空云端数据？" />}
+                                                        </AlertDialogTitle>
                                                         <AlertDialogDescription asChild>
                                                             {clearing ? (
                                                                 <div className="space-y-4">
@@ -214,7 +218,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                             ) : (
                                                                 <div>
                                                                     此操作将永久删除云端的所有数据，包括：
-                                                                    <br />• <MixedText text={String(data.records.count)} /> 条刷题记录
+                                                                    <br />• <MixedText text={String(data.records.count)} /> 条刷题历史
                                                                     <br />• <MixedText text={String(data.plans.count)} /> 个学习计划
                                                                     <br />• <MixedText text={String(data.knowledge.count)} /> 条知识点
                                                                     <br />• 应用设置
@@ -225,13 +229,17 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
                                                     <AlertDialogFooter>
-                                                        <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction
-                                                            onClick={handleClearCloudData}
-                                                            style={{ background: '#dc2626' }}
-                                                        >
-                                                            确认清空
-                                                        </AlertDialogAction>
+                                                        {!clearing && (
+                                                            <>
+                                                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                                <AlertDialogAction
+                                                                    onClick={handleClearCloudData}
+                                                                    style={{ background: '#dc2626' }}
+                                                                >
+                                                                    确认清空
+                                                                </AlertDialogAction>
+                                                            </>
+                                                        )}
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>

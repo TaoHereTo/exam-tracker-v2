@@ -150,7 +150,7 @@ export function MainApp() {
         }
     }, []);
 
-    // 计划和刷题记录持久化到localStorage
+    // 计划和刷题历史持久化到localStorage
     const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
     const [records, setRecords] = useLocalStorage<RecordItem[]>("exam-tracker-records-v2", []);
 
@@ -163,7 +163,7 @@ export function MainApp() {
         setPendingImport,
     } = useImportExport(records, setRecords, knowledge, setKnowledge, plans);
 
-    // 刷题记录分页
+    // 刷题历史分页
     const [historyPage, setHistoryPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     // 选中的记录ID
@@ -222,7 +222,7 @@ export function MainApp() {
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                     <div
-                        className={`flex items-center gap-2 w-full cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-16 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-14 ${isHovered || isOpen
+                        className={`flex items-center gap-2 cursor-pointer rounded-lg p-2 transition-all duration-200 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 ${isHovered || isOpen
                             ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
                             : ''
                             }`}
@@ -267,9 +267,9 @@ export function MainApp() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                     align="start"
-                    side="top"
+                    side="bottom"
                     sideOffset={5}
-                    className="w-48"
+                    className="w-48 text-left"
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => {
                         setIsHovered(false);
@@ -288,32 +288,32 @@ export function MainApp() {
                     {/* 仅在 Dock 模式下显示：数据概览 / 最佳成绩（图标 + 文本） */}
                     {navMode === 'dock' && (
                         <>
-                            <DropdownMenuItem onClick={() => setActiveTab('overview')}>
-                                <PieChart className="h-4 w-4 mr-2" />
+                            <DropdownMenuItem onClick={() => setActiveTab('overview')} className="justify-start">
+                                <PieChart className="h-4 w-4 mr-2 flex-shrink-0" />
                                 <MixedText text="数据概览" />
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
-                                <Trophy className="h-4 w-4 mr-2" />
+                            <DropdownMenuItem onClick={() => setActiveTab('personal-best')} className="justify-start">
+                                <Trophy className="h-4 w-4 mr-2 flex-shrink-0" />
                                 <MixedText text="最佳成绩" />
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                         </>
                     )}
-                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                        <User className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem onClick={() => setShowProfileDialog(true)} className="justify-start">
+                        <User className="h-4 w-4 mr-2 flex-shrink-0" />
                         <MixedText text="个人资料" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                        <Settings className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem onClick={() => setActiveTab('settings')} className="justify-start">
+                        <Settings className="h-4 w-4 mr-2 flex-shrink-0" />
                         <MixedText text="基础设置" />
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                        <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="justify-start">
+                        <SlidersHorizontal className="h-4 w-4 mr-2 flex-shrink-0" />
                         <MixedText text="高级设置" />
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
-                        <LogOut className="h-4 w-4 mr-2" />
+                    <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 justify-start">
+                        <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
                         <MixedText text="退出登录" />
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -360,7 +360,7 @@ export function MainApp() {
                         align="start"
                         side="top"
                         sideOffset={5}
-                        className="w-48"
+                        className="w-48 text-left"
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => {
                             setIsHovered(false);
@@ -380,33 +380,33 @@ export function MainApp() {
                         <>
                             {navMode === 'dock' && (
                                 <>
-                                    <DropdownMenuItem onClick={() => setActiveTab('overview')}>
-                                        <PieChart className="h-4 w-4 mr-2" />
+                                    <DropdownMenuItem onClick={() => setActiveTab('overview')} className="justify-start">
+                                        <PieChart className="h-4 w-4 mr-2 flex-shrink-0" />
                                         <MixedText text="数据概览" />
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setActiveTab('personal-best')}>
-                                        <Trophy className="h-4 w-4 mr-2" />
+                                    <DropdownMenuItem onClick={() => setActiveTab('personal-best')} className="justify-start">
+                                        <Trophy className="h-4 w-4 mr-2 flex-shrink-0" />
                                         <MixedText text="最佳成绩" />
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                 </>
                             )}
                         </>
-                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                            <User className="h-4 w-4 mr-2" />
+                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)} className="justify-start">
+                            <User className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="个人资料" />
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                            <Settings className="h-4 w-4 mr-2" />
+                        <DropdownMenuItem onClick={() => setActiveTab('settings')} className="justify-start">
+                            <Settings className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="基础设置" />
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                            <SlidersHorizontal className="h-4 w-4 mr-2" />
+                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="justify-start">
+                            <SlidersHorizontal className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="高级设置" />
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400">
-                            <LogOut className="h-4 w-4 mr-2" />
+                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 justify-start">
+                            <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="退出登录" />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -430,7 +430,7 @@ export function MainApp() {
             notify({
                 type: 'success',
                 message: '本地数据已清空',
-                description: '已清空本地的刷题记录、知识点和学习计划'
+                description: '已清空本地的刷题历史、知识点和学习计划'
             });
         } catch (error) {
             notify({
@@ -447,7 +447,7 @@ export function MainApp() {
         if (selectedRecordIds.length === 0) {
             notify({
                 message: "请先选择要删除的记录",
-                description: "请勾选要删除的刷题记录",
+                description: "请勾选要删除的刷题历史",
                 type: "warning"
             });
             return;
@@ -469,7 +469,7 @@ export function MainApp() {
 
         notify({
             message: "删除成功",
-            description: `已删除 ${recordsToDelete.length} 条刷题记录`,
+            description: `已删除 ${recordsToDelete.length} 条刷题历史`,
             type: "success"
         });
 
@@ -666,9 +666,9 @@ export function MainApp() {
                                         setActiveTab={setActiveTab}
                                         userInfo={<SidebarUserInfo />}
                                     />
-                                    <main className="flex-1 w-full overflow-auto bg-[#fafafa] dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
+                                    <main className="flex-1 w-full overflow-auto bg-background dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
                                         {/* 侧边栏触发器 */}
-                                        <div className="flex items-center gap-4 p-4 border-b border-border">
+                                        <div className="flex items-center gap-4 p-4 border-b border-border text-left">
                                             <SidebarTrigger className="size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-6 [&>svg]:!w-6 font-normal" />
                                             <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
                                         </div>
@@ -917,7 +917,7 @@ export function MainApp() {
                                     navMode={navMode}
                                     userInfo={<DockUserInfo />}
                                 />
-                                <main className={`flex-1 overflow-auto ${activeTab === 'overview' ? 'p-0' : 'p-6'} w-full max-w-7xl mx-auto bg-[#fafafa] dark:bg-background`}>
+                                <main className={`flex-1 overflow-auto ${activeTab === 'overview' ? 'p-0' : 'p-6'} w-full max-w-7xl mx-auto bg-background dark:bg-background text-left`}>
                                     {activeTab === 'overview' ? (
                                         <div className="p-6">
                                             <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
@@ -1106,7 +1106,7 @@ export function MainApp() {
                                         <div className="space-y-2">
                                             <p><MixedText text="即将导入以下数据：" /></p>
                                             <ul className="list-disc list-inside space-y-1">
-                                                <li><MixedText text={`刷题记录：${pendingImport.records.length} 条`} /></li>
+                                                <li><MixedText text={`刷题历史：${pendingImport.records.length} 条`} /></li>
                                                 <li><MixedText text={`知识点：${pendingImport.knowledge.length} 条`} /></li>
                                                 {pendingImport.plans && <li><MixedText text={`学习计划：${pendingImport.plans.length} 个`} /></li>}
                                             </ul>
@@ -1131,7 +1131,7 @@ export function MainApp() {
                                 <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
                                 <AlertDialogDescription asChild>
                                     <div className="space-y-2">
-                                        <p><MixedText text="确定要删除选中的" /> <MixedText text={`${recordsToDelete.length} 条`} /> <MixedText text="刷题记录吗？此操作不可恢复。" /></p>
+                                        <p><MixedText text="确定要删除选中的" /> <MixedText text={`${recordsToDelete.length} 条`} /> <MixedText text="刷题历史吗？此操作不可恢复。" /></p>
                                     </div>
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
@@ -1176,4 +1176,4 @@ export function MainApp() {
             </NavModeContext.Provider>
         </PasteProvider>
     );
-} 
+}

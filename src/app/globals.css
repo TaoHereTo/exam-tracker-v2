@@ -301,11 +301,11 @@ h6 {
   /* 与 Card 的 px-6 对齐 */
   --form-card-padding-y: 1.25rem;
   /* 与 CardContent 的 pb-4 对齐 */
-  --background: oklch(1 0 0);
+  --background: #F8F7F6;
   --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
+  --card: #FAFAFA;
   --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
+  --popover: #FAFAFA;
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
@@ -324,7 +324,7 @@ h6 {
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
+  --sidebar: #F8F7F6;
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -815,17 +815,21 @@ html,
 }
 
 /* 新的 shadcn/ui 侧边栏样式 */
+[data-slot="sidebar-wrapper"] {
+  background-color: var(--background);
+}
+
 [data-slot="sidebar"] {
   min-height: 100vh;
 }
 
 [data-slot="sidebar"] {
-  background-color: hsl(var(--sidebar));
+  background-color: var(--sidebar);
   color: hsl(var(--sidebar-foreground));
 }
 
 [data-slot="sidebar-inner"] {
-  background-color: hsl(var(--sidebar));
+  background-color: var(--sidebar);
   color: hsl(var(--sidebar-foreground));
 }
 
@@ -833,12 +837,14 @@ html,
 [data-slot="sidebar-gap"] {
   width: var(--sidebar-width);
   transition: width 0.2s ease-linear;
+  background-color: var(--sidebar) !important;
 }
 
 [data-slot="sidebar-container"] {
   width: var(--sidebar-width);
   transition: width 0.2s ease-linear;
   overflow: hidden;
+  background-color: var(--sidebar);
 }
 
 /* 当侧边栏处于icon模式时的宽度 */
@@ -1019,6 +1025,12 @@ html,
   width: calc(100% - 0.5rem) !important;
 }
 
+
+
+
+
+
+
 /* 增加侧边栏菜单按钮的左边距，让图标距离左边更远 */
 [data-slot="sidebar-menu-button"] {
   padding-left: 1rem !important;
@@ -1060,43 +1072,26 @@ html,
 
 /* 浅色模式下的hover效果 */
 [data-slot="sidebar-menu-button"]:hover {
-  background-color: hsl(var(--sidebar-accent));
-  color: hsl(var(--sidebar-accent-foreground));
-  transform: translateX(2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: #EEEDEC;
 }
 
-/* 深色模式下的hover效果 - 增强可见性 */
-.dark [data-slot="sidebar-menu-button"]:hover {
-  background-color: hsl(var(--sidebar-accent));
-  color: hsl(var(--sidebar-accent-foreground));
-  transform: translateX(2px);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
+/* 去除点击/聚焦时的外边框与阴影，防止看起来像按钮 */
+[data-slot="sidebar-menu-button"]:focus,
+[data-slot="sidebar-menu-button"]:focus-visible,
 [data-slot="sidebar-menu-button"]:active {
-  /* 移除按下去的动效 */
+  outline: none;
+  box-shadow: none;
+  border: none;
 }
 
 /* 浅色模式下的选中状态 */
 [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: hsl(var(--sidebar-accent));
-  color: hsl(var(--sidebar-accent-foreground));
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: translateX(2px);
+  background-color: #EEEDEC;
 }
 
 /* 深色模式下的选中状态 - 增强可见性 */
 .dark [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: hsl(var(--sidebar-accent));
-  color: hsl(var(--sidebar-accent-foreground));
-  font-weight: 600;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transform: translateX(2px);
-  position: relative;
+  background-color: #EEEDEC;
 }
 
 /* 确保侧边栏内容不会溢出 */

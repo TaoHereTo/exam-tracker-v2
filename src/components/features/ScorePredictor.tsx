@@ -52,7 +52,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
 
     const handlePredictScore = () => {
         if (!records || records.length === 0) {
-            notify({ type: "warning", message: "数据不足", description: "没有足够的刷题记录来进行预测。" });
+            notify({ type: "warning", message: "数据不足", description: "没有足够的刷题历史来进行预测。" });
             return;
         }
 

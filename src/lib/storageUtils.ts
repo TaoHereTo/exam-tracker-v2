@@ -119,7 +119,7 @@ export function isStorageNearLimit(threshold: number = 80): boolean {
  */
 export function getStorageKeyDisplayName(key: string): string {
     const keyMap: Record<string, string> = {
-        'exam-tracker-records-v2': '刷题记录',
+        'exam-tracker-records-v2': '刷题历史',
         'exam-tracker-knowledge-v2': '知识点',
         'exam-tracker-plans-v2': '学习计划',
         'exam-tracker-nav-mode': '导航模式',

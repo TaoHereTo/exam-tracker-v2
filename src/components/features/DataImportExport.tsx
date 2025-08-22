@@ -65,7 +65,7 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
                         <AlertDialogContent>
                             <AlertDialogHeader>
                                 <AlertDialogTitle><MixedText text="您确定要清空所有数据吗？" /></AlertDialogTitle>
-                                <AlertDialogDescription><MixedText text="此操作将永久删除所有刷题记录和知识点，无法撤销。" /></AlertDialogDescription>
+                                <AlertDialogDescription><MixedText text="此操作将永久删除所有刷题历史和知识点，无法撤销。" /></AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                                 <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>

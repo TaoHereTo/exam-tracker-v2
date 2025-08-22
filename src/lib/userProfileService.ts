@@ -57,13 +57,7 @@ export class UserProfileService {
                 .single();
 
             if (error) {
-                console.error('upsertUserProfile: 更新用户资料失败:', {
-                    error: error,
-                    message: error.message,
-                    details: error.details,
-                    hint: error.hint,
-                    code: error.code
-                });
+                console.error('upsertUserProfile: 更新用户资料失败:', error);
 
                 // 处理特定的数据库错误
                 if (error.code === '23505') {

@@ -95,10 +95,10 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
-                                <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题记录">
+                                <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题历史">
                                     <a href="#" onClick={(e) => { e.preventDefault(); setActiveTab('history'); }}>
                                         <BookCopy />
-                                        <span><MixedText text="刷题记录" /></span>
+                                        <span><MixedText text="刷题历史" /></span>
                                     </a>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>

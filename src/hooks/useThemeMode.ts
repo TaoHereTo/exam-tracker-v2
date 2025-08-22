@@ -17,14 +17,14 @@ export function useThemeMode() {
         if (!mounted) {
             // 服务端渲染时返回默认样式
             return {
-                background: 'linear-gradient(to bottom right, rgb(249, 250, 251), rgb(248, 250, 252), rgb(243, 244, 246))'
+                background: '#F8F7F6'
             };
         }
 
         return {
             background: isDarkMode
                 ? 'rgb(27, 28, 29)'
-                : 'linear-gradient(to bottom right, rgb(249, 250, 251), rgb(248, 250, 252), rgb(243, 244, 246))'
+                : '#F8F7F6'
         };
     };
 

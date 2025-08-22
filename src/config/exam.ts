@@ -21,7 +21,7 @@ export const MODULE_NAME_MAP: Record<string, string> = {
 export const PAGE_TITLE_MAP: Record<string, string> = {
     'overview': '数据概览',
     'charts': '数据图表',
-    'history': '刷题记录',
+    'history': '刷题历史',
     'personal-best': '最佳成绩',
     'knowledge-summary': '知识点汇总',
     'knowledge-entry': '知识点录入',

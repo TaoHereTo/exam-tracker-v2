@@ -1,6 +1,6 @@
 // 统一的数据格式定义 - 版本 7.0
 
-// 刷题记录类型
+// 刷题历史类型
 export type RecordItem = {
     id: string; // UUID 格式
     date: string;

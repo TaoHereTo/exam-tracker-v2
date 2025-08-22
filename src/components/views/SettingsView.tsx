@@ -209,7 +209,7 @@ export function SettingsView({
                                         <AlertDialogHeader>
                                             <AlertDialogTitle><MixedText text="确认清空本地数据？" /></AlertDialogTitle>
                                             <AlertDialogDescription>
-                                                此操作将从本地清除所有刷题记录、知识点与学习计划，但不会影响云端数据。
+                                                此操作将从本地清除所有刷题历史、知识点与学习计划，但不会影响云端数据。
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>

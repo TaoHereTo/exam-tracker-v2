@@ -20,7 +20,7 @@ export function PaginationSetting({ pageSize, setPageSize }: { pageSize: number;
         <Card>
             <CardHeader>
                 <CardTitle><MixedText text="分页设置" /></CardTitle>
-                <CardDescription><MixedText text="设置刷题记录每页显示的条数。" /></CardDescription>
+                <CardDescription><MixedText text="设置刷题历史每页显示的条数。" /></CardDescription>
             </CardHeader>
             <CardContent>
                 <Select value={tempSize} onValueChange={handleChange}>
