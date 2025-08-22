@@ -165,24 +165,16 @@ export function MainApp() {
 
     // 刷题历史分页
     const [historyPage, setHistoryPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const pageSize = 10; // 固定为10条每页
     // 选中的记录ID
     const [selectedRecordIds, setSelectedRecordIds] = useState<string[]>([]);
-
-    // 当pageSize改变时，如果当前页超出新的总页数，则重置到第一页
-    useEffect(() => {
-        const newTotalPages = Math.ceil(records.length / pageSize);
-        if (historyPage > newTotalPages && newTotalPages > 0) {
-            setHistoryPage(1);
-        }
-    }, [pageSize, records.length, historyPage]);
 
     // 清理无效的选中记录ID（当记录被删除或页面切换时）
     useEffect(() => {
         const currentPageRecords = records.slice((historyPage - 1) * pageSize, historyPage * pageSize);
         const currentPageIds = currentPageRecords.map(r => r.id);
         setSelectedRecordIds(prev => prev.filter(id => currentPageIds.includes(id)));
-    }, [records, historyPage, pageSize]);
+    }, [records, historyPage]);
 
     // 退出登录确认对话框状态
     const [signOutDialogOpen, setSignOutDialogOpen] = useState(false);
@@ -865,15 +857,12 @@ export function MainApp() {
                                                     onExport={handleExportData}
                                                     onImport={handleImportData}
                                                     onClearLocalData={handleClearLocalData}
-                                                    pageSize={pageSize}
-                                                    setPageSize={setPageSize}
                                                     activeTab={activeTab}
                                                     navMode={navMode}
                                                     records={records}
                                                     plans={plans}
                                                     knowledge={knowledge}
                                                     settings={{
-                                                        'page-size': String(pageSize),
                                                         'exam-tracker-nav-mode': navMode,
                                                         // 可以添加更多设置项
                                                     }}
@@ -1051,15 +1040,12 @@ export function MainApp() {
                                             onExport={handleExportData}
                                             onImport={handleImportData}
                                             onClearLocalData={handleClearLocalData}
-                                            pageSize={pageSize}
-                                            setPageSize={setPageSize}
                                             activeTab={activeTab}
                                             navMode={navMode}
                                             records={records}
                                             plans={plans}
                                             knowledge={knowledge}
                                             settings={{
-                                                'page-size': String(pageSize),
                                                 'exam-tracker-nav-mode': navMode,
                                                 // 可以添加更多设置项
                                             }}
@@ -1114,6 +1100,7 @@ export function MainApp() {
                                 <AlertDialogAction
                                     onClick={handleConfirmDelete}
                                     className="bg-red-600 hover:bg-red-700 text-white"
+                                    style={{ color: 'white' }}
                                 >
                                     <MixedText text="确认删除" />
                                 </AlertDialogAction>

@@ -47,6 +47,7 @@ export const MODULE_COLORS: Record<string, string> = {
 };
 
 // 统一的图例样式配置
+// 注意：背景颜色和边框颜色将在组件中根据主题动态设置
 export const UNIFIED_LEGEND_STYLE = {
     itemWidth: 18,
     itemHeight: 12,
@@ -57,7 +58,8 @@ export const UNIFIED_LEGEND_STYLE = {
         fontFamily: 'Times New Roman, 思源宋体, serif'
     },
     icon: 'roundRect' as const,
-    backgroundColor: 'rgba(255,255,255,0.7)',
+    // backgroundColor 和 borderColor 将在组件中根据主题动态设置
+    backgroundColor: 'rgba(255,255,255,0.9)', // 默认亮色主题
     borderColor: '#e0e6f1',
     borderWidth: 1,
     padding: [8, 12] as [number, number],

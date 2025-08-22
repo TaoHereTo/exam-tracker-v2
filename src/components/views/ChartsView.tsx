@@ -84,8 +84,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     }));
 
     // 根据主题动态设置颜色
-    const backgroundColor = isDarkMode ? '#1a1a1a' : '#fff';
+    const backgroundColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';
     const textColor = isDarkMode ? '#e5e5e5' : '#333';
+    // 图例文字在深色模式下使用黑色以提高可读性
+    const legendTextColor = isDarkMode ? '#333' : '#333';
     const borderColor = isDarkMode ? '#404040' : '#e0e6f1';
     const splitLineColor = isDarkMode ? '#404040' : '#e0e6f1';
     const splitAreaColor1 = isDarkMode ? '#2a2a2a' : '#f5f7fa';
@@ -137,7 +139,10 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             },
             legend: {
                 ...UNIFIED_LEGEND_STYLE,
-                textStyle: { color: textColor }
+                // 覆盖主题相关的样式
+                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
+                borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
+                textStyle: { color: legendTextColor }
             }
         },
         series: [
@@ -164,7 +169,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                                 const idx = (params as { dataIndex: number }).dataIndex;
                                 return pointColors[idx] || '#3366FF';
                             },
-                            borderColor: isDarkMode ? '#1a1a1a' : '#fff',
+                            borderColor: isDarkMode ? 'hsl(var(--background))' : '#F8F7F6',
                             borderWidth: 2,
                             shadowColor: function (params: unknown) {
                                 const idx = (params as { dataIndex: number }).dataIndex;

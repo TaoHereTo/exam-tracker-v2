@@ -757,7 +757,16 @@ export class CloudSyncService {
                 cloudSettings = await settingsService.getSettings();
                 console.log('设置获取成功:', Object.keys(cloudSettings).length);
             } catch (error) {
-                console.error('设置获取失败:', error);
+                // settingsService.getSettings() 已经处理了 PGRST116 错误并返回空对象
+                // 这里通常不会抛出异常，但为了安全起见保留异常处理
+                const errorDetails = {
+                    type: typeof error,
+                    message: error instanceof Error ? error.message : String(error),
+                    stack: error instanceof Error ? error.stack : undefined,
+                    errorCode: (error as unknown as { code?: string })?.code,
+                    errorStatus: (error as unknown as { status?: number })?.status
+                };
+                console.warn('设置获取遇到异常，使用空设置:', errorDetails);
                 cloudSettings = {};
             }
 
@@ -775,7 +784,7 @@ export class CloudSyncService {
                     recent: cloudKnowledge.slice(0, 5) // 最近5条知识点
                 },
                 settings: {
-                    hasSettings: Object.keys(cloudSettings).length > 0
+                    hasSettings: cloudSettings && Object.keys(cloudSettings).length > 0
                 }
             };
 

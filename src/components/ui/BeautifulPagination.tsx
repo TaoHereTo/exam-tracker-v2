@@ -24,7 +24,7 @@ export function BeautifulPagination({
     totalPages,
     onPageChange,
     className,
-    showPageInfo = true,
+    showPageInfo = false,
     totalItems,
 }: BeautifulPaginationProps) {
     const canGoPrevious = currentPage > 1

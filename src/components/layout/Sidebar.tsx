@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
@@ -29,15 +28,8 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     return (
         <SidebarUI collapsible="icon" className="group" data-side="left">
             <SidebarHeader>
-                <div className="flex items-center gap-3 px-2 py-3 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:px-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:py-0">
-                    <Image
-                        src="/icon.png"
-                        alt="应用图标"
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 flex-shrink-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-8 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-8"
-                    />
-                    <span className="text-xl font-bold group-data-[collapsible=icon]:group-data-[state=collapsed]:hidden">
+                <div className="flex items-center justify-center px-2 py-3">
+                    <span className="text-3xl font-black" style={{ fontSize: '28px', fontWeight: '900' }}>
                         <MixedText text="行测记录" />
                     </span>
                 </div>

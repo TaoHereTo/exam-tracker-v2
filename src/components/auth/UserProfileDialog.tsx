@@ -195,7 +195,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                         <Button
                             onClick={handleSaveProfile}
                             disabled={loading}
-                            className="min-w-[100px] bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                            className="min-w-[100px]"
                         >
                             {loading ? (
                                 <InlineLoadingSpinner />

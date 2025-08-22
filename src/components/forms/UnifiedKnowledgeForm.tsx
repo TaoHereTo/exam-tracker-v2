@@ -112,7 +112,7 @@ function DateField() {
   return (
     <Popover open={dateOpen} onOpenChange={setDateOpen}>
       <PopoverTrigger asChild>
-        <div className="w-full flex items-center justify-start text-left font-normal border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md">
+        <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md">
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
         </div>
       </PopoverTrigger>
@@ -383,7 +383,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             <ImageUploadField />
 
             <div className="form-actions">
-              <Button type="submit" className="w-full py-4 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+              <Button type="submit" className="w-full py-4">
                 <MixedText text="保存知识点" />
               </Button>
             </div>

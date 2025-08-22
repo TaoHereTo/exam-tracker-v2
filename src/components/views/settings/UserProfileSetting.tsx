@@ -154,7 +154,7 @@ export function UserProfileSetting() {
                 <div className="flex justify-end gap-2">
                     <Button
                         onClick={handleSaveProfile}
-                        className="min-w-[100px] bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                        className="min-w-[100px]"
                     >
                         <Save className="h-4 w-4 mr-2" />
                         <MixedText text="保存" />

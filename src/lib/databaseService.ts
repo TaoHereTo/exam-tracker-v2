@@ -553,23 +553,51 @@ export const settingsService = {
                 .single()
 
             if (error) {
-                console.warn('获取设置时返回错误:', error);
-
                 // 如果是没有找到记录的错误，返回空对象
                 if (error.code === 'PGRST116') {
-                    console.log('用户设置不存在，返回空对象');
+                    console.log('用户设置不存在（首次使用），返回空对象');
+                    return {};
+                }
+
+                // 处理 406 错误或其他 HTTP 错误
+                if (error.message.includes('406') || error.message.includes('Not Acceptable')) {
+                    console.warn('用户设置获取遇到406错误（首次使用或数据格式问题），返回空对象');
                     return {};
                 }
 
                 // 如果是其他错误，也返回空对象而不是抛出异常
-                console.warn('获取设置遇到错误，返回空对象:', error.message);
+                console.warn('获取设置遇到错误，返回空对象:', {
+                    code: error.code,
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint
+                });
                 return {};
             }
 
             console.log('设置查询成功:', data);
             return data?.settings || {};
         } catch (error) {
-            console.warn('设置查询异常:', error);
+            // 处理网络错误或其他异常
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            
+            // 特别处理 406 错误
+            if (errorMessage.includes('406') || errorMessage.includes('Not Acceptable')) {
+                console.warn('用户设置获取遇到网络级406错误（首次使用或API版本问题），返回空对象');
+                return {};
+            }
+            
+            // 处理其他网络错误
+            if (errorMessage.includes('Failed to load resource') || errorMessage.includes('fetch')) {
+                console.warn('用户设置获取遇到网络错误，返回空对象:', errorMessage);
+                return {};
+            }
+            
+            console.warn('设置查询异常:', {
+                error: error,
+                errorType: typeof error,
+                errorMessage: errorMessage
+            });
             // 返回空对象而不是抛出异常
             console.warn('获取设置遇到异常，返回空对象');
             return {};

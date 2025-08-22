@@ -11,17 +11,17 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-xs",
+          "border border-[color:var(--input-border)] bg-transparent text-foreground shadow-xs",
         destructive:
           "bg-destructive text-white shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
-          "border bg-background dark:bg-input/30 dark:border-input",
+          "border bg-input border-[color:var(--input-border)]",
         secondary:
           "bg-secondary text-secondary-foreground",
         ghost:
           "",
         pagination:
-          "border border-input bg-background shadow-xs",
+          "border border-[color:var(--input-border)] bg-input shadow-xs",
         link: "text-primary underline-offset-4",
       },
       size: {

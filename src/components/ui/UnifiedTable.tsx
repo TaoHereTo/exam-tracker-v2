@@ -143,14 +143,13 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     // 渲染表格内容
     const renderTableContent = () => (
         <div className="w-full">
-            <div className="mb-2 flex justify-between items-center">
-                <span className="text-gray-500 text-sm">共 <MixedText text={String(data.length)} /> 条</span>
+            <div className="mb-2 flex justify-end items-center">
                 {onBatchDelete && (
                     <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
-                                    variant="outline"
+                                    variant="destructive"
                                     size="icon"
                                     disabled={selected.length === 0}
                                     onClick={onBatchDelete}
@@ -229,7 +228,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     <ContextMenuTrigger asChild>
                                         <tr
                                             onClick={handleRowClick}
-                                            className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                                            className={`cursor-pointer hover:bg-[#EEEDEC] dark:hover:bg-[#28282A] transition-colors duration-25 ${isSelected ? 'bg-[#EEEDEC] dark:bg-[#28282A]' : ''}`}
                                         >
                                             {selectable && (
                                                 <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
@@ -275,7 +274,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 <tr
                                     key={String(key)}
                                     onClick={handleRowClick}
-                                    className={`cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                                    className={`cursor-pointer hover:bg-[#EEEDEC] dark:hover:bg-[#28282A] transition-colors duration-25 ${isSelected ? 'bg-[#EEEDEC] dark:bg-[#28282A]' : ''}`}
                                 >
                                     {selectable && (
                                         <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
@@ -311,7 +310,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     // 渲染容器包装
     const renderContainer = () => (
         <Card className={className}>
-            <CardContent className="p-3">
+            <CardContent className="p-3 pt-1">
                 <div className="flex flex-col gap-3">
                     {/* 标题和操作区域 */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -344,7 +343,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     )}
                                     {filter.type === 'search' && (
                                         <div className="relative w-36">
-                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 w-5 h-5 z-10 pointer-events-none" />
                                             <Input
                                                 placeholder={filter.placeholder || "搜索..."}
                                                 value={filter.value}
@@ -438,7 +437,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         disabled={deleteDisabled}
-                                                        variant="outline"
+                                                        variant="destructive"
                                                         size="icon"
                                                         className="h-9 w-9"
                                                     >
@@ -460,7 +459,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => onDelete()} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                            <AlertDialogAction onClick={() => onDelete()} style={{ background: '#dc2626', color: 'white' }}><MixedText text="确认删除" /></AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

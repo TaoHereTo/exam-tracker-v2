@@ -2,7 +2,6 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { AppearanceSetting } from "./settings/AppearanceSetting";
-import { PaginationSetting } from "./settings/PaginationSetting";
 
 
 
@@ -28,7 +27,6 @@ import { HelpCircle } from "lucide-react";
 
 export function SettingsView({
     onExport, onImport, onClearLocalData,
-    pageSize, setPageSize,
     activeTab,
     navMode,
     records = [],
@@ -39,8 +37,6 @@ export function SettingsView({
     onExport?: () => void;
     onImport?: () => void;
     onClearLocalData?: () => void;
-    pageSize: number;
-    setPageSize: (n: number) => void;
     activeTab?: string;
     navMode?: string;
     records?: RecordItem[];
@@ -189,7 +185,7 @@ export function SettingsView({
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Button
-                                                        variant="outline"
+                                                        variant="destructive"
                                                         size="icon"
                                                         className="h-9 w-9"
                                                         onClick={() => {
@@ -409,7 +405,6 @@ export function SettingsView({
 
                 {/* 新增设置卡片 */}
                 <AppearanceSetting />
-                <PaginationSetting pageSize={pageSize} setPageSize={setPageSize} />
                 <div className="flex justify-end mt-4">
                     {navMode && <SaveSettingsButton navMode={navMode as 'sidebar' | 'dock'} />}
                 </div>

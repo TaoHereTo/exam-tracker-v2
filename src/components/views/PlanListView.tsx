@@ -221,8 +221,20 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9"
-                        style={{ backgroundColor: '#1d4ed8' }}
+                        className="h-9 text-white"
+                        style={{ backgroundColor: '#1d4ed8', color: 'white' }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.color = 'black';
+                            e.currentTarget.style.transform = 'none';
+                            e.currentTarget.style.boxShadow = 'inherit';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.color = 'white';
+                            e.currentTarget.style.transform = 'none';
+                            e.currentTarget.style.boxShadow = 'inherit';
+                        }}
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="新建计划" />
@@ -236,7 +248,27 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     variant={!showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(false)}
                     className="flex items-center gap-2"
-                    style={!showCompleted ? { backgroundColor: '#10b981' } : {}}
+                    style={!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {}}
+                    onMouseEnter={(e) => {
+                        if (!showCompleted) {
+                            e.currentTarget.style.backgroundColor = '#10b981';
+                            e.currentTarget.style.color = 'black';
+                        } else {
+                            e.currentTarget.style.color = 'black';
+                        }
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'inherit';
+                    }}
+                    onMouseLeave={(e) => {
+                        if (!showCompleted) {
+                            e.currentTarget.style.backgroundColor = '#10b981';
+                            e.currentTarget.style.color = 'white';
+                        } else {
+                            e.currentTarget.style.color = '';
+                        }
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'inherit';
+                    }}
                 >
                     <Clock className="w-5 h-5" />
                     <MixedText text="进行中" />
@@ -245,7 +277,27 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     variant={showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(true)}
                     className="flex items-center gap-2"
-                    style={showCompleted ? { backgroundColor: '#0284c7' } : {}}
+                    style={showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}}
+                    onMouseEnter={(e) => {
+                        if (showCompleted) {
+                            e.currentTarget.style.backgroundColor = '#0284c7';
+                            e.currentTarget.style.color = 'black';
+                        } else {
+                            e.currentTarget.style.color = 'black';
+                        }
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'inherit';
+                    }}
+                    onMouseLeave={(e) => {
+                        if (showCompleted) {
+                            e.currentTarget.style.backgroundColor = '#0284c7';
+                            e.currentTarget.style.color = 'white';
+                        } else {
+                            e.currentTarget.style.color = '';
+                        }
+                        e.currentTarget.style.transform = 'none';
+                        e.currentTarget.style.boxShadow = 'inherit';
+                    }}
                 >
                     <CheckCircle className="w-5 h-5" />
                     <MixedText text="已完成" />
@@ -286,7 +338,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                     <TooltipTrigger asChild>
                                                         <AlertDialogTrigger asChild>
                                                             <Button
-                                                                variant="outline"
+                                                                variant="destructive"
                                                                 size="icon"
                                                                 className="h-9 w-9"
                                                             >
@@ -308,7 +360,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(plan.id)} style={{ background: '#dc2626' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                                    <AlertDialogAction onClick={() => handleDelete(plan.id)} style={{ background: '#dc2626', color: 'white' }}><MixedText text="确认删除" /></AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>
@@ -369,8 +421,20 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                         {!showCompleted && (
                             <Button
                                 onClick={() => handleOpenForm()}
-                                className="h-9"
-                                style={{ backgroundColor: '#1d4ed8' }}
+                                className="h-9 text-white"
+                                style={{ backgroundColor: '#1d4ed8', color: 'white' }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#1d4ed8';
+                                    e.currentTarget.style.color = 'black';
+                                    e.currentTarget.style.transform = 'none';
+                                    e.currentTarget.style.boxShadow = 'inherit';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#1d4ed8';
+                                    e.currentTarget.style.color = 'white';
+                                    e.currentTarget.style.transform = 'none';
+                                    e.currentTarget.style.boxShadow = 'inherit';
+                                }}
                             >
                                 <Plus className="w-5 h-5 mr-2" />
                                 <MixedText text="创建第一个计划" />

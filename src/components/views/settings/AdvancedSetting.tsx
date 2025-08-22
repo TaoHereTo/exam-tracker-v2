@@ -335,7 +335,7 @@ export function AdvancedSetting() {
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <div className="relative">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 dark:text-gray-300 z-10 pointer-events-none" />
                                         <Input
                                             placeholder="搜索图片..."
                                             value={imageSearchTerm}
@@ -636,7 +636,7 @@ export function AdvancedSetting() {
                                 confirmDeleteImages();
                             }}
                             disabled={isDeleting}
-                            style={{ background: '#dc2626' }}
+                            style={{ background: '#dc2626', color: 'white' }}
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">

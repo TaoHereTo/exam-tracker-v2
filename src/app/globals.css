@@ -317,7 +317,8 @@ h6 {
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
+  --input: #FCFCFC;
+  --input-border: #CDCDCD;
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -358,7 +359,8 @@ h6 {
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --input: #242628;
+  --input-border: #313335;
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -1114,6 +1116,11 @@ html,
   background-color: #EEEDEC;
 }
 
+/* 深色模式下的hover效果 - 使用深色背景提高可读性 */
+.dark [data-slot="sidebar-menu-button"]:hover {
+  background-color: #28282A;
+}
+
 /* 去除点击/聚焦时的外边框与阴影，防止看起来像按钮 */
 [data-slot="sidebar-menu-button"]:focus,
 [data-slot="sidebar-menu-button"]:focus-visible,
@@ -1128,9 +1135,9 @@ html,
   background-color: #EEEDEC;
 }
 
-/* 深色模式下的选中状态 - 增强可见性 */
+/* 深色模式下的选中状态 - 使用深色背景提高可读性 */
 .dark [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: #EEEDEC;
+  background-color: #28282A;
 }
 
 /* 确保侧边栏内容不会溢出 */
@@ -1138,6 +1145,11 @@ html,
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 0.25rem;
+}
+
+/* 用户信息区域在深色模式下的选中状态 */
+.dark [data-slot="sidebar-menu-button"][data-state="open"] {
+  background-color: #28282A;
 }
 
 /* 增加侧边栏组标签的左边距 */
@@ -1228,7 +1240,8 @@ html,
 .dark .sidebar-child[data-state="active"],
 .dark .sidebar-child.active,
 .dark .sidebar-child:active {
-  @apply text-gray-900 bg-white;
+  @apply text-white;
+  background-color: #28282A;
 }
 
 .sidebar-child.bg-primary:hover,
@@ -1244,7 +1257,8 @@ html,
 .dark .sidebar-child[data-state="active"]:hover,
 .dark .sidebar-child.active:hover,
 .dark .sidebar-child:active:hover {
-  @apply text-gray-900 bg-white;
+  @apply text-white;
+  background-color: #28282A;
 }
 
 /* 侧边栏图标和箭头样式 */
@@ -1454,6 +1468,303 @@ body.eye-care.dark .text-muted-foreground,
 }
 
 /* ========== 响应式设计优化 ========== */
+/* ========== 统一按钮Hover样式 ========== */
+/* 标准化所有按钮的hover颜色，但排除destructive按钮和no-hover按钮 */
+/* 浅色模式 - #EEEDEC */
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive) {
+  background-color: #EEEDEC !important;
+}
+
+/* 深色模式 - #28282A */
+.dark button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+.dark [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+.dark .btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+.dark [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive) {
+  background-color: #28282A !important;
+}
+
+/* ========== 统一下拉菜单Hover样式 ========== */
+/* DropdownMenuItem hover颜色标准化 */
+[data-slot="dropdown-menu-item"]:hover,
+[data-slot="dropdown-menu-item"]:focus,
+[data-slot="dropdown-menu-sub-trigger"]:hover,
+[data-slot="dropdown-menu-sub-trigger"]:focus,
+[data-slot="dropdown-menu-checkbox-item"]:hover,
+[data-slot="dropdown-menu-checkbox-item"]:focus,
+[data-slot="dropdown-menu-radio-item"]:hover,
+[data-slot="dropdown-menu-radio-item"]:focus {
+  background-color: #EEEDEC !important;
+}
+
+.dark [data-slot="dropdown-menu-item"]:hover,
+.dark [data-slot="dropdown-menu-item"]:focus,
+.dark [data-slot="dropdown-menu-sub-trigger"]:hover,
+.dark [data-slot="dropdown-menu-sub-trigger"]:focus,
+.dark [data-slot="dropdown-menu-checkbox-item"]:hover,
+.dark [data-slot="dropdown-menu-checkbox-item"]:focus,
+.dark [data-slot="dropdown-menu-radio-item"]:hover,
+.dark [data-slot="dropdown-menu-radio-item"]:focus {
+  background-color: #28282A !important;
+}
+
+/* SelectItem hover颜色标准化 */
+[data-slot="select-item"]:hover,
+[data-slot="select-item"]:focus {
+  background-color: #EEEDEC !important;
+}
+
+.dark [data-slot="select-item"]:hover,
+.dark [data-slot="select-item"]:focus {
+  background-color: #28282A !important;
+}
+
+/* ContextMenuItem hover颜色标准化 */
+[data-slot="context-menu-item"]:hover,
+[data-slot="context-menu-item"]:focus,
+[data-slot="context-menu-checkbox-item"]:hover,
+[data-slot="context-menu-checkbox-item"]:focus,
+[data-slot="context-menu-radio-item"]:hover,
+[data-slot="context-menu-radio-item"]:focus {
+  background-color: #EEEDEC !important;
+}
+
+.dark [data-slot="context-menu-item"]:hover,
+.dark [data-slot="context-menu-item"]:focus,
+.dark [data-slot="context-menu-checkbox-item"]:hover,
+.dark [data-slot="context-menu-checkbox-item"]:focus,
+.dark [data-slot="context-menu-radio-item"]:hover,
+.dark [data-slot="context-menu-radio-item"]:focus {
+  background-color: #28282A !important;
+}
+
+/* 保持outline按钮的边框 */
+button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider),
+[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider) {
+  border-color: var(--input-border) !important;
+}
+
+/* 确保所有带有destructive变体的按钮都有正确的红色背景 */
+.destructive,
+*[data-variant="destructive"],
+*[variant="destructive"],
+button[variant="destructive"],
+[role="button"][variant="destructive"],
+.btn-destructive {
+  background-color: #dc2626 !important;
+  color: white !important;
+  border-color: #dc2626 !important;
+}
+
+.dark .destructive,
+.dark *[data-variant="destructive"],
+.dark *[variant="destructive"],
+.dark button[variant="destructive"],
+.dark [role="button"][variant="destructive"],
+.dark .btn-destructive {
+  background-color: #dc2626 !important;
+  color: white !important;
+  border-color: #dc2626 !important;
+}
+
+/* 特殊按钮保持原有样式（如destructive等） */
+button[data-variant="destructive"],
+[data-slot="button"][data-variant="destructive"],
+button.bg-red-600,
+button.bg-destructive {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+.dark button[data-variant="destructive"],
+.dark [data-slot="button"][data-variant="destructive"],
+.dark button.bg-red-600,
+.dark button.bg-destructive {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+/* 确保 destructive 按钮在 hover 状态下保持红色背景 */
+button[data-variant="destructive"]:hover,
+[data-slot="button"][data-variant="destructive"]:hover,
+button[variant="destructive"]:hover,
+[role="button"][variant="destructive"]:hover,
+button.bg-red-600:hover,
+button.bg-destructive:hover,
+.destructive:hover,
+*[data-variant="destructive"]:hover,
+*[variant="destructive"]:hover {
+  background-color: #dc2626 !important;
+  color: white !important;
+  border-color: #dc2626 !important;
+}
+
+.dark button[data-variant="destructive"]:hover,
+.dark [data-slot="button"][data-variant="destructive"]:hover,
+.dark button[variant="destructive"]:hover,
+.dark [role="button"][variant="destructive"]:hover,
+.dark button.bg-red-600:hover,
+.dark button.bg-destructive:hover,
+.dark .destructive:hover,
+.dark *[data-variant="destructive"]:hover,
+.dark *[variant="destructive"]:hover {
+  background-color: #dc2626 !important;
+  color: white !important;
+  border-color: #dc2626 !important;
+}
+
+/* ========== 确认删除按钮文字颜色强制为白色 ========== */
+/* 确保所有确认删除按钮的文字始终为白色，无论hover状态如何 */
+/* AlertDialog Action 按钮 */
+[data-slot="alert-dialog-action"],
+button[style*="background: #dc2626"],
+button[style*="background:#dc2626"],
+.alert-dialog-action,
+.AlertDialogAction,
+/* 计划删除和知识点删除的确认按钮 */
+button[style*="background: #dc2626"] *,
+button[style*="background:#dc2626"] *,
+[data-slot="alert-dialog-action"] *,
+/* 更具体的选择器 */
+[role="alertdialog"] button[style*="#dc2626"],
+[role="alertdialog"] button[style*="#dc2626"] * {
+  color: white !important;
+}
+
+/* Hover状态也保持白色 */
+[data-slot="alert-dialog-action"]:hover,
+button[style*="background: #dc2626"]:hover,
+button[style*="background:#dc2626"]:hover,
+.alert-dialog-action:hover,
+.AlertDialogAction:hover,
+button[style*="background: #dc2626"]:hover *,
+button[style*="background:#dc2626"]:hover *,
+[data-slot="alert-dialog-action"]:hover *,
+[role="alertdialog"] button[style*="#dc2626"]:hover,
+[role="alertdialog"] button[style*="#dc2626"]:hover * {
+  color: white !important;
+}
+
+/* 确保MixedText组件在确认删除按钮中也保持白色 */
+[data-slot="alert-dialog-action"] .mixed-text-part,
+button[style*="background: #dc2626"] .mixed-text-part,
+button[style*="background:#dc2626"] .mixed-text-part,
+.alert-dialog-action .mixed-text-part,
+.AlertDialogAction .mixed-text-part,
+[role="alertdialog"] button[style*="#dc2626"] .mixed-text-part,
+/* MixedText的所有子元素 */
+[data-slot="alert-dialog-action"] [class*="mixed-text"],
+button[style*="background: #dc2626"] [class*="mixed-text"],
+button[style*="background:#dc2626"] [class*="mixed-text"],
+.alert-dialog-action [class*="mixed-text"],
+.AlertDialogAction [class*="mixed-text"],
+[role="alertdialog"] button[style*="#dc2626"] [class*="mixed-text"] {
+  color: white !important;
+}
+
+/* MixedText hover状态 */
+[data-slot="alert-dialog-action"]:hover .mixed-text-part,
+button[style*="background: #dc2626"]:hover .mixed-text-part,
+button[style*="background:#dc2626"]:hover .mixed-text-part,
+.alert-dialog-action:hover .mixed-text-part,
+.AlertDialogAction:hover .mixed-text-part,
+[role="alertdialog"] button[style*="#dc2626"]:hover .mixed-text-part,
+[data-slot="alert-dialog-action"]:hover [class*="mixed-text"],
+button[style*="background: #dc2626"]:hover [class*="mixed-text"],
+button[style*="background:#dc2626"]:hover [class*="mixed-text"],
+.alert-dialog-action:hover [class*="mixed-text"],
+.AlertDialogAction:hover [class*="mixed-text"],
+[role="alertdialog"] button[style*="#dc2626"]:hover [class*="mixed-text"] {
+  color: white !important;
+}
+
+/* ========== 优化Hover过渡效果 ========== */
+/* 对基础交互元素使用快速hover效果，但排除destructive按钮和卡片 */
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+tr:hover,
+tbody tr:hover,
+.hover\:bg-\[\#EEEDEC\]:hover,
+.dark .hover\:bg-\[\#28282A\]:hover {
+  transition-duration: 1ms !important;
+}
+
+/* 加速表格行的hover效果 */
+.transition-colors {
+  transition-duration: 1ms !important;
+}
+
+/* 卡片保持优雅的hover过渡效果 - 恢复较慢的过渡时间用于浮起效果 */
+[data-slot="card"],
+.card,
+.shadow-md,
+.hover\:shadow-lg,
+.hover\:-translate-y-1 {
+  transition-duration: 300ms !important;
+}
+
+
+
+
+/* 侧边栏拖拽边缘禁用hover效果 */
+[data-slot="sidebar-rail"]:hover,
+[data-sidebar="rail"]:hover {
+  background-color: transparent !important;
+}
+
+[data-slot="sidebar-rail"]:hover:after,
+[data-sidebar="rail"]:hover:after {
+  background-color: transparent !important;
+}
+
+/* 强制覆盖侧边栏标题样式 */
+[data-slot="sidebar-header"] span[style*="font-size"] {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+  display: block !important;
+}
+
+/* 更强的选择器覆盖 */
+.dark [data-slot="sidebar-header"] span[style*="font-size"],
+[data-slot="sidebar-header"] .mixed-text-container span[style*="font-size"],
+[data-slot="sidebar-header"] .mixed-text-part {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+}
+
+/* 最强选择器 - 对所有可能的元素应用样式 */
+[data-slot="sidebar-header"] * {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+}
+
+/* 针对 text-3xl 和 font-black 类的覆盖 */
+[data-slot="sidebar-header"] .text-3xl,
+[data-slot="sidebar-header"] .font-black {
+  font-size: 28px !important;
+  font-weight: 900 !important;
+}
+
+/* 基础交互元素保持快速响应 */
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not(.plan-status-button):not([data-slot="card"]):not(.card),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not(.plan-status-button):not([data-slot="card"]):not(.card) {
+  transition-duration: 1ms !important;
+}
+
+/* 保持Switch组件原有的过渡效果 */
+[data-slot="switch"],
+[data-slot="switch-thumb"],
+.switch,
+.switch *,
+.slider,
+.sun-moon {
+  transition-duration: 0.2s !important;
+}
+
 @media (max-width: 640px) {
 
   /* 小屏幕下的侧边栏优化 */

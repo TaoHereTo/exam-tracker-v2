@@ -213,7 +213,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         {/* 搜索和操作栏 */}
                         <div className="flex items-center gap-2">
                             <div className="relative flex-1">
-                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 dark:text-gray-300 z-10 pointer-events-none" />
                                 <Input
                                     placeholder="搜索图片名称..."
                                     value={searchTerm}
@@ -336,7 +336,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
-                            className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
                         >
                             <MixedText text="确认选择" />
                         </Button>
@@ -380,7 +379,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         <AlertDialogAction
                             onClick={confirmDelete}
                             disabled={isDeleting}
-                            style={{ background: '#EF4444' }}
+                            style={{ background: '#EF4444', color: 'white' }}
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">

@@ -49,9 +49,11 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     });
 
     // 根据主题动态设置颜色
-    const backgroundColor = isDarkMode ? '#1a1a1a' : '#fff';
+    const backgroundColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';
     const textColor = isDarkMode ? '#e5e5e5' : '#333';
-    const borderColor = isDarkMode ? '#1a1a1a' : '#fff';
+    // 图例文字在深色模式下使用黑色以提高可读性
+    const legendTextColor = isDarkMode ? '#333' : '#333';
+    const borderColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';
     const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
     const tooltipBorderColor = isDarkMode ? '#404040' : '#e0e6f1';
 
@@ -76,8 +78,11 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             top: 20,
             formatter: (name: string) => name,
             ...UNIFIED_LEGEND_STYLE,
+            // 覆盖主题相关的样式
+            backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
+            borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
             textStyle: {
-                color: textColor,
+                color: legendTextColor,
                 fontSize: 14,
                 fontWeight: 'bold',
                 fontFamily: 'Times New Roman, 思源宋体, serif'
