@@ -4,16 +4,19 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ========== 字体管理系统 ========== */
-/* 全局字体设置 - 简化版本 */
+/* 全局字体设置 */
+* {
+  font-family: '思源宋体', 'Times New Roman', serif;
+}
+
 body,
 html {
-  font-family: '思源宋体', 'Times New Roman', serif;
   width: 100%;
   margin: 0;
   padding: 0;
 }
 
-/* 基础字体类 - 简化 */
+/* 基础字体类 */
 .font-chinese {
   font-family: '思源宋体', serif;
 }
@@ -26,52 +29,9 @@ html {
   font-family: '思源宋体', 'Times New Roman', serif;
 }
 
-/* MixedText 组件样式 - 简化 */
-.mixed-text {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-.mixed-text-container {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
+/* MixedText 组件样式 */
 .mixed-text-part {
   font-weight: 400;
-}
-
-/* 输入框字体设置 - 简化 */
-input,
-textarea,
-select,
-button,
-[role="button"],
-[role="textbox"],
-[data-slot="input"],
-[data-slot="textarea"],
-[data-slot="select-trigger"],
-[data-slot="select-value"],
-[data-slot="select-item"] {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-/* 占位符字体设置 */
-input::placeholder,
-textarea::placeholder {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-/* Radix UI Select 组件字体设置 */
-[data-radix-select-trigger],
-[data-radix-select-value],
-[data-radix-select-item] {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-/* 表格字体设置 */
-table,
-td,
-th {
-  font-family: '思源宋体', 'Times New Roman', serif;
 }
 
 /* 表格标题字体粗细设置 */
@@ -79,35 +39,8 @@ th {
   font-weight: 600 !important;
 }
 
-/* 确保表格标题中的MixedText组件也保持加粗 */
 th .mixed-text-part {
   font-weight: 600 !important;
-}
-
-/* 标题字体设置 */
-label,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-/* 确保所有文本元素都使用正确字体 */
-* {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
-
-/* 特定元素的字体覆盖 */
-.text-sm,
-.text-base,
-.text-lg,
-.text-xl,
-.text-2xl,
-.text-3xl {
-  font-family: '思源宋体', 'Times New Roman', serif;
 }
 
 /* ========== 按钮间距系统 ========== */
@@ -275,32 +208,25 @@ h6 {
 /* ========== 颜色变量 ========== */
 :root {
   --radius: 0.625rem;
-  /* —— 通用间距刻度（可复用） —— */
+  /* 通用间距刻度（可复用） */
   --space-0: 0px;
-  --space-1: 0.25rem;
-  /* 4px */
-  --space-2: 0.5rem;
-  /* 8px */
-  --space-3: 0.75rem;
-  /* 12px */
-  --space-4: 1rem;
-  /* 16px */
-  --space-5: 1.25rem;
-  /* 20px */
-  --space-6: 1.5rem;
-  /* 24px */
-  --space-8: 2rem;
-  /* 32px */
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem; /* 24px */
+  --space-8: 2rem; /* 32px */
 
-  /* —— 表单/卡片统一间距令牌 —— */
+  /* 表单/卡片统一间距令牌 */
   --form-gap: var(--space-4);
   --form-section-gap: var(--space-5);
   --form-field-gap: var(--space-2);
   --form-grid-gap: var(--space-4);
   --form-card-padding-x: 1.5rem;
-  /* 与 Card 的 px-6 对齐 */
   --form-card-padding-y: 1.25rem;
-  /* 与 CardContent 的 pb-4 对齐 */
+  
+  /* 主题颜色 */
   --background: #F8F7F6;
   --foreground: oklch(0.145 0 0);
   --card: #FAFAFA;
@@ -325,6 +251,8 @@ h6 {
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
+  
+  /* 侧边栏颜色 */
   --sidebar: #F8F7F6;
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -335,11 +263,17 @@ h6 {
   --sidebar-ring: oklch(0.708 0 0);
   --sidebar-width: 280px;
   --sidebar-width-icon: 4rem;
+  
+  /* 彩虹色彩 */
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
+  
+  /* 统一的 hover 颜色 */
+  --hover-light: #EEEDEC;
+  --hover-dark: #28282A;
 }
 
 .dark {
@@ -386,34 +320,6 @@ h6 {
 
 /* ========== 基础样式 ========== */
 @layer base {
-  :root {
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
-    --sidebar-width: 280px;
-    --sidebar-width-mobile: 20rem;
-    --sidebar-width-icon: 4rem;
-  }
-
-  .dark {
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-    --sidebar-width: 280px;
-    --sidebar-width-mobile: 20rem;
-    --sidebar-width-icon: 4rem;
-  }
-
   * {
     @apply border-border outline-ring/50;
   }
@@ -1019,20 +925,6 @@ html,
   display: block !important;
 }
 
-/* 收起状态下按钮容器居中 */
-[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
-  justify-content: center !important;
-  text-align: center !important;
-  margin: 0.125rem 0.25rem !important;
-  width: calc(100% - 0.5rem) !important;
-}
-
-
-
-
-
-
-
 /* 增加侧边栏菜单按钮的左边距，让图标距离左边更远 */
 [data-slot="sidebar-menu-button"] {
   padding-left: 1rem !important;
@@ -1111,17 +1003,19 @@ html,
   display: block !important;
 }
 
-/* 浅色模式下的hover效果 */
-[data-slot="sidebar-menu-button"]:hover {
-  background-color: #EEEDEC;
+/* 侧边栏 hover 和选中状态样式 */
+[data-slot="sidebar-menu-button"]:hover,
+[data-slot="sidebar-menu-button"][data-active="true"] {
+  background-color: var(--hover-light);
 }
 
-/* 深色模式下的hover效果 - 使用深色背景提高可读性 */
-.dark [data-slot="sidebar-menu-button"]:hover {
-  background-color: #28282A;
+.dark [data-slot="sidebar-menu-button"]:hover,
+.dark [data-slot="sidebar-menu-button"][data-active="true"],
+.dark [data-slot="sidebar-menu-button"][data-state="open"] {
+  background-color: var(--hover-dark);
 }
 
-/* 去除点击/聚焦时的外边框与阴影，防止看起来像按钮 */
+/* 去除点击/聚焦时的外边框与阴影 */
 [data-slot="sidebar-menu-button"]:focus,
 [data-slot="sidebar-menu-button"]:focus-visible,
 [data-slot="sidebar-menu-button"]:active {
@@ -1130,103 +1024,64 @@ html,
   border: none;
 }
 
-/* 浅色模式下的选中状态 */
-[data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: #EEEDEC;
-}
-
-/* 深色模式下的选中状态 - 使用深色背景提高可读性 */
-.dark [data-slot="sidebar-menu-button"][data-active="true"] {
-  background-color: #28282A;
-}
-
-/* 确保侧边栏内容不会溢出 */
+/* 侧边栏间距和布局 */
 [data-slot="sidebar-inner"] {
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 0.25rem;
 }
 
-/* 用户信息区域在深色模式下的选中状态 */
-.dark [data-slot="sidebar-menu-button"][data-state="open"] {
-  background-color: #28282A;
+[data-slot="sidebar-container"] {
+  overflow: hidden;
 }
 
-/* 增加侧边栏组标签的左边距 */
+/* 侧边栏组标签样式 */
 [data-slot="sidebar-group-label"] {
   padding-left: 1.25rem !important;
   padding-right: 1rem !important;
 }
 
-/* 收起状态下的组标签样式 */
+/* 侧边栏头部和底部的内边距 */
+[data-slot="sidebar-header"],
+[data-slot="sidebar-footer"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 侧边栏组内容的内边距 */
+[data-slot="sidebar-group-content"] {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+/* 收起状态下的样式 */
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
   padding-left: 0.75rem !important;
   padding-right: 0.75rem !important;
   text-align: center !important;
 }
 
-/* 侧边栏容器确保不会产生横向滚动 */
-[data-slot="sidebar-container"] {
-  overflow: hidden;
-}
-
-/* 调整侧边栏头部和底部的内边距 */
-[data-slot="sidebar-header"] {
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-}
-
-[data-slot="sidebar-footer"] {
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-}
-
-/* 收起状态下的头部和底部样式 */
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"],
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
   padding-left: 0.75rem !important;
   padding-right: 0.75rem !important;
 }
 
-/* 调整侧边栏组内容的内边距 */
-[data-slot="sidebar-group-content"] {
-  padding-left: 0.5rem !important;
-  padding-right: 0.5rem !important;
-}
-
-/* 收起状态下的组内容样式 */
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-content"] {
   padding-left: 0.25rem !important;
   padding-right: 0.25rem !important;
 }
 
-/* 优化侧边栏按钮悬停效果，去除下划线，改为圆角高亮 */
-.sidebar-btn:hover,
-.sidebar-btn:focus-visible {
-  text-decoration: none !important;
-  background: rgba(59, 130, 246, 0.08);
-  border-radius: 0.5rem;
-  color: #2563eb;
-}
-
-.dark .sidebar-btn:hover,
-.dark .sidebar-btn:focus-visible {
-  background: rgba(59, 130, 246, 0.18);
-  color: #60a5fa;
-}
-
+/* 侧边栏按钮样式 */
 .sidebar-parent {
   @apply pl-2 py-4 text-base text-gray-800 dark:text-gray-100 flex items-center font-bold transition-all duration-150 border-none;
-}
-
-.sidebar-parent:hover {
-  @apply font-bold;
 }
 
 .sidebar-child {
   @apply pl-2 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start font-bold;
 }
 
+/* 侧边栏子项选中状态 */
 .sidebar-child.bg-primary,
 .sidebar-child[data-variant="default"],
 .sidebar-child[data-state="active"],
@@ -1241,7 +1096,7 @@ html,
 .dark .sidebar-child.active,
 .dark .sidebar-child:active {
   @apply text-white;
-  background-color: #28282A;
+  background-color: var(--hover-dark);
 }
 
 .sidebar-child.bg-primary:hover,
@@ -1258,7 +1113,7 @@ html,
 .dark .sidebar-child.active:hover,
 .dark .sidebar-child:active:hover {
   @apply text-white;
-  background-color: #28282A;
+  background-color: var(--hover-dark);
 }
 
 /* 侧边栏图标和箭头样式 */
@@ -1468,26 +1323,23 @@ body.eye-care.dark .text-muted-foreground,
 }
 
 /* ========== 响应式设计优化 ========== */
-/* ========== 统一按钮Hover样式 ========== */
-/* 标准化所有按钮的hover颜色，但排除destructive按钮、switch按钮、计划状态按钮和tabs触发器 */
-/* 浅色模式 - #EEEDEC */
+/* ========== 统一的 Hover 样式 ========== */
+/* 基础按钮 hover 效果 */
 button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
-  background-color: #EEEDEC !important;
+  background-color: var(--hover-light) !important;
+  transition-duration: 1ms !important;
 }
 
-/* 深色模式 - #28282A */
 .dark button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .dark [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-.dark .btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .dark [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
-  background-color: #28282A !important;
+  background-color: var(--hover-dark) !important;
+  transition-duration: 1ms !important;
 }
 
-/* ========== 统一下拉菜单Hover样式 ========== */
-/* DropdownMenuItem hover颜色标准化 */
+/* 下拉菜单 hover 效果 */
 [data-slot="dropdown-menu-item"]:hover,
 [data-slot="dropdown-menu-item"]:focus,
 [data-slot="dropdown-menu-sub-trigger"]:hover,
@@ -1495,8 +1347,16 @@ button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data
 [data-slot="dropdown-menu-checkbox-item"]:hover,
 [data-slot="dropdown-menu-checkbox-item"]:focus,
 [data-slot="dropdown-menu-radio-item"]:hover,
-[data-slot="dropdown-menu-radio-item"]:focus {
-  background-color: #EEEDEC !important;
+[data-slot="dropdown-menu-radio-item"]:focus,
+[data-slot="select-item"]:hover,
+[data-slot="select-item"]:focus,
+[data-slot="context-menu-item"]:hover,
+[data-slot="context-menu-item"]:focus,
+[data-slot="context-menu-checkbox-item"]:hover,
+[data-slot="context-menu-checkbox-item"]:focus,
+[data-slot="context-menu-radio-item"]:hover,
+[data-slot="context-menu-radio-item"]:focus {
+  background-color: var(--hover-light) !important;
 }
 
 .dark [data-slot="dropdown-menu-item"]:hover,
@@ -1506,216 +1366,102 @@ button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data
 .dark [data-slot="dropdown-menu-checkbox-item"]:hover,
 .dark [data-slot="dropdown-menu-checkbox-item"]:focus,
 .dark [data-slot="dropdown-menu-radio-item"]:hover,
-.dark [data-slot="dropdown-menu-radio-item"]:focus {
-  background-color: #28282A !important;
-}
-
-/* SelectItem hover颜色标准化 */
-[data-slot="select-item"]:hover,
-[data-slot="select-item"]:focus {
-  background-color: #EEEDEC !important;
-}
-
+.dark [data-slot="dropdown-menu-radio-item"]:focus,
 .dark [data-slot="select-item"]:hover,
-.dark [data-slot="select-item"]:focus {
-  background-color: #28282A !important;
-}
-
-/* ContextMenuItem hover颜色标准化 */
-[data-slot="context-menu-item"]:hover,
-[data-slot="context-menu-item"]:focus,
-[data-slot="context-menu-checkbox-item"]:hover,
-[data-slot="context-menu-checkbox-item"]:focus,
-[data-slot="context-menu-radio-item"]:hover,
-[data-slot="context-menu-radio-item"]:focus {
-  background-color: #EEEDEC !important;
-}
-
+.dark [data-slot="select-item"]:focus,
 .dark [data-slot="context-menu-item"]:hover,
 .dark [data-slot="context-menu-item"]:focus,
 .dark [data-slot="context-menu-checkbox-item"]:hover,
 .dark [data-slot="context-menu-checkbox-item"]:focus,
 .dark [data-slot="context-menu-radio-item"]:hover,
 .dark [data-slot="context-menu-radio-item"]:focus {
-  background-color: #28282A !important;
+  background-color: var(--hover-dark) !important;
 }
 
-/* 保持outline按钮的边框 */
-button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-plan-button]),
-[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-plan-button]) {
+
+/* 保持 outline 按钮的边框 */
+button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]),
+[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]) {
   border-color: var(--input-border) !important;
 }
 
-/* 确保所有带有destructive变体的按钮都有正确的红色背景 */
+/* destructive 按钮样式 */
 .destructive,
 *[data-variant="destructive"],
 *[variant="destructive"],
 button[variant="destructive"],
 [role="button"][variant="destructive"],
+[data-slot="alert-dialog-action"],
+button[style*="background: #dc2626"],
+button[style*="background:#dc2626"],
+.alert-dialog-action,
+.AlertDialogAction,
+button.bg-red-600,
+button.bg-destructive,
 .btn-destructive {
   background-color: #dc2626 !important;
   color: white !important;
   border-color: #dc2626 !important;
 }
 
-.dark .destructive,
-.dark *[data-variant="destructive"],
-.dark *[variant="destructive"],
-.dark button[variant="destructive"],
-.dark [role="button"][variant="destructive"],
-.dark .btn-destructive {
-  background-color: #dc2626 !important;
-  color: white !important;
-  border-color: #dc2626 !important;
-}
-
-/* 特殊按钮保持原有样式（如destructive等） */
-button[data-variant="destructive"],
-[data-slot="button"][data-variant="destructive"],
-button.bg-red-600,
-button.bg-destructive {
-  background-color: #dc2626 !important;
-  color: white !important;
-}
-
-.dark button[data-variant="destructive"],
-.dark [data-slot="button"][data-variant="destructive"],
-.dark button.bg-red-600,
-.dark button.bg-destructive {
-  background-color: #dc2626 !important;
-  color: white !important;
-}
-
-/* 确保 destructive 按钮在 hover 状态下保持红色背景 */
-button[data-variant="destructive"]:hover,
-[data-slot="button"][data-variant="destructive"]:hover,
-button[variant="destructive"]:hover,
-[role="button"][variant="destructive"]:hover,
-button.bg-red-600:hover,
-button.bg-destructive:hover,
+/* destructive 按钮 hover 状态 */
 .destructive:hover,
 *[data-variant="destructive"]:hover,
-*[variant="destructive"]:hover {
-  background-color: #dc2626 !important;
-  color: white !important;
-  border-color: #dc2626 !important;
-}
-
-.dark button[data-variant="destructive"]:hover,
-.dark [data-slot="button"][data-variant="destructive"]:hover,
-.dark button[variant="destructive"]:hover,
-.dark [role="button"][variant="destructive"]:hover,
-.dark button.bg-red-600:hover,
-.dark button.bg-destructive:hover,
-.dark .destructive:hover,
-.dark *[data-variant="destructive"]:hover,
-.dark *[variant="destructive"]:hover {
-  background-color: #dc2626 !important;
-  color: white !important;
-  border-color: #dc2626 !important;
-}
-
-/* ========== 确认删除按钮文字颜色强制为白色 ========== */
-/* 确保所有确认删除按钮的文字始终为白色，无论hover状态如何 */
-/* AlertDialog Action 按钮 */
-[data-slot="alert-dialog-action"],
-button[style*="background: #dc2626"],
-button[style*="background:#dc2626"],
-.alert-dialog-action,
-.AlertDialogAction,
-/* 计划删除和知识点删除的确认按钮 */
-button[style*="background: #dc2626"] *,
-button[style*="background:#dc2626"] *,
-[data-slot="alert-dialog-action"] *,
-/* 更具体的选择器 */
-[role="alertdialog"] button[style*="#dc2626"],
-[role="alertdialog"] button[style*="#dc2626"] * {
-  color: white !important;
-}
-
-/* Hover状态也保持白色 */
+*[variant="destructive"]:hover,
+button[variant="destructive"]:hover,
+[role="button"][variant="destructive"]:hover,
 [data-slot="alert-dialog-action"]:hover,
 button[style*="background: #dc2626"]:hover,
 button[style*="background:#dc2626"]:hover,
 .alert-dialog-action:hover,
 .AlertDialogAction:hover,
-button[style*="background: #dc2626"]:hover *,
-button[style*="background:#dc2626"]:hover *,
-[data-slot="alert-dialog-action"]:hover *,
-[role="alertdialog"] button[style*="#dc2626"]:hover,
-[role="alertdialog"] button[style*="#dc2626"]:hover * {
+button.bg-red-600:hover,
+button.bg-destructive:hover,
+.btn-destructive:hover {
+  background-color: #dc2626 !important;
   color: white !important;
+  border-color: #dc2626 !important;
 }
 
-/* 确保MixedText组件在确认删除按钮中也保持白色 */
+/* 确保 MixedText 组件在 destructive 按钮中保持白色 */
 [data-slot="alert-dialog-action"] .mixed-text-part,
 button[style*="background: #dc2626"] .mixed-text-part,
 button[style*="background:#dc2626"] .mixed-text-part,
 .alert-dialog-action .mixed-text-part,
 .AlertDialogAction .mixed-text-part,
 [role="alertdialog"] button[style*="#dc2626"] .mixed-text-part,
-/* MixedText的所有子元素 */
 [data-slot="alert-dialog-action"] [class*="mixed-text"],
 button[style*="background: #dc2626"] [class*="mixed-text"],
 button[style*="background:#dc2626"] [class*="mixed-text"],
 .alert-dialog-action [class*="mixed-text"],
 .AlertDialogAction [class*="mixed-text"],
-[role="alertdialog"] button[style*="#dc2626"] [class*="mixed-text"] {
+[role="alertdialog"] button[style*="#dc2626"] [class*="mixed-text"],
+/* 确保所有子元素都保持白色 */
+[data-slot="alert-dialog-action"] *,
+button[style*="background: #dc2626"] *,
+button[style*="background:#dc2626"] *,
+.alert-dialog-action *,
+.AlertDialogAction *,
+[role="alertdialog"] button[style*="#dc2626"] * {
   color: white !important;
 }
 
-/* MixedText hover状态 */
-[data-slot="alert-dialog-action"]:hover .mixed-text-part,
-button[style*="background: #dc2626"]:hover .mixed-text-part,
-button[style*="background:#dc2626"]:hover .mixed-text-part,
-.alert-dialog-action:hover .mixed-text-part,
-.AlertDialogAction:hover .mixed-text-part,
-[role="alertdialog"] button[style*="#dc2626"]:hover .mixed-text-part,
-[data-slot="alert-dialog-action"]:hover [class*="mixed-text"],
-button[style*="background: #dc2626"]:hover [class*="mixed-text"],
-button[style*="background:#dc2626"]:hover [class*="mixed-text"],
-.alert-dialog-action:hover [class*="mixed-text"],
-.AlertDialogAction:hover [class*="mixed-text"],
-[role="alertdialog"] button[style*="#dc2626"]:hover [class*="mixed-text"] {
-  color: white !important;
-}
-
-/* ========== 禁用特定组件的Hover效果 ========== */
-/* 禁用计划状态按钮的hover效果 - 最高优先级 */
-button[data-plan-button]:hover,
-button[data-plan-button]:focus,
-button[data-plan-button]:active,
-button[data-plan-button]:focus-visible,
+/* 禁用特定组件的 Hover 效果 */
 [data-plan-button]:hover,
 [data-plan-button]:focus,
 [data-plan-button]:active,
-[data-plan-button]:focus-visible {
-  /* 只禁用hover效果，保留默认背景色 */
-  transform: none !important;
-  box-shadow: none !important;
-  transition: none !important;
-  outline: none !important;
-  ring: 0 !important;
-  ring-offset: 0 !important;
-  border-ring: inherit !important;
-  ring-ring: none !important;
-}
-
-/* 禁用tabs触发器的hover效果 - 最高优先级 */
-[data-slot="tabs-trigger"],
+[data-plan-button]:focus-visible,
 [data-slot="tabs-trigger"]:hover,
 [data-slot="tabs-trigger"]:focus,
 [data-slot="tabs-trigger"]:active,
 [data-slot="tabs-trigger"]:focus-visible {
-  outline: none !important;
+  transform: none !important;
   box-shadow: none !important;
-  ring: 0 !important;
-  ring-offset: 0 !important;
-  border-ring: inherit !important;
-  ring-ring: none !important;
+  outline: none !important;
+  transition: none !important;
 }
 
-/* 增强tabs选中状态的可见性 */
+/* tabs 选中状态增强可见性 */
 [data-slot="tabs-trigger"][data-state="active"] {
   background-color: rgba(255, 255, 255, 0.7) !important;
   color: var(--foreground) !important;
@@ -1723,8 +1469,6 @@ button[data-plan-button]:focus-visible,
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   font-weight: 500 !important;
-  outline: none !important;
-  ring: 0 !important;
 }
 
 .dark [data-slot="tabs-trigger"][data-state="active"] {
@@ -1734,62 +1478,14 @@ button[data-plan-button]:focus-visible,
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   font-weight: 500 !important;
-  outline: none !important;
-  ring: 0 !important;
 }
 
-/* 确保在深色模式下也禁用 */
-.dark button[data-plan-button]:hover,
-.dark button[data-plan-button]:focus,
-.dark button[data-plan-button]:active,
-.dark button[data-plan-button]:focus-visible,
-.dark [data-plan-button]:hover,
-.dark [data-plan-button]:focus,
-.dark [data-plan-button]:active,
-.dark [data-plan-button]:focus-visible {
-  /* 只禁用hover效果，保留默认背景色 */
-  transform: none !important;
-  box-shadow: none !important;
-  transition: none !important;
-  outline: none !important;
-  ring: 0 !important;
-  ring-offset: 0 !important;
-  border-ring: inherit !important;
-  ring-ring: none !important;
-}
-
-.dark [data-slot="tabs-trigger"],
-.dark [data-slot="tabs-trigger"]:hover,
-.dark [data-slot="tabs-trigger"]:focus,
-.dark [data-slot="tabs-trigger"]:active,
-.dark [data-slot="tabs-trigger"]:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-  ring: 0 !important;
-  ring-offset: 0 !important;
-  border-ring: inherit !important;
-  ring-ring: none !important;
-}
-
-/* ========== 优化Hover过渡效果 ========== */
-/* 对基础交互元素使用快速hover效果，但排除destructive按钮和卡片 */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
-.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
-[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
-tr:hover,
-tbody tr:hover,
-.hover\:bg-\[\#EEEDEC\]:hover,
-.dark .hover\:bg-\[\#28282A\]:hover {
-  transition-duration: 1ms !important;
-}
-
-/* 加速表格行的hover效果 */
+/* 过渡效果优化 */
 .transition-colors {
   transition-duration: 1ms !important;
 }
 
-/* 卡片保持优雅的hover过渡效果 - 恢复较慢的过渡时间用于浮起效果 */
+/* 卡片保持优雅的过渡效果 */
 [data-slot="card"],
 .card,
 .shadow-md,
@@ -1798,55 +1494,13 @@ tbody tr:hover,
   transition-duration: 300ms !important;
 }
 
-
-
-
-/* 侧边栏拖拽边缘禁用hover效果 */
-[data-slot="sidebar-rail"]:hover,
-[data-sidebar="rail"]:hover {
-  background-color: transparent !important;
-}
-
-[data-slot="sidebar-rail"]:hover:after,
-[data-sidebar="rail"]:hover:after {
-  background-color: transparent !important;
-}
-
 /* 强制覆盖侧边栏标题样式 */
-[data-slot="sidebar-header"] span[style*="font-size"] {
-  font-size: 28px !important;
-  font-weight: 900 !important;
-  display: block !important;
-}
-
-/* 更强的选择器覆盖 */
-.dark [data-slot="sidebar-header"] span[style*="font-size"],
-[data-slot="sidebar-header"] .mixed-text-container span[style*="font-size"],
-[data-slot="sidebar-header"] .mixed-text-part {
-  font-size: 28px !important;
-  font-weight: 900 !important;
-}
-
-/* 最强选择器 - 对所有可能的元素应用样式 */
 [data-slot="sidebar-header"] * {
   font-size: 28px !important;
-  font-weight: 900 !important;
+  font-weight: 400 !important;
 }
 
-/* 针对 text-3xl 和 font-black 类的覆盖 */
-[data-slot="sidebar-header"] .text-3xl,
-[data-slot="sidebar-header"] .font-black {
-  font-size: 28px !important;
-  font-weight: 900 !important;
-}
-
-/* 基础交互元素保持快速响应，但排除计划状态按钮和tabs触发器 */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not([data-plan-button]):not([data-slot="tabs-trigger"]):not([data-slot="card"]):not(.card),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not([data-plan-button]):not([data-slot="tabs-trigger"]):not([data-slot="card"]):not(.card) {
-  transition-duration: 1ms !important;
-}
-
-/* 保持Switch组件原有的过渡效果 */
+/* Switch 组件保持原有过渡效果 */
 [data-slot="switch"],
 [data-slot="switch-thumb"],
 .switch,
@@ -1856,15 +1510,63 @@ button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.swit
   transition-duration: 0.2s !important;
 }
 
-@media (max-width: 640px) {
+/* 侧边栏拖拽边缘禁用 hover 效果 */
 
-  /* 小屏幕下的侧边栏优化 */
+/* 固定页面标题样式 */
+.page-title-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--background);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .page-title-sticky {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 确保内容区域正确滚动 */
+.content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 优化滚动条样式 */
+.content-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-scrollable::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+.dark .content-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 响应式优化 */
+@media (max-width: 640px) {
   .sidebar-parent,
   .sidebar-child {
     font-size: 0.875rem;
   }
 
-  /* 确保文字不会换行 */
   .truncate {
     white-space: nowrap;
     overflow: hidden;
@@ -1873,14 +1575,11 @@ button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.swit
 }
 
 @media (max-width: 480px) {
-
-  /* 超小屏幕下的进一步优化 */
   .sidebar-parent,
   .sidebar-child {
     font-size: 0.8rem;
   }
 
-  /* 确保图标和文字的对齐 */
   .flex-shrink-0 {
     flex-shrink: 0;
   }

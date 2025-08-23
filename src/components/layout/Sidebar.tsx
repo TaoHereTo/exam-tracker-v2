@@ -29,7 +29,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
         <SidebarUI collapsible="icon" className="group" data-side="left">
             <SidebarHeader>
                 <div className="flex items-center justify-center px-2 py-3">
-                    <span className="text-3xl font-black" style={{ fontSize: '28px', fontWeight: '900' }}>
+                    <span className="text-3xl font-normal" style={{ fontSize: '28px', fontWeight: '400' }}>
                         <MixedText text="行测记录" />
                     </span>
                 </div>

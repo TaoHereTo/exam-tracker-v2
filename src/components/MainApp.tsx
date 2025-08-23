@@ -632,14 +632,14 @@ export function MainApp() {
                                         setActiveTab={setActiveTab}
                                         userInfo={<SidebarUserInfo />}
                                     />
-                                    <main className="flex-1 w-full overflow-auto bg-background dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
-                                        {/* 侧边栏触发器 */}
-                                        <div className="flex items-center gap-4 p-4 border-b border-border text-left">
+                                    <main className="flex-1 w-full overflow-hidden bg-background dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
+                                        {/* 固定的侧边栏触发器和标题栏 */}
+                                        <div className="page-title-sticky flex items-center gap-4 p-4 border-b border-border text-left bg-background dark:bg-background">
                                             <SidebarTrigger className="size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-6 [&>svg]:!w-6 font-normal" />
                                             <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
                                         </div>
 
-                                        <div className={`w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-6'} max-w-7xl mx-auto`}>
+                                        <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-6'} max-w-7xl mx-auto`}>
                                             {activeTab === 'overview' && (
                                                 <OverviewView
                                                     records={records}
@@ -880,14 +880,22 @@ export function MainApp() {
                                     navMode={navMode}
                                     userInfo={<DockUserInfo />}
                                 />
-                                <main className={`flex-1 overflow-auto ${activeTab === 'overview' ? 'p-0' : 'p-6'} w-full max-w-7xl mx-auto bg-background dark:bg-background text-left`}>
-                                    {activeTab === 'overview' ? (
-                                        <div className="p-6">
-                                            <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
-                                        </div>
-                                    ) : (
-                                        <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
-                                    )}
+                                <main className={`flex-1 overflow-hidden ${activeTab === 'overview' ? 'p-0' : ''} w-full max-w-7xl mx-auto bg-background dark:bg-background text-left flex flex-col`}>
+                                    {/* 固定的页面标题栏 */}
+                                    <div className="page-title-sticky bg-background dark:bg-background border-b border-border">
+                                        {activeTab === 'overview' ? (
+                                            <div className="p-6">
+                                                <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
+                                            </div>
+                                        ) : (
+                                            <div className="p-6 pb-4">
+                                                <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* 可滚动的内容区域 */}
+                                    <div className={`content-scrollable flex-1 ${activeTab === 'overview' ? '' : 'p-6 pt-2'}`}>
 
                                     {activeTab === 'overview' && (
                                         <OverviewView
@@ -1051,6 +1059,7 @@ export function MainApp() {
                                             }}
                                         />
                                     )}
+                                    </div>
                                 </main>
                             </div>
                         )}
