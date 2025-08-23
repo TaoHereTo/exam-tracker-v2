@@ -222,10 +222,17 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     <Button
                         onClick={() => handleOpenForm()}
                         className="h-9 text-white"
-                        style={{ backgroundColor: '#1d4ed8', color: 'white' }}
+                        style={{ 
+                            backgroundColor: '#1d4ed8', 
+                            color: 'white',
+                            transition: 'none',
+                            transform: 'none',
+                            boxShadow: 'inherit'
+                        }}
+                        data-plan-button
                         onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = '#1d4ed8';
-                            e.currentTarget.style.color = 'black';
+                            e.currentTarget.style.color = 'white';
                             e.currentTarget.style.transform = 'none';
                             e.currentTarget.style.boxShadow = 'inherit';
                         }}
@@ -248,13 +255,17 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     variant={!showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(false)}
                     className="flex items-center gap-2"
-                    style={!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {}}
+                    style={{
+                        ...((!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {})),
+                        transition: 'none',
+                        transform: 'none',
+                        boxShadow: 'inherit'
+                    }}
+                    data-plan-button
                     onMouseEnter={(e) => {
                         if (!showCompleted) {
                             e.currentTarget.style.backgroundColor = '#10b981';
-                            e.currentTarget.style.color = 'black';
-                        } else {
-                            e.currentTarget.style.color = 'black';
+                            e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = 'inherit';
@@ -263,8 +274,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                         if (!showCompleted) {
                             e.currentTarget.style.backgroundColor = '#10b981';
                             e.currentTarget.style.color = 'white';
-                        } else {
-                            e.currentTarget.style.color = '';
                         }
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = 'inherit';
@@ -277,13 +286,17 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     variant={showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(true)}
                     className="flex items-center gap-2"
-                    style={showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}}
+                    style={{
+                        ...(showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}),
+                        transition: 'none',
+                        transform: 'none',
+                        boxShadow: 'inherit'
+                    }}
+                    data-plan-button
                     onMouseEnter={(e) => {
                         if (showCompleted) {
                             e.currentTarget.style.backgroundColor = '#0284c7';
-                            e.currentTarget.style.color = 'black';
-                        } else {
-                            e.currentTarget.style.color = 'black';
+                            e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = 'inherit';
@@ -292,8 +305,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                         if (showCompleted) {
                             e.currentTarget.style.backgroundColor = '#0284c7';
                             e.currentTarget.style.color = 'white';
-                        } else {
-                            e.currentTarget.style.color = '';
                         }
                         e.currentTarget.style.transform = 'none';
                         e.currentTarget.style.boxShadow = 'inherit';
@@ -422,10 +433,17 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             <Button
                                 onClick={() => handleOpenForm()}
                                 className="h-9 text-white"
-                                style={{ backgroundColor: '#1d4ed8', color: 'white' }}
+                                style={{ 
+                                    backgroundColor: '#1d4ed8', 
+                                    color: 'white',
+                                    transition: 'none',
+                                    transform: 'none',
+                                    boxShadow: 'inherit'
+                                }}
+                                data-plan-button
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                    e.currentTarget.style.color = 'black';
+                                    e.currentTarget.style.color = 'white';
                                     e.currentTarget.style.transform = 'none';
                                     e.currentTarget.style.boxShadow = 'inherit';
                                 }}

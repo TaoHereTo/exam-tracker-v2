@@ -47,9 +47,19 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white/30 data-[state=active]:text-foreground data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-sm hover:bg-white/10",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white/70 data-[state=active]:text-foreground data-[state=active]:shadow-md data-[state=active]:backdrop-blur-sm data-[state=active]:border data-[state=active]:border-white/20 data-[state=active]:font-medium dark:data-[state=active]:bg-white/15 dark:data-[state=active]:border-white/10",
         className
       )}
+      style={{
+        outline: 'none'
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outline = 'none';
+        // Only remove box-shadow if not in active state
+        if (e.currentTarget.dataset.state !== 'active') {
+          e.currentTarget.style.boxShadow = 'none';
+        }
+      }}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}

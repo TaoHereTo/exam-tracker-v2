@@ -30,6 +30,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
+    const [isPageDragOver, setIsPageDragOver] = useState(false); // 页面级拖拽状态
     const [isDeleting, setIsDeleting] = useState(false);
     const componentRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -112,6 +113,49 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         }
     }, [handleFileUpload]);
 
+    // 页面级拖拽事件处理
+    useEffect(() => {
+        const handlePageDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            // 检查是否包含图片文件
+            const items = e.dataTransfer?.items;
+            if (items) {
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.startsWith('image/')) {
+                        setIsPageDragOver(true);
+                        return;
+                    }
+                }
+            }
+        };
+
+        const handlePageDragLeave = (e: DragEvent) => {
+            e.preventDefault();
+            // 检查是否真的离开了页面（而不是进入子元素）
+            if (!e.relatedTarget || !document.body.contains(e.relatedTarget as Node)) {
+                setIsPageDragOver(false);
+                setIsDragOver(false);
+            }
+        };
+
+        const handlePageDrop = (e: DragEvent) => {
+            e.preventDefault();
+            setIsPageDragOver(false);
+            setIsDragOver(false);
+        };
+
+        // 添加页面级事件监听器
+        document.addEventListener('dragover', handlePageDragOver);
+        document.addEventListener('dragleave', handlePageDragLeave);
+        document.addEventListener('drop', handlePageDrop);
+
+        return () => {
+            document.removeEventListener('dragover', handlePageDragOver);
+            document.removeEventListener('dragleave', handlePageDragLeave);
+            document.removeEventListener('drop', handlePageDrop);
+        };
+    }, []);
+
     // 注册粘贴处理器
     useEffect(() => {
         const currentComponentId = componentId.current;
@@ -165,7 +209,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         }
     };
 
-    // 处理拖拽
+    // 处理拖拽 - 组件级别
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragOver(true);
@@ -173,12 +217,20 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
 
     const handleDragLeave = (e: React.DragEvent) => {
         e.preventDefault();
-        setIsDragOver(false);
+        // 只有当离开组件边界时才设置为false
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX;
+        const y = e.clientY;
+        
+        if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+            setIsDragOver(false);
+        }
     };
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragOver(false);
+        setIsPageDragOver(false);
 
         if (isLoading) return;
 
@@ -259,8 +311,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                     {/* 上传区域 */}
                     {(mode === 'upload' || mode === 'combined') && (
                         <div
-                            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors relative ${isDragOver
-                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                            className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors relative ${(isDragOver || isPageDragOver)
+                                ? 'border-blue-500 bg-blue-100 dark:bg-blue-900/30'
                                 : 'border-gray-300 hover:border-gray-400'
                                 }`}
                             onDragOver={handleDragOver}
@@ -276,31 +328,42 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center space-y-3">
-                                    <div className="flex flex-col items-center space-y-1">
-                                        <FileImage className="h-6 w-6 text-gray-400" />
-                                        <div className="text-center">
-                                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                                                <MixedText text="拖拽或粘贴图片" />
-                                            </p>
+                                    {(isDragOver || isPageDragOver) ? (
+                                        <div className="flex flex-col items-center space-y-2">
+                                            <FileImage className="h-8 w-8 text-blue-500" />
+                                            <div className="text-center">
+                                                <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                                                    <MixedText text="拖拽图片到此处" />
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ) : (
+                                        <div className="flex flex-col items-center space-y-1">
+                                            <FileImage className="h-6 w-6 text-gray-400" />
+                                            <div className="text-center">
+                                                <p className="text-xs text-gray-600 dark:text-gray-400">
+                                                    <MixedText text="拖拽或粘贴图片" />
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                    {/* 按钮区域 */}
-                                    <div
-                                        className="flex flex-col sm:flex-row gap-1 w-full max-w-80"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        {/* 本地选择按钮 */}
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleFileSelect}
-                                                className="hidden"
-                                                disabled={isLoading}
-                                                id={`file-input-${componentId.current}`}
-                                            />
-                                            <div className="w-full">
+                                    {/* 按钮区域 - 仅在非拖拽状态显示 */}
+                                    {!(isDragOver || isPageDragOver) && (
+                                        <div
+                                            className="flex justify-center gap-3"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            {/* 本地选择按钮 */}
+                                            <div>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleFileSelect}
+                                                    className="hidden"
+                                                    disabled={isLoading}
+                                                    id={`file-input-${componentId.current}`}
+                                                />
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
@@ -324,12 +387,10 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     </Tooltip>
                                                 </TooltipProvider>
                                             </div>
-                                        </div>
 
-                                        {/* 云端选择按钮 */}
-                                        {mode !== 'upload' && (
-                                            <div className="flex-1">
-                                                <div className="w-full">
+                                            {/* 云端选择按钮 */}
+                                            {mode !== 'upload' && (
+                                                <div>
                                                     <TooltipProvider>
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
@@ -356,27 +417,27 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                             </TooltipContent>
                                                         </Tooltip>
                                                     </TooltipProvider>
+                                                    {/* 隐藏的云端选择对话框触发器 */}
+                                                    <div className="hidden">
+                                                        <SupabaseImageSelectorDialog
+                                                            onImageSelected={handleImageSelected}
+                                                            trigger={
+                                                                <Button
+                                                                    data-cloud-selector="true"
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    className="h-9 w-9"
+                                                                    type="button"
+                                                                >
+                                                                    <CloudCheck className="w-5 h-5" />
+                                                                </Button>
+                                                            }
+                                                        />
+                                                    </div>
                                                 </div>
-                                                {/* 隐藏的云端选择对话框触发器 */}
-                                                <div className="hidden">
-                                                    <SupabaseImageSelectorDialog
-                                                        onImageSelected={handleImageSelected}
-                                                        trigger={
-                                                            <Button
-                                                                data-cloud-selector="true"
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-9 w-9"
-                                                                type="button"
-                                                            >
-                                                                <CloudCheck className="w-5 h-5" />
-                                                            </Button>
-                                                        }
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
+                                            )}
+                                        </div>
+                                    )}
 
 
                                 </div>

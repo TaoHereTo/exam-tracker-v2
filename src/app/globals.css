@@ -1469,20 +1469,20 @@ body.eye-care.dark .text-muted-foreground,
 
 /* ========== 响应式设计优化 ========== */
 /* ========== 统一按钮Hover样式 ========== */
-/* 标准化所有按钮的hover颜色，但排除destructive按钮和no-hover按钮 */
+/* 标准化所有按钮的hover颜色，但排除destructive按钮、switch按钮、计划状态按钮和tabs触发器 */
 /* 浅色模式 - #EEEDEC */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive) {
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
   background-color: #EEEDEC !important;
 }
 
 /* 深色模式 - #28282A */
-.dark button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-.dark [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-.dark .btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-.dark [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive) {
+.dark button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.dark [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.dark .btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.dark [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
   background-color: #28282A !important;
 }
 
@@ -1541,8 +1541,8 @@ button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data
 }
 
 /* 保持outline按钮的边框 */
-button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider),
-[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider) {
+button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-plan-button]),
+[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-plan-button]) {
   border-color: var(--input-border) !important;
 }
 
@@ -1680,12 +1680,103 @@ button[style*="background:#dc2626"]:hover [class*="mixed-text"],
   color: white !important;
 }
 
+/* ========== 禁用特定组件的Hover效果 ========== */
+/* 禁用计划状态按钮的hover效果 - 最高优先级 */
+button[data-plan-button]:hover,
+button[data-plan-button]:focus,
+button[data-plan-button]:active,
+button[data-plan-button]:focus-visible,
+[data-plan-button]:hover,
+[data-plan-button]:focus,
+[data-plan-button]:active,
+[data-plan-button]:focus-visible {
+  /* 只禁用hover效果，保留默认背景色 */
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+  outline: none !important;
+  ring: 0 !important;
+  ring-offset: 0 !important;
+  border-ring: inherit !important;
+  ring-ring: none !important;
+}
+
+/* 禁用tabs触发器的hover效果 - 最高优先级 */
+[data-slot="tabs-trigger"],
+[data-slot="tabs-trigger"]:hover,
+[data-slot="tabs-trigger"]:focus,
+[data-slot="tabs-trigger"]:active,
+[data-slot="tabs-trigger"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  ring: 0 !important;
+  ring-offset: 0 !important;
+  border-ring: inherit !important;
+  ring-ring: none !important;
+}
+
+/* 增强tabs选中状态的可见性 */
+[data-slot="tabs-trigger"][data-state="active"] {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  ring: 0 !important;
+}
+
+.dark [data-slot="tabs-trigger"][data-state="active"] {
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--foreground) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 500 !important;
+  outline: none !important;
+  ring: 0 !important;
+}
+
+/* 确保在深色模式下也禁用 */
+.dark button[data-plan-button]:hover,
+.dark button[data-plan-button]:focus,
+.dark button[data-plan-button]:active,
+.dark button[data-plan-button]:focus-visible,
+.dark [data-plan-button]:hover,
+.dark [data-plan-button]:focus,
+.dark [data-plan-button]:active,
+.dark [data-plan-button]:focus-visible {
+  /* 只禁用hover效果，保留默认背景色 */
+  transform: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+  outline: none !important;
+  ring: 0 !important;
+  ring-offset: 0 !important;
+  border-ring: inherit !important;
+  ring-ring: none !important;
+}
+
+.dark [data-slot="tabs-trigger"],
+.dark [data-slot="tabs-trigger"]:hover,
+.dark [data-slot="tabs-trigger"]:focus,
+.dark [data-slot="tabs-trigger"]:active,
+.dark [data-slot="tabs-trigger"]:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  ring: 0 !important;
+  ring-offset: 0 !important;
+  border-ring: inherit !important;
+  ring-ring: none !important;
+}
+
 /* ========== 优化Hover过渡效果 ========== */
 /* 对基础交互元素使用快速hover效果，但排除destructive按钮和卡片 */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
-[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive),
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
+.btn:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
+[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch input):not(.slider):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]),
 tr:hover,
 tbody tr:hover,
 .hover\:bg-\[\#EEEDEC\]:hover,
@@ -1749,9 +1840,9 @@ tbody tr:hover,
   font-weight: 900 !important;
 }
 
-/* 基础交互元素保持快速响应 */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not(.plan-status-button):not([data-slot="card"]):not(.card),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not(.plan-status-button):not([data-slot="card"]):not(.card) {
+/* 基础交互元素保持快速响应，但排除计划状态按钮和tabs触发器 */
+button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not([data-plan-button]):not([data-slot="tabs-trigger"]):not([data-slot="card"]):not(.card),
+[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not(.switch):not(.switch *):not(.slider):not(.sun-moon):not([data-plan-button]):not([data-slot="tabs-trigger"]):not([data-slot="card"]):not(.card) {
   transition-duration: 1ms !important;
 }
 
