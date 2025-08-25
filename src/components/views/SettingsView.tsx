@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { AppearanceSetting } from "./settings/AppearanceSetting";
+import { AppearanceSetting } from "@/components/views/settings/AppearanceSetting";
 
 
 
@@ -157,10 +157,6 @@ export function SettingsView({
         }
     };
 
-
-
-
-
     if (activeTab === 'settings-advanced') {
         return (
             <>
@@ -187,13 +183,12 @@ export function SettingsView({
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        className="h-8 sm:h-9 w-full sm:w-auto text-xs sm:text-sm"
+                                                        className="h-8 sm:h-9 w-8 sm:w-9 p-0"
                                                         onClick={() => {
                                                             setClearDataDialogOpen(true);
                                                         }}
                                                     >
-                                                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-                                                        <span className="text-xs sm:text-sm"><MixedText text="清空" /></span>
+                                                        <Trash2 className="w-4 h-4" />
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="text-xs">
@@ -407,7 +402,7 @@ export function SettingsView({
                 {/* 新增设置卡片 */}
                 <AppearanceSetting />
                 <div className="flex justify-end mt-3 sm:mt-4">
-                    {navMode && <SaveSettingsButton navMode={navMode as 'sidebar' | 'dock'} />}
+                    {/* Removed dock mode save button since dock mode is no longer supported */}
                 </div>
 
                 {/* 云端数据概览 */}

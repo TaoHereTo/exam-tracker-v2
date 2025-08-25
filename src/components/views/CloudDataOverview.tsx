@@ -116,54 +116,62 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                         <>
                             {/* 数据统计卡片 */}
                             <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
-                                        <CardTitle className="text-sm"><MixedText text="刷题历史" /></CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
-                                        <div className="text-xl sm:text-2xl font-bold text-blue-600">
-                                            <MixedText text={String(data.records.count)} />
-                                        </div>
-                                        <p className="text-xs text-gray-500"><MixedText text="条记录" /></p>
-                                    </CardContent>
+                                <Card className="h-[100px] sm:h-[120px] flex items-center justify-center">
+                                    <div className="flex flex-col items-center text-center w-full">
+                                        <CardHeader className="pb-1 px-3 sm:px-6 pt-0 w-full">
+                                            <CardTitle className="text-sm"><MixedText text="刷题历史" /></CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col items-center justify-center px-3 sm:px-6 py-0 w-full">
+                                            <div className="text-xl sm:text-2xl font-bold text-blue-600">
+                                                <MixedText text={String(data.records.count)} />
+                                            </div>
+                                            <p className="text-xs text-gray-500"><MixedText text="条记录" /></p>
+                                        </CardContent>
+                                    </div>
                                 </Card>
 
-                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
-                                        <CardTitle className="text-sm"><MixedText text="学习计划" /></CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
-                                        <div className="text-xl sm:text-2xl font-bold text-green-600">
-                                            <MixedText text={String(data.plans.count)} />
-                                        </div>
-                                        <p className="text-xs text-gray-500"><MixedText text="个计划" /></p>
-                                    </CardContent>
+                                <Card className="h-[100px] sm:h-[120px] flex items-center justify-center">
+                                    <div className="flex flex-col items-center text-center w-full">
+                                        <CardHeader className="pb-1 px-3 sm:px-6 pt-0 w-full">
+                                            <CardTitle className="text-sm"><MixedText text="学习计划" /></CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col items-center justify-center px-3 sm:px-6 py-0 w-full">
+                                            <div className="text-xl sm:text-2xl font-bold text-green-600">
+                                                <MixedText text={String(data.plans.count)} />
+                                            </div>
+                                            <p className="text-xs text-gray-500"><MixedText text="个计划" /></p>
+                                        </CardContent>
+                                    </div>
                                 </Card>
 
-                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
-                                        <CardTitle className="text-sm"><MixedText text="知识点" /></CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
-                                        <div className="text-xl sm:text-2xl font-bold text-purple-600">
-                                            <MixedText text={String(data.knowledge.count)} />
-                                        </div>
-                                        <p className="text-xs text-gray-500"><MixedText text="条知识点" /></p>
-                                    </CardContent>
+                                <Card className="h-[100px] sm:h-[120px] flex items-center justify-center">
+                                    <div className="flex flex-col items-center text-center w-full">
+                                        <CardHeader className="pb-1 px-3 sm:px-6 pt-0 w-full">
+                                            <CardTitle className="text-sm"><MixedText text="知识点" /></CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col items-center justify-center px-3 sm:px-6 py-0 w-full">
+                                            <div className="text-xl sm:text-2xl font-bold text-purple-600">
+                                                <MixedText text={String(data.knowledge.count)} />
+                                            </div>
+                                            <p className="text-xs text-gray-500"><MixedText text="条知识点" /></p>
+                                        </CardContent>
+                                    </div>
                                 </Card>
 
-                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
-                                        <CardTitle className="text-sm"><MixedText text="设置" /></CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
-                                        <div className="text-xl sm:text-2xl font-bold text-green-600">
-                                            {data.settings.hasSettings ? '✓' : '✗'}
-                                        </div>
-                                        <p className="text-xs text-gray-500">
-                                            {data.settings.hasSettings ? '已保存' : '未保存'}
-                                        </p>
-                                    </CardContent>
+                                <Card className="h-[100px] sm:h-[120px] flex items-center justify-center">
+                                    <div className="flex flex-col items-center text-center w-full">
+                                        <CardHeader className="pb-1 px-3 sm:px-6 pt-0 w-full">
+                                            <CardTitle className="text-sm"><MixedText text="设置" /></CardTitle>
+                                        </CardHeader>
+                                        <CardContent className="flex flex-col items-center justify-center px-3 sm:px-6 py-0 w-full">
+                                            <div className="text-xl sm:text-2xl font-bold text-green-600">
+                                                {data.settings.hasSettings ? '✓' : '✗'}
+                                            </div>
+                                            <p className="text-xs text-gray-500">
+                                                {data.settings.hasSettings ? '已保存' : '未保存'}
+                                            </p>
+                                        </CardContent>
+                                    </div>
                                 </Card>
                             </div>
 

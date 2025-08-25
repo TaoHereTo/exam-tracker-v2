@@ -8,8 +8,8 @@ import { MixedText } from "@/components/ui/MixedText";
 
 export function AppearanceSetting() {
     const { theme, setTheme } = useTheme();
-    // 新增：侧边栏/底部Dock切换
-    const [navMode, setNavMode] = useLocalStorage<'sidebar' | 'dock'>("exam-tracker-nav-mode", "sidebar");
+    // Only sidebar mode is supported now
+    const [navMode, setNavMode] = useLocalStorage<'sidebar'>("exam-tracker-nav-mode", "sidebar");
 
     // 护眼模式设置
     const [eyeCare, setEyeCare] = useLocalStorageBoolean('eye-care-enabled', false);
@@ -74,23 +74,7 @@ export function AppearanceSetting() {
                         className="mt-2 sm:mt-0"
                     />
                 </div>
-
-                {/* 导航模式切换 */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
-                    <div className="flex-1">
-                        <h3 className="font-medium text-sm sm:text-base"><MixedText text="导航模式" /></h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="选择侧边栏或底部Dock导航方式。" /></p>
-                    </div>
-                    <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                        <span className="text-xs sm:text-sm font-medium"><MixedText text="侧边栏" /></span>
-                        <Switch
-                            checked={navMode === 'dock'}
-                            onCheckedChange={checked => setNavMode(checked ? 'dock' : 'sidebar')}
-                        />
-                        <span className="text-xs sm:text-sm font-medium"><MixedText text="底部Dock" /></span>
-                    </div>
-                </div>
             </CardContent>
         </Card>
     );
-} 
+}
