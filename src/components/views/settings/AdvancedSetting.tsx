@@ -261,12 +261,12 @@ export function AdvancedSetting() {
                     <CardDescription className="text-xs sm:text-sm"><MixedText text="关闭后，数据概览中的卡片将以静态列表展示，不再滚动动画。" /></CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                    <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                         <div className="flex-1">
                             <h3 className="font-medium text-sm sm:text-base"><MixedText text="启用滚动动画" /></h3>
                             <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="控制数据概览卡片是否进行滚动动画展示。" /></p>
                         </div>
-                        <Switch checked={overviewAnimate} onCheckedChange={setOverviewAnimate} className="mt-2 sm:mt-0" />
+                        <Switch checked={overviewAnimate} onCheckedChange={setOverviewAnimate} className="mt-0" />
                     </div>
                 </CardContent>
             </Card>
@@ -277,8 +277,18 @@ export function AdvancedSetting() {
                     <CardDescription className="text-xs sm:text-sm"><MixedText text="监控和管理本地存储使用情况。" /></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3 sm:space-y-4">
+                    {/* 数据概览动画设置 */}
+                    <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                        <div className="flex-1">
+                            <h3 className="font-medium text-sm sm:text-base"><MixedText text="启用滚动动画" /></h3>
+                            <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="控制数据概览卡片是否进行滚动动画展示。" /></p>
+                        </div>
+                        <Switch checked={overviewAnimate} onCheckedChange={setOverviewAnimate} className="mt-0" />
+                    </div>
+                    
+                    {/* 本地存储使用情况 */}
                     {storageInfo && (
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                        <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                             <div className="flex-1">
                                 <h3 className="font-medium text-sm sm:text-base"><MixedText text="本地存储使用情况" /></h3>
                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -294,14 +304,15 @@ export function AdvancedSetting() {
                         </div>
                     )}
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                    {/* 云端图片管理 */}
+                    <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                         <div className="flex-1">
                             <h3 className="font-medium text-sm sm:text-base"><MixedText text="云端图片管理" /></h3>
                             <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                 <MixedText text="管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。" />
                             </p>
                         </div>
-                        <div className="flex items-center gap-1 sm:gap-2 mt-2 sm:mt-0">
+                        <div className="flex items-center gap-1 sm:gap-2">
                             <TooltipProvider>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -331,7 +342,7 @@ export function AdvancedSetting() {
                     {showImageManager && (
                         <div className="p-3 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 shadow-sm mt-3">
                             {/* 工具栏 */}
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+                            <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
                                 <div className="flex items-center gap-2 w-full sm:w-auto">
                                     <div className="relative flex-1 sm:flex-none">
                                         <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-300 z-10 pointer-events-none" />
@@ -361,7 +372,7 @@ export function AdvancedSetting() {
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
-                                <div className="flex items-center gap-1 sm:gap-2 mt-2 sm:mt-0">
+                                <div className="flex items-center gap-1 sm:gap-2">
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -617,7 +628,7 @@ export function AdvancedSetting() {
                             )}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                    <AlertDialogFooter className="flex flex-row sm:flex-row gap-2">
                         <AlertDialogCancel
                             disabled={isDeleting}
                             onClick={() => {
@@ -655,6 +666,14 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
+
+
+
+
+
+
 
 
 

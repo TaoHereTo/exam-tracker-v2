@@ -101,6 +101,32 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 fontFamily: 'Times New Roman, 思源宋体, serif'
             }
         },
+        // Add a separate legend for mobile with two-column layout at the bottom
+        media: [
+            {
+                query: { maxWidth: 768 },
+                option: {
+                    legend: {
+                        orient: 'horizontal',
+                        left: 'center',
+                        top: 'bottom',
+                        bottom: 10,
+                        itemGap: 10,
+                        itemWidth: 14,
+                        itemHeight: 14,
+                        padding: [10, 10, 10, 10],
+                        textStyle: {
+                            width: 40,
+                            overflow: 'truncate'
+                        },
+                        // Set a specific width and use flex wrap to create two rows
+                        width: 150,
+                        height: 40,
+                        align: 'auto'
+                    }
+                }
+            }
+        ],
         series: [
             {
                 name: '模块耗时分布',

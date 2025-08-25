@@ -137,6 +137,38 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                     fontFamily: 'Times New Roman, 思源宋体, serif'
                 }
             },
+            // Add a separate legend for mobile with two-column layout at the bottom
+            media: [
+                {
+                    query: { maxWidth: 768 },
+                    option: {
+                        legend: {
+                            orient: 'horizontal',
+                            left: 'center',
+                            top: 'bottom',
+                            bottom: 10,
+                            itemGap: 10,
+                            itemWidth: 14,
+                            itemHeight: 14,
+                            padding: [10, 10, 10, 10],
+                            textStyle: {
+                                width: 40,
+                                overflow: 'truncate'
+                            },
+                            // Set a specific width and use flex wrap to create two rows
+                            width: 150,
+                            height: 40,
+                            align: 'auto'
+                        },
+                        grid: {
+                            left: 60,
+                            right: 20,
+                            top: 20,
+                            bottom: 100
+                        }
+                    }
+                }
+            ],
             grid: {
                 left: 130,
                 right: 80,
@@ -145,6 +177,18 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 borderColor: borderColor,
                 borderWidth: 1,
                 containLabel: true,
+                // Mobile responsive grid adjustments for two-column legend
+                responsive: [
+                    {
+                        query: { maxWidth: 768 },
+                        option: {
+                            left: 60,
+                            right: 20,
+                            top: 20,
+                            bottom: 100
+                        }
+                    }
+                ]
             },
             xAxis: {
                 type: 'category',

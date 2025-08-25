@@ -155,7 +155,33 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                 backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
                 borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
                 textStyle: { color: legendTextColor }
-            }
+            },
+            // Add a separate legend for mobile with two-column layout at the bottom
+            media: [
+                {
+                    query: { maxWidth: 768 },
+                    option: {
+                        legend: {
+                            orient: 'horizontal',
+                            left: 'center',
+                            top: 'bottom',
+                            bottom: 10,
+                            itemGap: 10,
+                            itemWidth: 14,
+                            itemHeight: 14,
+                            padding: [10, 10, 10, 10],
+                            textStyle: {
+                                width: 40,
+                                overflow: 'truncate'
+                            },
+                            // Set a specific width and use flex wrap to create two rows
+                            width: 150,
+                            height: 40,
+                            align: 'auto'
+                        }
+                    }
+                }
+            ]
         },
         series: [
             {
@@ -302,7 +328,7 @@ export function ChartsView({ records }: ChartsViewProps) {
         <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full">
             <Tabs defaultValue="perMinute" className="w-full mb-6">
                 <div className="flex justify-center mb-4 w-full">
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full max-w-[calc(100vw-2rem)]">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-auto max-w-[calc(100vw-2rem)] justify-start">
                         <TabsTrigger value="perMinute" className="whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
                         <TabsTrigger value="accuracy" className="whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
                         <TabsTrigger value="pie" className="whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>

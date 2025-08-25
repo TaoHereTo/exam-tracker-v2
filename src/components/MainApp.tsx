@@ -505,10 +505,11 @@ export function MainApp() {
                         <SidebarProvider
                             style={{
                                 "--sidebar-width": "16rem",
-                                "--sidebar-width-mobile": "16rem",
+                                "--sidebar-width-mobile": "14rem",
                                 "--sidebar-width-icon": "4rem",
                             } as React.CSSProperties & {
                                 "--sidebar-width": string;
+                                "--sidebar-width-mobile": string;
                                 "--sidebar-width-icon": string;
                             }}
                         >

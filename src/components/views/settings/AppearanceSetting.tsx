@@ -39,14 +39,14 @@ export function AppearanceSetting() {
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4">
                 {/* 深浅色切换设置 */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                     <div className="flex-1">
                         <h3 className="font-medium text-sm sm:text-base"><MixedText text="深浅色切换" /></h3>
                         <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="切换浅色、深色或跟随系统。" /></p>
                     </div>
-                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                    <div className="w-auto">
                         <Select value={theme} onValueChange={setTheme}>
-                            <SelectTrigger className="w-full sm:w-[180px] h-8 sm:h-10 text-sm">
+                            <SelectTrigger className="w-[120px] sm:w-[180px] h-8 sm:h-10 text-sm">
                                 <SelectValue placeholder="选择外观" className="text-sm" />
                             </SelectTrigger>
                             <SelectContent>
@@ -59,7 +59,7 @@ export function AppearanceSetting() {
                 </div>
 
                 {/* 护眼模式设置 */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                     <div className="flex-1">
                         <h3 className="font-medium text-sm sm:text-base"><MixedText text="护眼模式" /></h3>
                         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -73,7 +73,7 @@ export function AppearanceSetting() {
                         checked={eyeCare}
                         onCheckedChange={setEyeCare}
                         disabled={theme === 'dark'}
-                        className="mt-2 sm:mt-0"
+                        className="mt-0"
                     />
                 </div>
             </CardContent>

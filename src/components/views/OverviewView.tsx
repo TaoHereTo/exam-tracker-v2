@@ -290,9 +290,9 @@ export function OverviewView({ records }: OverviewViewProps) {
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 sm:gap-8">
                 {overviewAnimate ? (
                     <Marquee className="w-full" pauseOnHover repeat={2}>
-                        <div className="flex gap-4 sm:gap-6">
+                        <div className="flex gap-3 sm:gap-6">
                             {group1.map((item, idx) => (
-                                <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                                <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
                                     <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                         <div className="flex flex-row items-center justify-center">
                                             <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
@@ -323,9 +323,9 @@ export function OverviewView({ records }: OverviewViewProps) {
                         </div>
                     </Marquee>
                 ) : (
-                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-6 py-4 sm:py-6">
+                    <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 px-2 sm:px-6 py-4 sm:py-6">
                         {cards.map((item, idx) => (
-                            <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                            <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
                                 <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                     <div className="flex flex-row items-center justify-center">
                                         <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
@@ -357,9 +357,9 @@ export function OverviewView({ records }: OverviewViewProps) {
                 )}
                 {overviewAnimate ? (
                     <Marquee className="w-full" pauseOnHover reverse repeat={2}>
-                        <div className="flex gap-4 sm:gap-6">
+                        <div className="flex gap-3 sm:gap-6">
                             {group2.map((item, idx) => (
-                                <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                                <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
                                     <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                         <div className="flex flex-row items-center justify-center">
                                             <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>

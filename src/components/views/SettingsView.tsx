@@ -168,7 +168,7 @@ export function SettingsView({
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                            <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                                 <div>
                                     <h3 className="font-medium text-sm sm:text-base"><MixedText text="清空本地数据" /></h3>
                                     <p className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -239,7 +239,7 @@ export function SettingsView({
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
+                        <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                             <div>
                                 <h3 className="font-medium text-sm sm:text-base"><MixedText text="备份与恢复" /></h3>
                                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
@@ -250,7 +250,7 @@ export function SettingsView({
                         </div>
 
                         <div className="p-3 sm:p-4 border rounded-lg">
-                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
+                            <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-3">
                                 <div>
                                     <h3 className="font-medium text-sm sm:text-base"><MixedText text="云端数据同步" /></h3>
                                     <p className="text-xs sm:text-sm text-muted-foreground mt-1">

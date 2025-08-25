@@ -28,7 +28,7 @@ import {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 const SIDEBAR_WIDTH = "280px"
-const SIDEBAR_WIDTH_MOBILE = "20rem"
+const SIDEBAR_WIDTH_MOBILE = "14rem"
 const SIDEBAR_WIDTH_ICON = "4rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
@@ -191,7 +191,7 @@ function Sidebar({
           className="bg-sidebar text-sidebar-foreground p-0 [&>button]:hidden"
           style={
             {
-              width: "var(--sidebar-width)",
+              width: "var(--sidebar-width-mobile)",
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
             } as React.CSSProperties
           }
