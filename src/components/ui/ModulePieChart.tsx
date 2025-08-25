@@ -86,52 +86,45 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             }
         },
         legend: {
-            orient: 'vertical',
-            left: 10,
-            top: 20,
+            // Change to horizontal legend at the bottom for all screen sizes
+            orient: 'horizontal',
+            left: 'center',
+            top: 'bottom',
+            bottom: 30,  // Increased from 10 to 30 for more spacing
+            itemGap: 15,
+            itemWidth: 25,
+            itemHeight: 14,
+            padding: [10, 20, 10, 20],  // Reduced padding to [10, 20, 10, 20] from [15, 20, 15, 20]
+            // Set width to 90% of container for better legend sizing
+            width: '90%',
+            height: 'auto',
+            align: 'auto',
+            type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
             formatter: (name: string) => name,
-            ...UNIFIED_LEGEND_STYLE,
+            // Manually apply the unified legend style properties we want
+            borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
+            icon: UNIFIED_LEGEND_STYLE.icon,
             // 覆盖主题相关的样式
             backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
             borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
+            borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
+            shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
+            shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
             textStyle: {
+                ...UNIFIED_LEGEND_STYLE.textStyle,
                 color: legendTextColor,
                 fontSize: 14,
                 fontWeight: 'bold',
                 fontFamily: 'Times New Roman, 思源宋体, serif'
             }
         },
-        // Add a separate legend for mobile with two-column layout at the bottom
-        media: [
-            {
-                query: { maxWidth: 768 },
-                option: {
-                    legend: {
-                        orient: 'horizontal',
-                        left: 'center',
-                        top: 'bottom',
-                        bottom: 10,
-                        itemGap: 10,
-                        itemWidth: 14,
-                        itemHeight: 14,
-                        padding: [10, 10, 10, 10],
-                        textStyle: {
-                            width: 40,
-                            overflow: 'truncate'
-                        },
-                        // Set a specific width and use flex wrap to create two rows
-                        width: 150,
-                        height: 40,
-                        align: 'auto'
-                    }
-                }
-            }
-        ],
+        // Remove the separate mobile legend configuration since we're using the same for all sizes
         series: [
             {
                 name: '模块耗时分布',
                 type: 'pie',
-                radius: ['40%', '70%'],
+                radius: ['30%', '50%'],  // Reduced outer radius from 60% to 50%
+                center: ['50%', '45%'],  // Moved up from 50% to 45% to create more space for legend
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
@@ -160,13 +153,14 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 0 60px 0' }} className="chart-wrapper">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
                 theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
                 key={`pie-${isDarkMode}`}
+                className="chart-container"
             />
         </div>
     );

@@ -123,72 +123,46 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             },
             legend: {
                 data: allModules,
-                top: 20,
-                left: 0,
-                orient: 'vertical',
-                ...UNIFIED_LEGEND_STYLE,
+                // Change to horizontal legend at the bottom for all screen sizes
+                orient: 'horizontal',
+                left: 'center',
+                top: 'bottom',
+                bottom: 10,
+                itemGap: 15,
+                itemWidth: 25,
+                itemHeight: 14,
+                padding: [15, 20, 15, 20],
+                // Set width to 90% of container for better legend sizing
+                width: '90%',
+                height: 'auto',
+                align: 'auto',
+                type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
+                // Manually apply the unified legend style properties we want
+                borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
+                icon: UNIFIED_LEGEND_STYLE.icon,
                 // 覆盖主题相关的样式
                 backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
                 borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
+                borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
+                shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
+                shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
                 textStyle: {
+                    ...UNIFIED_LEGEND_STYLE.textStyle,
                     color: legendTextColor,
                     fontSize: 14,
                     fontWeight: 'bold',
                     fontFamily: 'Times New Roman, 思源宋体, serif'
                 }
             },
-            // Add a separate legend for mobile with two-column layout at the bottom
-            media: [
-                {
-                    query: { maxWidth: 768 },
-                    option: {
-                        legend: {
-                            orient: 'horizontal',
-                            left: 'center',
-                            top: 'bottom',
-                            bottom: 10,
-                            itemGap: 10,
-                            itemWidth: 14,
-                            itemHeight: 14,
-                            padding: [10, 10, 10, 10],
-                            textStyle: {
-                                width: 40,
-                                overflow: 'truncate'
-                            },
-                            // Set a specific width and use flex wrap to create two rows
-                            width: 150,
-                            height: 40,
-                            align: 'auto'
-                        },
-                        grid: {
-                            left: 60,
-                            right: 20,
-                            top: 20,
-                            bottom: 100
-                        }
-                    }
-                }
-            ],
+            // Remove the separate mobile legend configuration since we're using the same for all sizes
             grid: {
-                left: 130,
-                right: 80,
+                left: 20,
+                right: 20,
                 top: 40,
-                bottom: 60,
+                bottom: 120,  // Increased bottom padding to accommodate the legend
                 borderColor: borderColor,
                 borderWidth: 1,
-                containLabel: true,
-                // Mobile responsive grid adjustments for two-column legend
-                responsive: [
-                    {
-                        query: { maxWidth: 768 },
-                        option: {
-                            left: 60,
-                            right: 20,
-                            top: 20,
-                            bottom: 100
-                        }
-                    }
-                ]
+                containLabel: true
             },
             xAxis: {
                 type: 'category',
@@ -257,7 +231,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
     }
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="chart-wrapper w-full h-full">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
@@ -265,6 +239,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 notMerge={true}
                 lazyUpdate={false}
                 opts={{ renderer: 'canvas' }}
+                className="chart-container w-full h-full"
             />
         </div>
     );

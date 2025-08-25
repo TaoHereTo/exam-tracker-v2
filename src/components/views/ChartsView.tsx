@@ -126,7 +126,8 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         radar: {
             indicator,
             splitNumber: 5,
-            radius: '70%',
+            radius: '50%',  // Reduced from 60% to create more space for legend
+            center: ['50%', '45%'],  // Moved up from 50% to create more space for legend
             axisName: {
                 color: textColor,
                 fontWeight: 'bold',
@@ -149,39 +150,38 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                     color: axisLineColor
                 }
             },
-            legend: {
-                ...UNIFIED_LEGEND_STYLE,
-                // 覆盖主题相关的样式
-                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
-                borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
-                textStyle: { color: legendTextColor }
-            },
-            // Add a separate legend for mobile with two-column layout at the bottom
-            media: [
-                {
-                    query: { maxWidth: 768 },
-                    option: {
-                        legend: {
-                            orient: 'horizontal',
-                            left: 'center',
-                            top: 'bottom',
-                            bottom: 10,
-                            itemGap: 10,
-                            itemWidth: 14,
-                            itemHeight: 14,
-                            padding: [10, 10, 10, 10],
-                            textStyle: {
-                                width: 40,
-                                overflow: 'truncate'
-                            },
-                            // Set a specific width and use flex wrap to create two rows
-                            width: 150,
-                            height: 40,
-                            align: 'auto'
-                        }
-                    }
-                }
-            ]
+        },
+        legend: {
+            // Change to horizontal legend at the bottom for all screen sizes
+            orient: 'horizontal',
+            left: 'center',
+            top: 'bottom',
+            bottom: 30,  // Increased from 10 to 30 for more spacing
+            itemGap: 15,
+            itemWidth: 25,
+            itemHeight: 14,
+            padding: [10, 20, 10, 20],  // Reduced padding to [10, 20, 10, 20] from [15, 20, 15, 20]
+            // Set width to 90% of container for better legend sizing
+            width: '90%',
+            height: 'auto',
+            align: 'auto',
+            type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
+            // Manually apply the unified legend style properties we want
+            borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
+            icon: UNIFIED_LEGEND_STYLE.icon,
+            // 覆盖主题相关的样式
+            backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
+            borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
+            borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
+            shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
+            shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
+            textStyle: {
+                ...UNIFIED_LEGEND_STYLE.textStyle,
+                color: legendTextColor,
+                fontSize: 14,
+                fontWeight: 'bold',
+                fontFamily: '思源宋体, Times New Roman, serif'
+            }
         },
         series: [
             {
@@ -237,12 +237,13 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         ]
     };
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 0 60px 0' }} className="chart-wrapper">
             <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ReactECharts
                     option={option}
                     style={{ height: '100%', width: '100%' }}
                     key={`radar-${isDarkMode}`}
+                    className="chart-container"
                 />
             </div>
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
@@ -325,41 +326,49 @@ export function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full">
+        <div className="flex flex-col items-center justify-start min-h-[80vh] mt-6 w-full">
             <Tabs defaultValue="perMinute" className="w-full mb-6">
                 <div className="flex justify-center mb-4 w-full">
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-auto max-w-[calc(100vw-2rem)] justify-start">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-auto max-w-full justify-start h-auto min-h-[40px]">
                         <TabsTrigger value="perMinute" className="whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
                         <TabsTrigger value="accuracy" className="whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
                         <TabsTrigger value="pie" className="whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
                         <TabsTrigger value="radar" className="whitespace-nowrap"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
-                <TabsContent value="perMinute">
-                    <div style={{ height: '500px' }} className="flex items-center justify-center">
-                        <TrendChart data={perMinuteData} yMax={2} />
+                <TabsContent value="perMinute" className="p-0 border-0">
+                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                        <div className="w-full h-full overflow-visible">
+                            <TrendChart data={perMinuteData} yMax={2} />
+                        </div>
                     </div>
                 </TabsContent>
-                <TabsContent value="accuracy">
-                    <div style={{ height: '500px' }} className="flex items-center justify-center">
-                        <TrendChart data={accuracyData} yMax={100} />
+                <TabsContent value="accuracy" className="p-0 border-0">
+                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                        <div className="w-full h-full overflow-visible">
+                            <TrendChart data={accuracyData} yMax={100} />
+                        </div>
                     </div>
                 </TabsContent>
-                <TabsContent value="pie">
-                    <div style={{ height: '500px' }} className="flex items-center justify-center">
-                        <ModulePieChart data={records.map(r => {
-                            return {
-                                date: r.date,
-                                module: normalizeModuleName(r.module),
-                                score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                duration: timeStringToMinutes(r.duration) || 0
-                            };
-                        })} />
+                <TabsContent value="pie" className="p-0 border-0">
+                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                        <div className="w-full h-full overflow-visible">
+                            <ModulePieChart data={records.map(r => {
+                                return {
+                                    date: r.date,
+                                    module: normalizeModuleName(r.module),
+                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                    duration: timeStringToMinutes(r.duration) || 0
+                                };
+                            })} />
+                        </div>
                     </div>
                 </TabsContent>
-                <TabsContent value="radar">
-                    <div style={{ height: '500px' }} className="flex items-center justify-center">
-                        <ModuleRadarChart data={records} />
+                <TabsContent value="radar" className="p-0 border-0">
+                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                        <div className="w-full h-full overflow-visible">
+                            <ModuleRadarChart data={records} />
+                        </div>
                     </div>
                 </TabsContent>
             </Tabs>
