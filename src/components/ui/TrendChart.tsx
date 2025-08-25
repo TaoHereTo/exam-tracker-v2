@@ -4,6 +4,7 @@ import React, { useMemo, useState, useEffect } from "react";
 import ReactECharts from 'echarts-for-react';
 import { getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { MixedText } from "@/components/ui/MixedText";
 
 // data: 做题记录数组，score 字段为百分比（如 85 表示 85%）或每分钟得分
 interface TrendChartProps {
@@ -70,6 +71,21 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
 
         return { allModules: modules, allDates: dates, chartData: data };
     }, [dedupedData, onlyModule]);
+
+    // 如果没有数据，显示提示信息
+    const renderNoDataMessage = () => {
+        if (allModules.length === 0 || allDates.length === 0) {
+            return (
+                <div className="flex items-center justify-center h-full w-full">
+                    <div className="text-center text-gray-500">
+                        <p className="text-lg"><MixedText text="暂无数据" /></p>
+                        <p className="text-sm mt-2"><MixedText text="请先添加刷题记录以查看趋势图表" /></p>
+                    </div>
+                </div>
+            );
+        }
+        return null;
+    };
 
     const option = useMemo(() => {
         // 根据主题动态设置颜色
@@ -189,6 +205,12 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             }))
         };
     }, [allModules, allDates, chartData, yMax, isDarkMode]);
+
+    // 如果没有数据，显示提示信息
+    const noDataMessage = renderNoDataMessage();
+    if (noDataMessage) {
+        return noDataMessage;
+    }
 
     return (
         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

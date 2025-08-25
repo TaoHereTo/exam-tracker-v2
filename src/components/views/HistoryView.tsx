@@ -29,7 +29,8 @@ export function ExerciseRecordView({
 }: ExerciseRecordViewProps) {
 
     return (
-        <div className="pt-2 px-2 sm:px-4 md:px-8">
+        // Added overflow-x-auto wrapper for horizontal scrolling on mobile
+        <div className="pt-2 px-2 sm:px-4 md:px-8 overflow-x-auto">
             <UnifiedTable<RecordItem, string>
                 columns={[
                     {

@@ -165,7 +165,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                     </TooltipProvider>
                 )}
             </div>
-            <table className="min-w-full border-collapse text-sm table-fixed">
+            <table className="min-w-full border-collapse text-sm table-fixed whitespace-nowrap">
                 <thead>
                     <tr>
                         {selectable && (

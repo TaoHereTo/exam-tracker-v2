@@ -5,6 +5,7 @@ import ReactECharts from 'echarts-for-react';
 import { FULL_EXAM_CONFIG, normalizeModuleName, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { MixedText } from "@/components/ui/MixedText";
 
 interface ModulePieChartProps {
     data: Array<{
@@ -47,6 +48,18 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             standardQuestions
         };
     });
+
+    // 如果没有数据，显示提示信息
+    if (pieData.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-full w-full">
+                <div className="text-center text-gray-500">
+                    <p className="text-lg"><MixedText text="暂无数据" /></p>
+                    <p className="text-sm mt-2"><MixedText text="请先添加刷题记录以查看模块耗时分布" /></p>
+                </div>
+            </div>
+        );
+    }
 
     // 根据主题动态设置颜色
     const backgroundColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';

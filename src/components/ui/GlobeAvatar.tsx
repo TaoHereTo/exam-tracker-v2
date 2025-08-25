@@ -95,10 +95,10 @@ export function GlobeAvatar({ className, size = 'md' }: GlobeAvatarProps) {
             className
         )}>
             <canvas
-                className="size-full opacity-0 transition-opacity duration-500 [contain:layout_paint_size] [image-rendering:crisp-edges] [image-rendering:-webkit-optimize-contrast]"
+                className="size-full opacity-0 transition-opacity duration-500 [contain:layout_paint_size] [image-rendering:crisp-edges] [image-rendering:-webkit-optimize-contrast] pointer-events-none"
                 style={{ imageRendering: 'crisp-edges' }}
                 ref={canvasRef}
             />
         </div>
     );
-} 
+}

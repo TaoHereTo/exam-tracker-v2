@@ -41,6 +41,18 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     // 只使用中文模块名称
     const modules = Object.keys(moduleStats).filter(m => !m.match(/^[a-z-]+$/));
 
+    // 如果没有模块数据，显示提示信息
+    if (modules.length === 0) {
+        return (
+            <div className="flex items-center justify-center h-full w-full">
+                <div className="text-center text-gray-500">
+                    <p className="text-lg"><MixedText text="暂无数据" /></p>
+                    <p className="text-sm mt-2"><MixedText text="请先添加刷题记录以查看模块能力分析" /></p>
+                </div>
+            </div>
+        );
+    }
+
     // 归一化参数
     let maxTotal = 1, maxPerMinute = 1;
     const perMinuteMap: Record<string, number> = {};
@@ -57,7 +69,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
     const values = modules.map(module => {
         const stat = moduleStats[module] || { correct: 0, total: 0, duration: 0 };
         const accuracy = stat.total > 0 ? stat.correct / stat.total : 0;
-        const perMinute = perMinuteMap[module] / maxPerMinute; // 归一化
+        const perMinute = stat.duration > 0 ? perMinuteMap[module] / maxPerMinute : 0; // 归一化
         const totalNorm = stat.total / maxTotal; // 归一化
         return Number((calcAbilityIndex({ accuracy, perMinute, total: totalNorm }) * 100).toFixed(2));
     });
@@ -73,7 +85,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         x2: 1,
         y2: 1,
         colorStops: modules.map((m, i) => ({
-            offset: i / (modules.length - 1),
+            offset: modules.length > 1 ? i / (modules.length - 1) : 0,
             color: getModuleColor(m)
         }))
     };
@@ -287,14 +299,14 @@ export function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0">
+        <div className="flex flex-col items-center justify-center min-h-[80vh] mt-0 w-full">
             <Tabs defaultValue="perMinute" className="w-full mb-6">
-                <div className="flex justify-center mb-4">
-                    <TabsList className="w-fit">
-                        <TabsTrigger value="perMinute"><MixedText text="每分钟得分" /></TabsTrigger>
-                        <TabsTrigger value="accuracy"><MixedText text="正确率" /></TabsTrigger>
-                        <TabsTrigger value="pie"><MixedText text="模块耗时分布" /></TabsTrigger>
-                        <TabsTrigger value="radar"><MixedText text="模块能力" /></TabsTrigger>
+                <div className="flex justify-center mb-4 w-full">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-full max-w-[calc(100vw-2rem)]">
+                        <TabsTrigger value="perMinute" className="whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy" className="whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie" className="whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar" className="whitespace-nowrap"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
                 <TabsContent value="perMinute">
@@ -327,4 +339,4 @@ export function ChartsView({ records }: ChartsViewProps) {
             </Tabs>
         </div>
     );
-} 
+}

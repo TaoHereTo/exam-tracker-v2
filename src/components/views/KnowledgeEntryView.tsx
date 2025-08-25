@@ -91,11 +91,11 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
 
     return (
         <div className="w-full flex flex-col items-center">
-            <div className="relative mb-4 flex justify-center">
+            <div className="relative mb-4 flex justify-center w-full max-w-full">
                 <Tabs value={tab} onValueChange={handleTabChange}>
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-12 px-2 w-fit">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-12 px-2 w-full max-w-[calc(100vw-2rem)]">
                         {MODULES.map(({ value, label }) => (
-                            <TabsTrigger key={value} value={value} className="py-2">
+                            <TabsTrigger key={value} value={value} className="py-2 whitespace-nowrap">
                                 <MixedText text={label} />
                             </TabsTrigger>
                         ))}

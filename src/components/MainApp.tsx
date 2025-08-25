@@ -290,8 +290,32 @@ export function MainApp() {
 
     // 用户信息显示组件 - Dock版本
     const DockUserInfo = () => {
-        const [isHovered, setIsHovered] = useState(false);
         const [isOpen, setIsOpen] = useState(false);
+
+        // 处理触发器点击事件，防止事件冒泡
+        const handleTriggerClick = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(!isOpen);
+        };
+
+        // 处理菜单项点击事件
+        const handleItemClick = (action: () => void) => {
+            return (e: React.MouseEvent) => {
+                e.preventDefault();
+                e.stopPropagation();
+                action();
+                setIsOpen(false);
+            };
+        };
+
+        // 处理退出登录点击事件
+        const handleSignOutClickWrapper = (e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleSignOutClick();
+            setIsOpen(false);
+        };
 
         return (
             <div className="flex items-center justify-center w-full">
@@ -300,20 +324,8 @@ export function MainApp() {
                         <TooltipTrigger asChild>
                             <DropdownMenuTrigger asChild>
                                 <div
-                                    className={`cursor-pointer rounded-lg p-2 transition-all duration-200 ${isHovered || isOpen
-                                        ? 'bg-gray-100 dark:bg-gray-800 shadow-sm'
-                                        : ''
-                                        }`}
-                                    onMouseEnter={() => setIsHovered(true)}
-                                    onMouseLeave={() => {
-                                        setIsHovered(false);
-                                        // 延迟关闭，给用户时间移动到下拉菜单
-                                        setTimeout(() => {
-                                            if (!isHovered) {
-                                                setIsOpen(false);
-                                            }
-                                        }, 100);
-                                    }}
+                                    className="cursor-pointer rounded-lg p-2 transition-all duration-200 bg-gray-100 dark:bg-gray-800 shadow-sm"
+                                    onClick={handleTriggerClick}
                                 >
                                     <GlobeAvatar size="md" />
                                 </div>
@@ -328,11 +340,7 @@ export function MainApp() {
                         side="top"
                         sideOffset={5}
                         className="w-48 text-left"
-                        onMouseEnter={() => setIsHovered(true)}
-                        onMouseLeave={() => {
-                            setIsHovered(false);
-                            setIsOpen(false);
-                        }}
+                        onCloseAutoFocus={(e) => e.preventDefault()}
                     >
                         <DropdownMenuLabel>
                             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -347,11 +355,17 @@ export function MainApp() {
                         <>
                             {navMode === 'dock' && (
                                 <>
-                                    <DropdownMenuItem onClick={() => setActiveTab('overview')} className="justify-start">
+                                    <DropdownMenuItem 
+                                        onClick={handleItemClick(() => setActiveTab('overview'))} 
+                                        className="justify-start"
+                                    >
                                         <PieChart className="h-4 w-4 mr-2 flex-shrink-0" />
                                         <MixedText text="数据概览" />
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => setActiveTab('personal-best')} className="justify-start">
+                                    <DropdownMenuItem 
+                                        onClick={handleItemClick(() => setActiveTab('personal-best'))} 
+                                        className="justify-start"
+                                    >
                                         <Trophy className="h-4 w-4 mr-2 flex-shrink-0" />
                                         <MixedText text="最佳成绩" />
                                     </DropdownMenuItem>
@@ -359,20 +373,32 @@ export function MainApp() {
                                 </>
                             )}
                         </>
-                        <DropdownMenuItem onClick={() => setShowProfileDialog(true)} className="justify-start">
+                        <DropdownMenuItem 
+                            onClick={handleItemClick(() => setShowProfileDialog(true))} 
+                            className="justify-start"
+                        >
                             <User className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="个人资料" />
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings')} className="justify-start">
+                        <DropdownMenuItem 
+                            onClick={handleItemClick(() => setActiveTab('settings'))} 
+                            className="justify-start"
+                        >
                             <Settings className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="基础设置" />
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="justify-start">
+                        <DropdownMenuItem 
+                            onClick={handleItemClick(() => setActiveTab('settings-advanced'))} 
+                            className="justify-start"
+                        >
                             <SlidersHorizontal className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="高级设置" />
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={handleSignOutClick} className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 justify-start">
+                        <DropdownMenuItem 
+                            onClick={handleSignOutClickWrapper} 
+                            className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400 justify-start"
+                        >
                             <LogOut className="h-4 w-4 mr-2 flex-shrink-0" />
                             <MixedText text="退出登录" />
                         </DropdownMenuItem>
@@ -620,8 +646,9 @@ export function MainApp() {
                         {navMode === 'sidebar' ? (
                             <SidebarProvider
                                 style={{
-                                    "--sidebar-width": "240px",
-                                    "--sidebar-width-icon": "5rem",
+                                    "--sidebar-width": "16rem",
+                                    "--sidebar-width-mobile": "16rem",
+                                    "--sidebar-width-icon": "4rem",
                                 } as React.CSSProperties & {
                                     "--sidebar-width": string;
                                     "--sidebar-width-icon": string;

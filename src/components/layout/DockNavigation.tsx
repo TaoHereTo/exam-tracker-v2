@@ -75,7 +75,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
                     {userInfo && (
                         <DockIcon className="pointer-events-auto size-10 sm:size-12">
                             {/* 去掉嵌套 Tooltip，避免重复弹出 */}
-                            <div className="pointer-events-auto">
+                            <div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>
                                 {userInfo}
                             </div>
                         </DockIcon>
