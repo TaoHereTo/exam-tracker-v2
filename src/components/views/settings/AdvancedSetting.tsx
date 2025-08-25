@@ -18,7 +18,6 @@ import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { BeautifulThemeSwitch } from "@/components/ui/BeautifulThemeSwitch";
 import { Switch } from "@/components/ui/switch";
 import { MixedText } from "@/components/ui/MixedText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -263,7 +262,7 @@ export function AdvancedSetting() {
                 </CardHeader>
                 <CardContent>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
-                        <div>
+                        <div className="flex-1">
                             <h3 className="font-medium text-sm sm:text-base"><MixedText text="启用滚动动画" /></h3>
                             <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="控制数据概览卡片是否进行滚动动画展示。" /></p>
                         </div>
@@ -362,7 +361,7 @@ export function AdvancedSetting() {
                                         </Tooltip>
                                     </TooltipProvider>
                                 </div>
-                                <div className="flex items-center gap-1 sm:gap-2">
+                                <div className="flex items-center gap-1 sm:gap-2 mt-2 sm:mt-0">
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
@@ -656,6 +655,10 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
+
+
 
 
 

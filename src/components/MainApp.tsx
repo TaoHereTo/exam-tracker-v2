@@ -46,6 +46,7 @@ import { UserProfileDialog } from "./auth/UserProfileDialog";
 import { AutoCloudSync } from "@/lib/autoCloudSync";
 import { useThemeMode } from "@/hooks/useThemeMode";
 
+import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggler";
 
 import { PageTitle } from "@/components/ui/PageTitle";
 import { LoadingWrapper, SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -523,6 +524,9 @@ export function MainApp() {
                                         <SidebarTrigger className="size-8 sm:size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
                                         <div className="min-w-0 flex-1">
                                             <PageTitle className="text-lg sm:text-xl md:text-2xl truncate">{normalizePageTitle(activeTab)}</PageTitle>
+                                        </div>
+                                        <div className="flex items-center">
+                                            <AnimatedThemeToggler className="w-8 h-8 sm:w-10 sm:h-10" />
                                         </div>
                                     </div>
 

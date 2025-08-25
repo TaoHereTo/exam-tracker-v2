@@ -142,30 +142,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
     // 渲染表格内容
     const renderTableContent = () => (
-        <div className="w-full">
-            <div className="mb-2 flex justify-end items-center">
-                {onBatchDelete && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="destructive"
-                                    size="icon"
-                                    disabled={selected.length === 0}
-                                    onClick={onBatchDelete}
-                                    className="h-9 w-9"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p><MixedText text={batchDeleteText} /></p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                )}
-            </div>
-            <table className="min-w-full border-collapse text-sm table-fixed whitespace-nowrap">
+        <div className="w-full overflow-x-auto">
+            <table className="min-w-full border-collapse text-sm table-fixed">
                 <thead>
                     <tr>
                         {selectable && (

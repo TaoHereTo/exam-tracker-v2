@@ -14,6 +14,7 @@ html {
   width: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
 /* 基础字体类 */
@@ -66,6 +67,39 @@ th .mixed-text-part {
 
 .button-group-lg {
   gap: 1.5rem;
+}
+
+/* ========== 移动端优化 ========== */
+/* 确保表格在移动端可以水平滚动 */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 优化表格在小屏幕上的显示 */
+@media (max-width: 640px) {
+  .table-fixed {
+    min-width: 600px;
+  }
+
+  .table-fixed td,
+  .table-fixed th {
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* 确保设置页面的开关和按钮在移动端正确对齐 */
+  .settings-row {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .settings-row > div:first-child {
+    flex: 1;
+  }
+
+  .settings-row > div:last-child {
+    margin-top: 0 !important;
+  }
 }
 
 /* ========== 光晕扫过动画 ========== */
@@ -225,7 +259,7 @@ th .mixed-text-part {
   --form-grid-gap: var(--space-4);
   --form-card-padding-x: 1.5rem;
   --form-card-padding-y: 1.25rem;
-  
+
   /* 主题颜色 */
   --background: #F8F7F6;
   --foreground: oklch(0.145 0 0);
@@ -251,7 +285,7 @@ th .mixed-text-part {
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  
+
   /* 侧边栏颜色 */
   --sidebar: #F8F7F6;
   --sidebar-foreground: oklch(0.145 0 0);
@@ -263,14 +297,14 @@ th .mixed-text-part {
   --sidebar-ring: oklch(0.708 0 0);
   --sidebar-width: 280px;
   --sidebar-width-icon: 4rem;
-  
+
   /* 彩虹色彩 */
   --color-1: oklch(66.2% 0.225 25.9);
   --color-2: oklch(60.4% 0.26 302);
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
-  
+
   /* 统一的 hover 颜色 */
   --hover-light: #EEEDEC;
   --hover-dark: #28282A;
@@ -1195,8 +1229,6 @@ html,
   -webkit-backface-visibility: hidden;
 }
 
-
-
 /* ========== 护眼模式 ========== */
 body.eye-care {
   background: #f7f3e8 !important;
@@ -1532,26 +1564,26 @@ button[style*="background:#dc2626"] *,
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   /* Mobile table improvements */
   .overflow-x-auto {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   table {
     font-size: 0.875rem;
   }
-  
+
   th, td {
     padding: 0.5rem 0.75rem !important;
   }
-  
+
   /* Mobile tab bar improvements */
   [data-slot="tabs-list"] {
     max-width: calc(100vw - 2rem) !important;
     overflow-x: auto !important;
   }
-  
+
   [data-slot="tabs-trigger"] {
     white-space: nowrap !important;
     max-width: 120px !important;
@@ -1569,27 +1601,32 @@ button[style*="background:#dc2626"] *,
   .flex-shrink-0 {
     flex-shrink: 0;
   }
-  
+
   /* Further mobile table improvements */
   table {
     font-size: 0.8rem;
   }
-  
+
   th, td {
     padding: 0.4rem 0.6rem !important;
   }
-  
+
   .page-title-sticky {
     padding: 0.5rem !important;
   }
-  
+
   /* Mobile tab bar improvements */
   [data-slot="tabs-list"] {
     max-width: calc(100vw - 1rem) !important;
   }
-  
+
   [data-slot="tabs-trigger"] {
     max-width: 100px !important;
     font-size: 0.875rem !important;
   }
+}
+
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }

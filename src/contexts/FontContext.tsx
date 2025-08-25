@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { FontConfig, defaultFontConfig } from '@/lib/fontUtils';
 
@@ -41,4 +43,4 @@ export function useFont() {
         throw new Error('useFont must be used within a FontProvider');
     }
     return context;
-} 
+}

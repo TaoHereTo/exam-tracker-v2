@@ -44,16 +44,18 @@ export function AppearanceSetting() {
                         <h3 className="font-medium text-sm sm:text-base"><MixedText text="深浅色切换" /></h3>
                         <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="切换浅色、深色或跟随系统。" /></p>
                     </div>
-                    <Select value={theme} onValueChange={setTheme}>
-                        <SelectTrigger className="w-full sm:w-[180px] h-8 sm:h-10 text-sm">
-                            <SelectValue placeholder="选择外观" className="text-sm" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="light" className="text-sm"><MixedText text="浅色模式" /></SelectItem>
-                            <SelectItem value="dark" className="text-sm"><MixedText text="深色模式" /></SelectItem>
-                            <SelectItem value="system" className="text-sm"><MixedText text="跟随系统" /></SelectItem>
-                        </SelectContent>
-                    </Select>
+                    <div className="w-full sm:w-auto mt-2 sm:mt-0">
+                        <Select value={theme} onValueChange={setTheme}>
+                            <SelectTrigger className="w-full sm:w-[180px] h-8 sm:h-10 text-sm">
+                                <SelectValue placeholder="选择外观" className="text-sm" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="light" className="text-sm"><MixedText text="浅色模式" /></SelectItem>
+                                <SelectItem value="dark" className="text-sm"><MixedText text="深色模式" /></SelectItem>
+                                <SelectItem value="system" className="text-sm"><MixedText text="跟随系统" /></SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
 
                 {/* 护眼模式设置 */}

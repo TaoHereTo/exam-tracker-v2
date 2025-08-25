@@ -29,69 +29,71 @@ export function ExerciseRecordView({
 }: ExerciseRecordViewProps) {
 
     return (
-        // Added overflow-x-auto wrapper for horizontal scrolling on mobile
-        <div className="pt-2 px-2 sm:px-4 md:px-8 overflow-x-auto">
-            <UnifiedTable<RecordItem, string>
-                columns={[
-                    {
-                        key: 'date',
-                        label: (
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs sm:text-sm">日期</span>
-                            </div>
-                        ),
-                        render: (row) => <MixedText text={format(new Date(row.date), 'yyyy-MM-dd')} />
-                    },
-                    {
-                        key: 'module',
-                        label: (
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs sm:text-sm">模块</span>
-                            </div>
-                        ),
-                        render: (row) => <MixedText text={normalizeModuleName(row.module)} />
-                    },
-                    {
-                        key: 'correct',
-                        label: (
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs sm:text-sm">正确数</span>
-                            </div>
-                        ),
-                        render: (row) => <MixedText text={`${row.correct}/${row.total}`} />
-                    },
-                    {
-                        key: 'accuracy',
-                        label: (
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs sm:text-sm">正确率</span>
-                            </div>
-                        ),
-                        render: (row) => <MixedText text={`${((row.correct / row.total) * 100).toFixed(1)}%`} />
-                    },
-                    {
-                        key: 'duration',
-                        label: (
-                            <div className="flex items-center gap-1">
-                                <span className="text-xs sm:text-sm">用时</span>
-                            </div>
-                        ),
-                        render: (row) => <MixedText text={formatDuration(row.duration)} />
-                    }
-                ]}
-                data={records}
-                selected={selectedRecordIds}
-                onSelect={onSelectIds}
-                rowKey={(row) => row.id}
-                pagination={{
-                    currentPage: historyPage,
-                    totalPages,
-                    onPageChange: setHistoryPage,
-                    totalItems: totalRecords
-                }}
-                onBatchDelete={onBatchDelete}
-                batchDeleteText="批量删除"
-            />
+        // Added proper container with horizontal scrolling for mobile
+        <div className="w-full overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-4 md:px-8">
+            <div className="min-w-full sm:min-w-0">
+                <UnifiedTable<RecordItem, string>
+                    columns={[
+                        {
+                            key: 'date',
+                            label: (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs sm:text-sm">日期</span>
+                                </div>
+                            ),
+                            render: (row) => <MixedText text={format(new Date(row.date), 'yyyy-MM-dd')} />
+                        },
+                        {
+                            key: 'module',
+                            label: (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs sm:text-sm">模块</span>
+                                </div>
+                            ),
+                            render: (row) => <MixedText text={normalizeModuleName(row.module)} />
+                        },
+                        {
+                            key: 'correct',
+                            label: (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs sm:text-sm">正确数</span>
+                                </div>
+                            ),
+                            render: (row) => <MixedText text={`${row.correct}/${row.total}`} />
+                        },
+                        {
+                            key: 'accuracy',
+                            label: (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs sm:text-sm">正确率</span>
+                                </div>
+                            ),
+                            render: (row) => <MixedText text={`${((row.correct / row.total) * 100).toFixed(1)}%`} />
+                        },
+                        {
+                            key: 'duration',
+                            label: (
+                                <div className="flex items-center gap-1">
+                                    <span className="text-xs sm:text-sm">用时</span>
+                                </div>
+                            ),
+                            render: (row) => <MixedText text={formatDuration(row.duration)} />
+                        }
+                    ]}
+                    data={records}
+                    selected={selectedRecordIds}
+                    onSelect={onSelectIds}
+                    rowKey={(row) => row.id}
+                    pagination={{
+                        currentPage: historyPage,
+                        totalPages,
+                        onPageChange: setHistoryPage,
+                        totalItems: totalRecords
+                    }}
+                    onBatchDelete={onBatchDelete}
+                    batchDeleteText="批量删除"
+                />
+            </div>
         </div>
 
     );

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useEffect, useRef, useCallback } from 'react';
 
 interface PasteContextType {
@@ -124,4 +126,4 @@ export const PasteProvider: React.FC<PasteProviderProps> = ({ children }) => {
             {children}
         </PasteContext.Provider>
     );
-}; 
+};
