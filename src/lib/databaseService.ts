@@ -298,10 +298,27 @@ export const knowledgeService = {
             module: knowledge.module
         };
 
-        // 处理不同类型的知识点字段
-        // 处理知识点字段
-        if ('type' in knowledge) knowledgeData.type = knowledge.type;
-        if ('note' in knowledge) knowledgeData.note = knowledge.note;
+        // 确保 type 字段始终存在（对于 politics 模块，使用 source 作为 type）
+        if ('type' in knowledge && knowledge.type) {
+            knowledgeData.type = knowledge.type;
+        } else if (knowledge.module === 'politics' && 'source' in knowledge && knowledge.source) {
+            // 对于 politics 模块，如果 type 不存在但 source 存在，使用 source 作为 type
+            knowledgeData.type = knowledge.source;
+        } else if ('source' in knowledge && knowledge.source) {
+            // 其他情况下，如果 type 不存在但 source 存在，使用 source 作为 type
+            knowledgeData.type = knowledge.source;
+        } else {
+            // 如果都没有，使用默认值
+            knowledgeData.type = '未分类';
+        }
+
+        // 确保 note 字段始终存在
+        if ('note' in knowledge && knowledge.note) {
+            knowledgeData.note = knowledge.note;
+        } else {
+            // 如果 note 不存在，使用默认值
+            knowledgeData.note = '无内容';
+        }
 
         // 处理其他字段 - 使用原始字段名
         if ('subCategory' in knowledge) knowledgeData.subCategory = knowledge.subCategory;
@@ -345,9 +362,29 @@ export const knowledgeService = {
                     module: updates.module
                 };
 
-                // 处理不同类型的知识点字段
-                if ('type' in updates) knowledgeData.type = updates.type;
-                if ('note' in updates) knowledgeData.note = updates.note;
+                // 确保 type 字段始终存在（对于 politics 模块，使用 source 作为 type）
+                if ('type' in updates && updates.type) {
+                    knowledgeData.type = updates.type;
+                } else if (updates.module === 'politics' && 'source' in updates && updates.source) {
+                    // 对于 politics 模块，如果 type 不存在但 source 存在，使用 source 作为 type
+                    knowledgeData.type = updates.source;
+                } else if ('source' in updates && updates.source) {
+                    // 其他情况下，如果 type 不存在但 source 存在，使用 source 作为 type
+                    knowledgeData.type = updates.source;
+                } else {
+                    // 如果都没有，使用默认值
+                    knowledgeData.type = '未分类';
+                }
+
+                // 确保 note 字段始终存在
+                if ('note' in updates && updates.note) {
+                    knowledgeData.note = updates.note;
+                } else {
+                    // 如果 note 不存在，使用默认值
+                    knowledgeData.note = '无内容';
+                }
+
+                // 处理其他字段 - 使用原始字段名
                 if ('subCategory' in updates) knowledgeData.subCategory = updates.subCategory;
                 if ('date' in updates) knowledgeData.date = updates.date;
                 if ('source' in updates) knowledgeData.source = updates.source;

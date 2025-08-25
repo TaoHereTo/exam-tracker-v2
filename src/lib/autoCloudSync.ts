@@ -89,12 +89,26 @@ export class AutoCloudSync {
             };
 
             // 处理不同类型的知识点字段，并进行数据清理
-            // 处理知识点字段
+            // 确保 type 字段始终存在（对于 politics 模块，使用 source 作为 type）
             if ('type' in knowledgeRecord && knowledgeRecord.type) {
                 knowledgeData.type = cleanValue(knowledgeRecord.type);
+            } else if (knowledge.module === 'politics' && 'source' in knowledgeRecord && knowledgeRecord.source) {
+                // 对于 politics 模块，如果 type 不存在但 source 存在，使用 source 作为 type
+                knowledgeData.type = cleanValue(knowledgeRecord.source);
+            } else if ('source' in knowledgeRecord && knowledgeRecord.source) {
+                // 其他情况下，如果 type 不存在但 source 存在，使用 source 作为 type
+                knowledgeData.type = cleanValue(knowledgeRecord.source);
+            } else {
+                // 如果都没有，使用默认值
+                knowledgeData.type = '未分类';
             }
+
+            // 确保 note 字段始终存在
             if ('note' in knowledgeRecord && knowledgeRecord.note) {
                 knowledgeData.note = cleanValue(knowledgeRecord.note);
+            } else {
+                // 如果 note 不存在，使用默认值
+                knowledgeData.note = '无内容';
             }
 
             // 处理其他字段 - 使用原始字段名
@@ -207,12 +221,26 @@ export class AutoCloudSync {
             };
 
             // 处理不同类型的知识点字段，并进行数据清理
-            // 处理知识点字段
+            // 确保 type 字段始终存在（对于 politics 模块，使用 source 作为 type）
             if ('type' in knowledgeRecord && knowledgeRecord.type) {
                 updateData.type = cleanValue(knowledgeRecord.type);
+            } else if (knowledge.module === 'politics' && 'source' in knowledgeRecord && knowledgeRecord.source) {
+                // 对于 politics 模块，如果 type 不存在但 source 存在，使用 source 作为 type
+                updateData.type = cleanValue(knowledgeRecord.source);
+            } else if ('source' in knowledgeRecord && knowledgeRecord.source) {
+                // 其他情况下，如果 type 不存在但 source 存在，使用 source 作为 type
+                updateData.type = cleanValue(knowledgeRecord.source);
+            } else {
+                // 如果都没有，使用默认值
+                updateData.type = '未分类';
             }
+
+            // 确保 note 字段始终存在
             if ('note' in knowledgeRecord && knowledgeRecord.note) {
                 updateData.note = cleanValue(knowledgeRecord.note);
+            } else {
+                // 如果 note 不存在，使用默认值
+                updateData.note = '无内容';
             }
 
             // 处理其他字段 - 使用原始字段名

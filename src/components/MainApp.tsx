@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback, useRef } from "react";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { SidebarInset } from "@/components/ui/sidebar";
 import { SidebarTrigger, SidebarProvider, useSidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { SettingsView } from "@/components/views/SettingsView";
 import { useImportExport } from "@/hooks/useImportExport";
@@ -632,11 +633,13 @@ export function MainApp() {
                                         setActiveTab={setActiveTab}
                                         userInfo={<SidebarUserInfo />}
                                     />
-                                    <main className="flex-1 w-full overflow-hidden bg-background dark:bg-background min-w-0 h-full transition-[margin] duration-200 ease-linear peer-data-[state=collapsed]:md:ml-[var(--sidebar-width-icon)] peer flex flex-col">
+                                    <SidebarInset className="flex flex-col">
                                         {/* 固定的侧边栏触发器和标题栏 */}
-                                        <div className="page-title-sticky flex items-center gap-4 p-4 border-b border-border text-left bg-background dark:bg-background">
-                                            <SidebarTrigger className="size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-6 [&>svg]:!w-6 font-normal" />
-                                            <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
+                                        <div className="page-title-sticky flex items-center gap-2 sm:gap-4 p-2 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
+                                            <SidebarTrigger className="size-8 sm:size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
+                                            <div className="min-w-0 flex-1">
+                                                <PageTitle className="text-lg sm:text-xl md:text-2xl truncate">{normalizePageTitle(activeTab)}</PageTitle>
+                                            </div>
                                         </div>
 
                                         <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-6'} max-w-7xl mx-auto`}>
@@ -697,7 +700,7 @@ export function MainApp() {
                                                     <PlanListView
                                                         plans={plansWithProgress}
                                                         onCreate={async (plan) => {
-                                                            const formattedPlan = {
+                                                            const formattedPlan: StudyPlan = {
                                                                 ...plan,
                                                                 module: plan.module as StudyPlan['module']
                                                             };
@@ -723,47 +726,14 @@ export function MainApp() {
                                                             }
                                                         }}
                                                         onUpdate={async (plan) => {
-                                                            const formattedPlan = {
+                                                            const formattedPlan: StudyPlan = {
                                                                 ...plan,
                                                                 module: plan.module as StudyPlan['module']
                                                             };
-
-                                                            // 检查 ID 格式
-                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
-
-                                                            if (!isUUID) {
-                                                                // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
-                                                                const newId = generateUUID();
-                                                                const updatedPlan = { ...formattedPlan, id: newId };
-
-                                                                // 更新本地数据为新ID
-                                                                setPlans(prev => prev.map(p => p.id === plan.id ? updatedPlan : p));
-
-                                                                // 通知用户ID已更新
-                                                                notify({
-                                                                    type: 'info',
-                                                                    message: 'ID格式已更新',
-                                                                    description: '学习计划ID已更新为新格式，正在同步到云端...'
-                                                                });
-
-                                                                // 使用新ID同步到云端
-                                                                try {
-                                                                    await AutoCloudSync.autoUpdatePlan(updatedPlan, notify);
-                                                                } catch (error) {
-                                                                    console.error('MainApp - 编辑计划失败:', error);
-                                                                }
-                                                                return;
-                                                            }
-
-                                                            // 对于新格式ID，直接更新本地和云端
                                                             setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                             // 自动更新到云端
-                                                            try {
-                                                                await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
-                                                            } catch (error) {
-                                                                console.error('MainApp - 编辑计划失败:', error);
-                                                            }
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
                                                         }}
                                                         onDelete={async (id) => {
                                                             setPlans(prev => prev.filter(p => p.id !== id));
@@ -787,89 +757,56 @@ export function MainApp() {
                                                                 console.error('MainApp - 删除计划失败:', error);
                                                             }
                                                         }}
-                                                    />
-                                                </Suspense>
-                                            )}
-
-                                            {activeTab === 'plan-detail' && (
-                                                <Suspense fallback={<SimpleLoadingSpinner />}>
-                                                    {plansWithProgress.length > 0 ? (
-                                                        <PlanDetailView
-                                                            plan={plansWithProgress[0]}
-                                                            onBack={() => setActiveTab('plan-list')}
-                                                            onEdit={() => { }}
-                                                            onUpdate={async (plan) => {
-                                                                const formattedPlan = {
-                                                                    ...plan,
-                                                                    module: plan.module as StudyPlan['module']
-                                                                };
-
-                                                                // 检查 ID 格式
-                                                                const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
-
-                                                                if (!isUUID) {
-                                                                    // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
-                                                                    const newId = generateUUID();
-                                                                    const updatedPlan = { ...formattedPlan, id: newId };
-
-                                                                    // 更新本地数据为新ID
-                                                                    setPlans(prev => prev.map(p => p.id === plan.id ? updatedPlan : p));
-
-                                                                    // 通知用户ID已更新
-                                                                    notify({
-                                                                        type: 'info',
-                                                                        message: 'ID格式已更新',
-                                                                        description: '学习计划ID已更新为新格式，正在同步到云端...'
-                                                                    });
-
-                                                                    // 使用新ID同步到云端
-                                                                    try {
-                                                                        await AutoCloudSync.autoUpdatePlan(updatedPlan, notify);
-                                                                    } catch (error) {
-                                                                        console.error('MainApp - 编辑计划失败:', error);
-                                                                    }
-                                                                    return;
-                                                                }
-
-                                                                // 对于新格式ID，直接更新本地和云端
-                                                                setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
-
-                                                                // 自动更新到云端
-                                                                try {
-                                                                    await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
-                                                                } catch (error) {
-                                                                    console.error('MainApp - 编辑计划失败:', error);
-                                                                }
-                                                            }}
-                                                        />
-                                                    ) : (
-                                                        <div className="flex items-center justify-center h-64">
-                                                            <div className="text-center">
-                                                                <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </Suspense>
-                                            )}
-
-                                            {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                                <SettingsView
-                                                    onExport={handleExportData}
-                                                    onImport={handleImportData}
-                                                    onClearLocalData={handleClearLocalData}
-                                                    activeTab={activeTab}
-                                                    navMode={navMode}
-                                                    records={records}
-                                                    plans={plans}
-                                                    knowledge={knowledge}
-                                                    settings={{
-                                                        'exam-tracker-nav-mode': navMode,
-                                                        // 可以添加更多设置项
-                                                    }}
                                                 />
-                                            )}
-                                        </div>
-                                    </main>
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'plan-detail' && (
+                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                {plansWithProgress.length > 0 ? (
+                                                    <PlanDetailView
+                                                        plan={plansWithProgress[0]}
+                                                        onBack={() => setActiveTab('plan-list')}
+                                                        onEdit={() => { }}
+                                                        onUpdate={async (plan) => {
+                                                            const formattedPlan: StudyPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                            // 自动更新到云端
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-64">
+                                                        <div className="text-center">
+                                                            <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Suspense>
+                                        )}
+
+                                        {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                            <SettingsView
+                                                onExport={handleExportData}
+                                                onImport={handleImportData}
+                                                onClearLocalData={handleClearLocalData}
+                                                activeTab={activeTab}
+                                                navMode={navMode}
+                                                records={records}
+                                                plans={plans}
+                                                knowledge={knowledge}
+                                                settings={{
+                                                    'exam-tracker-nav-mode': navMode,
+                                                    // 可以添加更多设置项
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                    </SidebarInset>
                                 </div>
                             </SidebarProvider>
                         ) : (
@@ -896,134 +833,90 @@ export function MainApp() {
 
                                     {/* 可滚动的内容区域 */}
                                     <div className={`content-scrollable flex-1 ${activeTab === 'overview' ? '' : 'p-6 pt-2'}`}>
+                                        {activeTab === 'overview' && (
+                                            <OverviewView
+                                                records={records}
+                                            />
+                                        )}
 
-                                    {activeTab === 'overview' && (
-                                        <OverviewView
-                                            records={records}
-                                        />
-                                    )}
+                                        {activeTab === 'charts' && (
+                                            <ChartsView records={records} />
+                                        )}
 
-                                    {activeTab === 'charts' && (
-                                        <ChartsView records={records} />
-                                    )}
+                                        {activeTab === 'history' && (
+                                            <ExerciseRecordView
+                                                records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                                selectedRecordIds={selectedRecordIds}
+                                                onSelectIds={setSelectedRecordIds}
+                                                onBatchDelete={handleBatchDelete}
+                                                historyPage={historyPage}
+                                                setHistoryPage={setHistoryPage}
+                                                totalPages={Math.ceil(records.length / pageSize)}
+                                                totalRecords={records.length}
+                                            />
+                                        )}
 
-                                    {activeTab === 'history' && (
-                                        <ExerciseRecordView
-                                            records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
-                                            selectedRecordIds={selectedRecordIds}
-                                            onSelectIds={setSelectedRecordIds}
-                                            onBatchDelete={handleBatchDelete}
-                                            historyPage={historyPage}
-                                            setHistoryPage={setHistoryPage}
-                                            totalPages={Math.ceil(records.length / pageSize)}
-                                            totalRecords={records.length}
-                                        />
-                                    )}
+                                        {activeTab === 'personal-best' && (
+                                            <PersonalBestView records={records} />
+                                        )}
 
-                                    {activeTab === 'personal-best' && (
-                                        <PersonalBestView records={records} />
-                                    )}
+                                        {activeTab === 'knowledge-summary' && (
+                                            <KnowledgeSummaryView
+                                                knowledge={knowledge}
+                                                onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
+                                                onEditKnowledge={handleEditKnowledge}
+                                            />
+                                        )}
 
-                                    {activeTab === 'knowledge-summary' && (
-                                        <KnowledgeSummaryView
-                                            knowledge={knowledge}
-                                            onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
-                                            onEditKnowledge={handleEditKnowledge}
-                                        />
-                                    )}
+                                        {activeTab === 'knowledge-entry' && (
+                                            <KnowledgeEntryView
+                                                onAddKnowledge={addKnowledge}
+                                            />
+                                        )}
 
-                                    {activeTab === 'knowledge-entry' && (
-                                        <KnowledgeEntryView
-                                            onAddKnowledge={addKnowledge}
-                                        />
-                                    )}
-
-                                    {activeTab === 'form' && (
-                                        <NewRecordForm
-                                            onAddRecord={async (newRecord) => {
-                                                setRecords(prev => [newRecord, ...prev]);
-
-                                                // 自动保存到云端
-                                                await AutoCloudSync.autoSaveRecord(newRecord, notify);
-                                            }}
-                                        />
-                                    )}
-
-                                    {activeTab === 'plan-list' && (
-                                        <Suspense fallback={<SimpleLoadingSpinner />}>
-                                            <PlanListView
-                                                plans={plansWithProgress}
-                                                onCreate={async (plan) => {
-                                                    const formattedPlan = {
-                                                        ...plan,
-                                                        module: plan.module as StudyPlan['module']
-                                                    };
-                                                    setPlans(prev => [formattedPlan, ...prev]);
-
-                                                    // 检查 ID 格式，只有 UUID 格式的才保存到云端
-                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
-
-                                                    if (!isUUID) {
-                                                        notify({
-                                                            type: 'warning',
-                                                            message: '本地保存成功',
-                                                            description: '计划已保存到本地，但云端同步跳过（旧格式ID）'
-                                                        });
-                                                        return;
-                                                    }
+                                        {activeTab === 'form' && (
+                                            <NewRecordForm
+                                                onAddRecord={async (newRecord) => {
+                                                    setRecords(prev => [newRecord, ...prev]);
 
                                                     // 自动保存到云端
-                                                    try {
-                                                        await AutoCloudSync.autoSavePlan(formattedPlan, notify);
-                                                    } catch (error) {
-                                                        console.error('MainApp - 创建计划失败:', error);
-                                                    }
-                                                }}
-                                                onUpdate={async (plan) => {
-                                                    const formattedPlan = {
-                                                        ...plan,
-                                                        module: plan.module as StudyPlan['module']
-                                                    };
-                                                    setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
-
-                                                    // 自动更新到云端
-                                                    await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
-                                                }}
-                                                onDelete={async (id) => {
-                                                    setPlans(prev => prev.filter(p => p.id !== id));
-
-                                                    // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                    if (!isUUID) {
-                                                        notify({
-                                                            type: 'warning',
-                                                            message: '本地删除成功',
-                                                            description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
-                                                        });
-                                                        return;
-                                                    }
-
-                                                    // 自动从云端删除
-                                                    try {
-                                                        await AutoCloudSync.autoDeletePlan(id, notify);
-                                                    } catch (error) {
-                                                        console.error('MainApp - 删除计划失败:', error);
-                                                    }
+                                                    await AutoCloudSync.autoSaveRecord(newRecord, notify);
                                                 }}
                                             />
-                                        </Suspense>
-                                    )}
+                                        )}
 
-                                    {activeTab === 'plan-detail' && (
-                                        <Suspense fallback={<SimpleLoadingSpinner />}>
-                                            {plansWithProgress.length > 0 ? (
-                                                <PlanDetailView
-                                                    plan={plansWithProgress[0]}
-                                                    onBack={() => setActiveTab('plan-list')}
-                                                    onEdit={() => { }}
+                                        {activeTab === 'plan-list' && (
+                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                <PlanListView
+                                                    plans={plansWithProgress}
+                                                    onCreate={async (plan) => {
+                                                        const formattedPlan: StudyPlan = {
+                                                            ...plan,
+                                                            module: plan.module as StudyPlan['module']
+                                                        };
+                                                        setPlans(prev => [formattedPlan, ...prev]);
+
+                                                        // 检查 ID 格式，只有 UUID 格式的才保存到云端
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
+
+                                                        if (!isUUID) {
+                                                            notify({
+                                                                type: 'warning',
+                                                                message: '本地保存成功',
+                                                                description: '计划已保存到本地，但云端同步跳过（旧格式ID）'
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        // 自动保存到云端
+                                                        try {
+                                                            await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                        } catch (error) {
+                                                            console.error('MainApp - 创建计划失败:', error);
+                                                        }
+                                                    }}
                                                     onUpdate={async (plan) => {
-                                                        const formattedPlan = {
+                                                        const formattedPlan: StudyPlan = {
                                                             ...plan,
                                                             module: plan.module as StudyPlan['module']
                                                         };
@@ -1032,39 +925,82 @@ export function MainApp() {
                                                         // 自动更新到云端
                                                         await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
                                                     }}
-                                                />
-                                            ) : (
-                                                <div className="flex items-center justify-center h-64">
-                                                    <div className="text-center">
-                                                        <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Suspense>
-                                    )}
+                                                    onDelete={async (id) => {
+                                                        setPlans(prev => prev.filter(p => p.id !== id));
 
-                                    {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                        <SettingsView
-                                            onExport={handleExportData}
-                                            onImport={handleImportData}
-                                            onClearLocalData={handleClearLocalData}
-                                            activeTab={activeTab}
-                                            navMode={navMode}
-                                            records={records}
-                                            plans={plans}
-                                            knowledge={knowledge}
-                                            settings={{
-                                                'exam-tracker-nav-mode': navMode,
-                                                // 可以添加更多设置项
-                                            }}
-                                        />
-                                    )}
+                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                        if (!isUUID) {
+                                                            notify({
+                                                                type: 'warning',
+                                                                message: '本地删除成功',
+                                                                description: '计划已从本地删除，但云端同步跳过（旧格式ID）'
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        // 自动从云端删除
+                                                            try {
+                                                                await AutoCloudSync.autoDeletePlan(id, notify);
+                                                            } catch (error) {
+                                                                console.error('MainApp - 删除计划失败:', error);
+                                                            }
+                                                    }}
+                                                />
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'plan-detail' && (
+                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                {plansWithProgress.length > 0 ? (
+                                                    <PlanDetailView
+                                                        plan={plansWithProgress[0]}
+                                                        onBack={() => setActiveTab('plan-list')}
+                                                        onEdit={() => { }}
+                                                        onUpdate={async (plan) => {
+                                                            const formattedPlan: StudyPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                            // 自动更新到云端
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-64">
+                                                        <div className="text-center">
+                                                            <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Suspense>
+                                        )}
+
+                                        {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                            <SettingsView
+                                                onExport={handleExportData}
+                                                onImport={handleImportData}
+                                                onClearLocalData={handleClearLocalData}
+                                                activeTab={activeTab}
+                                                navMode={navMode}
+                                                records={records}
+                                                plans={plans}
+                                                knowledge={knowledge}
+                                                settings={{
+                                                    'exam-tracker-nav-mode': navMode,
+                                                    // 可以添加更多设置项
+                                                }}
+                                            />
+                                        )}
                                     </div>
                                 </main>
                             </div>
                         )}
                     </LoadingWrapper>
-
+                        
                     {/* 导入确认对话框 */}
                     <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
                         <AlertDialogContent>

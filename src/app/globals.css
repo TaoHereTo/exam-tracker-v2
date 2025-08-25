@@ -1256,132 +1256,98 @@ body.eye-care.dark .text-muted-foreground,
 
 /* ========== Checkbox 动效 ========== */
 [data-slot="checkbox"] {
-  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* Completely disable all transitions and animations for checkbox */
+  transition: none !important;
   transform-origin: center;
 }
 
+/* Disable all hover effects for checkbox */
 [data-slot="checkbox"]:hover {
-  transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: none !important;
+  box-shadow: none !important;
+  animation: none !important;
 }
 
 [data-slot="checkbox"]:active {
-  transform: scale(0.95);
-  transition: all 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-[data-slot="checkbox"][data-state="checked"] {
-  animation: checkbox-check 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-[data-slot="checkbox"][data-state="unchecked"] {
-  animation: checkbox-uncheck 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes checkbox-check {
-  0% {
-    transform: scale(0.8);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes checkbox-uncheck {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(0.9);
-  }
+  transform: none !important;
+  transition: none !important;
 }
 
 [data-slot="checkbox-indicator"] {
-  animation: checkmark-appear 0.2s ease-in-out;
 }
 
 [data-slot="checkbox"][data-state="checked"] [data-slot="checkbox-indicator"] {
-  animation: checkmark-appear 0.2s ease-in-out;
-}
-
-@keyframes checkmark-appear {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 /* ========== 响应式设计优化 ========== */
 /* ========== 统一的 Hover 样式 ========== */
-/* 基础按钮 hover 效果 */
-button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
+/* 强制覆盖侧边栏标题样式 */
+[data-slot="sidebar-header"] * {
+  font-size: 28px !important;
+  font-weight: 400 !important;
+}
+
+/* Utility class for hover effects - can be applied selectively */
+.hover-effect:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.hover-effect[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.hover-effect[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
   background-color: var(--hover-light) !important;
   transition-duration: 1ms !important;
 }
 
-.dark button:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-.dark [role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
-.dark [data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
+.dark .hover-effect:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.dark .hover-effect[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
+.dark .hover-effect[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
   background-color: var(--hover-dark) !important;
   transition-duration: 1ms !important;
 }
 
-/* 下拉菜单 hover 效果 */
-[data-slot="dropdown-menu-item"]:hover,
-[data-slot="dropdown-menu-item"]:focus,
-[data-slot="dropdown-menu-sub-trigger"]:hover,
-[data-slot="dropdown-menu-sub-trigger"]:focus,
-[data-slot="dropdown-menu-checkbox-item"]:hover,
-[data-slot="dropdown-menu-checkbox-item"]:focus,
-[data-slot="dropdown-menu-radio-item"]:hover,
-[data-slot="dropdown-menu-radio-item"]:focus,
-[data-slot="select-item"]:hover,
-[data-slot="select-item"]:focus,
-[data-slot="context-menu-item"]:hover,
-[data-slot="context-menu-item"]:focus,
-[data-slot="context-menu-checkbox-item"]:hover,
-[data-slot="context-menu-checkbox-item"]:focus,
-[data-slot="context-menu-radio-item"]:hover,
-[data-slot="context-menu-radio-item"]:focus {
+/* Utility class for dropdown hover effects */
+.dropdown-hover-effect:hover,
+.dropdown-hover-effect:focus,
+.dropdown-hover-effect[data-slot="dropdown-menu-item"]:hover,
+.dropdown-hover-effect[data-slot="dropdown-menu-item"]:focus,
+.dropdown-hover-effect[data-slot="dropdown-menu-sub-trigger"]:hover,
+.dropdown-hover-effect[data-slot="dropdown-menu-sub-trigger"]:focus,
+.dropdown-hover-effect[data-slot="dropdown-menu-checkbox-item"]:hover,
+.dropdown-hover-effect[data-slot="dropdown-menu-checkbox-item"]:focus,
+.dropdown-hover-effect[data-slot="dropdown-menu-radio-item"]:hover,
+.dropdown-hover-effect[data-slot="dropdown-menu-radio-item"]:focus,
+.dropdown-hover-effect[data-slot="select-item"]:hover,
+.dropdown-hover-effect[data-slot="select-item"]:focus,
+.dropdown-hover-effect[data-slot="context-menu-item"]:hover,
+.dropdown-hover-effect[data-slot="context-menu-item"]:focus,
+.dropdown-hover-effect[data-slot="context-menu-checkbox-item"]:hover,
+.dropdown-hover-effect[data-slot="context-menu-checkbox-item"]:focus,
+.dropdown-hover-effect[data-slot="context-menu-radio-item"]:hover,
+.dropdown-hover-effect[data-slot="context-menu-radio-item"]:focus {
   background-color: var(--hover-light) !important;
 }
 
-.dark [data-slot="dropdown-menu-item"]:hover,
-.dark [data-slot="dropdown-menu-item"]:focus,
-.dark [data-slot="dropdown-menu-sub-trigger"]:hover,
-.dark [data-slot="dropdown-menu-sub-trigger"]:focus,
-.dark [data-slot="dropdown-menu-checkbox-item"]:hover,
-.dark [data-slot="dropdown-menu-checkbox-item"]:focus,
-.dark [data-slot="dropdown-menu-radio-item"]:hover,
-.dark [data-slot="dropdown-menu-radio-item"]:focus,
-.dark [data-slot="select-item"]:hover,
-.dark [data-slot="select-item"]:focus,
-.dark [data-slot="context-menu-item"]:hover,
-.dark [data-slot="context-menu-item"]:focus,
-.dark [data-slot="context-menu-checkbox-item"]:hover,
-.dark [data-slot="context-menu-checkbox-item"]:focus,
-.dark [data-slot="context-menu-radio-item"]:hover,
-.dark [data-slot="context-menu-radio-item"]:focus {
+.dark .dropdown-hover-effect:hover,
+.dark .dropdown-hover-effect:focus,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-sub-trigger"]:hover,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-sub-trigger"]:focus,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-checkbox-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-checkbox-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-radio-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="dropdown-menu-radio-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="select-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="select-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="context-menu-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="context-menu-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="context-menu-checkbox-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="context-menu-checkbox-item"]:focus,
+.dark .dropdown-hover-effect[data-slot="context-menu-radio-item"]:hover,
+.dark .dropdown-hover-effect[data-slot="context-menu-radio-item"]:focus {
   background-color: var(--hover-dark) !important;
 }
 
-
-/* 保持 outline 按钮的边框 */
-button[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]),
-[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]) {
+/* Utility class for outline button hover effects */
+.outline-hover-effect[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]),
+.outline-hover-effect[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]) {
   border-color: var(--input-border) !important;
 }
 
@@ -1492,12 +1458,6 @@ button[style*="background:#dc2626"] *,
 .hover\:shadow-lg,
 .hover\:-translate-y-1 {
   transition-duration: 300ms !important;
-}
-
-/* 强制覆盖侧边栏标题样式 */
-[data-slot="sidebar-header"] * {
-  font-size: 28px !important;
-  font-weight: 400 !important;
 }
 
 /* Switch 组件保持原有过渡效果 */

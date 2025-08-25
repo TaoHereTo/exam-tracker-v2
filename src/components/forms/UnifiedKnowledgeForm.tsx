@@ -125,6 +125,8 @@ function DateField() {
             const formatted = d ? format(d, 'yyyy-MM-dd') : '';
             setValue('date', formatted);
             if (errors['date']) clearError('date');
+            // Automatically close the popover after selecting a date
+            setDateOpen(false);
           }}
           initialFocus
           locale={zhCN}
