@@ -46,10 +46,10 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
     return (
         <div className="w-full">
             <div className="text-left mb-6 mt-0">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-1">
                     <MixedText text="欢迎回来" />
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                     <MixedText text="请登录或注册" />
                 </p>
             </div>
@@ -57,43 +57,43 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
             <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                     <Alert variant="destructive">
-                        <AlertDescription>
+                        <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={error} />
                         </AlertDescription>
                     </Alert>
                 )}
 
                 <div className="space-y-2 mb-4">
-                    <Label htmlFor="email" className="text-left text-gray-700 dark:text-gray-300 block">
+                    <Label htmlFor="email" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
                         <MixedText text="邮箱地址" />
                     </Label>
                     <div className="relative w-full">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱地址"
-                            className="w-full pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100"
+                            className="w-full pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2 mb-4">
-                    <Label htmlFor="password" className="text-left text-gray-700 dark:text-gray-300 block">
+                    <Label htmlFor="password" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
                         <MixedText text="密码" />
                     </Label>
                     <div className="relative w-full">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="password"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
-                            className="w-full pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100"
+                            className="w-full pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -101,27 +101,28 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                         >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                         </button>
                     </div>
                 </div>
 
-                {/* 记住我和忘记密码行 */}
-                <div className="flex justify-between items-center mb-4">
+                {/* 记住我和忘记密码行 - 响应式设计 */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="rememberMe"
                             checked={rememberMe}
                             onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                            className="size-4 sm:size-5"
                         />
-                        <Label htmlFor="rememberMe" className="text-sm text-gray-600 dark:text-gray-400">
+                        <Label htmlFor="rememberMe" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             <MixedText text="记住我" />
                         </Label>
                     </div>
                     <button
                         type="button"
                         onClick={onSwitchToForgotPassword}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
                     >
                         <MixedText text="忘记密码？" />
                     </button>
@@ -132,21 +133,21 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full"
+                        className="w-full h-10 sm:h-12 text-sm sm:text-base"
                     >
                         <MixedText text={loading ? '登录中...' : '登录'} />
                     </Button>
                 </div>
 
-                {/* 注册链接 */}
+                {/* 注册链接 - 响应式设计 */}
                 <div className="text-center">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                    <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <MixedText text="还没有账号？" />
                     </span>
                     <button
                         type="button"
                         onClick={onSwitchToSignUp}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline ml-1"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline ml-1"
                     >
                         <MixedText text="现在注册" />
                     </button>
@@ -154,4 +155,4 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
             </form>
         </div>
     )
-} 
+}

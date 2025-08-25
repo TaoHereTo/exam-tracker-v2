@@ -343,7 +343,7 @@ export function MainApp() {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {/* Dock模式下增加“数据概览 / 最佳成绩”入口（图标+文字） */}
+                        {/* Dock模式下增加"数据概览 / 最佳成绩"入口（图标+文字） */}
                         <>
                             {navMode === 'dock' && (
                                 <>
@@ -627,22 +627,22 @@ export function MainApp() {
                                     "--sidebar-width-icon": string;
                                 }}
                             >
-                                <div className="flex h-screen w-full relative z-[2]" data-sidebar="sidebar">
+                                <div className="flex h-screen w-full relative z-[2] flex-col md:flex-row" data-sidebar="sidebar">
                                     <Sidebar
                                         activeTab={activeTab}
                                         setActiveTab={setActiveTab}
                                         userInfo={<SidebarUserInfo />}
                                     />
-                                    <SidebarInset className="flex flex-col">
-                                        {/* 固定的侧边栏触发器和标题栏 */}
-                                        <div className="page-title-sticky flex items-center gap-2 sm:gap-4 p-2 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
+                                    <SidebarInset className="flex flex-col flex-1">
+                                        {/* 固定的侧边栏触发器和标题栏 - 响应式设计 */}
+                                        <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
                                             <SidebarTrigger className="size-8 sm:size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
                                             <div className="min-w-0 flex-1">
                                                 <PageTitle className="text-lg sm:text-xl md:text-2xl truncate">{normalizePageTitle(activeTab)}</PageTitle>
                                             </div>
                                         </div>
 
-                                        <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-6'} max-w-7xl mx-auto`}>
+                                        <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-4 sm:p-6'} max-w-7xl mx-auto`}>
                                             {activeTab === 'overview' && (
                                                 <OverviewView
                                                     records={records}
@@ -810,7 +810,7 @@ export function MainApp() {
                                 </div>
                             </SidebarProvider>
                         ) : (
-                            <div className="flex h-screen relative z-[2]">
+                            <div className="flex h-screen relative z-[2] flex-col">
                                 <DockNavigation
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
@@ -818,21 +818,21 @@ export function MainApp() {
                                     userInfo={<DockUserInfo />}
                                 />
                                 <main className={`flex-1 overflow-hidden ${activeTab === 'overview' ? 'p-0' : ''} w-full max-w-7xl mx-auto bg-background dark:bg-background text-left flex flex-col`}>
-                                    {/* 固定的页面标题栏 */}
+                                    {/* 固定的页面标题栏 - 响应式设计 */}
                                     <div className="page-title-sticky bg-background dark:bg-background border-b border-border">
                                         {activeTab === 'overview' ? (
-                                            <div className="p-6">
+                                            <div className="p-4 sm:p-6">
                                                 <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
                                             </div>
                                         ) : (
-                                            <div className="p-6 pb-4">
+                                            <div className="p-4 sm:p-6 pb-2 sm:pb-4">
                                                 <PageTitle>{normalizePageTitle(activeTab)}</PageTitle>
                                             </div>
                                         )}
                                     </div>
 
-                                    {/* 可滚动的内容区域 */}
-                                    <div className={`content-scrollable flex-1 ${activeTab === 'overview' ? '' : 'p-6 pt-2'}`}>
+                                    {/* 可滚动的内容区域 - 响应式设计 */}
+                                    <div className={`content-scrollable flex-1 ${activeTab === 'overview' ? '' : 'p-4 sm:p-6 pt-2 sm:pt-2'}`}>
                                         {activeTab === 'overview' && (
                                             <OverviewView
                                                 records={records}
@@ -941,11 +941,11 @@ export function MainApp() {
                                                         }
 
                                                         // 自动从云端删除
-                                                            try {
-                                                                await AutoCloudSync.autoDeletePlan(id, notify);
-                                                            } catch (error) {
-                                                                console.error('MainApp - 删除计划失败:', error);
-                                                            }
+                                                        try {
+                                                            await AutoCloudSync.autoDeletePlan(id, notify);
+                                                        } catch (error) {
+                                                            console.error('MainApp - 删除计划失败:', error);
+                                                        }
                                                     }}
                                                 />
                                             </Suspense>
@@ -1001,9 +1001,9 @@ export function MainApp() {
                         )}
                     </LoadingWrapper>
                         
-                    {/* 导入确认对话框 */}
+                    {/* 导入确认对话框 - 响应式设计 */}
                     <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="w-11/12 max-w-md sm:max-w-lg">
                             <AlertDialogHeader>
                                 <AlertDialogTitle><MixedText text="确认导入数据" /></AlertDialogTitle>
                                 <AlertDialogDescription asChild>
@@ -1022,16 +1022,18 @@ export function MainApp() {
                                     )}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction onClick={handleConfirmImport}><MixedText text="确认导入" /></AlertDialogAction>
+                            <AlertDialogFooter className="flex-col sm:flex-row">
+                                <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
+                                <AlertDialogAction onClick={handleConfirmImport} className="w-full sm:w-auto">
+                                    <MixedText text="确认导入" />
+                                </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    {/* 删除确认对话框 */}
+                    {/* 删除确认对话框 - 响应式设计 */}
                     <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="w-11/12 max-w-md sm:max-w-lg">
                             <AlertDialogHeader>
                                 <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
                                 <AlertDialogDescription asChild>
@@ -1040,11 +1042,11 @@ export function MainApp() {
                                     </div>
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                            <AlertDialogFooter className="flex-col sm:flex-row">
+                                <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleConfirmDelete}
-                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
                                     style={{ color: 'white' }}
                                 >
                                     <MixedText text="确认删除" />
@@ -1053,18 +1055,18 @@ export function MainApp() {
                         </AlertDialogContent>
                     </AlertDialog>
 
-                    {/* 退出登录确认对话框 */}
+                    {/* 退出登录确认对话框 - 响应式设计 */}
                     <AlertDialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="w-11/12 max-w-md sm:max-w-lg">
                             <AlertDialogHeader>
                                 <AlertDialogTitle><MixedText text="确认退出登录" /></AlertDialogTitle>
                                 <AlertDialogDescription>
                                     <MixedText text="您确定要退出登录吗？退出后需要重新登录才能使用应用。" />
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction onClick={handleSignOut} className="bg-red-600 hover:bg-red-700">
+                            <AlertDialogFooter className="flex-col sm:flex-row">
+                                <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
+                                <AlertDialogAction onClick={handleSignOut} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
                                     <MixedText text="确认退出" />
                                 </AlertDialogAction>
                             </AlertDialogFooter>
@@ -1072,7 +1074,7 @@ export function MainApp() {
                     </AlertDialog>
 
 
-                    {/* 用户资料对话框 */}
+                    {/* 用户资料对话框 - 响应式设计 */}
                     <UserProfileDialog
                         isOpen={showProfileDialog}
                         onClose={() => setShowProfileDialog(false)}

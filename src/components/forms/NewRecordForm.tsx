@@ -47,9 +47,9 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         return (
             <Popover>
                 <PopoverTrigger asChild>
-                    <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md">
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
+                    <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm sm:text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 sm:h-12">
+                        <CalendarIcon className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                        {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground text-sm sm:text-base">选择日期</span>}
                     </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -83,19 +83,20 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                     if (errors['duration']) clearError('duration');
                 }}
                 placeholder="选择时长"
+                className="h-10 sm:h-12 text-sm sm:text-base"
             />
         );
     }
 
     return (
-        <div className="flex items-start justify-center min-h-screen p-4 pt-10">
-            <Card className="w-full max-w-md flex flex-col">
-                <CardHeader className="pb-2">
-                    <CardTitle className="text-2xl">
+        <div className="flex items-start justify-center min-h-screen p-4 pt-6 sm:pt-10">
+            <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl flex flex-col">
+                <CardHeader className="pb-3 sm:pb-4">
+                    <CardTitle className="text-2xl sm:text-3xl">
                         <MixedText text="新增做题记录" />
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-2">
+                <CardContent className="pt-0 pb-3 sm:pb-4">
                     <BaseForm
                         className="form-stack"
                         validationSchema={{
@@ -138,7 +139,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                     >
                         {/* 模块选择 */}
                         <FormField name="module" className="form-field">
-                            <Label htmlFor="module">
+                            <Label htmlFor="module" className="text-sm sm:text-base">
                                 <MixedText text="选择模块" />
                             </Label>
                             <FormSelect
@@ -156,46 +157,48 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
 
                         {/* 日期选择 */}
                         <FormField name="date" className="form-field">
-                            <Label htmlFor="date">
+                            <Label htmlFor="date" className="text-sm sm:text-base">
                                 <MixedText text="做题日期" />
                             </Label>
                             <DateField />
                         </FormField>
 
                         {/* 总题数和正确题数 */}
-                        <div className="form-grid-2">
+                        <div className="form-grid-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <FormField name="total" className="form-field">
-                                <Label htmlFor="total">
+                                <Label htmlFor="total" className="text-sm sm:text-base">
                                     <MixedText text="总题数" />
                                 </Label>
                                 <FormInput
                                     name="total"
                                     type="number"
                                     placeholder="请输入总题数"
+                                    className="h-10 sm:h-12 text-sm sm:text-base"
                                 />
                             </FormField>
                             <FormField name="correct" className="form-field">
-                                <Label htmlFor="correct">
+                                <Label htmlFor="correct" className="text-sm sm:text-base">
                                     <MixedText text="正确题数" />
                                 </Label>
                                 <FormInput
                                     name="correct"
                                     type="number"
                                     placeholder="请输入正确题数"
+                                    className="h-10 sm:h-12 text-sm sm:text-base"
                                 />
                             </FormField>
                         </div>
 
                         {/* 做题时长 */}
                         <FormField name="duration" className="form-field">
-                            <Label htmlFor="duration">
+                            <Label htmlFor="duration" className="text-sm sm:text-base">
                                 <MixedText text="做题时长" />
                             </Label>
                             <DurationField />
                         </FormField>
 
-                        <div className="form-actions pt-4">
-                            <Button type="submit" className="w-full py-4">
+                        <div className="form-actions pt-4 sm:pt-6">
+                            <Button type="submit" className="w-full py-3 sm:py-4 text-sm sm:text-base h-10 sm:h-12">
                                 <MixedText text="保存记录" />
                             </Button>
                         </div>
@@ -204,4 +207,4 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
             </Card>
         </div>
     );
-} 
+}

@@ -287,27 +287,61 @@ export function OverviewView({ records }: OverviewViewProps) {
 
     return (
         <TooltipProvider>
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-8">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 sm:gap-8">
                 {overviewAnimate ? (
                     <Marquee className="w-full" pauseOnHover repeat={2}>
-                        <div className="flex gap-6">
+                        <div className="flex gap-4 sm:gap-6">
                             {group1.map((item, idx) => (
-                                <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
-                                    <CardHeader className="flex flex-row items-center justify-between pb-0">
-                                        <CardTitle>{item.title}</CardTitle>
+                                <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                                    <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
+                                        <div className="flex flex-row items-center justify-center">
+                                            <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
+                                            {item.tooltip && (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text={item.tooltip} /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            )}
+                                        </div>
+                                        <div className="flex flex-col items-center justify-center py-1 flex-grow">
+                                            <div className="text-lg sm:text-2xl font-bold">
+                                                <MixedText text={String(item.value)} />
+                                            </div>
+                                            {item.extra && (
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    <MixedText text={item.extra} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+                    </Marquee>
+                ) : (
+                    <div className="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 px-4 sm:px-6 py-4 sm:py-6">
+                        {cards.map((item, idx) => (
+                            <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                                <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
+                                    <div className="flex flex-row items-center justify-center">
+                                        <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
                                         {item.tooltip && (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+                                                    <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p><MixedText text={item.tooltip} /></p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         )}
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center">
-                                        <div className="text-2xl font-bold">
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center py-1 flex-grow">
+                                        <div className="text-lg sm:text-2xl font-bold">
                                             <MixedText text={String(item.value)} />
                                         </div>
                                         {item.extra && (
@@ -315,70 +349,42 @@ export function OverviewView({ records }: OverviewViewProps) {
                                                 <MixedText text={item.extra} />
                                             </div>
                                         )}
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-                    </Marquee>
-                ) : (
-                    <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-6 py-6">
-                        {cards.map((item, idx) => (
-                            <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
-                                <CardHeader className="flex flex-row items-center justify-between pb-0">
-                                    <CardTitle>{item.title}</CardTitle>
-                                    {item.tooltip && (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p><MixedText text={item.tooltip} /></p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )}
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col items-center justify-center">
-                                    <div className="text-2xl font-bold">
-                                        <MixedText text={String(item.value)} />
                                     </div>
-                                    {item.extra && (
-                                        <div className="text-xs text-muted-foreground mt-1">
-                                            <MixedText text={item.extra} />
-                                        </div>
-                                    )}
-                                </CardContent>
+                                </div>
                             </Card>
                         ))}
                     </div>
                 )}
                 {overviewAnimate ? (
                     <Marquee className="w-full" pauseOnHover reverse repeat={2}>
-                        <div className="flex gap-6">
+                        <div className="flex gap-4 sm:gap-6">
                             {group2.map((item, idx) => (
-                                <Card className="min-w-[220px] h-[120px] flex flex-col" key={item.title + idx}>
-                                    <CardHeader className="flex flex-row items-center justify-between pb-0">
-                                        <CardTitle>{item.title}</CardTitle>
-                                        {item.tooltip && (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p><MixedText text={item.tooltip} /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        )}
-                                    </CardHeader>
-                                    <CardContent className="flex-1 flex flex-col items-center justify-center">
-                                        <div className="text-2xl font-bold">
-                                            <MixedText text={String(item.value)} />
+                                <Card className="min-w-[160px] sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                                    <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
+                                        <div className="flex flex-row items-center justify-center">
+                                            <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
+                                            {item.tooltip && (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text={item.tooltip} /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            )}
                                         </div>
-                                        {item.extra && (
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                <MixedText text={item.extra} />
+                                        <div className="flex flex-col items-center justify-center py-1 flex-grow">
+                                            <div className="text-lg sm:text-2xl font-bold">
+                                                <MixedText text={String(item.value)} />
                                             </div>
-                                        )}
-                                    </CardContent>
+                                            {item.extra && (
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    <MixedText text={item.extra} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </Card>
                             ))}
                         </div>
@@ -387,4 +393,4 @@ export function OverviewView({ records }: OverviewViewProps) {
             </div>
         </TooltipProvider>
     );
-} 
+}

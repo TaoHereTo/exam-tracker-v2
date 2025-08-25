@@ -12,15 +12,15 @@ export function AuthPage() {
     const { isDarkMode, getBackgroundStyle } = useThemeMode();
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative" style={getBackgroundStyle() as React.CSSProperties}>
-            <div className="mx-4 relative z-[2]" style={{ width: 'min(32vw, 480px)' }}>
+        <div className="min-h-screen flex items-center justify-center relative px-4" style={getBackgroundStyle() as React.CSSProperties}>
+            <div className="mx-auto relative z-[2] w-full max-w-md sm:max-w-lg md:max-w-xl">
                 <MagicCard
-                    className="rounded-xl w-full dark:bg-gray-800/50 dark:border-gray-700"
+                    className="rounded-xl w-full dark:bg-gray-800/50 dark:border-gray-700 p-6 sm:p-8"
                     gradientSize={240}
                     gradientColor="rgba(0, 0, 0, 0.08)"
                     gradientOpacity={0.5}
                 >
-                    <div className="w-full px-6 py-4 md:px-8 md:py-6 lg:px-10 lg:py-8">
+                    <div className="w-full">
                         {currentView === 'login' && (
                             <LoginForm
                                 onSwitchToSignUp={() => setCurrentView('signup')}
@@ -38,4 +38,4 @@ export function AuthPage() {
             </div>
         </div>
     )
-} 
+}

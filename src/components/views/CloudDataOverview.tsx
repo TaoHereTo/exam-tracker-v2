@@ -98,66 +98,66 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
 
     return (
         <Drawer open={isOpen} onOpenChange={onClose}>
-            <DrawerContent className="max-h-[80vh]">
-                <DrawerHeader>
-                    <DrawerTitle><MixedText text="云端数据概览" /></DrawerTitle>
-                    <DrawerDescription>
+            <DrawerContent className="max-h-[80vh] p-0">
+                <DrawerHeader className="p-4 sm:p-6">
+                    <DrawerTitle className="text-base sm:text-lg"><MixedText text="云端数据概览" /></DrawerTitle>
+                    <DrawerDescription className="text-xs sm:text-sm">
                         查看云端存储的数据统计和最近记录
                     </DrawerDescription>
                 </DrawerHeader>
 
-                <div className="px-4 pb-4 space-y-4">
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-3 sm:space-y-4">
                     {loading ? (
-                        <div className="flex items-center justify-center py-8">
-                            <LoadingSpinner size="md" />
-                            <span className="ml-2"><MixedText text="正在加载云端数据..." /></span>
+                        <div className="flex items-center justify-center py-6 sm:py-8">
+                            <LoadingSpinner size="sm" />
+                            <span className="ml-2 text-sm"><MixedText text="正在加载云端数据..." /></span>
                         </div>
                     ) : data ? (
                         <>
                             {/* 数据统计卡片 */}
-                            <div className="grid grid-cols-2 gap-4">
-                                <Card className="h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0">
+                            <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
+                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
                                         <CardTitle className="text-sm"><MixedText text="刷题历史" /></CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex-1 flex items-center justify-center">
-                                        <div className="text-2xl font-bold text-blue-600">
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-blue-600">
                                             <MixedText text={String(data.records.count)} />
                                         </div>
                                         <p className="text-xs text-gray-500"><MixedText text="条记录" /></p>
                                     </CardContent>
                                 </Card>
 
-                                <Card className="h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0">
+                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
+                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
                                         <CardTitle className="text-sm"><MixedText text="学习计划" /></CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex-1 flex items-center justify-center">
-                                        <div className="text-2xl font-bold text-green-600">
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-green-600">
                                             <MixedText text={String(data.plans.count)} />
                                         </div>
                                         <p className="text-xs text-gray-500"><MixedText text="个计划" /></p>
                                     </CardContent>
                                 </Card>
 
-                                <Card className="h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0">
+                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
+                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
                                         <CardTitle className="text-sm"><MixedText text="知识点" /></CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex-1 flex items-center justify-center">
-                                        <div className="text-2xl font-bold text-purple-600">
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-purple-600">
                                             <MixedText text={String(data.knowledge.count)} />
                                         </div>
                                         <p className="text-xs text-gray-500"><MixedText text="条知识点" /></p>
                                     </CardContent>
                                 </Card>
 
-                                <Card className="h-[120px] flex flex-col">
-                                    <CardHeader className="pb-0">
+                                <Card className="h-[100px] sm:h-[120px] flex flex-col">
+                                    <CardHeader className="pb-0 px-3 sm:px-6 pt-3 sm:pt-6">
                                         <CardTitle className="text-sm"><MixedText text="设置" /></CardTitle>
                                     </CardHeader>
-                                    <CardContent className="flex-1 flex items-center justify-center">
-                                        <div className="text-2xl font-bold text-green-600">
+                                    <CardContent className="flex-1 flex flex-col items-center justify-center px-3 sm:px-6 py-2">
+                                        <div className="text-xl sm:text-2xl font-bold text-green-600">
                                             {data.settings.hasSettings ? '✓' : '✗'}
                                         </div>
                                         <p className="text-xs text-gray-500">
@@ -170,11 +170,11 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                             {/* 清空云端数据按钮 */}
                             {totalDataCount > 0 && (
                                 <Card className="border-destructive/50 bg-destructive/5">
-                                    <CardContent className="pt-6">
-                                        <div className="flex items-center justify-between">
+                                    <CardContent className="pt-4 sm:pt-6">
+                                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                                             <div>
-                                                <h4 className="font-medium text-destructive"><MixedText text="危险操作" /></h4>
-                                                <p className="text-sm text-destructive/80">
+                                                <h4 className="font-medium text-destructive text-sm sm:text-base"><MixedText text="危险操作" /></h4>
+                                                <p className="text-xs sm:text-sm text-destructive/80 mt-1">
                                                     云端共有 <MixedText text={String(totalDataCount)} /> 项数据
                                                 </p>
                                             </div>
@@ -184,20 +184,20 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                         disabled={clearing}
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-9 w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                        className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
                                                     >
-                                                        <Trash2 className="w-5 h-5" />
+                                                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                                     </Button>
                                                 </AlertDialogTrigger>
-                                                <AlertDialogContent>
+                                                <AlertDialogContent className="p-4 sm:p-6">
                                                     <AlertDialogHeader>
-                                                        <AlertDialogTitle>
+                                                        <AlertDialogTitle className="text-base sm:text-lg">
                                                             {clearing ? <MixedText text="正在清空云端数据" /> : <MixedText text="确认清空云端数据？" />}
                                                         </AlertDialogTitle>
                                                         <AlertDialogDescription asChild>
                                                             {clearing ? (
-                                                                <div className="space-y-4">
-                                                                    <p><MixedText text="正在清空云端数据，请稍候..." /></p>
+                                                                <div className="space-y-3 sm:space-y-4">
+                                                                    <p className="text-xs sm:text-sm"><MixedText text="正在清空云端数据，请稍候..." /></p>
                                                                     {clearProgress && (
                                                                         <div className="space-y-2">
                                                                             <div className="flex justify-between text-xs text-gray-600">
@@ -208,15 +208,16 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                                                 value={(clearProgress.current / clearProgress.total) * 100}
                                                                                 variant="danger"
                                                                                 showText={true}
+                                                                                className="h-2 sm:h-3"
                                                                             />
-                                                                            <p className="text-sm text-gray-600">
+                                                                            <p className="text-xs sm:text-sm text-gray-600">
                                                                                 {clearProgress.currentItem}
                                                                             </p>
                                                                         </div>
                                                                     )}
                                                                 </div>
                                                             ) : (
-                                                                <div>
+                                                                <div className="text-xs sm:text-sm">
                                                                     此操作将永久删除云端的所有数据，包括：
                                                                     <br />• <MixedText text={String(data.records.count)} /> 条刷题历史
                                                                     <br />• <MixedText text={String(data.plans.count)} /> 个学习计划
@@ -228,13 +229,14 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                             )}
                                                         </AlertDialogDescription>
                                                     </AlertDialogHeader>
-                                                    <AlertDialogFooter>
+                                                    <AlertDialogFooter className="flex-col sm:flex-row gap-2">
                                                         {!clearing && (
                                                             <>
-                                                                <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                                <AlertDialogCancel className="h-8 sm:h-9 text-xs sm:text-sm"><MixedText text="取消" /></AlertDialogCancel>
                                                                 <AlertDialogAction
                                                                     onClick={handleClearCloudData}
                                                                     style={{ background: '#dc2626' }}
+                                                                    className="h-8 sm:h-9 text-xs sm:text-sm"
                                                                 >
                                                                     确认清空
                                                                 </AlertDialogAction>
@@ -251,7 +253,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
 
                         </>
                     ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-6 sm:py-8 text-gray-500 text-sm">
                             暂无云端数据
                         </div>
                     )}

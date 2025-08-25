@@ -36,11 +36,11 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
 
     if (navMode !== 'dock') return null;
     return (
-        <div className="fixed bottom-[70px] left-0 w-full z-50 flex justify-center bg-transparent pointer-events-none">
+        <div className="fixed bottom-4 left-0 w-full z-50 flex justify-center bg-transparent pointer-events-none sm:bottom-6">
             <TooltipProvider>
-                <Dock>
+                <Dock className="pointer-events-auto" direction="middle">
                     {primaryDockItems.map(child => (
-                        <DockIcon key={`dock-primary-${child.key}`}>
+                        <DockIcon key={`dock-primary-${child.key}`} className="size-10 sm:size-12">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
@@ -48,21 +48,23 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
                                         aria-label={child.label}
                                         onClick={() => setActiveTab(child.key)}
                                         className={
-                                            "size-12 rounded-full flex items-center justify-center pointer-events-auto relative transition-all duration-150 " +
+                                            "size-10 sm:size-12 rounded-full flex items-center justify-center pointer-events-auto relative transition-all duration-150 " +
                                             (activeTab === child.key ? "" : "hover:bg-gray-200/70 dark:hover:bg-gray-700/60")
                                         }
                                     >
-                                        {child.icon}
+                                        <span className="text-sm sm:text-base">
+                                            {child.icon}
+                                        </span>
                                         {/* 当前页面底部主色小圆点 */}
                                         {activeTab === child.key && (
                                             <span
-                                                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-1.5 h-1.5 rounded-full bg-green-500 shadow"
+                                                className="absolute left-1/2 -translate-x-1/2 bottom-1 w-1.5 h-1.5 rounded-full bg-green-500 shadow sm:w-2 sm:h-2"
                                                 aria-hidden="true"
                                             />
                                         )}
                                     </button>
                                 </TooltipTrigger>
-                                <TooltipContent>
+                                <TooltipContent className="text-xs sm:text-sm">
                                     <p><MixedText text={child.label} /></p>
                                 </TooltipContent>
                             </Tooltip>
@@ -71,7 +73,7 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
 
                     {/* 用户信息 */}
                     {userInfo && (
-                        <DockIcon className="pointer-events-auto">
+                        <DockIcon className="pointer-events-auto size-10 sm:size-12">
                             {/* 去掉嵌套 Tooltip，避免重复弹出 */}
                             <div className="pointer-events-auto">
                                 {userInfo}
@@ -84,4 +86,4 @@ export default function DockNavigation({ activeTab, setActiveTab, navMode, userI
             </TooltipProvider>
         </div>
     );
-} 
+}

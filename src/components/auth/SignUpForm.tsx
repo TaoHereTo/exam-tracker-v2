@@ -67,10 +67,10 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
     return (
         <div className="w-full">
             <div className="text-left mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                     <MixedText text="创建账户" />
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                     <MixedText text="开始行测记录之旅" />
                 </p>
             </div>
@@ -78,7 +78,7 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
             <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                     <Alert variant="destructive">
-                        <AlertDescription>
+                        <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={error} />
                         </AlertDescription>
                     </Alert>
@@ -86,43 +86,43 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
 
                 {success && (
                     <Alert>
-                        <AlertDescription>
+                        <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={success} />
                         </AlertDescription>
                     </Alert>
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                         <MixedText text="邮箱地址" />
                     </Label>
                     <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱地址"
-                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="password" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="password" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                         <MixedText text="密码" />
                     </Label>
                     <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="password"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码（至少6位）"
-                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -130,24 +130,24 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                         >
-                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                         </button>
                     </div>
                 </div>
 
                 <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                         <MixedText text="确认密码" />
                     </Label>
                     <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="confirmPassword"
                             type={showConfirmPassword ? 'text' : 'password'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="请再次输入密码"
-                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -155,25 +155,25 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                         >
-                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            {showConfirmPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
                         </button>
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
                     <Button
                         type="button"
                         onClick={onSwitchToLogin}
                         variant="outline"
-                        className="bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-9"
+                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 sm:h-12 text-sm sm:text-base"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         <MixedText text="返回登录" />
                     </Button>
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                        className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 h-10 sm:h-12 text-sm sm:text-base"
                     >
                         <MixedText text={loading ? '注册中...' : '注册'} />
                     </Button>
@@ -181,4 +181,4 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
             </form>
         </div>
     )
-} 
+}

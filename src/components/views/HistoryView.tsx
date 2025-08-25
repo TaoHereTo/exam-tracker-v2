@@ -29,14 +29,14 @@ export function ExerciseRecordView({
 }: ExerciseRecordViewProps) {
 
     return (
-        <div className="pt-2 px-2 md:px-8">
+        <div className="pt-2 px-2 sm:px-4 md:px-8">
             <UnifiedTable<RecordItem, string>
                 columns={[
                     {
                         key: 'date',
                         label: (
                             <div className="flex items-center gap-1">
-                                <span>日期</span>
+                                <span className="text-xs sm:text-sm">日期</span>
                             </div>
                         ),
                         render: (row) => <MixedText text={format(new Date(row.date), 'yyyy-MM-dd')} />
@@ -45,7 +45,7 @@ export function ExerciseRecordView({
                         key: 'module',
                         label: (
                             <div className="flex items-center gap-1">
-                                <span>模块</span>
+                                <span className="text-xs sm:text-sm">模块</span>
                             </div>
                         ),
                         render: (row) => <MixedText text={normalizeModuleName(row.module)} />
@@ -54,7 +54,7 @@ export function ExerciseRecordView({
                         key: 'correct',
                         label: (
                             <div className="flex items-center gap-1">
-                                <span>正确数</span>
+                                <span className="text-xs sm:text-sm">正确数</span>
                             </div>
                         ),
                         render: (row) => <MixedText text={`${row.correct}/${row.total}`} />
@@ -63,7 +63,7 @@ export function ExerciseRecordView({
                         key: 'accuracy',
                         label: (
                             <div className="flex items-center gap-1">
-                                <span>正确率</span>
+                                <span className="text-xs sm:text-sm">正确率</span>
                             </div>
                         ),
                         render: (row) => <MixedText text={`${((row.correct / row.total) * 100).toFixed(1)}%`} />
@@ -72,7 +72,7 @@ export function ExerciseRecordView({
                         key: 'duration',
                         label: (
                             <div className="flex items-center gap-1">
-                                <span>用时</span>
+                                <span className="text-xs sm:text-sm">用时</span>
                             </div>
                         ),
                         render: (row) => <MixedText text={formatDuration(row.duration)} />
@@ -94,4 +94,4 @@ export function ExerciseRecordView({
         </div>
 
     );
-} 
+}

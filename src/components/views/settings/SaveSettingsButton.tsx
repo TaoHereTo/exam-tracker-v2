@@ -24,7 +24,7 @@ const SaveSettingsButton: React.FC<SaveSettingsButtonProps> = ({ navMode }) => {
         <Button
             onClick={handleSave}
             size="default"
-            className="px-6 py-2"
+            className="h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm"
         >
             <MixedText text="保存所有设置" />
         </Button>

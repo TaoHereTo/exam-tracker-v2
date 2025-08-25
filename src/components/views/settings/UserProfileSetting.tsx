@@ -83,22 +83,22 @@ export function UserProfileSetting() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle><MixedText text="个人资料设置" /></CardTitle>
-                <CardDescription>
+                <CardTitle className="text-base sm:text-lg"><MixedText text="个人资料设置" /></CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                     <MixedText text="管理您的个人信息和账户设置" />
                 </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4">
                 {/* 用户头像显示 */}
                 <div className="space-y-2">
-                    <Label><MixedText text="用户头像" /></Label>
-                    <div className="flex items-center gap-4">
-                        <Avatar className="h-16 w-16">
+                    <Label className="text-sm"><MixedText text="用户头像" /></Label>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
                             <AvatarFallback>
-                                <User className="h-8 w-8" />
+                                <User className="h-6 w-6 sm:h-8 sm:w-8" />
                             </AvatarFallback>
                         </Avatar>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                        <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             <MixedText text="使用默认头像" />
                         </div>
                     </div>
@@ -106,13 +106,14 @@ export function UserProfileSetting() {
 
                 {/* 用户名设置 */}
                 <div className="space-y-2">
-                    <Label htmlFor="username"><MixedText text="用户名" /></Label>
+                    <Label htmlFor="username" className="text-sm"><MixedText text="用户名" /></Label>
                     <Input
                         id="username"
                         value={formData.username}
                         onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
                         placeholder="请输入用户名"
                         maxLength={20}
+                        className="h-8 sm:h-10 text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
                         <MixedText text="用户名用于登录和显示，最多20个字符" />
@@ -121,13 +122,14 @@ export function UserProfileSetting() {
 
                 {/* 显示名称设置 */}
                 <div className="space-y-2">
-                    <Label htmlFor="displayName"><MixedText text="显示名称" /></Label>
+                    <Label htmlFor="displayName" className="text-sm"><MixedText text="显示名称" /></Label>
                     <Input
                         id="displayName"
                         value={formData.displayName}
                         onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
                         placeholder="请输入显示名称"
                         maxLength={30}
+                        className="h-8 sm:h-10 text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
                         <MixedText text="显示名称将作为您的主要标识，最多30个字符" />
@@ -136,7 +138,7 @@ export function UserProfileSetting() {
 
                 {/* 个人简介设置 */}
                 <div className="space-y-2">
-                    <Label htmlFor="bio"><MixedText text="个人简介" /></Label>
+                    <Label htmlFor="bio" className="text-sm"><MixedText text="个人简介" /></Label>
                     <Textarea
                         id="bio"
                         value={formData.bio}
@@ -144,6 +146,7 @@ export function UserProfileSetting() {
                         placeholder="介绍一下自己..."
                         maxLength={200}
                         rows={3}
+                        className="text-sm"
                     />
                     <p className="text-xs text-muted-foreground">
                         <MixedText text="个人简介最多200个字符" />
@@ -154,17 +157,17 @@ export function UserProfileSetting() {
                 <div className="flex justify-end gap-2">
                     <Button
                         onClick={handleSaveProfile}
-                        className="min-w-[100px]"
+                        className="h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm"
                     >
-                        <Save className="h-4 w-4 mr-2" />
+                        <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         <MixedText text="保存" />
                     </Button>
                 </div>
 
                 {/* 当前信息预览 */}
-                <div className="pt-4 border-t">
-                    <h4 className="font-medium mb-2"><MixedText text="当前信息" /></h4>
-                    <div className="space-y-2 text-sm">
+                <div className="pt-3 sm:pt-4 border-t">
+                    <h4 className="font-medium mb-2 text-sm sm:text-base"><MixedText text="当前信息" /></h4>
+                    <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
                         <div>
                             <span className="text-muted-foreground"><MixedText text="显示名称：" /></span>
                             <span><MixedText text={getDisplayName()} /></span>

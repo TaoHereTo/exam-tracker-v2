@@ -165,17 +165,17 @@ export function SettingsView({
         return (
             <>
                 <AdvancedSetting />
-                <Card className="mt-6">
+                <Card className="mt-4 sm:mt-6">
                     <CardHeader>
-                        <CardTitle><MixedText text="危险操作" /></CardTitle>
-                        <CardDescription><MixedText text="此处操作不可逆，请谨慎使用！" /></CardDescription>
+                        <CardTitle className="text-lg sm:text-xl"><MixedText text="危险操作" /></CardTitle>
+                        <CardDescription className="text-xs sm:text-sm"><MixedText text="此处操作不可逆，请谨慎使用！" /></CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                                 <div>
-                                    <h3 className="font-medium"><MixedText text="清空本地数据" /></h3>
-                                    <p className="text-sm text-muted-foreground">
+                                    <h3 className="font-medium text-sm sm:text-base"><MixedText text="清空本地数据" /></h3>
+                                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                         仅删除本地浏览器中的数据，不影响云端。
                                     </p>
                                 </div>
@@ -186,30 +186,31 @@ export function SettingsView({
                                                 <TooltipTrigger asChild>
                                                     <Button
                                                         variant="destructive"
-                                                        size="icon"
-                                                        className="h-9 w-9"
+                                                        size="sm"
+                                                        className="h-8 sm:h-9 w-full sm:w-auto text-xs sm:text-sm"
                                                         onClick={() => {
                                                             setClearDataDialogOpen(true);
                                                         }}
                                                     >
-                                                        <Trash2 className="w-5 h-5" />
+                                                        <Trash2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                                                        <span className="text-xs sm:text-sm"><MixedText text="清空" /></span>
                                                     </Button>
                                                 </TooltipTrigger>
-                                                <TooltipContent>
+                                                <TooltipContent className="text-xs">
                                                     <p><MixedText text="清空本地数据" /></p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
                                     </AlertDialogTrigger>
-                                    <AlertDialogContent>
+                                    <AlertDialogContent className="w-11/12 max-w-md p-4 sm:p-6">
                                         <AlertDialogHeader>
-                                            <AlertDialogTitle><MixedText text="确认清空本地数据？" /></AlertDialogTitle>
-                                            <AlertDialogDescription>
+                                            <AlertDialogTitle className="text-base sm:text-lg"><MixedText text="确认清空本地数据？" /></AlertDialogTitle>
+                                            <AlertDialogDescription className="text-xs sm:text-sm">
                                                 此操作将从本地清除所有刷题历史、知识点与学习计划，但不会影响云端数据。
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                                            <AlertDialogCancel className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"><MixedText text="取消" /></AlertDialogCancel>
                                             <AlertDialogAction
                                                 onClick={() => {
                                                     if (onClearLocalData) {
@@ -217,7 +218,7 @@ export function SettingsView({
                                                     }
                                                     setClearDataDialogOpen(false);
                                                 }}
-                                                className="bg-red-600 hover:bg-red-700 text-white"
+                                                className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
                                             >
                                                 确认清空
                                             </AlertDialogAction>
@@ -234,47 +235,47 @@ export function SettingsView({
 
     return (
         <TooltipProvider>
-            <div className="space-y-6 max-w-4xl mx-auto">
+            <div className="space-y-4 sm:space-y-6 max-w-4xl mx-auto px-2 sm:px-4">
                 <Card>
                     <CardHeader>
-                        <CardTitle><MixedText text="数据管理" /></CardTitle>
-                        <CardDescription>
+                        <CardTitle className="text-lg sm:text-xl"><MixedText text="数据管理" /></CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
                             备份、恢复您的应用数据。请及时保存。
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
                             <div>
-                                <h3 className="font-medium"><MixedText text="备份与恢复" /></h3>
-                                <p className="text-sm text-muted-foreground">
+                                <h3 className="font-medium text-sm sm:text-base"><MixedText text="备份与恢复" /></h3>
+                                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                     将所有数据导出到文件、或从文件恢复。
                                 </p>
                             </div>
                             <DataImportExport onImport={onImport!} onExport={onExport!} />
                         </div>
 
-                        <div className="p-4 border rounded-lg">
-                            <div className="flex items-center justify-between mb-3">
+                        <div className="p-3 sm:p-4 border rounded-lg">
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
                                 <div>
-                                    <h3 className="font-medium"><MixedText text="云端数据同步" /></h3>
-                                    <p className="text-sm text-muted-foreground">
+                                    <h3 className="font-medium text-sm sm:text-base"><MixedText text="云端数据同步" /></h3>
+                                    <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                                         将数据同步到云端，实现多设备数据共享和备份。
                                     </p>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-1 sm:gap-2">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
                                                 onClick={handleUploadToCloud}
                                                 disabled={isUploading}
                                                 variant="outline"
-                                                size="icon"
-                                                className="h-9 w-9"
+                                                size="sm"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
-                                                <CloudUpload className="w-5 h-5" />
+                                                <CloudUpload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
                                         </TooltipTrigger>
-                                        <TooltipContent>
+                                        <TooltipContent className="text-xs">
                                             <p><MixedText text="将本地数据上传到云端备份" /></p>
                                         </TooltipContent>
                                     </Tooltip>
@@ -284,13 +285,13 @@ export function SettingsView({
                                                 onClick={handleDownloadFromCloud}
                                                 disabled={isDownloading}
                                                 variant="outline"
-                                                size="icon"
-                                                className="h-9 w-9"
+                                                size="sm"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
-                                                <CloudDownload className="w-5 h-5" />
+                                                <CloudDownload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
                                         </TooltipTrigger>
-                                        <TooltipContent>
+                                        <TooltipContent className="text-xs">
                                             <p><MixedText text="从云端下载数据到本地" /></p>
                                         </TooltipContent>
                                     </Tooltip>
@@ -299,13 +300,13 @@ export function SettingsView({
                                             <Button
                                                 onClick={handleViewCloudData}
                                                 variant="outline"
-                                                size="icon"
-                                                className="h-9 w-9"
+                                                size="sm"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
-                                                <Eye className="w-5 h-5" />
+                                                <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
                                         </TooltipTrigger>
-                                        <TooltipContent>
+                                        <TooltipContent className="text-xs">
                                             <p><MixedText text="查看云端存储的数据详情" /></p>
                                         </TooltipContent>
                                     </Tooltip>
@@ -314,16 +315,16 @@ export function SettingsView({
 
                             {/* 状态和进度显示 */}
                             {syncStatus && (
-                                <p className="text-xs text-blue-600 mb-2"><MixedText text={syncStatus} /></p>
+                                <p className="text-xs text-blue-600 mb-2 mt-1"><MixedText text={syncStatus} /></p>
                             )}
                             {uploadProgress && (
-                                <div className="space-y-2">
+                                <div className="space-y-2 mt-2">
                                     <div className="text-xs text-gray-600 mb-1">
                                         <span><MixedText text={`上传进度 ${uploadProgress.current}/${uploadProgress.total}`} /></span>
                                     </div>
 
                                     <div className="flex items-center gap-2">
-                                        <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden">
+                                        <div className="flex-1 h-2 sm:h-3 bg-gray-200 rounded-full overflow-hidden">
                                             <div
                                                 className="h-full transition-all duration-300"
                                                 style={{
@@ -334,10 +335,10 @@ export function SettingsView({
                                         </div>
                                         <button
                                             onClick={handleCancelUpload}
-                                            className="w-6 h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
+                                            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
                                             title="取消上传"
                                         >
-                                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="w-2 h-2 sm:w-3 sm:h-3" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                                             </svg>
                                         </button>
@@ -348,26 +349,26 @@ export function SettingsView({
 
                         {/* 同步报告显示 */}
                         {syncReport && (
-                            <div className="p-4 border rounded-lg bg-gray-50">
-                                <h4 className="font-medium mb-3"><MixedText text="同步报告" /></h4>
-                                <div className="grid grid-cols-3 gap-4 text-sm mb-4">
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-green-600">
+                            <div className="p-3 sm:p-4 border rounded-lg bg-gray-50">
+                                <h4 className="font-medium mb-2 sm:mb-3 text-sm sm:text-base"><MixedText text="同步报告" /></h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-xs sm:text-sm mb-3 sm:mb-4">
+                                    <div className="text-center p-2 sm:p-3 bg-green-50 rounded">
+                                        <div className="text-base sm:text-2xl font-bold text-green-600">
                                             <MixedText text={String(syncReport.records.filter(r => r.action === 'uploaded').length)} />
                                         </div>
-                                        <div className="text-gray-600"><MixedText text="记录上传" /></div>
+                                        <div className="text-gray-600 text-xs sm:text-sm"><MixedText text="记录上传" /></div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-blue-600">
+                                    <div className="text-center p-2 sm:p-3 bg-blue-50 rounded">
+                                        <div className="text-base sm:text-2xl font-bold text-blue-600">
                                             <MixedText text={String(syncReport.plans.filter(p => p.action === 'uploaded').length)} />
                                         </div>
-                                        <div className="text-gray-600"><MixedText text="计划上传" /></div>
+                                        <div className="text-gray-600 text-xs sm:text-sm"><MixedText text="计划上传" /></div>
                                     </div>
-                                    <div className="text-center">
-                                        <div className="text-2xl font-bold text-purple-600">
+                                    <div className="text-center p-2 sm:p-3 bg-purple-50 rounded">
+                                        <div className="text-base sm:text-2xl font-bold text-purple-600">
                                             <MixedText text={String(syncReport.knowledge.filter(k => k.action === 'uploaded').length)} />
                                         </div>
-                                        <div className="text-gray-600"><MixedText text="知识点上传" /></div>
+                                        <div className="text-gray-600 text-xs sm:text-sm"><MixedText text="知识点上传" /></div>
                                     </div>
                                 </div>
 
@@ -381,8 +382,8 @@ export function SettingsView({
 
                                     if (skippedRecords.length > 0 || skippedPlans.length > 0 || skippedKnowledge.length > 0) {
                                         return (
-                                            <div className="mt-3 p-3 border border-yellow-200 rounded-lg bg-yellow-50">
-                                                <h5 className="font-medium text-yellow-800 mb-2">
+                                            <div className="mt-2 sm:mt-3 p-2 sm:p-3 border border-yellow-200 rounded-lg bg-yellow-50">
+                                                <h5 className="font-medium text-yellow-800 mb-1 sm:mb-2 text-sm">
                                                     <MixedText text="跳过项目" />
                                                 </h5>
                                                 <div className="text-xs text-yellow-700">
@@ -405,7 +406,7 @@ export function SettingsView({
 
                 {/* 新增设置卡片 */}
                 <AppearanceSetting />
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mt-3 sm:mt-4">
                     {navMode && <SaveSettingsButton navMode={navMode as 'sidebar' | 'dock'} />}
                 </div>
 
@@ -417,4 +418,4 @@ export function SettingsView({
             </div>
         </TooltipProvider>
     );
-} 
+}

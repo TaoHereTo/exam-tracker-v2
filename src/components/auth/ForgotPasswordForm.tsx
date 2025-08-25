@@ -43,10 +43,10 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
     return (
         <div className="w-full">
             <div className="text-left mb-6">
-                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
                     <MixedText text="找回密码" />
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
                     <MixedText text="输入您的邮箱地址，我们将发送重置密码的链接" />
                 </p>
             </div>
@@ -54,7 +54,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
             <form onSubmit={handleSubmit} className="space-y-4">
                 {error && (
                     <Alert variant="destructive">
-                        <AlertDescription>
+                        <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={error} />
                         </AlertDescription>
                     </Alert>
@@ -62,44 +62,44 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
 
                 {success && (
                     <Alert>
-                        <AlertDescription>
+                        <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={success} />
                         </AlertDescription>
                     </Alert>
                 )}
 
                 <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
                         <MixedText text="邮箱地址" />
                     </Label>
                     <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-5 w-5 z-10" />
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱地址"
-                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100"
+                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center pt-4">
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
                     <Button
                         type="button"
                         onClick={onSwitchToLogin}
                         variant="outline"
-                        className="bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-9"
+                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 sm:h-12 text-sm sm:text-base"
                     >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         <MixedText text="返回登录" />
                     </Button>
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200"
+                        className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 h-10 sm:h-12 text-sm sm:text-base"
                     >
                         <MixedText text={loading ? '发送中...' : '发送重置邮件'} />
                     </Button>
@@ -107,4 +107,4 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
             </form>
         </div>
     )
-} 
+}
