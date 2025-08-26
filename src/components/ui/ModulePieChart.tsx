@@ -90,16 +90,16 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             orient: 'horizontal',
             left: 'center',
             top: 'bottom',
-            bottom: 30,  // Increased from 10 to 30 for more spacing
+            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 60 : 50,  // Increased mobile spacing
             itemGap: 15,
             itemWidth: 25,
             itemHeight: 14,
-            padding: [10, 20, 10, 20],  // Reduced padding to [10, 20, 10, 20] from [15, 20, 15, 20]
+            padding: [10, 20, 10, 20],
             // Set width to 90% of container for better legend sizing
             width: '90%',
             height: 'auto',
             align: 'auto',
-            type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
+            type: 'plain',
             formatter: (name: string) => name,
             // Manually apply the unified legend style properties we want
             borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
@@ -123,8 +123,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
             {
                 name: '模块耗时分布',
                 type: 'pie',
-                radius: ['30%', '50%'],  // Reduced outer radius from 60% to 50%
-                center: ['50%', '45%'],  // Moved up from 50% to 45% to create more space for legend
+                radius: ['40%', '70%'],  // Increased size: inner radius from 30% to 40%, outer from 50% to 70%
+                center: ['50%', '40%'],  // Moved up slightly from 45% to 40% to create more space for legend
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
@@ -153,7 +153,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 0 60px 0' }} className="chart-wrapper">
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: typeof window !== 'undefined' && window.innerWidth < 768 ? '0 0 120px 0' : '0 0 100px 0' }} className="chart-wrapper">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}

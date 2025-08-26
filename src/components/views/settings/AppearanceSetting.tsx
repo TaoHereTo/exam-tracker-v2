@@ -46,7 +46,7 @@ export function AppearanceSetting() {
                     </div>
                     <div className="w-auto">
                         <Select value={theme} onValueChange={setTheme}>
-                            <SelectTrigger className="w-[120px] sm:w-[180px] h-8 sm:h-10 text-sm">
+                            <SelectTrigger className="w-auto min-w-[120px] sm:min-w-[180px] h-8 sm:h-10 text-sm">
                                 <SelectValue placeholder="选择外观" className="text-sm" />
                             </SelectTrigger>
                             <SelectContent>

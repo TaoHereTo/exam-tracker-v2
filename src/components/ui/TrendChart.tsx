@@ -127,17 +127,24 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 orient: 'horizontal',
                 left: 'center',
                 top: 'bottom',
-                bottom: 10,
-                itemGap: 15,
-                itemWidth: 25,
-                itemHeight: 14,
-                padding: [15, 20, 15, 20],
+                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 50,  // Match pie chart spacing
+                itemGap: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 15,
+                itemWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 15 : 25,
+                itemHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
+                padding: typeof window !== 'undefined' && window.innerWidth < 768 ? [5, 10, 5, 10] : [10, 20, 10, 20],
                 // Set width to 90% of container for better legend sizing
                 width: '90%',
                 height: 'auto',
                 align: 'auto',
-                type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
-                // Manually apply the unified legend style properties we want
+                type: 'plain',
+                formatter: function(name: string) {
+                    // On mobile, limit the name length to prevent overflow
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+                        return name.length > 4 ? name.substring(0, 4) : name;
+                    }
+                    return name;
+                },
+                // Match pie chart legend styling exactly
                 borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
                 icon: UNIFIED_LEGEND_STYLE.icon,
                 // 覆盖主题相关的样式
@@ -149,17 +156,17 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 textStyle: {
                     ...UNIFIED_LEGEND_STYLE.textStyle,
                     color: legendTextColor,
-                    fontSize: 14,
+                    fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 14 : 14,  // Match pie chart font size
                     fontWeight: 'bold',
                     fontFamily: 'Times New Roman, 思源宋体, serif'
                 }
             },
             // Remove the separate mobile legend configuration since we're using the same for all sizes
             grid: {
-                left: 20,
-                right: 20,
-                top: 40,
-                bottom: 120,  // Increased bottom padding to accommodate the legend
+                left: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
+                right: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
+                top: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 40,
+                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 120,  // Increased to match pie chart spacing
                 borderColor: borderColor,
                 borderWidth: 1,
                 containLabel: true
@@ -198,11 +205,11 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 symbol: 'circle',
                 symbolSize: 10,
                 lineStyle: {
-                    width: 5,
+                    width: typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 5,
                     color: getModuleColor(module),
                     shadowColor: getModuleColor(module),
-                    shadowBlur: 10,
-                    shadowOffsetY: 2,
+                    shadowBlur: typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10,
+                    shadowOffsetY: typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 2,
                     cap: 'round',
                     join: 'round'
                 },
@@ -211,14 +218,14 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                     borderColor: isDarkMode ? 'hsl(var(--background))' : '#F8F7F6',
                     borderWidth: 2,
                     shadowColor: getModuleColor(module),
-                    shadowBlur: 8
+                    shadowBlur: typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 8
                 },
                 connectNulls: true, // 连接null值，保持线条连续
                 emphasis: {
                     focus: 'series',
                     showSymbol: true,
-                    lineStyle: { width: 7 },
-                    itemStyle: { borderWidth: 4 }
+                    lineStyle: { width: typeof window !== 'undefined' && window.innerWidth < 768 ? 3 : 7 },
+                    itemStyle: { borderWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 4 }
                 }
             }))
         };

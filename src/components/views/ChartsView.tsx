@@ -126,12 +126,12 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         radar: {
             indicator,
             splitNumber: 5,
-            radius: '50%',  // Reduced from 60% to create more space for legend
-            center: ['50%', '45%'],  // Moved up from 50% to create more space for legend
+            radius: typeof window !== 'undefined' && window.innerWidth < 768 ? '60%' : '75%',
+            center: ['50%', typeof window !== 'undefined' && window.innerWidth < 768 ? '45%' : '50%'],  // Moved down further from 40%/45% to 45%/50%
             axisName: {
                 color: textColor,
                 fontWeight: 'bold',
-                fontSize: 15,
+                fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 12 : 15,
                 fontFamily: '思源宋体, Times New Roman, serif'
             },
             splitLine: {
@@ -156,16 +156,16 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             orient: 'horizontal',
             left: 'center',
             top: 'bottom',
-            bottom: 30,  // Increased from 10 to 30 for more spacing
-            itemGap: 15,
-            itemWidth: 25,
-            itemHeight: 14,
-            padding: [10, 20, 10, 20],  // Reduced padding to [10, 20, 10, 20] from [15, 20, 15, 20]
+            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 50,  // Increased from 15/30 to 30/50 for more spacing
+            itemGap: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 15,
+            itemWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 15 : 25,
+            itemHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
+            padding: typeof window !== 'undefined' && window.innerWidth < 768 ? [5, 10, 5, 10] : [10, 20, 10, 20],
             // Set width to 90% of container for better legend sizing
             width: '90%',
             height: 'auto',
             align: 'auto',
-            type: 'plain',  // Changed from 'scroll' to 'plain' to remove pagination
+            type: 'plain',
             // Manually apply the unified legend style properties we want
             borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
             icon: UNIFIED_LEGEND_STYLE.icon,
@@ -178,7 +178,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             textStyle: {
                 ...UNIFIED_LEGEND_STYLE.textStyle,
                 color: legendTextColor,
-                fontSize: 14,
+                fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 14,
                 fontWeight: 'bold',
                 fontFamily: '思源宋体, Times New Roman, serif'
             }
@@ -196,24 +196,24 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
                         },
                         lineStyle: {
                             color: lineGradient,
-                            width: 4,
+                            width: typeof window !== 'undefined' && window.innerWidth < 768 ? 2 : 4,
                             shadowColor: '#3366FF',
-                            shadowBlur: 10
+                            shadowBlur: typeof window !== 'undefined' && window.innerWidth < 768 ? 5 : 10
                         },
                         symbol: 'circle',
-                        symbolSize: 14,
+                        symbolSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
                         itemStyle: {
                             color: function (params: unknown) {
                                 const idx = (params as { dataIndex: number }).dataIndex;
                                 return pointColors[idx] || '#3366FF';
                             },
                             borderColor: isDarkMode ? 'hsl(var(--background))' : '#F8F7F6',
-                            borderWidth: 2,
+                            borderWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 2,
                             shadowColor: function (params: unknown) {
                                 const idx = (params as { dataIndex: number }).dataIndex;
                                 return pointColors[idx] || '#3366FF';
                             },
-                            shadowBlur: 8
+                            shadowBlur: typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 8
                         },
                         markPoint: {
                             symbol: 'circle',
@@ -237,7 +237,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         ]
     };
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 0 60px 0' }} className="chart-wrapper">
+        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 0 100px 0' }} className="chart-wrapper">
             <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <ReactECharts
                     option={option}
@@ -337,21 +337,21 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </TabsList>
                 </div>
                 <TabsContent value="perMinute" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                    <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
                         <div className="w-full h-full overflow-visible">
                             <TrendChart data={perMinuteData} yMax={2} />
                         </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="accuracy" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                    <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
                         <div className="w-full h-full overflow-visible">
                             <TrendChart data={accuracyData} yMax={100} />
                         </div>
                     </div>
                 </TabsContent>
                 <TabsContent value="pie" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                    <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
                         <div className="w-full h-full overflow-visible">
                             <ModulePieChart data={records.map(r => {
                                 return {
@@ -365,7 +365,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </div>
                 </TabsContent>
                 <TabsContent value="radar" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[500px] h-[500px] sm:h-[500px] overflow-visible">
+                    <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
                         <div className="w-full h-full overflow-visible">
                             <ModuleRadarChart data={records} />
                         </div>

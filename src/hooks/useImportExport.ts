@@ -126,7 +126,7 @@ export function useImportExport(
         const a = document.createElement('a');
         const today = format(new Date(), 'yyyy-MM-dd');
         a.href = url;
-        a.download = `行测记录_${today}_v7.json`;
+        a.download = `行测记录_${today}.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
