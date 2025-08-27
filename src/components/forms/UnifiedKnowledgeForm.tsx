@@ -25,6 +25,7 @@ import { HelpCircle } from "lucide-react";
 import { BaseForm, FormField, FormInput, FormSelect, FormTextarea, useFormContext } from "@/components/forms/BaseForm";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -112,11 +113,11 @@ function DateField() {
   return (
     <Popover open={dateOpen} onOpenChange={setDateOpen}>
       <PopoverTrigger asChild>
-        <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md">
+        <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10">
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 text-black dark:text-white" align="start">
         <Calendar
           mode="single"
           selected={date}
@@ -282,6 +283,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   };
 
   const fieldConfig = getFieldConfig();
+  const { isDarkMode } = useThemeMode();
 
   // 图片上传处理组件
   const ImageUploadField = () => {
@@ -385,7 +387,11 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             <ImageUploadField />
 
             <div className="form-actions">
-              <Button type="submit" className="w-full py-4">
+              <Button type="submit" className={`w-full py-4 ${
+                isDarkMode 
+                    ? 'bg-white text-black hover:bg-gray-200' 
+                    : 'bg-black text-white hover:bg-gray-800'
+              }`}>
                 <MixedText text="保存知识点" />
               </Button>
             </div>

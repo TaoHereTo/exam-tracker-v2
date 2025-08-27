@@ -11,7 +11,7 @@ import { User, Save } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MixedText } from "@/components/ui/MixedText";
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 export function UserProfileSetting() {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -22,6 +22,7 @@ export function UserProfileSetting() {
     });
     const { notify } = useNotification();
     const { user } = useAuth(); // 获取当前用户信息
+    const { isDarkMode } = useThemeMode();
 
     // 加载用户资料
     const loadUserProfile = useCallback(async () => {
@@ -157,7 +158,11 @@ export function UserProfileSetting() {
                 <div className="flex justify-end gap-2">
                     <Button
                         onClick={handleSaveProfile}
-                        className="h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm"
+                        className={`h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm ${
+                            isDarkMode 
+                                ? 'bg-white text-black hover:bg-gray-200' 
+                                : 'bg-black text-white hover:bg-gray-800'
+                        }`}
                     >
                         <Save className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         <MixedText text="保存" />

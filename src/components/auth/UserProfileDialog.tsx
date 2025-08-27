@@ -11,7 +11,7 @@ import { User, Save } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import { InlineLoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuth } from "@/contexts/AuthContext";
-
+import { useThemeMode } from "@/hooks/useThemeMode";
 
 interface UserProfileDialogProps {
     isOpen: boolean;
@@ -30,6 +30,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
     const { notify } = useNotification();
     const { user } = useAuth();
+    const { isDarkMode } = useThemeMode();
 
     // 加载用户资料
     const loadUserProfile = useCallback(async () => {
@@ -195,7 +196,11 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                         <Button
                             onClick={handleSaveProfile}
                             disabled={loading}
-                            className="min-w-[100px]"
+                            className={`min-w-[100px] ${
+                                isDarkMode 
+                                    ? 'bg-white text-black hover:bg-gray-200' 
+                                    : 'bg-black text-white hover:bg-gray-800'
+                            }`}
                         >
                             {loading ? (
                                 <InlineLoadingSpinner />

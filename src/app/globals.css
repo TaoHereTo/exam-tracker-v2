@@ -49,6 +49,66 @@ th .mixed-text-part {
   margin: 0.25rem 0;
 }
 
+/* ========== 日历样式修复 ========== */
+/* 使用最高优先级的选择器强制覆盖所有日历样式 */
+
+/* 所有日历按钮的基础颜色 */
+* button[data-day],
+* .rdp button,
+* [data-slot="calendar"] button,
+[data-radix-popper-content-wrapper] button,
+[data-radix-popper-content-wrapper] * button {
+  color: #000000 !important;
+}
+
+.dark * button[data-day],
+.dark * .rdp button,
+.dark * [data-slot="calendar"] button,
+.dark [data-radix-popper-content-wrapper] button,
+.dark [data-radix-popper-content-wrapper] * button {
+  color: #ffffff !important;
+}
+
+/* 选中状态的颜色 */
+* button[data-day][data-selected-single="true"],
+* .rdp button[data-selected-single="true"],
+* [data-slot="calendar"] button[data-selected-single="true"],
+[data-radix-popper-content-wrapper] button[data-selected-single="true"],
+[data-radix-popper-content-wrapper] * button[data-selected-single="true"] {
+  color: #ffffff !important;
+  background-color: var(--primary) !important;
+}
+
+.dark * button[data-day][data-selected-single="true"],
+.dark * .rdp button[data-selected-single="true"],
+.dark * [data-slot="calendar"] button[data-selected-single="true"],
+.dark [data-radix-popper-content-wrapper] button[data-selected-single="true"],
+.dark [data-radix-popper-content-wrapper] * button[data-selected-single="true"] {
+  color: #000000 !important;
+  background-color: var(--primary) !important;
+}
+
+/* 范围选择的颜色 */
+* button[data-day][data-range-start="true"],
+* button[data-day][data-range-end="true"],
+* .rdp button[data-range-start="true"],
+* .rdp button[data-range-end="true"],
+[data-radix-popper-content-wrapper] button[data-range-start="true"],
+[data-radix-popper-content-wrapper] button[data-range-end="true"] {
+  color: #ffffff !important;
+  background-color: var(--primary) !important;
+}
+
+.dark * button[data-day][data-range-start="true"],
+.dark * button[data-day][data-range-end="true"],
+.dark * .rdp button[data-range-start="true"],
+.dark * .rdp button[data-range-end="true"],
+.dark [data-radix-popper-content-wrapper] button[data-range-start="true"],
+.dark [data-radix-popper-content-wrapper] button[data-range-end="true"] {
+  color: #000000 !important;
+  background-color: var(--primary) !important;
+}
+
 .button-spacing-md {
   margin: 0.5rem 0;
 }
