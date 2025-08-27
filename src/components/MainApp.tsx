@@ -646,54 +646,54 @@ export function MainApp() {
                                                             console.error('MainApp - 删除计划失败:', error);
                                                         }
                                                     }}
-                                            />
-                                        </Suspense>
-                                    )}
-
-                                    {activeTab === 'plan-detail' && (
-                                        <Suspense fallback={<SimpleLoadingSpinner />}>
-                                            {plansWithProgress.length > 0 ? (
-                                                <PlanDetailView
-                                                    plan={plansWithProgress[0]}
-                                                    onBack={() => setActiveTab('plan-list')}
-                                                    onEdit={() => { }}
-                                                    onUpdate={async (plan) => {
-                                                        const formattedPlan: StudyPlan = {
-                                                            ...plan,
-                                                            module: plan.module as StudyPlan['module']
-                                                        };
-                                                        setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
-
-                                                        // 自动更新到云端
-                                                        await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
-                                                    }}
                                                 />
-                                            ) : (
-                                                <div className="flex items-center justify-center h-64">
-                                                    <div className="text-center">
-                                                        <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </Suspense>
-                                    )}
+                                            </Suspense>
+                                        )}
 
-                                    {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                        <SettingsView
-                                            onExport={handleExportData}
-                                            onImport={handleImportData}
-                                            onClearLocalData={handleClearLocalData}
-                                            activeTab={activeTab}
-                                            navMode={navMode}
-                                            records={records}
-                                            plans={plans}
-                                            knowledge={knowledge}
-                                            settings={{
-                                                'exam-tracker-nav-mode': navMode,
-                                                // 可以添加更多设置项
-                                            }}
-                                        />
-                                    )}
+                                        {activeTab === 'plan-detail' && (
+                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                                {plansWithProgress.length > 0 ? (
+                                                    <PlanDetailView
+                                                        plan={plansWithProgress[0]}
+                                                        onBack={() => setActiveTab('plan-list')}
+                                                        onEdit={() => { }}
+                                                        onUpdate={async (plan) => {
+                                                            const formattedPlan: StudyPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+
+                                                            // 自动更新到云端
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-64">
+                                                        <div className="text-center">
+                                                            <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Suspense>
+                                        )}
+
+                                        {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                            <SettingsView
+                                                onExport={handleExportData}
+                                                onImport={handleImportData}
+                                                onClearLocalData={handleClearLocalData}
+                                                activeTab={activeTab}
+                                                navMode={navMode}
+                                                records={records}
+                                                plans={plans}
+                                                knowledge={knowledge}
+                                                settings={{
+                                                    'exam-tracker-nav-mode': navMode,
+                                                    // 可以添加更多设置项
+                                                }}
+                                            />
+                                        )}
                                 </div>
                                 </SidebarInset>
                             </div>

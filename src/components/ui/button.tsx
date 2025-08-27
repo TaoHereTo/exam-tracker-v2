@@ -44,34 +44,39 @@ interface ButtonProps extends React.ComponentProps<"button">,
   children?: React.ReactNode
 }
 
-function Button({
-  className,
-  variant,
-  size,
-  asChild = false,
-  children,
-  ...props
-}: ButtonProps) {
-  const Comp = asChild ? Slot : "button"
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button({
+    className,
+    variant,
+    size,
+    asChild = false,
+    children,
+    ...props
+  }: ButtonProps, ref) {
+    const Comp = asChild ? Slot : "button"
 
-  // 处理子元素，确保文字使用MixedText
-  const renderChildren = () => {
-    if (typeof children === 'string') {
-      return <MixedText text={children} />
+    // 处理子元素，确保文字使用MixedText
+    const renderChildren = () => {
+      if (typeof children === 'string') {
+        return <MixedText text={children} />
+      }
+      return children
     }
-    return children
-  }
 
-  return (
-    <Comp
-      data-slot="button"
-      data-variant={variant}
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-    >
-      {renderChildren()}
-    </Comp>
-  )
-}
+    return (
+      <Comp
+        ref={ref}
+        data-slot="button"
+        data-variant={variant}
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      >
+        {renderChildren()}
+      </Comp>
+    )
+  }
+)
+
+Button.displayName = "Button"
 
 export { Button, buttonVariants }

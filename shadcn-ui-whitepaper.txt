@@ -1,0 +1,199 @@
+# shadcn/ui 项目开发白皮书
+
+> 本文档基于对 shadcn/ui 官方组件库源码的全面分析生成，旨在为开发团队提供一套统一、高效的最佳实践指南。
+
+## 1. 核心设计哲学 (Core Design Philosophy)
+
+shadcn/ui 的核心设计哲学建立在几个关键原则之上：
+
+1. **非侵入式设计**：组件库不强制锁定特定的样式系统或框架，而是与现有的技术栈良好集成。
+2. **组合优于继承**：通过将复杂组件分解为更小的、可组合的部分，提供最大的灵活性。
+3. **代码所有权**：用户拥有他们添加到项目中的代码，可以自由修改和定制。
+4. **基于 Radix UI 和 Tailwind CSS 构建**：利用 Radix UI 提供的无障碍无头组件和 Tailwind CSS 的实用优先 CSS 框架。
+5. **TypeScript 优先**：所有组件都使用严格的 TypeScript 类型检查，确保类型安全。
+
+## 2. 样式与主题系统 (Styling & Theming System)
+
+### 2.1. CSS 变量是基础
+
+shadcn/ui 使用 CSS 自定义属性（CSS 变量）作为主题系统的基础。在 tailwind.config.cjs 中，通过 HSL 值定义了核心颜色系统：
+
+```javascript
+colors: {
+  border: "hsl(var(--border))",
+  input: "hsl(var(--input))",
+  ring: "hsl(var(--ring))",
+  background: "hsl(var(--background))",
+  foreground: "hsl(var(--foreground))",
+  primary: {
+    DEFAULT: "hsl(var(--primary))",
+    foreground: "hsl(var(--primary-foreground))",
+  },
+  // ... 其他颜色定义
+}
+```
+
+在组件中，通过 Tailwind 的类名使用这些变量，例如 `bg-primary`、`text-primary-foreground`、`border-border` 等。
+
+### 2.2. Tailwind CSS 的角色
+
+Tailwind CSS 在 shadcn/ui 中扮演着核心角色：
+
+1. **原子化类名**：使用实用类来构建组件样式，而不是编写自定义 CSS。
+2. **与 CSS 变量结合**：通过 `hsl(var(--primary))` 这样的语法将 Tailwind 类与 CSS 变量连接。
+3. **响应式设计**：利用 Tailwind 的响应式前缀（如 `md:`, `lg:`）实现响应式组件。
+
+### 2.3. cn 工具函数的重要性
+
+在 utils.ts 中定义的 cn 函数是样式合并的关键工具：
+
+```typescript
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+这个函数结合了 clsx（用于条件类名）和 twMerge（用于合并 Tailwind 类），确保类名正确合并而不冲突。
+
+## 3. 组件架构与模式 (Component Architecture & Patterns)
+
+### 3.1. `cva` (class-variance-authority) 是变体的核心
+
+class-variance-authority (cva) 是管理组件变体的核心工具。它允许开发者定义具有不同 variant 和 `size` 的组件变体。
+
+以 buttonVariants 为例：
+
+```typescript
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+        ghost:
+          "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
+```
+
+### 3.2. 组合优于继承 (Composition Over Inheritance)
+
+shadcn/ui 通过组件组合提供灵活性。以 Card 组件为例：
+
+```typescript
+function Card({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card"
+      className={cn(
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="card-header"
+      className={cn(
+        "@container/card-header grid auto-rows-min grid-rows-[auto_auto] items-start gap-1.5 px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+// ... 其他 Card 子组件
+```
+
+这种模式允许开发者通过组合不同的部分来创建各种卡片布局，而不是创建单一的复杂组件。
+
+### 3.3. `React.forwardRef` 的强制使用
+
+所有组件都使用 `React.forwardRef` 来传递 refs，这对于组件的可访问性和与其他库的集成至关重要：
+
+```typescript
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    // 实现细节
+  }
+)
+Button.displayName = "Button"
+```
+
+## 4. 编码规范与文件组织 (Coding Standards & File Organization)
+
+### 4.1. 文件结构
+
+shadcn/ui 遵循清晰的文件组织结构：
+
+- `components/ui/`：基础 UI 组件（通过 CLI 添加）
+- `components/`：自定义业务组件
+- `lib/utils.ts`：工具函数，包括 cn 函数
+
+### 4.2. 编码约定
+
+1. **TypeScript 优先**：所有组件都有严格的类型定义
+2. **函数式组件**：使用函数式组件而非类组件
+3. **Props 解构**：使用解构赋值处理组件 props
+4. **displayName**：为所有 forwardRef 组件设置 displayName
+5. **data-slot 属性**：为组件添加 `data-slot` 属性用于样式钩子
+
+### 4.3. 工具函数
+
+lib/utils.ts 包含核心工具函数：
+
+- cn：类名合并函数
+- 其他项目特定的工具函数
+
+## 5. 【最终产物】AI 代码生成指令集 (Master Prompt for AI)
+
+基于以上所有分析，提炼出这份最终的、用于指导未来所有 AI 编码任务的指令集。
+
+### 5.1. ✅ 必须遵守 (MUST Follow)
+
+- **主题优先**: 所有颜色、间距、圆角等必须使用 tailwind.config.cjs 中定义的主题变量。
+- **变体驱动**: 必须使用 `cva` 来管理组件的所有样式变体。
+- **cn 函数合并**: 所有 className 的传递和合并必须通过 cn 工具函数。
+- **完全组合**: 复杂 UI 应通过组合 `components/ui` 中的基础组件来构建，并存放在单独的业务组件文件中。
+- **转发 Ref**: 所有自定义组件必须使用 `React.forwardRef`。
+- **TypeScript 类型**: 所有组件必须有完整的 TypeScript 类型定义。
+- **data-slot 属性**: 为组件添加 `data-slot` 属性用于样式钩子。
+
+### 5.2. ❌ 绝对禁止 (ABSOLUTELY Forbidden)
+
+- **禁止硬编码**: 绝对禁止在组件中硬编码任何颜色值 (`#FFF`, `red`, `bg-red-500`)、具体的像素值 (`px`, `rem`) 等。
+- **禁止内联样式**: 绝对禁止使用 `style` 属性进行样式定义，除非是处理动态计算值（如动画）。
+- **禁止修改源文件**: 绝对禁止直接修改从 `shadcn/ui` CLI 添加的 `components/ui` 内的源文件。
+- **禁止省略 cn**: 在处理 className props 时，绝对禁止使用简单的字符串拼接。
+- **禁止忽略可访问性**: 在构建表单、对话框等组件时，必须遵循 Radix UI 提供的底层无头组件的可访问性（a11y）规范。
+- **禁止缺少 displayName**: 使用 `forwardRef` 的组件必须设置 `displayName`。
+- **禁止类名冲突**: 确保使用 cn 函数正确合并类名，避免冲突。
+
+这份白皮书为理解和使用 shadcn/ui 提供了全面的指导，确保团队在开发过程中遵循一致的最佳实践。
