@@ -899,8 +899,8 @@ html,
 }
 
 [data-slot="sidebar-menu-button"] span {
-  font-size: 0.9rem;
-  line-height: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
   display: flex;
   align-items: center;
 }
@@ -992,7 +992,7 @@ html,
   transition: none;
   position: relative;
   border-radius: 0.5rem;
-  margin: 0.125rem 0.25rem;
+  margin: 0.25rem 0.25rem;
   width: calc(100% - 0.5rem);
   box-sizing: border-box;
   margin-left: 0;
@@ -1003,7 +1003,7 @@ html,
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
   justify-content: center !important;
   text-align: center !important;
-  margin: 0.125rem 0.25rem !important;
+  margin: 0.25rem 0.25rem !important;
   width: calc(100% - 0.5rem) !important;
 }
 
@@ -1020,9 +1020,25 @@ html,
 }
 
 /* 增加侧边栏菜单按钮的左边距，让图标距离左边更远 */
-[data-slot="sidebar-menu-button"] {
+[data-slot="sidebar-menu-button"]:not([data-slot="sidebar-footer"] *),
+button[data-slot="sidebar-menu-button"]:not([data-slot="sidebar-footer"] *),
+[data-sidebar="menu-button"]:not([data-slot="sidebar-footer"] *),
+.peer\/menu-button:not([data-slot="sidebar-footer"] *) {
   padding-left: 1rem !important;
   padding-right: 1rem !important;
+  height: 2rem !important; /* 32px - 稍微增加 */
+  min-height: 2rem !important; /* 32px */
+  max-height: 2rem !important; /* 32px */
+}
+
+/* 覆盖 shadcn/ui 的默认高度设置 */
+[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+[data-sidebar="menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+.peer\/menu-button[data-size="default"]:not([data-slot="sidebar-footer"] *) {
+  height: 2rem !important; /* 32px - 稍微增加 */
+  min-height: 2rem !important; /* 32px */
+  max-height: 2rem !important; /* 32px */
 }
 
 /* 确保下拉菜单项内图标和文字间距正确 */
@@ -1142,6 +1158,49 @@ html,
   padding-right: 1rem !important;
 }
 
+/* 确保侧边栏底部用户信息区域不被遮挡 */
+[data-slot="sidebar-footer"] {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 0.5rem !important;
+  margin-top: auto !important;
+  position: relative !important;
+  bottom: 0 !important;
+}
+
+/* 侧边栏底部用户信息内容样式 */
+[data-slot="sidebar-footer"] > * {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/* 确保侧边栏容器底部有足够空间，并使用 flex 布局 */
+[data-slot="sidebar-inner"] {
+  padding-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* 确保侧边栏内容区域能够伸展 */
+[data-slot="sidebar-content"] {
+  flex: 1 !important;
+}
+
+/* 用户信息按钮或内容的特殊处理 */
+[data-slot="sidebar-footer"] button,
+[data-slot="sidebar-footer"] [role="button"],
+[data-slot="sidebar-footer"] [data-slot="sidebar-menu-button"] {
+  height: 3rem !important; /* 48px - 比子菜单稍大但比原来小 */
+  min-height: 3rem !important;
+  max-height: 3rem !important;
+  padding: 0.75rem 1rem !important;
+}
+
 /* 侧边栏组内容的内边距 */
 [data-slot="sidebar-group-content"] {
   padding-left: 0.5rem !important;
@@ -1159,6 +1218,7 @@ html,
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
   padding-left: 0.75rem !important;
   padding-right: 0.75rem !important;
+  padding-bottom: 0.5rem !important;
 }
 
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-content"] {
@@ -1172,7 +1232,7 @@ html,
 }
 
 .sidebar-child {
-  @apply pl-2 py-2 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start font-bold;
+  @apply pl-2 py-1 text-sm text-gray-700 dark:text-gray-300 w-full text-left justify-start font-bold;
 }
 
 /* 侧边栏子项选中状态 */
@@ -1618,6 +1678,29 @@ button[style*="background:#dc2626"] *,
   .sidebar-child {
     font-size: 0.875rem;
   }
+  
+  .sidebar-child {
+    @apply py-2;
+  }
+  
+  [data-slot="sidebar-menu-button"],
+  button[data-slot="sidebar-menu-button"],
+  [data-sidebar="menu-button"],
+  .peer\/menu-button {
+    height: 2.5rem !important; /* 40px - 保持移动端触摸友好 */
+    min-height: 2.5rem !important; /* 40px */
+    max-height: 2.5rem !important; /* 40px */
+  }
+  
+  [data-slot="sidebar-menu-button"][data-size="default"],
+  button[data-slot="sidebar-menu-button"][data-size="default"],
+  [data-sidebar="menu-button"][data-size="default"],
+  .peer\/menu-button[data-size="default"] {
+    height: 2.5rem !important; /* 40px */
+    min-height: 2.5rem !important; /* 40px */
+    max-height: 2.5rem !important; /* 40px */
+  }
+}
 
   .truncate {
     white-space: nowrap;
@@ -1655,7 +1738,6 @@ button[style*="background:#dc2626"] *,
     text-overflow: ellipsis !important;
     overflow: hidden !important;
   }
-}
 
 @media (max-width: 480px) {
   .sidebar-parent,

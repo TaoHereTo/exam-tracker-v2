@@ -90,8 +90,10 @@ export function ExerciseRecordView({
                         onPageChange: setHistoryPage,
                         totalItems: totalRecords
                     }}
-                    onBatchDelete={onBatchDelete}
-                    batchDeleteText="批量删除"
+                    showDelete={true}
+                    onDelete={onBatchDelete}
+                    deleteDisabled={selectedRecordIds.length === 0}
+                    deleteConfirmText="此操作将删除所选的刷题记录，删除后无法恢复。是否确认？"
                 />
             </div>
         </div>

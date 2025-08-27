@@ -20,7 +20,7 @@ import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 
-import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronUp } from "lucide-react";
+import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronDown } from "lucide-react";
 import { generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 
@@ -222,7 +222,7 @@ export function MainApp() {
                                         <MixedText text={user?.email || ''} />
                                     </span>
                                 </div>
-                                <ChevronUp className="ml-auto size-4" />
+                                <ChevronDown className={`ml-auto size-4 transition-transform duration-200 ${isOpen ? '-rotate-180' : ''}`} />
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent

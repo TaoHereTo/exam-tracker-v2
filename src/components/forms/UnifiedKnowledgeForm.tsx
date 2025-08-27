@@ -387,11 +387,10 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             <ImageUploadField />
 
             <div className="form-actions">
-              <Button type="submit" className={`w-full py-4 ${
-                isDarkMode 
-                    ? 'bg-white text-black hover:bg-gray-200' 
-                    : 'bg-black text-white hover:bg-gray-800'
-              }`}>
+              <Button type="submit" className={`w-full py-4 ${isDarkMode
+                ? 'bg-white text-black hover:bg-gray-200'
+                : 'bg-black text-white hover:bg-gray-800'
+                }`}>
                 <MixedText text="保存知识点" />
               </Button>
             </div>

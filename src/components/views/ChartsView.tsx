@@ -152,36 +152,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             },
         },
         legend: {
-            // Change to horizontal legend at the bottom for all screen sizes
-            orient: 'horizontal',
-            left: 'center',
-            top: 'bottom',
-            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 50,  // Increased from 15/30 to 30/50 for more spacing
-            itemGap: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 15,
-            itemWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 15 : 25,
-            itemHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
-            padding: typeof window !== 'undefined' && window.innerWidth < 768 ? [5, 10, 5, 10] : [10, 20, 10, 20],
-            // Set width to 90% of container for better legend sizing
-            width: '90%',
-            height: 'auto',
-            align: 'auto',
-            type: 'plain',
-            // Manually apply the unified legend style properties we want
-            borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
-            icon: UNIFIED_LEGEND_STYLE.icon,
-            // 覆盖主题相关的样式
-            backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
-            borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
-            borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
-            shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
-            shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
-            textStyle: {
-                ...UNIFIED_LEGEND_STYLE.textStyle,
-                color: legendTextColor,
-                fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 14,
-                fontWeight: 'bold',
-                fontFamily: '思源宋体, Times New Roman, serif'
-            }
+            show: false
         },
         series: [
             {
@@ -249,15 +220,6 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
                 能力值 =
                 <span className="mx-1 font-bold"><MixedText text="正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2" /></span>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <span className="inline-block cursor-pointer ml-1 text-primary" style={{ fontSize: '1.1em' }}>？</span>
-                    </TooltipTrigger>
-                    <TooltipContent sideOffset={4}>
-                        能力值为归一化后的加权和。<br />
-                        正确率、每分钟得分、做题量均归一化到0~1后加权。
-                    </TooltipContent>
-                </Tooltip>
             </div>
         </div>
     );
