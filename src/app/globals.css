@@ -52,62 +52,184 @@ th .mixed-text-part {
 /* ========== 日历样式修复 ========== */
 /* 使用最高优先级的选择器强制覆盖所有日历样式 */
 
-/* 所有日历按钮的基础颜色 */
-* button[data-day],
-* .rdp button,
-* [data-slot="calendar"] button,
-[data-radix-popper-content-wrapper] button,
-[data-radix-popper-content-wrapper] * button {
+/* 日历整体紧凑布局 */
+[data-slot="calendar"] {
+  padding: 0.75rem !important;
+}
+
+[data-slot="calendar"] table {
+  border-spacing: 0 !important;
+  border-collapse: separate !important;
+}
+
+[data-slot="calendar"] .rdp-week {
+  margin-top: 0.25rem !important;
+}
+
+[data-slot="calendar"] .rdp-day {
+  padding: 0 !important;
+}
+
+/* 日期按钮紧凑样式 */
+[data-slot="calendar"] button[data-day] {
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+  min-height: 2rem !important;
+  padding: 0 !important;
+  margin: 0.125rem !important;
+  font-size: 0.875rem !important;
+}
+
+/* 修复日期范围选择的具体问题 */
+
+/* 确保开始和结束日期只有黑色填充，移除所有其他背景 */
+[data-slot="calendar"] .rdp-day[data-range-start="true"],
+[data-slot="calendar"] .rdp-day[data-range-end="true"] {
+  background-color: transparent !important;
+}
+
+[data-slot="calendar"] button[data-range-start="true"],
+[data-slot="calendar"] button[data-range-end="true"] {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.dark [data-slot="calendar"] .rdp-day[data-range-start="true"],
+.dark [data-slot="calendar"] .rdp-day[data-range-end="true"] {
+  background-color: transparent !important;
+}
+
+.dark [data-slot="calendar"] button[data-range-start="true"],
+.dark [data-slot="calendar"] button[data-range-end="true"] {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* 修复今天日期在范围中间的显示 - 移除today的深色背景，让range-middle样式生效 */
+[data-slot="calendar"] button[data-range-middle="true"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.dark [data-slot="calendar"] button[data-range-middle="true"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+/* 特别处理今天日期在范围中的情况 - 确保今天日期不会有额外的深色背景 */
+[data-slot="calendar"] .rdp-day_today button[data-range-middle="true"],
+[data-slot="calendar"] .rdp-today button[data-range-middle="true"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.dark [data-slot="calendar"] .rdp-day_today button[data-range-middle="true"],
+.dark [data-slot="calendar"] .rdp-today button[data-range-middle="true"] {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+
+
+/* 所有日历按钮的基础颜色 - 覆盖ghost按钮的默认样式 */
+[data-slot="calendar"] button[data-day] {
   color: #000000 !important;
 }
 
-.dark * button[data-day],
-.dark * .rdp button,
-.dark * [data-slot="calendar"] button,
-.dark [data-radix-popper-content-wrapper] button,
-.dark [data-radix-popper-content-wrapper] * button {
+.dark [data-slot="calendar"] button[data-day] {
   color: #ffffff !important;
 }
 
 /* 选中状态的颜色 */
-* button[data-day][data-selected-single="true"],
-* .rdp button[data-selected-single="true"],
-* [data-slot="calendar"] button[data-selected-single="true"],
-[data-radix-popper-content-wrapper] button[data-selected-single="true"],
-[data-radix-popper-content-wrapper] * button[data-selected-single="true"] {
+[data-slot="calendar"] button[data-selected-single="true"] {
   color: #ffffff !important;
   background-color: var(--primary) !important;
 }
 
-.dark * button[data-day][data-selected-single="true"],
-.dark * .rdp button[data-selected-single="true"],
-.dark * [data-slot="calendar"] button[data-selected-single="true"],
-.dark [data-radix-popper-content-wrapper] button[data-selected-single="true"],
-.dark [data-radix-popper-content-wrapper] * button[data-selected-single="true"] {
+.dark [data-slot="calendar"] button[data-selected-single="true"] {
   color: #000000 !important;
   background-color: var(--primary) !important;
 }
 
-/* 范围选择的颜色 */
-* button[data-day][data-range-start="true"],
-* button[data-day][data-range-end="true"],
-* .rdp button[data-range-start="true"],
-* .rdp button[data-range-end="true"],
-[data-radix-popper-content-wrapper] button[data-range-start="true"],
-[data-radix-popper-content-wrapper] button[data-range-end="true"] {
+/* 日期范围选择的开始和结束日期文字颜色 */
+[data-slot="calendar"] button[data-range-start="true"],
+[data-slot="calendar"] button[data-range-end="true"] {
   color: #ffffff !important;
   background-color: var(--primary) !important;
 }
 
-.dark * button[data-day][data-range-start="true"],
-.dark * button[data-day][data-range-end="true"],
-.dark * .rdp button[data-range-start="true"],
-.dark * .rdp button[data-range-end="true"],
-.dark [data-radix-popper-content-wrapper] button[data-range-start="true"],
-.dark [data-radix-popper-content-wrapper] button[data-range-end="true"] {
+.dark [data-slot="calendar"] button[data-range-start="true"],
+.dark [data-slot="calendar"] button[data-range-end="true"] {
   color: #000000 !important;
   background-color: var(--primary) !important;
 }
+
+
+
+/* 修复日历中灰色文字的问题 - 直接覆盖muted-foreground */
+[data-slot="calendar"] .text-muted-foreground,
+[data-slot="calendar"] [class*="text-muted-foreground"] {
+  color: #000000 !important;
+}
+
+.dark [data-slot="calendar"] .text-muted-foreground,
+.dark [data-slot="calendar"] [class*="text-muted-foreground"] {
+  color: #ffffff !important;
+}
+
+/* 特别处理日历中可能使用muted-foreground的元素 */
+[data-slot="calendar"] .rdp-weekday,
+[data-slot="calendar"] .rdp-week_number {
+  color: #666666 !important;
+}
+
+.dark [data-slot="calendar"] .rdp-weekday,
+.dark [data-slot="calendar"] .rdp-week_number {
+  color: #cccccc !important;
+}
+
+/* 强制移除日期范围开始和结束日期的所有额外背景样式 */
+[data-slot="calendar"] .rdp-day.rdp-range_start,
+[data-slot="calendar"] .rdp-day.rdp-range_end,
+[data-slot="calendar"] .rdp-range_start,
+[data-slot="calendar"] .rdp-range_end,
+[data-slot="calendar"] [data-range-start="true"],
+[data-slot="calendar"] [data-range-end="true"] {
+  background-color: transparent !important;
+}
+
+/* 确保只有按钮本身有背景色 */
+[data-slot="calendar"] .rdp-day.rdp-range_start button,
+[data-slot="calendar"] .rdp-day.rdp-range_end button,
+[data-slot="calendar"] .rdp-range_start button,
+[data-slot="calendar"] .rdp-range_end button,
+[data-slot="calendar"] [data-range-start="true"] button,
+[data-slot="calendar"] [data-range-end="true"] button {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+.dark [data-slot="calendar"] .rdp-day.rdp-range_start,
+.dark [data-slot="calendar"] .rdp-day.rdp-range_end,
+.dark [data-slot="calendar"] .rdp-range_start,
+.dark [data-slot="calendar"] .rdp-range_end,
+.dark [data-slot="calendar"] [data-range-start="true"],
+.dark [data-slot="calendar"] [data-range-end="true"] {
+  background-color: transparent !important;
+}
+
+.dark [data-slot="calendar"] .rdp-day.rdp-range_start button,
+.dark [data-slot="calendar"] .rdp-day.rdp-range_end button,
+.dark [data-slot="calendar"] .rdp-range_start button,
+.dark [data-slot="calendar"] .rdp-range_end button,
+.dark [data-slot="calendar"] [data-range-start="true"] button,
+.dark [data-slot="calendar"] [data-range-end="true"] button {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+/* 移除了可能干扰范围选择的旧规则 - 让CalendarDayButton的内置样式生效 */
 
 .button-spacing-md {
   margin: 0.5rem 0;

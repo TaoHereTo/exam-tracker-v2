@@ -566,7 +566,11 @@ export function MainApp() {
 
                                     <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-4 sm:p-6'} max-w-7xl mx-auto`}>
                                         {activeTab === 'overview' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <OverviewView
                                                     records={records}
                                                 />
@@ -574,13 +578,21 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'charts' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <ChartsView records={records} />
                                             </Suspense>
                                         )}
 
                                         {activeTab === 'history' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <ExerciseRecordView
                                                     records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
                                                     selectedRecordIds={selectedRecordIds}
@@ -595,13 +607,21 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'personal-best' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <PersonalBestView records={records} />
                                             </Suspense>
                                         )}
 
                                         {activeTab === 'knowledge-summary' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <KnowledgeSummaryView
                                                     knowledge={knowledge}
                                                     onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
@@ -611,7 +631,11 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'knowledge-entry' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <KnowledgeEntryView
                                                     onAddKnowledge={addKnowledge}
                                                 />
@@ -619,7 +643,11 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'form' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <NewRecordForm
                                                     onAddRecord={async (newRecord) => {
                                                         setRecords(prev => [newRecord, ...prev]);
@@ -632,7 +660,11 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'plan-list' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <PlanListView
                                                     plans={plansWithProgress}
                                                     onCreate={async (plan) => {
@@ -698,7 +730,11 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'plan-detail' && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 {plansWithProgress.length > 0 ? (
                                                     <PlanDetailView
                                                         plan={plansWithProgress[0]}
@@ -726,7 +762,11 @@ export function MainApp() {
                                         )}
 
                                         {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
                                                 <SettingsView
                                                     onExport={handleExportData}
                                                     onImport={handleImportData}
