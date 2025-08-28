@@ -12,6 +12,7 @@ import { MixedText } from "@/components/ui/MixedText";
 import { InlineLoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { UiverseSpinner } from '@/components/ui/UiverseSpinner';
 
 interface UserProfileDialogProps {
     isOpen: boolean;
@@ -194,21 +195,17 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             <MixedText text="取消" />
                         </Button>
                         <Button
-                            onClick={handleSaveProfile}
+                            type="submit"
                             disabled={loading}
-                            className={`min-w-[100px] ${
-                                isDarkMode 
-                                    ? 'bg-white text-black hover:bg-gray-200' 
-                                    : 'bg-black text-white hover:bg-gray-800'
-                            }`}
+                            className="w-full"
                         >
                             {loading ? (
-                                <InlineLoadingSpinner />
-                            ) : (
                                 <>
-                                    <Save className="h-4 w-4 mr-2" />
-                                    <MixedText text="保存" />
+                                    <UiverseSpinner size="sm" />
+                                    <span className="ml-2"><MixedText text="更新中..." /></span>
                                 </>
+                            ) : (
+                                <MixedText text="更新资料" />
                             )}
                         </Button>
                     </div>

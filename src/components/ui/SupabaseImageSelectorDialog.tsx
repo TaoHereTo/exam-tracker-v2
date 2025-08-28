@@ -23,6 +23,7 @@ import Image from 'next/image';
 import { smartImageSort } from '@/lib/utils';
 import { MixedText } from './MixedText';
 import { InlineLoadingSpinner } from './LoadingSpinner';
+import { SimpleUiverseSpinner } from './UiverseSpinner';
 
 interface SupabaseImageSelectorDialogProps {
     onImageSelected: (imageId: string) => void;
@@ -351,7 +352,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         <AlertDialogDescription asChild>
                             {isDeleting && (
                                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                                    <InlineLoadingSpinner />
+                                    <SimpleUiverseSpinner />
                                 </div>
                             )}
                             {isDeleting ? (
@@ -396,3 +397,4 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 }; 
+

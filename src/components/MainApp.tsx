@@ -50,6 +50,7 @@ import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggle
 
 import { PageTitle } from "@/components/ui/PageTitle";
 import { LoadingWrapper, SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
 import {
     AlertDialog,
     AlertDialogContent,
@@ -585,7 +586,7 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'plan-list' && (
-                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
                                                 <PlanListView
                                                     plans={plansWithProgress}
                                                     onCreate={async (plan) => {
@@ -651,7 +652,7 @@ export function MainApp() {
                                         )}
 
                                         {activeTab === 'plan-detail' && (
-                                            <Suspense fallback={<SimpleLoadingSpinner />}>
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
                                                 {plansWithProgress.length > 0 ? (
                                                     <PlanDetailView
                                                         plan={plansWithProgress[0]}

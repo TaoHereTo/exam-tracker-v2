@@ -7,6 +7,7 @@ import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import Image from 'next/image';
 import { SimpleLoadingSpinner } from './LoadingSpinner';
 import { MixedText } from './MixedText';
+import { SimpleUiverseSpinner } from './UiverseSpinner';
 import {
     Drawer,
     DrawerContent,
@@ -166,6 +167,11 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                                             setImageUrl(null);
                                         }}
                                     />
+                                    {isLoading && (
+                                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                                            <SimpleUiverseSpinner />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         ) : hasError ? (

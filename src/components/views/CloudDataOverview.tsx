@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CloudDataOverview as CloudDataOverviewType, ProgressCallback } from '@/types/common';
 import { MixedText } from '@/components/ui/MixedText';
+import { SimpleUiverseSpinner } from '@/components/ui/UiverseSpinner';
 
 interface CloudDataOverviewProps {
     isOpen: boolean;

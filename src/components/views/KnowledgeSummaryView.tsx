@@ -3,6 +3,7 @@ import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, A
 import { Button } from "@/components/ui/button";
 import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
 import { SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
 import type { KnowledgeItem } from "@/types/record";
 import * as XLSX from "xlsx";
 import { format } from 'date-fns';
@@ -547,7 +548,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>
                     ) : editItem ? (
                         <div className="py-2">
-                            <Suspense fallback={<SimpleLoadingSpinner className="py-8" />}>
+                            <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
                                 <ModuleForm
                                     module={editItem.module}
                                     onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}

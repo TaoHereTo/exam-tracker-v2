@@ -1,5 +1,6 @@
 import React from 'react';
 import { MixedText } from './MixedText';
+import { UiverseSpinner } from './UiverseSpinner';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
@@ -7,16 +8,10 @@ interface LoadingSpinnerProps {
   className?: string;
 }
 
-const sizeMap = {
-  sm: 'h-4 w-4',
-  md: 'h-8 w-8',
-  lg: 'h-12 w-12'
-};
-
 export function LoadingSpinner({ size = 'md', text, className = '' }: LoadingSpinnerProps) {
   return (
     <div className={`flex flex-col items-center space-y-2 ${className}`}>
-      <div className={`${sizeMap[size]} animate-spin rounded-full border-b-2 border-blue-600`}></div>
+      <UiverseSpinner size={size} />
       {text && (
         <p className="text-sm text-gray-600">
           <MixedText text={text} />
@@ -29,14 +24,14 @@ export function LoadingSpinner({ size = 'md', text, className = '' }: LoadingSpi
 // 简化的loading组件，只显示旋转动画
 export function SimpleLoadingSpinner({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg'; className?: string }) {
   return (
-    <div className={`${sizeMap[size]} animate-spin rounded-full border-b-2 border-blue-600 ${className}`}></div>
+    <UiverseSpinner size={size} />
   );
 }
 
 // 内联loading组件，用于按钮等小空间
 export function InlineLoadingSpinner({ className = '' }: { className?: string }) {
   return (
-    <div className={`h-4 w-4 animate-spin rounded-full border-b-2 border-blue-600 ${className}`}></div>
+    <UiverseSpinner size="sm" />
   );
 }
 
@@ -51,7 +46,8 @@ export function LoadingWrapper({ loading, children, className = '' }: LoadingWra
   if (loading) {
     return (
       <div className={`flex items-center justify-center min-h-[80vh] ${className}`}>
-        <LoadingSpinner size="lg" text="加载中..." />
+        <UiverseSpinner size="lg" centered />
+        <span className="ml-3 text-gray-600 dark:text-gray-300">加载中...</span>
       </div>
     );
   }

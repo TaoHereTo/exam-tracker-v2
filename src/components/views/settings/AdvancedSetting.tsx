@@ -22,8 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { MixedText } from "@/components/ui/MixedText";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
-
-
+import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
 
 export function AdvancedSetting() {
     const { notify } = useNotification();
@@ -666,6 +665,8 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
 
 
 

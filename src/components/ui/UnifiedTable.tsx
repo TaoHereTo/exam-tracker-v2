@@ -15,6 +15,7 @@ import { Search, Upload, Trash2, Edit, FileSpreadsheet } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MixedText } from "@/components/ui/MixedText";
+import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
 
 // 数据表格列定义
 export interface DataTableColumn<T> {
@@ -326,7 +327,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 placeholder={filter.placeholder || "搜索..."}
                                                 value={filter.value}
                                                 onChange={e => filter.onChange(e.target.value)}
-                                                className="w-full h-9 py-2 pl-10"
+                                                className="w-full h-10 py-2 pl-10"
                                             />
                                         </div>
                                     )}
