@@ -4,19 +4,13 @@ import React, { useState, useEffect, lazy, Suspense, useMemo, useCallback, useRe
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import { SidebarTrigger, SidebarProvider, useSidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
-import { SettingsView } from "@/components/views/SettingsView";
 import { useImportExport } from "@/hooks/useImportExport";
-import { OverviewView } from "@/components/views/OverviewView";
-import { ChartsView } from "@/components/views/ChartsView";
-import { ExerciseRecordView } from "@/components/views/HistoryView";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings } from "@/types/record";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import { PersonalBestView } from "@/components/views/PersonalBestView";
-import KnowledgeSummaryView from "@/components/views/KnowledgeSummaryView";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -62,8 +56,6 @@ import {
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
 import { normalizePageTitle } from "@/config/exam";
-import { NewRecordForm } from "@/components/forms/NewRecordForm";
-import KnowledgeEntryView from "@/components/views/KnowledgeEntryView";
 import { clearLocalStorageData } from "@/lib/storageUtils";
 
 // 懒加载组件
@@ -75,6 +67,46 @@ const PlanListView = lazy(() =>
 const PlanDetailView = lazy(() =>
     import("@/components/views/PlanDetailView").then(module => ({
         default: module.default
+    }))
+);
+const OverviewView = lazy(() =>
+    import("@/components/views/OverviewView").then(module => ({
+        default: module.OverviewView
+    }))
+);
+const ChartsView = lazy(() =>
+    import("@/components/views/ChartsView").then(module => ({
+        default: module.ChartsView
+    }))
+);
+const ExerciseRecordView = lazy(() =>
+    import("@/components/views/HistoryView").then(module => ({
+        default: module.ExerciseRecordView
+    }))
+);
+const PersonalBestView = lazy(() =>
+    import("@/components/views/PersonalBestView").then(module => ({
+        default: module.PersonalBestView
+    }))
+);
+const KnowledgeSummaryView = lazy(() =>
+    import("@/components/views/KnowledgeSummaryView").then(module => ({
+        default: module.default
+    }))
+);
+const KnowledgeEntryView = lazy(() =>
+    import("@/components/views/KnowledgeEntryView").then(module => ({
+        default: module.default
+    }))
+);
+const NewRecordForm = lazy(() =>
+    import("@/components/forms/NewRecordForm").then(module => ({
+        default: module.NewRecordForm
+    }))
+);
+const SettingsView = lazy(() =>
+    import("@/components/views/SettingsView").then(module => ({
+        default: module.SettingsView
     }))
 );
 
@@ -534,55 +566,69 @@ export function MainApp() {
 
                                     <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-4 sm:p-6'} max-w-7xl mx-auto`}>
                                         {activeTab === 'overview' && (
-                                            <OverviewView
-                                                records={records}
-                                            />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <OverviewView
+                                                    records={records}
+                                                />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'charts' && (
-                                            <ChartsView records={records} />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <ChartsView records={records} />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'history' && (
-                                            <ExerciseRecordView
-                                                records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
-                                                selectedRecordIds={selectedRecordIds}
-                                                onSelectIds={setSelectedRecordIds}
-                                                onBatchDelete={handleBatchDelete}
-                                                historyPage={historyPage}
-                                                setHistoryPage={setHistoryPage}
-                                                totalPages={Math.ceil(records.length / pageSize)}
-                                                totalRecords={records.length}
-                                            />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <ExerciseRecordView
+                                                    records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                                    selectedRecordIds={selectedRecordIds}
+                                                    onSelectIds={setSelectedRecordIds}
+                                                    onBatchDelete={handleBatchDelete}
+                                                    historyPage={historyPage}
+                                                    setHistoryPage={setHistoryPage}
+                                                    totalPages={Math.ceil(records.length / pageSize)}
+                                                    totalRecords={records.length}
+                                                />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'personal-best' && (
-                                            <PersonalBestView records={records} />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <PersonalBestView records={records} />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'knowledge-summary' && (
-                                            <KnowledgeSummaryView
-                                                knowledge={knowledge}
-                                                onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
-                                                onEditKnowledge={handleEditKnowledge}
-                                            />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <KnowledgeSummaryView
+                                                    knowledge={knowledge}
+                                                    onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
+                                                    onEditKnowledge={handleEditKnowledge}
+                                                />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'knowledge-entry' && (
-                                            <KnowledgeEntryView
-                                                onAddKnowledge={addKnowledge}
-                                            />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <KnowledgeEntryView
+                                                    onAddKnowledge={addKnowledge}
+                                                />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'form' && (
-                                            <NewRecordForm
-                                                onAddRecord={async (newRecord) => {
-                                                    setRecords(prev => [newRecord, ...prev]);
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <NewRecordForm
+                                                    onAddRecord={async (newRecord) => {
+                                                        setRecords(prev => [newRecord, ...prev]);
 
-                                                    // 自动保存到云端
-                                                    await AutoCloudSync.autoSaveRecord(newRecord, notify);
-                                                }}
-                                            />
+                                                        // 自动保存到云端
+                                                        await AutoCloudSync.autoSaveRecord(newRecord, notify);
+                                                    }}
+                                                />
+                                            </Suspense>
                                         )}
 
                                         {activeTab === 'plan-list' && (
@@ -680,20 +726,22 @@ export function MainApp() {
                                         )}
 
                                         {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
-                                            <SettingsView
-                                                onExport={handleExportData}
-                                                onImport={handleImportData}
-                                                onClearLocalData={handleClearLocalData}
-                                                activeTab={activeTab}
-                                                navMode={navMode}
-                                                records={records}
-                                                plans={plans}
-                                                knowledge={knowledge}
-                                                settings={{
-                                                    'exam-tracker-nav-mode': navMode,
-                                                    // 可以添加更多设置项
-                                                }}
-                                            />
+                                            <Suspense fallback={<SimpleUiverseSpinner />}>
+                                                <SettingsView
+                                                    onExport={handleExportData}
+                                                    onImport={handleImportData}
+                                                    onClearLocalData={handleClearLocalData}
+                                                    activeTab={activeTab}
+                                                    navMode={navMode}
+                                                    records={records}
+                                                    plans={plans}
+                                                    knowledge={knowledge}
+                                                    settings={{
+                                                        'exam-tracker-nav-mode': navMode,
+                                                        // 可以添加更多设置项
+                                                    }}
+                                                />
+                                            </Suspense>
                                         )}
                                 </div>
                                 </SidebarInset>

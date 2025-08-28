@@ -7,7 +7,6 @@ import { minutesToTimeString } from "@/lib/utils";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Button } from "@/components/ui/button";
 import { MixedText } from "@/components/ui/MixedText";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Bot } from "lucide-react";
 
 interface RecordItem {
@@ -153,23 +152,13 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
             </CardHeader>
             <CardContent className="relative pb-20">
                 <div className="mb-6">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={handlePredictScore}
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-9 w-9"
-                                >
-                                    <Bot className="w-5 h-5" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p><MixedText text="预测我的行测总分" /></p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                    <Button
+                        onClick={handlePredictScore}
+                        className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 h-9"
+                    >
+                        <Bot className="w-5 h-5 mr-2" />
+                        <MixedText text="预测我的行测总分" />
+                    </Button>
                 </div>
                 {prediction && (
                     <>
