@@ -156,7 +156,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                         onClick={handlePredictScore}
                         className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 h-9"
                     >
-                        <Bot className="w-5 h-5 mr-2" />
+                        <Bot className="w-5 h-5 mr-0.5" />
                         <MixedText text="预测我的行测总分" />
                     </Button>
                 </div>

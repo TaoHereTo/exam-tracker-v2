@@ -29,6 +29,7 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
 }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isImageLoading, setIsImageLoading] = useState(false); // For tracking actual image load
     const [hasError, setHasError] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [scale, setScale] = useState(1);
@@ -75,6 +76,8 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
             // 重置缩放和旋转
             setScale(1);
             setRotation(0);
+            // When opening the preview, we're loading the image again
+            setIsImageLoading(true);
         }
     };
 
@@ -161,13 +164,18 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                                             transform: `scale(${scale}) rotate(${rotation}deg)`,
                                             transition: 'transform 0.2s ease-in-out'
                                         }}
+                                        onLoad={() => {
+                                            // 图片加载成功时的处理
+                                            setIsImageLoading(false);
+                                        }}
                                         onError={() => {
                                             // 图片加载失败时的处理
                                             setHasError(true);
                                             setImageUrl(null);
+                                            setIsImageLoading(false);
                                         }}
                                     />
-                                    {isLoading && (
+                                    {isImageLoading && (
                                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
                                             <SimpleUiverseSpinner />
                                         </div>
@@ -224,4 +232,4 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
             </Drawer>
         </>
     );
-}; 
+};
