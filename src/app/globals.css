@@ -132,12 +132,22 @@ th .mixed-text-part {
 
 
 
-/* 所有日历按钮的基础颜色 - 覆盖ghost按钮的默认样式 */
-[data-slot="calendar"] button[data-day] {
+/* 所有日历按钮的基础颜色 - 使用最强的选择器覆盖所有可能的样式 */
+[data-slot="calendar"] button[data-day],
+[data-slot="calendar"] .rdp-button,
+[data-slot="calendar"] .rdp-day button,
+[data-slot="calendar"] [role="gridcell"] button,
+[data-radix-popper-content-wrapper] [data-slot="calendar"] button,
+[data-radix-popper-content-wrapper] [data-slot="calendar"] .rdp-button {
   color: #000000 !important;
 }
 
-.dark [data-slot="calendar"] button[data-day] {
+.dark [data-slot="calendar"] button[data-day],
+.dark [data-slot="calendar"] .rdp-button,
+.dark [data-slot="calendar"] .rdp-day button,
+.dark [data-slot="calendar"] [role="gridcell"] button,
+.dark [data-radix-popper-content-wrapper] [data-slot="calendar"] button,
+.dark [data-radix-popper-content-wrapper] [data-slot="calendar"] .rdp-button {
   color: #ffffff !important;
 }
 
@@ -176,6 +186,64 @@ th .mixed-text-part {
 .dark [data-slot="calendar"] .text-muted-foreground,
 .dark [data-slot="calendar"] [class*="text-muted-foreground"] {
   color: #ffffff !important;
+}
+
+/* 强制覆盖Button组件的ghost变体样式 */
+[data-slot="calendar"] button[class*="ghost"],
+[data-slot="calendar"] .btn-ghost,
+[data-slot="calendar"] [data-variant="ghost"] {
+  color: #000000 !important;
+}
+
+.dark [data-slot="calendar"] button[class*="ghost"],
+.dark [data-slot="calendar"] .btn-ghost,
+.dark [data-slot="calendar"] [data-variant="ghost"] {
+  color: #ffffff !important;
+}
+
+/* 最强力的覆盖 - 针对所有可能的日历内按钮 */
+[data-slot="calendar"] * {
+  --tw-text-opacity: 1 !important;
+}
+
+/* 终极解决方案 - 使用CSS自定义属性强制覆盖 */
+[data-slot="calendar"] {
+  --calendar-text-color: #000000;
+}
+
+.dark [data-slot="calendar"] {
+  --calendar-text-color: #ffffff;
+}
+
+[data-slot="calendar"] button:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  color: var(--calendar-text-color) !important;
+  --tw-text-opacity: 1 !important;
+}
+
+/* 如果上面的都不行，这个应该能强制覆盖任何样式 */
+html [data-slot="calendar"] button[data-day]:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  color: #000000 !important;
+}
+
+html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  color: #ffffff !important;
+}
+
+/* 强制日历按钮圆角 */
+[data-slot="calendar"] .calendar-day-button {
+  border-radius: 8px !important;
+}
+
+/* 确保选中状态的按钮有圆角 */
+[data-slot="calendar"] button[data-selected-single="true"],
+[data-slot="calendar"] button[data-range-start="true"],
+[data-slot="calendar"] button[data-range-end="true"] {
+  border-radius: 8px !important;
+}
+
+/* 范围中间的按钮保持方形 */
+[data-slot="calendar"] button[data-range-middle="true"] {
+  border-radius: 0px !important;
 }
 
 /* 特别处理日历中可能使用muted-foreground的元素 */
