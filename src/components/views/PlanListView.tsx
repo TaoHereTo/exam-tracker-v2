@@ -221,26 +221,23 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 text-white"
+                        className="h-9 text-white shadow-sm"
                         style={{ 
                             backgroundColor: '#1d4ed8', 
                             color: 'white',
                             transition: 'none',
-                            transform: 'none',
-                            boxShadow: 'inherit'
+                            transform: 'none'
                         }}
                         data-plan-button
                         onMouseEnter={(e) => {
                             e.currentTarget.style.backgroundColor = '#1d4ed8';
                             e.currentTarget.style.color = 'white';
                             e.currentTarget.style.transform = 'none';
-                            e.currentTarget.style.boxShadow = 'inherit';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.backgroundColor = '#1d4ed8';
                             e.currentTarget.style.color = 'white';
                             e.currentTarget.style.transform = 'none';
-                            e.currentTarget.style.boxShadow = 'inherit';
                         }}
                     >
                         <Plus className="w-5 h-5 mr-2" />
@@ -254,12 +251,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                 <Button
                     variant={!showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(false)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 shadow-sm"
                     style={{
                         ...((!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {})),
                         transition: 'none',
-                        transform: 'none',
-                        boxShadow: 'inherit'
+                        transform: 'none'
                     }}
                     data-plan-button
                     onMouseEnter={(e) => {
@@ -268,7 +264,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = 'inherit';
                     }}
                     onMouseLeave={(e) => {
                         if (!showCompleted) {
@@ -276,7 +271,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = 'inherit';
                     }}
                 >
                     <Clock className="w-5 h-5" />
@@ -285,12 +279,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                 <Button
                     variant={showCompleted ? "default" : "outline"}
                     onClick={() => setShowCompleted(true)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 shadow-sm"
                     style={{
                         ...(showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}),
                         transition: 'none',
-                        transform: 'none',
-                        boxShadow: 'inherit'
+                        transform: 'none'
                     }}
                     data-plan-button
                     onMouseEnter={(e) => {
@@ -299,7 +292,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = 'inherit';
                     }}
                     onMouseLeave={(e) => {
                         if (showCompleted) {
@@ -307,7 +299,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             e.currentTarget.style.color = 'white';
                         }
                         e.currentTarget.style.transform = 'none';
-                        e.currentTarget.style.boxShadow = 'inherit';
                     }}
                 >
                     <CheckCircle className="w-5 h-5" />

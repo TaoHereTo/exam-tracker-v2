@@ -47,6 +47,7 @@ interface UnifiedKnowledgeFormProps {
   module: string;
   onAddKnowledge: (knowledge: Partial<KnowledgeItem> | Record<string, unknown>) => void;
   initialData?: Partial<KnowledgeItem> | Record<string, unknown>;
+  isInDialog?: boolean;
 }
 
 // 根据模块获取配置
@@ -109,19 +110,35 @@ function DateField() {
   const currentDate = getValue('date') as string;
   const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
   const [dateOpen, setDateOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
+
+  // 当外部表单值或已选日期变化时，同步月份到已选日期
+  useEffect(() => {
+    if (date) setCurrentMonth(date);
+  }, [date?.getTime()]);
+
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      // 打开时对齐到当前已选日期
+      if (date) setCurrentMonth(date);
+    }
+    setDateOpen(open);
+  };
 
   return (
-    <Popover open={dateOpen} onOpenChange={setDateOpen}>
+    <Popover open={dateOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 shadow-xs transition-[color,box-shadow]">
+        <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 shadow-xs transition-[color,box-shadow]">
           <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
-        </div>
+        </button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
           captionLayout="dropdown"
+          month={currentMonth}
+          onMonthChange={setCurrentMonth}
           selected={date}
           onSelect={(d) => {
             setDate(d);
@@ -131,7 +148,7 @@ function DateField() {
             // Automatically close the popover after selecting a date
             setDateOpen(false);
           }}
-          initialFocus
+          initialFocus={false}
           locale={zhCN}
         />
       </PopoverContent>
@@ -143,6 +160,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   module,
   onAddKnowledge,
   initialData,
+  isInDialog = false
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
   const { showError, showSuccess } = useFormNotification();
@@ -317,85 +335,162 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
   return (
     <div className="flex items-start justify-center w-full">
-      <Card className="w-full max-w-2xl flex flex-col">
-        {!initialData && (
-          <CardHeader className="pb-2">
-            <CardTitle className="text-2xl">
-              <MixedText text={config.title} />
-            </CardTitle>
+      {isInDialog ? (
+        // When in dialog, render without Card wrapper to avoid nested card appearance
+        <div className="w-full max-w-2xl flex flex-col">
+          <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+            <BaseForm
+              className="form-stack"
+              validationSchema={getValidationSchema()}
+              onSubmit={handleSubmit}
+              initialData={getInitialData()}
+            >
+              {/* 子分类选择器 */}
+              {config.hasSubCategory && (
+                <FormField name="subCategory" className="form-field">
+                  <Label htmlFor="subCategory">
+                    <MixedText text="选择子分类" />
+                  </Label>
+                  <FormSelect
+                    name="subCategory"
+                    placeholder="请选择子分类"
+                  >
+                    {config.subCategories?.map((category: string) => (
+                      <SelectItem key={category} value={category}>
+                        <MixedText text={category} />
+                      </SelectItem>
+                    ))}
+                  </FormSelect>
+                </FormField>
+              )}
+
+              {/* 日期选择器 */}
+              {config.hasDateField && (
+                <FormField name="date" className="form-field">
+                  <Label htmlFor="date">
+                    <MixedText text="选择发布日期" />
+                  </Label>
+                  <DateField />
+                </FormField>
+              )}
+
+              {/* 第一个字段 */}
+              <FormField name="firstField" className="form-field">
+                <Label htmlFor="firstField">
+                  <MixedText text={fieldConfig.firstLabel} />
+                </Label>
+                <FormInput
+                  name="firstField"
+                  placeholder={fieldConfig.firstPlaceholder}
+                />
+              </FormField>
+
+              {/* 第二个字段 */}
+              <FormField name="secondField" className="form-field">
+                <Label htmlFor="secondField">
+                  <MixedText text={fieldConfig.secondLabel} />
+                </Label>
+                <FormTextarea
+                  name="secondField"
+                  placeholder={fieldConfig.secondPlaceholder}
+                  className="min-h-[100px]"
+                  rows={4}
+                />
+              </FormField>
+
+              {/* 图片上传组件 */}
+              <ImageUploadField />
+
+              <div className="form-actions">
+                <Button type="submit" variant="primary" className="w-full py-4">
+                  <MixedText text="保存知识点" />
+                </Button>
+              </div>
+            </BaseForm>
+          </div>
+        </div>
+      ) : (
+        // When not in dialog, render with Card wrapper as usual
+        <Card className="w-full max-w-2xl flex flex-col">
+          {!initialData && (
+            <CardHeader className="pb-2">
+              <CardTitle className="text-2xl">
+                <MixedText text={config.title} />
+              </CardTitle>
           </CardHeader>
-        )}
-        <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
-          <BaseForm
-            className="form-stack"
-            validationSchema={getValidationSchema()}
-            onSubmit={handleSubmit}
-            initialData={getInitialData()}
-          >
-            {/* 子分类选择器 */}
-            {config.hasSubCategory && (
-              <FormField name="subCategory" className="form-field">
-                <Label htmlFor="subCategory">
-                  <MixedText text="选择子分类" />
+          )}
+          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+            <BaseForm
+              className="form-stack"
+              validationSchema={getValidationSchema()}
+              onSubmit={handleSubmit}
+              initialData={getInitialData()}
+            >
+              {/* 子分类选择器 */}
+              {config.hasSubCategory && (
+                <FormField name="subCategory" className="form-field">
+                  <Label htmlFor="subCategory">
+                    <MixedText text="选择子分类" />
+                  </Label>
+                  <FormSelect
+                    name="subCategory"
+                    placeholder="请选择子分类"
+                  >
+                    {config.subCategories?.map((category: string) => (
+                      <SelectItem key={category} value={category}>
+                        <MixedText text={category} />
+                      </SelectItem>
+                    ))}
+                  </FormSelect>
+                </FormField>
+              )}
+
+              {/* 日期选择器 */}
+              {config.hasDateField && (
+                <FormField name="date" className="form-field">
+                  <Label htmlFor="date">
+                    <MixedText text="选择发布日期" />
+                  </Label>
+                  <DateField />
+                </FormField>
+              )}
+
+              {/* 第一个字段 */}
+              <FormField name="firstField" className="form-field">
+                <Label htmlFor="firstField">
+                  <MixedText text={fieldConfig.firstLabel} />
                 </Label>
-                <FormSelect
-                  name="subCategory"
-                  placeholder="请选择子分类"
-                >
-                  {config.subCategories?.map((category: string) => (
-                    <SelectItem key={category} value={category}>
-                      <MixedText text={category} />
-                    </SelectItem>
-                  ))}
-                </FormSelect>
+                <FormInput
+                  name="firstField"
+                  placeholder={fieldConfig.firstPlaceholder}
+                />
               </FormField>
-            )}
 
-            {/* 日期选择器 */}
-            {config.hasDateField && (
-              <FormField name="date" className="form-field">
-                <Label htmlFor="date">
-                  <MixedText text="选择发布日期" />
+              {/* 第二个字段 */}
+              <FormField name="secondField" className="form-field">
+                <Label htmlFor="secondField">
+                  <MixedText text={fieldConfig.secondLabel} />
                 </Label>
-                <DateField />
+                <FormTextarea
+                  name="secondField"
+                  placeholder={fieldConfig.secondPlaceholder}
+                  className="min-h-[100px]"
+                  rows={4}
+                />
               </FormField>
-            )}
 
-            {/* 第一个字段 */}
-            <FormField name="firstField" className="form-field">
-              <Label htmlFor="firstField">
-                <MixedText text={fieldConfig.firstLabel} />
-              </Label>
-              <FormInput
-                name="firstField"
-                placeholder={fieldConfig.firstPlaceholder}
-              />
-            </FormField>
+              {/* 图片上传组件 */}
+              <ImageUploadField />
 
-            {/* 第二个字段 */}
-            <FormField name="secondField" className="form-field">
-              <Label htmlFor="secondField">
-                <MixedText text={fieldConfig.secondLabel} />
-              </Label>
-              <FormTextarea
-                name="secondField"
-                placeholder={fieldConfig.secondPlaceholder}
-                className="min-h-[100px]"
-                rows={4}
-              />
-            </FormField>
-
-            {/* 图片上传组件 */}
-            <ImageUploadField />
-
-            <div className="form-actions">
-              <Button type="submit" variant="primary" className="w-full py-4">
-                <MixedText text="保存知识点" />
-              </Button>
-            </div>
-          </BaseForm>
-        </CardContent>
-      </Card>
+              <div className="form-actions">
+                <Button type="submit" variant="primary" className="w-full py-4">
+                  <MixedText text="保存知识点" />
+                </Button>
+              </div>
+            </BaseForm>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }; 

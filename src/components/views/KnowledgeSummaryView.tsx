@@ -553,6 +553,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                                     module={editItem.module}
                                     onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
                                     initialData={editItem}
+                                    isInDialog={true}
                                 />
                             </Suspense>
                         </div>

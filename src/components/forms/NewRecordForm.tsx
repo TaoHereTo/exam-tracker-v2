@@ -26,6 +26,7 @@ interface NewRecordFormProps {
 export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [dateOpen, setDateOpen] = useState(false);
+    const [currentMonth, setCurrentMonth] = useState<Date | undefined>(new Date());
     const { isDarkMode } = useThemeMode();
 
     const handleSubmit = (data: Record<string, string | number | boolean | undefined>) => {
@@ -44,27 +45,52 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
 
     // 日期字段组件
     function DateField() {
-        const { setValue, errors, clearError } = useFormContext();
+        const { setValue, errors, clearError, getValue } = useFormContext();
+        const currentDate = getValue('date') as string;
+        const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
+        const [dateOpen, setDateOpen] = useState(false);
+        const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
+
+        // 当外部表单值或已选日期变化时，同步月份到已选日期
+        useEffect(() => {
+            if (date) setCurrentMonth(date);
+        }, [date?.getTime()]);
+
+        const handleOpenChange = (open: boolean) => {
+            if (open) {
+                // 打开时对齐到当前已选日期
+                if (date) setCurrentMonth(date);
+            }
+            setDateOpen(open);
+        };
+
         return (
-            <Popover>
+            <Popover open={dateOpen} onOpenChange={handleOpenChange}>
                 <PopoverTrigger asChild>
-                    <div className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10">
+                    <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10">
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground text-sm">选择日期</span>}
-                    </div>
+                    </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 text-black dark:text-white" align="start">
+                <PopoverContent 
+                    className="w-auto p-0 text-black dark:text-white" 
+                    align="start"
+                >
                     <Calendar
                         mode="single"
                         captionLayout="dropdown"
+                        month={currentMonth}
+                        onMonthChange={setCurrentMonth}
                         selected={date}
                         onSelect={(d) => {
                             setDate(d);
                             const formatted = d ? format(d, 'yyyy-MM-dd') : '';
                             setValue('date', formatted);
                             if (errors['date']) clearError('date');
+                            // 选择日期后关闭
+                            setDateOpen(false);
                         }}
-                        initialFocus
+                        initialFocus={false}
                         locale={zhCN}
                     />
                 </PopoverContent>

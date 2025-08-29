@@ -207,7 +207,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     <ContextMenuTrigger asChild>
                                         <tr
                                             onClick={handleRowClick}
-                                            className={`cursor-pointer hover:bg-[#EEEDEC] dark:hover:bg-[#262626] transition-colors duration-25 ${isSelected ? 'bg-[#EEEDEC] dark:bg-[#262626]' : ''}`}
+                                            className={`cursor-pointer hover:bg-[var(--hover-light)] dark:hover:bg-[var(--hover-dark)] transition-colors duration-25 ${isSelected ? 'bg-[var(--hover-light)] dark:bg-[var(--hover-dark)]' : ''}`}
                                         >
                                             {selectable && (
                                                 <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
@@ -253,7 +253,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 <tr
                                     key={String(key)}
                                     onClick={handleRowClick}
-                                    className={`cursor-pointer hover:bg-[#EEEDEC] dark:hover:bg-[#262626] transition-colors duration-25 ${isSelected ? 'bg-[#EEEDEC] dark:bg-[#262626]' : ''}`}
+                                    className={`cursor-pointer hover:bg-[var(--hover-light)] dark:hover:bg-[var(--hover-dark)] transition-colors duration-25 ${isSelected ? 'bg-[var(--hover-light)] dark:bg-[var(--hover-dark)]' : ''}`}
                                 >
                                     {selectable && (
                                         <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
