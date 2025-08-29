@@ -199,11 +199,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         </FormField>
 
                         <div className="form-actions pt-4">
-                            <Button type="submit" className={`w-full py-2 text-sm h-10 ${
-                                isDarkMode 
-                                    ? 'bg-white text-black hover:bg-gray-200' 
-                                    : 'bg-black text-white hover:bg-gray-800'
-                            }`}>
+                            <Button type="submit" variant="primary" className="w-full py-2 text-sm h-10">
                                 <MixedText text="保存记录" />
                             </Button>
                         </div>

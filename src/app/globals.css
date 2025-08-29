@@ -1152,6 +1152,41 @@ html,
   padding: 0.5rem !important;
 }
 
+/* 修复footer区域（地球图标）在收起状态下的对齐问题 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.75rem !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"]>div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] svg {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* 确保侧边栏底部用户信息在展开状态下也居中显示 */
+[data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+[data-slot="sidebar-footer"] > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
 /* 组标签样式 - 去掉左边框 */
 [data-slot="sidebar-group-label"] {
   color: hsl(var(--sidebar-foreground) / 0.7);
@@ -1358,6 +1393,20 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   margin-top: auto !important;
   position: relative !important;
   bottom: 0 !important;
+}
+
+/* 确保侧边栏底部用户信息在展开状态下也居中显示 */
+[data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+[data-slot="sidebar-footer"] > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
 }
 
 /* 侧边栏底部用户信息内容样式 */
@@ -2082,4 +2131,99 @@ button[style*="background:#dc2626"] *,
 ::view-transition-old(root), ::view-transition-new(root) {
     animation: none;
     mix-blend-mode: normal;
+}
+
+/* ========== 侧边栏按钮高度调整 ========== */
+/* 调整侧边栏菜单按钮的垂直高度 - 稍微减少高度和间距 */
+html body [data-slot="sidebar"] button[data-sidebar="menu-button"],
+html body [data-slot="sidebar"] .peer\/menu-button,
+html body [data-slot="sidebar-content"] button[data-sidebar="menu-button"],
+html body [data-slot="sidebar-content"] .peer\/menu-button,
+html body [data-slot="sidebar-group-content"] button,
+html body [data-slot="sidebar-group-content"] .peer\/menu-button,
+html body [data-slot="sidebar-group-content"] a,
+html body [data-slot="sidebar-menu"] button,
+html body [data-slot="sidebar-menu"] a {
+  min-height: 2.5rem !important; /* 40px - 稍微减少 */
+  height: auto !important;
+  padding: 0.5rem 0.5rem !important; /* 上下8px，左右8px - 减少垂直padding */
+  margin: 0.125rem 0 !important; /* 上下2px间距 - 减少子项目间距离 */
+  box-sizing: border-box !important;
+  line-height: 1.5rem !important;
+  transition: none !important;
+}
+
+/* 强制覆盖所有可能的状态 */
+html body [data-slot="sidebar"] button[data-sidebar="menu-button"]:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar"] .peer\/menu-button:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-content"] button[data-sidebar="menu-button"]:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-content"] .peer\/menu-button:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-group-content"] button:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-group-content"] .peer\/menu-button:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-group-content"] a:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-menu"] button:not(:hover):not([data-active="true"]),
+html body [data-slot="sidebar-menu"] a:not(:hover):not([data-active="true"]) {
+  padding: 0.5rem 0.5rem !important;
+  margin: 0.125rem 0 !important;
+  min-height: 2.5rem !important;
+  height: auto !important;
+}
+
+/* 覆盖可能存在的Tailwind类 */
+html body [data-slot="sidebar"] .h-10,
+html body [data-slot="sidebar"] .h-11,
+html body [data-slot="sidebar"] .h-12,
+html body [data-slot="sidebar"] .sm\:h-12,
+html body [data-slot="sidebar"] .sm\:h-13 {
+  height: auto !important;
+  min-height: 2.5rem !important;
+  padding: 0.5rem 0.5rem !important;
+  margin: 0.125rem 0 !important;
+}
+
+/* 确保选中状态和悬停状态保持相同的高度和padding */
+html body [data-slot="sidebar"] button[data-sidebar="menu-button"][data-active="true"],
+html body [data-slot="sidebar"] button[data-sidebar="menu-button"]:hover,
+html body [data-slot="sidebar"] .peer\/menu-button[data-active="true"],
+html body [data-slot="sidebar"] .peer\/menu-button:hover,
+html body [data-slot="sidebar-content"] button[data-sidebar="menu-button"][data-active="true"],
+html body [data-slot="sidebar-content"] button[data-sidebar="menu-button"]:hover,
+html body [data-slot="sidebar-content"] .peer\/menu-button[data-active="true"],
+html body [data-slot="sidebar-content"] .peer\/menu-button:hover,
+html body [data-slot="sidebar-group-content"] button[data-active="true"],
+html body [data-slot="sidebar-group-content"] button:hover,
+html body [data-slot="sidebar-group-content"] .peer\/menu-button[data-active="true"],
+html body [data-slot="sidebar-group-content"] .peer\/menu-button:hover,
+html body [data-slot="sidebar-group-content"] a[data-active="true"],
+html body [data-slot="sidebar-group-content"] a:hover,
+html body [data-slot="sidebar-menu"] button[data-active="true"],
+html body [data-slot="sidebar-menu"] button:hover,
+html body [data-slot="sidebar-menu"] a[data-active="true"],
+html body [data-slot="sidebar-menu"] a:hover {
+  min-height: 2.5rem !important; /* 与默认状态相同 */
+  height: auto !important; /* 与默认状态相同 */
+  padding: 0.5rem 0.5rem !important; /* 与默认状态相同 */
+  margin: 0.125rem 0 !important; /* 与默认状态相同 */
+  background-color: #EEEDEC !important;
+}
+
+html body.dark [data-slot="sidebar"] button[data-sidebar="menu-button"][data-active="true"],
+html body.dark [data-slot="sidebar"] button[data-sidebar="menu-button"]:hover,
+html body.dark [data-slot="sidebar"] .peer\/menu-button[data-active="true"],
+html body.dark [data-slot="sidebar"] .peer\/menu-button:hover,
+html body.dark [data-slot="sidebar-content"] button[data-sidebar="menu-button"][data-active="true"],
+html body.dark [data-slot="sidebar-content"] button[data-sidebar="menu-button"]:hover,
+html body.dark [data-slot="sidebar-content"] .peer\/menu-button[data-active="true"],
+html body.dark [data-slot="sidebar-content"] .peer\/menu-button:hover,
+html body.dark [data-slot="sidebar-group-content"] button[data-active="true"],
+html body.dark [data-slot="sidebar-group-content"] button:hover,
+html body.dark [data-slot="sidebar-group-content"] .peer\/menu-button[data-active="true"],
+html body.dark [data-slot="sidebar-group-content"] .peer\/menu-button:hover,
+html body.dark [data-slot="sidebar-group-content"] a[data-active="true"],
+html body.dark [data-slot="sidebar-group-content"] a:hover,
+html body.dark [data-slot="sidebar-menu"] button[data-active="true"],
+html body.dark [data-slot="sidebar-menu"] button:hover,
+html body.dark [data-slot="sidebar-menu"] a[data-active="true"],
+html body.dark [data-slot="sidebar-menu"] a:hover {
+  background-color: #28282A !important;
 }

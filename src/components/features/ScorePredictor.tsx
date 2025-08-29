@@ -8,6 +8,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { Button } from "@/components/ui/button";
 import { MixedText } from "@/components/ui/MixedText";
 import { Bot } from "lucide-react";
+import { SparklesText } from "@/components/magicui/sparkles-text";
 
 interface RecordItem {
     module: keyof typeof MODULE_SCORES;
@@ -154,7 +155,8 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                 <div className="mb-6">
                     <Button
                         onClick={handlePredictScore}
-                        className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 h-9"
+                        variant="primary"
+                        className="h-9"
                     >
                         <Bot className="w-5 h-5 mr-0.5" />
                         <MixedText text="预测我的行测总分" />
@@ -177,12 +179,18 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                         {/* 预测总分右下角渐变大号数字 */}
                         <div className="absolute right-8 bottom-4 flex flex-row items-end gap-3">
                             <span className="text-2xl font-bold text-gray-700 mb-1"><MixedText text="预测总分" /></span>
-                            <span
-                                className="text-5xl font-extrabold bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-lg"
-                                style={{ letterSpacing: 2 }}
+                            <SparklesText
+                                colors={{ first: "#9E7AFF", second: "#FE8BBB" }}
+                                sparklesCount={8}
+                                className=""
                             >
-                                {prediction.total.toFixed(2)} 分
-                            </span>
+                                <span
+                                    className="text-5xl font-extrabold bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 bg-clip-text text-transparent drop-shadow-lg"
+                                    style={{ letterSpacing: 2 }}
+                                >
+                                    {prediction.total.toFixed(2)} 分
+                                </span>
+                            </SparklesText>
                         </div>
                     </>
                 )}

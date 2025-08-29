@@ -590,7 +590,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                             <Button type="button" variant="outline" onClick={handleCloseForm}>
                                                 <MixedText text="取消" />
                                             </Button>
-                                            <Button type="submit" className="bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200">
+                                            <Button type="submit" variant="primary">
                                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                                             </Button>
                                         </ButtonGroup>

@@ -1,9 +1,10 @@
 import { useRef } from "react";
 import { Download, Upload } from "lucide-react";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { MixedText } from "@/components/ui/MixedText";
+import { cn } from "@/lib/utils";
 import {
     Tooltip,
     TooltipContent,
@@ -71,7 +72,7 @@ export function DataImportExport({ onImport, onExport, onClearAllData }: DataImp
                                 <AlertDialogCancel className="h-8 sm:h-9 text-xs sm:text-sm"><MixedText text="取消" /></AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={onClearAllData}
-                                    className="bg-red-600 hover:bg-red-700 text-white h-8 sm:h-9 text-xs sm:text-sm"
+                                    className={cn(buttonVariants({ variant: "danger" }), "h-8 sm:h-9 text-xs sm:text-sm")}
                                 >
                                     <MixedText text="确认清空" />
                                 </AlertDialogAction>

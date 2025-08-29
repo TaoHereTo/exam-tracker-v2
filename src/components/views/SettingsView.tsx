@@ -8,7 +8,8 @@ import { AppearanceSetting } from "@/components/views/settings/AppearanceSetting
 import { DataImportExport } from "@/components/features/DataImportExport";
 import { AdvancedSetting } from "./settings/AdvancedSetting";
 import SaveSettingsButton from "./settings/SaveSettingsButton";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Download, Upload, Eye, Trash2, CloudUpload, CloudDownload } from "lucide-react";
 import { useState } from "react";
 import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
@@ -213,7 +214,7 @@ export function SettingsView({
                                                     }
                                                     setClearDataDialogOpen(false);
                                                 }}
-                                                className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                                                className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9")}
                                             >
                                                 确认清空
                                             </AlertDialogAction>

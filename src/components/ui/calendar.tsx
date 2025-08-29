@@ -70,11 +70,11 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md",
+          "relative has-focus:border-ring border border-input shadow-sm has-focus:ring-ring/50 has-focus:ring-[3px] has-focus:shadow-md rounded-md transition-all",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(
-          "absolute bg-popover inset-0 opacity-0",
+          "absolute bg-popover inset-0 opacity-0 shadow-lg rounded-md",
           defaultClassNames.dropdown
         ),
         caption_label: cn(
@@ -110,7 +110,7 @@ function Calendar({
         range_middle: cn("rounded-none", defaultClassNames.range_middle),
         range_end: cn("rounded-r-md", defaultClassNames.range_end),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none shadow-sm",
           defaultClassNames.today
         ),
         outside: cn(
@@ -271,11 +271,11 @@ function CalendarDayButton({
       className={cn(
         "calendar-day-button",
         // 添加hover和focus效果
-        "hover:bg-gray-100 dark:hover:bg-gray-800",
-        "focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50",
+        "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
+        "focus:ring-2 focus:ring-ring focus:ring-opacity-50 focus:shadow-md",
         // 选中状态覆盖hover效果
         modifiers.selected || modifiers.range_start || modifiers.range_end ? 
-          "hover:opacity-90" : "",
+          "hover:opacity-90 shadow-sm" : "",
         defaultClassNames.day,
         className
       )}

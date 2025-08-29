@@ -43,7 +43,7 @@ export function DateRangePicker({
                         className={cn(
                             "w-full justify-start text-left font-normal h-10",
                             !dateRange && "text-muted-foreground",
-                            false,
+                            error && "border-destructive ring-destructive/20",
                             disabled && "opacity-50 cursor-not-allowed"
                         )}
                         disabled={disabled}

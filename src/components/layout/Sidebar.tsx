@@ -75,7 +75,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('overview')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览">
                                         <a href="#">
                                             <GalleryVerticalEnd className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="数据概览" /></span>
@@ -85,7 +85,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('charts')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'charts'} tooltip="数据图表" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'charts'} tooltip="数据图表">
                                         <a href="#">
                                             <ChartSpline className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="数据图表" /></span>
@@ -95,7 +95,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('personal-best')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'personal-best'} tooltip="最佳成绩" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'personal-best'} tooltip="最佳成绩">
                                         <a href="#">
                                             <Trophy className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="最佳成绩" /></span>
@@ -116,7 +116,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('form')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'form'} tooltip="新的记录" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'form'} tooltip="新的记录">
                                         <a href="#">
                                             <PenTool className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="新的记录" /></span>
@@ -126,7 +126,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('history')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题历史" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'history'} tooltip="刷题历史">
                                         <a href="#">
                                             <BookCopy className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="刷题历史" /></span>
@@ -147,7 +147,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('plan-list')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'plan-list'} tooltip="制定计划" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'plan-list'} tooltip="制定计划">
                                         <a href="#">
                                             <ListTodo className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="制定计划" /></span>
@@ -168,7 +168,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('knowledge-entry')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'knowledge-entry'} tooltip="知识点录入" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'knowledge-entry'} tooltip="知识点录入">
                                         <a href="#">
                                             <NotebookPen className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="知识点录入" /></span>
@@ -178,7 +178,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('knowledge-summary')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'knowledge-summary'} tooltip="知识点汇总" className="h-10 sm:h-12">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'knowledge-summary'} tooltip="知识点汇总">
                                         <a href="#">
                                             <BookMarked className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="知识点汇总" /></span>
@@ -193,8 +193,10 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
 
             {/* 用户信息区域 */}
             {userInfo && (
-                <SidebarFooter className="p-4">
-                    {userInfo}
+                <SidebarFooter className="p-4 flex justify-center items-center">
+                    <div className="w-full flex justify-center items-center">
+                        {userInfo}
+                    </div>
                 </SidebarFooter>
             )}
             <SidebarRail />

@@ -15,8 +15,9 @@ import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronDown } from "lucide-react";
-import { generateUUID, isUUID } from "@/lib/utils";
+import { cn, generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
+import { TextAnimate } from "@/components/magicui/text-animate";
 
 import {
     DropdownMenu,
@@ -32,7 +33,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { GlobeAvatar } from "@/components/ui/GlobeAvatar";
+
 import { UserProfileService } from "@/lib/userProfileService";
 import type { UserProfile } from "@/types/user";
 
@@ -55,6 +56,7 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
+import { buttonVariants } from "@/components/ui/button";
 import { normalizePageTitle } from "@/config/exam";
 import { clearLocalStorageData } from "@/lib/storageUtils";
 
@@ -246,55 +248,65 @@ export function MainApp() {
                 <SidebarMenuItem>
                     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                         <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">
+                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground !justify-between !items-center">
+                                <div className="flex flex-col items-center justify-center flex-1">
+                                    <span className="truncate font-semibold text-sm">
                                         <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
                                     </span>
-                                    <span className="truncate text-xs">
+                                    <span className="truncate text-xs text-muted-foreground">
                                         <MixedText text={user?.email || ''} />
                                     </span>
                                 </div>
-                                <ChevronDown className={`ml-auto size-4 transition-transform duration-200 ${isOpen ? '-rotate-180' : ''}`} />
+                                <ChevronDown className={`size-4 transition-transform duration-200 ${isOpen ? '-rotate-180' : ''}`} />
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-32 min-w-32 rounded-lg"
+                            className="w-36 min-w-36 rounded-lg"
                             side={isCollapsed ? "top" : "bottom"}
                             align={isCollapsed ? "start" : "end"}
                             sideOffset={isCollapsed ? 8 : 4}
                             alignOffset={isCollapsed ? 40 : 0}
                         >
                             <DropdownMenuLabel className="p-0 font-normal">
-                                <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                    <GlobeAvatar size="sm" />
-                                    <div className="grid flex-1 text-left text-sm leading-tight">
-                                        <span className="truncate font-semibold">
-                                            <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                                        </span>
-                                        <span className="truncate text-xs">
-                                            <MixedText text={userProfile?.bio || '座右铭'} />
-                                        </span>
-                                    </div>
+                                <div className="flex items-center justify-center px-2 py-2 text-center">
+                                    <TextAnimate
+                                        animation="blurIn"
+                                        by="character"
+                                        className="text-sm text-black dark:text-white font-medium"
+                                        startOnView={true}
+                                        once={false}
+                                        duration={0.4}
+                                        delay={0.05}
+                                    >
+                                        {userProfile?.bio || '座右铭'}
+                                    </TextAnimate>
                                 </div>
                             </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                                <User className="h-4 w-4 mr-2" />
-                                <MixedText text="个人资料" />
+                            <DropdownMenuItem onClick={() => setShowProfileDialog(true)} className="flex justify-center">
+                                <div className="flex items-center gap-4">
+                                    <User className="h-4 w-4" />
+                                    <MixedText text="个人资料" />
+                                </div>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                                <Settings className="h-4 w-4 mr-2" />
-                                <MixedText text="基础设置" />
+                            <DropdownMenuItem onClick={() => setActiveTab('settings')} className="flex justify-center">
+                                <div className="flex items-center gap-4">
+                                    <Settings className="h-4 w-4" />
+                                    <MixedText text="基础设置" />
+                                </div>
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')}>
-                                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                                <MixedText text="高级设置" />
+                            <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="flex justify-center">
+                                <div className="flex items-center gap-4">
+                                    <SlidersHorizontal className="h-4 w-4" />
+                                    <MixedText text="高级设置" />
+                                </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleSignOutClick}>
-                                <LogOut className="h-4 w-4 mr-2" />
-                                <MixedText text="退出登录" />
+                            <DropdownMenuItem onClick={handleSignOutClick} className="flex justify-center text-red-600 hover:text-red-700 focus:text-red-700">
+                                <div className="flex items-center gap-4">
+                                    <LogOut className="h-4 w-4 text-red-600" />
+                                    <MixedText text="退出登录" />
+                                </div>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -838,7 +850,7 @@ export function MainApp() {
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleConfirmDelete}
-                                    className="bg-red-600 hover:bg-red-700 text-white w-full sm:w-auto"
+                                    className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto")}
                                     style={{ color: 'white' }}
                                 >
                                     <MixedText text="确认删除" />
@@ -858,7 +870,7 @@ export function MainApp() {
                             </AlertDialogHeader>
                             <AlertDialogFooter className="flex-col sm:flex-row">
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction onClick={handleSignOut} className="bg-red-600 hover:bg-red-700 w-full sm:w-auto">
+                                <AlertDialogAction onClick={handleSignOut} className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto")}>
                                     <MixedText text="确认退出" />
                                 </AlertDialogAction>
                             </AlertDialogFooter>

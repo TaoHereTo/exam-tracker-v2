@@ -196,8 +196,9 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                         </Button>
                         <Button
                             type="submit"
+                            variant="primary"
                             disabled={loading}
-                            className="w-full"
+                            onClick={handleSaveProfile}
                         >
                             {loading ? (
                                 <>
