@@ -557,7 +557,7 @@ html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="tru
 
   /* 统一的 hover 颜色 */
   --hover-light: #EEEDEC;
-  --hover-dark: #28282A;
+  --hover-dark: #262626;
 }
 
 .dark {
@@ -611,6 +611,15 @@ html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="tru
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ========== Utility Classes for Border Colors ========== */
+.border-input-border {
+  border-color: var(--input-border);
+}
+
+.dark .border-input-border {
+  border-color: var(--input-border);
 }
 
 /* ========== 统一的表单/卡片布局工具类 ========== */
@@ -1347,7 +1356,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
 .dark [data-slot="sidebar-menu-button"]:hover,
 .dark [data-slot="sidebar-menu-button"][data-active="true"],
 .dark [data-slot="sidebar-menu-button"][data-state="open"] {
-  background-color: var(--hover-dark);
+  background-color: #262626 !important;
 }
 
 /* 去除点击/聚焦时的外边框与阴影 */
@@ -1734,6 +1743,11 @@ body.eye-care.dark .text-muted-foreground,
 .dark .dropdown-hover-effect[data-slot="context-menu-radio-item"]:hover,
 .dark .dropdown-hover-effect[data-slot="context-menu-radio-item"]:focus {
   background-color: var(--hover-dark) !important;
+}
+
+/* Dark mode border color for dropdown menus */
+.dark [data-slot="dropdown-menu-content"] {
+  border-color: #555555 !important;
 }
 
 /* Utility class for outline button hover effects */
@@ -2225,5 +2239,5 @@ html body.dark [data-slot="sidebar-menu"] button[data-active="true"],
 html body.dark [data-slot="sidebar-menu"] button:hover,
 html body.dark [data-slot="sidebar-menu"] a[data-active="true"],
 html body.dark [data-slot="sidebar-menu"] a:hover {
-  background-color: #28282A !important;
+  background-color: #262626 !important;
 }

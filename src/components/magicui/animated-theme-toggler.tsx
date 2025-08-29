@@ -60,7 +60,7 @@ export const AnimatedThemeToggler = ({ className }: props) => {
       ref={buttonRef} 
       onClick={changeTheme} 
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full bg-background border border-input shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+        "flex items-center justify-center w-10 h-10 rounded-full bg-background border border-input-border shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors",
         className
       )}
       disabled={isAnimating}

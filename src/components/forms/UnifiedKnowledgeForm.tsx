@@ -121,6 +121,7 @@ function DateField() {
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="single"
+          captionLayout="dropdown"
           selected={date}
           onSelect={(d) => {
             setDate(d);

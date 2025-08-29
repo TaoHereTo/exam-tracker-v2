@@ -199,12 +199,13 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             variant="primary"
                             disabled={loading}
                             onClick={handleSaveProfile}
+                            className="flex items-center justify-center h-10 rounded-md"
                         >
                             {loading ? (
-                                <>
-                                    <UiverseSpinner size="sm" />
+                                <div className="flex items-center justify-center w-full">
+                                    <UiverseSpinner size={18} className="inline-block" />
                                     <span className="ml-2"><MixedText text="更新中..." /></span>
-                                </>
+                                </div>
                             ) : (
                                 <MixedText text="更新资料" />
                             )}

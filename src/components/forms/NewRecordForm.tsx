@@ -56,6 +56,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                 <PopoverContent className="w-auto p-0 text-black dark:text-white" align="start">
                     <Calendar
                         mode="single"
+                        captionLayout="dropdown"
                         selected={date}
                         onSelect={(d) => {
                             setDate(d);
