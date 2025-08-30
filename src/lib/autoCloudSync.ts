@@ -1,5 +1,5 @@
-import { recordService, planService, knowledgeService } from './databaseService';
-import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record';
+import { recordService, planService, knowledgeService, countdownService } from './databaseService';
+import { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from '../types/record';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { normalizeModuleName } from '@/config/exam';
 
@@ -64,6 +64,36 @@ export class AutoCloudSync {
                 type: 'error',
                 message: '云端保存失败',
                 description: `计划已保存到本地，但云端同步失败: ${errorMessage}`
+            });
+        }
+    }
+
+    /**
+     * 自动保存考试倒计时到云端
+     */
+    static async autoSaveCountdown(countdown: ExamCountdown, notify: ReturnType<typeof useNotification>['notify']) {
+        try {
+            await countdownService.addCountdown({
+                name: countdown.name,
+                examDate: countdown.examDate,
+                description: countdown.description
+            });
+
+            notify({
+                type: 'success',
+                message: '倒计时已保存到云端',
+                description: `考试倒计时"${countdown.name}"已自动同步到云端`
+            });
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorDetails = error instanceof Error ? error.stack : '无详细信息';
+
+            console.error('自动保存倒计时到云端失败:', error);
+
+            notify({
+                type: 'error',
+                message: '云端保存失败',
+                description: `倒计时已保存到本地，但云端同步失败: ${errorMessage}`
             });
         }
     }
@@ -200,6 +230,53 @@ export class AutoCloudSync {
     }
 
     /**
+     * 自动更新考试倒计时到云端
+     */
+    static async autoUpdateCountdown(countdown: ExamCountdown, notify: ReturnType<typeof useNotification>['notify']) {
+        try {
+            // 检查倒计时ID是否为UUID格式
+            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(countdown.id);
+
+            if (!isUUID) {
+
+                notify({
+                    type: 'warning',
+                    message: '本地更新成功',
+                    description: `倒计时"${countdown.name}"已更新到本地，但云端同步跳过（旧格式ID）`
+                });
+                return;
+            }
+
+
+
+            // 直接更新，不进行查重检查
+            const result = await countdownService.updateCountdown(countdown.id, {
+                name: countdown.name,
+                examDate: countdown.examDate,
+                description: countdown.description
+            });
+
+
+
+            notify({
+                type: 'success',
+                message: '倒计时已更新到云端',
+                description: `考试倒计时"${countdown.name}"已自动同步更新到云端`
+            });
+        } catch (error) {
+            console.error('自动更新倒计时到云端失败:', error);
+
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
+            notify({
+                type: 'error',
+                message: '云端更新失败',
+                description: `倒计时已更新到本地，但云端同步失败: ${errorMessage}`
+            });
+        }
+    }
+
+    /**
      * 自动更新知识点到云端
      */
     static async autoUpdateKnowledge(knowledge: KnowledgeItem, notify: ReturnType<typeof useNotification>['notify']) {
@@ -328,6 +405,30 @@ export class AutoCloudSync {
     }
 
     /**
+     * 自动删除考试倒计时从云端
+     */
+    static async autoDeleteCountdown(countdownId: string, notify: ReturnType<typeof useNotification>['notify']) {
+        try {
+            await countdownService.deleteCountdown(countdownId);
+            notify({
+                type: 'success',
+                message: '倒计时已从云端删除',
+                description: '考试倒计时已从云端同步删除'
+            });
+        } catch (error) {
+            // 改进错误日志，提供更详细的错误信息
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('自动删除倒计时从云端失败:', error);
+
+            notify({
+                type: 'error',
+                message: '云端删除失败',
+                description: `倒计时已从本地删除，但云端同步失败: ${errorMessage}`
+            });
+        }
+    }
+
+    /**
      * 自动删除知识点从云端
      */
     static async autoDeleteKnowledge(knowledgeId: string, notify: ReturnType<typeof useNotification>['notify']) {
@@ -350,4 +451,4 @@ export class AutoCloudSync {
             });
         }
     }
-} 
+}

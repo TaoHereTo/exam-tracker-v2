@@ -7,7 +7,7 @@ import { SidebarTrigger, SidebarProvider, useSidebar, SidebarMenu, SidebarMenuIt
 import { useImportExport } from "@/hooks/useImportExport";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
-import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings } from "@/types/record";
+import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings, ExamCountdown } from "@/types/record";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -112,6 +112,13 @@ const SettingsView = lazy(() =>
     }))
 );
 
+// 添加倒计时视图的懒加载
+const CountdownView = lazy(() =>
+    import("@/components/views/CountdownView").then(module => ({
+        default: module.default
+    }))
+);
+
 export function MainApp() {
     const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
@@ -189,6 +196,7 @@ export function MainApp() {
     // 计划和刷题历史持久化到localStorage
     const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
     const [records, setRecords] = useLocalStorage<RecordItem[]>("exam-tracker-records-v2", []);
+    const [countdowns, setCountdowns] = useLocalStorage<ExamCountdown[]>("exam-tracker-countdowns-v2", []);
 
     const {
         handleExportData,
@@ -197,7 +205,7 @@ export function MainApp() {
         setImportDialogOpen,
         pendingImport,
         setPendingImport,
-    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans);
+    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans, countdowns);
 
     // 刷题历史分页
     const [historyPage, setHistoryPage] = useState(1);
@@ -319,18 +327,19 @@ export function MainApp() {
     const handleClearLocalData = async () => {
         try {
             // 清空localStorage中的数据
-            clearLocalStorageData(['records', 'knowledge', 'plans']);
+            clearLocalStorageData(['records', 'knowledge', 'plans', 'countdowns']);
 
             // 清空React状态
             setRecords([]);
             setKnowledge([]);
             setPlans([]);
+            setCountdowns([]);
             setSelectedRecordIds([]);
 
             notify({
                 type: 'success',
                 message: '本地数据已清空',
-                description: '已清空本地的刷题历史、知识点和学习计划'
+                description: '已清空本地的刷题历史、知识点、学习计划和考试倒计时'
             });
         } catch (error) {
             notify({
@@ -796,6 +805,74 @@ export function MainApp() {
                                                         </div>
                                                     </div>
                                                 )}
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'countdown' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <CountdownView
+                                                    countdowns={countdowns}
+                                                    onCreate={async (countdown) => {
+                                                        const formattedCountdown: ExamCountdown = {
+                                                            ...countdown
+                                                        };
+                                                        setCountdowns(prev => [formattedCountdown, ...prev]);
+
+                                                        // 检查 ID 格式，只有 UUID 格式的才保存到云端
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(countdown.id);
+
+                                                        if (!isUUID) {
+                                                            notify({
+                                                                type: 'warning',
+                                                                message: '本地保存成功',
+                                                                description: '倒计时已保存到本地，但云端同步跳过（旧格式ID）'
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        // 自动保存到云端
+                                                        try {
+                                                            await AutoCloudSync.autoSaveCountdown(formattedCountdown, notify);
+                                                        } catch (error) {
+                                                            console.error('MainApp - 创建倒计时失败:', error);
+                                                        }
+                                                    }}
+                                                    onUpdate={async (countdown) => {
+                                                        const formattedCountdown: ExamCountdown = {
+                                                            ...countdown
+                                                        };
+                                                        setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
+
+                                                        // 自动更新到云端
+                                                        await AutoCloudSync.autoUpdateCountdown(formattedCountdown, notify);
+                                                    }}
+                                                    onDelete={async (id) => {
+                                                        setCountdowns(prev => prev.filter(c => c.id !== id));
+
+                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                        if (!isUUID) {
+                                                            notify({
+                                                                type: 'warning',
+                                                                message: '本地删除成功',
+                                                                description: '倒计时已从本地删除，但云端同步跳过（旧格式ID）'
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        // 自动从云端删除
+                                                        try {
+                                                            await AutoCloudSync.autoDeleteCountdown(id, notify);
+                                                        } catch (error) {
+                                                            console.error('MainApp - 删除倒计时失败:', error);
+                                                        }
+                                                    }}
+                                                />
                                             </Suspense>
                                         )}
 

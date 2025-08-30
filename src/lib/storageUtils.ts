@@ -65,7 +65,7 @@ export function getLocalStorageInfo(): StorageInfo {
 /**
  * 清理localStorage中的特定数据
  */
-export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'plans' | 'settings')[] = []) {
+export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'plans' | 'countdowns' | 'settings')[] = []) {
     // 根据指定的数据类型清理对应的键
     const keysToRemove: string[] = [];
 
@@ -77,6 +77,9 @@ export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'pla
     }
     if (dataTypes.length === 0 || dataTypes.includes('plans')) {
         keysToRemove.push('exam-tracker-plans-v2');
+    }
+    if (dataTypes.length === 0 || dataTypes.includes('countdowns')) {
+        keysToRemove.push('exam-tracker-countdowns-v2');
     }
     if (dataTypes.length === 0 || dataTypes.includes('settings')) {
         keysToRemove.push(
@@ -122,6 +125,7 @@ export function getStorageKeyDisplayName(key: string): string {
         'exam-tracker-records-v2': '刷题历史',
         'exam-tracker-knowledge-v2': '知识点',
         'exam-tracker-plans-v2': '学习计划',
+        'exam-tracker-countdowns-v2': '考试倒计时',
         'exam-tracker-nav-mode': '导航模式',
         'eye-care-enabled': '护眼模式',
 
@@ -149,4 +153,4 @@ export function formatStorageSize(bytes: number): string {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-} 
+}

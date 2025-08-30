@@ -155,6 +155,16 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                     </SidebarMenuButton>
                                 </SidebarMenuItemWrapper>
                             </SidebarMenuItem>
+                            <SidebarMenuItem>
+                                <SidebarMenuItemWrapper onNavigate={() => setActiveTab('countdown')}>
+                                    <SidebarMenuButton asChild isActive={activeTab === 'countdown'} tooltip="考试倒计时">
+                                        <a href="#">
+                                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <span className="text-sm sm:text-base"><MixedText text="考试倒计时" /></span>
+                                        </a>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItemWrapper>
+                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>

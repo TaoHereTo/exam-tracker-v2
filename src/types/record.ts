@@ -28,7 +28,17 @@ export interface StudyPlan {
     description?: string;
     createdAt?: string; // ISO 8601 格式
     updatedAt?: string; // ISO 8601 格式
-}
+};
+
+// 考试倒计时类型
+export interface ExamCountdown {
+    id: string; // UUID 格式
+    name: string;
+    examDate: string; // YYYY-MM-DD 格式
+    description?: string;
+    createdAt?: string; // ISO 8601 格式
+    updatedAt?: string; // ISO 8601 格式
+};
 
 // 知识点类型定义 - 统一使用 type 和 note 字段
 export type KnowledgeItem = {
@@ -75,12 +85,14 @@ export interface ExportDataV7 {
     records: RecordItem[];
     knowledge: KnowledgeItem[];
     plans: StudyPlan[];
+    countdowns: ExamCountdown[];
     settings: UserSettings;
     cloudImages: CloudImageInfo[];
     metadata: {
         totalRecords: number;
         totalKnowledge: number;
         totalPlans: number;
+        totalCountdowns: number;
         totalImages: number;
         appVersion?: string;
     };
@@ -99,8 +111,9 @@ export type PendingImport = {
     records: RecordItem[];
     knowledge: KnowledgeItem[];
     plans?: StudyPlan[];
+    countdowns?: ExamCountdown[];
     settings?: UserSettings;
     cloudImages?: CloudImageInfo[];
     importStats?: ImportStats;
     version?: number;
-}; 
+};

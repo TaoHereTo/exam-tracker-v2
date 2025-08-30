@@ -4,6 +4,7 @@ import type {
     RecordItem,
     KnowledgeItem,
     StudyPlan,
+    ExamCountdown,
     PendingImport,
     UserSettings,
     CloudImageInfo,
@@ -19,7 +20,8 @@ export function useImportExport(
     setRecords: (r: RecordItem[]) => void,
     knowledge: KnowledgeItem[],
     setKnowledge: (k: KnowledgeItem[]) => void,
-    plans?: StudyPlan[]
+    plans?: StudyPlan[],
+    countdowns?: ExamCountdown[]
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -92,6 +94,15 @@ export function useImportExport(
         };
     }
 
+    function formatCountdown(countdown: ExamCountdown): ExamCountdown {
+        return {
+            ...countdown,
+            id: countdown.id || generateUUID(),
+            createdAt: countdown.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+    }
+
     // 导出数据到 JSON 文件（使用新的统一格式）
     const handleExportData = () => {
         // 获取所有云端图片数据
@@ -101,6 +112,7 @@ export function useImportExport(
         const formattedRecords = records.map(formatRecord);
         const formattedKnowledge = knowledge.map(formatKnowledge);
         const formattedPlans = (plans || []).map(formatPlan);
+        const formattedCountdowns = (countdowns || []).map(formatCountdown);
         const settings = getAllSettings();
 
         const exportData: ExportDataV7 = {
@@ -109,12 +121,14 @@ export function useImportExport(
             records: formattedRecords,
             knowledge: formattedKnowledge,
             plans: formattedPlans,
+            countdowns: formattedCountdowns,
             settings,
             cloudImages,
             metadata: {
                 totalRecords: formattedRecords.length,
                 totalKnowledge: formattedKnowledge.length,
                 totalPlans: formattedPlans.length,
+                totalCountdowns: formattedCountdowns.length,
                 totalImages: cloudImages.length,
                 appVersion: '7.0.0'
             }
@@ -135,7 +149,7 @@ export function useImportExport(
         notify({
             type: "success",
             message: "导出成功",
-            description: `已导出 ${formattedRecords.length} 条记录、${formattedKnowledge.length} 条知识点、${formattedPlans.length} 个计划、${cloudImages.length} 张图片。`
+            description: `已导出 ${formattedRecords.length} 条记录、${formattedKnowledge.length} 条知识点、${formattedPlans.length} 个计划、${formattedCountdowns.length} 个倒计时、${cloudImages.length} 张图片。`
         });
     };
 
@@ -158,6 +172,7 @@ export function useImportExport(
                     let importedRecords: RecordItem[] = [];
                     let importedKnowledge: KnowledgeItem[] = [];
                     let importedPlans: StudyPlan[] = [];
+                    let importedCountdowns: ExamCountdown[] = [];
                     let importedSettings: UserSettings = {};
                     let importedCloudImages: CloudImageInfo[] = [];
                     let version = 1;
@@ -168,6 +183,7 @@ export function useImportExport(
                         importedRecords = importedObject.records || [];
                         importedKnowledge = importedObject.knowledge || [];
                         importedPlans = importedObject.plans || [];
+                        importedCountdowns = importedObject.countdowns || [];
                         importedSettings = importedObject.settings || {};
                         importedCloudImages = importedObject.cloudImages || [];
                     } else if (importedObject.version === 6) {
@@ -200,6 +216,10 @@ export function useImportExport(
                         .filter((p: StudyPlan | Record<string, unknown>) => p && 'name' in p && 'module' in p)
                         .map(formatPlan);
 
+                    const validatedCountdowns = importedCountdowns
+                        .filter((c: ExamCountdown | Record<string, unknown>) => c && 'name' in c && 'examDate' in c)
+                        .map(formatCountdown);
+
                     // 导入云端图片
                     if (importedCloudImages.length > 0) {
                         supabaseImageManager.importImageInfo(importedCloudImages);
@@ -210,6 +230,7 @@ export function useImportExport(
                         records: validatedRecords,
                         knowledge: validatedKnowledge,
                         plans: validatedPlans,
+                        countdowns: validatedCountdowns,
                         settings: importedSettings,
                         cloudImages: importedCloudImages,
                         version
@@ -264,8 +285,13 @@ export function useImportExport(
             setRecords([...newRecords, ...records]);
             setKnowledge([...newKnowledge, ...knowledge]);
 
+            // 导入倒计时（去重）
+            if (pendingImport.countdowns) {
+                // TODO: Implement countdown import logic when needed
+            }
+
             const stats = {
-                total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0),
+                total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0) + (pendingImport.countdowns?.length || 0),
                 added: newRecords.length + newKnowledge.length,
                 repeated: (pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length),
                 updated: 0,
@@ -300,4 +326,4 @@ export function useImportExport(
         pendingImport,
         setPendingImport
     };
-} 
+}

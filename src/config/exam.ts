@@ -34,6 +34,7 @@ export const PAGE_TITLE_MAP: Record<string, string> = {
     'settings-basic': '基础设置',
     'settings-advanced': '高级设置',
     'plan': '制定计划',
+    'countdown': '考试倒计时',
 };
 
 // 统一的模块颜色配置

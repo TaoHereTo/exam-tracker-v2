@@ -1,5 +1,5 @@
 import { supabase } from '../supabaseClient'
-import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record'
+import { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from '../types/record'
 import { UserSettings } from '../types/record'
 
 // 获取当前用户ID
@@ -186,6 +186,103 @@ export const planService = {
 
         const { error } = await supabase
             .from('plans')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId)
+
+        if (error) {
+            throw error;
+        }
+    }
+}
+
+// 考试倒计时相关操作
+export const countdownService = {
+    // 获取用户的所有考试倒计时
+    async getCountdowns(): Promise<ExamCountdown[]> {
+        const userId = await getCurrentUserId()
+        if (!userId) {
+            console.warn('用户未登录，返回空倒计时列表');
+            return [];
+        }
+
+        const { data, error } = await supabase
+            .from('exam_countdowns')
+            .select('*')
+            .eq('user_id', userId)
+            .order('examDate', { ascending: true })
+
+        if (error) {
+            console.error('获取倒计时失败:', error);
+            return [];
+        }
+        return data || []
+    },
+
+    // 添加新的考试倒计时
+    async addCountdown(countdown: Omit<ExamCountdown, 'id'>): Promise<ExamCountdown> {
+        const userId = await getCurrentUserId()
+        if (!userId) throw new Error('用户未登录')
+
+        // 构建正确的数据对象，确保字段名与数据库表匹配
+        const countdownData = {
+            user_id: userId,
+            name: countdown.name,
+            "examDate": countdown.examDate,
+            description: countdown.description
+        }
+
+        const { data, error } = await supabase
+            .from('exam_countdowns')
+            .insert([countdownData])
+            .select()
+            .single()
+
+        if (error) {
+            console.error('考试倒计时上传错误:', error);
+            throw new Error(`考试倒计时上传失败: ${error.message || '未知错误'}`);
+        }
+        return data
+    },
+
+    // 更新考试倒计时
+    async updateCountdown(id: string, updates: Partial<ExamCountdown>): Promise<ExamCountdown> {
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) throw new Error('用户未登录')
+
+            // 处理带有双引号的字段名
+            const updateData: Record<string, unknown> = { ...updates };
+            if ('examDate' in updateData) {
+                updateData["examDate"] = updateData.examDate;
+                delete updateData.examDate;
+            }
+
+            const { data, error } = await supabase
+                .from('exam_countdowns')
+                .update(updateData)
+                .eq('id', id)
+                .eq('user_id', userId)
+                .select()
+                .single()
+
+            if (error) {
+                throw new Error(`考试倒计时更新失败: ${error.message || '未知错误'}`);
+            }
+
+            return data
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // 删除考试倒计时
+    async deleteCountdown(id: string): Promise<void> {
+        const userId = await getCurrentUserId()
+        if (!userId) throw new Error('用户未登录')
+
+        const { error } = await supabase
+            .from('exam_countdowns')
             .delete()
             .eq('id', id)
             .eq('user_id', userId)
@@ -664,4 +761,4 @@ export const settingsService = {
             throw error;
         }
     }
-} 
+}
