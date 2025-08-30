@@ -1,5 +1,5 @@
 import React from "react";
-import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline } from "lucide-react";
+import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     Sidebar as SidebarUI,
@@ -28,14 +28,14 @@ type SidebarProps = {
 // 创建一个包装器组件来处理菜单点击事件
 function SidebarMenuItemWrapper({ children, onNavigate }: { children: React.ReactNode; onNavigate: () => void }) {
     const { isMobile, setOpenMobile } = useSidebar();
-    
+
     // 创建一个新的点击处理函数
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
-        
+
         // 执行导航操作
         onNavigate();
-        
+
         // 如果是移动端，自动关闭侧边栏
         if (isMobile) {
             setTimeout(() => {
@@ -43,14 +43,14 @@ function SidebarMenuItemWrapper({ children, onNavigate }: { children: React.Reac
             }, 100); // 稍微延迟关闭，确保导航已经完成
         }
     };
-    
+
     // 克隆子元素并替换 onClick 处理函数
     if (React.isValidElement(children)) {
         return React.cloneElement(children, {
             onClick: handleClick
         } as React.Attributes & { onClick: (e: React.MouseEvent) => void });
     }
-    
+
     return children;
 }
 
@@ -159,7 +159,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('countdown')}>
                                     <SidebarMenuButton asChild isActive={activeTab === 'countdown'} tooltip="考试倒计时">
                                         <a href="#">
-                                            <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                                            <AlarmClockCheck className="h-4 w-4 sm:h-5 sm:w-5" />
                                             <span className="text-sm sm:text-base"><MixedText text="考试倒计时" /></span>
                                         </a>
                                     </SidebarMenuButton>

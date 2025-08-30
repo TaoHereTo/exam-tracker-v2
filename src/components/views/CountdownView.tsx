@@ -141,7 +141,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         const now = new Date();
         const exam = new Date(examDate);
         const diffDays = differenceInDays(exam, now);
-        
+
         if (diffDays > 0) {
             return `${diffDays}天`;
         } else if (diffDays === 0) {
@@ -166,26 +166,50 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         const now = new Date();
         const exam = new Date(examDate);
         const diffDays = differenceInDays(exam, now);
-        
+
         if (diffDays > 0) {
             const remainingHours = differenceInHours(exam, now) % 24;
             const remainingMinutes = differenceInMinutes(exam, now) % 60;
-            return `${diffDays}天 ${remainingHours}小时 ${remainingMinutes}分钟`;
+            return (
+                <span>
+                    <span className="text-3xl font-bold">{diffDays}</span>
+                    <span className="text-lg font-medium text-gray-400">天</span>
+                    <span className="mx-2"></span>
+                    <span className="text-3xl font-bold">{remainingHours}</span>
+                    <span className="text-lg font-medium text-gray-400">小时</span>
+                    <span className="mx-2"></span>
+                    <span className="text-3xl font-bold">{remainingMinutes}</span>
+                    <span className="text-lg font-medium text-gray-400">分钟</span>
+                </span>
+            );
         } else if (diffDays === 0) {
             const diffHours = differenceInHours(exam, now);
             if (diffHours > 0) {
                 const remainingMinutes = differenceInMinutes(exam, now) % 60;
-                return `${diffHours}小时 ${remainingMinutes}分钟`;
+                return (
+                    <span>
+                        <span className="text-3xl font-bold">{diffHours}</span>
+                        <span className="text-lg font-medium text-gray-400">小时</span>
+                        <span className="mx-2"></span>
+                        <span className="text-3xl font-bold">{remainingMinutes}</span>
+                        <span className="text-lg font-medium text-gray-400">分钟</span>
+                    </span>
+                );
             } else {
                 const diffMinutes = differenceInMinutes(exam, now);
                 if (diffMinutes > 0) {
-                    return `${diffMinutes}分钟`;
+                    return (
+                        <span>
+                            <span className="text-3xl font-bold">{diffMinutes}</span>
+                            <span className="text-lg font-medium text-gray-400">分钟</span>
+                        </span>
+                    );
                 } else {
-                    return "已开始";
+                    return <span className="text-3xl font-bold">已开始</span>;
                 }
             }
         } else {
-            return "已过期";
+            return <span className="text-3xl font-bold">已过期</span>;
         }
     };
 
@@ -194,7 +218,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         const now = new Date();
         const exam = new Date(examDate);
         const diffDays = differenceInDays(exam, now);
-        
+
         if (diffDays > 30) {
             return "text-green-500";
         } else if (diffDays > 7) {
@@ -208,14 +232,11 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
     return (
         <div className="space-y-6 w-full">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                <h2 className="text-2xl font-bold text-gray-800">
-                    <MixedText text="考试倒计时" />
-                </h2>
+            <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-10 px-4 bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all"
+                        className="h-11 px-6 bg-[#15803d] hover:bg-[#166534] text-white hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl font-medium"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="添加考试" />
@@ -223,112 +244,101 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 </ButtonGroup>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full items-stretch">
                 {countdowns.length > 0 ? (
                     countdowns.map(countdown => (
-                        <Card key={countdown.id} className="shadow-md hover:shadow-lg transition-all duration-300 w-full flex flex-col border border-gray-200 rounded-xl overflow-hidden">
-                            <CardContent className="p-0 flex-1 flex flex-col">
-                                {/* Countdown display at the top */}
-                                <div className="text-center py-6 bg-gradient-to-r from-blue-50 to-indigo-50">
-                                    <div className="text-4xl font-bold text-black">
-                                        {calculateDetailedCountdown(countdown.examDate)}
-                                    </div>
-                                    <div className="text-sm mt-1 font-medium text-gray-600">
-                                        {differenceInDays(new Date(countdown.examDate), new Date()) > 0 ? '剩余时间' : '距离考试'}
-                                    </div>
-                                </div>
-                                
-                                {/* Content section */}
-                                <div className="p-5 flex-1 flex flex-col justify-between bg-white">
-                                    <div>
-                                        <div className="flex items-start justify-between gap-3 mb-3">
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-xl font-bold text-gray-800 truncate">
-                                                    <MixedText text={countdown.name} />
-                                                </h3>
-                                                <div className="text-sm text-gray-500 mt-1">
-                                                    <MixedText text={`考试日期：${format(new Date(countdown.examDate), 'yyyy年MM月dd日', { locale: zhCN })}`} />
-                                                </div>
-                                            </div>
-                                            {/* Action buttons */}
-                                            <div className="flex gap-1 flex-shrink-0">
+                        <Card key={countdown.id} className="shadow-sm hover:shadow-md transition-all duration-300 w-full flex flex-col border-0 rounded-2xl overflow-hidden p-0">
+                            <div className="px-8 py-6">
+                                <div className="flex flex-col">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div className="text-xl font-medium text-foreground">
+                                            距离<span className="font-bold">{countdown.name}</span>开始还有
+                                        </div>
+                                        {/* Action buttons */}
+                                        <div className="flex gap-2 flex-shrink-0">
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            onClick={() => handleOpenForm(countdown)}
+                                                            variant="outline"
+                                                            size="sm"
+                                                            className="h-9 w-9 p-0 transition-colors"
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="编辑" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                            <AlertDialog>
                                                 <TooltipProvider>
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
-                                                            <Button
-                                                                onClick={() => handleOpenForm(countdown)}
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="h-8 w-8 p-0 border-gray-300"
-                                                            >
-                                                                <Edit className="w-4 h-4 text-gray-600" />
-                                                            </Button>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="destructive"
+                                                                    size="icon"
+                                                                    className="h-9 w-9"
+                                                                >
+                                                                    <Trash2 className="w-5 h-5" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
-                                                            <p><MixedText text="编辑" /></p>
+                                                            <p><MixedText text="删除" /></p>
                                                         </TooltipContent>
                                                     </Tooltip>
                                                 </TooltipProvider>
-                                                <AlertDialog>
-                                                    <TooltipProvider>
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <AlertDialogTrigger asChild>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        size="sm"
-                                                                        className="h-8 w-8 p-0 border-red-300 hover:bg-red-50"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4 text-red-600" />
-                                                                    </Button>
-                                                                </AlertDialogTrigger>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                <p><MixedText text="删除" /></p>
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader>
-                                                            <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
-                                                        </AlertDialogHeader>
-                                                        <AlertDialogDescription>
-                                                            此操作将永久删除考试倒计时&quot;{countdown.name}&quot;，删除后无法恢复。
-                                                        </AlertDialogDescription>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600 hover:bg-red-700"><MixedText text="确认删除" /></AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </div>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogDescription>
+                                                        此操作将永久删除考试倒计时&quot;{countdown.name}&quot;，删除后无法恢复。
+                                                    </AlertDialogDescription>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600 hover:bg-red-700"><MixedText text="确认删除" /></AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
                                         </div>
-                                        
-                                        {countdown.description && (
-                                            <div className="text-gray-600 mt-3 text-sm leading-relaxed">
-                                                <MixedText text={countdown.description} />
-                                            </div>
-                                        )}
+                                    </div>
+                                    <div className="text-foreground">
+                                        {calculateDetailedCountdown(countdown.examDate)}
                                     </div>
                                 </div>
-                            </CardContent>
+                            </div>
                         </Card>
                     ))
                 ) : (
-                    <div className="col-span-full flex flex-col items-center justify-center py-16 text-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                        <h3 className="text-xl font-medium text-gray-700 mb-2">
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center bg-muted/50 rounded-2xl">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                            <Clock className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-foreground mb-3">
                             <MixedText text="暂无考试倒计时" />
                         </h3>
-                        <p className="text-gray-500 mb-4 max-w-md">
+                        <p className="text-muted-foreground mb-6 max-w-md text-lg">
                             <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
                         </p>
+                        <Button
+                            onClick={() => handleOpenForm()}
+                            className="bg-[#15803d] hover:bg-[#166534] text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            <MixedText text="立即添加" />
+                        </Button>
                     </div>
                 )}
             </div>
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-xl">
-                        <CardHeader className="border-b border-gray-100">
+                        <CardHeader className="border-b border-border">
                             <CardTitle className="text-xl">{editId ? <MixedText text="编辑考试" /> : <MixedText text="添加考试" />}</CardTitle>
                         </CardHeader>
                         <form onSubmit={handleSubmit}>
@@ -348,29 +358,26 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </FormField>
                                         <FormError error={errors.name} />
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <FormField label={<MixedText text="考试日期" />} htmlFor="examDate" required>
                                             <Popover open={dateOpen} onOpenChange={setDateOpen}>
                                                 <PopoverTrigger asChild>
-                                                    <button 
-                                                        type="button" 
-                                                        className="w-full flex items-center justify-between text-left font-normal border border-gray-300 bg-white px-3 py-2.5 text-sm rounded-md h-11 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                                    <button
+                                                        type="button"
+                                                        className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
                                                         onClick={() => setDateOpen(true)}
                                                     >
-                                                        <div className="flex items-center">
-                                                            <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
-                                                            {date ? (
-                                                                <span>{format(date, 'PPP', { locale: zhCN })}</span>
-                                                            ) : (
-                                                                <span className="text-gray-400">请选择考试日期</span>
-                                                            )}
-                                                        </div>
-                                                        <span className="text-gray-400">▼</span>
+                                                        <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                                                        {date ? (
+                                                            <span>{format(date, 'PPP', { locale: zhCN })}</span>
+                                                        ) : (
+                                                            <span className="text-muted-foreground">请选择考试日期</span>
+                                                        )}
                                                     </button>
                                                 </PopoverTrigger>
-                                                <PopoverContent 
-                                                    className="w-auto p-0 text-black dark:text-white bg-white border border-gray-200 rounded-lg shadow-lg" 
+                                                <PopoverContent
+                                                    className="w-auto p-0 text-black dark:text-white"
                                                     align="start"
                                                     onInteractOutside={() => setDateOpen(false)}
                                                 >
@@ -404,7 +411,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </FormField>
                                         <FormError error={errors.examDate} />
                                     </div>
-                                    
+
                                     <div className="space-y-2">
                                         <FormField label={<MixedText text="考试描述" />} htmlFor="description">
                                             <Textarea
@@ -422,19 +429,20 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                             </CardContent>
                             <div className="px-6 pb-6">
                                 <ButtonGroup spacing="sm" margin="none" className="justify-end">
-                                    <Button 
-                                        type="button" 
-                                        variant="outline" 
+                                    <Button
+                                        type="button"
+                                        variant="outline"
                                         onClick={handleCloseForm}
                                         className="h-10 px-4"
                                     >
                                         <MixedText text="取消" />
                                     </Button>
-                                    <Button 
-                                        type="submit" 
-                                        className="h-10 px-4 bg-blue-600 hover:bg-blue-700"
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        className="h-10 px-4"
                                     >
-                                        {editId ? <MixedText text="更新考试" /> : <MixedText text="添加考试" />}
+                                        {editId ? <MixedText text="更新" /> : <MixedText text="添加考试" />}
                                     </Button>
                                 </ButtonGroup>
                             </div>
