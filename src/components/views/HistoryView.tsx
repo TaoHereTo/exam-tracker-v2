@@ -7,7 +7,8 @@ import { MixedText } from '@/components/ui/MixedText';
 
 
 interface ExerciseRecordViewProps {
-    records: RecordItem[];
+    records: RecordItem[]; // Current page records
+    allRecords: RecordItem[]; // All records
     selectedRecordIds: string[];
     onSelectIds: (ids: string[]) => void;
     onBatchDelete: () => void;
@@ -19,6 +20,7 @@ interface ExerciseRecordViewProps {
 
 export function ExerciseRecordView({
     records,
+    allRecords,
     selectedRecordIds,
     onSelectIds,
     onBatchDelete,
@@ -90,6 +92,8 @@ export function ExerciseRecordView({
                         onPageChange: setHistoryPage,
                         totalItems: totalRecords
                     }}
+                    records={allRecords}
+                    showModuleStats={true}
                     showDelete={true}
                     onDelete={onBatchDelete}
                     deleteDisabled={selectedRecordIds.length === 0}

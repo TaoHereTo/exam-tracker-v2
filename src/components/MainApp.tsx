@@ -516,7 +516,32 @@ export function MainApp() {
     const handleConfirmImport = useCallback(() => {
         if (!pendingImport) return;
 
-        const { records: newRecords, knowledge: newKnowledge, plans: newPlans, settings } = pendingImport;
+        // 导入记录（去重）
+        const existingRecordKeys = new Set(records.map(r => `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`));
+        const newRecords = pendingImport.records.filter(r => {
+            const key = `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
+            return !existingRecordKeys.has(key);
+        });
+
+        // 导入知识点（去重）- 改进的去重逻辑
+        // 创建现有知识点的内容键集合
+        const existingKnowledgeContentKeys = new Set(knowledge.map(k => 
+            `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
+        ));
+        
+        const newKnowledge = pendingImport.knowledge.filter(k => {
+            // 为导入的知识点创建内容键
+            const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;
+            return !existingKnowledgeContentKeys.has(contentKey);
+        });
+
+        // 导入计划（去重）
+        const existingPlanKeys = new Set(plans.map(p => `${p.name}__${p.module}__${p.type}__${p.startDate}__${p.endDate}`));
+        let newPlans = pendingImport.plans || [];
+        newPlans = newPlans.filter(p => {
+            const key = `${p.name}__${p.module}__${p.type}__${p.startDate}__${p.endDate}`;
+            return !existingPlanKeys.has(key);
+        });
 
         if (newRecords.length > 0) {
             setRecords(prev => [...newRecords, ...prev]);
@@ -524,19 +549,19 @@ export function MainApp() {
         if (newKnowledge.length > 0) {
             setKnowledge(prev => [...newKnowledge, ...prev]);
         }
-        if (newPlans && newPlans.length > 0) {
+        if (newPlans.length > 0) {
             setPlans(prev => [...newPlans, ...prev]);
         }
 
-        setImportDialogOpen(false);
-        setPendingImport(undefined);
-
         notify({
             message: "导入成功",
-            description: `已导入 ${newRecords.length} 条记录、${newKnowledge.length} 条知识点${newPlans ? `、${newPlans.length} 个计划` : ''}`,
+            description: `已导入 ${newRecords.length} 条记录、${newKnowledge.length} 条知识点${newPlans.length > 0 ? `、${newPlans.length} 个计划` : ''}，跳过 ${(pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length) + ((pendingImport.plans?.length || 0) - newPlans.length)} 项重复数据`,
             type: "success"
         });
-    }, [pendingImport, setRecords, setKnowledge, setPlans, setImportDialogOpen, setPendingImport, notify]);
+
+        setImportDialogOpen(false);
+        setPendingImport(undefined);
+    }, [pendingImport, records, knowledge, plans, setRecords, setKnowledge, setPlans, setImportDialogOpen, setPendingImport, notify]);
 
     if (!isClient) {
         return null;
@@ -607,6 +632,7 @@ export function MainApp() {
                                             }>
                                                 <ExerciseRecordView
                                                     records={records.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                                    allRecords={records}
                                                     selectedRecordIds={selectedRecordIds}
                                                     onSelectIds={setSelectedRecordIds}
                                                     onBatchDelete={handleBatchDelete}
@@ -816,7 +842,7 @@ export function MainApp() {
                                                 {pendingImport.plans && <li><MixedText text={`学习计划：${pendingImport.plans.length} 个`} /></li>}
                                             </ul>
                                             <p className="text-sm text-gray-600 mt-2">
-                                                注意：导入的数据将与现有数据合并，重复的记录可能会被保留。
+                                                注意：导入的数据将与现有数据合并，重复的数据将被自动跳过。
                                             </p>
                                         </div>
                                     )}

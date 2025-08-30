@@ -191,9 +191,9 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                 <AlertDialogTrigger asChild>
                                                     <Button
                                                         disabled={clearing}
-                                                        variant="ghost"
-                                                        size="sm"
-                                                        className="h-8 w-8 sm:h-9 sm:w-9 p-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                        variant="destructive"
+                                                        size="icon"
+                                                        className="h-8 w-8 sm:h-9 sm:w-9"
                                                     >
                                                         <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                                     </Button>
@@ -244,8 +244,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                                 <AlertDialogCancel className="h-8 sm:h-9 text-xs sm:text-sm"><MixedText text="取消" /></AlertDialogCancel>
                                                                 <AlertDialogAction
                                                                     onClick={handleClearCloudData}
-                                                                    style={{ background: '#dc2626' }}
-                                                                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                                                                    className="h-8 sm:h-9 text-xs sm:text-sm bg-destructive text-white hover:bg-destructive/90"
                                                                 >
                                                                     确认清空
                                                                 </AlertDialogAction>

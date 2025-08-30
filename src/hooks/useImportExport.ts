@@ -248,9 +248,17 @@ export function useImportExport(
                 return !existingRecordKeys.has(key);
             });
 
-            // 导入知识点（去重）
-            const existingKnowledgeIds = new Set(knowledge.map(k => k.id));
-            const newKnowledge = pendingImport.knowledge.filter(k => !existingKnowledgeIds.has(k.id));
+            // 导入知识点（去重）- 改进的去重逻辑
+            // 创建现有知识点的内容键集合
+            const existingKnowledgeContentKeys = new Set(knowledge.map(k => 
+                `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
+            ));
+            
+            const newKnowledge = pendingImport.knowledge.filter(k => {
+                // 为导入的知识点创建内容键
+                const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;
+                return !existingKnowledgeContentKeys.has(contentKey);
+            });
 
             // 更新状态
             setRecords([...newRecords, ...records]);

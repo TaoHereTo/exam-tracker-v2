@@ -65,21 +65,18 @@ export class CloudSyncService {
     // 检查知识点是否重复 - 全面比较所有字段
     private static isKnowledgeDuplicate(localKnowledge: KnowledgeItem, cloudKnowledge: KnowledgeItem): boolean {
         // 基础字段比较
-        const localRecord = localKnowledge as Record<string, unknown>;
-        const cloudRecord = cloudKnowledge as Record<string, unknown>;
-
         if (localKnowledge.module !== cloudKnowledge.module) {
             // 知识点模块不匹配
             return false;
         }
 
         // 全面比较所有字段
-        const isDuplicate = localRecord.type === cloudRecord.type &&
-            localRecord.note === cloudRecord.note &&
-            localRecord.subCategory === cloudRecord.subCategory &&
-            localRecord.date === cloudRecord.date &&
-            localRecord.source === cloudRecord.source &&
-            localRecord.imagePath === cloudRecord.imagePath;
+        const isDuplicate = localKnowledge.type === cloudKnowledge.type &&
+            localKnowledge.note === cloudKnowledge.note &&
+            localKnowledge.subCategory === cloudKnowledge.subCategory &&
+            localKnowledge.date === cloudKnowledge.date &&
+            localKnowledge.source === cloudKnowledge.source &&
+            localKnowledge.imagePath === cloudKnowledge.imagePath;
 
         return isDuplicate;
     }

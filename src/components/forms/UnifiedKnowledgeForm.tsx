@@ -111,11 +111,12 @@ function DateField() {
   const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
   const [dateOpen, setDateOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
+  const dateTimestamp = date?.getTime();
 
   // 当外部表单值或已选日期变化时，同步月份到已选日期
   useEffect(() => {
     if (date) setCurrentMonth(date);
-  }, [date?.getTime()]);
+  }, [date, dateTimestamp]);
 
   const handleOpenChange = (open: boolean) => {
     if (open) {

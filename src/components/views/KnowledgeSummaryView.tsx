@@ -14,10 +14,14 @@ import { lazy, Suspense } from 'react';
 const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
 import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
-import { Edit, Trash2, X } from 'lucide-react';
+import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
-
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -315,6 +319,17 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         return col;
     }), [selectedModule]);
 
+    // Calculate module counts for hover card
+    const moduleCounts = useMemo(() => {
+        const counts: Record<string, number> = {};
+        MODULES.forEach(module => {
+            counts[module.label] = knowledge.filter(item => 
+                normalizeModuleName(item.module) === module.label
+            ).length;
+        });
+        return counts;
+    }, [knowledge]);
+
     // 使用useMemo优化过滤和分页计算
     const { filtered, totalPages, paged } = useMemo(() => {
         // 先按模块过滤
@@ -523,6 +538,8 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     onPageChange: setPage,
                     totalItems: knowledge.length
                 }}
+                knowledge={knowledge}
+                showModuleStats={true}
                 showExport={true}
                 onExport={handleExportExcel}
                 showNew={false}
@@ -535,6 +552,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 deleteConfirmText="此操作将删除所选的知识点，删除后无法恢复。是否确认？"
                 className="w-full"
             />
+            {/* 移除原来的模块统计信息悬浮卡片，因为现在已经在分页信息中显示了 */}
             {/* 编辑弹窗 */}
             <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <SimpleDialogContent>
@@ -560,8 +578,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     ) : null}
                 </SimpleDialogContent>
             </SimpleDialog>
-
-
         </div>
     );
 };

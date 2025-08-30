@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MixedText } from "@/components/ui/MixedText";
 import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
+import type { RecordItem, KnowledgeItem } from "@/types/record";
 
 // 数据表格列定义
 export interface DataTableColumn<T> {
@@ -80,6 +81,11 @@ export interface UnifiedTableProps<T, K extends string | number = string | numbe
         onPageChange: (page: number) => void;
         totalItems?: number;
     };
+    
+    // 模块统计相关
+    records?: RecordItem[];
+    knowledge?: KnowledgeItem[];
+    showModuleStats?: boolean;
 
     // 预设操作
     showExport?: boolean;
@@ -121,6 +127,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
     // 分页相关
     pagination,
+    
+    // 模块统计相关
+    records = [],
+    knowledge = [],
+    showModuleStats = false,
 
     // 预设操作
     showExport = false,
@@ -237,7 +248,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <ContextMenuContent>
                                             {contextMenuItems.map((item, index) => (
                                                 <ContextMenuItem
-                                                    key={index}
+                                                    key={`context-menu-${index}`}
                                                     onClick={() => item.onClick(row)}
                                                     disabled={item.disabled}
                                                     className={item.variant === 'destructive' ? 'text-red-600 focus:text-red-700' : ''}
@@ -299,7 +310,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         <div className="flex flex-row mr-4">
                             {filters.map((filter, index) => (
                                 <div
-                                    key={index}
+                                    key={`filter-${index}`}
                                     className={filter.className}
                                     style={{
                                         marginRight: index < filters.length - 1 ? '12px' : '0',
@@ -340,7 +351,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             {/* 自定义操作按钮 */}
                             {actions.map((action, index) => (
                                 <Button
-                                    key={index}
+                                    key={`action-${index}`}
                                     onClick={action.onClick}
                                     disabled={action.disabled}
                                     variant={action.variant || "default"}
@@ -459,6 +470,10 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 totalPages={pagination.totalPages}
                                 onPageChange={pagination.onPageChange}
                                 totalItems={pagination.totalItems}
+                                showPageInfo={true}
+                                records={records}
+                                knowledge={knowledge}
+                                showModuleStats={showModuleStats}
                             />
                         </div>
                     )}

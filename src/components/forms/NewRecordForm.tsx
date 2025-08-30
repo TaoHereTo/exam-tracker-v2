@@ -50,11 +50,12 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
         const [dateOpen, setDateOpen] = useState(false);
         const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
+        const dateTimestamp = date?.getTime();
 
         // 当外部表单值或已选日期变化时，同步月份到已选日期
         useEffect(() => {
             if (date) setCurrentMonth(date);
-        }, [date?.getTime()]);
+        }, [date, dateTimestamp]);
 
         const handleOpenChange = (open: boolean) => {
             if (open) {

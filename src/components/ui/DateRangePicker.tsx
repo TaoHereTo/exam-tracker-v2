@@ -38,11 +38,14 @@ export function DateRangePicker({
         dateRange?.to ?? dateRange?.from
     )
 
+    const fromTimestamp = dateRange?.from?.getTime();
+    const toTimestamp = dateRange?.to?.getTime();
+
     React.useEffect(() => {
         // 当外部传入的日期变化时，保持月份定位到已选择的末端（有 to 用 to，否则用 from）
         if (dateRange?.to) setCurrentMonth(dateRange.to)
         else if (dateRange?.from) setCurrentMonth(dateRange.from)
-    }, [dateRange?.from?.getTime(), dateRange?.to?.getTime()])
+    }, [dateRange?.from, dateRange?.to, fromTimestamp, toTimestamp])
 
     const handleSelect = React.useCallback(
         (range: DateRange | undefined) => {

@@ -9,6 +9,13 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { MODULES, normalizeModuleName } from "@/config/exam"
+import type { RecordItem, KnowledgeItem } from "@/types/record"
 
 interface BeautifulPaginationProps {
     currentPage: number
@@ -17,6 +24,9 @@ interface BeautifulPaginationProps {
     className?: string
     showPageInfo?: boolean
     totalItems?: number
+    records?: RecordItem[]
+    knowledge?: KnowledgeItem[]
+    showModuleStats?: boolean
 }
 
 export function BeautifulPagination({
@@ -24,11 +34,38 @@ export function BeautifulPagination({
     totalPages,
     onPageChange,
     className,
-    showPageInfo = false,
+    showPageInfo = true,
     totalItems,
+    records = [],
+    knowledge = [],
+    showModuleStats = false,
 }: BeautifulPaginationProps) {
     const canGoPrevious = currentPage > 1
     const canGoNext = currentPage < totalPages
+
+    // Calculate module counts for records
+    const recordModuleCounts = React.useMemo(() => {
+        if (!showModuleStats || !records.length) return {}
+        
+        const counts: Record<string, number> = {}
+        records.forEach(record => {
+            const normalizedModule = normalizeModuleName(record.module)
+            counts[normalizedModule] = (counts[normalizedModule] || 0) + 1
+        })
+        return counts
+    }, [records, showModuleStats])
+
+    // Calculate module counts for knowledge
+    const knowledgeModuleCounts = React.useMemo(() => {
+        if (!showModuleStats || !knowledge.length) return {}
+        
+        const counts: Record<string, number> = {}
+        knowledge.forEach(item => {
+            const normalizedModule = normalizeModuleName(item.module)
+            counts[normalizedModule] = (counts[normalizedModule] || 0) + 1
+        })
+        return counts
+    }, [knowledge, showModuleStats])
 
     const handlePrevious = () => {
         if (canGoPrevious) {
@@ -50,18 +87,56 @@ export function BeautifulPagination({
         onPageChange(totalPages)
     }
 
+    // Render pagination info with optional hover card
+    const renderPaginationInfo = () => {
+        const pageInfoText = totalItems !== undefined ? (
+            <>第 {currentPage} 页，共 {totalPages} 页，总计 {totalItems} 条记录</>
+        ) : (
+            <>第 {currentPage} 页，共 {totalPages} 页</>
+        )
+
+        if (!showModuleStats) {
+            return (
+                <div className="text-sm font-semibold text-muted-foreground hover:underline">
+                    {pageInfoText}
+                </div>
+            )
+        }
+
+        return (
+            <HoverCard>
+                <HoverCardTrigger asChild>
+                    <div className="text-sm font-semibold text-muted-foreground cursor-pointer hover:underline">
+                        {pageInfoText}
+                    </div>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                        <h4 className="text-sm font-semibold">
+                            {knowledge.length > 0 ? "各模块知识点统计" : "各模块刷题记录统计"}
+                        </h4>
+                        <div className="grid grid-cols-2 gap-2">
+                            {MODULES.map(module => (
+                                <div key={module.value} className="flex justify-between text-sm">
+                                    <span>{module.label}:</span>
+                                    <span className="font-medium">
+                                        {knowledge.length > 0 
+                                            ? (knowledgeModuleCounts[module.label] || 0) 
+                                            : (recordModuleCounts[module.label] || 0)} 条
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </HoverCardContent>
+            </HoverCard>
+        )
+    }
+
     return (
         <div className={cn("flex items-center justify-end gap-4 w-full", className)}>
             {/* 页码信息 */}
-            {showPageInfo && (
-                <div className="text-sm font-semibold text-muted-foreground">
-                    {totalItems !== undefined ? (
-                        <>第 {currentPage} 页，共 {totalPages} 页，总计 {totalItems} 条记录</>
-                    ) : (
-                        <>第 {currentPage} 页，共 {totalPages} 页</>
-                    )}
-                </div>
-            )}
+            {showPageInfo && renderPaginationInfo()}
 
             {/* 分页按钮组 */}
             <TooltipProvider>
@@ -146,4 +221,3 @@ export function BeautifulPagination({
         </div>
     )
 }
-
