@@ -5,7 +5,8 @@ import {
     splitMixedText,
     generateMixedTextStyle,
     getTextType,
-    defaultFontConfig
+    defaultFontConfig,
+    renderFormattedText
 } from '@/lib/fontUtils';
 import { useFont } from '@/contexts/FontContext';
 
@@ -35,6 +36,35 @@ export const MixedText = memo(function MixedText({
 
     const content = text || (typeof children === 'string' ? children : '');
     if (!content) return <Component className={className} style={style} onClick={onClick}>{children}</Component>;
+
+    // More accurate check for formatting markers
+    const hasBoldFormatting = /\*\*[^*]+\*\*/.test(content);
+    const hasItalicFormatting = /(?<!\*)\*[^*]+\*(?!\*)/.test(content);
+    const hasRedFormatting = /\{red\}[^}]+\{\/red\}/.test(content);
+    const hasFormatting = hasBoldFormatting || hasItalicFormatting || hasRedFormatting;
+    
+    // Debug logging for formatting detection
+    if (process.env.NODE_ENV === 'development' && hasFormatting) {
+        console.log('MixedText formatting detected:', {
+            content,
+            hasBoldFormatting,
+            hasItalicFormatting,
+            hasRedFormatting
+        });
+    }
+
+    if (hasFormatting) {
+        // Render formatted text
+        return (
+            <Component
+                className={cn("mixed-text", className)}
+                style={{ ...style, fontFamily: 'inherit' }}
+                onClick={onClick}
+            >
+                {renderFormattedText(content)}
+            </Component>
+        );
+    }
 
     const textType = getTextType(content);
 
@@ -159,4 +189,4 @@ export const MixedLabel = memo(function MixedLabel({
             <MixedText text={text} />
         </label>
     );
-}); 
+});

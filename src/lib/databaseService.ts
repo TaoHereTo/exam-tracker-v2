@@ -505,8 +505,9 @@ export const knowledgeService = {
         // 数据清理函数
         const cleanValue = (value: unknown): unknown => {
             if (typeof value === 'string') {
-                // 移除 null 字符和其他控制字符
-                return value.replace(/[\u0000-\u001F\u007F-\u009F]/g, '').trim();
+                // 移除 null 字符和其他控制字符，但保留文本格式化标记
+                // 保留 * (U+002A), { (U+007B), } (U+007D) 用于文本格式化
+                return value.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F]/g, '').trim();
             }
             return value;
         };

@@ -1,3 +1,5 @@
+import React from 'react';
+
 // 字体管理工具
 export interface FontConfig {
     chineseFont: string;
@@ -128,4 +130,151 @@ export function generateMixedTextStyle(part: { text: string; type: 'chinese' | '
                 fontWeight: 400
             };
     }
-} 
+}
+
+// Function to parse and render formatted text
+export const renderFormattedText = (text: string) => {
+    if (!text || typeof text !== 'string') {
+        return text;
+    }
+
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+        console.log('renderFormattedText input:', text);
+    }
+
+    // Use simpler regex patterns that are more compatible
+    const boldRegex = /\*\*([^*]+)\*\*/g;
+    const italicRegex = /\*([^*]+)\*/g;
+    const redRegex = /\{red\}([^{}]+)\{\/red\}/g;
+
+    // Split text by all patterns
+    const parts: { text: string; type: 'normal' | 'bold' | 'italic' | 'red' }[] = [];
+    let lastIndex = 0;
+
+    // Find all matches using a simpler approach
+    const allMatches: { index: number; match: string; type: 'bold' | 'italic' | 'red'; content: string }[] = [];
+
+    // Find bold matches
+    let match;
+    while ((match = boldRegex.exec(text)) !== null) {
+        allMatches.push({
+            index: match.index,
+            match: match[0],
+            type: 'bold',
+            content: match[1]
+        });
+    }
+
+    // Reset and find italic matches (but exclude those already matched by bold)
+    italicRegex.lastIndex = 0;
+    while ((match = italicRegex.exec(text)) !== null) {
+        // Skip if this is part of a bold pattern
+        const isBoldPattern = text.substring(match.index - 1, match.index + match[0].length + 1).includes('**');
+        if (!isBoldPattern) {
+            allMatches.push({
+                index: match.index,
+                match: match[0],
+                type: 'italic',
+                content: match[1]
+            });
+        }
+    }
+
+    // Reset and find red matches
+    redRegex.lastIndex = 0;
+    while ((match = redRegex.exec(text)) !== null) {
+        allMatches.push({
+            index: match.index,
+            match: match[0],
+            type: 'red',
+            content: match[1]
+        });
+    }
+
+    // Sort matches by index
+    allMatches.sort((a, b) => a.index - b.index);
+
+    // Remove overlapping matches
+    const nonOverlappingMatches = allMatches.filter((current, index) => {
+        if (index === 0) return true;
+        const previous = allMatches[index - 1];
+        return current.index >= previous.index + previous.match.length;
+    });
+
+    // Debug logging
+    if (process.env.NODE_ENV === 'development' && nonOverlappingMatches.length > 0) {
+        console.log('renderFormattedText matches:', nonOverlappingMatches);
+    }
+
+    // Process matches
+    for (const { index, match, type, content } of nonOverlappingMatches) {
+        // Add text before match
+        if (index > lastIndex) {
+            parts.push({
+                text: text.substring(lastIndex, index),
+                type: 'normal'
+            });
+        }
+
+        // Add formatted text
+        parts.push({
+            text: content,
+            type
+        });
+
+        lastIndex = index + match.length;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+        parts.push({
+            text: text.substring(lastIndex),
+            type: 'normal'
+        });
+    }
+
+    // If no formatting found, return original text
+    if (parts.length === 0) {
+        return text;
+    }
+
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+        console.log('renderFormattedText parts:', parts);
+    }
+
+    return parts.map((part, index) => {
+        switch (part.type) {
+            case 'bold':
+                return React.createElement('strong', {
+                    key: index,
+                    className: 'font-bold',
+                    style: {
+                        fontWeight: 'bold',
+                        fontFamily: 'inherit'
+                    }
+                }, part.text);
+            case 'italic':
+                return React.createElement('em', {
+                    key: index,
+                    className: 'italic',
+                    style: {
+                        fontStyle: 'italic',
+                        fontFamily: 'inherit'
+                    }
+                }, part.text);
+            case 'red':
+                return React.createElement('span', {
+                    key: index,
+                    className: 'text-red-500',
+                    style: {
+                        color: '#ef4444',
+                        fontFamily: 'inherit'
+                    }
+                }, part.text);
+            default:
+                return React.createElement(React.Fragment, { key: index }, part.text);
+        }
+    });
+};

@@ -21,11 +21,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Calendar as CalendarIcon } from "lucide-react";
+import { HelpCircle, Calendar as CalendarIcon, Bold, Italic, Underline, Palette } from "lucide-react";
 import { BaseForm, FormField, FormInput, FormSelect, FormTextarea, useFormContext } from "@/components/forms/BaseForm";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { FormattingToolbar } from "./FormattingToolbar";
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -157,6 +159,8 @@ function DateField() {
   );
 }
 
+
+
 export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   module,
   onAddKnowledge,
@@ -227,6 +231,16 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
   // 处理表单提交
   const handleSubmit = (data: Record<string, unknown>) => {
+    // 调试：显示提交的数据
+    console.log('🔍 知识点提交数据:', {
+      firstField: data.firstField,
+      secondField: data.secondField,
+      firstFieldType: typeof data.firstField,
+      secondFieldType: typeof data.secondField,
+      firstFieldLength: String(data.firstField || '').length,
+      secondFieldLength: String(data.secondField || '').length
+    });
+
     // 根据模块构建不同的数据格式
     let knowledgeData: Partial<KnowledgeItem> | Record<string, unknown> = {
       imagePath: data.imagePath
@@ -388,15 +402,24 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
               {/* 第二个字段 */}
               <FormField name="secondField" className="form-field">
-                <Label htmlFor="secondField">
-                  <MixedText text={fieldConfig.secondLabel} />
-                </Label>
+                <div className="flex items-center justify-between mb-1">
+
+                  <Label htmlFor="secondField">
+
+                    <MixedText text={fieldConfig.secondLabel} />
+
+                  </Label>
+
+                  <FormattingToolbar fieldName="secondField" />
+
+                </div>
+
                 <FormTextarea
-                  name="secondField"
-                  placeholder={fieldConfig.secondPlaceholder}
-                  className="min-h-[100px]"
-                  rows={4}
-                />
+                    name="secondField"
+                    placeholder={fieldConfig.secondPlaceholder}
+                    className="min-h-[100px]"
+                    rows={4}
+                  />
               </FormField>
 
               {/* 图片上传组件 */}
@@ -418,7 +441,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               <CardTitle className="text-2xl">
                 <MixedText text={config.title} />
               </CardTitle>
-          </CardHeader>
+            </CardHeader>
           )}
           <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
             <BaseForm
@@ -469,15 +492,24 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
               {/* 第二个字段 */}
               <FormField name="secondField" className="form-field">
-                <Label htmlFor="secondField">
-                  <MixedText text={fieldConfig.secondLabel} />
-                </Label>
+                <div className="flex items-center justify-between mb-1">
+
+                  <Label htmlFor="secondField">
+
+                    <MixedText text={fieldConfig.secondLabel} />
+
+                  </Label>
+
+                  <FormattingToolbar fieldName="secondField" />
+
+                </div>
+
                 <FormTextarea
-                  name="secondField"
-                  placeholder={fieldConfig.secondPlaceholder}
-                  className="min-h-[100px]"
-                  rows={4}
-                />
+                    name="secondField"
+                    placeholder={fieldConfig.secondPlaceholder}
+                    className="min-h-[100px]"
+                    rows={4}
+                  />
               </FormField>
 
               {/* 图片上传组件 */}

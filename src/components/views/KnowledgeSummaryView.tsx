@@ -13,15 +13,92 @@ import { lazy, Suspense } from 'react';
 // 动态导入统一表单组件
 const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
-import { AlertDialog as SimpleDialog, AlertDialogContent as SimpleDialogContent, AlertDialogHeader as SimpleDialogHeader, AlertDialogTitle as SimpleDialogTitle, AlertDialogDescription as SimpleDialogDescription, AlertDialogFooter as SimpleDialogFooter, AlertDialogCancel as SimpleDialogCancel } from "@/components/ui/alert-dialog";
 import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+
+// 通用的格式化渲染函数
+const renderFormattedText = (text: string): React.ReactNode => {
+    if (!text) return '';
+
+
+
+    const parts: React.ReactNode[] = [];
+    let remaining = text;
+    let key = 0;
+
+    while (remaining.length > 0) {
+        // 找到所有可能的匹配及其位置
+        const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
+        const colorMatch = remaining.match(/\{(red|green|blue|yellow|purple|orange)\}([^{}]+)\{\/\1\}/);
+        const italicMatch = remaining.match(/\*([^*]+)\*/);
+
+        // 收集所有有效匹配
+        const matches = [];
+
+        if (boldMatch && boldMatch.index !== undefined) {
+            matches.push({ type: 'bold', match: boldMatch, index: boldMatch.index });
+        }
+
+        if (colorMatch && colorMatch.index !== undefined) {
+            matches.push({ type: 'color', match: colorMatch, index: colorMatch.index, color: colorMatch[1] });
+        }
+
+        if (italicMatch && italicMatch.index !== undefined) {
+            // 检查斜体是否与加粗冲突
+            const beforeChar = italicMatch.index > 0 ? remaining[italicMatch.index - 1] : '';
+            const afterIndex = italicMatch.index + italicMatch[0].length;
+            const afterChar = afterIndex < remaining.length ? remaining[afterIndex] : '';
+
+            if (beforeChar !== '*' && afterChar !== '*') {
+                matches.push({ type: 'italic', match: italicMatch, index: italicMatch.index });
+            }
+        }
+
+        if (matches.length === 0) {
+            parts.push(remaining);
+            break;
+        }
+
+        // 按位置排序，处理最早出现的匹配
+        matches.sort((a, b) => a.index - b.index);
+        const firstMatch = matches[0];
+
+        // 添加匹配前的文本
+        if (firstMatch.index > 0) {
+            parts.push(remaining.substring(0, firstMatch.index));
+        }
+
+        // 处理匹配
+        switch (firstMatch.type) {
+            case 'bold':
+                parts.push(<strong key={key++} className="font-bold" style={{ fontWeight: 'bold', fontFamily: 'inherit' }}>{firstMatch.match[1]}</strong>);
+                break;
+            case 'color':
+                const colorMap: Record<string, string> = {
+                    red: '#ef4444',
+                    green: '#22c55e',
+                    blue: '#3b82f6',
+                    yellow: '#eab308',
+                    purple: '#a855f7',
+                    orange: '#f97316'
+                };
+                const color = (firstMatch.color && colorMap[firstMatch.color]) ? colorMap[firstMatch.color] : '#ef4444';
+                parts.push(<span key={key++} style={{ color: color + ' !important', fontWeight: 'bold', fontFamily: 'inherit' }}>{firstMatch.match[2]}</span>);
+                break;
+            case 'italic':
+                parts.push(<em key={key++} className="italic" style={{ fontStyle: 'italic', fontFamily: 'inherit' }}>{firstMatch.match[1]}</em>);
+                break;
+        }
+
+        // 更新剩余文本
+        remaining = remaining.substring(firstMatch.index + firstMatch.match[0].length);
+    }
+
+
+
+    return parts.length > 0 ? parts : text;
+};
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -91,9 +168,10 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         className: 'w-48',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
+
                             return (
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    <MixedText text={note || ''} />
+                                    {renderFormattedText(note || '')}
                                 </div>
                             );
                         }
@@ -143,7 +221,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    <MixedText text={note || ''} />
+                                    {renderFormattedText(note || '')}
                                 </div>
                             );
                         }
@@ -193,7 +271,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    <MixedText text={note || ''} />
+                                    {renderFormattedText(note || '')}
                                 </div>
                             );
                         }
@@ -231,7 +309,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    <MixedText text={note || ''} />
+                                    {renderFormattedText(note || '')}
                                 </div>
                             );
                         }
@@ -269,7 +347,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    <MixedText text={note || ''} />
+                                    {renderFormattedText(note || '')}
                                 </div>
                             );
                         }
@@ -323,7 +401,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const moduleCounts = useMemo(() => {
         const counts: Record<string, number> = {};
         MODULES.forEach(module => {
-            counts[module.label] = knowledge.filter(item => 
+            counts[module.label] = knowledge.filter(item =>
                 normalizeModuleName(item.module) === module.label
             ).length;
         });
@@ -458,23 +536,23 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     '相关重点': k.note ?? '',
                 };
             } else if (selectedModule === 'verbal') {
-                const k = item as { type?: string; note?: string; sub_category?: string };
+                const k = item as { type?: string; note?: string; subCategory?: string };
                 return {
-                    '言语类型': k.sub_category ?? '',
+                    '言语类型': k.subCategory ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
             } else if (selectedModule === 'logic') {
-                const k = item as { type?: string; note?: string; sub_category?: string };
+                const k = item as { type?: string; note?: string; subCategory?: string };
                 return {
-                    '推理类型': k.sub_category ?? '',
+                    '推理类型': k.subCategory ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
             } else if (selectedModule === 'common') {
-                const k = item as { type?: string; note?: string; sub_category?: string };
+                const k = item as { type?: string; note?: string; subCategory?: string };
                 return {
-                    '常识类型': k.sub_category ?? '',
+                    '常识类型': k.subCategory ?? '',
                     '类型': k.type ?? '',
                     '技巧记录': k.note ?? '',
                 };
@@ -522,8 +600,29 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         }
     ];
 
+    // 调试：显示前几条数据的格式化信息
+    const debugData = useMemo(() => {
+        const moduleKnowledge = knowledge.filter(item => normalizeModuleName(item.module) === normalizeModuleName(selectedModule));
+        return moduleKnowledge.slice(0, 3).map(item => {
+            const note = (item as Record<string, unknown>).note as string || '';
+            const type = (item as Record<string, unknown>).type as string || '';
+            return {
+                id: item.id,
+                note,
+                type,
+                hasBoldInNote: /\*\*[^*]+\*\*/.test(note),
+                hasItalicInNote: /\*[^*]+\*/.test(note),
+                hasRedInNote: /\{red\}[^{}]+\{\/red\}/.test(note),
+                hasBoldInType: /\*\*[^*]+\*\*/.test(type),
+                hasItalicInType: /\*[^*]+\*/.test(type),
+                hasRedInType: /\{red\}[^{}]+\{\/red\}/.test(type)
+            };
+        });
+    }, [knowledge, selectedModule]);
+
     return (
         <div className="pt-4 px-2 md:px-8">
+
             <UnifiedTable<KnowledgeItem, string>
                 columns={columns}
                 data={paged}
@@ -554,16 +653,16 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
             />
             {/* 移除原来的模块统计信息悬浮卡片，因为现在已经在分页信息中显示了 */}
             {/* 编辑弹窗 */}
-            <SimpleDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
-                <SimpleDialogContent>
+            <AlertDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
+                <AlertDialogContent>
                     <div className="flex justify-between items-center">
-                        <SimpleDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</SimpleDialogTitle>
+                        <AlertDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</AlertDialogTitle>
                         <Button variant="outline" size="icon" onClick={() => setEditDialogOpen(false)} className="h-9 w-9">
                             <X className="w-5 h-5" />
                         </Button>
                     </div>
                     {editError ? (
-                        <SimpleDialogDescription className="text-red-500"><MixedText text={editError} /></SimpleDialogDescription>
+                        <AlertDialogDescription className="text-red-500"><MixedText text={editError} /></AlertDialogDescription>
                     ) : editItem ? (
                         <div className="py-2">
                             <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
@@ -576,8 +675,8 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                             </Suspense>
                         </div>
                     ) : null}
-                </SimpleDialogContent>
-            </SimpleDialog>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 };
