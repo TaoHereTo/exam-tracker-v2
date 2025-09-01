@@ -310,7 +310,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0 button-hover-danger"
                                                                 onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
                                                             >
                                                                 <Trash2 className="h-3 w-3" />

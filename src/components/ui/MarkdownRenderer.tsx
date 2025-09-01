@@ -14,59 +14,74 @@ function parseMarkdown(content: string): React.ReactNode[] {
 
     const lines = content.split('\n');
     const elements: React.ReactNode[] = [];
-    let currentList: string[] = [];
-    let isInList = false;
+    let currentUnorderedList: string[] = [];
+    let currentOrderedList: string[] = [];
+    let isInUnorderedList = false;
+    let isInOrderedList = false;
+
+    const finishCurrentList = (index: number) => {
+        if (isInUnorderedList && currentUnorderedList.length > 0) {
+            elements.push(
+                <ul key={`ul-${index}`} className="list-disc mb-3 pl-5 space-y-2">
+                    {currentUnorderedList.map((item, i) => (
+                        <li key={i} className="leading-tight pl-1">{item}</li>
+                    ))}
+                </ul>
+            );
+            currentUnorderedList = [];
+            isInUnorderedList = false;
+        }
+        if (isInOrderedList && currentOrderedList.length > 0) {
+            elements.push(
+                <ol key={`ol-${index}`} className="list-decimal mb-3 pl-5 space-y-2">
+                    {currentOrderedList.map((item, i) => (
+                        <li key={i} className="leading-tight pl-1">{item}</li>
+                    ))}
+                </ol>
+            );
+            currentOrderedList = [];
+            isInOrderedList = false;
+        }
+    };
 
     lines.forEach((line, index) => {
         const trimmedLine = line.trim();
 
         if (!trimmedLine) {
             // 空行，结束当前列表
-            if (isInList && currentList.length > 0) {
-                elements.push(
-                    <ul key={`list-${index}`} className="list-disc list-inside mb-3 space-y-1">
-                        {currentList.map((item, i) => (
-                            <li key={i} className="ml-2">{item}</li>
-                        ))}
-                    </ul>
-                );
-                currentList = [];
-                isInList = false;
-            }
+            finishCurrentList(index);
             return;
         }
 
-        // 检查是否是列表项
+        // 检查是否是无序列表项
         if (trimmedLine.startsWith('- ')) {
-            if (!isInList) {
-                isInList = true;
+            // 如果之前是有序列表，先结束它
+            if (isInOrderedList) {
+                finishCurrentList(index);
             }
-            currentList.push(trimmedLine.substring(2));
+            if (!isInUnorderedList) {
+                isInUnorderedList = true;
+            }
+            currentUnorderedList.push(trimmedLine.substring(2));
             return;
         }
 
         // 检查是否是有序列表
         const orderedListMatch = trimmedLine.match(/^(\d+)\.\s(.+)$/);
         if (orderedListMatch) {
-            if (!isInList) {
-                isInList = true;
+            // 如果之前是无序列表，先结束它
+            if (isInUnorderedList) {
+                finishCurrentList(index);
             }
-            currentList.push(orderedListMatch[2]);
+            if (!isInOrderedList) {
+                isInOrderedList = true;
+            }
+            currentOrderedList.push(orderedListMatch[2]);
             return;
         }
 
         // 结束当前列表
-        if (isInList && currentList.length > 0) {
-            elements.push(
-                <ul key={`list-${index}`} className="list-disc list-inside mb-3 space-y-1">
-                    {currentList.map((item, i) => (
-                        <li key={i} className="ml-2">{item}</li>
-                    ))}
-                </ul>
-            );
-            currentList = [];
-            isInList = false;
-        }
+        finishCurrentList(index);
 
         // 检查分割线
         if (trimmedLine === '---') {
@@ -110,21 +125,13 @@ function parseMarkdown(content: string): React.ReactNode[] {
 
         // 创建段落元素
         elements.push(
-            <p key={`p-${index}`} className="mb-3 leading-relaxed"
+            <p key={`p-${index}`} className="mb-3 leading-normal"
                 dangerouslySetInnerHTML={{ __html: processedText }} />
         );
     });
 
     // 处理最后的列表
-    if (isInList && currentList.length > 0) {
-        elements.push(
-            <ul key="list-final" className="list-disc list-inside mb-3 space-y-1">
-                {currentList.map((item, i) => (
-                    <li key={i} className="ml-2">{item}</li>
-                ))}
-            </ul>
-        );
-    }
+    finishCurrentList(lines.length);
 
     return elements;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { Button } from '@/components/ui/button';
 import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X } from 'lucide-react';
@@ -26,6 +26,39 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
+    const [activeFormats, setActiveFormats] = useState<string[]>([]);
+
+    // 检测当前选中文本的格式状态
+    const checkActiveFormats = useCallback(() => {
+        if (!textareaRef.current) return [];
+
+        const textarea = textareaRef.current;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = value.substring(start, end);
+        
+        if (!selectedText) return [];
+
+        const formats = [];
+        
+        // 检查加粗
+        if (selectedText.startsWith('**') && selectedText.endsWith('**') && selectedText.length > 4) {
+            formats.push('bold');
+        }
+        
+        // 检查斜体（确保不是加粗）
+        if (selectedText.startsWith('*') && selectedText.endsWith('*') && 
+            !selectedText.startsWith('**') && selectedText.length > 2) {
+            formats.push('italic');
+        }
+        
+        // 检查删除线
+        if (selectedText.startsWith('~~') && selectedText.endsWith('~~') && selectedText.length > 4) {
+            formats.push('strikethrough');
+        }
+
+        return formats;
+    }, [value]);
 
     // 格式化函数
     const formatText = (prefix: string, suffix?: string) => {
@@ -35,6 +68,11 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const selectedText = value.substring(start, end);
+
+        if (!selectedText) {
+            alert('请先选中要格式化的文字');
+            return;
+        }
 
         let newText: string;
         let newCursorStart: number;
@@ -57,14 +95,41 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         const newValue = value.substring(0, start) + newText + value.substring(end);
         onChange(newValue);
 
-        // 设置光标位置
+        // 设置光标位置并更新格式状态
         setTimeout(() => {
             if (textareaRef.current) {
                 textareaRef.current.setSelectionRange(newCursorStart, newCursorEnd);
                 textareaRef.current.focus();
+                setActiveFormats(checkActiveFormats());
             }
         }, 0);
     };
+
+    // 监听文本选择变化
+    const handleSelectionChange = () => {
+        setActiveFormats(checkActiveFormats());
+    };
+
+    // 添加 useEffect 来监听初始状态
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            // 初始化格式状态
+            setActiveFormats(checkActiveFormats());
+            
+            // 添加事件监听器
+            const handleClick = () => setActiveFormats(checkActiveFormats());
+            const handleKeyUp = () => setActiveFormats(checkActiveFormats());
+            
+            textarea.addEventListener('click', handleClick);
+            textarea.addEventListener('keyup', handleKeyUp);
+            
+            return () => {
+                textarea.removeEventListener('click', handleClick);
+                textarea.removeEventListener('keyup', handleKeyUp);
+            };
+        }
+    }, [value, checkActiveFormats]);
 
     // 插入文本函数
     const insertText = (text: string) => {
@@ -88,16 +153,107 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         }, 0);
     };
 
+    // 智能换行处理
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        // 处理快捷键
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key.toLowerCase()) {
+                case 'b':
+                    e.preventDefault();
+                    formatText('**');
+                    return;
+                case 'i':
+                    e.preventDefault();
+                    formatText('*');
+                    return;
+            }
+        }
+
+        if (e.key === 'Enter' && !e.shiftKey) {
+            const textarea = e.currentTarget;
+            const start = textarea.selectionStart;
+            const lines = value.substring(0, start).split('\n');
+            const currentLine = lines[lines.length - 1];
+
+            // 检查当前行是否是列表项
+            const unorderedListMatch = currentLine.match(/^(\s*)- (.*)$/);
+            const orderedListMatch = currentLine.match(/^(\s*)(\d+)\. (.*)$/);
+
+            if (unorderedListMatch) {
+                e.preventDefault();
+                const [, indent, content] = unorderedListMatch;
+                
+                if (content.trim() === '') {
+                    // 如果列表项为空，则退出列表
+                    const newValue = value.substring(0, start - currentLine.length) + 
+                                   indent + 
+                                   value.substring(start);
+                    onChange(newValue);
+                    setTimeout(() => {
+                        if (textareaRef.current) {
+                            const newPos = start - currentLine.length + indent.length;
+                            textareaRef.current.setSelectionRange(newPos, newPos);
+                        }
+                    }, 0);
+                } else {
+                    // 继续无序列表
+                    const newText = `\n${indent}- `;
+                    const newValue = value.substring(0, start) + newText + value.substring(start);
+                    onChange(newValue);
+                    setTimeout(() => {
+                        if (textareaRef.current) {
+                            const newPos = start + newText.length;
+                            textareaRef.current.setSelectionRange(newPos, newPos);
+                        }
+                    }, 0);
+                }
+                return;
+            }
+
+            if (orderedListMatch) {
+                e.preventDefault();
+                const [, indent, number, content] = orderedListMatch;
+                
+                if (content.trim() === '') {
+                    // 如果列表项为空，则退出列表
+                    const newValue = value.substring(0, start - currentLine.length) + 
+                                   indent + 
+                                   value.substring(start);
+                    onChange(newValue);
+                    setTimeout(() => {
+                        if (textareaRef.current) {
+                            const newPos = start - currentLine.length + indent.length;
+                            textareaRef.current.setSelectionRange(newPos, newPos);
+                        }
+                    }, 0);
+                } else {
+                    // 继续有序列表，递增数字
+                    const nextNumber = parseInt(number) + 1;
+                    const newText = `\n${indent}${nextNumber}. `;
+                    const newValue = value.substring(0, start) + newText + value.substring(start);
+                    onChange(newValue);
+                    setTimeout(() => {
+                        if (textareaRef.current) {
+                            const newPos = start + newText.length;
+                            textareaRef.current.setSelectionRange(newPos, newPos);
+                        }
+                    }, 0);
+                }
+                return;
+            }
+        }
+    };
+
     // 全屏切换
     const toggleFullscreen = () => {
         setIsFullscreen(!isFullscreen);
-        if (isPreview) setIsPreview(false);
+        // 不要在全屏模式下自动关闭预览
     };
 
     // 预览切换
     const togglePreview = () => {
         setIsPreview(!isPreview);
-        if (isFullscreen) setIsFullscreen(false);
+        // 不要在预览模式下自动退出全屏
     };
 
     // 全屏样式
@@ -112,12 +268,15 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         padding: '20px',
     } : {};
 
+    // 动态计算高度
+    const dynamicHeight = isFullscreen ? 'calc(100vh - 120px)' : `${height}px`;
+
     return (
         <TooltipProvider>
             <div className={`w-full ${className}`} style={fullscreenStyle}>
                 <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                     {/* 工具栏 */}
-                    <div className="flex items-center justify-between p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
                         <div className="flex items-center gap-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -129,7 +288,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             formatText('**');
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className={`md-toolbar-button-base toolbar-button-bold ${activeFormats.includes('bold') ? 'active' : ''}`}
                                         type="button"
                                     >
                                         <Bold className="h-4 w-4" />
@@ -150,7 +309,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             formatText('*');
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className={`md-toolbar-button-base toolbar-button-italic ${activeFormats.includes('italic') ? 'active' : ''}`}
                                         type="button"
                                     >
                                         <Italic className="h-4 w-4" />
@@ -171,7 +330,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             formatText('~~');
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className={`md-toolbar-button-base md-toolbar-button-strikethrough ${activeFormats.includes('strikethrough') ? 'active' : ''}`}
                                         type="button"
                                     >
                                         <Strikethrough className="h-4 w-4" />
@@ -182,7 +341,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
 
-                            <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+                            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1" />
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -194,7 +353,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             insertText('\n---\n');
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className="md-toolbar-button-base md-toolbar-button-divider"
                                         type="button"
                                     >
                                         <Minus className="h-4 w-4" />
@@ -245,7 +404,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                                 }
                                             }, 0);
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className="md-toolbar-button-base md-toolbar-button-list"
                                         type="button"
                                     >
                                         <List className="h-4 w-4" />
@@ -296,7 +455,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                                 }
                                             }, 0);
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className="md-toolbar-button-base md-toolbar-button-list"
                                         type="button"
                                     >
                                         <ListOrdered className="h-4 w-4" />
@@ -321,7 +480,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             );
                                             insertText(`[${selectedText || '链接文本'}](URL)`);
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className="md-toolbar-button-base md-toolbar-button-link"
                                         type="button"
                                     >
                                         <Link className="h-4 w-4" />
@@ -344,14 +503,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             togglePreview();
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className={`md-toolbar-button-base md-toolbar-button-preview ${isPreview ? 'active' : ''}`}
                                         type="button"
                                     >
                                         <Eye className="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>预览</p>
+                                    <p>{isPreview ? '关闭预览' : '预览'}</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -365,7 +524,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                             e.stopPropagation();
                                             toggleFullscreen();
                                         }}
-                                        className="h-8 w-8 p-0"
+                                        className={`md-toolbar-button-base md-toolbar-button-fullscreen ${isFullscreen ? 'active' : ''}`}
                                         type="button"
                                     >
                                         {isFullscreen ? <X className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
@@ -380,32 +539,44 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
                     {/* 内容区域 */}
                     {isPreview ? (
-                        <div className="flex" style={{ height: `${height}px` }}>
+                        <div className="flex" style={{ height: dynamicHeight }}>
                             {/* 左侧编辑区域 */}
                             <div className="w-1/2 border-r border-gray-200 dark:border-gray-700">
                                 <textarea
                                     ref={textareaRef}
                                     value={value}
                                     onChange={(e) => onChange(e.target.value)}
+                                    onSelect={handleSelectionChange}
+                                    onMouseUp={handleSelectionChange}
+                                    onKeyUp={handleSelectionChange}
+                                    onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
-                                    style={{ height: `${height}px` }}
-                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+                                    style={{ height: dynamicHeight }}
+                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
                                 />
                             </div>
                             {/* 右侧预览区域 */}
-                            <div className="w-1/2 p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-auto">
-                                <MarkdownRenderer content={value || placeholder} />
+                            <div className="w-1/2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-auto">
+                                <div className="p-3 leading-relaxed" style={{ minHeight: dynamicHeight }}>
+                                    <MarkdownRenderer content={value || placeholder} />
+                                </div>
                             </div>
                         </div>
                     ) : (
-                        <textarea
-                            ref={textareaRef}
-                            value={value}
-                            onChange={(e) => onChange(e.target.value)}
-                            placeholder={placeholder}
-                            style={{ height: `${height}px` }}
-                            className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100"
-                        />
+                        <div style={{ height: dynamicHeight }}>
+                            <textarea
+                                ref={textareaRef}
+                                value={value}
+                                onChange={(e) => onChange(e.target.value)}
+                                onSelect={handleSelectionChange}
+                                onMouseUp={handleSelectionChange}
+                                onKeyUp={handleSelectionChange}
+                                onKeyDown={handleKeyDown}
+                                placeholder={placeholder}
+                                style={{ height: dynamicHeight }}
+                                className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
+                            />
+                        </div>
                     )}
                 </div>
             </div>

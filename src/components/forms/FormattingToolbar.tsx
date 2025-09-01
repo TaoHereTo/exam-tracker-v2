@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Bold, Italic, Palette, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -21,6 +21,7 @@ const colorOptions = [
 export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName }) => {
   const { getValue, setValue } = useFormContext();
   const [selectedColor, setSelectedColor] = useState('red');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // 检查当前选中文本的格式状态
   const getActiveFormats = useCallback(() => {
@@ -37,12 +38,13 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
     const activeFormats = [];
     
     // 检查加粗
-    if (selectedText.startsWith('**') && selectedText.endsWith('**')) {
+    if (selectedText.startsWith('**') && selectedText.endsWith('**') && selectedText.length > 4) {
       activeFormats.push('bold');
     }
     
     // 检查斜体
-    if (selectedText.startsWith('*') && selectedText.endsWith('*') && !selectedText.startsWith('**')) {
+    if (selectedText.startsWith('*') && selectedText.endsWith('*') && 
+        !selectedText.startsWith('**') && selectedText.length > 2) {
       activeFormats.push('italic');
     }
     
@@ -56,6 +58,26 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
   }, [fieldName, getValue]);
 
   const activeFormats = useMemo(() => getActiveFormats(), [getActiveFormats]);
+
+  // 添加事件监听器来监听文本选择变化
+  useEffect(() => {
+    const textarea = document.querySelector(`textarea[name="${fieldName}"]`) as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const handleSelectionChange = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+
+    textarea.addEventListener('mouseup', handleSelectionChange);
+    textarea.addEventListener('keyup', handleSelectionChange);
+    textarea.addEventListener('select', handleSelectionChange);
+
+    return () => {
+      textarea.removeEventListener('mouseup', handleSelectionChange);
+      textarea.removeEventListener('keyup', handleSelectionChange);
+      textarea.removeEventListener('select', handleSelectionChange);
+    };
+  }, [fieldName]);
 
   const handleFormat = (formatType: 'bold' | 'italic' | 'color') => {
     const textarea = document.querySelector(`textarea[name="${fieldName}"]`) as HTMLTextAreaElement;
@@ -117,17 +139,20 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
     }
     
     let newValue: string;
-    let newCursorPos: number;
+    let newCursorStart: number;
+    let newCursorEnd: number;
 
     if (isFormatted) {
       // Remove formatting
       newValue = beforeText + unformattedText + afterText;
-      newCursorPos = start + unformattedText.length;
+      newCursorStart = start;
+      newCursorEnd = start + unformattedText.length;
     } else {
       // Add formatting
       const formattedText = `${prefix}${selectedText}${suffix}`;
       newValue = beforeText + formattedText + afterText;
-      newCursorPos = start + formattedText.length;
+      newCursorStart = start + prefix.length;
+      newCursorEnd = start + prefix.length + selectedText.length;
     }
 
     // 更新React表单状态
@@ -137,7 +162,9 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
     setTimeout(() => {
       textarea.value = newValue;
       textarea.focus();
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.setSelectionRange(newCursorStart, newCursorEnd);
+      // 触发状态更新
+      setRefreshTrigger(prev => prev + 1);
     }, 0);
   };
 
@@ -152,10 +179,8 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
           size="sm"
           aria-label="加粗"
           onClick={() => handleFormat('bold')}
-          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-l-md rounded-r-none border-0 ${
-            activeFormats.includes('bold') 
-              ? 'bg-accent text-accent-foreground' 
-              : 'hover:bg-accent hover:text-accent-foreground'
+          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-l-md rounded-r-none border-0 toolbar-button-base toolbar-button-bold ${
+            activeFormats.includes('bold') ? 'active' : ''
           }`}
         >
           <Bold className="h-3.5 w-3.5" />
@@ -167,10 +192,8 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
           size="sm"
           aria-label="斜体"
           onClick={() => handleFormat('italic')}
-          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-none border-0 border-l border-input-border ${
-            activeFormats.includes('italic') 
-              ? 'bg-accent text-accent-foreground' 
-              : 'hover:bg-accent hover:text-accent-foreground'
+          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-none border-0 border-l border-input-border toolbar-button-base toolbar-button-italic ${
+            activeFormats.includes('italic') ? 'active' : ''
           }`}
         >
           <Italic className="h-3.5 w-3.5" />
@@ -182,10 +205,8 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
           size="sm"
           aria-label={`标记为${selectedColorOption?.label}`}
           onClick={() => handleFormat('color')}
-          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-none border-0 border-l border-input-border ${
-            activeFormats.includes('color') 
-              ? 'bg-accent text-accent-foreground' 
-              : 'hover:bg-accent hover:text-accent-foreground'
+          className={`px-1 py-0.5 h-6 w-6 min-w-0 rounded-none border-0 border-l border-input-border toolbar-button-base toolbar-button-color ${
+            activeFormats.includes('color') ? 'active' : ''
           }`}
         >
           <Palette className="h-3.5 w-3.5" style={{ color: selectedColorOption?.color }} />
@@ -197,7 +218,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ fieldName 
               type="button"
               variant="ghost"
               size="sm"
-              className="px-1 py-0.5 h-6 w-5 min-w-0 rounded-l-none rounded-r-md border-0 border-l border-input-border hover:bg-accent hover:text-accent-foreground"
+              className="px-1 py-0.5 h-6 w-5 min-w-0 rounded-l-none rounded-r-md border-0 border-l border-input-border toolbar-button-base toolbar-button-dropdown"
             >
               <ChevronDown className="h-2.5 w-2.5" />
             </Button>
