@@ -132,13 +132,17 @@ th .mixed-text-part {
   background-color: var(--background) !important;
   border: 1px solid var(--input-border) !important;
   border-radius: 0.375rem !important;
-  padding: 0.25rem 0.5rem !important; /* Increased padding for better appearance */
+  padding: 0.25rem 0.5rem !important;
+  /* Increased padding for better appearance */
   font-weight: 500 !important;
-  min-width: 70px !important; /* Increased width for better balance */
+  min-width: 70px !important;
+  /* Increased width for better balance */
   text-align: center !important;
   font-size: 0.875rem !important;
-  height: 2rem !important; /* Restored to match the cell size for proper alignment */
-  line-height: 1.5rem !important; /* Adjusted line height */
+  height: 2rem !important;
+  /* Restored to match the cell size for proper alignment */
+  line-height: 1.5rem !important;
+  /* Adjusted line height */
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -2201,4 +2205,189 @@ td {
   mix-blend-mode: normal;
 }
 
-/* 精简：移除“侧边栏按钮高度调整”整段，避免与组件行为冲突 */
+/* 精简：移除"侧边栏按钮高度调整"整段，避免与组件行为冲突 */
+
+/* ========== Markdown编辑器样式 ========== */
+/* 确保Markdown编辑器在Next.js中正常工作 */
+[data-color-mode*="light"] {
+  --color-canvas-default: #ffffff;
+  --color-canvas-subtle: #f6f8fa;
+  --color-border-default: #d0d7de;
+  --color-border-muted: #d0d7de;
+  --color-neutral-muted: rgba(175, 184, 193, 0.2);
+  --color-accent-fg: #0969da;
+  --color-accent-emphasis: #0969da;
+  --color-attention-subtle: rgba(187, 128, 9, 0.15);
+  --color-danger-subtle: rgba(248, 81, 73, 0.1);
+}
+
+[data-color-mode*="dark"] {
+  --color-canvas-default: #0d1117;
+  --color-canvas-subtle: #161b22;
+  --color-border-default: #30363d;
+  --color-border-muted: #21262d;
+  --color-neutral-muted: rgba(110, 118, 129, 0.4);
+  --color-accent-fg: #58a6ff;
+  --color-accent-emphasis: #1f6feb;
+  --color-attention-subtle: rgba(187, 128, 9, 0.15);
+  --color-danger-subtle: rgba(248, 81, 73, 0.1);
+}
+
+/* Markdown编辑器容器样式 */
+.w-md-editor {
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border-default);
+  background-color: var(--color-canvas-default);
+}
+
+/* Markdown编辑器工具栏样式 */
+.w-md-editor-toolbar {
+  border-bottom: 1px solid var(--color-border-default);
+  background-color: var(--color-canvas-subtle);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+/* Markdown编辑器内容区域样式 */
+.w-md-editor-content {
+  border-radius: 0 0 0.5rem 0.5rem;
+}
+
+/* Markdown渲染器样式 */
+.markdown-content {
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-content h1 {
+  font-size: 2em;
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: 0.3em;
+}
+
+.markdown-content h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid var(--color-border-default);
+  padding-bottom: 0.3em;
+}
+
+.markdown-content h3 {
+  font-size: 1.25em;
+}
+
+.markdown-content h4 {
+  font-size: 1em;
+}
+
+.markdown-content h5 {
+  font-size: 0.875em;
+}
+
+.markdown-content h6 {
+  font-size: 0.85em;
+  color: var(--color-fg-muted);
+}
+
+.markdown-content p {
+  margin-bottom: 1em;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.markdown-content li {
+  margin-bottom: 0.25em;
+}
+
+.markdown-content blockquote {
+  margin: 1em 0;
+  padding: 0 1em;
+  color: var(--color-fg-muted);
+  border-left: 0.25em solid var(--color-border-default);
+}
+
+.markdown-content code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: var(--color-neutral-muted);
+  border-radius: 6px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.markdown-content pre {
+  padding: 1em;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: var(--color-canvas-subtle);
+  border-radius: 6px;
+  border: 1px solid var(--color-border-default);
+}
+
+.markdown-content pre code {
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.markdown-content table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+}
+
+.markdown-content table th,
+.markdown-content table td {
+  padding: 0.5em;
+  border: 1px solid var(--color-border-default);
+}
+
+.markdown-content table th {
+  font-weight: 600;
+  background-color: var(--color-canvas-subtle);
+}
+
+.markdown-content a {
+  color: var(--color-accent-fg);
+  text-decoration: none;
+}
+
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 1.5em 0;
+  background-color: var(--color-border-default);
+  border: 0;
+}
+
+/* 确保Markdown编辑器在表格单元格中正常显示 */
+.markdown-content {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* 表格中的Markdown内容样式调整 */
+.whitespace-pre-wrap {
+  white-space: normal !important;
+}

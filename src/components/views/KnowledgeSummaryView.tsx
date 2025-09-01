@@ -16,89 +16,9 @@ const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ de
 import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
-
-// 通用的格式化渲染函数
-const renderFormattedText = (text: string): React.ReactNode => {
-    if (!text) return '';
+import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 
 
-
-    const parts: React.ReactNode[] = [];
-    let remaining = text;
-    let key = 0;
-
-    while (remaining.length > 0) {
-        // 找到所有可能的匹配及其位置
-        const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
-        const colorMatch = remaining.match(/\{(red|green|blue|yellow|purple|orange)\}([^{}]+)\{\/\1\}/);
-        const italicMatch = remaining.match(/\*([^*]+)\*/);
-
-        // 收集所有有效匹配
-        const matches = [];
-
-        if (boldMatch && boldMatch.index !== undefined) {
-            matches.push({ type: 'bold', match: boldMatch, index: boldMatch.index });
-        }
-
-        if (colorMatch && colorMatch.index !== undefined) {
-            matches.push({ type: 'color', match: colorMatch, index: colorMatch.index, color: colorMatch[1] });
-        }
-
-        if (italicMatch && italicMatch.index !== undefined) {
-            // 检查斜体是否与加粗冲突
-            const beforeChar = italicMatch.index > 0 ? remaining[italicMatch.index - 1] : '';
-            const afterIndex = italicMatch.index + italicMatch[0].length;
-            const afterChar = afterIndex < remaining.length ? remaining[afterIndex] : '';
-
-            if (beforeChar !== '*' && afterChar !== '*') {
-                matches.push({ type: 'italic', match: italicMatch, index: italicMatch.index });
-            }
-        }
-
-        if (matches.length === 0) {
-            parts.push(remaining);
-            break;
-        }
-
-        // 按位置排序，处理最早出现的匹配
-        matches.sort((a, b) => a.index - b.index);
-        const firstMatch = matches[0];
-
-        // 添加匹配前的文本
-        if (firstMatch.index > 0) {
-            parts.push(remaining.substring(0, firstMatch.index));
-        }
-
-        // 处理匹配
-        switch (firstMatch.type) {
-            case 'bold':
-                parts.push(<strong key={key++} className="font-bold" style={{ fontWeight: 'bold', fontFamily: 'inherit' }}>{firstMatch.match[1]}</strong>);
-                break;
-            case 'color':
-                const colorMap: Record<string, string> = {
-                    red: '#ef4444',
-                    green: '#22c55e',
-                    blue: '#3b82f6',
-                    yellow: '#eab308',
-                    purple: '#a855f7',
-                    orange: '#f97316'
-                };
-                const color = (firstMatch.color && colorMap[firstMatch.color]) ? colorMap[firstMatch.color] : '#ef4444';
-                parts.push(<span key={key++} style={{ color: color + ' !important', fontWeight: 'bold', fontFamily: 'inherit' }}>{firstMatch.match[2]}</span>);
-                break;
-            case 'italic':
-                parts.push(<em key={key++} className="italic" style={{ fontStyle: 'italic', fontFamily: 'inherit' }}>{firstMatch.match[1]}</em>);
-                break;
-        }
-
-        // 更新剩余文本
-        remaining = remaining.substring(firstMatch.index + firstMatch.match[0].length);
-    }
-
-
-
-    return parts.length > 0 ? parts : text;
-};
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -170,8 +90,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
 
                             return (
-                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    {renderFormattedText(note || '')}
+                                <div className="text-sm leading-relaxed">
+                                    <MarkdownRenderer content={note || ''} />
                                 </div>
                             );
                         }
@@ -220,8 +140,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    {renderFormattedText(note || '')}
+                                <div className="text-sm leading-relaxed">
+                                    <MarkdownRenderer content={note || ''} />
                                 </div>
                             );
                         }
@@ -270,8 +190,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    {renderFormattedText(note || '')}
+                                <div className="text-sm leading-relaxed">
+                                    <MarkdownRenderer content={note || ''} />
                                 </div>
                             );
                         }
@@ -308,8 +228,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    {renderFormattedText(note || '')}
+                                <div className="text-sm leading-relaxed">
+                                    <MarkdownRenderer content={note || ''} />
                                 </div>
                             );
                         }
@@ -346,8 +266,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                    {renderFormattedText(note || '')}
+                                <div className="text-sm leading-relaxed">
+                                    <MarkdownRenderer content={note || ''} />
                                 </div>
                             );
                         }

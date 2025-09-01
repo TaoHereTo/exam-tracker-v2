@@ -28,6 +28,7 @@ import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { FormattingToolbar } from "./FormattingToolbar";
+import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -348,6 +349,22 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     );
   };
 
+  // Markdown编辑器字段组件
+  const MarkdownEditorField = () => {
+    const { setValue, getValue } = useFormContext();
+    const currentValue = getValue('secondField') as string;
+
+    return (
+      <MarkdownEditor
+        value={currentValue || ''}
+        onChange={(value) => setValue('secondField', value || '')}
+        placeholder={fieldConfig.secondPlaceholder}
+        height={200}
+        className="w-full"
+      />
+    );
+  };
+
   return (
     <div className="flex items-start justify-center w-full">
       {isInDialog ? (
@@ -402,24 +419,10 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
               {/* 第二个字段 */}
               <FormField name="secondField" className="form-field">
-                <div className="flex items-center justify-between mb-1">
-
-                  <Label htmlFor="secondField">
-
-                    <MixedText text={fieldConfig.secondLabel} />
-
-                  </Label>
-
-                  <FormattingToolbar fieldName="secondField" />
-
-                </div>
-
-                <FormTextarea
-                    name="secondField"
-                    placeholder={fieldConfig.secondPlaceholder}
-                    className="min-h-[100px]"
-                    rows={4}
-                  />
+                <Label htmlFor="secondField">
+                  <MixedText text={fieldConfig.secondLabel} />
+                </Label>
+                <MarkdownEditorField />
               </FormField>
 
               {/* 图片上传组件 */}
@@ -492,24 +495,10 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
               {/* 第二个字段 */}
               <FormField name="secondField" className="form-field">
-                <div className="flex items-center justify-between mb-1">
-
-                  <Label htmlFor="secondField">
-
-                    <MixedText text={fieldConfig.secondLabel} />
-
-                  </Label>
-
-                  <FormattingToolbar fieldName="secondField" />
-
-                </div>
-
-                <FormTextarea
-                    name="secondField"
-                    placeholder={fieldConfig.secondPlaceholder}
-                    className="min-h-[100px]"
-                    rows={4}
-                  />
+                <Label htmlFor="secondField">
+                  <MixedText text={fieldConfig.secondLabel} />
+                </Label>
+                <MarkdownEditorField />
               </FormField>
 
               {/* 图片上传组件 */}

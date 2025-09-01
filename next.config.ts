@@ -59,6 +59,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
 
+  // 配置transpilePackages以支持react-md-editor
+  transpilePackages: ['@uiw/react-md-editor'],
+
   // 压缩配置
   compress: true,
 
