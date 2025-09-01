@@ -1,12 +1,132 @@
 'use client';
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
 import { useThemeMode } from '@/hooks/useThemeMode';
 
 interface MarkdownRendererProps {
     content: string;
     className?: string;
+}
+
+// 简单的 Markdown 解析函数
+function parseMarkdown(content: string): React.ReactNode[] {
+    if (!content) return [];
+
+    const lines = content.split('\n');
+    const elements: React.ReactNode[] = [];
+    let currentList: string[] = [];
+    let isInList = false;
+
+    lines.forEach((line, index) => {
+        const trimmedLine = line.trim();
+
+        if (!trimmedLine) {
+            // 空行，结束当前列表
+            if (isInList && currentList.length > 0) {
+                elements.push(
+                    <ul key={`list-${index}`} className="list-disc list-inside mb-3 space-y-1">
+                        {currentList.map((item, i) => (
+                            <li key={i} className="ml-2">{item}</li>
+                        ))}
+                    </ul>
+                );
+                currentList = [];
+                isInList = false;
+            }
+            return;
+        }
+
+        // 检查是否是列表项
+        if (trimmedLine.startsWith('- ')) {
+            if (!isInList) {
+                isInList = true;
+            }
+            currentList.push(trimmedLine.substring(2));
+            return;
+        }
+
+        // 检查是否是有序列表
+        const orderedListMatch = trimmedLine.match(/^(\d+)\.\s(.+)$/);
+        if (orderedListMatch) {
+            if (!isInList) {
+                isInList = true;
+            }
+            currentList.push(orderedListMatch[2]);
+            return;
+        }
+
+        // 结束当前列表
+        if (isInList && currentList.length > 0) {
+            elements.push(
+                <ul key={`list-${index}`} className="list-disc list-inside mb-3 space-y-1">
+                    {currentList.map((item, i) => (
+                        <li key={i} className="ml-2">{item}</li>
+                    ))}
+                </ul>
+            );
+            currentList = [];
+            isInList = false;
+        }
+
+        // 检查分割线
+        if (trimmedLine === '---') {
+            elements.push(<hr key={`hr-${index}`} className="my-6 border-gray-300 dark:border-gray-600" />);
+            return;
+        }
+
+        // 检查标题
+        if (trimmedLine.startsWith('#')) {
+            const level = trimmedLine.match(/^#+/)?.[0].length || 1;
+            const text = trimmedLine.replace(/^#+\s*/, '');
+            const HeadingTag = `h${Math.min(level, 6)}` as keyof React.JSX.IntrinsicElements;
+            const headingClasses = {
+                1: 'text-2xl font-bold mb-4 mt-6',
+                2: 'text-xl font-bold mb-3 mt-5',
+                3: 'text-lg font-bold mb-2 mt-4',
+                4: 'text-base font-bold mb-2 mt-3',
+                5: 'text-sm font-bold mb-1 mt-2',
+                6: 'text-xs font-bold mb-1 mt-2'
+            };
+            elements.push(
+                React.createElement(HeadingTag, {
+                    key: `heading-${index}`,
+                    className: headingClasses[level as keyof typeof headingClasses]
+                }, text)
+            );
+            return;
+        }
+
+        // 处理粗体和斜体
+        let processedText = trimmedLine;
+        processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        processedText = processedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        processedText = processedText.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+        // 处理链接
+        processedText = processedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
+
+        // 处理内联代码
+        processedText = processedText.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+
+        // 创建段落元素
+        elements.push(
+            <p key={`p-${index}`} className="mb-3 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: processedText }} />
+        );
+    });
+
+    // 处理最后的列表
+    if (isInList && currentList.length > 0) {
+        elements.push(
+            <ul key="list-final" className="list-disc list-inside mb-3 space-y-1">
+                {currentList.map((item, i) => (
+                    <li key={i} className="ml-2">{item}</li>
+                ))}
+            </ul>
+        );
+    }
+
+    return elements;
 }
 
 export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
@@ -19,83 +139,11 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         return null;
     }
 
+    const parsedContent = parseMarkdown(content);
+
     return (
         <div className={`markdown-content ${className}`} data-color-mode={isDarkMode ? 'dark' : 'light'}>
-            <ReactMarkdown
-                components={{
-                    // 自定义标题样式
-                    h1: ({ children }) => <h1 className="text-2xl font-bold mb-4 mt-6">{children}</h1>,
-                    h2: ({ children }) => <h2 className="text-xl font-bold mb-3 mt-5">{children}</h2>,
-                    h3: ({ children }) => <h3 className="text-lg font-bold mb-2 mt-4">{children}</h3>,
-                    h4: ({ children }) => <h4 className="text-base font-bold mb-2 mt-3">{children}</h4>,
-                    h5: ({ children }) => <h5 className="text-sm font-bold mb-1 mt-2">{children}</h5>,
-                    h6: ({ children }) => <h6 className="text-xs font-bold mb-1 mt-2">{children}</h6>,
-
-                    // 自定义段落样式
-                    p: ({ children }) => <p className="mb-3 leading-relaxed">{children}</p>,
-
-                    // 自定义列表样式
-                    ul: ({ children }) => <ul className="list-disc list-inside mb-3 space-y-1">{children}</ul>,
-                    ol: ({ children }) => <ol className="list-decimal list-inside mb-3 space-y-1">{children}</ol>,
-                    li: ({ children }) => <li className="ml-2">{children}</li>,
-
-                    // 自定义代码样式
-                    code: ({ children, className }) => {
-                        const isInline = !className;
-                        if (isInline) {
-                            return <code className="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono">{children}</code>;
-                        }
-                        return <code className={className}>{children}</code>;
-                    },
-                    pre: ({ children }) => (
-                        <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-3">
-                            {children}
-                        </pre>
-                    ),
-
-                    // 自定义引用样式
-                    blockquote: ({ children }) => (
-                        <blockquote className="border-l-4 border-gray-300 dark:border-gray-600 pl-4 italic mb-3">
-                            {children}
-                        </blockquote>
-                    ),
-
-                    // 自定义链接样式
-                    a: ({ children, href }) => (
-                        <a
-                            href={href}
-                            className="text-blue-600 dark:text-blue-400 hover:underline"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
-                            {children}
-                        </a>
-                    ),
-
-                    // 自定义表格样式
-                    table: ({ children }) => (
-                        <div className="overflow-x-auto mb-3">
-                            <table className="min-w-full border border-gray-300 dark:border-gray-600">
-                                {children}
-                            </table>
-                        </div>
-                    ),
-                    thead: ({ children }) => <thead className="bg-gray-50 dark:bg-gray-700">{children}</thead>,
-                    tbody: ({ children }) => <tbody>{children}</tbody>,
-                    tr: ({ children }) => <tr className="border-b border-gray-300 dark:border-gray-600">{children}</tr>,
-                    th: ({ children }) => <th className="px-4 py-2 text-left font-semibold">{children}</th>,
-                    td: ({ children }) => <td className="px-4 py-2">{children}</td>,
-
-                    // 自定义强调样式
-                    strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-                    em: ({ children }) => <em className="italic">{children}</em>,
-
-                    // 自定义分割线样式
-                    hr: () => <hr className="my-6 border-gray-300 dark:border-gray-600" />,
-                }}
-            >
-                {content}
-            </ReactMarkdown>
+            {parsedContent}
         </div>
     );
 };
