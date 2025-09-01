@@ -43,15 +43,7 @@ export const MixedText = memo(function MixedText({
     const hasRedFormatting = /\{red\}[^}]+\{\/red\}/.test(content);
     const hasFormatting = hasBoldFormatting || hasItalicFormatting || hasRedFormatting;
     
-    // Debug logging for formatting detection
-    if (process.env.NODE_ENV === 'development' && hasFormatting) {
-        console.log('MixedText formatting detected:', {
-            content,
-            hasBoldFormatting,
-            hasItalicFormatting,
-            hasRedFormatting
-        });
-    }
+
 
     if (hasFormatting) {
         // Render formatted text

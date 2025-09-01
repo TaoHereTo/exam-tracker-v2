@@ -520,7 +520,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         }
     ];
 
-    // 调试：显示前几条数据的格式化信息
     const debugData = useMemo(() => {
         const moduleKnowledge = knowledge.filter(item => normalizeModuleName(item.module) === normalizeModuleName(selectedModule));
         return moduleKnowledge.slice(0, 3).map(item => {

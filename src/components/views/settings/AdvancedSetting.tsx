@@ -324,7 +324,7 @@ export function AdvancedSetting() {
                                             }}
                                             variant="outline"
                                             size="icon"
-                                            className="h-8 w-8 sm:h-9 sm:w-9"
+                                            className="h-8 w-8 sm:h-9 sm:w-9 button-hover-info"
                                         >
                                             {showImageManager ? <XCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Package className="w-4 h-4 sm:w-5 sm:h-5" />}
                                         </Button>
@@ -360,7 +360,7 @@ export function AdvancedSetting() {
                                                     disabled={isLoadingImages}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-info"
                                                 >
                                                     <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />
                                                 </Button>
@@ -379,7 +379,7 @@ export function AdvancedSetting() {
                                                     onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-secondary"
                                                 >
                                                     {imageManagerView === 'grid' ? <List className="w-4 h-4 sm:w-5 sm:h-5" /> : <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />}
                                                 </Button>
@@ -396,7 +396,7 @@ export function AdvancedSetting() {
                                                     onClick={handleUploadImage}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-success"
                                                 >
                                                     <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />
                                                 </Button>
@@ -414,7 +414,7 @@ export function AdvancedSetting() {
                                                         onClick={handleDeleteSelectedImages}
                                                         variant="outline"
                                                         size="icon"
-                                                        className="h-8 w-8 sm:h-9 sm:w-9"
+                                                        className="h-8 w-8 sm:h-9 sm:w-9 button-hover-danger"
                                                     >
                                                         <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                                     </Button>

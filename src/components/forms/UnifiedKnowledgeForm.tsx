@@ -132,7 +132,7 @@ function DateField() {
   return (
     <Popover open={dateOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 shadow-xs button-hover-info">
+        <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 shadow-xs button-hover-secondary">
           <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
         </button>
@@ -232,15 +232,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
   // 处理表单提交
   const handleSubmit = (data: Record<string, unknown>) => {
-    // 调试：显示提交的数据
-    console.log('🔍 知识点提交数据:', {
-      firstField: data.firstField,
-      secondField: data.secondField,
-      firstFieldType: typeof data.firstField,
-      secondFieldType: typeof data.secondField,
-      firstFieldLength: String(data.firstField || '').length,
-      secondFieldLength: String(data.secondField || '').length
-    });
+
 
     // 根据模块构建不同的数据格式
     let knowledgeData: Partial<KnowledgeItem> | Record<string, unknown> = {

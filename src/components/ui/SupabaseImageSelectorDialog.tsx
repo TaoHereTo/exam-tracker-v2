@@ -193,7 +193,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <DialogTrigger asChild>
                     {trigger || (
                         <div className="flex justify-center">
-                            <Button type="button" variant="outline" className="w-48">
+                            <Button type="button" variant="outline" className="w-48 button-hover-info">
                                 <MixedText text="从云端选择图片" />
                             </Button>
                         </div>
@@ -227,6 +227,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 size="sm"
                                 onClick={handleRefresh}
                                 disabled={isLoading}
+                                className="button-hover-secondary"
                             >
                                 <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                                 <MixedText text="刷新" />
@@ -331,12 +332,13 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <Button variant="outline" onClick={handleCancel}>
+                        <Button variant="outline" onClick={handleCancel} className="button-hover-secondary">
                             <MixedText text="取消" />
                         </Button>
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
+                            className="button-hover-primary"
                         >
                             <MixedText text="确认选择" />
                         </Button>

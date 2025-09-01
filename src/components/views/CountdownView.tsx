@@ -236,7 +236,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 bg-[#15803d] hover:bg-[#166534] text-white hover:text-white shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl font-medium"
+                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium button-hover-success"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="添加考试" />
@@ -263,7 +263,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                             onClick={() => handleOpenForm(countdown)}
                                                             variant="outline"
                                                             size="sm"
-                                                            className="h-9 w-9 p-0 transition-colors"
+                                                            className="h-9 w-9 p-0 button-hover-info"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </Button>
@@ -281,7 +281,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                 <Button
                                                                     variant="destructive"
                                                                     size="icon"
-                                                                    className="h-9 w-9"
+                                                                    className="h-9 w-9 button-hover-danger"
                                                                 >
                                                                     <Trash2 className="w-5 h-5" />
                                                                 </Button>
@@ -327,7 +327,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </p>
                         <Button
                             onClick={() => handleOpenForm()}
-                            className="bg-[#15803d] hover:bg-[#166534] text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium button-hover-success"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             <MixedText text="立即添加" />
@@ -365,7 +365,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 <PopoverTrigger asChild>
                                                     <button
                                                         type="button"
-                                                        className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
+                                                        className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow] button-hover-secondary"
                                                         onClick={() => setDateOpen(true)}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -433,14 +433,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         type="button"
                                         variant="outline"
                                         onClick={handleCloseForm}
-                                        className="h-10 px-4"
+                                        className="h-10 px-4 button-hover-secondary"
                                     >
                                         <MixedText text="取消" />
                                     </Button>
                                     <Button
                                         type="submit"
                                         variant="primary"
-                                        className="h-10 px-4"
+                                        className="h-10 px-4 button-hover-primary"
                                     >
                                         {editId ? <MixedText text="更新" /> : <MixedText text="添加考试" />}
                                     </Button>

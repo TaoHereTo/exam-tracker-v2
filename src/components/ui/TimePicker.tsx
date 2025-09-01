@@ -95,7 +95,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
             <PopoverTrigger asChild>
                 <div
                     className={cn(
-                        "w-full flex items-center justify-start text-left font-normal border bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10",
+                        "w-full flex items-center justify-start text-left font-normal border bg-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 button-hover-secondary",
                         "border-[color:var(--input-border)]",
                         !value && "text-muted-foreground",
                         className
@@ -159,6 +159,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                             type="button"
                             size="sm"
                             onClick={handleConfirm}
+                            className="button-hover-primary"
                         >
                             <MixedText text="确认" />
                         </Button>

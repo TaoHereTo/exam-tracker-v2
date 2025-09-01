@@ -184,7 +184,7 @@ export function SettingsView({
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        className="h-8 sm:h-9 w-8 sm:w-9 p-0"
+                                                        className="h-8 sm:h-9 w-8 sm:w-9 p-0 button-hover-danger"
                                                         onClick={() => {
                                                             setClearDataDialogOpen(true);
                                                         }}
@@ -266,7 +266,7 @@ export function SettingsView({
                                                 disabled={isUploading}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9"
+                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-success"
                                             >
                                                 <CloudUpload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
@@ -282,7 +282,7 @@ export function SettingsView({
                                                 disabled={isDownloading}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9"
+                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-info"
                                             >
                                                 <CloudDownload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
@@ -297,7 +297,7 @@ export function SettingsView({
                                                 onClick={handleViewCloudData}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9"
+                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-secondary"
                                             >
                                                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>

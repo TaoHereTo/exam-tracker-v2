@@ -276,7 +276,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             <div className={`w-full ${className}`} style={fullscreenStyle}>
                 <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                     {/* 工具栏 */}
-                    <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#0A0A0A]">
                         <div className="flex items-center gap-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -552,11 +552,11 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                     onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
                                     style={{ height: dynamicHeight }}
-                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
+                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
                                 />
                             </div>
                             {/* 右侧预览区域 */}
-                            <div className="w-1/2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 overflow-auto">
+                            <div className="w-1/2 bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 overflow-auto">
                                 <div className="p-3 leading-relaxed" style={{ minHeight: dynamicHeight }}>
                                     <MarkdownRenderer content={value || placeholder} />
                                 </div>
@@ -574,7 +574,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                 onKeyDown={handleKeyDown}
                                 placeholder={placeholder}
                                 style={{ height: dynamicHeight }}
-                                className="w-full p-3 resize-none outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
+                                className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
                             />
                         </div>
                     )}
