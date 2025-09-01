@@ -27,7 +27,7 @@ import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { FormattingToolbar } from "./FormattingToolbar";
+
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
 
 // 模块配置类型定义
