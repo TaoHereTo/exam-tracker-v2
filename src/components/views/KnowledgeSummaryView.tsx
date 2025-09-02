@@ -292,6 +292,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editItem, setEditItem] = useState<KnowledgeItem | null>(null);
     const [editError, setEditError] = useState("");
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     // 当模块改变时，重置子分类选择
     useEffect(() => {
@@ -387,14 +388,17 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         if (selectedRows.length === 0) {
             return;
         }
+        setDeleteDialogOpen(true);
+    };
+
+    const confirmDelete = () => {
         if (!onBatchDeleteKnowledge) {
             return;
         }
         onBatchDeleteKnowledge(selectedRows);
         setSelectedRows([]);
+        setDeleteDialogOpen(false);
     };
-
-
 
     const handleEdit = (item?: KnowledgeItem) => {
         if (item) {
@@ -570,7 +574,25 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 deleteConfirmText="此操作将删除所选的知识点，删除后无法恢复。是否确认？"
                 className="w-full"
             />
-            {/* 移除原来的模块统计信息悬浮卡片，因为现在已经在分页信息中显示了 */}
+            {/* 删除确认弹窗 */}
+            <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
+                        <AlertDialogDescription>
+                            <MixedText text="此操作将删除所选的知识点，删除后无法恢复。是否确认？" />
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+                            <MixedText text="取消" />
+                        </AlertDialogCancel>
+                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
+                            <MixedText text="确认删除" />
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
             {/* 编辑弹窗 */}
             <AlertDialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
                 <AlertDialogContent>
