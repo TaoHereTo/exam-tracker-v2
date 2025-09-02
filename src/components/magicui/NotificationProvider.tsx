@@ -18,7 +18,83 @@ interface NotificationContextProps {
     notify: (n: Omit<Notification, "id">) => void;
 }
 
+// Type definition for webkitAudioContext
+interface WebkitAudioContext extends AudioContext {
+    webkitAudioContext: typeof AudioContext;
+}
+
 const NotificationContext = createContext<NotificationContextProps | undefined>(undefined);
+
+// Function to play sound based on notification type
+const playNotificationSound = (type: NotificationType) => {
+    try {
+        // Create audio context
+        const AudioContextConstructor = window.AudioContext || (window as unknown as WebkitAudioContext).webkitAudioContext;
+        const audioContext = new AudioContextConstructor();
+        
+        // Create oscillator and gain node
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        // Set frequency and duration based on notification type
+        switch (type) {
+            case "success":
+                // Higher pitch for success
+                oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+                break;
+            case "error":
+                // Lower pitch for error with two tones
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+                
+                // Second tone
+                const oscillator2 = audioContext.createOscillator();
+                const gainNode2 = audioContext.createGain();
+                oscillator2.connect(gainNode2);
+                gainNode2.connect(audioContext.destination);
+                oscillator2.frequency.setValueAtTime(180, audioContext.currentTime + 0.2);
+                gainNode2.gain.setValueAtTime(0.1, audioContext.currentTime + 0.2);
+                gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
+                oscillator2.start(audioContext.currentTime + 0.2);
+                oscillator2.stop(audioContext.currentTime + 0.35);
+                break;
+            case "warning":
+                // Medium pitch for warning with vibrato
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+                // Add vibrato effect
+                oscillator.frequency.setValueAtTime(460, audioContext.currentTime + 0.05);
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(420, audioContext.currentTime + 0.15);
+                oscillator.frequency.setValueAtTime(440, audioContext.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.4);
+                break;
+            case "info":
+                // Soft beep for info
+                oscillator.frequency.setValueAtTime(660, audioContext.currentTime);
+                gainNode.gain.setValueAtTime(0.07, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+                break;
+        }
+    } catch (error) {
+        // Audio not supported or blocked, silently fail
+        console.log('Audio not supported or blocked');
+    }
+};
 
 export const useNotification = () => {
     const ctx = useContext(NotificationContext);
@@ -42,6 +118,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         setNotifications((prev) => [{ ...n, id }, ...prev]);
         timerRef.current[id] = setTimeout(() => remove(id), 5000);
+        
+        // Play sound when notification appears
+        playNotificationSound(n.type);
     }, [remove]);
 
     return (
@@ -76,4 +155,4 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             </div>
         </NotificationContext.Provider>
     );
-}; 
+};
