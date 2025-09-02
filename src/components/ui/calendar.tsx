@@ -25,23 +25,18 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames()
 
-  const disabledMerged = React.useMemo(() => {
-    const result: any[] = []
-    const incoming = (props as any).disabled
-    if (Array.isArray(incoming)) {
-      result.push(...incoming)
-    } else if (incoming) {
-      result.push(incoming)
-    }
-    result.push({ outside: true })
-    return result
-  }, [(props as any).disabled])
+  // Simplified approach - just add the outside: true to whatever disabled prop is passed
+  const disabledWithOutside = props.disabled ? 
+    Array.isArray(props.disabled) ? 
+      [...props.disabled, { outside: true }] : 
+      [props.disabled, { outside: true }] : 
+    [{ outside: true }]
 
   return (
     <DayPicker
       // 仍显示非当月日期，但禁用
       showOutsideDays={showOutsideDays}
-      disabled={disabledMerged}
+      disabled={disabledWithOutside as React.ComponentProps<typeof DayPicker>['disabled']}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
