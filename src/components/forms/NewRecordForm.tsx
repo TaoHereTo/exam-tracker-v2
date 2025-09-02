@@ -30,7 +30,9 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     const { isDarkMode } = useThemeMode();
 
     const handleSubmit = (data: Record<string, string | number | boolean | undefined>) => {
-        const dateToFormat = date ?? new Date();
+        // 优先使用表单中的日期值，避免总是使用今天
+        const selectedDateStr = String(data.date || '');
+        const dateToFormat = selectedDateStr ? new Date(selectedDateStr) : new Date();
         const newRecord: RecordItem = {
             id: generateUUID(),
             date: format(dateToFormat, 'yyyy-MM-dd'),

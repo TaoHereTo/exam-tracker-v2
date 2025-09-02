@@ -420,40 +420,26 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
                             {/* 删除按钮 */}
                             {showDelete && onDelete && (
-                                <AlertDialog>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <AlertDialogTrigger asChild>
-                                                    <Button
-                                                        disabled={deleteDisabled}
-                                                        variant="destructive"
-                                                        size="icon"
-                                                        className="h-9 w-9 button-hover-danger"
-                                                    >
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </Button>
-                                                </AlertDialogTrigger>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p><MixedText text="批量删除" /></p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                    <AlertDialogContent>
-                                        <AlertDialogHeader>
-                                            <AlertDialogTitle><MixedText text="确认批量删除？" /></AlertDialogTitle>
-                                            <AlertDialogDescription>
-                                                {deleteConfirmText}
-                                            </AlertDialogDescription>
-                                        </AlertDialogHeader>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => onDelete()} style={{ background: '#dc2626', color: 'white' }}><MixedText text="确认删除" /></AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                onClick={onDelete}
+                                                disabled={deleteDisabled}
+                                                variant="destructive"
+                                                size="icon"
+                                                className="h-9 w-9 button-hover-danger"
+                                            >
+                                                <Trash2 className="w-5 h-5" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text="批量删除" /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             )}
+
                         </div>
                     </div>
 

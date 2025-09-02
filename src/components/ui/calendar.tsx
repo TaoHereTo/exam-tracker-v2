@@ -27,7 +27,9 @@ function Calendar({
 
   return (
     <DayPicker
+      // 仍显示非当月日期，但禁用
       showOutsideDays={showOutsideDays}
+      disabled={props.disabled}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -111,11 +113,12 @@ function Calendar({
           defaultClassNames.today
         ),
         outside: cn(
-          "text-muted-foreground aria-selected:text-muted-foreground",
+          // 更明显地区分非当月日期
+          "text-gray-400 dark:text-gray-500 opacity-60",
           defaultClassNames.outside
         ),
         disabled: cn(
-          "text-muted-foreground opacity-50",
+          "text-muted-foreground opacity-50 pointer-events-none",
           defaultClassNames.disabled
         ),
         hidden: cn("invisible", defaultClassNames.hidden),
@@ -188,6 +191,7 @@ function CalendarDayButton({
 }: React.ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames()
   const [isDark, setIsDark] = React.useState(false)
+  const isDisabled = !!modifiers.disabled
 
   const ref = React.useRef<HTMLButtonElement>(null)
 
@@ -230,13 +234,25 @@ function CalendarDayButton({
       aspectRatio: '1',
       border: 'none',
       borderRadius: '8px', // 增加圆角
-      cursor: 'pointer',
+      cursor: isDisabled ? 'not-allowed' : 'pointer',
       fontSize: '14px',
       fontWeight: 'normal',
       outline: 'none',
       // Removed transition effect to prevent hover animations
       transition: 'none',
-      transform: 'none'
+      transform: 'none',
+      pointerEvents: isDisabled ? 'none' : 'auto',
+      opacity: isDisabled ? 0.5 : 1
+    }
+
+    // 非当月日期弱化显示
+    if (modifiers.outside) {
+      return {
+        ...baseStyle,
+        backgroundColor: 'transparent',
+        color: isDark ? '#6b7280' : '#9ca3af', // gray-500 (dark) / gray-400 (light)
+        opacity: 0.6
+      }
     }
 
     if (modifiers.selected || modifiers.range_start || modifiers.range_end) {
@@ -267,6 +283,11 @@ function CalendarDayButton({
 
   // 处理点击事件，防止事件冒泡导致日历关闭
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isDisabled) {
+      e.preventDefault()
+      e.stopPropagation()
+      return
+    }
     // 阻止事件冒泡到父级元素，避免触发 Popover 的关闭逻辑
     e.stopPropagation()
     // 调用原始的 onClick 处理函数（如果存在）
@@ -279,6 +300,9 @@ function CalendarDayButton({
     <button
       ref={ref}
       data-day={day.date.toLocaleDateString()}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
+      tabIndex={isDisabled ? -1 : undefined}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&
