@@ -78,9 +78,8 @@ export interface UserSettings {
     [key: string]: string | undefined;
 }
 
-// 导出数据格式 - 版本 7.0
-export interface ExportDataV7 {
-    version: 7;
+// 导出数据格式（无版本字段）
+export interface ExportData {
     exportedAt: string; // ISO 8601 格式
     records: RecordItem[];
     knowledge: KnowledgeItem[];
@@ -115,5 +114,4 @@ export type PendingImport = {
     settings?: UserSettings;
     cloudImages?: CloudImageInfo[];
     importStats?: ImportStats;
-    version?: number;
 };

@@ -10,6 +10,7 @@ export class AutoCloudSync {
     static async autoSaveRecord(record: RecordItem, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             await recordService.addRecord({
+                id: record.id,
                 date: record.date,
                 module: record.module,
                 total: record.total,
@@ -364,13 +365,13 @@ export class AutoCloudSync {
         try {
             // 只有UUID格式的ID才尝试从云端删除
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(recordId));
-            
+
             if (!isUUID) {
                 // 对于旧格式ID，不尝试云端删除，只通知用户
                 console.log('跳过云端删除（旧格式ID）:', recordId);
                 return;
             }
-            
+
             await recordService.deleteRecord(recordId);
             notify({
                 type: 'success',
@@ -381,7 +382,7 @@ export class AutoCloudSync {
             // 改进错误日志，提供更详细的错误信息
             const errorMessage = error instanceof Error ? error.message : String(error);
             const errorDetails = error instanceof Error ? error.stack : '无详细信息';
-            
+
             console.error('自动删除记录从云端失败:', {
                 recordId,
                 error: errorMessage,

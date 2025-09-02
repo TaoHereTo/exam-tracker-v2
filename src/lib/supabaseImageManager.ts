@@ -244,17 +244,18 @@ export class SupabaseImageManager {
     // 获取图片URL - 添加重试机制和更好的错误处理
     public getImageUrl(imageId: string): string | null {
         try {
-            // 清理图片ID，移除可能的特殊字符
-            const cleanImageId = imageId.replace(/[^a-zA-Z0-9._-]/g, '_');
+            // 兼容含路径的 imageId（例如 folder/subfolder/file.png）
+            // 仅对不允许的字符做清理，保留路径分隔符 '/'
+            const cleanImageId = imageId.replace(/[^a-zA-Z0-9._\/-]/g, '_');
 
             // 首先尝试从本地存储获取图片信息
-            const imageInfo = this.getImageInfo(cleanImageId);
+            const imageInfo = this.getImageInfo(cleanImageId) || this.getImageInfo(imageId);
             if (imageInfo) {
                 // 如果本地存储的URL无效，尝试重新生成
                 if (!imageInfo.url || imageInfo.url.includes('undefined')) {
                     const { data: urlData } = supabase.storage
                         .from(this.BUCKET_NAME)
-                        .getPublicUrl(imageInfo.fileName);
+                        .getPublicUrl(imageInfo.fileName || cleanImageId);
 
                     if (urlData?.publicUrl) {
                         // 更新本地存储的URL

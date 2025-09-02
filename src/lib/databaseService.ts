@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient'
 import { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from '../types/record'
+import { generateUUID } from './utils'
 import { UserSettings } from '../types/record'
 
 // 获取当前用户ID
@@ -42,13 +43,15 @@ export const recordService = {
         return data || []
     },
 
-    // 添加新的刷题历史
-    async addRecord(record: Omit<RecordItem, 'id'>): Promise<RecordItem> {
+    // 添加新的刷题历史（携带 UUID 写入）
+    async addRecord(record: Omit<RecordItem, 'id'> & { id?: string }): Promise<RecordItem> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
+        const finalId = record.id && typeof record.id === 'string' && record.id ? record.id : generateUUID()
         const recordData = {
+            id: finalId,
             user_id: userId,
             date: record.date,
             module: record.module,
@@ -715,19 +718,19 @@ export const settingsService = {
         } catch (error) {
             // 处理网络错误或其他异常
             const errorMessage = error instanceof Error ? error.message : String(error);
-            
+
             // 特别处理 406 错误
             if (errorMessage.includes('406') || errorMessage.includes('Not Acceptable')) {
                 console.warn('用户设置获取遇到网络级406错误（首次使用或API版本问题），返回空对象');
                 return {};
             }
-            
+
             // 处理其他网络错误
             if (errorMessage.includes('Failed to load resource') || errorMessage.includes('fetch')) {
                 console.warn('用户设置获取遇到网络错误，返回空对象:', errorMessage);
                 return {};
             }
-            
+
             console.warn('设置查询异常:', {
                 error: error,
                 errorType: typeof error,

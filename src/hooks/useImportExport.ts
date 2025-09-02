@@ -8,7 +8,7 @@ import type {
     PendingImport,
     UserSettings,
     CloudImageInfo,
-    ExportDataV7
+    ExportData
 } from "@/types/record";
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
@@ -66,8 +66,11 @@ export function useImportExport(
 
     // 格式化数据以确保一致性
     function formatRecord(record: RecordItem): RecordItem {
+        // 统一 id 为 UUID；若不是 UUID，则生成新的 UUID
+        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(record.id || ''));
         return {
             ...record,
+            id: isUUID ? String(record.id) : generateUUID(),
             module: record.module as RecordItem['module'],
             createdAt: record.createdAt || new Date().toISOString(),
             updatedAt: new Date().toISOString()
@@ -115,8 +118,7 @@ export function useImportExport(
         const formattedCountdowns = (countdowns || []).map(formatCountdown);
         const settings = getAllSettings();
 
-        const exportData: ExportDataV7 = {
-            version: 7,
+        const exportData: ExportData = {
             exportedAt: new Date().toISOString(),
             records: formattedRecords,
             knowledge: formattedKnowledge,
@@ -168,40 +170,21 @@ export function useImportExport(
                     const fileContent = event.target?.result as string;
                     const importedObject = JSON.parse(fileContent);
 
-                    // 处理不同版本的数据格式
+                    // 兼容导入：不依赖 version 字段
                     let importedRecords: RecordItem[] = [];
                     let importedKnowledge: KnowledgeItem[] = [];
                     let importedPlans: StudyPlan[] = [];
                     let importedCountdowns: ExamCountdown[] = [];
                     let importedSettings: UserSettings = {};
                     let importedCloudImages: CloudImageInfo[] = [];
-                    let version = 1;
 
-                    if (importedObject.version === 7) {
-                        // 新格式 v7
-                        version = 7;
-                        importedRecords = importedObject.records || [];
-                        importedKnowledge = importedObject.knowledge || [];
-                        importedPlans = importedObject.plans || [];
-                        importedCountdowns = importedObject.countdowns || [];
-                        importedSettings = importedObject.settings || {};
-                        importedCloudImages = importedObject.cloudImages || [];
-                    } else if (importedObject.version === 6) {
-                        // 旧格式 v6
-                        version = 6;
-                        importedRecords = importedObject.records || [];
-                        importedKnowledge = importedObject.knowledge || [];
-                        importedPlans = importedObject.plans || [];
-                        importedSettings = importedObject.settings || {};
-                        importedCloudImages = importedObject.cloudImages || [];
-                    } else {
-                        // 兼容旧格式
-                        importedRecords = importedObject.records || importedObject.data || [];
-                        importedKnowledge = importedObject.knowledge || importedObject.knowledgeItems || [];
-                        importedPlans = importedObject.plans || importedObject.studyPlans || [];
-                        importedSettings = importedObject.settings || {};
-                        importedCloudImages = importedObject.cloudImages || [];
-                    }
+                    // 优先读取常用键名；若无则尝试兼容键
+                    importedRecords = importedObject.records || importedObject.data || [];
+                    importedKnowledge = importedObject.knowledge || importedObject.knowledgeItems || [];
+                    importedPlans = importedObject.plans || importedObject.studyPlans || [];
+                    importedCountdowns = importedObject.countdowns || importedObject.examCountdowns || [];
+                    importedSettings = importedObject.settings || {};
+                    importedCloudImages = importedObject.cloudImages || [];
 
                     // 数据验证和格式化
                     const validatedRecords = importedRecords
@@ -232,8 +215,7 @@ export function useImportExport(
                         plans: validatedPlans,
                         countdowns: validatedCountdowns,
                         settings: importedSettings,
-                        cloudImages: importedCloudImages,
-                        version
+                        cloudImages: importedCloudImages
                     });
 
                     setImportDialogOpen(true);
@@ -271,10 +253,10 @@ export function useImportExport(
 
             // 导入知识点（去重）- 改进的去重逻辑
             // 创建现有知识点的内容键集合
-            const existingKnowledgeContentKeys = new Set(knowledge.map(k => 
+            const existingKnowledgeContentKeys = new Set(knowledge.map(k =>
                 `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
             ));
-            
+
             const newKnowledge = pendingImport.knowledge.filter(k => {
                 // 为导入的知识点创建内容键
                 const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;

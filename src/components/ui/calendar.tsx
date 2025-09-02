@@ -25,11 +25,23 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames()
 
+  const disabledMerged = React.useMemo(() => {
+    const result: any[] = []
+    const incoming = (props as any).disabled
+    if (Array.isArray(incoming)) {
+      result.push(...incoming)
+    } else if (incoming) {
+      result.push(incoming)
+    }
+    result.push({ outside: true })
+    return result
+  }, [(props as any).disabled])
+
   return (
     <DayPicker
       // 仍显示非当月日期，但禁用
       showOutsideDays={showOutsideDays}
-      disabled={props.disabled}
+      disabled={disabledMerged}
       className={cn(
         "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
@@ -191,7 +203,7 @@ function CalendarDayButton({
 }: React.ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames()
   const [isDark, setIsDark] = React.useState(false)
-  const isDisabled = !!modifiers.disabled
+  const isDisabled = !!modifiers.disabled || !!modifiers.outside
 
   const ref = React.useRef<HTMLButtonElement>(null)
 
@@ -296,6 +308,13 @@ function CalendarDayButton({
     }
   }
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (isDisabled) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+  }
+
   return (
     <button
       ref={ref}
@@ -321,6 +340,7 @@ function CalendarDayButton({
         className
       )}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
       {...props}
     />
   )

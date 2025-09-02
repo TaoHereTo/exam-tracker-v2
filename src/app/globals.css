@@ -321,6 +321,7 @@ html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="tru
 }
 
 /* 强制移除日期范围开始和结束日期的所有额外背景样式 */
+/* Calendar: 范围容器透明，背景交由按钮本身控制 */
 [data-slot="calendar"] .rdp-day.rdp-range_start,
 [data-slot="calendar"] .rdp-day.rdp-range_end,
 [data-slot="calendar"] .rdp-range_start,
@@ -360,64 +361,7 @@ html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="tru
   color: var(--primary-foreground) !important;
 }
 
-/* 移除了可能干扰范围选择的旧规则 - 让CalendarDayButton的内置样式生效 */
-
-.dark [data-slot="calendar"] .rdp-day.rdp-range_end,
-.dark [data-slot="calendar"] .rdp-range_start,
-.dark [data-slot="calendar"] .rdp-range_end,
-.dark [data-slot="calendar"] [data-range-start="true"],
-.dark [data-slot="calendar"] [data-range-end="true"] {
-  background-color: transparent !important;
-}
-
-.dark [data-slot="calendar"] .rdp-day.rdp-range_start button,
-.dark [data-slot="calendar"] .rdp-day.rdp-range_end button,
-.dark [data-slot="calendar"] .rdp-range_start button,
-.dark [data-slot="calendar"] .rdp-range_end button,
-.dark [data-slot="calendar"] [data-range-start="true"] button,
-.dark [data-slot="calendar"] [data-range-end="true"] button {
-  background-color: var(--primary) !important;
-  color: var(--primary-foreground) !important;
-}
-
-/* 移除了可能干扰范围选择的旧规则 - 让CalendarDayButton的内置样式生效 */
-
-[data-slot="calendar"] [data-range-start="true"],
-[data-slot="calendar"] [data-range-end="true"] {
-  background-color: transparent !important;
-}
-
-/* 确保只有按钮本身有背景色 */
-[data-slot="calendar"] .rdp-day.rdp-range_start button,
-[data-slot="calendar"] .rdp-day.rdp-range_end button,
-[data-slot="calendar"] .rdp-range_start button,
-[data-slot="calendar"] .rdp-range_end button,
-[data-slot="calendar"] [data-range-start="true"] button,
-[data-slot="calendar"] [data-range-end="true"] button {
-  background-color: var(--primary) !important;
-  color: var(--primary-foreground) !important;
-}
-
-.dark [data-slot="calendar"] .rdp-day.rdp-range_start,
-.dark [data-slot="calendar"] .rdp-day.rdp-range_end,
-.dark [data-slot="calendar"] .rdp-range_start,
-.dark [data-slot="calendar"] .rdp-range_end,
-.dark [data-slot="calendar"] [data-range-start="true"],
-.dark [data-slot="calendar"] [data-range-end="true"] {
-  background-color: transparent !important;
-}
-
-.dark [data-slot="calendar"] .rdp-day.rdp-range_start button,
-.dark [data-slot="calendar"] .rdp-day.rdp-range_end button,
-.dark [data-slot="calendar"] .rdp-range_start button,
-.dark [data-slot="calendar"] .rdp-range_end button,
-.dark [data-slot="calendar"] [data-range-start="true"] button,
-.dark [data-slot="calendar"] [data-range-end="true"] button {
-  background-color: var(--primary) !important;
-  color: var(--primary-foreground) !important;
-}
-
-/* 移除了可能干扰范围选择的旧规则 - 让CalendarDayButton的内置样式生效 */
+/* 保留一套范围选择样式，移除重复定义，避免冲突 */
 
 .button-spacing-md {
   margin: 0.5rem 0;
@@ -2111,7 +2055,7 @@ button[style*="background:#dc2626"] *,
   color: var(--foreground) !important;
   box-shadow: none !important;
   backdrop-filter: blur(8px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid var(--input-border) !important;
   font-weight: 500 !important;
 }
 
@@ -2122,6 +2066,14 @@ button[style*="background:#dc2626"] *,
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   font-weight: 500 !important;
+}
+
+/* Calendar: 强制禁用 outside 与 aria-disabled 的点击 */
+[data-slot="calendar"] button[aria-disabled="true"],
+[data-slot="calendar"] .rdp-day.rdp-outside button,
+[data-slot="calendar"] .rdp-day[data-outside="true"] button,
+[data-slot="calendar"] .rdp-day[aria-disabled="true"] button {
+  pointer-events: none !important;
 }
 
 /* 过渡效果优化 */
