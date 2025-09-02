@@ -91,7 +91,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                         type="button"
                         onClick={onSwitchToLogin}
                         variant="outline"
-                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 h-10 sm:h-12 text-sm sm:text-base"
+                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 h-10 sm:h-12 text-sm sm:text-base transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
                     >
                         <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         <MixedText text="返回登录" />
@@ -99,7 +99,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 h-10 sm:h-12 text-sm sm:text-base"
+                        className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black h-10 sm:h-12 text-sm sm:text-base transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
                     >
                         <MixedText text={loading ? '发送中...' : '发送重置邮件'} />
                     </Button>

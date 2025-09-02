@@ -70,7 +70,7 @@ function Calendar({
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
+          "has-focus:border-ring border-input has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn("absolute inset-0 opacity-0", defaultClassNames.dropdown),
@@ -127,11 +127,11 @@ function Calendar({
           const handlePointerDown = (e: React.PointerEvent) => {
             e.stopPropagation();
           };
-          
+
           const handleMouseDown = (e: React.MouseEvent) => {
             e.stopPropagation();
           };
-          
+
           return (
             <div
               data-slot="calendar"
@@ -234,7 +234,9 @@ function CalendarDayButton({
       fontSize: '14px',
       fontWeight: 'normal',
       outline: 'none',
-      transition: 'all 0.2s ease'
+      // Removed transition effect to prevent hover animations
+      transition: 'none',
+      transform: 'none'
     }
 
     if (modifiers.selected || modifiers.range_start || modifiers.range_end) {
@@ -289,12 +291,8 @@ function CalendarDayButton({
       style={getButtonStyle()}
       className={cn(
         "calendar-day-button",
-        // 添加hover和focus效果
-        "hover:bg-accent hover:text-accent-foreground hover:shadow-sm",
-        // 移除选中日期的focus环，只保留黑色填充
-        modifiers.selected || modifiers.range_start || modifiers.range_end ?
-          "focus:ring-0 focus:ring-offset-0 hover:opacity-90 shadow-sm" :
-          "focus:ring-2 focus:ring-ring focus:ring-opacity-50 focus:shadow-md",
+        // 移除选中与未选中状态下的阴影与浮起效果
+        "focus:ring-0 focus:ring-offset-0",
         defaultClassNames.day,
         className
       )}

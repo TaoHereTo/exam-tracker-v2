@@ -149,11 +149,11 @@ th .mixed-text-part {
   justify-content: center !important;
 }
 
-/* 月份/年份下拉按钮悬停效果 */
-[data-slot="calendar"] .rdp-dropdown_root:hover {
+/* 月份/年份下拉按钮悬停效果 - removed to prevent unwanted hover effects */
+/* [data-slot="calendar"] .rdp-dropdown_root:hover {
   background-color: var(--accent) !important;
   color: var(--accent-foreground) !important;
-}
+} */
 
 /* 修复日期范围选择的具体问题 */
 
@@ -783,6 +783,237 @@ html.dark [data-slot="calendar"] button[data-day]:not([data-selected-single="tru
   /* 操作按钮区域 */
   .form-actions {
     margin-top: 0.5rem;
+  }
+}
+
+/* ========== 主题切换优化 ========== */
+/* 为主题切换添加硬件加速和性能优化 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+  will-change: clip-path;
+  transform: translateZ(0);
+  /* 启用硬件加速 */
+}
+
+/* 减少重绘和回流 */
+html {
+  contain: layout style paint;
+}
+
+/* 优化动画性能 */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.1s;
+  }
+}
+
+/* ========== MarkdownEditor 性能优化 ========== */
+/* 为MarkdownEditor组件添加性能优化 */
+.markdown-editor-container {
+  contain: layout style;
+  will-change: auto;
+  /* 避免不必要的合成层 */
+}
+
+/* 优化textarea的渲染性能 */
+.markdown-editor-textarea {
+  contain: layout style;
+  transform: translateZ(0);
+  /* 启用硬件加速 */
+}
+
+/* 减少工具栏按钮在主题切换时的重绘 */
+.md-toolbar-button-base {
+  contain: layout style;
+  will-change: transform, background-color, border-color;
+}
+
+/* 在主题切换动画期间暂时禁用某些过渡效果 */
+::view-transition-group(root) * {
+  transition-duration: 0s !important;
+}
+
+/* 恢复过渡效果 */
+html:not(:has(::view-transition-group(root))) * {
+  transition-duration: inherit;
+}
+
+/* 在主题切换期间优化MarkdownEditor性能 */
+::view-transition-group(root) .markdown-editor-container {
+  pointer-events: none;
+  /* 暂时禁用交互 */
+}
+
+::view-transition-group(root) .markdown-editor-textarea {
+  will-change: auto;
+  /* 移除will-change以减少合成层 */
+}
+
+/* 主题切换完成后恢复 */
+html:not(:has(::view-transition-group(root))) .markdown-editor-container {
+  pointer-events: auto;
+}
+
+html:not(:has(::view-transition-group(root))) .markdown-editor-textarea {
+  will-change: transform;
+}
+
+/* ========== 知识点录入页面优化 ========== */
+/* 为知识点录入页面添加特殊的性能优化 */
+.knowledge-entry-container {
+  contain: layout style;
+}
+
+/* 在主题切换期间优化知识点录入页面 */
+::view-transition-group(root) .knowledge-entry-container {
+  contain: strict;
+  /* 更严格的包含 */
+  transform: translateZ(0);
+  /* 强制硬件加速 */
+}
+
+::view-transition-group(root) .knowledge-entry-container .markdown-editor-container {
+  display: none !important;
+  /* 完全隐藏编辑器 */
+}
+
+::view-transition-group(root) .markdown-editor-textarea {
+  display: none !important;
+}
+
+/* 主题切换完成后恢复 */
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container {
+  contain: layout style;
+  transform: none;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .markdown-editor-container {
+  display: block !important;
+}
+
+html:not(:has(::view-transition-group(root))) .markdown-editor-textarea {
+  display: block !important;
+}
+
+/* 为不支持 :has() 的浏览器提供备用方案 */
+@supports not (selector(:has(*))) {
+  .knowledge-entry-container .markdown-editor-container {
+    transition: opacity 0.1s ease;
+  }
+
+  .theme-transitioning .knowledge-entry-container .markdown-editor-container {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ========== 计划完成庆祝动画 ========== */
+@keyframes confetti {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes celebration-bounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(-90deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes celebration-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4);
+  }
+}
+
+.animate-confetti {
+  animation: confetti linear infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-celebration-glow {
+  animation: celebration-glow 2s ease-in-out infinite;
+}
+
+/* 庆祝弹窗的渐变背景 */
+.celebration-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 庆祝弹窗的闪光边框 */
+.celebration-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #dda0dd);
+  background-size: 400% 400%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: celebration-border-glow 3s ease infinite;
+}
+
+@keyframes celebration-border-glow {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
   }
 }
 
@@ -1737,14 +1968,12 @@ body.eye-care.dark .text-muted-foreground,
 .hover-effect:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .hover-effect[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .hover-effect[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
-  background-color: var(--hover-light) !important;
   transition-duration: 1ms !important;
 }
 
 .dark .hover-effect:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .dark .hover-effect[role="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
 .dark .hover-effect[data-slot="button"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]) {
-  background-color: var(--hover-dark) !important;
   transition-duration: 1ms !important;
 }
 
@@ -1798,9 +2027,7 @@ body.eye-care.dark .text-muted-foreground,
 
 /* Utility class for outline button hover effects */
 .outline-hover-effect[data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]),
-.outline-hover-effect[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]) {
-  border-color: var(--input-border) !important;
-}
+.outline-hover-effect[data-slot="button"][data-variant="outline"]:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-plan-button]) {}
 
 /* destructive 按钮样式 */
 .destructive,
@@ -1882,7 +2109,7 @@ button[style*="background:#dc2626"] *,
 [data-slot="tabs-trigger"][data-state="active"] {
   background-color: rgba(255, 255, 255, 0.7) !important;
   color: var(--foreground) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+  box-shadow: none !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
   font-weight: 500 !important;
@@ -1891,7 +2118,7 @@ button[style*="background:#dc2626"] *,
 .dark [data-slot="tabs-trigger"][data-state="active"] {
   background-color: rgba(255, 255, 255, 0.15) !important;
   color: var(--foreground) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: none !important;
   backdrop-filter: blur(8px) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   font-weight: 500 !important;
@@ -1905,9 +2132,7 @@ button[style*="background:#dc2626"] *,
 /* 卡片保持优雅的过渡效果 */
 [data-slot="card"],
 .card,
-.shadow-md,
-.hover\:shadow-lg,
-.hover\:-translate-y-1 {
+.shadow-md {
   transition-duration: 300ms !important;
 }
 

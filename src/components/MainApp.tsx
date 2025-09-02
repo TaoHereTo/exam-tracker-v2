@@ -42,6 +42,7 @@ import { AutoCloudSync } from "@/lib/autoCloudSync";
 import { useThemeMode } from "@/hooks/useThemeMode";
 
 import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggler";
+import { PlanCompletionCelebration } from "@/components/ui/PlanCompletionCelebration";
 
 import { PageTitle } from "@/components/ui/PageTitle";
 import { LoadingWrapper, SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -56,7 +57,7 @@ import {
     AlertDialogCancel,
     AlertDialogAction,
 } from "@/components/ui/alert-dialog";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { normalizePageTitle } from "@/config/exam";
 import { clearLocalStorageData } from "@/lib/storageUtils";
 
@@ -138,6 +139,10 @@ export function MainApp() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [recordsToDelete, setRecordsToDelete] = useState<string[]>([]);
 
+    // 计划完成庆祝弹窗状态
+    const [celebrationOpen, setCelebrationOpen] = useState(false);
+    const [completedPlan, setCompletedPlan] = useState<StudyPlan | null>(null);
+
     const loadUserProfile = useCallback(async () => {
         try {
             // 使用ensureUserProfile确保用户资料存在
@@ -175,6 +180,24 @@ export function MainApp() {
     const [isClient, setIsClient] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
+    // 计划完成回调函数 - Moved this function before useEffect that uses it
+    const handlePlanCompleted = useCallback((plan: StudyPlan) => {
+        setCompletedPlan(plan);
+        setCelebrationOpen(true);
+    }, []);
+
+    // 处理庆祝弹窗关闭
+    const handleCelebrationClose = useCallback(() => {
+        setCelebrationOpen(false);
+        setCompletedPlan(null);
+    }, []);
+
+    // 处理查看计划
+    const handleViewCompletedPlans = useCallback(() => {
+        setActiveTab('plan-list');
+        // 可以在这里添加滚动到已完成计划的逻辑
+    }, []);
+
     useEffect(() => {
         setIsClient(true);
 
@@ -191,7 +214,10 @@ export function MainApp() {
                 }
             }, 0);
         }
-    }, []);
+
+        // 移除键盘测试快捷键
+        return () => { };
+    }, []); // Removed handlePlanCompleted from dependencies since it's now defined before this useEffect
 
     // 计划和刷题历史持久化到localStorage
     const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
@@ -310,12 +336,13 @@ export function MainApp() {
                                 </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleSignOutClick} className="flex justify-center text-red-600 hover:text-red-700 focus:text-red-700">
+                            <DropdownMenuItem onClick={handleSignOutClick} className="flex justify-center text-red-600 focus:text-red-700">
                                 <div className="flex items-center gap-4">
                                     <LogOut className="h-4 w-4 text-red-600" />
                                     <MixedText text="退出登录" />
                                 </div>
                             </DropdownMenuItem>
+
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </SidebarMenuItem>
@@ -470,16 +497,7 @@ export function MainApp() {
         });
     }, [plans, records]);
 
-    // 计划完成回调函数
-    const handlePlanCompleted = useCallback((plan: StudyPlan) => {
-        notify({
-            type: 'success',
-            message: '恭喜！你完成了一项计划！',
-            description: `学习计划"${plan.name}"已完成！继续保持！`
-        });
-    }, [notify]);
-
-    // 使用计划进度hook
+    // 使用计划进度hook - Moved this after handlePlanCompleted is defined
     usePlanProgress(plans, setPlans, records, calcPlanProgress, handlePlanCompleted);
 
     // 计算统计数据 - 优化性能
@@ -534,10 +552,10 @@ export function MainApp() {
 
         // 导入知识点（去重）- 改进的去重逻辑
         // 创建现有知识点的内容键集合
-        const existingKnowledgeContentKeys = new Set(knowledge.map(k => 
+        const existingKnowledgeContentKeys = new Set(knowledge.map(k =>
             `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
         ));
-        
+
         const newKnowledge = pendingImport.knowledge.filter(k => {
             // 为导入的知识点创建内容键
             const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;
@@ -601,11 +619,15 @@ export function MainApp() {
                                 <SidebarInset className="flex flex-col flex-1">
                                     {/* 固定的侧边栏触发器和标题栏 - 响应式设计 */}
                                     <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
-                                        <SidebarTrigger className="size-8 sm:size-10 hover:bg-accent hover:text-accent-foreground [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
+                                        <SidebarTrigger className="size-8 sm:size-10 [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal transition-all duration-300 ease-out hover:scale-105 active:scale-95" />
                                         <div className="min-w-0 flex-1">
-                                            <PageTitle className="text-lg sm:text-xl md:text-2xl truncate">{normalizePageTitle(activeTab)}</PageTitle>
+                                            <PageTitle
+                                                className="text-lg sm:text-xl md:text-2xl truncate cursor-pointer"
+                                            >
+                                                {normalizePageTitle(activeTab)}
+                                            </PageTitle>
                                         </div>
-                                        <div className="flex items-center">
+                                        <div className="flex items-center gap-2">
                                             <AnimatedThemeToggler className="w-8 h-8 sm:w-10 sm:h-10" />
                                         </div>
                                     </div>
@@ -898,12 +920,12 @@ export function MainApp() {
                                                 />
                                             </Suspense>
                                         )}
-                                </div>
+                                    </div>
                                 </SidebarInset>
                             </div>
                         </SidebarProvider>
                     </LoadingWrapper>
-                        
+
                     {/* 导入确认对话框 - 响应式设计 */}
                     <AlertDialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
                         <AlertDialogContent className="w-11/12 max-w-md sm:max-w-lg">
@@ -927,8 +949,8 @@ export function MainApp() {
                             </AlertDialogHeader>
                             <AlertDialogFooter className="flex-col sm:flex-row">
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction 
-                                    onClick={handleConfirmImport} 
+                                <AlertDialogAction
+                                    onClick={handleConfirmImport}
                                     className="w-full sm:w-auto"
                                     style={{ background: '#10B981', color: 'white' }}
                                 >
@@ -980,6 +1002,14 @@ export function MainApp() {
                         </AlertDialogContent>
                     </AlertDialog>
 
+
+                    {/* 计划完成庆祝弹窗 */}
+                    <PlanCompletionCelebration
+                        isOpen={celebrationOpen}
+                        onClose={handleCelebrationClose}
+                        onViewPlans={handleViewCompletedPlans}
+                        planName={completedPlan?.name || ''}
+                    />
 
                     {/* 用户资料对话框 - 响应式设计 */}
                     <UserProfileDialog

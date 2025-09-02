@@ -259,6 +259,7 @@ export function FormSelect({ name, placeholder, children, className = '', style 
         >
             <SelectTrigger
                 className={`w-full ${className}`}
+                style={{ transition: 'none', transform: 'none', boxShadow: 'none' }}
             >
                 <SelectValue placeholder={placeholder} />
             </SelectTrigger>

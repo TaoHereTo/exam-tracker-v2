@@ -456,7 +456,7 @@ export function AdvancedSetting() {
                                                 key={image.id}
                                                 className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
                                                     ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
-                                                    : 'hover:border-gray-300 dark:hover:border-gray-600'
+                                                    : ''
                                                     } ${imageManagerView === 'list' ? 'flex items-center gap-2 sm:gap-3 p-2' : 'p-1 sm:p-2'}`}
                                                 onClick={() => {
                                                     const newSelected = new Set(selectedImages);
@@ -467,6 +467,7 @@ export function AdvancedSetting() {
                                                     }
                                                     setSelectedImages(newSelected);
                                                 }}
+
                                             >
                                                 {/* 选择框 */}
                                                 <input
@@ -532,7 +533,7 @@ export function AdvancedSetting() {
                                                                             // 打开图片预览
                                                                             window.open(image.url, '_blank');
                                                                         }}
-                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9"
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-gray-800/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90"
                                                                     >
                                                                         <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
                                                                     </Button>
@@ -665,6 +666,8 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
 
 
 

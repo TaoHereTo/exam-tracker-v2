@@ -15,18 +15,33 @@ interface MarkdownEditorProps {
     height?: number;
 }
 
-export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
+const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     value,
     onChange,
     placeholder = '请输入内容...',
     className = '',
     height = 200
 }) => {
-    const { isDarkMode } = useThemeMode();
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
     const [activeFormats, setActiveFormats] = useState<string[]>([]);
+    
+    // 添加主题切换检测
+    const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
+    
+    useEffect(() => {
+        const handleTransitionStart = () => setIsThemeTransitioning(true);
+        const handleTransitionEnd = () => setIsThemeTransitioning(false);
+        
+        document.addEventListener('startViewTransition', handleTransitionStart);
+        document.addEventListener('endViewTransition', handleTransitionEnd);
+        
+        return () => {
+            document.removeEventListener('startViewTransition', handleTransitionStart);
+            document.removeEventListener('endViewTransition', handleTransitionEnd);
+        };
+    }, []);
 
     // 检测当前选中文本的格式状态
     const checkActiveFormats = useCallback(() => {
@@ -110,26 +125,35 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         setActiveFormats(checkActiveFormats());
     };
 
-    // 添加 useEffect 来监听初始状态
+    // 添加 useEffect 来监听初始状态 - 优化版本
     useEffect(() => {
         const textarea = textareaRef.current;
         if (textarea) {
             // 初始化格式状态
             setActiveFormats(checkActiveFormats());
             
-            // 添加事件监听器
-            const handleClick = () => setActiveFormats(checkActiveFormats());
-            const handleKeyUp = () => setActiveFormats(checkActiveFormats());
+            // 使用防抖的事件处理器来减少频繁更新
+            let debounceTimer: NodeJS.Timeout;
+            const debouncedFormatCheck = () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => {
+                    setActiveFormats(checkActiveFormats());
+                }, 100); // 100ms防抖
+            };
+            
+            const handleClick = debouncedFormatCheck;
+            const handleKeyUp = debouncedFormatCheck;
             
             textarea.addEventListener('click', handleClick);
             textarea.addEventListener('keyup', handleKeyUp);
             
             return () => {
+                clearTimeout(debounceTimer);
                 textarea.removeEventListener('click', handleClick);
                 textarea.removeEventListener('keyup', handleKeyUp);
             };
         }
-    }, [value, checkActiveFormats]);
+    }, [checkActiveFormats]); // 移除value依赖，减少重新绑定
 
     // 插入文本函数
     const insertText = (text: string) => {
@@ -256,7 +280,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         // 不要在预览模式下自动退出全屏
     };
 
-    // 全屏样式
+    // 全屏样式 - 使用CSS变量避免JS计算
     const fullscreenStyle = isFullscreen ? {
         position: 'fixed' as const,
         top: 0,
@@ -264,7 +288,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         right: 0,
         bottom: 0,
         zIndex: 9999,
-        backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+        backgroundColor: 'var(--background)', // 使用CSS变量
         padding: '20px',
     } : {};
 
@@ -273,7 +297,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
     return (
         <TooltipProvider>
-            <div className={`w-full ${className}`} style={fullscreenStyle}>
+            <div className={`w-full markdown-editor-container ${className}`} style={fullscreenStyle}>
                 <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
                     {/* 工具栏 */}
                     <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#0A0A0A]">
@@ -552,7 +576,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                     onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
                                     style={{ height: dynamicHeight }}
-                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
+                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea"
                                 />
                             </div>
                             {/* 右侧预览区域 */}
@@ -574,7 +598,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
                                 onKeyDown={handleKeyDown}
                                 placeholder={placeholder}
                                 style={{ height: dynamicHeight }}
-                                className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed"
+                                className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea"
                             />
                         </div>
                     )}
@@ -582,4 +606,8 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             </div>
         </TooltipProvider>
     );
-};
+});
+
+MarkdownEditorComponent.displayName = 'MarkdownEditor';
+
+export { MarkdownEditorComponent as MarkdownEditor };

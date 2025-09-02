@@ -268,8 +268,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 key={image.id}
                                                 className={`group relative cursor-pointer rounded-lg border-2 transition-all hover:shadow-md ${selectedImage === image.id
                                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                                    }`}
+                                                    : 'border-gray-200 dark:border-gray-700'
+                                                    } transition-all duration-300 ease-out hover:scale-105 active:scale-95`}
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
                                                 <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
@@ -332,16 +332,17 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <Button variant="outline" onClick={handleCancel} className="button-hover-secondary">
+                        <Button variant="outline" onClick={handleCancel} className="transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95">
                             <MixedText text="取消" />
                         </Button>
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
-                            className="button-hover-primary"
+                            className="transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
                         >
                             <MixedText text="确认选择" />
                         </Button>
+
                     </div>
                 </DialogContent>
             </Dialog>
@@ -399,4 +400,6 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 }; 
+
+
 

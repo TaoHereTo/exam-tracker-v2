@@ -122,7 +122,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <button
                         type="button"
                         onClick={onSwitchToForgotPassword}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline transition-all duration-300 ease-out hover:scale-105 active:scale-95"
                     >
                         <MixedText text="忘记密码？" />
                     </button>
@@ -147,7 +147,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <button
                         type="button"
                         onClick={onSwitchToSignUp}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline ml-1"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 transition-all duration-300 ease-out hover:scale-105 active:scale-95"
                     >
                         <MixedText text="现在注册" />
                     </button>

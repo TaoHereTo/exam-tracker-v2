@@ -31,7 +31,7 @@ const TabsList = React.forwardRef<
       ref={ref}
       data-slot="tabs-list"
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-md bg-muted/20 backdrop-blur-md border border-gray-300/70 dark:border-gray-600/70 shadow-lg p-1 text-muted-foreground w-fit",
+        "inline-flex h-10 items-center justify-center rounded-md bg-muted/20 backdrop-blur-md border border-gray-300/70 dark:border-gray-600/70 p-1 text-muted-foreground w-fit",
         className
       )}
       {...props}
@@ -52,11 +52,13 @@ const TabsTrigger = React.forwardRef<
       ref={ref}
       data-slot="tabs-trigger"
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition-all outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white/70 data-[state=active]:text-foreground data-[state=active]:shadow-md data-[state=active]:backdrop-blur-sm data-[state=active]:border data-[state=active]:border-white/20 data-[state=active]:font-medium dark:data-[state=active]:bg-white/15 dark:data-[state=active]:border-white/10",
+        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white/70 data-[state=active]:text-foreground data-[state=active]:backdrop-blur-sm data-[state=active]:border data-[state=active]:border-white/20 data-[state=active]:font-medium dark:data-[state=active]:bg-white/15 dark:data-[state=active]:border-white/10",
         className
       )}
       style={{
-        outline: 'none'
+        outline: 'none',
+        transition: 'none',
+        transform: 'none'
       }}
       onFocus={(e) => {
         e.currentTarget.style.outline = 'none';

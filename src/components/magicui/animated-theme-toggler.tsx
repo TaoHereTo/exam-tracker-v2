@@ -22,37 +22,51 @@ export const AnimatedThemeToggler = ({ className }: props) => {
     
     const newTheme = theme === "dark" ? "light" : "dark";
     
-    await document.startViewTransition(() => {
-      flushSync(() => {
-        setTheme(newTheme);
-      });
-    }).ready;
-
-    const { top, left, width, height } =
-      buttonRef.current.getBoundingClientRect();
-    const y = top + height / 2;
-    const x = left + width / 2;
-
-    const right = window.innerWidth - left;
-    const bottom = window.innerHeight - top;
-    const maxRad = Math.hypot(Math.max(left, right), Math.max(top, bottom));
-
-    document.documentElement.animate(
-      {
-        clipPath: [
-          `circle(0px at ${x}px ${y}px)`,
-          `circle(${maxRad}px at ${x}px ${y}px)`,
-        ],
-      },
-      {
-        duration: 700,
-        easing: "ease-in-out",
-        pseudoElement: "::view-transition-new(root)",
-      },
-    );
+    // 检查浏览器是否支持 View Transition API
+    if (!document.startViewTransition) {
+      // 如果不支持，直接切换主题
+      setTheme(newTheme);
+      setTimeout(() => setIsAnimating(false), 200);
+      return;
+    }
     
-    // Reset animation state after a delay
-    setTimeout(() => setIsAnimating(false), 700);
+    try {
+      await document.startViewTransition(() => {
+        flushSync(() => {
+          setTheme(newTheme);
+        });
+      }).ready;
+
+      const { top, left, width, height } =
+        buttonRef.current.getBoundingClientRect();
+      const y = top + height / 2;
+      const x = left + width / 2;
+
+      // 简化计算，减少性能开销
+      const maxRad = Math.max(window.innerWidth, window.innerHeight) * 1.2;
+
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${maxRad}px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: 400, // 减少动画时间
+          easing: "ease-out", // 使用更简单的缓动函数
+          pseudoElement: "::view-transition-new(root)",
+        },
+      );
+      
+      // Reset animation state after a delay
+      setTimeout(() => setIsAnimating(false), 400);
+    } catch (error) {
+      // 如果动画失败，直接切换主题
+      console.warn('Theme transition animation failed:', error);
+      setTheme(newTheme);
+      setTimeout(() => setIsAnimating(false), 200);
+    }
   };
   
   return (
@@ -60,7 +74,7 @@ export const AnimatedThemeToggler = ({ className }: props) => {
       ref={buttonRef} 
       onClick={changeTheme} 
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full bg-background border border-input-border shadow-sm hover:bg-accent hover:text-accent-foreground transition-colors",
+        "flex items-center justify-center w-10 h-10 rounded-full bg-background border border-input-border shadow-sm transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95",
         className
       )}
       disabled={isAnimating}

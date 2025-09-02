@@ -56,7 +56,7 @@ export function DateRangePicker({
         },
         [onDateRangeChange]
     )
-    
+
     const handleOpenChange = React.useCallback((nextOpen: boolean) => {
         if (nextOpen) {
             // 打开时将月份对齐到已选日期
@@ -65,17 +65,17 @@ export function DateRangePicker({
         }
         setOpen(nextOpen)
     }, [dateRange?.from, dateRange?.to])
-    
+
     // Prevent popover from closing when interacting with calendar elements
     const handleCalendarInteraction = (e: React.MouseEvent | React.PointerEvent) => {
         e.stopPropagation()
     }
-    
+
     // Handle month/year dropdown changes without closing the popover
     const handleMonthChange = React.useCallback((month: Date) => {
         setCurrentMonth(month)
     }, [])
-    
+
     return (
         <div className={cn("grid gap-2", className)}>
             <Popover open={open} onOpenChange={handleOpenChange}>
@@ -90,6 +90,11 @@ export function DateRangePicker({
                             disabled && "opacity-50 cursor-not-allowed"
                         )}
                         disabled={disabled}
+                        style={{
+                            transition: 'none',
+                            transform: 'none',
+                            boxShadow: 'none'
+                        }}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {dateRange?.from ? (
@@ -107,8 +112,8 @@ export function DateRangePicker({
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent 
-                    className="w-auto p-0 text-black dark:text-white" 
+                <PopoverContent
+                    className="w-auto p-0 text-black dark:text-white"
                     align="start"
                     onPointerDownOutside={(e) => {
                         // Prevent closing when interacting with dropdowns
@@ -125,7 +130,7 @@ export function DateRangePicker({
                         }
                     }}
                 >
-                    <div 
+                    <div
                         onClick={handleCalendarInteraction}
                         onPointerDown={handleCalendarInteraction}
                     >

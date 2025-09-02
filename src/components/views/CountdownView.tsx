@@ -236,7 +236,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium button-hover-success"
+                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="添加考试" />
@@ -301,7 +301,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                     </AlertDialogDescription>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600 hover:bg-red-700"><MixedText text="确认删除" /></AlertDialogAction>
+                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600 transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"><MixedText text="确认删除" /></AlertDialogAction>
+
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>
@@ -327,7 +328,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </p>
                         <Button
                             onClick={() => handleOpenForm()}
-                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium button-hover-success"
+                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             <MixedText text="立即添加" />
@@ -365,7 +366,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 <PopoverTrigger asChild>
                                                     <button
                                                         type="button"
-                                                        className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow] button-hover-secondary"
+                                                        className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
                                                         onClick={() => setDateOpen(true)}
                                                     >
                                                         <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
@@ -433,14 +434,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         type="button"
                                         variant="outline"
                                         onClick={handleCloseForm}
-                                        className="h-10 px-4 button-hover-secondary"
+                                        className="h-10 px-4"
                                     >
                                         <MixedText text="取消" />
                                     </Button>
                                     <Button
                                         type="submit"
                                         variant="primary"
-                                        className="h-10 px-4 button-hover-primary"
+                                        className="h-10 px-4"
                                     >
                                         {editId ? <MixedText text="更新" /> : <MixedText text="添加考试" />}
                                     </Button>
