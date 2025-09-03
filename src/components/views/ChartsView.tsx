@@ -291,11 +291,11 @@ export function ChartsView({ records }: ChartsViewProps) {
         <div className="flex flex-col items-center justify-start min-h-[80vh] mt-6 w-full">
             <Tabs defaultValue="perMinute" className="w-full mb-6">
                 <div className="flex justify-center mb-4 w-full">
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide w-auto max-w-full justify-start h-auto min-h-[40px]">
-                        <TabsTrigger value="perMinute" className="whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
-                        <TabsTrigger value="accuracy" className="whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
-                        <TabsTrigger value="pie" className="whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
-                        <TabsTrigger value="radar" className="whitespace-nowrap"><MixedText text="模块能力" /></TabsTrigger>
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full mx-auto">
+                        <TabsTrigger value="perMinute" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-gray-600 dark:data-[state=active]:bg-transparent"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-gray-600 dark:data-[state=active]:bg-transparent"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-gray-600 dark:data-[state=active]:bg-transparent"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-gray-600 dark:data-[state=active]:bg-transparent"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
                 <TabsContent value="perMinute" className="p-0 border-0">

@@ -54,7 +54,7 @@
 .md-toolbar-button-fullscreen {}
 
 .md-toolbar-button-fullscreen.active {
-  @apply bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 shadow-md border-indigo-200 dark:border-indigo-700;
+  @apply text-indigo-700 dark:text-indigo-300 shadow-md border-indigo-200 dark:border-indigo-700;
 }
 
 /* 通用按钮hover效果 */

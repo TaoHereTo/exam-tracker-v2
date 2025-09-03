@@ -4,94 +4,63 @@ import * as React from "react"
 import * as TabsPrimitive from "@radix-ui/react-tabs"
 
 import { cn } from "@/lib/utils"
-import { MixedText } from "./MixedText"
 
-const Tabs = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof TabsPrimitive.Root>
->(function Tabs({ className, ...props }, ref) {
+function Tabs({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
     <TabsPrimitive.Root
-      ref={ref}
       data-slot="tabs"
       className={cn("flex flex-col gap-2", className)}
       {...props}
     />
   )
-})
+}
 
-Tabs.displayName = "Tabs"
-
-const TabsList = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof TabsPrimitive.List>
->(function TabsList({ className, children, ...props }, ref) {
+function TabsList({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
-      ref={ref}
       data-slot="tabs-list"
       className={cn(
-        "inline-flex h-10 items-center justify-center rounded-md bg-muted/20 backdrop-blur-md border border-gray-300/70 dark:border-gray-600/70 p-1 text-muted-foreground w-fit",
+        "bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]",
         className
       )}
       {...props}
-    >
-      {typeof children === 'string' ? <MixedText text={children} /> : children}
-    </TabsPrimitive.List>
+    />
   )
-})
+}
 
-TabsList.displayName = "TabsList"
-
-const TabsTrigger = React.forwardRef<
-  HTMLButtonElement,
-  React.ComponentProps<typeof TabsPrimitive.Trigger>
->(function TabsTrigger({ className, children, ...props }, ref) {
+function TabsTrigger({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Trigger>) {
   return (
     <TabsPrimitive.Trigger
-      ref={ref}
       data-slot="tabs-trigger"
       className={cn(
-        "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium outline-none disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-foreground data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:shadow-[inset_0_0_0_1px_rgba(0,0,0,0.06)] dark:data-[state=active]:bg-white/15 dark:data-[state=active]:border-white/10 dark:data-[state=active]:shadow-none",
+        "data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:outline-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground inline-flex h-[calc(100%-1px)] flex-1 items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1 text-sm font-medium whitespace-nowrap transition-[color,box-shadow] focus-visible:ring-[3px] focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:shadow-sm [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
-      style={{
-        outline: 'none',
-        transition: 'none',
-        transform: 'none'
-      }}
-      onFocus={(e) => {
-        e.currentTarget.style.outline = 'none';
-        // Only remove box-shadow if not in active state
-        if (e.currentTarget.dataset.state !== 'active') {
-          e.currentTarget.style.boxShadow = 'none';
-        }
-      }}
       {...props}
-    >
-      {typeof children === 'string' ? <MixedText text={children} /> : children}
-    </TabsPrimitive.Trigger>
+    />
   )
-})
+}
 
-TabsTrigger.displayName = "TabsTrigger"
-
-const TabsContent = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<typeof TabsPrimitive.Content>
->(function TabsContent({ className, children, ...props }, ref) {
+function TabsContent({
+  className,
+  ...props
+}: React.ComponentProps<typeof TabsPrimitive.Content>) {
   return (
     <TabsPrimitive.Content
-      ref={ref}
       data-slot="tabs-content"
-      className={cn("mt-2 rounded-md border border-muted bg-background p-6", className)}
+      className={cn("flex-1 outline-none", className)}
       {...props}
-    >
-      {typeof children === 'string' ? <MixedText text={children} /> : children}
-    </TabsPrimitive.Content>
+    />
   )
-})
-
-TabsContent.displayName = "TabsContent"
+}
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
