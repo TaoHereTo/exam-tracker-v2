@@ -371,7 +371,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                             <Button
                                                                 variant="outline"
                                                                 size="icon"
-                                                                className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                                                className="h-9 w-9"
                                                                 type="button"
                                                                 onClick={(e) => {
                                                                     e.preventDefault();
@@ -398,7 +398,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                                 <Button
                                                                     variant="outline"
                                                                     size="icon"
-                                                                    className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                                                    className="h-9 w-9"
                                                                     type="button"
                                                                     onClick={(e) => {
                                                                         e.preventDefault();
@@ -427,7 +427,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                                     data-cloud-selector="true"
                                                                     variant="outline"
                                                                     size="icon"
-                                                                    className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                                                    className="h-9 w-9"
                                                                     type="button"
                                                                 >
                                                                     <CloudCheck className="w-5 h-5" />
@@ -491,7 +491,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             size="sm"
                                             variant="secondary"
                                             onClick={handlePreview}
-                                            className="h-8 w-8 p-0 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                            className="h-8 w-8 p-0"
                                         >
                                             <Eye className="h-5 w-5" />
                                         </Button>
@@ -509,7 +509,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             variant="destructive"
                                             onClick={handleRemoveImage}
                                             disabled={isDeleting}
-                                            className="h-8 w-8 p-0 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                            className="h-8 w-8 p-0"
                                         >
                                             <X className="h-4 w-4" />
                                         </Button>
@@ -540,7 +540,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             }}
                                             variant="outline"
                                             size="icon"
-                                            className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                            className="h-9 w-9"
                                         >
                                             <Inbox className="w-5 h-5" />
                                         </Button>
@@ -560,7 +560,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 type="button"
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                                className="h-9 w-9"
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
@@ -589,7 +589,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                 type="button"
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-9 w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90 hover:shadow-lg"
+                                                className="h-9 w-9"
                                             >
                                                 <CloudCheck className="w-5 h-5" />
                                             </Button>

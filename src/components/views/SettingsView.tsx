@@ -184,7 +184,7 @@ export function SettingsView({
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
-                                                        className="h-8 sm:h-9 w-8 sm:w-9 p-0 button-hover-danger"
+                                                        className="h-8 sm:h-9 w-8 sm:w-9 p-0"
                                                         onClick={() => {
                                                             setClearDataDialogOpen(true);
                                                         }}
@@ -214,7 +214,7 @@ export function SettingsView({
                                                     }
                                                     setClearDataDialogOpen(false);
                                                 }}
-                                                className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9")}
+                                                className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9")}
                                             >
                                                 确认清空
                                             </AlertDialogAction>
@@ -266,7 +266,7 @@ export function SettingsView({
                                                 disabled={isUploading}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-success"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
                                                 <CloudUpload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
@@ -282,7 +282,7 @@ export function SettingsView({
                                                 disabled={isDownloading}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-info"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
                                                 <CloudDownload className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
@@ -297,7 +297,7 @@ export function SettingsView({
                                                 onClick={handleViewCloudData}
                                                 variant="outline"
                                                 size="sm"
-                                                className="h-8 sm:h-9 w-8 sm:w-9 button-hover-secondary"
+                                                className="h-8 sm:h-9 w-8 sm:w-9"
                                             >
                                                 <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
                                             </Button>
@@ -331,7 +331,7 @@ export function SettingsView({
                                         </div>
                                         <button
                                             onClick={handleCancelUpload}
-                                            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-500 text-white flex items-center justify-center transition-all duration-300 ease-out hover:scale-110 active:scale-90"
+                                            className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-red-500 text-white flex items-center justify-center"
                                             title="取消上传"
                                         >
 

@@ -87,12 +87,6 @@ th .mixed-text-part {
     min-width: 600px;
   }
 
-  .table-fixed td,
-  .table-fixed th {
-    white-space: nowrap;
-    padding: 0.5rem 0.75rem;
-  }
-
   /* 确保设置页面的开关和按钮在移动端正确对齐 */
   .settings-row {
     flex-direction: row !important;
@@ -490,12 +484,28 @@ html:not(:has(::view-transition-group(root))) * {
 }
 
 /* 主题切换完成后恢复 */
-html:not(:has(::view-transition-group(root))) .markdown-editor-container {
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container {
   pointer-events: auto;
 }
 
-html:not(:has(::view-transition-group(root))) .markdown-editor-textarea {
-  will-change: transform;
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+/* 为不支持 :has() 的浏览器提供备用方案 */
+@supports not (selector(:has(*))) {
+  .knowledge-entry-container .knowledge-entry-container {
+    transition: opacity 0.1s ease;
+  }
+
+  .theme-transitioning .knowledge-entry-container .knowledge-entry-container {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 /* ========== 知识点录入页面优化 ========== */
@@ -512,12 +522,12 @@ html:not(:has(::view-transition-group(root))) .markdown-editor-textarea {
   /* 强制硬件加速 */
 }
 
-::view-transition-group(root) .knowledge-entry-container .markdown-editor-container {
+::view-transition-group(root) .knowledge-entry-container .knowledge-entry-container {
   display: none !important;
   /* 完全隐藏编辑器 */
 }
 
-::view-transition-group(root) .markdown-editor-textarea {
+::view-transition-group(root) .knowledge-entry-container .knowledge-entry-container {
   display: none !important;
 }
 
@@ -527,21 +537,21 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container {
   transform: none;
 }
 
-html:not(:has(::view-transition-group(root))) .knowledge-entry-container .markdown-editor-container {
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
   display: block !important;
 }
 
-html:not(:has(::view-transition-group(root))) .markdown-editor-textarea {
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
   display: block !important;
 }
 
 /* 为不支持 :has() 的浏览器提供备用方案 */
 @supports not (selector(:has(*))) {
-  .knowledge-entry-container .markdown-editor-container {
+  .knowledge-entry-container .knowledge-entry-container {
     transition: opacity 0.1s ease;
   }
 
-  .theme-transitioning .knowledge-entry-container .markdown-editor-container {
+  .theme-transitioning .knowledge-entry-container .knowledge-entry-container {
     opacity: 0;
     pointer-events: none;
   }
@@ -1639,12 +1649,7 @@ body.eye-care.dark .text-muted-foreground,
 /* Tabs component now handles all styling, removing global overrides */
 
 /* Calendar: 强制禁用 outside 与 aria-disabled 的点击 */
-[data-slot="calendar"] button[aria-disabled="true"],
-[data-slot="calendar"] .rdp-day.rdp-outside button,
-[data-slot="calendar"] .rdp-day[data-outside="true"] button,
-[data-slot="calendar"] .rdp-day[aria-disabled="true"] button {
-  pointer-events: none !important;
-}
+/* Calendar component now handles all styling, removing global overrides */
 
 /* 过渡效果优化 */
 .transition-colors {
@@ -1761,11 +1766,6 @@ table {
   font-size: 0.875rem;
 }
 
-th,
-td {
-  padding: 0.5rem 0.75rem !important;
-}
-
 /* Mobile tab bar improvements */
 /* Tabs component now handles all styling, removing global overrides */
 
@@ -1783,11 +1783,6 @@ td {
   /* Further mobile table improvements */
   table {
     font-size: 0.8rem;
-  }
-
-  th,
-  td {
-    padding: 0.4rem 0.6rem !important;
   }
 
   .page-title-sticky {

@@ -619,7 +619,7 @@ export function MainApp() {
                                 <SidebarInset className="flex flex-col flex-1">
                                     {/* 固定的侧边栏触发器和标题栏 - 响应式设计 */}
                                     <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
-                                        <SidebarTrigger className="size-8 sm:size-10 [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal transition-all duration-300 ease-out hover:scale-105 active:scale-95" />
+                                        <SidebarTrigger className="size-8 sm:size-10 [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
                                         <div className="min-w-0 flex-1">
                                             <PageTitle
                                                 className="text-lg sm:text-xl md:text-2xl truncate cursor-pointer"
@@ -975,7 +975,7 @@ export function MainApp() {
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleConfirmDelete}
-                                    className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto")}
+                                    className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto")}
                                     style={{ color: 'white' }}
                                 >
                                     <MixedText text="确认删除" />
@@ -995,7 +995,7 @@ export function MainApp() {
                             </AlertDialogHeader>
                             <AlertDialogFooter className="flex-col sm:flex-row">
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction onClick={handleSignOut} className={cn(buttonVariants({ variant: "danger" }), "w-full sm:w-auto")}>
+                                <AlertDialogAction onClick={handleSignOut} className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto")}>
                                     <MixedText text="确认退出" />
                                 </AlertDialogAction>
                             </AlertDialogFooter>

@@ -25,20 +25,11 @@ function Calendar({
 }) {
   const defaultClassNames = getDefaultClassNames()
 
-  // Simplified approach - just add the outside: true to whatever disabled prop is passed
-  const disabledWithOutside = props.disabled ? 
-    Array.isArray(props.disabled) ? 
-      [...props.disabled, { outside: true }] : 
-      [props.disabled, { outside: true }] : 
-    [{ outside: true }]
-
   return (
     <DayPicker
-      // 仍显示非当月日期，但禁用
       showOutsideDays={showOutsideDays}
-      disabled={disabledWithOutside as React.ComponentProps<typeof DayPicker>['disabled']}
       className={cn(
-        "bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "bg-background group/calendar p-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
         String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
         className
@@ -52,80 +43,82 @@ function Calendar({
       classNames={{
         root: cn("w-fit", defaultClassNames.root),
         months: cn(
-          "relative flex flex-col gap-4 md:flex-row",
+          "flex gap-4 flex-col md:flex-row relative",
           defaultClassNames.months
         ),
-        month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
+        month: cn("flex flex-col w-full gap-4", defaultClassNames.month),
         nav: cn(
-          "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
+          "flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between",
           defaultClassNames.nav
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
+          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "h-[--cell-size] w-[--cell-size] select-none p-0 aria-disabled:opacity-50",
+          "size-(--cell-size) aria-disabled:opacity-50 p-0 select-none",
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex h-[--cell-size] w-full items-center justify-center px-[--cell-size]",
+          "flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)",
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
-          "flex h-[--cell-size] w-full items-center justify-center gap-1 text-sm font-medium",
+          "w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5",
           defaultClassNames.dropdowns
         ),
         dropdown_root: cn(
-          "has-focus:border-ring border-input has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border",
+          "relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md",
           defaultClassNames.dropdown_root
         ),
-        dropdown: cn("absolute inset-0 opacity-0", defaultClassNames.dropdown),
+        dropdown: cn(
+          "absolute bg-popover inset-0 opacity-0",
+          defaultClassNames.dropdown
+        ),
         caption_label: cn(
           "select-none font-medium",
           captionLayout === "label"
             ? "text-sm"
-            : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5",
+            : "rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5",
           defaultClassNames.caption_label
         ),
         table: "w-full border-collapse",
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
-          "text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal",
+          "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none",
           defaultClassNames.weekday
         ),
-        week: cn("mt-2 flex w-full", defaultClassNames.week),
+        week: cn("flex w-full mt-2", defaultClassNames.week),
         week_number_header: cn(
-          "w-[--cell-size] select-none",
+          "select-none w-(--cell-size)",
           defaultClassNames.week_number_header
         ),
         week_number: cn(
-          "text-muted-foreground select-none text-[0.8rem]",
+          "text-[0.8rem] select-none text-muted-foreground",
           defaultClassNames.week_number
         ),
         day: cn(
-          "group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md",
+          "relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none",
           defaultClassNames.day
         ),
         range_start: cn(
-          "bg-accent rounded-l-md",
+          "rounded-l-md bg-accent",
           defaultClassNames.range_start
         ),
         range_middle: cn("rounded-none", defaultClassNames.range_middle),
-        range_end: cn("bg-accent rounded-r-md", defaultClassNames.range_end),
+        range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
         today: cn(
           "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
           defaultClassNames.today
         ),
         outside: cn(
-          // 更明显地区分非当月日期
-          "text-gray-400 dark:text-gray-500 opacity-60",
+          "text-muted-foreground aria-selected:text-muted-foreground",
           defaultClassNames.outside
         ),
         disabled: cn(
-          "text-muted-foreground opacity-50 pointer-events-none",
+          "text-muted-foreground opacity-50",
           defaultClassNames.disabled
         ),
         hidden: cn("invisible", defaultClassNames.hidden),
@@ -133,22 +126,11 @@ function Calendar({
       }}
       components={{
         Root: ({ className, rootRef, ...props }) => {
-          // Handle pointer events to prevent calendar from closing when interacting with dropdowns
-          const handlePointerDown = (e: React.PointerEvent) => {
-            e.stopPropagation();
-          };
-
-          const handleMouseDown = (e: React.MouseEvent) => {
-            e.stopPropagation();
-          };
-
           return (
             <div
               data-slot="calendar"
               ref={rootRef}
               className={cn(className)}
-              onPointerDown={handlePointerDown}
-              onMouseDown={handleMouseDown}
               {...props}
             />
           )
@@ -156,14 +138,14 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <ChevronLeftIcon className={cn("size-5", className)} {...props} />
+              <ChevronLeftIcon className={cn("size-4", className)} {...props} />
             )
           }
 
           if (orientation === "right") {
             return (
               <ChevronRightIcon
-                className={cn("size-5", className)}
+                className={cn("size-4", className)}
                 {...props}
               />
             )
@@ -177,7 +159,7 @@ function Calendar({
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
-              <div className="flex size-[--cell-size] items-center justify-center text-center">
+              <div className="flex size-(--cell-size) items-center justify-center text-center">
                 {children}
               </div>
             </td>
@@ -197,126 +179,18 @@ function CalendarDayButton({
   ...props
 }: React.ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames()
-  const [isDark, setIsDark] = React.useState(false)
-  const isDisabled = !!modifiers.disabled || !!modifiers.outside
 
   const ref = React.useRef<HTMLButtonElement>(null)
-
-  // 避免库的默认 focused 导致跳焦到今天；仅在选中时保持焦点在所选日期
   React.useEffect(() => {
-    if (modifiers.selected) ref.current?.focus()
-  }, [modifiers.selected])
-
-  // 检测主题变化
-  React.useEffect(() => {
-    const checkTheme = () => {
-      if (typeof window !== 'undefined') {
-        setIsDark(document.documentElement.classList.contains('dark'))
-      }
-    }
-
-    checkTheme()
-
-    // 监听主题变化
-    const observer = new MutationObserver(checkTheme)
-    if (typeof window !== 'undefined') {
-      observer.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class']
-      })
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  // 根据状态确定样式
-  const getButtonStyle = (): React.CSSProperties => {
-    const baseStyle: React.CSSProperties = {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      height: '100%',
-      minWidth: 'var(--cell-size)',
-      aspectRatio: '1',
-      border: 'none',
-      borderRadius: '8px', // 增加圆角
-      cursor: isDisabled ? 'not-allowed' : 'pointer',
-      fontSize: '14px',
-      fontWeight: 'normal',
-      outline: 'none',
-      // Removed transition effect to prevent hover animations
-      transition: 'none',
-      transform: 'none',
-      pointerEvents: isDisabled ? 'none' : 'auto',
-      opacity: isDisabled ? 0.5 : 1
-    }
-
-    // 非当月日期弱化显示
-    if (modifiers.outside) {
-      return {
-        ...baseStyle,
-        backgroundColor: 'transparent',
-        color: isDark ? '#6b7280' : '#9ca3af', // gray-500 (dark) / gray-400 (light)
-        opacity: 0.6
-      }
-    }
-
-    if (modifiers.selected || modifiers.range_start || modifiers.range_end) {
-      return {
-        ...baseStyle,
-        backgroundColor: isDark ? '#ffffff' : '#000000',
-        color: isDark ? '#000000' : '#ffffff',
-        borderRadius: '8px'
-      }
-    }
-
-    if (modifiers.range_middle) {
-      return {
-        ...baseStyle,
-        backgroundColor: isDark ? '#333333' : '#f0f0f0',
-        color: isDark ? '#ffffff' : '#000000',
-        borderRadius: '0px' // 范围中间保持方形连接
-      }
-    }
-
-    // 默认状态
-    return {
-      ...baseStyle,
-      backgroundColor: 'transparent',
-      color: isDark ? '#ffffff' : '#000000'
-    }
-  }
-
-  // 处理点击事件，防止事件冒泡导致日历关闭
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (isDisabled) {
-      e.preventDefault()
-      e.stopPropagation()
-      return
-    }
-    // 阻止事件冒泡到父级元素，避免触发 Popover 的关闭逻辑
-    e.stopPropagation()
-    // 调用原始的 onClick 处理函数（如果存在）
-    if (props.onClick) {
-      props.onClick(e)
-    }
-  }
-
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (isDisabled) {
-      e.preventDefault()
-      e.stopPropagation()
-    }
-  }
+    if (modifiers.focused) ref.current?.focus()
+  }, [modifiers.focused])
 
   return (
-    <button
+    <Button
       ref={ref}
+      variant="ghost"
+      size="icon"
       data-day={day.date.toLocaleDateString()}
-      disabled={isDisabled}
-      aria-disabled={isDisabled}
-      tabIndex={isDisabled ? -1 : undefined}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&
@@ -326,16 +200,11 @@ function CalendarDayButton({
       data-range-start={modifiers.range_start}
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
-      style={getButtonStyle()}
       className={cn(
-        "calendar-day-button",
-        // 移除选中与未选中状态下的阴影与浮起效果
-        "focus:ring-0 focus:ring-offset-0",
+        "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
         defaultClassNames.day,
         className
       )}
-      onClick={handleClick}
-      onMouseDown={handleMouseDown}
       {...props}
     />
   )

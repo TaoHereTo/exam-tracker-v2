@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '../ui/alert'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { Checkbox } from '../ui/checkbox'
+import Link from 'next/link'
 
 interface LoginFormProps {
     onSwitchToSignUp: () => void
@@ -119,13 +120,12 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             <MixedText text="记住我" />
                         </Label>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onSwitchToForgotPassword}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline transition-all duration-300 ease-out hover:scale-105 active:scale-95"
+                    <Link
+                        href="/forgot-password"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline"
                     >
                         <MixedText text="忘记密码？" />
-                    </button>
+                    </Link>
                 </div>
 
                 {/* 登录按钮 */}
@@ -144,13 +144,12 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         <MixedText text="还没有账号？" />
                     </span>
-                    <button
-                        type="button"
-                        onClick={onSwitchToSignUp}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 transition-all duration-300 ease-out hover:scale-105 active:scale-95"
+                    <Link
+                        href="/signup"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1"
                     >
-                        <MixedText text="现在注册" />
-                    </button>
+                        <MixedText text="注册账号" />
+                    </Link>
                 </div>
             </form>
         </div>

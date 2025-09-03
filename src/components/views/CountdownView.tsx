@@ -236,7 +236,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
+                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium"
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="添加考试" />
@@ -263,7 +263,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                             onClick={() => handleOpenForm(countdown)}
                                                             variant="outline"
                                                             size="sm"
-                                                            className="h-9 w-9 p-0 button-hover-info"
+                                                            className="h-9 w-9 p-0"
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </Button>
@@ -281,7 +281,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                 <Button
                                                                     variant="destructive"
                                                                     size="icon"
-                                                                    className="h-9 w-9 button-hover-danger"
+                                                                    className="h-9 w-9"
                                                                 >
                                                                     <Trash2 className="w-5 h-5" />
                                                                 </Button>
@@ -301,7 +301,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                     </AlertDialogDescription>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600 transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"><MixedText text="确认删除" /></AlertDialogAction>
+                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600"><MixedText text="确认删除" /></AlertDialogAction>
 
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
@@ -328,7 +328,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </p>
                         <Button
                             onClick={() => handleOpenForm()}
-                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
+                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium"
                         >
                             <Plus className="w-5 h-5 mr-2" />
                             <MixedText text="立即添加" />
@@ -440,7 +440,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                     </Button>
                                     <Button
                                         type="submit"
-                                        variant="primary"
+                                        variant="default"
                                         className="h-10 px-4"
                                     >
                                         {editId ? <MixedText text="更新" /> : <MixedText text="添加考试" />}

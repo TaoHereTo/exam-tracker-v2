@@ -155,7 +155,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                 <div className="mb-6">
                     <Button
                         onClick={handlePredictScore}
-                        variant="primary"
+                        variant="default"
                         className="h-9"
                     >
                         <Bot className="w-5 h-5 mr-0.5" />

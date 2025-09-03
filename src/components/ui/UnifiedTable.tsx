@@ -384,7 +384,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 onClick={onExport}
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-9 w-9 button-hover-success"
+                                                className="h-9 w-9"
                                             >
                                                 <Upload className="w-5 h-5" />
                                             </Button>
@@ -406,7 +406,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 disabled={editDisabled}
                                                 variant="outline"
                                                 size="icon"
-                                                className="h-9 w-9 button-hover-info"
+                                                className="h-9 w-9"
                                             >
                                                 <Edit className="w-5 h-5" />
                                             </Button>
@@ -428,7 +428,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 disabled={deleteDisabled}
                                                 variant="destructive"
                                                 size="icon"
-                                                className="h-9 w-9 button-hover-danger"
+                                                className="h-9 w-9"
                                             >
                                                 <Trash2 className="w-5 h-5" />
                                             </Button>

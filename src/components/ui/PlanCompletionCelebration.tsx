@@ -176,7 +176,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
+            className="flex-1"
           >
             <MixedText text="好的，我知道了" />
           </Button>
@@ -189,7 +189,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
               isDarkMode 
                 ? 'bg-white text-black' 
                 : 'bg-black text-white'
-            } transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95`}
+            }`}
           >
             <MixedText text="去查看" />
             <ArrowRight className="w-4 h-4 ml-2" />

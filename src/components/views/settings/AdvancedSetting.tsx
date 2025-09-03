@@ -324,7 +324,7 @@ export function AdvancedSetting() {
                                             }}
                                             variant="outline"
                                             size="icon"
-                                            className="h-8 w-8 sm:h-9 sm:w-9 button-hover-info"
+                                            className="h-8 w-8 sm:h-9 sm:w-9"
                                         >
                                             {showImageManager ? <XCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Package className="w-4 h-4 sm:w-5 sm:h-5" />}
                                         </Button>
@@ -360,7 +360,7 @@ export function AdvancedSetting() {
                                                     disabled={isLoadingImages}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-info"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9"
                                                 >
                                                     <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />
                                                 </Button>
@@ -379,7 +379,7 @@ export function AdvancedSetting() {
                                                     onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-secondary"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9"
                                                 >
                                                     {imageManagerView === 'grid' ? <List className="w-4 h-4 sm:w-5 sm:h-5" /> : <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />}
                                                 </Button>
@@ -396,7 +396,7 @@ export function AdvancedSetting() {
                                                     onClick={handleUploadImage}
                                                     variant="outline"
                                                     size="icon"
-                                                    className="h-8 w-8 sm:h-9 sm:w-9 button-hover-success"
+                                                    className="h-8 w-8 sm:h-9 sm:w-9"
                                                 >
                                                     <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />
                                                 </Button>
@@ -414,7 +414,7 @@ export function AdvancedSetting() {
                                                         onClick={handleDeleteSelectedImages}
                                                         variant="outline"
                                                         size="icon"
-                                                        className="h-8 w-8 sm:h-9 sm:w-9 button-hover-danger"
+                                                        className="h-8 w-8 sm:h-9 sm:w-9"
                                                     >
                                                         <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                                     </Button>
@@ -533,7 +533,7 @@ export function AdvancedSetting() {
                                                                             // 打开图片预览
                                                                             window.open(image.url, '_blank');
                                                                         }}
-                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-gray-800/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9 transition-all duration-300 ease-out hover:scale-110 active:scale-90"
+                                                                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-gray-800/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9"
                                                                     >
                                                                         <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
                                                                     </Button>
@@ -666,6 +666,12 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
+
+
+
+
 
 
 

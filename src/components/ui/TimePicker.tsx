@@ -161,10 +161,10 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     <div className="flex justify-end pt-2">
                         <Button
                             type="button"
-                            variant="primary"
+                            variant="default"
                             size="sm"
                             onClick={handleConfirm}
-                            className="transition-none transform-none button-hover-primary"
+                            className="transition-none transform-none"
                             style={{ boxShadow: 'none' }}
                         >
                             <MixedText text="确认" />

@@ -145,7 +145,7 @@ export function BeautifulPagination({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                variant="pagination"
+                                variant="ghost"
                                 size="icon"
                                 onClick={handleFirst}
                                 disabled={!canGoPrevious}
@@ -164,7 +164,7 @@ export function BeautifulPagination({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                variant="pagination"
+                                variant="ghost"
                                 size="icon"
                                 onClick={handlePrevious}
                                 disabled={!canGoPrevious}
@@ -183,7 +183,7 @@ export function BeautifulPagination({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                variant="pagination"
+                                variant="ghost"
                                 size="icon"
                                 onClick={handleNext}
                                 disabled={!canGoNext}
@@ -202,7 +202,7 @@ export function BeautifulPagination({
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                variant="pagination"
+                                variant="ghost"
                                 size="icon"
                                 onClick={handleLast}
                                 disabled={!canGoNext}

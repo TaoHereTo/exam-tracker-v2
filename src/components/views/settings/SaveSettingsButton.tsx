@@ -20,7 +20,7 @@ const SaveSettingsButton: React.FC = () => {
                 isDarkMode 
                     ? 'bg-white text-black' 
                     : 'bg-black text-white'
-            } transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95`}
+            }`}
         >
             <MixedText text="保存所有设置" />
         </Button>

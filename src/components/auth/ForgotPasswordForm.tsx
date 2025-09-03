@@ -9,6 +9,8 @@ import { Alert, AlertDescription } from '../ui/alert'
 import { Mail, ArrowLeft } from 'lucide-react'
 
 import { MixedText } from '../ui/MixedText'
+import { UiverseSpinner } from '../ui/UiverseSpinner'
+import Link from 'next/link'
 
 interface ForgotPasswordFormProps {
     onSwitchToLogin: () => void
@@ -16,13 +18,13 @@ interface ForgotPasswordFormProps {
 
 export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps) {
     const [email, setEmail] = useState('')
-    const [loading, setLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setLoading(true)
+        setIsLoading(true)
         setError('')
         setSuccess('')
 
@@ -37,7 +39,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
             setEmail('')
         }
 
-        setLoading(false)
+        setIsLoading(false)
     }
 
     return (
@@ -87,21 +89,21 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-                    <Button
-                        type="button"
-                        onClick={onSwitchToLogin}
-                        variant="outline"
-                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 h-10 sm:h-12 text-sm sm:text-base transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
-                    >
-                        <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                        <MixedText text="返回登录" />
-                    </Button>
+                    <Link href="/login">
+                        <Button
+                            type="button"
+                            variant="default"
+                            className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black h-10 sm:h-12 text-sm sm:text-base"
+                        >
+                            <MixedText text="返回登录" />
+                        </Button>
+                    </Link>
                     <Button
                         type="submit"
-                        disabled={loading}
-                        className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black h-10 sm:h-12 text-sm sm:text-base transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95"
+                        disabled={isLoading}
+                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 h-10 sm:h-12 text-sm sm:text-base"
                     >
-                        <MixedText text={loading ? '发送中...' : '发送重置邮件'} />
+                        {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> <MixedText text="发送中..." /></> : <MixedText text="发送重置链接" />}
                     </Button>
                 </div>
             </form>

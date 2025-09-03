@@ -324,7 +324,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                         onClick={() => handleOpenForm(plan)}
                                                         variant="outline"
                                                         size="icon"
-                                                        className="h-9 w-9 button-hover-info"
+                                                        className="h-9 w-9"
                                                     >
                                                         <Edit className="w-5 h-5" />
                                                     </Button>
@@ -342,7 +342,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                             <Button
                                                                 variant="destructive"
                                                                 size="icon"
-                                                                className="h-9 w-9 button-hover-danger"
+                                                                className="h-9 w-9"
                                                             >
                                                                 <Trash2 className="w-5 h-5" />
                                                             </Button>
@@ -578,10 +578,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                     </div>
                                     <div className="form-actions">
                                         <ButtonGroup spacing="sm" margin="none" className="justify-end">
-                                            <Button type="button" variant="outline" onClick={handleCloseForm} className="button-hover-secondary">
+                                            <Button type="button" variant="outline" onClick={handleCloseForm}>
                                                 <MixedText text="取消" />
                                             </Button>
-                                            <Button type="submit" variant="primary" className="button-hover-primary">
+                                            <Button type="submit" variant="default">
                                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                                             </Button>
                                         </ButtonGroup>

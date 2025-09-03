@@ -191,15 +191,15 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end gap-2 pt-4">
-                        <Button variant="outline" onClick={onClose} className="button-hover-secondary">
+                        <Button variant="outline" onClick={onClose} className="h-10">
                             <MixedText text="取消" />
                         </Button>
                         <Button
                             type="submit"
-                            variant="primary"
+                            variant="default"
                             disabled={loading}
                             onClick={handleSaveProfile}
-                            className="flex items-center justify-center h-10 rounded-md button-hover-primary"
+                            className="flex items-center justify-center h-10 rounded-md"
                         >
                             {loading ? (
                                 <div className="flex items-center justify-center w-full">

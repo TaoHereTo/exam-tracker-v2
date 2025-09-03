@@ -426,7 +426,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               <ImageUploadField />
 
               <div className="form-actions">
-                <Button type="submit" variant="primary" className="w-full py-4 button-hover-primary">
+                <Button type="submit" variant="default" className="w-full py-4">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>
@@ -502,7 +502,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               <ImageUploadField />
 
               <div className="form-actions">
-                <Button type="submit" variant="primary" className="w-full py-4 button-hover-primary">
+                <Button type="submit" variant="default" className="w-full py-4">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>

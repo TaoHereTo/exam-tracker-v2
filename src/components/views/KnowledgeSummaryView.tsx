@@ -598,7 +598,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 <AlertDialogContent>
                     <div className="flex justify-between items-center">
                         <AlertDialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</AlertDialogTitle>
-                        <Button variant="outline" size="icon" onClick={() => setEditDialogOpen(false)} className="h-9 w-9 button-hover-danger">
+                        <Button variant="outline" size="icon" onClick={() => setEditDialogOpen(false)} className="h-9 w-9">
                             <X className="w-5 h-5" />
                         </Button>
                     </div>

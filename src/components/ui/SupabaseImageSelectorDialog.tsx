@@ -210,7 +210,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <DialogTrigger asChild>
                     {trigger || (
                         <div className="flex justify-center">
-                            <Button type="button" variant="outline" className="w-48 button-hover-info">
+                            <Button type="button" variant="outline" className="w-48">
                                 <MixedText text="从云端选择图片" />
                             </Button>
                         </div>
@@ -264,7 +264,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 size="sm"
                                 onClick={handleRefresh}
                                 disabled={isLoading}
-                                className="button-hover-secondary"
+                                className=""
                             >
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
@@ -347,7 +347,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                             <Button
                                                                 variant="ghost"
                                                                 size="sm"
-                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0 button-hover-danger"
+                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0"
                                                                 onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
                                                             >
                                                                 <Trash2 className="h-3 w-3" />
@@ -368,14 +368,13 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <Button variant="outline" onClick={handleCancel} className="transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95">
+                        <Button variant="outline" onClick={handleCancel}>
                             <MixedText text="取消" />
                         </Button>
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
-                            className={`h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'
-                                } transition-all duration-300 ease-out hover:scale-105 hover:shadow-md active:scale-95`}
+                            className={`h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}
                         >
                             <MixedText text="确认选择" />
                         </Button>
@@ -445,6 +444,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
+
+
 
 
 
