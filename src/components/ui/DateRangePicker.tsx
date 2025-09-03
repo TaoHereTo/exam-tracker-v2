@@ -84,7 +84,7 @@ export function DateRangePicker({
                         id="date"
                         variant="outline"
                         className={cn(
-                            "w-full justify-start text-left font-normal h-10",
+                            "w-full justify-start text-left font-normal h-10 bg-white dark:bg-black !bg-white dark:!bg-black",
                             !dateRange && "text-muted-foreground",
                             error && "border-destructive ring-destructive/20",
                             disabled && "opacity-50 cursor-not-allowed"

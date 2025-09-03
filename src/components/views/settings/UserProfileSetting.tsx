@@ -82,7 +82,7 @@ export function UserProfileSetting() {
     };
 
     return (
-        <Card>
+        <Card className="max-w-2xl mx-auto">
             <CardHeader>
                 <CardTitle className="text-base sm:text-lg"><MixedText text="个人资料设置" /></CardTitle>
                 <CardDescription className="text-xs sm:text-sm">

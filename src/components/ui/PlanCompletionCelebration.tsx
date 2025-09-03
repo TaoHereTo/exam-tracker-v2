@@ -190,6 +190,10 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
                 ? 'bg-white text-black' 
                 : 'bg-black text-white'
             }`}
+            style={{
+              backgroundColor: isDarkMode ? '#FFFFFF' : undefined,
+              color: isDarkMode ? '#000000' : undefined
+            }}
           >
             <MixedText text="去查看" />
             <ArrowRight className="w-4 h-4 ml-2" />

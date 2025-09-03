@@ -132,7 +132,7 @@ function DateField() {
   return (
     <Popover open={dateOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-input border-[color:var(--input-border)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10"
+        <button type="button" className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-black px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10"
           style={{
             transition: 'none',
             transform: 'none',
@@ -142,7 +142,7 @@ function DateField() {
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground">选择日期</span>}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 bg-white dark:bg-black" align="start">
         <Calendar
           mode="single"
           captionLayout="dropdown"

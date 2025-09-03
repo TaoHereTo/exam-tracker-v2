@@ -317,6 +317,48 @@ th .mixed-text-part {
   --hover-dark: #262626;
 }
 
+/* 强制所有白色背景元素使用纯白色 */
+.bg-white,
+[data-slot="button"].bg-white,
+.dark .bg-white,
+.bg-\[.*white.*\],
+[data-slot="button"].bg-\[.*white.*\],
+.dark .bg-\[.*white.*\] {
+  background-color: #FFFFFF !important;
+}
+
+/* 特别处理庆祝弹窗中的白色按钮 */
+.dark .bg-white.text-black,
+[data-slot="button"].dark .bg-white.text-black {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* 特别处理深色模式下的白色按钮 */
+.dark .text-black.bg-white,
+[data-slot="button"].dark .text-black.bg-white {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* 强制所有 outline 按钮在浅色模式下使用纯白色背景，在深色模式下使用纯黑色背景 */
+[data-slot="button"][variant="outline"],
+[data-slot="button"].variant-outline {
+  background-color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="outline"],
+.dark [data-slot="button"].variant-outline {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* 特殊处理带图标按钮的背景色 */
+[data-slot="button"][variant="outline"] svg,
+.dark [data-slot="button"][variant="outline"] svg {
+  color: inherit !important;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
