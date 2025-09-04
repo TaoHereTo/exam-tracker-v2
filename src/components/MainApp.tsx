@@ -326,13 +326,7 @@ export function MainApp() {
                             <DropdownMenuItem onClick={() => setActiveTab('settings')} className="flex justify-center">
                                 <div className="flex items-center gap-4">
                                     <Settings className="h-4 w-4" />
-                                    <MixedText text="基础设置" />
-                                </div>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => setActiveTab('settings-advanced')} className="flex justify-center">
-                                <div className="flex items-center gap-4">
-                                    <SlidersHorizontal className="h-4 w-4" />
-                                    <MixedText text="高级设置" />
+                                    <MixedText text="程序设置" />
                                 </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
@@ -898,7 +892,7 @@ export function MainApp() {
                                             </Suspense>
                                         )}
 
-                                        {(activeTab === 'settings' || activeTab === 'settings-advanced') && (
+                                        {(activeTab === 'settings') && (
                                             <Suspense fallback={
                                                 <div className="flex items-center justify-center min-h-[60vh]">
                                                     <SimpleUiverseSpinner />
