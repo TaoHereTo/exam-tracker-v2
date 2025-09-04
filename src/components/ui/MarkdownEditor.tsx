@@ -561,7 +561,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                             e.stopPropagation();
                                             toggleFullscreen();
                                         }}
-                                        className={`md-toolbar-button-base md-toolbar-button-fullscreen ${isFullscreen ? 'active' : ''}`}
+                                        className="md-toolbar-button-base md-toolbar-button-fullscreen"
                                         type="button"
                                     >
                                         {isFullscreen ? <X className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
