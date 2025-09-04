@@ -362,7 +362,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                 </AlertDialogHeader>
                                                 <AlertDialogFooter>
                                                     <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(plan.id)} style={{ background: '#dc2626', color: 'white' }}><MixedText text="确认删除" /></AlertDialogAction>
+                                                    <AlertDialogAction 
+                                                        onClick={() => handleDelete(plan.id)}
+                                                        className="bg-[#dc2626] text-white shadow-xs hover:bg-[#dc2626]/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+                                                    >
+                                                        <MixedText text="确认删除" />
+                                                    </AlertDialogAction>
                                                 </AlertDialogFooter>
                                             </AlertDialogContent>
                                         </AlertDialog>

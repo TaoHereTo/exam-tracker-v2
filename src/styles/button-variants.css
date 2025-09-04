@@ -75,7 +75,8 @@
 }
 
 /* 绿色outline按钮的hover效果 */
-.button-hover-success:not([style*="bg-[#15803d]"]) {}
+.button-hover-success:not([style*="bg-[#15803d]"]) {
+}
 
 .button-hover-warning {
 }
@@ -98,11 +99,14 @@
 /* 原规则已移除，避免影响 Select/Date/Tab 等交互控件 */
 
 /* 特殊处理outline按钮的hover效果 */
-[variant="outline"].button-hover-info {}
+[variant="outline"].button-hover-info {
+}
 
 /* 修复黑色按钮的hover效果 */
 .bg-black:hover,
-.bg-gray-900:hover {}
+.bg-gray-900:hover {
+}
 
 /* 修复主要按钮的hover效果 */
-[data-variant="primary"].button-hover-primary {}
+[data-variant="primary"].button-hover-primary {
+}

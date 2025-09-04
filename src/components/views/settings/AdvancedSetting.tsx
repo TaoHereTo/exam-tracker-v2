@@ -648,8 +648,7 @@ export function AdvancedSetting() {
                                 confirmDeleteImages();
                             }}
                             disabled={isDeleting}
-                            style={{ background: '#dc2626', color: 'white' }}
-                            className="h-8 sm:h-9 text-xs sm:text-sm"
+                            className="bg-[#dc2626] text-white shadow-xs hover:bg-[#dc2626]/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm"
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-1 sm:gap-2">
@@ -666,6 +665,10 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
+
+
 
 
 
