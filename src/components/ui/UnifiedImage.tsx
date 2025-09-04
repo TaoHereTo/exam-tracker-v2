@@ -491,6 +491,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             size="sm"
                                             variant="secondary"
                                             onClick={handlePreview}
+                                            type="button"
                                             className="h-8 w-8 p-0"
                                         >
                                             <Eye className="h-5 w-5" />
@@ -509,6 +510,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                             variant="destructive"
                                             onClick={handleRemoveImage}
                                             disabled={isDeleting}
+                                            type="button"
                                             className="h-8 w-8 p-0"
                                         >
                                             <X className="h-4 w-4" />

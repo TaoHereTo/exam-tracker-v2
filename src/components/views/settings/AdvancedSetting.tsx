@@ -406,25 +406,24 @@ export function AdvancedSetting() {
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
-                                    {selectedImages.size > 0 && (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        onClick={handleDeleteSelectedImages}
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="h-8 w-8 sm:h-9 sm:w-9"
-                                                    >
-                                                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent className="text-xs">
-                                                    <p><MixedText text={`删除选中的 ${selectedImages.size} 张图片`} /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    )}
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button
+                                                    onClick={handleDeleteSelectedImages}
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    disabled={selectedImages.size === 0}
+                                                    className="h-8 w-8 sm:h-9 sm:w-9"
+                                                >
+                                                    <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="text-xs">
+                                                <p><MixedText text={selectedImages.size > 0 ? `删除选中的 ${selectedImages.size} 张图片` : '请选择要删除的图片'} /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
                                 </div>
                             </div>
 
@@ -665,6 +664,8 @@ export function AdvancedSetting() {
         </>
     );
 } 
+
+
 
 
 
