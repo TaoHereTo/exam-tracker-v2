@@ -321,9 +321,9 @@ th .mixed-text-part {
 .bg-white,
 [data-slot="button"].bg-white,
 .dark .bg-white,
-.bg-\[.*white.*\],
-[data-slot="button"].bg-\[.*white.*\],
-.dark .bg-\[.*white.*\] {
+.bg-\[white\],
+[data-slot="button"].bg-\[white\],
+.dark .bg-\[white\] {
   background-color: #FFFFFF !important;
 }
 

@@ -236,9 +236,9 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium"
+                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium hover:bg-[#15803d]/80"
                     >
-                        <Plus className="w-5 h-5 mr-2" />
+                        <Plus className="w-5 h-5 mr-1" />
                         <MixedText text="添加考试" />
                     </Button>
                 </ButtonGroup>
@@ -326,13 +326,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         <p className="text-muted-foreground mb-6 max-w-md text-lg">
                             <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
                         </p>
-                        <Button
-                            onClick={() => handleOpenForm()}
-                            className="bg-[#15803d] text-white px-6 py-3 rounded-xl font-medium"
-                        >
-                            <Plus className="w-5 h-5 mr-2" />
-                            <MixedText text="立即添加" />
-                        </Button>
                     </div>
                 )}
             </div>
