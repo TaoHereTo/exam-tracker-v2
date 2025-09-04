@@ -585,7 +585,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     onChange={handleTextChange}
                                     onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
-                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100"
                                     style={{
                                         height: editorHeight,
                                         fontFamily: 'inherit',
@@ -601,7 +601,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     ref={previewTextareaRef}
                                     value={previewText}
                                     readOnly
-                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100"
                                     style={{
                                         height: editorHeight,
                                         fontFamily: 'inherit',

@@ -31,17 +31,25 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
         setLoading(true)
         setError('')
 
-        const { error } = await signIn(email, password)
+        try {
+            console.log('Attempting to sign in with:', { email });
+            const { error } = await signIn(email, password)
 
-        if (error) {
-            setError(error.message)
-        } else {
-            // 登录成功后清除表单数据
-            setEmail('')
-            setPassword('')
+            if (error) {
+                setError(error.message || '登录失败，请检查邮箱和密码')
+                console.error('Login error:', error)
+            } else {
+                console.log('Login successful');
+                // 登录成功后清除表单数据
+                setEmail('')
+                setPassword('')
+            }
+        } catch (err) {
+            console.error('Unexpected error during login:', err)
+            setError('登录过程中发生错误，请稍后重试')
+        } finally {
+            setLoading(false)
         }
-
-        setLoading(false)
     }
 
     return (
@@ -121,7 +129,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         </Label>
                     </div>
                     <Link
-                        href="/forgot-password"
+                        href="/auth/forgot-password"
                         className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline"
                     >
                         <MixedText text="忘记密码？" />
@@ -129,11 +137,11 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                 </div>
 
                 {/* 登录按钮 */}
-                <div className="w-full mb-4">
+                <div className="w-full mb-4 flex justify-center">
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="w-full h-10 sm:h-12 text-sm sm:text-base"
+                        className="w-full h-9 sm:h-10 text-sm"
                         variant="default"
                     >
                         <MixedText text={loading ? '登录中...' : '登录'} />
@@ -146,7 +154,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         <MixedText text="还没有账号？" />
                     </span>
                     <Link
-                        href="/signup"
+                        href="/auth/signup"
                         className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1"
                     >
                         <MixedText text="注册账号" />

@@ -89,18 +89,20 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                 </div>
 
                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-                    <Link href="/login">
+                    <Link href="/auth/login">
                         <Button
                             type="button"
-                            variant="default"
+                            variant="outline"
+                            className="flex items-center gap-2"
                         >
+                            <ArrowLeft className="h-4 w-4" />
                             <MixedText text="返回登录" />
                         </Button>
                     </Link>
                     <Button
                         type="submit"
                         disabled={isLoading}
-                        variant="outline"
+                        variant="default"
                     >
                         {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> <MixedText text="发送中..." /></> : <MixedText text="发送重置链接" />}
                     </Button>

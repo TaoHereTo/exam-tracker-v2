@@ -78,6 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // 监听认证状态变化
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
+                console.log('Auth state changed:', event, session?.user?.id);
                 if (mounted) {
                     await updateAuthState(session);
                 }
@@ -91,12 +92,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, [updateAuthState])
 
     const signIn = useCallback(async (email: string, password: string) => {
-        const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
-        return { error }
-    }, [])
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            })
+            
+            if (error) {
+                console.error('Sign in error:', error);
+                return { error };
+            }
+            
+            console.log('Sign in successful:', data.user?.id);
+            // Manually update the auth state after successful sign in
+            await updateAuthState(data.session);
+            return { error: null };
+        } catch (err) {
+            console.error('Unexpected sign in error:', err);
+            return { error: err as AuthError };
+        }
+    }, [updateAuthState])
 
     const signUp = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signUp({
@@ -132,4 +147,4 @@ export function useAuth() {
         throw new Error('useAuth must be used within an AuthProvider')
     }
     return context
-} 
+}
