@@ -951,8 +951,7 @@ export function MainApp() {
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
                                 <AlertDialogAction
                                     onClick={handleConfirmImport}
-                                    className="w-full sm:w-auto"
-                                    style={{ background: '#10B981', color: 'white' }}
+                                    className={cn(buttonVariants({ variant: "default" }), "w-full sm:w-auto")}
                                 >
                                     <MixedText text="确认导入" />
                                 </AlertDialogAction>
@@ -976,7 +975,6 @@ export function MainApp() {
                                 <AlertDialogAction
                                     onClick={handleConfirmDelete}
                                     className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto")}
-                                    style={{ color: 'white' }}
                                 >
                                     <MixedText text="确认删除" />
                                 </AlertDialogAction>
@@ -995,7 +993,7 @@ export function MainApp() {
                             </AlertDialogHeader>
                             <AlertDialogFooter className="flex-col sm:flex-row">
                                 <AlertDialogCancel className="w-full sm:w-auto"><MixedText text="取消" /></AlertDialogCancel>
-                                <AlertDialogAction onClick={handleSignOut} className={cn(buttonVariants({ variant: "destructive" }), "w-full sm:w-auto")}>
+                                <AlertDialogAction onClick={handleSignOut} variant="destructive" className="w-full sm:w-auto">
                                     <MixedText text="确认退出" />
                                 </AlertDialogAction>
                             </AlertDialogFooter>

@@ -13,11 +13,12 @@ import { CloudSyncService } from '@/lib/cloudSyncService';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import { CloudDataOverview as CloudDataOverviewType, ProgressCallback } from '@/types/common';
 import { MixedText } from '@/components/ui/MixedText';
 import { SimpleUiverseSpinner } from '@/components/ui/UiverseSpinner';
+import { cn } from '@/lib/utils';
 
 interface CloudDataOverviewProps {
     isOpen: boolean;
@@ -244,7 +245,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                                 <AlertDialogCancel className="h-8 sm:h-9 text-xs sm:text-sm"><MixedText text="取消" /></AlertDialogCancel>
                                                                 <AlertDialogAction
                                                                     onClick={handleClearCloudData}
-                                                                    className="h-8 sm:h-9 text-xs sm:text-sm bg-destructive text-white"
+                                                                    className={cn(buttonVariants({ variant: "destructive" }), "h-8 sm:h-9 text-xs sm:text-sm")}
                                                                 >
                                                                     确认清空
                                                                 </AlertDialogAction>

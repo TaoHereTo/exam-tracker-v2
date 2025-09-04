@@ -5,6 +5,7 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { type VariantProps } from "class-variance-authority"
 import { MixedText } from "./MixedText";
 
 const AlertDialog = React.forwardRef<
@@ -147,14 +148,18 @@ const AlertDialogDescription = React.forwardRef<
 })
 AlertDialogDescription.displayName = "AlertDialogDescription"
 
+type AlertDialogActionProps = React.ComponentProps<typeof AlertDialogPrimitive.Action> & 
+  VariantProps<typeof buttonVariants>;
+
 const AlertDialogAction = React.forwardRef<
   HTMLButtonElement,
-  React.ComponentProps<typeof AlertDialogPrimitive.Action>
->(function AlertDialogAction({ className, children, ...props }, ref) {
+  AlertDialogActionProps
+>(function AlertDialogAction({ className, children, variant, ...props }, ref) {
   return (
     <AlertDialogPrimitive.Action
       ref={ref}
-      className={cn(buttonVariants(), className)}
+      data-slot="button"
+      className={cn(buttonVariants({ variant }), className)}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}

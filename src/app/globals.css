@@ -362,6 +362,19 @@ th .mixed-text-part {
   color: inherit !important;
 }
 
+/* destructive 按钮样式 */
+[data-slot="button"][variant="destructive"],
+[data-slot="button"].variant-destructive {
+  background-color: #dc2626 !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="destructive"],
+.dark [data-slot="button"].variant-destructive {
+  background-color: #dc2626 !important;
+  color: #FFFFFF !important;
+}
+
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

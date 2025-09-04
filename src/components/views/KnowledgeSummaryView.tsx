@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
 import { SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
@@ -17,8 +17,7 @@ import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
-
-
+import { cn } from '@/lib/utils';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -587,7 +586,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
                             <MixedText text="取消" />
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40">
+                        <AlertDialogAction onClick={confirmDelete} variant="destructive">
                             <MixedText text="确认删除" />
                         </AlertDialogAction>
                     </AlertDialogFooter>

@@ -368,17 +368,21 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end space-x-2 pt-4 border-t">
-                        <Button variant="outline" onClick={handleCancel}>
+                        <Button 
+                            variant="outline" 
+                            onClick={handleCancel}
+                            className="h-9"
+                        >
                             <MixedText text="取消" />
                         </Button>
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
-                            variant={isDarkMode ? "default" : "default"}
+                            variant="default"
+                            className="h-9"
                         >
                             <MixedText text="确认选择" />
                         </Button>
-
                     </div>
                 </DialogContent>
             </Dialog>
@@ -427,7 +431,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         <AlertDialogAction
                             onClick={confirmDelete}
                             disabled={isDeleting}
-                            style={{ background: '#EF4444', color: 'white' }}
+                            variant="destructive"
                         >
                             {isDeleting ? (
                                 <div className="flex items-center gap-2">
@@ -444,6 +448,12 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
+
+
+
+
+
+
 
 
 

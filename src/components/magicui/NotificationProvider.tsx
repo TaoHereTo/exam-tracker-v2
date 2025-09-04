@@ -133,7 +133,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                             key={n.id}
                             className={`shadow-lg rounded-lg px-4 py-3 mb-2 flex items-start gap-3 transition-all
               `}
-                            style={{ minWidth: 240 }}
+                            style={{ minWidth: 240, backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                         >
                             <span className="mt-0.5">
                                 {n.type === "success" && <CheckCircle2 className="text-green-500 w-5 h-5" />}

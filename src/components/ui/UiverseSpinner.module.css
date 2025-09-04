@@ -22,7 +22,7 @@
   width: 0.074em;
   height: 0.2777em;
   border-radius: 0.0555em;
-  background-color: #d1d5db; /* light gray color */
+  background-color: #6b7280; /* neutral gray color that works in both light and dark modes */
   -webkit-transform-origin: center -0.2222em;
   -ms-transform-origin: center -0.2222em;
   transform-origin: center -0.2222em;
@@ -127,9 +127,9 @@
 
 @keyframes spinnerFade9234 {
   0% {
-    background-color: #69717d; /* dark gray color */
+    background-color: #4b5563; /* darker gray for better visibility */
   }
   100% {
-    background-color: #d1d5db; /* light gray color */
+    background-color: #9ca3af; /* lighter gray for contrast */
   }
 }

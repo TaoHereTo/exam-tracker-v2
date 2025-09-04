@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
@@ -302,7 +302,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                     </AlertDialogDescription>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40">
+                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
                                                             <MixedText text="确认删除" />
                                                         </AlertDialogAction>
                                                     </AlertDialogFooter>
