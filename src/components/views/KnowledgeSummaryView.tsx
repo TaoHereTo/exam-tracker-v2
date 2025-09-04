@@ -587,7 +587,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
                             <MixedText text="取消" />
                         </AlertDialogCancel>
-                        <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700 text-white">
+                        <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40">
                             <MixedText text="确认删除" />
                         </AlertDialogAction>
                     </AlertDialogFooter>

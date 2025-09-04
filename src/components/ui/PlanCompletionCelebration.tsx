@@ -185,15 +185,8 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
               onViewPlans();
               onClose();
             }}
-            className={`flex-1 ${
-              isDarkMode 
-                ? 'bg-white text-black' 
-                : 'bg-black text-white'
-            }`}
-            style={{
-              backgroundColor: isDarkMode ? '#FFFFFF' : undefined,
-              color: isDarkMode ? '#000000' : undefined
-            }}
+            className="flex-1"
+            variant={isDarkMode ? "default" : "default"}
           >
             <MixedText text="去查看" />
             <ArrowRight className="w-4 h-4 ml-2" />

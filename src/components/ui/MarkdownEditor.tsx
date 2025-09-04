@@ -13,6 +13,7 @@ interface MarkdownEditorProps {
     placeholder?: string;
     className?: string;
     height?: number;
+    disabled?: boolean;
 }
 
 const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
@@ -20,12 +21,17 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     onChange,
     placeholder = '请输入内容...',
     className = '',
-    height = 200
+    height = 200,
+    disabled = false
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const previewTextareaRef = useRef<HTMLTextAreaElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
     const [activeFormats, setActiveFormats] = useState<string[]>([]);
+    const [textValue, setTextValue] = useState(value);
+    const [previewText, setPreviewText] = useState(value);
+    const [editorHeight, setEditorHeight] = useState(`${height}px`);
     
     // 添加主题切换检测
     const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
@@ -294,6 +300,13 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
 
     // 动态计算高度
     const dynamicHeight = isFullscreen ? 'calc(100vh - 120px)' : `${height}px`;
+
+    const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const newValue = e.target.value;
+        setTextValue(newValue);
+        setPreviewText(newValue);
+        onChange(newValue);
+    };
 
     return (
         <TooltipProvider>
@@ -568,22 +581,34 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                             <div className="w-1/2 border-r border-gray-200 dark:border-gray-700">
                                 <textarea
                                     ref={textareaRef}
-                                    value={value}
-                                    onChange={(e) => onChange(e.target.value)}
-                                    onSelect={handleSelectionChange}
-                                    onMouseUp={handleSelectionChange}
-                                    onKeyUp={handleSelectionChange}
+                                    value={textValue}
+                                    onChange={handleTextChange}
                                     onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
-                                    style={{ height: dynamicHeight }}
-                                    className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                    style={{
+                                        height: editorHeight,
+                                        fontFamily: 'inherit',
+                                        fontSize: 'inherit',
+                                        lineHeight: 'inherit'
+                                    }}
+                                    disabled={disabled}
                                 />
                             </div>
                             {/* 右侧预览区域 */}
-                            <div className="w-1/2 bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 overflow-auto">
-                                <div className="p-3 leading-relaxed" style={{ minHeight: dynamicHeight }}>
-                                    <MarkdownRenderer content={value || placeholder} />
-                                </div>
+                            <div className="w-1/2 overflow-auto">
+                                <textarea
+                                    ref={previewTextareaRef}
+                                    value={previewText}
+                                    readOnly
+                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                    style={{
+                                        height: editorHeight,
+                                        fontFamily: 'inherit',
+                                        fontSize: 'inherit',
+                                        lineHeight: 'inherit'
+                                    }}
+                                />
                             </div>
                         </div>
                     ) : (

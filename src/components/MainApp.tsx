@@ -618,7 +618,7 @@ export function MainApp() {
                                 />
                                 <SidebarInset className="flex flex-col flex-1">
                                     {/* 固定的侧边栏触发器和标题栏 - 响应式设计 */}
-                                    <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left bg-background dark:bg-background">
+                                    <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left">
                                         <SidebarTrigger className="size-8 sm:size-10 [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
                                         <div className="min-w-0 flex-1">
                                             <PageTitle

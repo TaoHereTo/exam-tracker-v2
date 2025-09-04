@@ -236,7 +236,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 bg-[#15803d] text-white rounded-xl font-medium hover:bg-[#15803d]/80"
+                        className="h-11 px-6 rounded-xl font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90"
+                        variant="default"
                     >
                         <Plus className="w-5 h-5 mr-1" />
                         <MixedText text="添加考试" />
@@ -301,8 +302,9 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                     </AlertDialogDescription>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-red-600"><MixedText text="确认删除" /></AlertDialogAction>
-
+                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} className="bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40">
+                                                            <MixedText text="确认删除" />
+                                                        </AlertDialogAction>
                                                     </AlertDialogFooter>
                                                 </AlertDialogContent>
                                             </AlertDialog>

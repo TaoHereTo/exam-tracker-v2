@@ -374,11 +374,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                         <Button
                             onClick={handleConfirm}
                             disabled={!selectedImage}
-                            className={`h-8 sm:h-10 px-3 sm:px-6 text-xs sm:text-sm ${isDarkMode ? 'bg-white text-black' : 'bg-black text-white'}`}
-                            style={{
-                              backgroundColor: isDarkMode ? '#FFFFFF' : undefined,
-                              color: isDarkMode ? '#000000' : undefined
-                            }}
+                            variant={isDarkMode ? "default" : "default"}
                         >
                             <MixedText text="确认选择" />
                         </Button>
@@ -448,6 +444,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
+
+
 
 
 

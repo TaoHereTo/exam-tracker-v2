@@ -131,7 +131,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     {notifications.map((n) => (
                         <div
                             key={n.id}
-                            className={`shadow-lg rounded-lg px-4 py-3 mb-2 bg-white dark:bg-gray-900 flex items-start gap-3 transition-all
+                            className={`shadow-lg rounded-lg px-4 py-3 mb-2 flex items-start gap-3 transition-all
               `}
                             style={{ minWidth: 240 }}
                         >

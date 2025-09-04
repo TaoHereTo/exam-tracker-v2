@@ -15,7 +15,7 @@ export function AuthPage() {
         <div className="min-h-screen flex items-center justify-center relative px-4" style={getBackgroundStyle() as React.CSSProperties}>
             <div className="mx-auto relative z-[2] w-full max-w-md sm:max-w-lg md:max-w-xl">
                 <MagicCard
-                    className="rounded-xl w-full dark:bg-gray-800/50 dark:border-gray-700 p-6 sm:p-8"
+                    className="rounded-xl w-full p-6 sm:p-8"
                     gradientSize={240}
                     gradientColor="rgba(0, 0, 0, 0.08)"
                     gradientOpacity={0.5}

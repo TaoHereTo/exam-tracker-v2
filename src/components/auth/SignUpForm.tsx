@@ -18,6 +18,7 @@ interface SignUpFormProps {
 
 export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
     const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
@@ -105,8 +106,26 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="请输入邮箱地址"
-                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            placeholder="请输入邮箱"
+                            className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <div className="space-y-2">
+                    <Label htmlFor="username" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                        <MixedText text="用户名" />
+                    </Label>
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                        <Input
+                            id="username"
+                            type="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            placeholder="请输入用户名"
+                            className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
@@ -120,11 +139,11 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="password"
-                            type={showPassword ? 'text' : 'password'}
+                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            placeholder="请输入密码（至少6位）"
-                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            placeholder="请输入密码"
+                            className="pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -145,11 +164,11 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="confirmPassword"
-                            type={showConfirmPassword ? 'text' : 'password'}
+                            type="password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="请再次输入密码"
-                            className="pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            placeholder="请确认密码"
+                            className="pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -167,7 +186,6 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <Button
                             type="button"
                             variant="default"
-                            className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black h-10 sm:h-12 text-sm sm:text-base"
                         >
                             <MixedText text="返回登录" />
                         </Button>
@@ -175,7 +193,7 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                     <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 h-10 sm:h-12 text-sm sm:text-base"
+                        variant="outline"
                     >
                         {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> <MixedText text="注册中..." /></> : <MixedText text="注册" />}
                     </Button>

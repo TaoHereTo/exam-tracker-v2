@@ -317,34 +317,37 @@ th .mixed-text-part {
   --hover-dark: #262626;
 }
 
-/* 强制所有白色背景元素使用纯白色 */
-.bg-white,
-[data-slot="button"].bg-white,
-.dark .bg-white,
-.bg-\[white\],
-[data-slot="button"].bg-\[white\],
-.dark .bg-\[white\] {
-  background-color: #FFFFFF !important;
+/* 按钮主题适配：默认按钮在浅色模式下为黑色背景白色文字，深色模式下为白色背景黑色文字 */
+[data-slot="button"][variant="default"],
+[data-slot="button"].variant-default {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
 }
 
-/* 特别处理庆祝弹窗中的白色按钮 */
-.dark .bg-white.text-black,
-[data-slot="button"].dark .bg-white.text-black {
+.dark [data-slot="button"][variant="default"],
+.dark [data-slot="button"].variant-default {
   background-color: #FFFFFF !important;
   color: #000000 !important;
 }
 
-/* 特别处理深色模式下的白色按钮 */
-.dark .text-black.bg-white,
-[data-slot="button"].dark .text-black.bg-white {
+/* 按钮主题适配：secondary按钮在浅色模式下为灰色背景黑色文字，深色模式下为白色背景黑色文字 */
+[data-slot="button"][variant="secondary"],
+[data-slot="button"].variant-secondary {
+  background-color: #f0f0f0 !important;
+  color: #000000 !important;
+}
+
+.dark [data-slot="button"][variant="secondary"],
+.dark [data-slot="button"].variant-secondary {
   background-color: #FFFFFF !important;
   color: #000000 !important;
 }
 
-/* 强制所有 outline 按钮在浅色模式下使用纯白色背景，在深色模式下使用纯黑色背景 */
+/* 按钮主题适配：outline按钮在浅色模式下为白色背景黑色文字，深色模式下为黑色背景白色文字 */
 [data-slot="button"][variant="outline"],
 [data-slot="button"].variant-outline {
   background-color: #FFFFFF !important;
+  color: #000000 !important;
 }
 
 .dark [data-slot="button"][variant="outline"],

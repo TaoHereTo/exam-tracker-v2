@@ -75,8 +75,8 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="请输入邮箱地址"
-                            className="w-full pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            placeholder="请输入邮箱"
+                            className="w-full pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
@@ -94,7 +94,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
-                            className="w-full pl-10 pr-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 focus:ring-0 focus:ring-transparent text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            className="w-full pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                         <button
@@ -134,6 +134,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         type="submit"
                         disabled={loading}
                         className="w-full h-10 sm:h-12 text-sm sm:text-base"
+                        variant="default"
                     >
                         <MixedText text={loading ? '登录中...' : '登录'} />
                     </Button>

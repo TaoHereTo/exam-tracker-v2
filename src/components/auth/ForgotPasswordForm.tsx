@@ -81,8 +81,8 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            placeholder="请输入邮箱地址"
-                            className="pl-10 bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 text-sm sm:text-base h-10 sm:h-12"
+                            placeholder="请输入注册邮箱"
+                            className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
                             required
                         />
                     </div>
@@ -93,7 +93,6 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                         <Button
                             type="button"
                             variant="default"
-                            className="w-full sm:w-auto bg-black dark:bg-white text-white dark:text-black h-10 sm:h-12 text-sm sm:text-base"
                         >
                             <MixedText text="返回登录" />
                         </Button>
@@ -101,7 +100,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                     <Button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full sm:w-auto bg-white dark:bg-gray-700 text-black dark:text-gray-100 border-gray-300 dark:border-gray-600 h-10 sm:h-12 text-sm sm:text-base"
+                        variant="outline"
                     >
                         {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> <MixedText text="发送中..." /></> : <MixedText text="发送重置链接" />}
                     </Button>

@@ -176,7 +176,7 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                                         }}
                                     />
                                     {isImageLoading && (
-                                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
+                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
                                             <SimpleUiverseSpinner />
                                         </div>
                                     )}
@@ -184,9 +184,9 @@ export const CloudImageViewer: React.FC<CloudImageViewerProps> = ({
                             </div>
                         ) : hasError ? (
                             <div className="flex flex-col items-center justify-center h-64 text-center">
-                                <LucideImage className="h-16 w-16 text-gray-400 mb-4" />
-                                <p className="text-gray-500 mb-2">图片加载失败</p>
-                                <p className="text-sm text-gray-400">图片文件可能不存在或已被删除</p>
+                                <LucideImage className="h-16 w-16 text-muted-foreground mb-4" />
+                                <p className="text-muted-foreground mb-2">图片加载失败</p>
+                                <p className="text-sm text-muted-foreground/80">图片文件可能不存在或已被删除</p>
                             </div>
                         ) : null}
                     </div>
