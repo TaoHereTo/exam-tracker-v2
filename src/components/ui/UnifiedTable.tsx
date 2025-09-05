@@ -159,7 +159,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                 <thead>
                     <tr>
                         {selectable && (
-                            <th className={`border-b px-4 py-2 text-center bg-gray-100 dark:bg-gray-800 dark:text-gray-100 ${checkboxColClassName}`}>
+                            <th className={`border-b px-4 py-2 text-center bg-gray-100 dark:bg-[#303030] dark:text-gray-100 ${checkboxColClassName}`}>
                                 <Checkbox
                                     checked={allSelected}
                                     indeterminate={indeterminate}
@@ -174,11 +174,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border-b px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100 font-semibold ${col.className || ''}`}>
+                            <th key={col.key} className={`border-b px-4 py-2 bg-gray-100 dark:bg-[#303030] dark:text-gray-100 font-semibold ${col.className || ''}`}>
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
-                        {renderActions && <th className="border-b px-4 py-2 bg-gray-100 dark:bg-gray-800 dark:text-gray-100"><MixedText text="操作" /></th>}
+                        {renderActions && <th className="border-b px-4 py-2 bg-gray-100 dark:bg-[#303030] dark:text-gray-100"><MixedText text="操作" /></th>}
                     </tr>
                 </thead>
                 <tbody>

@@ -598,7 +598,7 @@ export function UnifiedSettings({
 
           {/* Image Management Interface */}
           {showImageManager && (
-            <div className="p-3 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-900 shadow-sm mt-3">
+            <div className="p-3 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-[#171717] shadow-sm mt-3">
               {/* Toolbar */}
               <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -740,7 +740,7 @@ export function UnifiedSettings({
                             }
                             setSelectedImages(newSelected);
                           }}
-                          className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
+                          className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-white dark:bg-[#171717] border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                         />
 
                         {/* Image Preview */}
@@ -790,7 +790,7 @@ export function UnifiedSettings({
                                       // Open image preview
                                       window.open(image.url, '_blank');
                                     }}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-gray-800/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9"
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-[#171717]/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9"
                                   >
                                     <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
                                   </Button>

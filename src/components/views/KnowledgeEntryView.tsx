@@ -95,7 +95,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 <Tabs value={tab} onValueChange={handleTabChange}>
                     <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full mx-auto">
                         {MODULES.map(({ value, label }) => (
-                            <TabsTrigger key={value} value={value} className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-gray-600 dark:data-[state=active]:bg-transparent">
+                            <TabsTrigger key={value} value={value} className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent">
                                 <MixedText text={label} />
                             </TabsTrigger>
                         ))}

@@ -121,7 +121,7 @@ function parseMarkdown(content: string): React.ReactNode[] {
         processedText = processedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
 
         // 处理内联代码
-        processedText = processedText.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+        processedText = processedText.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-[#171717] px-1 py-0.5 rounded text-sm font-mono">$1</code>');
 
         // 创建段落元素
         elements.push(

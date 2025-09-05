@@ -308,7 +308,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                     }`}
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
-                                                <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center mb-2 overflow-hidden">
+                                                <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden">
                                                     <Image
                                                         src={image.url}
                                                         alt={image.originalName}
