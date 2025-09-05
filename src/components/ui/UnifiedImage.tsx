@@ -34,6 +34,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const [isDeleting, setIsDeleting] = useState(false);
     const componentRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cloudSelectorRef = useRef<HTMLButtonElement>(null);
+    const cloudReselectRef = useRef<HTMLButtonElement>(null);
     const componentId = useRef(`unified-image-${Math.random().toString(36).substr(2, 9)}`);
 
     const { notify } = useNotification();
@@ -404,9 +406,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                                         e.preventDefault();
                                                                         e.stopPropagation();
                                                                         // 手动触发云端选择对话框
-                                                                        const cloudButton = document.querySelector('[data-cloud-selector="true"]');
-                                                                        if (cloudButton) {
-                                                                            (cloudButton as HTMLElement).click();
+                                                                        if (cloudSelectorRef.current) {
+                                                                            cloudSelectorRef.current.click();
                                                                         }
                                                                     }}
                                                                 >
@@ -424,6 +425,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                             onImageSelected={handleImageSelected}
                                                             trigger={
                                                                 <Button
+                                                                    ref={cloudSelectorRef}
                                                                     data-cloud-selector="true"
                                                                     variant="outline"
                                                                     size="icon"
@@ -567,9 +569,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     e.preventDefault();
                                                     e.stopPropagation();
                                                     // 手动触发云端选择对话框
-                                                    const cloudReselectButton = document.querySelector('[data-cloud-reselector="true"]');
-                                                    if (cloudReselectButton) {
-                                                        (cloudReselectButton as HTMLElement).click();
+                                                    if (cloudReselectRef.current) {
+                                                        cloudReselectRef.current.click();
                                                     }
                                                 }}
                                             >
@@ -587,6 +588,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                         onImageSelected={handleImageSelected}
                                         trigger={
                                             <Button
+                                                ref={cloudReselectRef}
                                                 data-cloud-reselector="true"
                                                 type="button"
                                                 variant="outline"
