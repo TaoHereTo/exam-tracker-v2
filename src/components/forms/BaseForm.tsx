@@ -131,7 +131,7 @@ export function BaseForm({
 
         try {
             onSubmit(values);
-            showSuccess();
+            // showSuccess(); // Removed per user request - only show notification on knowledge save
 
             if (resetOnSubmit) {
                 setValues(initialData);

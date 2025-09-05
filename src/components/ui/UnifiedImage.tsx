@@ -48,20 +48,22 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
 
         if (!isImageByMime && !isImageByExtension) {
-            notify({
-                type: "error",
-                message: "文件类型错误",
-                description: "请选择图片文件"
-            });
+            // Removed per user request - only show notification on knowledge save
+            // notify({
+            //     type: "error",
+            //     message: "文件类型错误",
+            //     description: "请选择图片文件"
+            // });
             return;
         }
 
         if (file.size > 5 * 1024 * 1024) { // 5MB
-            notify({
-                type: "error",
-                message: "文件过大",
-                description: "图片大小不能超过5MB"
-            });
+            // Removed per user request - only show notification on knowledge save
+            // notify({
+            //     type: "error",
+            //     message: "文件过大",
+            //     description: "图片大小不能超过5MB"
+            // });
             return;
         }
 
@@ -71,32 +73,35 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             onChange?.(imageInfo.id);
             setPreviewUrl(imageInfo.url);
 
-            notify({
-                type: "success",
-                message: "图片上传成功",
-                description: "图片已上传到云端存储"
-            });
+            // Removed per user request - only show notification on knowledge save
+            // notify({
+            //     type: "success",
+            //     message: "图片上传成功",
+            //     description: "图片已上传到云端存储"
+            // });
         } catch (error) {
             console.error('上传失败:', error);
             const errorMessage = error instanceof Error ? error.message : "图片上传失败";
 
             if (errorMessage.includes('RLS') || errorMessage.includes('权限不足')) {
-                notify({
-                    type: "error",
-                    message: "权限配置问题",
-                    description: "请检查 Supabase 存储桶配置"
-                });
+                // Removed per user request - only show notification on knowledge save
+                // notify({
+                //     type: "error",
+                //     message: "权限配置问题",
+                //     description: "请检查 Supabase 存储桶配置"
+                // });
             } else {
-                notify({
-                    type: "error",
-                    message: "上传失败",
-                    description: errorMessage
-                });
+                // Removed per user request - only show notification on knowledge save
+                // notify({
+                //     type: "error",
+                //     message: "上传失败",
+                //     description: errorMessage
+                // });
             }
         } finally {
             setIsLoading(false);
         }
-    }, [onChange, notify]);
+    }, [onChange]); // Removed 'notify' from dependency array since we're not using it anymore
 
     // 处理粘贴图片
     const handlePaste = useCallback(async (e: ClipboardEvent) => {
@@ -246,7 +251,8 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         if (imageFile) {
             handleFileUpload(imageFile);
         } else {
-            notify({ type: "error", message: "请拖拽图片文件" });
+            // Removed per user request - only show notification on knowledge save
+            // notify({ type: "error", message: "请拖拽图片文件" });
         }
     };
 
@@ -254,11 +260,12 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
     const handleRemoveImage = async () => {
         setPreviewUrl(null);
         onChange?.(undefined);
-        notify({
-            type: "success",
-            message: "已移除图片",
-            description: "仅取消本次选择，不会删除云端文件"
-        });
+        // Removed per user request - only show notification on knowledge save
+        // notify({
+        //     type: "success",
+        //     message: "已移除图片",
+        //     description: "仅取消本次选择，不会删除云端文件"
+        // });
     };
 
     // 预览图片
@@ -275,11 +282,12 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
         if (cloudUrl) {
             setPreviewUrl(cloudUrl);
         }
-        notify({
-            type: "success",
-            message: "图片选择成功",
-            description: "已从云端选择图片"
-        });
+        // Removed per user request - only show notification on knowledge save
+        // notify({
+        //     type: "success",
+        //     message: "图片选择成功",
+        //     description: "已从云端选择图片"
+        // });
     };
 
     const sizeClasses = {

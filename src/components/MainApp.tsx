@@ -159,6 +159,13 @@ export function MainApp() {
         const knowledgeWithId = { ...newKnowledge, id: generateUUID() };
         setKnowledge(prev => [knowledgeWithId, ...prev]);
 
+        // Show success notification immediately
+        notify({
+            type: 'success',
+            message: '知识点保存成功',
+            description: '知识点已保存到本地并正在同步到云端'
+        });
+
         // 异步保存到云端，不阻塞UI
         setTimeout(() => {
             AutoCloudSync.autoSaveKnowledge(knowledgeWithId, notify);

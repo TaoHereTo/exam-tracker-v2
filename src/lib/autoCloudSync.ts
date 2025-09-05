@@ -159,6 +159,7 @@ export class AutoCloudSync {
 
             await knowledgeService.addKnowledge(knowledgeData);
 
+            // Restored per user request - show cloud sync status when saving knowledge
             notify({
                 type: 'success',
                 message: '知识点已保存到云端',
@@ -170,6 +171,7 @@ export class AutoCloudSync {
 
             console.error('自动保存知识点到云端失败:', error);
 
+            // Restored per user request - show cloud sync status when saving knowledge
             notify({
                 type: 'error',
                 message: '云端保存失败',
@@ -187,18 +189,16 @@ export class AutoCloudSync {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(plan.id);
 
             if (!isUUID) {
-
-                notify({
-                    type: 'warning',
-                    message: '本地更新成功',
-                    description: `计划"${plan.name}"已更新到本地，但云端同步跳过（旧格式ID）`
-                });
+                // Removed per user request - only show notification on knowledge save
+                // notify({
+                //     type: 'warning',
+                //     message: '本地更新成功',
+                //     description: `计划"${plan.name}"已更新到本地，但云端同步跳过（旧格式ID）`
+                // });
                 return;
             }
 
-
-
-            // 直接更新，不进行查重检查
+            // Directly update without duplicate checking
             const result = await planService.updatePlan(plan.id, {
                 name: plan.name,
                 module: plan.module,
@@ -211,8 +211,7 @@ export class AutoCloudSync {
                 description: plan.description
             });
 
-
-
+            // Restored per user request - keep plan update notifications
             notify({
                 type: 'success',
                 message: '计划已更新到云端',
@@ -223,6 +222,7 @@ export class AutoCloudSync {
 
             const errorMessage = error instanceof Error ? error.message : String(error);
 
+            // Restored per user request - keep plan update notifications
             notify({
                 type: 'error',
                 message: '云端更新失败',
@@ -240,26 +240,23 @@ export class AutoCloudSync {
             const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(countdown.id);
 
             if (!isUUID) {
-
-                notify({
-                    type: 'warning',
-                    message: '本地更新成功',
-                    description: `倒计时"${countdown.name}"已更新到本地，但云端同步跳过（旧格式ID）`
-                });
+                // Removed per user request - only show notification on knowledge save
+                // notify({
+                //     type: 'warning',
+                //     message: '本地更新成功',
+                //     description: `倒计时"${countdown.name}"已更新到本地，但云端同步跳过（旧格式ID）`
+                // });
                 return;
             }
 
-
-
-            // 直接更新，不进行查重检查
+            // Directly update without duplicate checking
             const result = await countdownService.updateCountdown(countdown.id, {
                 name: countdown.name,
                 examDate: countdown.examDate,
                 description: countdown.description
             });
 
-
-
+            // Restored per user request - keep countdown update notifications
             notify({
                 type: 'success',
                 message: '倒计时已更新到云端',
@@ -270,6 +267,7 @@ export class AutoCloudSync {
 
             const errorMessage = error instanceof Error ? error.message : String(error);
 
+            // Restored per user request - keep countdown update notifications
             notify({
                 type: 'error',
                 message: '云端更新失败',
@@ -339,6 +337,7 @@ export class AutoCloudSync {
 
             await knowledgeService.updateKnowledge(knowledge.id, updateData as Partial<KnowledgeItem>);
 
+            // Restored per user request - show cloud sync status when updating knowledge
             notify({
                 type: 'success',
                 message: '知识点已更新到云端',
@@ -350,6 +349,7 @@ export class AutoCloudSync {
 
             console.error('自动更新知识点到云端失败:', error);
 
+            // Restored per user request - show cloud sync status when updating knowledge
             notify({
                 type: 'error',
                 message: '云端更新失败',
@@ -373,6 +373,7 @@ export class AutoCloudSync {
             }
 
             await recordService.deleteRecord(recordId);
+            // Restored per user request - keep record delete notifications
             notify({
                 type: 'success',
                 message: '记录已从云端删除',
@@ -389,6 +390,7 @@ export class AutoCloudSync {
                 details: errorDetails
             });
 
+            // Restored per user request - keep record delete notifications
             notify({
                 type: 'error',
                 message: '云端删除失败',
@@ -403,6 +405,7 @@ export class AutoCloudSync {
     static async autoDeletePlan(planId: string, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             await planService.deletePlan(planId);
+            // Restored per user request - keep plan delete notifications
             notify({
                 type: 'success',
                 message: '计划已从云端删除',
@@ -414,6 +417,7 @@ export class AutoCloudSync {
             const errorDetails = error instanceof Error ? error.stack : '未知错误';
             console.error('自动删除计划从云端失败:', error);
 
+            // Restored per user request - keep plan delete notifications
             notify({
                 type: 'error',
                 message: '云端删除失败',
@@ -428,6 +432,7 @@ export class AutoCloudSync {
     static async autoDeleteCountdown(countdownId: string, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             await countdownService.deleteCountdown(countdownId);
+            // Restored per user request - keep countdown delete notifications
             notify({
                 type: 'success',
                 message: '倒计时已从云端删除',
@@ -438,6 +443,7 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('自动删除倒计时从云端失败:', error);
 
+            // Restored per user request - keep countdown delete notifications
             notify({
                 type: 'error',
                 message: '云端删除失败',
@@ -452,6 +458,7 @@ export class AutoCloudSync {
     static async autoDeleteKnowledge(knowledgeId: string, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             await knowledgeService.deleteKnowledge(knowledgeId);
+            // Restored per user request - keep notifications in knowledge summary view
             notify({
                 type: 'success',
                 message: '知识点已从云端删除',
@@ -462,6 +469,7 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('自动删除知识点从云端失败:', error);
 
+            // Restored per user request - keep notifications in knowledge summary view
             notify({
                 type: 'error',
                 message: '云端删除失败',
