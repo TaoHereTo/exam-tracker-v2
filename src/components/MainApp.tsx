@@ -357,7 +357,7 @@ export function MainApp() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
                             side="top"
-                            align="start"
+                            align={isCollapsed ? "start" : "end"}
                             sideOffset={4}
                             className="w-[--radix-popper-anchor-width] shadow-xl bg-white/95 dark:bg-[#262626] backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg"
                         >
