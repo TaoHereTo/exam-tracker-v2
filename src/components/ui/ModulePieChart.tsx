@@ -63,11 +63,11 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
     }
 
     // 根据主题动态设置颜色
-    const backgroundColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';
+    const backgroundColor = isDarkMode ? '#101010' : '#F8F7F6';
     const textColor = isDarkMode ? '#e5e5e5' : '#333';
     // 图例文字在深色模式下使用黑色以提高可读性
     const legendTextColor = isDarkMode ? '#333' : '#333';
-    const borderColor = isDarkMode ? 'hsl(var(--background))' : '#F8F7F6';
+    const borderColor = isDarkMode ? '#101010' : '#F8F7F6';
     const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
     const tooltipBorderColor = isDarkMode ? '#404040' : '#e0e6f1';
 

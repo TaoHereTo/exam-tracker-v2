@@ -199,7 +199,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             name="刷题记录"
                             className="col-span-1 md:col-span-2"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-sm bg-background/30">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-lg bg-background/50">
                                     <div className="absolute left-30 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
                                         <Card className="p-4 w-full max-w-[70%]">
                                             <div className="space-y-3">
@@ -288,7 +288,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             name="学习计划"
                             className="col-span-1"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-sm bg-background/30">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-lg bg-background/50">
                                     <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
                                         <div className="flex-1 space-y-3 w-full max-w-[100%]">
                                             {mockPlans.map(plan => (
@@ -322,10 +322,10 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             name="数据可视化"
                             className="col-span-1"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-[2px] bg-background/20 dark:bg-background/10">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
                                     {/* Pie chart visualization */}
                                     <div className="absolute left-0 top-0 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="w-full h-64 relative bg-white/30 dark:bg-[#1a1a1a]/30 backdrop-blur-[2px] border border-white/20 dark:border-white/10 rounded-lg p-4">
+                                        <div className="w-full h-64 relative bg-white/50 dark:bg-[#101010] backdrop-blur-md rounded-lg p-4">
                                             <ModulePieChart 
                                                 data={[
                                                     { date: '2023-01-01', module: '资料分析', score: 1.5, duration: 25 },
@@ -359,9 +359,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             name="知识点录入"
                             className="col-span-1 md:col-span-2"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-[2px] bg-background/20 dark:bg-background/10">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
                                     <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/30 dark:bg-[#1a1a1a]/30 backdrop-blur-[2px] border border-white/20 dark:border-white/10 rounded-lg p-2">
+                                        <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-md border border-white/40 dark:border-white/30 rounded-lg p-2">
                                             <UnifiedTable
                                                 columns={[
                                                     { key: 'module', label: '模块', className: 'w-24 text-xs' },
