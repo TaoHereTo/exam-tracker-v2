@@ -1,6 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import React, { useState, useEffect, useMemo } from "react";
-import { Marquee } from "@/components/magicui/marquee";
 import { useLocalStorageBoolean } from "@/hooks/useLocalStorage";
 import { normalizeModuleName } from "@/config/exam";
 import { timeStringToMinutes, minutesToTimeString } from "@/lib/utils";
@@ -25,8 +24,6 @@ interface OverviewViewProps {
 }
 
 export function OverviewView({ records }: OverviewViewProps) {
-    const [overviewAnimate] = useLocalStorageBoolean('overview-animate', true);
-
     // 获取tooltip提示文本
     const getTooltipText = (title: string): string => {
         const tooltipMap: Record<string, string> = {
@@ -279,117 +276,40 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
     ];
 
-    // 动画布局
-    // 均分为两组
-    const half = Math.ceil(cards.length / 2);
-    const group1 = cards.slice(0, half);
-    const group2 = cards.slice(half);
-
     return (
         <TooltipProvider>
             <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 sm:gap-8">
-                {overviewAnimate ? (
-                    <Marquee className="w-full" pauseOnHover repeat={2}>
-                        <div className="flex gap-3 sm:gap-6">
-                            {group1.map((item, idx) => (
-                                <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
-                                    <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
-                                        <div className="flex flex-row items-center justify-center">
-                                            <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
-                                            {item.tooltip && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p><MixedText text={item.tooltip} /></p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                        </div>
-                                        <div className="flex flex-col items-center justify-center py-1 flex-grow">
-                                            <div className="text-lg sm:text-2xl font-bold">
-                                                <MixedText text={String(item.value)} />
-                                            </div>
-                                            {item.extra && (
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    <MixedText text={item.extra} />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </Card>
-                            ))}
-                        </div>
-                    </Marquee>
-                ) : (
-                    <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 px-2 sm:px-6 py-4 sm:py-6">
-                        {cards.map((item, idx) => (
-                            <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
-                                <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
-                                    <div className="flex flex-row items-center justify-center">
-                                        <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
-                                        {item.tooltip && (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p><MixedText text={item.tooltip} /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col items-center justify-center py-1 flex-grow">
-                                        <div className="text-lg sm:text-2xl font-bold">
-                                            <MixedText text={String(item.value)} />
-                                        </div>
-                                        {item.extra && (
-                                            <div className="text-xs text-muted-foreground mt-1">
-                                                <MixedText text={item.extra} />
-                                            </div>
-                                        )}
-                                    </div>
+                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 px-2 sm:px-6 py-4 sm:py-6">
+                    {cards.map((item, idx) => (
+                        <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+                            <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
+                                <div className="flex flex-row items-center justify-center">
+                                    <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
+                                    {item.tooltip && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p><MixedText text={item.tooltip} /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
                                 </div>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-                {overviewAnimate ? (
-                    <Marquee className="w-full" pauseOnHover reverse repeat={2}>
-                        <div className="flex gap-3 sm:gap-6">
-                            {group2.map((item, idx) => (
-                                <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
-                                    <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
-                                        <div className="flex flex-row items-center justify-center">
-                                            <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
-                                            {item.tooltip && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p><MixedText text={item.tooltip} /></p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                        </div>
-                                        <div className="flex flex-col items-center justify-center py-1 flex-grow">
-                                            <div className="text-lg sm:text-2xl font-bold">
-                                                <MixedText text={String(item.value)} />
-                                            </div>
-                                            {item.extra && (
-                                                <div className="text-xs text-muted-foreground mt-1">
-                                                    <MixedText text={item.extra} />
-                                                </div>
-                                            )}
-                                        </div>
+                                <div className="flex flex-col items-center justify-center py-1 flex-grow">
+                                    <div className="text-lg sm:text-2xl font-bold">
+                                        <MixedText text={String(item.value)} />
                                     </div>
-                                </Card>
-                            ))}
-                        </div>
-                    </Marquee>
-                ) : null}
+                                    {item.extra && (
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                            <MixedText text={item.extra} />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
             </div>
         </TooltipProvider>
     );

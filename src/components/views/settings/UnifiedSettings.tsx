@@ -82,9 +82,6 @@ export function UnifiedSettings({
   const [currentDeletingImage, setCurrentDeletingImage] = useState<string>('');
   const [deleteDialogKey, setDeleteDialogKey] = useState(0);
   
-  // Advanced settings - overview animation
-  const [overviewAnimate, setOverviewAnimate] = useLocalStorageBoolean('overview-animate', true);
-  
   // Cloud sync states
   const [isUploading, setIsUploading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -366,15 +363,6 @@ export function UnifiedSettings({
               disabled={theme === 'dark'}
               className="mt-0"
             />
-          </div>
-
-          {/* Overview Animation */}
-          <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
-            <div className="flex-1">
-              <h3 className="font-medium text-sm sm:text-base"><MixedText text="数据概览动画" /></h3>
-              <p className="text-xs sm:text-sm text-muted-foreground mt-1"><MixedText text="控制数据概览卡片是否进行滚动动画展示。" /></p>
-            </div>
-            <Switch checked={overviewAnimate} onCheckedChange={setOverviewAnimate} className="mt-0" />
           </div>
         </CardContent>
       </Card>
@@ -922,3 +910,9 @@ export function UnifiedSettings({
     </div>
   );
 }
+
+
+
+
+
+
