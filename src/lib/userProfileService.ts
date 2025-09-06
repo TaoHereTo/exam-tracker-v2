@@ -38,7 +38,8 @@ export class UserProfileService {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 console.error('upsertUserProfile: 用户未登录');
-                throw new Error('用户未登录');
+                // Return null instead of throwing to prevent crashes
+                return null;
             }
 
             // 准备要插入的数据，包含email字段
@@ -154,6 +155,11 @@ export class UserProfileService {
                     display_name: null,
                     bio: null
                 });
+
+                // If upsertUserProfile returned null (user not logged in), return null
+                if (!profile) {
+                    return null;
+                }
             }
 
             return profile;
@@ -199,4 +205,4 @@ export class UserProfileService {
             return null;
         }
     }
-} 
+}

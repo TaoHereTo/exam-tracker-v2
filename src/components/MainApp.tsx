@@ -152,6 +152,7 @@ export function MainApp() {
         } catch (error) {
             console.error('加载用户资料失败:', error);
             // 不设置错误状态，避免影响页面渲染
+            setUserProfile(null);
         }
     }, []);
 
