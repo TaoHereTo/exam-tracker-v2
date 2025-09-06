@@ -29,6 +29,7 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { UnifiedImage } from "@/components/ui/UnifiedImage";
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -237,8 +238,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
   // 处理表单提交
   const handleSubmit = (data: Record<string, unknown>) => {
-
-
     // 根据模块构建不同的数据格式
     let knowledgeData: Partial<KnowledgeItem> | Record<string, unknown> = {
       imagePath: data.imagePath
@@ -291,7 +290,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     }
 
     onAddKnowledge(knowledgeData);
-    // 移除这里的 showSuccess()，因为 MainApp 中的 addKnowledge 会处理通知
   };
 
   // 获取字段标签和占位符
@@ -318,17 +316,28 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const fieldConfig = getFieldConfig();
   const { isDarkMode } = useThemeMode();
 
-
-
   // Markdown编辑器字段组件
   const MarkdownEditorField = () => {
     const { setValue, getValue } = useFormContext();
     const currentValue = getValue('secondField') as string;
+    const currentImagePath = getValue('imagePath') as string;
+
+    // Handle image changes from MarkdownEditor
+    const handleImageChange = (imageIds: string[]) => {
+      // For now, we'll use the first image ID if any images are selected
+      // In a more advanced implementation, we might want to handle multiple images
+      if (imageIds.length > 0) {
+        setValue('imagePath', imageIds[0]);
+      } else {
+        setValue('imagePath', '');
+      }
+    };
 
     return (
       <MarkdownEditor
         value={currentValue || ''}
         onChange={(value) => setValue('secondField', value || '')}
+        onImageChange={handleImageChange}
         placeholder={fieldConfig.secondPlaceholder}
         height={200}
         className="w-full"

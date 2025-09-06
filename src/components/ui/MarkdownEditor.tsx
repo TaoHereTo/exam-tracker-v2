@@ -23,6 +23,7 @@ interface MarkdownEditorProps {
     className?: string;
     height?: number;
     disabled?: boolean;
+    onImageChange?: (imageIds: string[]) => void; // Add this new prop
 }
 
 const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
@@ -31,7 +32,8 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     placeholder = '请输入内容...',
     className = '',
     height = 200,
-    disabled = false
+    disabled = false,
+    onImageChange // Add this new prop
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const previewTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -350,12 +352,33 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
             const imageInfo = await supabaseImageManager.uploadImage(file);
             const imageUrl = imageInfo.url;
             setPreviewImages(prev => [...prev, imageUrl]);
+            
+            // Extract image ID from the imageInfo and pass it back
+            if (onImageChange) {
+                // Get all current image IDs from previewImages
+                // For existing images, we need to extract IDs from URLs
+                const currentImageIds = previewImages.map(url => {
+                    // Extract image ID from URL (filename part)
+                    try {
+                        const urlObj = new URL(url);
+                        const pathParts = urlObj.pathname.split('/');
+                        return pathParts[pathParts.length - 1];
+                    } catch (e) {
+                        // Fallback: use the full URL as ID
+                        return url;
+                    }
+                });
+                
+                // Add the new image ID
+                const newImageId = imageInfo.id;
+                onImageChange([...currentImageIds, newImageId]);
+            }
         } catch (error) {
             console.error('上传失败:', error);
         } finally {
             setIsUploading(false);
         }
-    }, []);
+    }, [onImageChange, previewImages]);
 
     // 处理文件选择
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -418,12 +441,50 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
       setPreviewImages(prev => [...prev, cloudUrl]);
       // 自动展开预览区域
       setAccordionValue("preview");
+      
+      // Pass the image ID back to the parent
+      if (onImageChange) {
+        // Get all current image IDs from previewImages
+        const currentImageIds = previewImages.map(url => {
+          // Extract image ID from URL (filename part)
+          try {
+            const urlObj = new URL(url);
+            const pathParts = urlObj.pathname.split('/');
+            return pathParts[pathParts.length - 1];
+          } catch (e) {
+            // Fallback: use the full URL as ID
+            return url;
+          }
+        });
+        
+        // Add the new image ID
+        onImageChange([...currentImageIds, imageId]);
+      }
     }
   };
 
     // 移除图片
     const removeImage = (index: number) => {
-        setPreviewImages(prev => prev.filter((_, i) => i !== index));
+        const newPreviewImages = previewImages.filter((_, i) => i !== index);
+        setPreviewImages(newPreviewImages);
+        
+        // Update the image IDs passed back to the parent
+        if (onImageChange) {
+            // Get all current image IDs from previewImages
+            const currentImageIds = newPreviewImages.map(url => {
+                // Extract image ID from URL (filename part)
+                try {
+                    const urlObj = new URL(url);
+                    const pathParts = urlObj.pathname.split('/');
+                    return pathParts[pathParts.length - 1];
+                } catch (e) {
+                    // Fallback: use the full URL as ID
+                    return url;
+                }
+            });
+            
+            onImageChange(currentImageIds);
+        }
     };
 
     // 注册粘贴处理器

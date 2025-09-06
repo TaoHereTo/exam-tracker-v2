@@ -200,7 +200,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             className="col-span-1 md:col-span-2"
                             background={
                                 <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-lg bg-background/50">
-                                    <div className="absolute left-30 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
+                                    <div className="absolute left-25 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
                                         <Card className="p-4 w-full max-w-[70%]">
                                             <div className="space-y-3">
                                                 <div>
