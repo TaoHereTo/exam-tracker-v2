@@ -14,11 +14,12 @@ interface ModulePieChartProps {
         score: number;
         duration: number;
     }>;
+    showLegend?: boolean;
 }
 
 // 使用统一的配置，不再需要重复定义
 
-export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
+export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend = true }) => {
     const { isDarkMode } = useThemeMode();
 
     // 统计每个模块的总耗时和总题数（只统计有效记录，单位均为分钟）
@@ -73,19 +74,9 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     const option = {
         backgroundColor,
         tooltip: {
-            trigger: 'item',
-            backgroundColor: tooltipBgColor,
-            borderColor: tooltipBorderColor,
-            borderWidth: 1,
-            textStyle: { color: textColor },
-            formatter: (params: Record<string, unknown>) => {
-                const data = params.data as { standardQuestions: number; avg: number };
-                const totalTime = minutesToTimeString(data.avg * data.standardQuestions);
-                const avgTime = minutesToTimeString(data.avg);
-                return `${params.name}<br/>${data.standardQuestions}题 × ${avgTime}/题 = <b>${totalTime}</b>`;
-            }
+            show: false // Disable tooltip entirely
         },
-        legend: {
+        legend: showLegend ? {
             // Change to horizontal legend at the bottom for all screen sizes
             orient: 'horizontal',
             left: 'center',
@@ -117,6 +108,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 fontWeight: 'bold',
                 fontFamily: 'Times New Roman, 思源宋体, serif'
             }
+        } : {
+            show: false
         },
         // Remove the separate mobile legend configuration since we're using the same for all sizes
         series: [
@@ -124,7 +117,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
                 name: '模块耗时分布',
                 type: 'pie',
                 radius: ['40%', '70%'],  // Increased size: inner radius from 30% to 40%, outer from 50% to 70%
-                center: ['50%', '40%'],  // Moved up slightly from 45% to 40% to create more space for legend
+                center: ['50%', '50%'],  // Center the chart when no legend is shown
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
@@ -153,7 +146,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data }) => {
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: typeof window !== 'undefined' && window.innerWidth < 768 ? '0 0 120px 0' : '0 0 100px 0' }} className="chart-wrapper">
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: showLegend ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '0 0 120px 0' : '0 0 100px 0') : '0' }} className="chart-wrapper">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}

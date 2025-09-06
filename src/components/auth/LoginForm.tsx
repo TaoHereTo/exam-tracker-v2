@@ -84,7 +84,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱"
-                            className="w-full pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
+                            className="w-full pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
                             required
                         />
                     </div>
@@ -102,7 +102,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
-                            className="w-full pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
+                            className="w-full pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
                             required
                         />
                         <button

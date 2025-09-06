@@ -82,7 +82,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入注册邮箱"
-                            className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-10 sm:h-12"
+                            className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
                             required
                         />
                     </div>

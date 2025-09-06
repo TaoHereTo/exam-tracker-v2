@@ -11,7 +11,8 @@ import { MagicCard } from '../magicui/magic-card'
 import { BentoGrid, BentoCard } from '../magicui/bento-grid'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import { useAuth } from '@/contexts/AuthContext'
-import { BarChart3, BookOpen, Calendar as CalendarIcon, TrendingUp, FileText, Target, BookCopy } from 'lucide-react'
+import { useNotification } from '@/components/magicui/NotificationProvider' // Added notification import
+import { BarChart3, BookOpen, Calendar as CalendarIcon, TrendingUp, FileText, Target, BookCopy, Flower } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
@@ -24,6 +25,8 @@ import { TimePicker } from '@/components/ui/TimePicker'
 import { MODULES } from '@/config/exam'
 import { MixedText } from '@/components/ui/MixedText'
 import { UnifiedTable } from '@/components/ui/UnifiedTable'
+import { ModulePieChart } from '@/components/ui/ModulePieChart'
+import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler' // Added import for theme toggler
 import type { RecordItem } from '@/types/record'
 import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
@@ -116,6 +119,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
     const pathname = usePathname()
     const router = useRouter()
     const { user, loading } = useAuth()
+    const { notify } = useNotification() // Added notification hook
     const { isDarkMode, getBackgroundStyle } = useThemeMode();
 
     // Determine the current view based on the pathname
@@ -140,17 +144,29 @@ export function AuthPage({ initialView }: AuthPageProps) {
         }
     }, [loading, user, router])
 
+    // Function to show login notification
+    const showLoginNotification = () => {
+        notify({
+            type: "info",
+            message: "登录账号后开始记录",
+            icon: "flower" // Custom property to indicate we want a flower icon
+        });
+    };
+
     return (
         <div className="min-h-screen flex flex-col lg:flex-row relative" style={getBackgroundStyle() as React.CSSProperties}>
-            {/* 顶部左侧应用图标 */}
-            <Link href="/" className="absolute left-4 top-4 z-[3] inline-flex items-center gap-3">
-                <Image src="/trace.svg" alt="App Icon" className="h-10 w-10 sm:h-12 sm:w-12" width={48} height={48} />
-                <span className="hidden sm:inline text-lg sm:text-xl font-semibold text-foreground/90">行测每日记录</span>
-            </Link>
+            {/* 顶部左侧应用图标和主题切换器 */}
+            <div className="absolute left-4 top-4 z-[3] inline-flex items-center gap-3">
+                <Link href="/" className="inline-flex items-center gap-3">
+                    <Image src="/trace.svg" alt="App Icon" className="h-10 w-10 sm:h-12 sm:w-12" width={48} height={48} />
+                    <span className="hidden sm:inline text-lg sm:text-xl font-semibold text-foreground/90">行测每日记录</span>
+                </Link>
+                <AnimatedThemeToggler className="w-10 h-10" />
+            </div>
 
             {/* 左侧登录表单 */}
             <div className="flex-1 flex items-center justify-center p-4 lg:p-8 order-2 lg:order-1">
-                <div className="w-full max-w-md">
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
                     <MagicCard
                         className="rounded-xl w-full p-6 sm:p-8"
                         gradientSize={240}
@@ -184,8 +200,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             className="col-span-1 md:col-span-2"
                             background={
                                 <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-sm bg-background/30">
-                                    <div className="absolute left-10 top-10 w-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <Card className="p-4 w-full max-w-[80%]">
+                                    <div className="absolute left-30 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
+                                        <Card className="p-4 w-full max-w-[70%]">
                                             <div className="space-y-3">
                                                 <div>
                                                     <Label className="text-sm">模块</Label>
@@ -262,10 +278,11 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             }
                             Icon={BookCopy}
                             description="快速录入和管理刷题记录"
-                            href="#"
                             cta="开始记录"
                             titleClassName="text-yellow-600 dark:text-yellow-400"
                             descriptionClassName="text-yellow-500/80 dark:text-yellow-300/80"
+                            iconClassName="text-yellow-600 dark:text-yellow-400"
+                            onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
                             name="学习计划"
@@ -295,173 +312,68 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             }
                             Icon={CalendarIcon}
                             description="制定个性化学习计划"
-                            href="#"
                             cta="制定计划"
                             titleClassName="text-orange-600 dark:text-orange-400"
                             descriptionClassName="text-orange-500/80 dark:text-orange-300/80"
+                            iconClassName="text-orange-600 dark:text-orange-400"
+                            onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
                             name="数据可视化"
                             className="col-span-1"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-sm bg-background/30">
-                                    {/* Line chart visualization */}
-                                    <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="w-full h-64 relative">
-                                            {/* Y-axis labels */}
-                                            <div className="absolute left-10 top-10 bottom-0 flex flex-col justify-between text-xs text-muted-foreground py-4">
-                                                <span>2.0</span>
-                                                <span>1.5</span>
-                                                <span>1.0</span>
-                                                <span>0.5</span>
-                                                <span>0.0</span>
-                                            </div>
-                                            
-                                            {/* Chart area */}
-                                            <div className="absolute left-8 right-0 top-0 bottom-6">
-                                                {/* Grid lines */}
-                                                <div className="absolute inset-0 flex flex-col justify-between">
-                                                    {[0, 1, 2, 3, 4].map(i => (
-                                                        <div key={i} className="border-t border-muted-foreground/20"></div>
-                                                    ))}
-                                                </div>
-                                                
-                                                {/* Data lines */}
-                                                {/* 资料分析 line */}
-                                                <svg className="absolute inset-0 w-full h-full">
-                                                    <polyline 
-                                                        points="0,40 5,25 10,10 15,20 20,15 25,5 30,30 35,20 40,10 45,25 50,15 55,5 60,20 65,10 70,30 75,20 80,15 85,25 90,15 95,10 100,30" 
-                                                        fill="none" 
-                                                        stroke="#3b82f6" 
-                                                        strokeWidth="2"
-                                                        className="drop-shadow-sm"
-                                                    />
-                                                    <circle cx="0" cy="40" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="5" cy="25" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="10" cy="10" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="15" cy="20" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="20" cy="15" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="25" cy="5" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="30" cy="30" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="35" cy="20" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="40" cy="10" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="45" cy="25" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="50" cy="15" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="55" cy="5" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="60" cy="20" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="65" cy="10" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="70" cy="30" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="75" cy="20" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="80" cy="15" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="85" cy="25" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="90" cy="15" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="95" cy="10" r="1.5" fill="#3b82f6" />
-                                                    <circle cx="100" cy="30" r="1.5" fill="#3b82f6" />
-                                                </svg>
-                                                
-                                                {/* 言语理解 line */}
-                                                <svg className="absolute inset-0 w-full h-full">
-                                                    <polyline 
-                                                        points="0,60 5,55 10,45 15,50 20,40 25,35 30,45 35,50 40,40 45,35 50,45 55,50 60,40 65,35 70,45 75,50 80,40 85,35 90,45 95,50 100,45" 
-                                                        fill="none" 
-                                                        stroke="#10b981" 
-                                                        strokeWidth="2"
-                                                        className="drop-shadow-sm"
-                                                    />
-                                                    <circle cx="0" cy="60" r="1.5" fill="#10b981" />
-                                                    <circle cx="5" cy="55" r="1.5" fill="#10b981" />
-                                                    <circle cx="10" cy="45" r="1.5" fill="#10b981" />
-                                                    <circle cx="15" cy="50" r="1.5" fill="#10b981" />
-                                                    <circle cx="20" cy="40" r="1.5" fill="#10b981" />
-                                                    <circle cx="25" cy="35" r="1.5" fill="#10b981" />
-                                                    <circle cx="30" cy="45" r="1.5" fill="#10b981" />
-                                                    <circle cx="35" cy="50" r="1.5" fill="#10b981" />
-                                                    <circle cx="40" cy="40" r="1.5" fill="#10b981" />
-                                                    <circle cx="45" cy="35" r="1.5" fill="#10b981" />
-                                                    <circle cx="50" cy="45" r="1.5" fill="#10b981" />
-                                                    <circle cx="55" cy="50" r="1.5" fill="#10b981" />
-                                                    <circle cx="60" cy="40" r="1.5" fill="#10b981" />
-                                                    <circle cx="65" cy="35" r="1.5" fill="#10b981" />
-                                                    <circle cx="70" cy="45" r="1.5" fill="#10b981" />
-                                                    <circle cx="75" cy="50" r="1.5" fill="#10b981" />
-                                                    <circle cx="80" cy="40" r="1.5" fill="#10b981" />
-                                                    <circle cx="85" cy="35" r="1.5" fill="#10b981" />
-                                                    <circle cx="90" cy="45" r="1.5" fill="#10b981" />
-                                                    <circle cx="95" cy="50" r="1.5" fill="#10b981" />
-                                                    <circle cx="100" cy="45" r="1.5" fill="#10b981" />
-                                                </svg>
-                                                
-                                                {/* 判断推理 line */}
-                                                <svg className="absolute inset-0 w-full h-full">
-                                                    <polyline 
-                                                        points="0,50 5,40 10,30 15,35 20,25 25,20 30,30 35,35 40,25 45,20 50,30 55,35 60,25 65,20 70,30 75,35 80,25 85,20 90,30 95,35 100,30" 
-                                                        fill="none" 
-                                                        stroke="#f59e0b" 
-                                                        strokeWidth="2"
-                                                        className="drop-shadow-sm"
-                                                    />
-                                                    <circle cx="0" cy="50" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="5" cy="40" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="10" cy="30" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="15" cy="35" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="20" cy="25" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="25" cy="20" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="30" cy="30" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="35" cy="35" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="40" cy="25" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="45" cy="20" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="50" cy="30" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="55" cy="35" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="60" cy="25" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="65" cy="20" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="70" cy="30" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="75" cy="35" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="80" cy="25" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="85" cy="20" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="90" cy="30" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="95" cy="35" r="1.5" fill="#f59e0b" />
-                                                    <circle cx="100" cy="30" r="1.5" fill="#f59e0b" />
-                                                </svg>
-                                            </div>
-                                            
-                                            {/* X-axis labels */}
-                                            <div className="absolute left-8 right-0 bottom-0 flex justify-between text-xs text-muted-foreground pb-1">
-                                                <span>01/01</span>
-                                                <span>01/05</span>
-                                                <span>01/10</span>
-                                                <span>01/15</span>
-                                                <span>01/20</span>
-                                            </div>
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-[2px] bg-background/20 dark:bg-background/10">
+                                    {/* Pie chart visualization */}
+                                    <div className="absolute left-0 top-0 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
+                                        <div className="w-full h-64 relative bg-white/30 dark:bg-[#1a1a1a]/30 backdrop-blur-[2px] border border-white/20 dark:border-white/10 rounded-lg p-4">
+                                            <ModulePieChart 
+                                                data={[
+                                                    { date: '2023-01-01', module: '资料分析', score: 1.5, duration: 25 },
+                                                    { date: '2023-01-02', module: '政治理论', score: 1.2, duration: 30 },
+                                                    { date: '2023-01-03', module: '数量关系', score: 1.8, duration: 20 },
+                                                    { date: '2023-01-04', module: '常识判断', score: 1.6, duration: 28 },
+                                                    { date: '2023-01-05', module: '言语理解', score: 1.3, duration: 32 },
+                                                    { date: '2023-01-06', module: '判断推理', score: 1.7, duration: 22 },
+                                                    { date: '2023-01-07', module: '资料分析', score: 1.4, duration: 26 },
+                                                    { date: '2023-01-08', module: '政治理论', score: 1.1, duration: 31 },
+                                                    { date: '2023-01-09', module: '数量关系', score: 1.9, duration: 19 },
+                                                    { date: '2023-01-10', module: '常识判断', score: 1.5, duration: 29 },
+                                                    { date: '2023-01-11', module: '言语理解', score: 1.4, duration: 33 },
+                                                    { date: '2023-01-12', module: '判断推理', score: 1.6, duration: 23 }
+                                                ]} 
+                                                showLegend={false}
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             }
                             Icon={BarChart3}
                             description="直观的图表展示学习进度和成绩趋势"
-                            href="#"
                             cta="了解更多"
                             titleClassName="text-blue-600 dark:text-blue-400"
                             descriptionClassName="text-blue-500/80 dark:text-blue-300/80"
+                            iconClassName="text-blue-600 dark:text-blue-400"
+                            onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
                             name="知识点录入"
                             className="col-span-1 md:col-span-2"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-sm bg-background/30">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-[2px] bg-background/20 dark:bg-background/10">
                                     <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="flex-1 overflow-hidden w-full max-w-[90%]">
+                                        <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/30 dark:bg-[#1a1a1a]/30 backdrop-blur-[2px] border border-white/20 dark:border-white/10 rounded-lg p-2">
                                             <UnifiedTable
                                                 columns={[
-                                                    { key: 'module', label: '模块', className: 'w-24' },
-                                                    { key: 'type', label: '类型', className: 'w-28' },
-                                                    { key: 'note', label: '笔记', className: 'w-48' },
+                                                    { key: 'module', label: '模块', className: 'w-24 text-xs' },
+                                                    { key: 'type', label: '类型', className: 'w-28 text-xs' },
+                                                    { key: 'note', label: '笔记', className: 'w-48 text-xs' },
                                                 ]}
                                                 data={mockKnowledgeData}
                                                 selected={[]}
                                                 onSelect={() => {}}
                                                 rowKey={(row) => row.id}
                                                 selectable={false}
-                                                className="text-xs"
+                                                className="text-xs bg-transparent"
                                             />
                                         </div>
                                     </div>
@@ -469,10 +381,11 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             }
                             Icon={BookOpen}
                             description="便捷录入和整理知识点"
-                            href="#"
                             cta="开始使用"
                             titleClassName="text-green-600 dark:text-green-400"
                             descriptionClassName="text-green-500/80 dark:text-green-300/80"
+                            iconClassName="text-green-600 dark:text-green-400"
+                            onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                     </BentoGrid>
                 </div>

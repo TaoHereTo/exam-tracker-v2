@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import { AnimatedList } from "./animated-list";
-import { CheckCircle2, XCircle, Info, AlertTriangle } from "lucide-react";
+import { CheckCircle2, XCircle, Info, AlertTriangle, Flower } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 
 export type NotificationType = "success" | "error" | "info" | "warning";
@@ -12,6 +12,7 @@ export interface Notification {
     type: NotificationType;
     message: string;
     description?: string;
+    icon?: string; // Added custom icon property
 }
 
 interface NotificationContextProps {
@@ -123,6 +124,27 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         playNotificationSound(n.type);
     }, [remove]);
 
+    // Function to render the appropriate icon based on type or custom icon
+    const renderIcon = (notification: Notification) => {
+        // If a custom icon is specified and it's "flower", use the Flower icon
+        if (notification.icon === "flower") {
+            return <Flower className="text-green-500 w-5 h-5" />;
+        }
+        
+        // Otherwise, use the default icons based on type
+        switch (notification.type) {
+            case "success":
+                return <CheckCircle2 className="text-green-500 w-5 h-5" />;
+            case "error":
+                return <XCircle className="text-red-500 w-5 h-5" />;
+            case "warning":
+                return <AlertTriangle className="text-yellow-500 w-5 h-5" />;
+            case "info":
+            default:
+                return <Info className="text-blue-500 w-5 h-5" />;
+        }
+    };
+
     return (
         <NotificationContext.Provider value={{ notify }}>
             {children}
@@ -136,10 +158,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                             style={{ minWidth: 240, backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
                         >
                             <span className="mt-0.5">
-                                {n.type === "success" && <CheckCircle2 className="text-green-500 w-5 h-5" />}
-                                {n.type === "error" && <XCircle className="text-red-500 w-5 h-5" />}
-                                {n.type === "warning" && <AlertTriangle className="text-yellow-500 w-5 h-5" />}
-                                {n.type === "info" && <Info className="text-blue-500 w-5 h-5" />}
+                                {renderIcon(n)}
                             </span>
                             <div>
                                 <div className="font-semibold text-base notification-message">
