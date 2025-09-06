@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { useFormNotification } from "@/hooks/useFormNotification";
-import { UnifiedImage } from "@/components/ui/UnifiedImage";
+
 import { ValidationSchema, validateForm, FormData } from "@/lib/formValidation";
 
 import { MixedText } from "@/components/ui/MixedText";
@@ -21,7 +21,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { HelpCircle, Calendar as CalendarIcon, Bold, Italic, Underline, Palette } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { BaseForm, FormField, FormInput, FormSelect, FormTextarea, useFormContext } from "@/components/forms/BaseForm";
 import { format } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -59,26 +59,26 @@ const getModuleConfig = (module: string): ModuleConfig => {
     'math': {
       title: '录入 - 数量关系',
       typePlaceholder: '例如：数学技巧',
-      notePlaceholder: '请输入具体的技巧或知识点...'
+      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     },
     'data-analysis': {
       title: '录入 - 资料分析',
       typePlaceholder: '例如：速算技巧',
-      notePlaceholder: '请输入具体的技巧或知识点...'
+      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     },
     'logic': {
       title: '录入 - 判断推理',
       hasSubCategory: true,
       subCategories: ['图形推理', '定义判断', '类比推理', '逻辑判断'],
       typePlaceholder: '例如：推理技巧',
-      notePlaceholder: '请输入具体的技巧或知识点...'
+      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     },
     'common': {
       title: '录入 - 常识判断',
       hasSubCategory: true,
       subCategories: ['经济常识', '法律常识', '科技常识', '人文常识', '地理国情'],
       typePlaceholder: '例如：常识技巧',
-      notePlaceholder: '请输入具体的技巧或知识点...'
+      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     },
     'verbal': {
       title: '录入 - 言语理解',
@@ -88,7 +88,7 @@ const getModuleConfig = (module: string): ModuleConfig => {
       firstFieldLabel: '类型',
       secondFieldLabel: '技巧记录',
       firstFieldPlaceholder: '请输入类型...',
-      secondFieldPlaceholder: '请输入技巧记录...'
+      secondFieldPlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     },
     'politics': {
       title: '录入 - 政治理论',
@@ -96,7 +96,7 @@ const getModuleConfig = (module: string): ModuleConfig => {
       firstFieldLabel: '文件来源',
       secondFieldLabel: '相关重点',
       firstFieldPlaceholder: '请输入文件来源',
-      secondFieldPlaceholder: '请输入相关重点...'
+      secondFieldPlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
     }
   };
 
@@ -318,33 +318,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const fieldConfig = getFieldConfig();
   const { isDarkMode } = useThemeMode();
 
-  // 图片上传处理组件
-  const ImageUploadField = () => {
-    const { setValue, getValue } = useFormContext();
-    const currentImagePath = getValue('imagePath') as string;
 
-    return (
-      <div className="pt-0">
-        <div className="flex items-center gap-2 mb-2">
-          <Label className="text-sm font-medium">图片</Label>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <HelpCircle className="h-4 w-4 text-muted-foreground" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>可以上传相关的图片资料</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
-        <UnifiedImage
-          value={currentImagePath}
-          onChange={(path) => {
-            setValue('imagePath', path);
-          }}
-        />
-      </div>
-    );
-  };
 
   // Markdown编辑器字段组件
   const MarkdownEditorField = () => {
@@ -422,9 +396,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              {/* 图片上传组件 */}
-              <ImageUploadField />
-
               <div className="form-actions">
                 <Button type="submit" variant="default" className="w-full py-4">
                   <MixedText text="保存知识点" />
@@ -498,9 +469,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              {/* 图片上传组件 */}
-              <ImageUploadField />
-
               <div className="form-actions">
                 <Button type="submit" variant="default" className="w-full py-4">
                   <MixedText text="保存知识点" />
@@ -512,4 +480,4 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       )}
     </div>
   );
-}; 
+};

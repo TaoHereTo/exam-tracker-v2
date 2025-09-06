@@ -3,9 +3,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { Button } from '@/components/ui/button';
-import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X, Cloud, Upload, Image as ImageIcon } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { SupabaseImageSelectorDialog } from '@/components/ui/SupabaseImageSelectorDialog';
+import { supabaseImageManager } from '@/lib/supabaseImageManager';
+import { usePasteContext } from '@/contexts/PasteContext';
+import { useNotification } from '@/components/magicui/NotificationProvider';
+import Image from 'next/image';
 
 interface MarkdownEditorProps {
     value: string;
@@ -26,15 +33,29 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const previewTextareaRef = useRef<HTMLTextAreaElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const cloudSelectorRef = useRef<HTMLButtonElement>(null);
+    const componentId = useRef(`markdown-editor-${Math.random().toString(36).substr(2, 9)}`);
+
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPreview, setIsPreview] = useState(false);
     const [activeFormats, setActiveFormats] = useState<string[]>([]);
     const [textValue, setTextValue] = useState(value);
     const [previewText, setPreviewText] = useState(value);
     const [editorHeight, setEditorHeight] = useState(`${height}px`);
-    
+
+    // 图片相关状态
+    const [previewImages, setPreviewImages] = useState<string[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [accordionValue, setAccordionValue] = useState<string>("");
+
     // 添加主题切换检测
     const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
+
+    // 通知和粘贴上下文
+    const { notify } = useNotification();
+    const { registerPasteHandler, unregisterPasteHandler, setActiveHandler } = usePasteContext();
     
     useEffect(() => {
         const handleTransitionStart = () => setIsThemeTransitioning(true);
@@ -308,6 +329,109 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         onChange(newValue);
     };
 
+    // 图片处理函数
+    const handleFileUpload = useCallback(async (file: File) => {
+        const isImageByMime = file.type.startsWith('image/');
+        const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
+
+        if (!isImageByMime && !isImageByExtension) {
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            return;
+        }
+
+        setIsUploading(true);
+        setAccordionValue("preview"); // 展开accordion
+        try {
+            const imageInfo = await supabaseImageManager.uploadImage(file);
+            const imageUrl = imageInfo.url;
+            setPreviewImages(prev => [...prev, imageUrl]);
+        } catch (error) {
+            console.error('上传失败:', error);
+        } finally {
+            setIsUploading(false);
+        }
+    }, []);
+
+    // 处理文件选择
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            handleFileUpload(file);
+        }
+    };
+
+    // 处理粘贴图片
+    const handlePaste = useCallback(async (e: ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) {
+                    await handleFileUpload(file);
+                    break;
+                }
+            }
+        }
+    }, [handleFileUpload]);
+
+    // 处理拖拽
+    const handleDragOver = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOver(false);
+
+        if (isUploading) return;
+
+        const files = Array.from(e.dataTransfer.files);
+        const imageFile = files.find(file => {
+            const isImageByMime = file.type.startsWith('image/');
+            const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
+            return isImageByMime || isImageByExtension;
+        });
+
+        if (imageFile) {
+            handleFileUpload(imageFile);
+        }
+    };
+
+    // 处理图片选择
+    const handleImageSelected = (imageId: string) => {
+        const cloudUrl = supabaseImageManager.getImageUrl(imageId);
+        if (cloudUrl) {
+            setPreviewImages(prev => [...prev, cloudUrl]);
+        }
+    };
+
+    // 移除图片
+    const removeImage = (index: number) => {
+        setPreviewImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // 注册粘贴处理器
+    useEffect(() => {
+        const currentComponentId = componentId.current;
+        registerPasteHandler(currentComponentId, handlePaste);
+
+        return () => {
+            unregisterPasteHandler(currentComponentId);
+        };
+    }, [registerPasteHandler, unregisterPasteHandler, handlePaste]);
+
     return (
         <TooltipProvider>
             <div className={`w-full markdown-editor-container ${className}`} style={fullscreenStyle}>
@@ -527,6 +651,62 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     <p>链接</p>
                                 </TooltipContent>
                             </Tooltip>
+
+                            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1" />
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            fileInputRef.current?.click();
+                                        }}
+                                        className="md-toolbar-button-base md-toolbar-button-upload"
+                                        type="button"
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading ? (
+                                            <LoadingSpinner size="sm" />
+                                        ) : (
+                                            <Upload className="h-4 w-4" />
+                                        )}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>从本地上传图片</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (cloudSelectorRef.current) {
+                                                cloudSelectorRef.current.click();
+                                            }
+                                        }}
+                                        className="md-toolbar-button-base md-toolbar-button-cloud"
+                                        type="button"
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading ? (
+                                            <LoadingSpinner size="sm" />
+                                        ) : (
+                                            <Cloud className="h-4 w-4" />
+                                        )}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>从云端选择图片</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
 
                         <div className="flex items-center gap-1">
@@ -621,12 +801,106 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                 onMouseUp={handleSelectionChange}
                                 onKeyUp={handleSelectionChange}
                                 onKeyDown={handleKeyDown}
+                                onDragOver={handleDragOver}
+                                onDragLeave={handleDragLeave}
+                                onDrop={handleDrop}
+                                onPaste={async (e) => {
+                                    e.preventDefault(); // 阻止默认粘贴行为
+                                    const items = e.clipboardData?.items;
+                                    if (!items) return;
+
+                                    for (let i = 0; i < items.length; i++) {
+                                        const item = items[i];
+                                        if (item.type.startsWith('image/')) {
+                                            const file = item.getAsFile();
+                                            if (file) {
+                                                await handleFileUpload(file);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }}
                                 placeholder={placeholder}
                                 style={{ height: dynamicHeight }}
-                                className="w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea"
+                                className={`w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea ${isDragOver ? 'ring-2 ring-blue-500' : ''}`}
                             />
                         </div>
                     )}
+                </div>
+
+                {/* 图片预览区域 */}
+                <div className="mt-4">
+                    <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
+                        <AccordionItem value="preview">
+                            <AccordionTrigger className="text-sm font-medium">
+                                图片预览 ({previewImages.length})
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                {isUploading ? (
+                                    <div className="p-8 text-center">
+                                        <LoadingSpinner size="sm" text="正在上传图片..." />
+                                    </div>
+                                ) : previewImages.length > 0 ? (
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                                        {previewImages.map((imageUrl, index) => (
+                                            <div key={index} className="relative group">
+                                                <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+                                                    <Image
+                                                        src={imageUrl}
+                                                        alt={`预览图片 ${index + 1}`}
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                    />
+                                                </div>
+                                                <Button
+                                                    size="sm"
+                                                    variant="destructive"
+                                                    className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    onClick={() => removeImage(index)}
+                                                >
+                                                    <X className="h-3 w-3" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                                        <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                        <p className="text-sm">暂无图片</p>
+                                        <p className="text-xs mt-1">使用工具栏按钮上传或选择图片</p>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
+
+                {/* 隐藏的文件输入 */}
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    disabled={isUploading}
+                />
+
+                {/* 云端选择对话框 */}
+                <div className="hidden">
+                    <SupabaseImageSelectorDialog
+                        onImageSelected={handleImageSelected}
+                        trigger={
+                            <Button
+                                ref={cloudSelectorRef}
+                                variant="outline"
+                                size="sm"
+                            >
+                                <Cloud className="h-4 w-4 mr-2" />
+                                从云端选择
+                            </Button>
+                        }
+                    />
                 </div>
             </div>
         </TooltipProvider>
