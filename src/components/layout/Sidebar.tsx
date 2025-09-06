@@ -204,13 +204,12 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
             </SidebarContent>
 
             {/* 用户信息区域 */}
-            {userInfo && (
-                <SidebarFooter className="p-4 flex justify-center items-center">
-                    <div className="w-full flex justify-center items-center">
-                        {userInfo}
-                    </div>
-                </SidebarFooter>
-            )}
+            <SidebarFooter>
+                {(() => {
+                    console.log('Sidebar Footer rendering userInfo:', !!userInfo);
+                    return userInfo;
+                })()}
+            </SidebarFooter>
             <SidebarRail />
         </SidebarUI>
     );

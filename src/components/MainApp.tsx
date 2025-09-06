@@ -18,6 +18,7 @@ import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronDow
 import { cn, generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 import { TextAnimate } from "@/components/magicui/text-animate";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import {
     DropdownMenu,
@@ -175,14 +176,10 @@ export function MainApp() {
     // 加载用户资料 - 优化性能
     useEffect(() => {
         if (user && !userProfile) {
-            // 延迟加载用户资料，不阻塞初始渲染
-            const timer = setTimeout(() => {
-                loadUserProfile();
-            }, 100);
-
-            return () => clearTimeout(timer);
+            // 立即加载用户资料，确保头像能正常显示
+            loadUserProfile();
         }
-    }, [user, userProfile, loadUserProfile]);
+    }, [user, userProfile, loadUserProfile]); // 重新添加 loadUserProfile 依赖，因为它现在是稳定的
 
     const [isClient, setIsClient] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
@@ -280,33 +277,89 @@ export function MainApp() {
 
     // 用户信息显示组件 - 侧边栏版本
     const SidebarUserInfo = () => {
+        console.log('SidebarUserInfo component is being rendered!');
         const [isOpen, setIsOpen] = useState(false);
         const { state } = useSidebar();
         const isCollapsed = state === 'collapsed';
+
+        // 获取用户姓名的首字母
+        const getInitials = () => {
+            const name = userProfile?.display_name || userProfile?.username || user?.email || '';
+            return name.charAt(0).toUpperCase() || 'U'; // 默认显示 'U' 如果没有姓名
+        };
+
+        // 获取用户名显示文本
+        const getDisplayName = () => {
+            return userProfile?.display_name || userProfile?.username || user?.email || '用户';
+        };
+
+        // 获取邮箱显示文本
+        const getDisplayEmail = () => {
+            return user?.email || '';
+        };
 
         return (
             <SidebarMenu>
                 <SidebarMenuItem>
                     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                         <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground !justify-between !items-center">
-                                <div className="flex flex-col items-center justify-center flex-1">
-                                    <span className="truncate font-semibold text-sm">
-                                        <MixedText text={userProfile?.display_name || userProfile?.username || user?.email || ''} />
-                                    </span>
-                                    <span className="truncate text-xs text-muted-foreground">
-                                        <MixedText text={user?.email || ''} />
-                                    </span>
-                                </div>
-                                <ChevronDown className={`size-4 transition-transform duration-200 ${isOpen ? '-rotate-180' : ''}`} />
+                            <SidebarMenuButton
+                                className={cn(
+                                    "data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground",
+                                    isCollapsed
+                                        ? "justify-center items-center p-0 w-10 h-10"
+                                        : "!justify-start !items-center !px-3"
+                                )}
+                                tooltip={isCollapsed ? "用户信息" : undefined}
+                            >
+                                {isCollapsed ? (
+                                    // 折叠状态：显示用户姓名首字母头像
+                                    <div className="flex items-center justify-center w-full h-full">
+                                        <div
+                                            className={cn(
+                                                "w-7 h-7 rounded-md flex items-center justify-center text-sm font-semibold aspect-square",
+                                                isDarkMode
+                                                    ? "bg-white text-black"
+                                                    : "bg-black text-white"
+                                            )}
+                                        >
+                                            {(() => {
+                                                console.log('Rendering collapsed Avatar with initials:', getInitials());
+                                                return getInitials();
+                                            })()}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // 展开状态：显示头像 + 用户信息
+                                    <>
+                                        <div
+                                            className={cn(
+                                                "w-7 h-7 rounded-md flex items-center justify-center text-sm font-semibold mr-1 aspect-square flex-shrink-0",
+                                                isDarkMode
+                                                    ? "bg-white text-black"
+                                                    : "bg-black text-white"
+                                            )}
+                                        >
+                                            {getInitials()}
+                                        </div>
+                                        <div className="flex flex-col items-start justify-center flex-1 min-w-0">
+                                            <span className="truncate font-semibold text-xs text-left w-full">
+                                                <MixedText text={getDisplayName()} />
+                                            </span>
+                                            <span className="truncate text-xs text-muted-foreground text-left w-full">
+                                                <MixedText text={getDisplayEmail()} />
+                                            </span>
+                                        </div>
+                                        <ChevronDown className={`size-4 transition-transform duration-200 ${isOpen ? '-rotate-180' : ''}`} />
+                                    </>
+                                )}
                             </SidebarMenuButton>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent
-                            className="w-36 min-w-36 rounded-lg"
-                            side={isCollapsed ? "top" : "bottom"}
-                            align={isCollapsed ? "start" : "end"}
-                            sideOffset={isCollapsed ? 8 : 4}
-                            alignOffset={isCollapsed ? 40 : 0}
+                            side="top"
+                            align="start"
+                            sideOffset={4}
+                            className="w-[--radix-popper-anchor-width] shadow-xl bg-white/95 dark:bg-[#262626] backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg"
                         >
                             <DropdownMenuLabel className="p-0 font-normal">
                                 <div className="flex items-center justify-center px-2 py-2 text-center">
@@ -343,7 +396,6 @@ export function MainApp() {
                                     <MixedText text="退出登录" />
                                 </div>
                             </DropdownMenuItem>
-
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </SidebarMenuItem>

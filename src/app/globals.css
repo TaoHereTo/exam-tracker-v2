@@ -1159,18 +1159,6 @@ html,
   font-weight: 500;
 }
 
-[data-slot="sidebar-menu-button"] span {
-  font-size: 1rem;
-  line-height: 1.5rem;
-  display: flex;
-  align-items: center;
-}
-
-[data-slot="sidebar-header"] span {
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
 /* 深色模式下侧边栏头部增强可见性 */
 .dark [data-slot="sidebar-header"] span {
   font-weight: 700;
@@ -1616,11 +1604,6 @@ body.eye-care.dark .text-muted-foreground,
 
 /* ========== 响应式设计优化 ========== */
 /* ========== 统一的 Hover 样式 ========== */
-/* 强制覆盖侧边栏标题样式 */
-[data-slot="sidebar-header"] * {
-  font-size: 28px !important;
-  font-weight: 400 !important;
-}
 
 /* Utility class for hover effects - can be applied selectively */
 .hover-effect:hover:not([data-slot="switch"]):not([data-slot="switch-thumb"]):not([data-variant="destructive"]):not([variant="destructive"]):not(.bg-red-600):not(.bg-destructive):not([data-plan-button]):not([data-slot="tabs-trigger"]),
@@ -1944,4 +1927,3 @@ table {
   animation: none;
   mix-blend-mode: normal;
 }
-
