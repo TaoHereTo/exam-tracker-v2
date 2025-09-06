@@ -18,7 +18,6 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeMode } from "@/hooks/useThemeMode";
 
-import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
 import {
@@ -63,9 +62,6 @@ export function UnifiedSettings({
   // Appearance settings
   const [eyeCare, setEyeCare] = useLocalStorageBoolean('eye-care-enabled', false);
   
-  // Advanced settings - localStorage monitoring
-  const [storageInfo, setStorageInfo] = useState<StorageInfo | null>(null);
-  
   // Advanced settings - image management
   const [showImageManager, setShowImageManager] = useState(false);
   const [cloudImages, setCloudImages] = useState<SupabaseImageInfo[]>([]);
@@ -95,18 +91,6 @@ export function UnifiedSettings({
   const [showCloudOverview, setShowCloudOverview] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
-
-  // Update storage info
-  const updateStorageInfo = useCallback(() => {
-    const info = getLocalStorageInfo();
-    setStorageInfo(info);
-  }, []);
-
-  useEffect(() => {
-    updateStorageInfo();
-    const interval = setInterval(updateStorageInfo, 30000);
-    return () => clearInterval(interval);
-  }, [updateStorageInfo]);
 
   // Eye care mode effect
   useEffect(() => {
@@ -478,24 +462,6 @@ export function UnifiedSettings({
               </div>
             </div>
           </div>
-
-          {/* Local Storage Usage */}
-          {storageInfo && (
-            <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
-              <div className="flex-1">
-                <h3 className="font-medium text-sm sm:text-base"><MixedText text="本地存储使用情况" /></h3>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  <MixedText text={`已使用 ${formatStorageSize(storageInfo.usedSize)} / ${formatStorageSize(5 * 1024 * 1024)} (${storageInfo.usagePercentage.toFixed(1)}%)`} />
-                </p>
-                <Progress
-                  value={storageInfo.usagePercentage}
-                  variant="info"
-                  showText={true}
-                  className="mt-2 h-2 sm:h-3"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Clear Local Data */}
           <div className="flex flex-row items-start sm:items-center justify-between p-3 sm:p-4 border rounded-lg gap-3">
@@ -910,8 +876,6 @@ export function UnifiedSettings({
     </div>
   );
 }
-
-
 
 
 
