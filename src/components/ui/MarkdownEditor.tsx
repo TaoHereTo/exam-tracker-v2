@@ -13,6 +13,8 @@ import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { usePasteContext } from '@/contexts/PasteContext';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
+import { PhotoProvider, PhotoView } from 'react-photo-view';
+import 'react-photo-view/dist/react-photo-view.css';
 
 interface MarkdownEditorProps {
     value: string;
@@ -409,13 +411,15 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         }
     };
 
-    // 处理图片选择
-    const handleImageSelected = (imageId: string) => {
-        const cloudUrl = supabaseImageManager.getImageUrl(imageId);
-        if (cloudUrl) {
-            setPreviewImages(prev => [...prev, cloudUrl]);
-        }
-    };
+  // 处理图片选择
+  const handleImageSelected = (imageId: string) => {
+    const cloudUrl = supabaseImageManager.getImageUrl(imageId);
+    if (cloudUrl) {
+      setPreviewImages(prev => [...prev, cloudUrl]);
+      // 自动展开预览区域
+      setAccordionValue("preview");
+    }
+  };
 
     // 移除图片
     const removeImage = (index: number) => {
@@ -841,29 +845,33 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                         <LoadingSpinner size="sm" text="正在上传图片..." />
                                     </div>
                                 ) : previewImages.length > 0 ? (
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                                        {previewImages.map((imageUrl, index) => (
-                                            <div key={index} className="relative group">
-                                                <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={`预览图片 ${index + 1}`}
-                                                        fill
-                                                        className="object-cover"
-                                                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                                                    />
+                                    <PhotoProvider>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                                            {previewImages.map((imageUrl, index) => (
+                                                <div key={index} className="relative group">
+                                                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer">
+                                                        <PhotoView src={imageUrl}>
+                                                            <Image
+                                                                src={imageUrl}
+                                                                alt={`预览图片 ${index + 1}`}
+                                                                fill
+                                                                className="object-cover hover:scale-105 transition-transform duration-200"
+                                                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                                            />
+                                                        </PhotoView>
+                                                    </div>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        onClick={() => removeImage(index)}
+                                                    >
+                                                        <X className="h-3 w-3" />
+                                                    </Button>
                                                 </div>
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    onClick={() => removeImage(index)}
-                                                >
-                                                    <X className="h-3 w-3" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    </PhotoProvider>
                                 ) : (
                                     <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                                         <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />

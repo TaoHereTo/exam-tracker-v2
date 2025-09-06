@@ -21,8 +21,8 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { getLocalStorageInfo, formatStorageSize, type StorageInfo } from "@/lib/storageUtils";
 import { smartImageSort } from "@/lib/utils";
 import Image from "next/image";
-import { 
-  Save, Search, RefreshCw, Eye, Image as ImageIcon, Grid3X3, List, 
+import {
+  Save, Search, RefreshCw, Eye, Image as ImageIcon, Grid3X3, List,
   Trash2, CloudUpload, XCircle, Package, Settings, SlidersHorizontal,
   Upload, Download, Eye as EyeIcon, CloudUpload as CloudUploadIcon, CloudDownload
 } from "lucide-react";
@@ -32,6 +32,8 @@ import { buttonVariants } from "@/components/ui/button";
 import type { RecordItem, StudyPlan, KnowledgeItem, UserSettings } from "@/types/record";
 import type { UploadProgress } from "@/lib/cloudSyncService";
 import type { SyncReportItem } from "@/types/common";
+import { PhotoProvider, PhotoView } from 'react-photo-view';
+import 'react-photo-view/dist/react-photo-view.css';
 
 export function UnifiedSettings({
   onExport, 
@@ -708,115 +710,111 @@ export function UnifiedSettings({
                     </div>
                   </div>
                 ) : (
-                  <div className={`${imageManagerView === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4' : 'space-y-2'}`}>
-                    {filteredImages.map((image) => (
-                      <div
-                        key={image.id}
-                        className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
-                          ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
-                          : ''
-                          } ${imageManagerView === 'list' ? 'flex items-center gap-2 sm:gap-3 p-2' : 'p-1 sm:p-2'}`}
-                        onClick={() => {
-                          const newSelected = new Set(selectedImages);
-                          if (newSelected.has(image.id)) {
-                            newSelected.delete(image.id);
-                          } else {
-                            newSelected.add(image.id);
-                          }
-                          setSelectedImages(newSelected);
-                        }}
-                      >
-                        {/* Checkbox */}
-                        <input
-                          type="checkbox"
-                          checked={selectedImages.has(image.id)}
-                          onChange={(e) => {
-                            e.stopPropagation();
+                  <PhotoProvider>
+                    <div className={`${imageManagerView === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4' : 'space-y-2'}`}>
+                      {filteredImages.map((image) => (
+                        <div
+                          key={image.id}
+                          className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
+                            ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
+                            : ''
+                            } ${imageManagerView === 'list' ? 'flex items-center gap-2 sm:gap-3 p-2' : 'p-1 sm:p-2'}`}
+                          onClick={() => {
                             const newSelected = new Set(selectedImages);
-                            if (e.target.checked) {
-                              newSelected.add(image.id);
-                            } else {
+                            if (newSelected.has(image.id)) {
                               newSelected.delete(image.id);
+                            } else {
+                              newSelected.add(image.id);
                             }
                             setSelectedImages(newSelected);
                           }}
-                          className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-white dark:bg-[#171717] border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-
-                        {/* Image Preview */}
-                        <div
-                          className={`${imageManagerView === 'list' ? 'w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0' : 'w-full aspect-square'} rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
-                          style={{
-                            border: '1px solid #e5e7eb',
-                            backgroundColor: 'white'
-                          }}
                         >
-                          <Image
-                            src={image.url}
-                            alt={image.originalName}
-                            width={200}
-                            height={200}
-                            className="w-full h-full object-cover"
-                            style={{
-                              backgroundColor: 'transparent',
-                              display: 'block'
+                          {/* Checkbox */}
+                          <input
+                            type="checkbox"
+                            checked={selectedImages.has(image.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              const newSelected = new Set(selectedImages);
+                              if (e.target.checked) {
+                                newSelected.add(image.id);
+                              } else {
+                                newSelected.delete(image.id);
+                              }
+                              setSelectedImages(newSelected);
                             }}
-                            onLoad={() => {
-                              // Image loaded successfully
-                            }}
-                            onError={(e) => {
-                              // Image loading failed
-                              const target = e.target as HTMLImageElement;
-                              target.style.backgroundColor = '#f3f4f6';
-                              target.style.display = 'flex';
-                              target.style.alignItems = 'center';
-                              target.style.justifyContent = 'center';
-                              target.style.color = '#6b7280';
-                              target.style.fontSize = '8px';
-                              target.textContent = '加载失败';
-                            }}
+                            className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-white dark:bg-[#171717] border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
                           />
 
-                          {/* Preview Button */}
-                          <div className="absolute inset-0 bg-transparent transition-all duration-200 flex items-center justify-center">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={(e: React.MouseEvent) => {
-                                      e.stopPropagation();
-                                      // Open image preview
-                                      window.open(image.url, '_blank');
-                                    }}
-                                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-[#171717]/90 shadow-sm z-20 h-7 w-7 sm:h-9 sm:w-9"
-                                  >
-                                    <Eye className="w-3 h-3 sm:w-5 sm:h-5" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent className="text-xs">
-                                  <p><MixedText text="预览图片" /></p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                          {/* Image Preview */}
+                          <div
+                            className={`${imageManagerView === 'list' ? 'w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0' : 'w-full aspect-square'} rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
+                            style={{
+                              border: '1px solid #e5e7eb',
+                              backgroundColor: 'white'
+                            }}
+                          >
+                            <PhotoView src={image.url}>
+                              <div className="relative w-full h-full">
+                                <Image
+                                  src={image.url}
+                                  alt={image.originalName}
+                                  width={200}
+                                  height={200}
+                                  className="w-full h-full object-cover cursor-pointer"
+                                  style={{
+                                    backgroundColor: 'transparent',
+                                    display: 'block'
+                                  }}
+                                  onLoad={() => {
+                                    // Image loaded successfully
+                                  }}
+                                  onError={(e) => {
+                                    // Image loading failed
+                                    const target = e.target as HTMLImageElement;
+                                    target.style.backgroundColor = '#f3f4f6';
+                                    target.style.display = 'flex';
+                                    target.style.alignItems = 'center';
+                                    target.style.justifyContent = 'center';
+                                    target.style.color = '#6b7280';
+                                    target.style.fontSize = '8px';
+                                    target.textContent = '加载失败';
+                                  }}
+                                />
+                                {/* Preview Overlay */}
+                                <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <div className="bg-white/90 dark:bg-[#171717]/90 rounded-full p-2 shadow-sm">
+                                          <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300" />
+                                        </div>
+                                      </TooltipTrigger>
+                                      <TooltipContent className="text-xs">
+                                        <p><MixedText text="点击预览图片" /></p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                </div>
+                              </div>
+                            </PhotoView>
                           </div>
-                        </div>
 
-                        {/* Image Info */}
-                        <div className={`${imageManagerView === 'list' ? 'flex-1 min-w-0' : 'mt-1 sm:mt-2'} space-y-1`}>
-                          <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                            {image.originalName}
-                          </div>
-                          <div className="flex items-center gap-1 sm:gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <span><MixedText text={formatFileSize(image.size)} /></span>
-                            <span className="hidden sm:inline">•</span>
-                            <span><MixedText text={formatUploadTime(image.uploadedAt)} /></span>
+                          {/* Image Info */}
+                          <div className={`${imageManagerView === 'list' ? 'flex-1 min-w-0' : 'mt-1 sm:mt-2'} space-y-1`}>
+                            <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
+                              {image.originalName}
+                            </div>
+                            <div className="flex items-center gap-1 sm:gap-2 text-xs text-gray-500 dark:text-gray-400">
+                              <span><MixedText text={formatFileSize(image.size)} /></span>
+                              <span className="hidden sm:inline">•</span>
+                              <span><MixedText text={formatUploadTime(image.uploadedAt)} /></span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </PhotoProvider>
                 )}
 
                 {/* Statistics */}
