@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { Button } from '@/components/ui/button';
-import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X, Cloud, Upload, Image as ImageIcon } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X, Cloud, Upload, Image as ImageIcon, Heading1, Palette } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -15,6 +15,10 @@ import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+
+// 添加颜色选择组件
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button as UIButton } from '@/components/ui/button';
 
 interface MarkdownEditorProps {
     value: string;
@@ -719,6 +723,101 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p>链接</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* 标题按钮 */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="relative">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="md-toolbar-button-base md-toolbar-button-heading"
+                                                    type="button"
+                                                >
+                                                    <Heading1 className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-48 p-2" align="start">
+                                                <div className="grid gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="justify-start"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            insertText('# ');
+                                                        }}
+                                                    >
+                                                        <Heading1 className="h-4 w-4 mr-2" />
+                                                        一级标题
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="justify-start"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            insertText('## ');
+                                                        }}
+                                                    >
+                                                        <Heading1 className="h-4 w-4 mr-2 opacity-75" />
+                                                        二级标题
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="justify-start"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            insertText('### ');
+                                                        }}
+                                                    >
+                                                        <Heading1 className="h-4 w-4 mr-2 opacity-50" />
+                                                        三级标题
+                                                    </Button>
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>标题</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* 颜色选择按钮 - 注意：当前渲染器不支持颜色 */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="relative">
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="md-toolbar-button-base md-toolbar-button-color"
+                                                    type="button"
+                                                    disabled
+                                                >
+                                                    <Palette className="h-4 w-4" />
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-48 p-2" align="start">
+                                                <div className="text-xs text-muted-foreground p-2">
+                                                    当前渲染器不支持文字颜色
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>颜色（暂不支持）</p>
                                 </TooltipContent>
                             </Tooltip>
 
