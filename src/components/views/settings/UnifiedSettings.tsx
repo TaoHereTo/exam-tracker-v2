@@ -306,7 +306,7 @@ export function UnifiedSettings({
       {/* Appearance Settings */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base sm:text-lg"><MixedText text="外观模式" /></CardTitle>
+          <CardTitle className="text-lg sm:text-xl"><MixedText text="外观模式" /></CardTitle>
           <CardDescription className="text-xs sm:text-sm"><MixedText text="设置应用的外观和导航方式。" /></CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 sm:space-y-4">
@@ -876,6 +876,10 @@ export function UnifiedSettings({
     </div>
   );
 }
+
+
+
+
 
 
 

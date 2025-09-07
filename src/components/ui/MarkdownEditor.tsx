@@ -57,6 +57,12 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     // 添加主题切换检测
     const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
 
+    // 同步外部value与内部状态
+    useEffect(() => {
+        setTextValue(value);
+        setPreviewText(value);
+    }, [value]);
+
     // 通知和粘贴上下文
     const { notify } = useNotification();
     const { registerPasteHandler, unregisterPasteHandler, setActiveHandler } = usePasteContext();
@@ -822,45 +828,33 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                     {isPreview ? (
                         <div className="flex" style={{ height: dynamicHeight }}>
                             {/* 左侧编辑区域 */}
-                            <div className="w-1/2 border-r border-gray-200 dark:border-gray-700">
+                            <div className="w-1/2 border-r border-gray-200 dark:border-gray-700 flex flex-col">
                                 <textarea
                                     ref={textareaRef}
                                     value={textValue}
                                     onChange={handleTextChange}
                                     onKeyDown={handleKeyDown}
                                     placeholder={placeholder}
-                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100"
+                                    className="w-full px-3 py-2 resize-none outline-none border-0 leading-normal text-sm markdown-editor-textarea bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 flex-1"
                                     style={{
-                                        height: editorHeight,
-                                        fontFamily: 'inherit',
-                                        fontSize: 'inherit',
-                                        lineHeight: 'inherit'
+                                        fontFamily: 'inherit'
                                     }}
                                     disabled={disabled}
                                 />
                             </div>
                             {/* 右侧预览区域 */}
-                            <div className="w-1/2 overflow-auto">
-                                <textarea
-                                    ref={previewTextareaRef}
-                                    value={previewText}
-                                    readOnly
-                                    className="w-full p-3 resize-none outline-none border-0 leading-relaxed text-sm markdown-editor-textarea bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100"
-                                    style={{
-                                        height: editorHeight,
-                                        fontFamily: 'inherit',
-                                        fontSize: 'inherit',
-                                        lineHeight: 'inherit'
-                                    }}
-                                />
+                            <div className="w-1/2 overflow-auto px-3 py-2 bg-white dark:bg-[#242628] flex flex-col">
+                                <div className="flex-1">
+                                    <MarkdownRenderer content={previewText} className="leading-normal text-sm" />
+                                </div>
                             </div>
                         </div>
                     ) : (
-                        <div style={{ height: dynamicHeight }}>
+                        <div style={{ height: dynamicHeight }} className="flex flex-col">
                             <textarea
                                 ref={textareaRef}
-                                value={value}
-                                onChange={(e) => onChange(e.target.value)}
+                                value={textValue}
+                                onChange={handleTextChange}
                                 onSelect={handleSelectionChange}
                                 onMouseUp={handleSelectionChange}
                                 onKeyUp={handleSelectionChange}
@@ -885,8 +879,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     }
                                 }}
                                 placeholder={placeholder}
-                                style={{ height: dynamicHeight }}
-                                className={`w-full p-3 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-relaxed text-sm markdown-editor-textarea ${isDragOver ? 'ring-2 ring-blue-500' : ''}`}
+                                className={`w-full px-3 py-2 resize-none outline-none bg-white dark:bg-[#242628] text-gray-900 dark:text-gray-100 border-0 leading-normal text-sm markdown-editor-textarea flex-1 ${isDragOver ? 'ring-2 ring-blue-500' : ''}`}
                             />
                         </div>
                     )}

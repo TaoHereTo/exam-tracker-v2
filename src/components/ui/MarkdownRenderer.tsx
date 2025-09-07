@@ -22,9 +22,9 @@ function parseMarkdown(content: string): React.ReactNode[] {
     const finishCurrentList = (index: number) => {
         if (isInUnorderedList && currentUnorderedList.length > 0) {
             elements.push(
-                <ul key={`ul-${index}`} className="list-disc mb-3 pl-5 space-y-2">
+                <ul key={`ul-${index}`} className="list-disc mb-3 pl-5">
                     {currentUnorderedList.map((item, i) => (
-                        <li key={i} className="leading-tight pl-1">{item}</li>
+                        <li key={i} className="leading-normal pl-1">{item}</li>
                     ))}
                 </ul>
             );
@@ -33,9 +33,9 @@ function parseMarkdown(content: string): React.ReactNode[] {
         }
         if (isInOrderedList && currentOrderedList.length > 0) {
             elements.push(
-                <ol key={`ol-${index}`} className="list-decimal mb-3 pl-5 space-y-2">
+                <ol key={`ol-${index}`} className="list-decimal mb-3 pl-5">
                     {currentOrderedList.map((item, i) => (
-                        <li key={i} className="leading-tight pl-1">{item}</li>
+                        <li key={i} className="leading-normal pl-1">{item}</li>
                     ))}
                 </ol>
             );
