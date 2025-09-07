@@ -10,6 +10,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { Checkbox } from '../ui/checkbox'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface LoginFormProps {
     onSwitchToSignUp: () => void
@@ -25,6 +26,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
     const [password, setPassword] = useState('')
 
     const { signIn } = useAuth()
+    const router = useRouter()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -32,17 +34,12 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
         setError('')
 
         try {
-            console.log('Attempting to sign in with:', { email });
-            const { error } = await signIn(email, password)
-
-            if (error) {
-                setError(error.message || '登录失败，请检查邮箱和密码')
-                console.error('Login error:', error)
+            const result = await signIn(email, password);
+            if (!result.success) {
+                setError(result.error || '登录失败');
             } else {
-                console.log('Login successful');
-                // 登录成功后清除表单数据
-                setEmail('')
-                setPassword('')
+                setError('');
+                router.push('/');
             }
         } catch (err) {
             console.error('Unexpected error during login:', err)

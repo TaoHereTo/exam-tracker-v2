@@ -335,22 +335,10 @@ export const knowledgeService = {
                 .eq('user_id', userId)
 
             if (error) {
-                console.log('检查知识点存在性失败:', {
-                    knowledgeId: id,
-                    userId: userId,
-                    error: error.message,
-                    code: error.code
-                });
                 return false;
             }
 
             const exists = data && data.length > 0;
-            console.log('知识点存在:', {
-                knowledgeId: id,
-                userId: userId,
-                hasData: exists,
-                count: data?.length || 0
-            });
             return exists;
         } catch (error) {
             console.error('检查知识点存在性异常:', error);
@@ -365,24 +353,32 @@ export const knowledgeService = {
             return [];
         }
 
-        console.log('开始获取知识点，用户ID:', userId);
-
         try {
-            // 先尝试简单的查询
             const { data, error } = await supabase
                 .from('knowledge')
                 .select('*')
                 .eq('user_id', userId)
+                .order('created_at', { ascending: false })
 
             if (error) {
-                console.error('知识点查询失败:', error);
+                console.error('获取知识点失败:', error);
                 return [];
             }
 
-            console.log('知识点查询成功，数量:', data?.length || 0);
-            return data || [];
+            return data?.map(item => ({
+                id: item.id,
+                module: item.module,
+                type: item.type || '',
+                note: item.note || '',
+                subCategory: item.subCategory || '',
+                date: item.date || '',
+                source: item.source || '',
+                imagePath: item.imagePath || '',
+                created_at: item.created_at,
+                updated_at: item.updated_at
+            })) || [];
         } catch (error) {
-            console.error('知识点查询异常:', error);
+            console.error('获取知识点异常:', error);
             return [];
         }
     },
@@ -551,14 +547,6 @@ export const knowledgeService = {
         // 让 Supabase 客户端自己处理字段映射
 
         // 添加详细的调试信息
-        console.log('databaseService.updateKnowledge - 开始更新知识点:', {
-            knowledgeId: id,
-            userId: userId,
-            originalUpdates: updates,
-            processedUpdateData: updateData,
-            updateDataKeys: Object.keys(updateData),
-            updateDataValues: Object.values(updateData)
-        });
 
         // 检查数据中是否有特殊字符或无效值
         const invalidValues = Object.entries(updateData).filter(([key, value]) => {
@@ -573,33 +561,14 @@ export const knowledgeService = {
         }
 
         // 尝试不同的方法来避免 406 错误
-        console.log('databaseService.updateKnowledge - 发送请求到 Supabase:', {
-            table: 'knowledge',
-            updateData: updateData,
-            id: id,
-            userId: userId
-        });
 
         // 方法1：先检查记录是否存在
-        console.log('databaseService.updateKnowledge - 检查记录是否存在:', {
-            knowledgeId: id,
-            userId: userId
-        });
 
         const { data: existingRecords, error: checkError } = await supabase
             .from('knowledge')
             .select('*')
             .eq('id', id)
             .eq('user_id', userId)
-
-        console.log('databaseService.updateKnowledge - 记录检查结果:', {
-            hasData: existingRecords && existingRecords.length > 0,
-            dataKeys: existingRecords && existingRecords.length > 0 ? Object.keys(existingRecords[0]) : null,
-            hasError: !!checkError,
-            errorCode: checkError?.code,
-            errorMessage: checkError?.message,
-            count: existingRecords?.length || 0
-        });
 
         if (checkError) {
             throw new Error(`检查知识点失败: ${checkError.message}`);
@@ -681,8 +650,6 @@ export const settingsService = {
             return {};
         }
 
-        console.log('开始获取用户设置，用户ID:', userId);
-
         try {
             const { data, error } = await supabase
                 .from('user_settings')
@@ -693,7 +660,6 @@ export const settingsService = {
             if (error) {
                 // 如果是没有找到记录的错误，返回空对象
                 if (error.code === 'PGRST116') {
-                    console.log('用户设置不存在（首次使用），返回空对象');
                     return {};
                 }
 
@@ -713,7 +679,6 @@ export const settingsService = {
                 return {};
             }
 
-            console.log('设置查询成功:', data);
             return data?.settings || {};
         } catch (error) {
             // 处理网络错误或其他异常
@@ -747,8 +712,6 @@ export const settingsService = {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
 
-        console.log('开始保存用户设置:', { userId, settings });
-
         try {
             const { error } = await supabase
                 .from('user_settings')
@@ -759,7 +722,6 @@ export const settingsService = {
                 throw error;
             }
 
-            console.log('设置保存成功');
         } catch (error) {
             console.error('设置保存异常:', error);
             throw error;

@@ -9,7 +9,7 @@ interface AuthContextType {
     user: User | null
     session: Session | null
     loading: boolean
-    signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+    signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
     signUp: (email: string, password: string) => Promise<{ error: AuthError | null }>
     signOut: () => Promise<void>
 }
@@ -56,62 +56,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     useEffect(() => {
-        let mounted = true;
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            setUser(session?.user || null);
+            setLoading(false);
+        });
 
-        // 获取当前会话
-        const getSession = async () => {
-            try {
-                const { data: { session } } = await supabase.auth.getSession()
-                if (mounted) {
-                    await updateAuthState(session);
-                }
-            } catch (error) {
-                console.error('Failed to get session:', error);
-                if (mounted) {
-                    setLoading(false);
-                }
-            }
-        }
-
-        getSession()
-
-        // 监听认证状态变化
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            async (event, session) => {
-                console.log('Auth state changed:', event, session?.user?.id);
-                if (mounted) {
-                    await updateAuthState(session);
-                }
-            }
-        )
+        // Check active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user || null);
+            setLoading(false);
+        });
 
         return () => {
-            mounted = false;
-            subscription.unsubscribe()
-        }
-    }, [updateAuthState])
+            authListener.subscription.unsubscribe();
+        };
+    }, []);
 
-    const signIn = useCallback(async (email: string, password: string) => {
+    const signIn = async (email: string, password: string) => {
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password,
-            })
+            });
+
+            if (error) throw error;
             
-            if (error) {
-                console.error('Sign in error:', error);
-                return { error };
-            }
-            
-            console.log('Sign in successful:', data.user?.id);
-            // Manually update the auth state after successful sign in
-            await updateAuthState(data.session);
-            return { error: null };
-        } catch (err) {
-            console.error('Unexpected sign in error:', err);
-            return { error: err as AuthError };
+            setUser(data.user);
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: (error as Error).message };
         }
-    }, [updateAuthState])
+    };
 
     const signUp = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signUp({

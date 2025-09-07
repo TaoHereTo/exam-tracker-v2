@@ -19,6 +19,7 @@ import { cn, generateUUID, isUUID } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
 import { TextAnimate } from "@/components/magicui/text-animate";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import {
     DropdownMenu,
@@ -278,25 +279,39 @@ export function MainApp() {
 
     // 用户信息显示组件 - 侧边栏版本
     const SidebarUserInfo = () => {
-        console.log('SidebarUserInfo component is being rendered!');
         const [isOpen, setIsOpen] = useState(false);
         const { state } = useSidebar();
         const isCollapsed = state === 'collapsed';
 
-        // 获取用户姓名的首字母
+        const userInfo = userProfile || user;
+
+        if (!userInfo) {
+            return (
+                <div className="flex items-center justify-center p-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                </div>
+            );
+        }
+
         const getInitials = () => {
-            const name = userProfile?.display_name || userProfile?.username || user?.email || '';
-            return name.charAt(0).toUpperCase() || 'U'; // 默认显示 'U' 如果没有姓名
+            const displayName = ('display_name' in userInfo && userInfo.display_name) || 
+                              ('username' in userInfo && userInfo.username) || 
+                              userInfo.email || 
+                              'U';
+            return displayName.charAt(0).toUpperCase();
         };
 
         // 获取用户名显示文本
         const getDisplayName = () => {
-            return userProfile?.display_name || userProfile?.username || user?.email || '用户';
+            return ('display_name' in userInfo && userInfo.display_name) || 
+                   ('username' in userInfo && userInfo.username) || 
+                   userInfo.email || 
+                   '用户';
         };
 
         // 获取邮箱显示文本
         const getDisplayEmail = () => {
-            return user?.email || '';
+            return userInfo.email || '';
         };
 
         return (
@@ -324,10 +339,7 @@ export function MainApp() {
                                                     : "bg-black text-white"
                                             )}
                                         >
-                                            {(() => {
-                                                console.log('Rendering collapsed Avatar with initials:', getInitials());
-                                                return getInitials();
-                                            })()}
+                                            {getInitials()}
                                         </div>
                                     </div>
                                 ) : (

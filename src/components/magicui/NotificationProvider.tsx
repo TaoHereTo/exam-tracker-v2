@@ -93,7 +93,7 @@ const playNotificationSound = (type: NotificationType) => {
         }
     } catch (error) {
         // Audio not supported or blocked, silently fail
-        console.log('Audio not supported or blocked');
+
     }
 };
 

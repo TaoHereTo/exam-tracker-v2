@@ -55,8 +55,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + 0.5);
       } catch (error) {
-        // 音效播放失败，静默处理
-        console.log('Audio not supported or blocked');
+        // Audio not supported or blocked, silently fail
       }
       
       // 动画序列

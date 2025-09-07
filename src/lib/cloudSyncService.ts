@@ -1,8 +1,25 @@
 import { recordService, planService, knowledgeService, settingsService } from './databaseService';
 import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record';
 import { supabase } from '../supabaseClient';
-import { SyncReportItem } from '../types/common';
+import { SyncReportItem, CloudDataOverview } from '../types/common';
 import { UserSettings } from '../types/record';
+
+// 获取当前用户ID
+const getCurrentUserId = async () => {
+    try {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error) {
+            console.warn('获取用户信息失败:', error.message);
+            return null;
+        }
+
+        return data.user?.id || null;
+    } catch (error) {
+        console.warn('获取用户信息异常:', error);
+        return null;
+    }
+};
 
 export interface SyncResult {
     success: boolean;
@@ -198,71 +215,34 @@ export class CloudSyncService {
         const userId = userData?.user?.id;
         if (!userId) throw new Error('用户未登录');
 
-        console.log('开始批量上传知识点:', {
-            count: knowledgeToUpload.length,
-            userId: userId
-        });
+        // Prepare data for batch upload
+        const uploadData = knowledgeToUpload.map(item => ({
+            id: item.id,
+            user_id: userId,
+            module: item.module,
+            type: item.type || '',
+            note: item.note || '',
+            "subCategory": item.subCategory || '',
+            "date": item.date || null,
+            "source": item.source || '',
+            "imagePath": item.imagePath || null,
+            created_at: item.createdAt || new Date().toISOString(),
+            updated_at: item.updatedAt || new Date().toISOString()
+        }));
 
-        // 构建批量插入数据
-        const knowledgeData = knowledgeToUpload.map(knowledge => {
-            // 确保必填字段不为空
-            if (!knowledge.type || !knowledge.note) {
-                console.warn('跳过无效的知识点:', {
-                    id: knowledge.id,
-                    type: knowledge.type,
-                    note: knowledge.note
-                });
-                return null;
-            }
-
-            const data: Record<string, unknown> = {
-                user_id: userId,
-                module: knowledge.module,
-                type: knowledge.type,
-                note: knowledge.note
-            };
-
-            // 处理可选字段
-            if (knowledge.subCategory) data.subCategory = knowledge.subCategory;
-            if (knowledge.date) data.date = knowledge.date;
-            if (knowledge.source) data.source = knowledge.source;
-            if (knowledge.imagePath) data.imagePath = knowledge.imagePath;
-
-            return data;
-        }).filter(Boolean); // 过滤掉无效的数据
-
-        console.log('知识点数据准备完成:', {
-            sampleData: knowledgeData[0],
-            totalCount: knowledgeData.length
-        });
-
-        // 批量插入知识点
+        // Perform batch upload
         const { data, error } = await supabase
             .from('knowledge')
-            .insert(knowledgeData)
+            .upsert(uploadData, {
+                onConflict: 'id',
+                ignoreDuplicates: false
+            })
             .select();
 
         if (error) {
             console.error('知识点批量上传失败:', error);
-
-            // 如果是数据验证错误，返回部分成功的结果
-            if (error.code === '23502' || error.message.includes('not-null constraint')) {
-                console.warn('部分知识点数据无效，跳过无效数据');
-                return {
-                    uploaded: 0, report: knowledgeToUpload.map(k => ({
-                        item: k,
-                        action: 'failed' as const,
-                        reason: '知识点数据无效（type或note字段为空）'
-                    }))
-                };
-            }
-
-            throw new Error(`批量上传知识点失败: ${error.message} (代码: ${error.code})`);
+            throw error;
         }
-
-        console.log('知识点批量上传成功:', {
-            uploaded: data?.length || 0
-        });
 
         const report = knowledgeToUpload.map(knowledge => ({
             item: knowledge,
@@ -294,12 +274,6 @@ export class CloudSyncService {
         };
 
         try {
-            console.log('开始云端上传，数据统计:', {
-                records: localRecords.length,
-                plans: localPlans.length,
-                knowledge: localKnowledge.length
-            });
-
             // 检查是否取消
             const checkCancelled = () => {
                 if (abortController?.signal.aborted) {
@@ -322,12 +296,6 @@ export class CloudSyncService {
                 planService.getPlans().catch(() => []),
                 knowledgeService.getKnowledge().catch(() => [])
             ]);
-
-            console.log('云端数据获取完成:', {
-                cloudRecords: cloudRecords.length,
-                cloudPlans: cloudPlans.length,
-                cloudKnowledge: cloudKnowledge.length
-            });
 
             checkCancelled();
 
@@ -371,12 +339,6 @@ export class CloudSyncService {
                 return !cloudKnowledge.some(cloudKnowledgeItem =>
                     this.isKnowledgeDuplicate(knowledge, cloudKnowledgeItem)
                 );
-            });
-
-            console.log('数据过滤完成:', {
-                recordsToUpload: recordsToUpload.length,
-                plansToUpload: plansToUpload.length,
-                knowledgeToUpload: knowledgeToUpload.length
             });
 
             // 批量上传记录
@@ -552,15 +514,6 @@ export class CloudSyncService {
             const skippedPlans = report.plans.filter(p => p.action === 'skipped').length;
             const skippedKnowledge = report.knowledge.filter(k => k.action === 'skipped').length;
 
-            console.log('上传完成统计:', {
-                uploadedRecords,
-                uploadedPlans,
-                uploadedKnowledge,
-                skippedRecords,
-                skippedPlans,
-                skippedKnowledge
-            });
-
             return {
                 success: true,
                 message: `成功上传 ${uploadedRecords} 条记录、${uploadedPlans} 个计划、${uploadedKnowledge} 条知识点。跳过 ${skippedRecords} 条重复记录、${skippedPlans} 个重复计划、${skippedKnowledge} 条重复知识点。`,
@@ -710,92 +663,44 @@ export class CloudSyncService {
         }
     }
 
-    // 查看云端数据概览
-    static async getCloudDataOverview(): Promise<{
-        records: { count: number; recent: RecordItem[] };
-        plans: { count: number; recent: StudyPlan[] };
-        knowledge: { count: number; recent: KnowledgeItem[] };
-        settings: { hasSettings: boolean };
-    }> {
+    // 获取云端数据概览（用于同步前的检查）
+    static async getCloudDataOverview(): Promise<CloudDataOverview> {
         try {
-            console.log('开始获取云端数据概览');
-
-            // 分别处理每个服务，避免一个失败影响其他
-            let cloudRecords: RecordItem[] = [];
-            let cloudPlans: StudyPlan[] = [];
-            let cloudKnowledge: KnowledgeItem[] = [];
-            let cloudSettings: UserSettings = {};
-
-            try {
-                cloudRecords = await recordService.getRecords();
-                console.log('记录获取成功:', cloudRecords.length);
-            } catch (error) {
-                console.error('记录获取失败:', error);
-                cloudRecords = [];
+            const userId = await getCurrentUserId();
+            if (!userId) {
+                throw new Error('用户未登录');
             }
 
-            try {
-                cloudPlans = await planService.getPlans();
-                console.log('计划获取成功:', cloudPlans.length);
-            } catch (error) {
-                console.error('计划获取失败:', error);
-                cloudPlans = [];
-            }
+            // 并行获取各类数据
+            const [cloudRecords, cloudPlans, cloudKnowledge, cloudSettings] = await Promise.all([
+                recordService.getRecords().catch(() => []),
+                planService.getPlans().catch(() => []),
+                knowledgeService.getKnowledge().catch(() => []),
+                settingsService.getSettings().catch(() => ({}))
+            ]);
 
-            try {
-                cloudKnowledge = await knowledgeService.getKnowledge();
-                console.log('知识点获取成功:', cloudKnowledge.length);
-            } catch (error) {
-                console.error('知识点获取失败:', error);
-                cloudKnowledge = [];
-            }
-
-            try {
-                cloudSettings = await settingsService.getSettings();
-                console.log('设置获取成功:', Object.keys(cloudSettings).length);
-            } catch (error) {
-                // settingsService.getSettings() 已经处理了 PGRST116 错误并返回空对象
-                // 这里通常不会抛出异常，但为了安全起见保留异常处理
-                const errorDetails = {
-                    type: typeof error,
-                    message: error instanceof Error ? error.message : String(error),
-                    stack: error instanceof Error ? error.stack : undefined,
-                    errorCode: (error as unknown as { code?: string })?.code,
-                    errorStatus: (error as unknown as { status?: number })?.status
-                };
-                console.warn('设置获取遇到异常，使用空设置:', errorDetails);
-                cloudSettings = {};
-            }
-
-            const result = {
+            const result: CloudDataOverview = {
                 records: {
                     count: cloudRecords.length,
-                    recent: cloudRecords.slice(0, 5) // 最近5条记录
+                    recent: cloudRecords.slice(0, 5) // Get the 5 most recent records
                 },
                 plans: {
                     count: cloudPlans.length,
-                    recent: cloudPlans.slice(0, 5) // 最近5个计划
+                    recent: cloudPlans.slice(0, 5) // Get the 5 most recent plans
                 },
                 knowledge: {
                     count: cloudKnowledge.length,
-                    recent: cloudKnowledge.slice(0, 5) // 最近5条知识点
+                    recent: cloudKnowledge.slice(0, 5) // Get the 5 most recent knowledge items
                 },
                 settings: {
-                    hasSettings: cloudSettings && Object.keys(cloudSettings).length > 0
+                    hasSettings: Object.keys(cloudSettings).length > 0
                 }
             };
 
-            console.log('云端数据概览获取完成:', result);
             return result;
         } catch (error) {
             console.error('获取云端数据概览失败:', error);
-            // 返回空数据而不是抛出错误
-            return {
-                records: { count: 0, recent: [] },
-                plans: { count: 0, recent: [] },
-                knowledge: { count: 0, recent: [] },
-                settings: { hasSettings: false }
-            };
+            throw error;
         }
     }
 

@@ -116,7 +116,6 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         const selectedText = value.substring(start, end);
 
         if (!selectedText) {
-            alert('请先选中要格式化的文字');
             return;
         }
 

@@ -138,11 +138,6 @@ export const renderFormattedText = (text: string) => {
         return text;
     }
 
-    // Debug logging
-    if (process.env.NODE_ENV === 'development') {
-        console.log('renderFormattedText input:', text);
-    }
-
     // Use simpler regex patterns that are more compatible
     const boldRegex = /\*\*([^*]+)\*\*/g;
     const italicRegex = /\*([^*]+)\*/g;
@@ -202,11 +197,6 @@ export const renderFormattedText = (text: string) => {
         return current.index >= previous.index + previous.match.length;
     });
 
-    // Debug logging
-    if (process.env.NODE_ENV === 'development' && nonOverlappingMatches.length > 0) {
-        console.log('renderFormattedText matches:', nonOverlappingMatches);
-    }
-
     // Process matches
     for (const { index, match, type, content } of nonOverlappingMatches) {
         // Add text before match
@@ -237,11 +227,6 @@ export const renderFormattedText = (text: string) => {
     // If no formatting found, return original text
     if (parts.length === 0) {
         return text;
-    }
-
-    // Debug logging
-    if (process.env.NODE_ENV === 'development') {
-        console.log('renderFormattedText parts:', parts);
     }
 
     return parts.map((part, index) => {

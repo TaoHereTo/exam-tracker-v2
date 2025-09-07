@@ -364,11 +364,11 @@ export class AutoCloudSync {
     static async autoDeleteRecord(recordId: string | number, notify: ReturnType<typeof useNotification>['notify']) {
         try {
             // 只有UUID格式的ID才尝试从云端删除
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(recordId));
+            const isValidId = (id: string | number) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id));
 
-            if (!isUUID) {
-                // 对于旧格式ID，不尝试云端删除，只通知用户
-                console.log('跳过云端删除（旧格式ID）:', recordId);
+            if (!isValidId(recordId)) {
+                // Remove debug logging as part of code cleanup
+                // console.log('跳过云端删除（旧格式ID）:', recordId);
                 return;
             }
 

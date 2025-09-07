@@ -206,8 +206,25 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
             {/* 用户信息区域 */}
             <SidebarFooter>
                 {(() => {
-                    console.log('Sidebar Footer rendering userInfo:', !!userInfo);
-                    return userInfo;
+                    return (
+                        <div className="flex items-center justify-between p-4 border-t">
+                            <div className="flex items-center gap-3">
+                                {userInfo ? (
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium">{userInfo}</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-sm font-medium">未登录</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    );
                 })()}
             </SidebarFooter>
             <SidebarRail />
