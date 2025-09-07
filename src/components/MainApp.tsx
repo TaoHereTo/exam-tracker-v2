@@ -133,7 +133,7 @@ export function MainApp() {
 
     // 认证相关
     const { user, signOut } = useAuth();
-    const { notify } = useNotification();
+    const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
 
     const [showProfileDialog, setShowProfileDialog] = useState(false);
 
@@ -162,18 +162,16 @@ export function MainApp() {
         const knowledgeWithId = { ...newKnowledge, id: generateUUID() };
         setKnowledge(prev => [knowledgeWithId, ...prev]);
 
-        // Show success notification immediately
-        notify({
-            type: 'success',
-            message: '知识点保存成功',
-            description: '知识点已保存到本地并正在同步到云端'
-        });
-
         // 异步保存到云端，不阻塞UI
         setTimeout(() => {
-            AutoCloudSync.autoSaveKnowledge(knowledgeWithId, notify);
+            AutoCloudSync.autoSaveKnowledge(knowledgeWithId, {
+                notify,
+                notifyLoading,
+                updateToSuccess,
+                updateToError
+            });
         }, 0);
-    }, [setKnowledge, notify]);
+    }, [setKnowledge, notify, notifyLoading, updateToSuccess, updateToError]);
 
     // 加载用户资料 - 优化性能
     useEffect(() => {
@@ -464,7 +462,12 @@ export function MainApp() {
 
         // 批量从云端删除选中的记录
         for (const id of recordIds) {
-            await AutoCloudSync.autoDeleteRecord(id, notify);
+            await AutoCloudSync.autoDeleteRecord(id, {
+                notify,
+                notifyLoading,
+                updateToSuccess,
+                updateToError
+            });
         }
 
         notify({
@@ -487,7 +490,12 @@ export function MainApp() {
         // 批量从云端删除，只删除UUID格式的ID（新格式）
         for (const id of ids) {
             if (isUUID(id)) {
-                await AutoCloudSync.autoDeleteKnowledge(id, notify);
+                await AutoCloudSync.autoDeleteKnowledge(id, {
+                    notify,
+                    notifyLoading,
+                    updateToSuccess,
+                    updateToError
+                });
             }
         }
     };
@@ -516,36 +524,26 @@ export function MainApp() {
 
             // 对于旧格式ID，应该创建新记录而不是更新
             try {
-                await AutoCloudSync.autoSaveKnowledge(updatedItem, notify);
-            } catch (error) {
-                console.error('MainApp - 编辑知识点失败 (ID转换):', {
-                    originalId: item.id,
-                    newId: updatedItem.id,
-                    error: error instanceof Error ? error.message : String(error),
-                    fullError: error
+                await AutoCloudSync.autoSaveKnowledge(updatedItem, {
+                    notify,
+                    notifyLoading,
+                    updateToSuccess,
+                    updateToError
                 });
+            } catch (error) {
             }
             return;
         }
 
         // 对于新格式ID，直接同步到云端
         try {
-            await AutoCloudSync.autoUpdateKnowledge(item, notify);
-        } catch (error) {
-            console.error('MainApp - 编辑知识点失败 (直接更新):', {
-                knowledgeId: item.id,
-                knowledgeData: {
-                    module: item.module,
-                    type: (item as Record<string, unknown>).type,
-                    note: (item as Record<string, unknown>).note,
-                    subCategory: (item as Record<string, unknown>).subCategory,
-                    date: (item as Record<string, unknown>).date,
-                    source: (item as Record<string, unknown>).source,
-                    imagePath: (item as Record<string, unknown>).imagePath
-                },
-                error: error instanceof Error ? error.message : String(error),
-                fullError: error
+            await AutoCloudSync.autoUpdateKnowledge(item, {
+                notify,
+                notifyLoading,
+                updateToSuccess,
+                updateToError
             });
+        } catch (error) {
         }
     };
 
@@ -660,6 +658,33 @@ export function MainApp() {
         return null;
     }
 
+    // Component to handle sidebar state and update CSS variables for toast positioning
+    // This component must be inside SidebarProvider to use useSidebar hook
+    const UpdateToastPositioning = () => {
+        const { state } = useSidebar();
+        const isCollapsed = state === 'collapsed';
+        
+        React.useEffect(() => {
+            // Update CSS variable based on sidebar state
+            const updateCSSVariables = () => {
+                const sidebarWidth = isCollapsed ? 
+                    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-icon') || '68') :
+                    parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '256');
+                
+                const offset = isCollapsed ? sidebarWidth / 2 : sidebarWidth / 2;
+                document.documentElement.style.setProperty('--sidebar-offset', `${offset}px`);
+            };
+            
+            updateCSSVariables();
+            
+            // Also update on window resize
+            window.addEventListener('resize', updateCSSVariables);
+            return () => window.removeEventListener('resize', updateCSSVariables);
+        }, [isCollapsed]);
+        
+        return null; // This component doesn't render anything
+    };
+
     return (
         <PasteProvider>
             <NavModeContext.Provider value={navMode}>
@@ -676,6 +701,8 @@ export function MainApp() {
                                 "--sidebar-width-icon": string;
                             }}
                         >
+                            {/* This component handles sidebar state and updates CSS variables for toast positioning */}
+                            <UpdateToastPositioning />
                             <div className="flex h-screen w-full relative z-[2] flex-col md:flex-row" data-sidebar="sidebar">
                                 <Sidebar
                                     activeTab={activeTab}
@@ -788,7 +815,12 @@ export function MainApp() {
                                                         setRecords(prev => [newRecord, ...prev]);
 
                                                         // 自动保存到云端
-                                                        await AutoCloudSync.autoSaveRecord(newRecord, notify);
+                                                        await AutoCloudSync.autoSaveRecord(newRecord, {
+                                                            notify,
+                                                            notifyLoading,
+                                                            updateToSuccess,
+                                                            updateToError
+                                                        });
                                                     }}
                                                 />
                                             </Suspense>
@@ -809,21 +841,14 @@ export function MainApp() {
                                                         };
                                                         setPlans(prev => [formattedPlan, ...prev]);
 
-                                                        // 检查 ID 格式，只有 UUID 格式的才保存到云端
-                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(plan.id);
-
-                                                        if (!isUUID) {
-                                                            notify({
-                                                                type: 'warning',
-                                                                message: '本地保存成功',
-                                                                description: '计划已保存到本地，但云端同步跳过（旧格式ID）'
-                                                            });
-                                                            return;
-                                                        }
-
                                                         // 自动保存到云端
                                                         try {
-                                                            await AutoCloudSync.autoSavePlan(formattedPlan, notify);
+                                                            await AutoCloudSync.autoSavePlan(formattedPlan, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
                                                         } catch (error) {
                                                             console.error('MainApp - 创建计划失败:', error);
                                                         }
@@ -836,7 +861,12 @@ export function MainApp() {
                                                         setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                         // 自动更新到云端
-                                                        await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                        await AutoCloudSync.autoUpdatePlan(formattedPlan, {
+                                                            notify,
+                                                            notifyLoading,
+                                                            updateToSuccess,
+                                                            updateToError
+                                                        });
                                                     }}
                                                     onDelete={async (id) => {
                                                         setPlans(prev => prev.filter(p => p.id !== id));
@@ -855,7 +885,12 @@ export function MainApp() {
 
                                                         // 自动从云端删除
                                                         try {
-                                                            await AutoCloudSync.autoDeletePlan(id, notify);
+                                                            await AutoCloudSync.autoDeletePlan(id, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
                                                         } catch (error) {
                                                             console.error('MainApp - 删除计划失败:', error);
                                                         }
@@ -883,7 +918,12 @@ export function MainApp() {
                                                             setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                             // 自动更新到云端
-                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, notify);
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
                                                         }}
                                                     />
                                                 ) : (
@@ -924,7 +964,12 @@ export function MainApp() {
 
                                                         // 自动保存到云端
                                                         try {
-                                                            await AutoCloudSync.autoSaveCountdown(formattedCountdown, notify);
+                                                            await AutoCloudSync.autoSaveCountdown(formattedCountdown, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
                                                         } catch (error) {
                                                             console.error('MainApp - 创建倒计时失败:', error);
                                                         }
@@ -936,7 +981,12 @@ export function MainApp() {
                                                         setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
 
                                                         // 自动更新到云端
-                                                        await AutoCloudSync.autoUpdateCountdown(formattedCountdown, notify);
+                                                        await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
+                                                            notify,
+                                                            notifyLoading,
+                                                            updateToSuccess,
+                                                            updateToError
+                                                        });
                                                     }}
                                                     onDelete={async (id) => {
                                                         setCountdowns(prev => prev.filter(c => c.id !== id));
@@ -955,7 +1005,12 @@ export function MainApp() {
 
                                                         // 自动从云端删除
                                                         try {
-                                                            await AutoCloudSync.autoDeleteCountdown(id, notify);
+                                                            await AutoCloudSync.autoDeleteCountdown(id, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
                                                         } catch (error) {
                                                             console.error('MainApp - 删除倒计时失败:', error);
                                                         }
@@ -1081,6 +1136,7 @@ export function MainApp() {
                         onClose={() => setShowProfileDialog(false)}
                         onProfileUpdate={loadUserProfile}
                     />
+
                 </div>
             </NavModeContext.Provider>
         </PasteProvider>

@@ -1,22 +1,25 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useRef } from "react";
-import { AnimatedList } from "./animated-list";
+import React, { createContext, useContext, useCallback } from "react";
+import toast, { Toaster, ToastBar } from "react-hot-toast";
 import { CheckCircle2, XCircle, Info, AlertTriangle, Flower } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 
 export type NotificationType = "success" | "error" | "info" | "warning";
 
 export interface Notification {
-    id: string;
+    id?: string;
     type: NotificationType;
     message: string;
     description?: string;
-    icon?: string; // Added custom icon property
+    icon?: string;
 }
 
 interface NotificationContextProps {
     notify: (n: Omit<Notification, "id">) => void;
+    notifyLoading?: (message: string, description?: string) => string;
+    updateToSuccess?: (id: string, message: string, description?: string) => void;
+    updateToError?: (id: string, message: string, description?: string) => void;
 }
 
 // Type definition for webkitAudioContext
@@ -93,8 +96,56 @@ const playNotificationSound = (type: NotificationType) => {
         }
     } catch (error) {
         // Audio not supported or blocked, silently fail
-
     }
+};
+
+// Function to get the appropriate icon based on type or custom icon
+const getIcon = (notification: Notification) => {
+    // If a custom icon is specified and it's "flower", use the Flower icon
+    if (notification.icon === "flower") {
+        return <Flower className="text-green-500 w-5 h-5" />;
+    }
+    
+    // Otherwise, use the default icons based on type
+    switch (notification.type) {
+        case "success":
+            return <CheckCircle2 className="text-green-500 w-5 h-5" />;
+        case "error":
+            return <XCircle className="text-red-500 w-5 h-5" />;
+        case "warning":
+            return <AlertTriangle className="text-yellow-500 w-5 h-5" />;
+        case "info":
+        default:
+            return <Info className="text-blue-500 w-5 h-5" />;
+    }
+};
+
+// Custom Toast Content Component
+const ToastContent = ({ notification, showIcon }: { notification: Notification; showIcon?: boolean }) => {
+    // Only show custom icons for warning and info notifications
+    // Success and error notifications use react-hot-toast's built-in icons
+    const shouldShowIcon = showIcon !== false && (notification.type === "warning" || notification.type === "info" || notification.icon === "flower");
+    const icon = shouldShowIcon ? getIcon(notification) : null;
+    
+    return (
+        <div className="flex items-start gap-1.5">
+            {icon && (
+                <span className="mt-0.5 flex-shrink-0">
+                    {icon}
+                </span>
+            )}
+            <div>
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+                    <MixedText text={notification.message} />
+                </div>
+                {notification.description && (
+                    <div className="text-xs text-gray-500 mt-1 notification-description dark:text-gray-300">
+                        <MixedText text={notification.description} />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export const useNotification = () => {
@@ -104,74 +155,154 @@ export const useNotification = () => {
 };
 
 export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const timerRef = useRef<{ [key: string]: NodeJS.Timeout }>({});
-
-    const remove = useCallback((id: string) => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
-        if (timerRef.current[id]) {
-            clearTimeout(timerRef.current[id]);
-            delete timerRef.current[id];
+    const notify = useCallback((n: Omit<Notification, "id">) => {
+        // Play sound when notification appears
+        playNotificationSound(n.type);
+        
+        // Create toast based on type
+        const toastOptions = {
+            position: "top-center" as const,
+            duration: 5000,
+            style: {
+                background: 'var(--card)',
+                border: '1px solid var(--border)',
+                minWidth: '200px',
+                maxWidth: '280px',
+                padding: '8px 12px',
+                boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+            },
+        };
+        
+        switch (n.type) {
+            case "success":
+                toast.success(<ToastContent notification={n} showIcon={false} />, toastOptions);
+                break;
+            case "error":
+                toast.error(<ToastContent notification={n} showIcon={false} />, toastOptions);
+                break;
+            case "warning":
+                toast(<ToastContent notification={n} />, { 
+                    ...toastOptions,
+                    icon: getIcon(n)
+                });
+                break;
+            case "info":
+            default:
+                toast(<ToastContent notification={n} />, { 
+                    ...toastOptions,
+                    icon: getIcon(n)
+                });
+                break;
         }
     }, []);
 
-    const notify = useCallback((n: Omit<Notification, "id">) => {
-        const id = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        setNotifications((prev) => [{ ...n, id }, ...prev]);
-        timerRef.current[id] = setTimeout(() => remove(id), 5000);
-        
-        // Play sound when notification appears
-        playNotificationSound(n.type);
-    }, [remove]);
+    // New function for loading notifications that can transition to success/error
+    const notifyLoading = useCallback((message: string, description?: string) => {
+        const id = toast.loading(
+            <div className="flex items-start gap-1.5">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+                    <MixedText text={message} />
+                </div>
+            </div>,
+            {
+                position: "top-center",
+                style: {
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    minWidth: '200px',
+                    maxWidth: '280px',
+                    padding: '8px 12px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                },
+            }
+        );
+        return id;
+    }, []);
 
-    // Function to render the appropriate icon based on type or custom icon
-    const renderIcon = (notification: Notification) => {
-        // If a custom icon is specified and it's "flower", use the Flower icon
-        if (notification.icon === "flower") {
-            return <Flower className="text-green-500 w-5 h-5" />;
-        }
-        
-        // Otherwise, use the default icons based on type
-        switch (notification.type) {
-            case "success":
-                return <CheckCircle2 className="text-green-500 w-5 h-5" />;
-            case "error":
-                return <XCircle className="text-red-500 w-5 h-5" />;
-            case "warning":
-                return <AlertTriangle className="text-yellow-500 w-5 h-5" />;
-            case "info":
-            default:
-                return <Info className="text-blue-500 w-5 h-5" />;
-        }
-    };
+    // New function to update a loading notification to success
+    const updateToSuccess = useCallback((id: string, message: string, description?: string) => {
+        toast.success(
+            <div className="flex items-start gap-1.5">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+                    <MixedText text={message} />
+                </div>
+            </div>,
+            {
+                id,
+                position: "top-center",
+                style: {
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    minWidth: '200px',
+                    maxWidth: '280px',
+                    padding: '8px 12px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                },
+            }
+        );
+    }, []);
+
+    // New function to update a loading notification to error
+    const updateToError = useCallback((id: string, message: string, description?: string) => {
+        toast.error(
+            <div className="flex items-start gap-1.5">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+                    <MixedText text={message} />
+                </div>
+            </div>,
+            {
+                id,
+                position: "top-center",
+                style: {
+                    background: 'var(--card)',
+                    border: '1px solid var(--border)',
+                    minWidth: '200px',
+                    maxWidth: '280px',
+                    padding: '8px 12px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                },
+            }
+        );
+    }, []);
 
     return (
-        <NotificationContext.Provider value={{ notify }}>
+        <NotificationContext.Provider value={{ notify, notifyLoading, updateToSuccess, updateToError }}>
             {children}
-            <div className="fixed top-6 right-6 z-[99999] w-[320px] max-w-full pointer-events-none">
-                <AnimatedList delay={200} className="items-end">
-                    {notifications.map((n) => (
-                        <div
-                            key={n.id}
-                            className={`shadow-lg rounded-lg px-4 py-3 mb-2 flex items-start gap-3 transition-all
-              `}
-                            style={{ minWidth: 240, backgroundColor: 'var(--card)', border: '1px solid var(--border)' }}
-                        >
-                            <span className="mt-0.5">
-                                {renderIcon(n)}
-                            </span>
-                            <div>
-                                <div className="font-semibold text-base notification-message">
-                                    <MixedText text={n.message} />
-                                </div>
-                                {n.description && (
-                                    <div className="text-xs text-gray-500 mt-1 notification-description"><MixedText text={n.description} /></div>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </AnimatedList>
-            </div>
+            <Toaster 
+                position="top-center"
+                toastOptions={{
+                    duration: 5000,
+                    style: {
+                        background: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        minWidth: '200px',
+                        maxWidth: '280px',
+                        padding: '8px 12px',
+                        boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    },
+                }}
+                containerStyle={{
+                    position: 'fixed',
+                    top: '20px',
+                    left: 'calc(50% + var(--sidebar-offset, 0px))',
+                    transform: 'translateX(-50%)',
+                    zIndex: 9999,
+                    width: '100%',
+                    maxWidth: 'calc(100vw - var(--toast-max-width, 40px))',
+                }}
+            >
+                {(t) => (
+                    <ToastBar 
+                        toast={t} 
+                        style={{
+                            ...t.style,
+                            animation: t.visible 
+                                ? 'toast-enter 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards' 
+                                : 'toast-exit 0.3s cubic-bezier(0.06, 0.71, 0.57, 1) forwards',
+                        }}
+                    />
+                )}
+            </Toaster>
         </NotificationContext.Provider>
     );
 };

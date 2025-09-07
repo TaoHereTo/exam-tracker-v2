@@ -477,6 +477,37 @@ html {
   }
 }
 
+/* ========== Toast Animations ========== */
+@keyframes toast-enter {
+  from {
+    transform: translate3d(0, -100%, 0) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, -100%, 0) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-enter {
+  animation: enter 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+.animate-leave {
+  animation: leave 0.3s cubic-bezier(0.06, 0.71, 0.57, 1) forwards;
+}
+
 /* ========== MarkdownEditor 性能优化 ========== */
 /* 为MarkdownEditor组件添加性能优化 */
 .markdown-editor-container {
@@ -509,12 +540,12 @@ html:not(:has(::view-transition-group(root))) * {
 }
 
 /* 在主题切换期间优化MarkdownEditor性能 */
-::view-transition-group(root) .markdown-editor-container {
+::view-transition-group(root) .knowledge-entry-container {
   pointer-events: none;
   /* 暂时禁用交互 */
 }
 
-::view-transition-group(root) .markdown-editor-textarea {
+::view-transition-group(root) .knowledge-editor-textarea {
   will-change: auto;
   /* 移除will-change以减少合成层 */
 }
@@ -1898,6 +1929,15 @@ table {
 .echarts-for-react {
   width: 100% !important;
   max-width: 100% !important;
+}
+
+/* Toast positioning within main content area */
+#toast-container {
+  pointer-events: none;
+}
+
+#toast-container > * {
+  pointer-events: auto;
 }
 
 ::view-transition-old(root),

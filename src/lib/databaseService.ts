@@ -72,7 +72,31 @@ export const recordService = {
         return data
     },
 
+    // 更新刷题历史
+    async updateRecord(id: string, updates: Partial<RecordItem>): Promise<RecordItem> {
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) throw new Error('用户未登录')
 
+            const updateData: Record<string, unknown> = { ...updates };
+
+            const { data, error } = await supabase
+                .from('exercise_records')
+                .update(updateData)
+                .eq('id', id)
+                .eq('user_id', userId)
+                .select()
+                .single()
+
+            if (error) {
+                throw new Error(`刷题记录更新失败: ${error.message || '未知错误'}`);
+            }
+
+            return data
+        } catch (error) {
+            throw error;
+        }
+    },
 
     // 删除刷题历史
     async deleteRecord(id: string | number): Promise<void> {
