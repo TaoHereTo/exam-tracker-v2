@@ -741,108 +741,6 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                 </TooltipContent>
                             </Tooltip>
 
-
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            const selectedText = value.substring(
-                                                textareaRef.current?.selectionStart || 0,
-                                                textareaRef.current?.selectionEnd || 0
-                                            );
-
-                                            let newText: string;
-                                            if (selectedText.trim()) {
-                                                // 如果有选中的文本，将其转换为列表
-                                                const lines = selectedText.split('\n');
-                                                const formattedLines = lines.map(line => line.trim() ? `- ${line}` : line);
-                                                newText = formattedLines.join('\n');
-                                            } else {
-                                                // 如果没有选中文本，插入一个新的列表项
-                                                newText = '- ';
-                                            }
-
-                                            const newValue = value.substring(0, textareaRef.current?.selectionStart || 0) +
-                                                newText +
-                                                value.substring(textareaRef.current?.selectionEnd || 0);
-                                            onChange(newValue);
-
-                                            // 设置光标位置
-                                            setTimeout(() => {
-                                                if (textareaRef.current) {
-                                                    const newCursorPos = (textareaRef.current?.selectionStart || 0) + newText.length;
-                                                    textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
-                                                    textareaRef.current.focus();
-                                                }
-                                            }, 0);
-                                        }}
-                                        className="md-toolbar-button-base md-toolbar-button-list"
-                                        type="button"
-                                    >
-                                        <List className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>无序列表</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            const selectedText = value.substring(
-                                                textareaRef.current?.selectionStart || 0,
-                                                textareaRef.current?.selectionEnd || 0
-                                            );
-
-                                            let newText: string;
-                                            if (selectedText.trim()) {
-                                                // 如果有选中的文本，将其转换为有序列表
-                                                const lines = selectedText.split('\n');
-                                                const formattedLines = lines.map((line, index) =>
-                                                    line.trim() ? `${index + 1}. ${line}` : line
-                                                );
-                                                newText = formattedLines.join('\n');
-                                            } else {
-                                                // 如果没有选中文本，插入一个新的有序列表项
-                                                newText = '1. ';
-                                            }
-
-                                            const newValue = value.substring(0, textareaRef.current?.selectionStart || 0) +
-                                                newText +
-                                                value.substring(textareaRef.current?.selectionEnd || 0);
-                                            onChange(newValue);
-
-                                            // 设置光标位置
-                                            setTimeout(() => {
-                                                if (textareaRef.current) {
-                                                    const newCursorPos = (textareaRef.current?.selectionStart || 0) + newText.length;
-                                                    textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
-                                                    textareaRef.current.focus();
-                                                }
-                                            }, 0);
-                                        }}
-                                        className="md-toolbar-button-base md-toolbar-button-list"
-                                        type="button"
-                                    >
-                                        <ListOrdered className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>有序列表</p>
-                                </TooltipContent>
-                            </Tooltip>
-
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -868,59 +766,172 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                 </TooltipContent>
                             </Tooltip>
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            fileInputRef.current?.click();
-                                        }}
-                                        className="md-toolbar-button-base md-toolbar-button-upload"
-                                        type="button"
-                                        disabled={isUploading}
-                                    >
-                                        {isUploading ? (
-                                            <LoadingSpinner size="sm" />
-                                        ) : (
-                                            <Upload className="h-4 w-4" />
-                                        )}
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>从本地上传图片</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            {/* 列表按钮 */}
+                            <Popover>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="md-toolbar-button-base md-toolbar-button-list"
+                                                type="button"
+                                            >
+                                                <List className="h-4 w-4" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>列表</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <PopoverContent className="w-32 p-1" align="start">
+                                    <div className="grid gap-0.5">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-start h-8 px-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const selectedText = value.substring(
+                                                    textareaRef.current?.selectionStart || 0,
+                                                    textareaRef.current?.selectionEnd || 0
+                                                );
 
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            if (cloudSelectorRef.current) {
-                                                cloudSelectorRef.current.click();
-                                            }
-                                        }}
-                                        className="md-toolbar-button-base md-toolbar-button-cloud"
-                                        type="button"
-                                        disabled={isUploading}
-                                    >
-                                        {isUploading ? (
-                                            <LoadingSpinner size="sm" />
-                                        ) : (
-                                            <Cloud className="h-4 w-4" />
-                                        )}
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>从云端选择图片</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                                let newText: string;
+                                                if (selectedText.trim()) {
+                                                    // 如果有选中的文本，将其转换为列表
+                                                    const lines = selectedText.split('\n');
+                                                    const formattedLines = lines.map(line => line.trim() ? `- ${line}` : line);
+                                                    newText = formattedLines.join('\n');
+                                                } else {
+                                                    // 如果没有选中文本，插入一个新的列表项
+                                                    newText = '- ';
+                                                }
+
+                                                const newValue = value.substring(0, textareaRef.current?.selectionStart || 0) +
+                                                    newText +
+                                                    value.substring(textareaRef.current?.selectionEnd || 0);
+                                                onChange(newValue);
+
+                                                // 设置光标位置
+                                                setTimeout(() => {
+                                                    if (textareaRef.current) {
+                                                        const newCursorPos = (textareaRef.current?.selectionStart || 0) + newText.length;
+                                                        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+                                                        textareaRef.current.focus();
+                                                    }
+                                                }, 0);
+                                            }}
+                                        >
+                                            <List className="h-4 w-4 mr-2" />
+                                            无序列表
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-start h-8 px-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                const selectedText = value.substring(
+                                                    textareaRef.current?.selectionStart || 0,
+                                                    textareaRef.current?.selectionEnd || 0
+                                                );
+
+                                                let newText: string;
+                                                if (selectedText.trim()) {
+                                                    // 如果有选中的文本，将其转换为有序列表
+                                                    const lines = selectedText.split('\n');
+                                                    const formattedLines = lines.map((line, index) =>
+                                                        line.trim() ? `${index + 1}. ${line}` : line
+                                                    );
+                                                    newText = formattedLines.join('\n');
+                                                } else {
+                                                    // 如果没有选中文本，插入一个新的有序列表项
+                                                    newText = '1. ';
+                                                }
+
+                                                const newValue = value.substring(0, textareaRef.current?.selectionStart || 0) +
+                                                    newText +
+                                                    value.substring(textareaRef.current?.selectionEnd || 0);
+                                                onChange(newValue);
+
+                                                // 设置光标位置
+                                                setTimeout(() => {
+                                                    if (textareaRef.current) {
+                                                        const newCursorPos = (textareaRef.current?.selectionStart || 0) + newText.length;
+                                                        textareaRef.current.setSelectionRange(newCursorPos, newCursorPos);
+                                                        textareaRef.current.focus();
+                                                    }
+                                                }, 0);
+                                            }}
+                                        >
+                                            <ListOrdered className="h-4 w-4 mr-2" />
+                                            有序列表
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+
+                            {/* 图片上传按钮 */}
+                            <Popover>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="md-toolbar-button-base md-toolbar-button-upload"
+                                                type="button"
+                                                disabled={isUploading}
+                                            >
+                                                {isUploading ? (
+                                                    <LoadingSpinner size="sm" />
+                                                ) : (
+                                                    <ImageIcon className="h-4 w-4" />
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>图片</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <PopoverContent className="w-32 p-1" align="start">
+                                    <div className="grid gap-0.5">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-start h-8 px-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                fileInputRef.current?.click();
+                                            }}
+                                        >
+                                            <Upload className="h-4 w-4 mr-2" />
+                                            从本地上传
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-start h-8 px-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (cloudSelectorRef.current) {
+                                                    cloudSelectorRef.current.click();
+                                                }
+                                            }}
+                                        >
+                                            <Cloud className="h-4 w-4 mr-2" />
+                                            从云端选择
+                                        </Button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         </div>
 
                         <div className="flex items-center gap-1">
