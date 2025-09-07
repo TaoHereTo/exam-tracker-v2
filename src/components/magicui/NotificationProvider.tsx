@@ -289,6 +289,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     zIndex: 9999,
                     width: '100%',
                     maxWidth: 'calc(100vw - var(--toast-max-width, 40px))',
+                    transition: 'left 0.3s ease-out',
                 }}
             >
                 {(t) => (
