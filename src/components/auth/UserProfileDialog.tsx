@@ -110,7 +110,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-xs w-[380px] sm:w-[500px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <User className="h-5 w-5" />
@@ -170,25 +170,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                         </div>
                     </div>
 
-                    {/* 当前信息预览 */}
-                    <div className="pt-4 border-t">
-                        <h4 className="font-medium mb-3"><MixedText text="当前信息" /></h4>
-                        <div className="space-y-2 text-sm">
-                            <div>
-                                <span className="text-muted-foreground"><MixedText text="显示名称：" /></span>
-                                <span><MixedText text={getDisplayName()} /></span>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground"><MixedText text="用户名：" /></span>
-                                <span><MixedText text={profile?.username || '未设置'} /></span>
-                            </div>
-                            <div>
-                                <span className="text-muted-foreground"><MixedText text="座右铭：" /></span>
-                                <span><MixedText text={profile?.bio || '未设置'} /></span>
-                            </div>
-                        </div>
-                    </div>
-
+                    
                     {/* 操作按钮 */}
                     <div className="flex justify-end gap-2 pt-4">
                         <Button variant="outline" onClick={onClose} className="h-10">
