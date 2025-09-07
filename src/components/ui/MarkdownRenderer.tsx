@@ -111,8 +111,14 @@ function parseMarkdown(content: string): React.ReactNode[] {
             return;
         }
 
-        // 处理粗体和斜体
+        // 处理颜色
         let processedText = trimmedLine;
+        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #dc2626;">$1</span>');
+        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #3b82f6;">$1</span>');
+        processedText = processedText.replace(/\{green\}(.*?)\{\/green\}/g, '<span style="color: #10b981;">$1</span>');
+        processedText = processedText.replace(/\{orange\}(.*?)\{\/orange\}/g, '<span style="color: #f97316;">$1</span>');
+
+        // 处理粗体和斜体
         processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         processedText = processedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
         processedText = processedText.replace(/~~(.*?)~~/g, '<del>$1</del>');

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useThemeMode } from '@/hooks/useThemeMode';
 import { Button } from '@/components/ui/button';
-import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X, Cloud, Upload, Image as ImageIcon, Heading1, Heading2, Heading3, Palette } from 'lucide-react';
+import { Bold, Italic, Strikethrough, Minus, List, ListOrdered, Link, Maximize2, Eye, X, Cloud, Upload, Image as ImageIcon, Heading, Heading1, Heading2, Heading3, Palette } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -95,6 +95,26 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         if (!selectedText) return [];
 
         const formats = [];
+        
+        // 检查红色
+        if (selectedText.startsWith('{red}') && selectedText.endsWith('{/red}') && selectedText.length > 11) {
+            formats.push('red');
+        }
+        
+        // 检查蓝色
+        if (selectedText.startsWith('{blue}') && selectedText.endsWith('{/blue}') && selectedText.length > 13) {
+            formats.push('blue');
+        }
+        
+        // 检查绿色
+        if (selectedText.startsWith('{green}') && selectedText.endsWith('{/green}') && selectedText.length > 13) {
+            formats.push('green');
+        }
+        
+        // 检查橙色
+        if (selectedText.startsWith('{orange}') && selectedText.endsWith('{/orange}') && selectedText.length > 15) {
+            formats.push('orange');
+        }
         
         // 检查加粗
         if (selectedText.startsWith('**') && selectedText.endsWith('**') && selectedText.length > 4) {
@@ -218,20 +238,6 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
 
     // 智能换行处理
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        // 处理快捷键
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key.toLowerCase()) {
-                case 'b':
-                    e.preventDefault();
-                    formatText('**');
-                    return;
-                case 'i':
-                    e.preventDefault();
-                    formatText('*');
-                    return;
-            }
-        }
-
         if (e.key === 'Enter' && !e.shiftKey) {
             const textarea = e.currentTarget;
             const start = textarea.selectionStart;
@@ -529,7 +535,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>粗体 (Ctrl+B)</p>
+                                    <p>粗体</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -550,7 +556,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>斜体 (Ctrl+I)</p>
+                                    <p>斜体</p>
                                 </TooltipContent>
                             </Tooltip>
 
@@ -565,7 +571,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                                 className="md-toolbar-button-base md-toolbar-button-heading"
                                                 type="button"
                                             >
-                                                <Heading1 className="h-5 w-5" />
+                                                <Heading className="h-5 w-5" />
                                             </Button>
                                         </PopoverTrigger>
                                     </TooltipTrigger>
@@ -586,7 +592,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                             }}
                                         >
                                             <Heading1 className="h-4 w-4 mr-2" />
-                                            Heading 1
+                                            一级标题
                                         </Button>
                                         <Button
                                             variant="ghost"
@@ -599,7 +605,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                             }}
                                         >
                                             <Heading2 className="h-4 w-4 mr-2" />
-                                            Heading 2
+                                            二级标题
                                         </Button>
                                         <Button
                                             variant="ghost"
@@ -612,13 +618,13 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                             }}
                                         >
                                             <Heading3 className="h-4 w-4 mr-2" />
-                                            Heading 3
+                                            三级标题
                                         </Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
 
-                            {/* 颜色选择按钮 - 注意：当前渲染器不支持颜色 */}
+                            {/* 颜色选择按钮 */}
                             <Popover>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
@@ -628,19 +634,65 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                                 size="sm"
                                                 className="md-toolbar-button-base md-toolbar-button-color"
                                                 type="button"
-                                                disabled
                                             >
                                                 <Palette className="h-5 w-5" />
                                             </Button>
                                         </PopoverTrigger>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>颜色（暂不支持）</p>
+                                        <p>颜色</p>
                                     </TooltipContent>
                                 </Tooltip>
-                                <PopoverContent className="w-48 p-2" align="start">
-                                    <div className="text-xs text-muted-foreground p-1">
-                                        当前渲染器不支持文字颜色
+                                <PopoverContent className="w-32 p-2" align="start">
+                                    <div className="grid grid-cols-2 gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-center p-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                formatText('{red}', '{/red}');
+                                            }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#dc2626' }}></div>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-center p-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                formatText('{blue}', '{/blue}');
+                                            }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-center p-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                formatText('{green}', '{/green}');
+                                            }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className="justify-center p-2"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                formatText('{orange}', '{/orange}');
+                                            }}
+                                        >
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#f97316' }}></div>
+                                        </Button>
                                     </div>
                                 </PopoverContent>
                             </Popover>
