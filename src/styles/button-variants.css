@@ -29,6 +29,14 @@
   @apply h-7 w-7 p-0 border border-transparent;
 }
 
+.md-toolbar-button-heading {
+  @apply h-7 w-7 p-0;
+}
+
+.md-toolbar-button-color {
+  @apply h-7 w-7 p-0;
+}
+
 .md-toolbar-button-strikethrough {}
 
 .md-toolbar-button-strikethrough.active {
