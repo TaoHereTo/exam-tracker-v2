@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useLocalStorageBoolean, useLocalStorageString } from "@/hooks/useLocalStorage";
 import { useTheme } from "next-themes";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
@@ -55,7 +55,7 @@ export function UnifiedSettings({
   activeTab?: string;
   navMode?: string;
 }) {
-  const { notify } = useNotification();
+  const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
   const { isDarkMode } = useThemeMode();
   const { theme, setTheme } = useTheme();
   
@@ -68,15 +68,10 @@ export function UnifiedSettings({
   const [imageSearchTerm, setImageSearchTerm] = useState('');
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
-  const [imageManagerView, setImageManagerView] = useState<'grid' | 'list'>('grid');
   
   // Advanced settings - delete images
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteProgress, setDeleteProgress] = useState(0);
-  const [currentDeletingImage, setCurrentDeletingImage] = useState<string>('');
-  const [deleteDialogKey, setDeleteDialogKey] = useState(0);
   
   // Cloud sync states
   const [isUploading, setIsUploading] = useState(false);
@@ -169,24 +164,29 @@ export function UnifiedSettings({
   const confirmDeleteImages = async () => {
     if (imagesToDelete.length === 0) return;
 
-    setIsDeleting(true);
-    setDeleteProgress(0);
-    setCurrentDeletingImage('准备删除...');
-    setDeleteDialogKey(prev => prev + 1);
+    // Close the dialog immediately and show loading notification
+    setDeleteDialogOpen(false);
+    
+    // Show loading notification
+    let toastId: string | undefined;
+    if (notifyLoading) {
+      toastId = notifyLoading("正在删除图片", `正在删除 ${imagesToDelete.length} 张图片`);
+    } else {
+      // Fallback to regular notification if notifyLoading is not available
+      notify({
+        type: "info",
+        message: "正在删除图片",
+        description: `正在删除 ${imagesToDelete.length} 张图片`
+      });
+    }
 
-    await new Promise(resolve => setTimeout(resolve, 100));
     try {
       let successCount = 0;
-      const totalImages = imagesToDelete.length;
-
+      
       for (let i = 0; i < imagesToDelete.length; i++) {
         const imageId = imagesToDelete[i];
         const image = cloudImages.find(img => img.id === imageId);
         const imageName = image?.originalName || `图片${i + 1}`;
-
-        setCurrentDeletingImage(imageName);
-        const progress = ((i + 1) / totalImages) * 100;
-        setDeleteProgress(progress);
 
         try {
           const success = await supabaseImageManager.deleteImage(imageId);
@@ -194,49 +194,35 @@ export function UnifiedSettings({
         } catch (error) {
           console.error('删除图片失败:', error);
         }
-
-        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      setDeleteProgress(100);
-      setCurrentDeletingImage('删除完成');
-      
-      if (successCount > 0) {
+      // Update to success notification
+      if (toastId && updateToSuccess) {
+        updateToSuccess(toastId, "删除成功", `成功删除 ${successCount} 张图片`);
+      } else {
         notify({
           type: "success",
           message: "删除成功",
           description: `成功删除 ${successCount} 张图片`
         });
-        setSelectedImages(new Set());
-        await loadCloudImages();
+      }
+      
+      setSelectedImages(new Set());
+      await loadCloudImages();
+    } catch (error) {
+      // Update to error notification
+      if (toastId && updateToError) {
+        updateToError(toastId, "删除失败", "删除过程中发生错误，请重试");
       } else {
         notify({
           type: "error",
           message: "删除失败",
-          description: "没有图片被成功删除"
+          description: "删除过程中发生错误，请重试"
         });
       }
-
-      setTimeout(() => {
-        setIsDeleting(false);
-        setDeleteProgress(0);
-        setCurrentDeletingImage('');
-        setDeleteDialogOpen(false);
-        setImagesToDelete([]);
-      }, 1500);
-
-    } catch (error) {
-      setIsDeleting(false);
-      setDeleteProgress(0);
-      setCurrentDeletingImage('');
-      setDeleteDialogOpen(false);
+    } finally {
+      // Clear the images to delete array
       setImagesToDelete([]);
-
-      notify({
-        type: "error",
-        message: "删除失败",
-        description: "删除过程中发生错误，请重试"
-      });
     }
   };
 
@@ -264,13 +250,29 @@ export function UnifiedSettings({
     }
   };
 
-  // Filter and sort images
-  const filteredImages = cloudImages
-    .filter(img =>
+  // Add sorting state variables (like in SupabaseImageSelectorDialog)
+  const [sortKey, setSortKey] = useState<'time' | 'name'>('time');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Update the filteredImages with sorting (like in SupabaseImageSelectorDialog)
+  const filteredImages = useMemo(() => {
+    // 过滤图片
+    const filtered = cloudImages.filter(img =>
       img.originalName.toLowerCase().includes(imageSearchTerm.toLowerCase()) ||
       img.fileName.toLowerCase().includes(imageSearchTerm.toLowerCase())
-    )
-    .sort(smartImageSort);
+    );
+
+    // 排序
+    const sorted = [...filtered];
+    if (sortKey === 'name') {
+      sorted.sort((a, b) => a.originalName.localeCompare(b.originalName, 'zh-CN'));
+    } else {
+      // time
+      sorted.sort((a, b) => new Date(a.uploadedAt).getTime() - new Date(b.uploadedAt).getTime());
+    }
+    if (sortOrder === 'desc') sorted.reverse();
+    return sorted;
+  }, [cloudImages, imageSearchTerm, sortKey, sortOrder]);
 
   // Cloud sync functions
   const handleUploadToCloud = async () => {
@@ -587,23 +589,27 @@ export function UnifiedSettings({
                   </TooltipProvider>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={() => setImageManagerView(imageManagerView === 'grid' ? 'list' : 'grid')}
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 sm:h-9 sm:w-9"
-                        >
-                          {imageManagerView === 'grid' ? <List className="w-4 h-4 sm:w-5 sm:h-5" /> : <Grid3X3 className="w-4 h-4 sm:w-5 sm:h-5" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-xs">
-                        <p><MixedText text={imageManagerView === 'grid' ? '列表视图' : '网格视图'} /></p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  {/* Add sorting dropdown like in SupabaseImageSelectorDialog */}
+                  <div className="flex items-center gap-2 min-w-[140px]">
+                    <Select
+                      value={`${sortKey}_${sortOrder}`}
+                      onValueChange={(v) => {
+                        const [k, o] = v.split('_');
+                        setSortKey(k as 'time' | 'name');
+                        setSortOrder(o as 'asc' | 'desc');
+                      }}
+                    >
+                      <SelectTrigger size="sm" className="h-8 sm:h-9">
+                        <SelectValue placeholder="排序" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="time_desc">时间降序</SelectItem>
+                        <SelectItem value="time_asc">时间升序</SelectItem>
+                        <SelectItem value="name_asc">名称升序</SelectItem>
+                        <SelectItem value="name_desc">名称降序</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
@@ -665,14 +671,14 @@ export function UnifiedSettings({
                   </div>
                 ) : (
                   <PhotoProvider>
-                    <div className={`${imageManagerView === 'grid' ? 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4' : 'space-y-2'}`}>
-                      {filteredImages.map((image) => (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
+                      {filteredImages.map((image: SupabaseImageInfo) => (
                         <div
                           key={image.id}
                           className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
                             ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
                             : ''
-                            } ${imageManagerView === 'list' ? 'flex items-center gap-2 sm:gap-3 p-2' : 'p-1 sm:p-2'}`}
+                            } p-1 sm:p-2`}
                           onClick={() => {
                             const newSelected = new Set(selectedImages);
                             if (newSelected.has(image.id)) {
@@ -702,7 +708,7 @@ export function UnifiedSettings({
 
                           {/* Image Preview */}
                           <div
-                            className={`${imageManagerView === 'list' ? 'w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0' : 'w-full aspect-square'} rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
+                            className={`w-full aspect-square rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
                             style={{
                               border: '1px solid #e5e7eb',
                               backgroundColor: 'white'
@@ -755,7 +761,7 @@ export function UnifiedSettings({
                           </div>
 
                           {/* Image Info */}
-                          <div className={`${imageManagerView === 'list' ? 'flex-1 min-w-0' : 'mt-1 sm:mt-2'} space-y-1`}>
+                          <div className={`mt-1 sm:mt-2 space-y-1`}>
                             <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                               {image.originalName}
                             </div>
@@ -789,84 +795,42 @@ export function UnifiedSettings({
 
       {/* Delete Image Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
-        if (!isDeleting) {
-          if (!open) {
-            setDeleteDialogOpen(false);
-            setImagesToDelete([]);
-            setDeleteProgress(0);
-            setCurrentDeletingImage('');
-          }
-        } else {
-          if (!open) {
-            setDeleteDialogOpen(true);
-          }
+        setDeleteDialogOpen(open);
+        if (!open) {
+          setImagesToDelete([]);
         }
       }}>
-        <AlertDialogContent key={`delete-dialog-${deleteDialogKey}`} className="p-4 sm:p-6">
+        <AlertDialogContent className="p-4 sm:p-6">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-base sm:text-lg"><MixedText text="确认删除图片" /></AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              {isDeleting ? (
-                <div className="space-y-3 sm:space-y-4">
-                  <p className="text-xs sm:text-sm"><MixedText text="正在删除图片，请稍候..." /></p>
-                  <div className="space-y-2">
-                    <Progress
-                      value={deleteProgress}
-                      variant="danger"
-                      showText={true}
-                      className="h-2 sm:h-3"
-                    />
-                    {currentDeletingImage && (
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <MixedText text={`正在删除: ${currentDeletingImage}`} />
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-xs sm:text-sm">
-                  <MixedText text="确定要删除以下图片吗？此操作不可撤销！" />
-                  <br />
-                  <span className="font-medium text-red-600 text-xs sm:text-sm">
-                    {imagesToDelete.map(id => {
-                      const img = cloudImages.find(img => img.id === id);
-                      return img?.originalName || id;
-                    }).join('、')}
-                  </span>
-                </div>
-              )}
+            <AlertDialogDescription>
+              <div className="text-xs sm:text-sm">
+                确定要删除以下图片吗？此操作不可撤销！
+                <br />
+                <span className="font-medium text-red-600 text-xs sm:text-sm">
+                  {imagesToDelete.map(id => {
+                    const img = cloudImages.find(img => img.id === id);
+                    return img?.originalName || id;
+                  }).join('、')}
+                </span>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row sm:flex-row gap-2">
             <AlertDialogCancel
-              disabled={isDeleting}
               onClick={() => {
-                if (!isDeleting) {
-                  setDeleteDialogOpen(false);
-                  setImagesToDelete([]);
-                  setDeleteProgress(0);
-                  setCurrentDeletingImage('');
-                }
+                setDeleteDialogOpen(false);
+                setImagesToDelete([]);
               }}
               className="h-8 sm:h-9 text-xs sm:text-sm"
             >
               <MixedText text="取消" />
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                confirmDeleteImages();
-              }}
-              disabled={isDeleting}
+              onClick={confirmDeleteImages}
               className="bg-[#dc2626] text-white shadow-xs hover:bg-[#dc2626]/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm"
             >
-              {isDeleting ? (
-                <div className="flex items-center gap-1 sm:gap-2">
-                  <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-white border-t-current"></div>
-                  <MixedText text="删除中..." />
-                </div>
-              ) : (
-                <MixedText text="确认删除" />
-              )}
+              <MixedText text="确认删除" />
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -876,6 +840,8 @@ export function UnifiedSettings({
     </div>
   );
 }
+
+
 
 
 

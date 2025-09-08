@@ -21,6 +21,8 @@ import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle } from 'lucide-rea
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
+import { PhotoProvider, PhotoView } from 'react-photo-view';
+import 'react-photo-view/dist/react-photo-view.css';
 import { smartImageSort } from '@/lib/utils';
 import { MixedText } from './MixedText';
 import { InlineLoadingSpinner } from './LoadingSpinner';
@@ -49,7 +51,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const [imageToDelete, setImageToDelete] = useState<{ id: string; name: string } | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
-    const { notify } = useNotification();
+    const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
     const { isDarkMode } = useThemeMode();
 
     // 加载可用图片
@@ -106,34 +108,60 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
     const confirmDelete = async () => {
         if (!imageToDelete) return;
 
-        setIsDeleting(true);
+        // Show loading notification instead of progress bar
+        let toastId: string | undefined;
+        if (notifyLoading) {
+            toastId = notifyLoading("正在删除图片", `正在删除: ${imageToDelete.name}`);
+        } else {
+            // Fallback to regular notification if notifyLoading is not available
+            notify({
+                type: "info",
+                message: "正在删除图片",
+                description: `正在删除: ${imageToDelete.name}`
+            });
+        }
+        
         try {
             const success = await supabaseImageManager.deleteImage(imageToDelete.id);
             if (success) {
-                notify({
-                    type: "success",
-                    message: "删除成功",
-                    description: `"${imageToDelete.name}"已从云端删除`
-                });
+                if (toastId && updateToSuccess) {
+                    updateToSuccess(toastId, "删除成功", `"${imageToDelete.name}"已从云端删除`);
+                } else {
+                    notify({
+                        type: "success",
+                        message: "删除成功",
+                        description: `"${imageToDelete.name}"已从云端删除`
+                    });
+                }
                 // 重新加载图片列表
                 await loadAvailableImages();
+            } else {
+                if (toastId && updateToError) {
+                    updateToError(toastId, "删除失败", "无法删除图片，请检查网络连接");
+                } else {
+                    notify({
+                        type: "error",
+                        message: "删除失败",
+                        description: "无法删除图片，请检查网络连接"
+                    });
+                }
+            }
+        } catch (error) {
+            if (toastId && updateToError) {
+                updateToError(toastId, "删除失败", "删除图片时发生错误，请稍后重试");
             } else {
                 notify({
                     type: "error",
                     message: "删除失败",
-                    description: "无法删除图片，请检查网络连接"
+                    description: "删除图片时发生错误，请稍后重试"
                 });
             }
-        } catch (error) {
-            notify({
-                type: "error",
-                message: "删除失败",
-                description: "删除图片时发生错误，请稍后重试"
-            });
         } finally {
-            setIsDeleting(false);
-            setDeleteConfirmOpen(false);
-            setImageToDelete(null);
+            // Close the dialog after a short delay to ensure the user sees the result
+            setTimeout(() => {
+                setDeleteConfirmOpen(false);
+                setImageToDelete(null);
+            }, 1000);
         }
     };
 
@@ -236,10 +264,10 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     placeholder="搜索图片名称..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="pl-10"
+                                    className="pl-10 h-9"
                                 />
                             </div>
-                            <div className="flex items-center gap-2 min-w-[160px]">
+                            <div className="flex items-center gap-2">
                                 <Select
                                     value={`${sortKey}_${sortOrder}`}
                                     onValueChange={(v) => {
@@ -248,7 +276,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                         setSortOrder(o as 'asc' | 'desc');
                                     }}
                                 >
-                                    <SelectTrigger size="sm">
+                                    <SelectTrigger className="h-9">
                                         <SelectValue placeholder="排序" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -264,7 +292,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                 size="sm"
                                 onClick={handleRefresh}
                                 disabled={isLoading}
-                                className=""
+                                className="h-9 w-9"
                             >
                                 <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                             </Button>
@@ -297,7 +325,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     </div>
                                 </div>
                             ) : (
-                                <>
+                                <PhotoProvider>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                                         {processedImages.map((image) => (
                                             <div
@@ -309,16 +337,18 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
                                                 <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden">
-                                                    <Image
-                                                        src={image.url}
-                                                        alt={image.originalName}
-                                                        width={200}
-                                                        height={200}
-                                                        className="object-cover w-full h-full"
-                                                        onError={() => {
-                                                            setImageLoadErrors(prev => new Set(prev).add(image.id));
-                                                        }}
-                                                    />
+                                                    <PhotoView src={image.url}>
+                                                        <Image
+                                                            src={image.url}
+                                                            alt={image.originalName}
+                                                            width={200}
+                                                            height={200}
+                                                            className="object-cover w-full h-full cursor-pointer"
+                                                            onError={() => {
+                                                                setImageLoadErrors(prev => new Set(prev).add(image.id));
+                                                            }}
+                                                        />
+                                                    </PhotoView>
                                                 </div>
 
                                                 <div className="p-2">
@@ -336,7 +366,9 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 {/* 选择指示器 */}
                                                 {selectedImage === image.id && (
                                                     <div className="absolute top-2 right-2">
-                                                        <Check className="h-4 w-4 text-blue-500" />
+                                                        <div className="bg-blue-500 rounded-full p-1">
+                                                            <Check className="h-5 w-5 text-white" />
+                                                        </div>
                                                     </div>
                                                 )}
 
@@ -345,12 +377,12 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                     <Tooltip>
                                                         <TooltipTrigger asChild>
                                                             <Button
-                                                                variant="ghost"
+                                                                variant="destructive"
                                                                 size="sm"
-                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 border-0"
+                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 border-0"
                                                                 onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
                                                             >
-                                                                <Trash2 className="h-3 w-3" />
+                                                                <Trash2 className="h-4 w-4" />
                                                             </Button>
                                                         </TooltipTrigger>
                                                         <TooltipContent>
@@ -361,7 +393,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                             </div>
                                         ))}
                                     </div>
-                                </>
+                                </PhotoProvider>
                             )}
                         </div>
                     </div>
@@ -398,49 +430,20 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle><MixedText text="确认删除" /></AlertDialogTitle>
-                        <AlertDialogDescription asChild>
-                            <div>
-                                {isDeleting && (
-                                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-lg">
-                                        <SimpleUiverseSpinner />
-                                    </div>
-                                )}
-                                {isDeleting ? (
-                                    <div className="space-y-4">
-                                        <p><MixedText text="正在删除图片，请稍候..." /></p>
-                                        <div className="flex items-center gap-2">
-                                            <InlineLoadingSpinner />
-                                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                <MixedText text={`正在删除: ${imageToDelete?.name}`} />
-                                            </span>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div>
-                                        <MixedText text={`确定要删除"${imageToDelete?.name}"吗？`} />
-                                        <br />
-                                        <br />
-                                        <MixedText text="此操作不可撤销，图片将从云端永久删除。" />
-                                    </div>
-                                )}
-                            </div>
+                        <AlertDialogDescription>
+                            <MixedText text={`确定要删除"${imageToDelete?.name}"吗？`} />
+                            <br />
+                            <br />
+                            <MixedText text="此操作不可撤销，图片将从云端永久删除。" />
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}><MixedText text="取消" /></AlertDialogCancel>
+                        <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
                         <AlertDialogAction
                             onClick={confirmDelete}
-                            disabled={isDeleting}
                             variant="destructive"
                         >
-                            {isDeleting ? (
-                                <div className="flex items-center gap-2">
-                                    <InlineLoadingSpinner />
-                                    <MixedText text="删除中..." />
-                                </div>
-                            ) : (
-                                <MixedText text="确认删除" />
-                            )}
+                            <MixedText text="确认删除" />
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -448,6 +451,18 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
