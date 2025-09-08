@@ -116,15 +116,7 @@ th .mixed-text-part {
 
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
 
-  --color-color-5: var(--color-5);
-
-  --color-color-4: var(--color-4);
-
-  --color-color-3: var(--color-3);
-
-  --color-color-2: var(--color-2);
-
-  --color-color-1: var(--color-1);
+  /* 彩虹色变量已在上方定义，这里移除重复 */
 
   @keyframes rainbow {
     0% {
@@ -420,13 +412,7 @@ html {
   }
 }
 
-.animate-enter {
-  animation: enter 0.3s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
-}
-
-.animate-leave {
-  animation: leave 0.3s cubic-bezier(0.06, 0.71, 0.57, 1) forwards;
-}
+/* 移除重复的动画定义，已在keyframes中定义 */
 
 /* ========== MarkdownEditor 性能优化 ========== */
 /* 为MarkdownEditor组件添加性能优化 */
@@ -1708,18 +1694,8 @@ body.eye-care.dark .text-muted-foreground,
   text-overflow: ellipsis;
 }
 
-/* Mobile table improvements */
-/* Removed duplicate overflow-x-auto definition */
-
-table {
-  font-size: 0.875rem;
-}
-
-/* Mobile tab bar improvements */
-/* Tabs component now handles all styling, removing global overrides */
-
+/* 移动端响应式优化 - 合并重复的媒体查询 */
 @media (max-width: 480px) {
-
   .sidebar-parent,
   .sidebar-child {
     font-size: 0.8rem;
@@ -1729,7 +1705,6 @@ table {
     flex-shrink: 0;
   }
 
-  /* Further mobile table improvements */
   table {
     font-size: 0.8rem;
   }
@@ -1737,8 +1712,6 @@ table {
   .page-title-sticky {
     padding: 0.5rem !important;
   }
-
-  /* Mobile tab bar improvements */
 }
 
 /* Chart legend improvements for mobile */
@@ -1748,71 +1721,51 @@ table {
   }
 }
 
-/* Ensure charts take full width */
-.chart-container {
+/* ========== 图表样式优化 ========== */
+/* 统一的图表容器样式 */
+.chart-container,
+.chart-wrapper,
+.echarts-for-react {
   width: 100% !important;
+  max-width: 100% !important;
+}
+
+.chart-container {
   height: 100% !important;
 }
 
 .chart-wrapper {
-  width: 100% !important;
   height: 100% !important;
 }
 
-/* Mobile chart improvements */
+/* 移动端图表优化 */
 @media (max-width: 768px) {
   .chart-container {
-    width: 100% !important;
     padding: 0 5px;
   }
 
   .chart-wrapper {
-    width: 100% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
   }
 
-  /* Ensure chart legends use 90% width on mobile */
   .echarts-for-react .chart-legend {
     width: 90% !important;
   }
 
-  /* Specific fix for TrendChart components */
   [data-tab-content] .chart-wrapper,
-  .tabs-content .chart-wrapper {
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
+  .tabs-content .chart-wrapper,
   [data-tab-content] .chart-container,
   .tabs-content .chart-container {
     width: 100% !important;
     max-width: 100% !important;
   }
 
-  /* Responsive chart heights */
   .min-h-\[400px\] {
     min-height: 300px !important;
   }
 
-  .h-\[500px\] {
-    height: 400px !important;
-  }
-
-  /* Ensure chart containers expand to full width */
-  
-
-  /* Remove aggressive chart width fixes */
-  /* These rules were causing charts to be off-center */
-
-  /* Force chart parent containers to full width */
-}
-
-/* Ensure charts in tabs take full width */
-
-/* Responsive chart container heights */
-@media (max-width: 768px) {
   .h-\[500px\] {
     height: 400px !important;
   }
@@ -1822,16 +1775,6 @@ table {
   .h-\[500px\] {
     height: 350px !important;
   }
-}
-
-/* Ensure chart containers expand properly */
-
-/* Chart container and wrapper rules */
-.chart-container,
-.chart-wrapper,
-.echarts-for-react {
-  width: 100% !important;
-  max-width: 100% !important;
 }
 
 /* Toast positioning within main content area */
