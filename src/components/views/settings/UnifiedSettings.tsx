@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-import { Progress } from "@/components/ui/progress";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { InlineLoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -320,7 +319,7 @@ export function UnifiedSettings({
             </div>
             <div className="w-auto">
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger className="w-auto min-w-[120px] sm:min-w-[180px] h-8 sm:h-10 text-sm">
+                <SelectTrigger className="w-auto min-w-[100px] sm:min-w-[140px] h-8 sm:h-10 text-sm">
                   <SelectValue placeholder="选择外观" className="text-sm" />
                 </SelectTrigger>
                 <SelectContent>
@@ -840,13 +839,3 @@ export function UnifiedSettings({
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-

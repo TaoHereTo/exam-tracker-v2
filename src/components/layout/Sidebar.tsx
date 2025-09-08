@@ -59,9 +59,9 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     return (
         <SidebarUI collapsible="icon" className="group" data-side="left">
             <SidebarHeader className="p-4">
-                <div className="flex items-center justify-start px-2 py-3 gap-2">
-                    <Image src="/trace.svg" alt="App Icon" className="h-7 w-7 sm:h-8 sm:w-8" width={32} height={32} />
-                    <span className="text-base sm:text-lg font-normal leading-none">
+                <div className="flex items-center justify-center px-2 py-3 gap-2">
+                    <Image src="/trace.svg" alt="App Icon" className="h-8 w-8 sm:h-9 sm:w-9" width={36} height={36} />
+                    <span className="text-lg sm:text-xl font-medium leading-none">
                         <MixedText text="行测记录" />
                     </span>
                 </div>

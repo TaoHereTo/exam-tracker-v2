@@ -68,12 +68,12 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
-                                <div className="flex items-center justify-between">
+                                <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
-                                </div>
+                                </span>
                             );
                         }
                     },
@@ -119,12 +119,12 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
-                                <div className="flex items-center justify-between">
+                                <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
-                                </div>
+                                </span>
                             );
                         }
                     },
@@ -169,12 +169,12 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
-                                <div className="flex items-center justify-between">
+                                <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
                                         <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
-                                </div>
+                                </span>
                             );
                         }
                     },
@@ -205,7 +205,31 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>发布日期</span>
                             </div>
                         ),
-                        className: 'w-24'
+                        className: 'w-24',
+                        render: (row: KnowledgeItem) => {
+                            const value = (row as Record<string, unknown>).date as string;
+                            const imagePath = (row as Record<string, unknown>).imagePath as string;
+                            if (!value || typeof value !== 'string') return '';
+                            const d = new Date(value);
+                            if (!isNaN(d.getTime())) {
+                                return (
+                                    <div className="flex items-center justify-between">
+                                        <span className="flex-1">{format(d, 'yyyy-MM-dd')}</span>
+                                        {imagePath && (
+                                            <CloudImageViewer imageId={imagePath} size="sm" />
+                                        )}
+                                    </div>
+                                );
+                            }
+                            return (
+                                <div className="flex items-center justify-between">
+                                    <span className="flex-1">{value}</span>
+                                    {imagePath && (
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
+                                    )}
+                                </div>
+                            );
+                        }
                     },
                     {
                         key: 'source',
@@ -252,7 +276,19 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>类型</span>
                             </div>
                         ),
-                        className: 'w-24'
+                        className: 'w-24',
+                        render: (row: KnowledgeItem) => {
+                            const type = (row as Record<string, unknown>).type as string;
+                            const imagePath = (row as Record<string, unknown>).imagePath as string;
+                            return (
+                                <span className="flex items-center justify-between w-full">
+                                    <MixedText text={type} className="flex-1" />
+                                    {imagePath && (
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
+                                    )}
+                                </span>
+                            );
+                        }
                     },
                     {
                         key: 'note',
@@ -299,23 +335,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
         setPage(1);
     }, [selectedModule]);
 
-    const columns = useMemo(() => getColumns(selectedModule).map(col => {
-        if (selectedModule === 'politics' && col.key === 'date') {
-            return {
-                ...col,
-                render: (row: KnowledgeItem) => {
-                    const value = (row as Record<string, unknown>)[col.key];
-                    if (!value || typeof value !== 'string') return '';
-                    const d = new Date(value);
-                    if (!isNaN(d.getTime())) {
-                        return format(d, 'yyyy-MM-dd');
-                    }
-                    return value;
-                }
-            };
-        }
-        return col;
-    }), [selectedModule]);
+    const columns = useMemo(() => getColumns(selectedModule), [selectedModule]);
 
     // Calculate module counts for hover card
     const moduleCounts = useMemo(() => {
@@ -621,4 +641,4 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     );
 };
 
-export default KnowledgeSummaryView; 
+export default KnowledgeSummaryView;
