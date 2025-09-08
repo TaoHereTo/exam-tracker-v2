@@ -518,6 +518,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                     {/* 工具栏 */}
                     <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#0A0A0A]">
                         <div className="flex items-center gap-1">
+                            {/* 格式化按钮组 - 统一样式和事件处理 */}
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button

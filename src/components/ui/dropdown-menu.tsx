@@ -88,7 +88,15 @@ const DropdownMenuItem = React.forwardRef<
     <DropdownMenuPrimitive.Item
       ref={ref}
       data-slot="dropdown-menu-item"
-      className={cn("relative flex cursor-default select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-[#404040] data-[disabled]:pointer-events-none data-[disabled]:opacity-50 text-left", className)}
+      className={cn(
+        // 基础样式 - 统一管理
+        "relative flex cursor-default select-none items-center justify-start rounded-sm px-2 py-1.5 text-sm outline-none transition-colors text-left",
+        // 交互样式 - 合并重复定义
+        "focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground dark:hover:bg-[#404040]",
+        // 禁用状态 - 统一处理
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className
+      )}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}
@@ -105,7 +113,15 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   return (
     <DropdownMenuPrimitive.CheckboxItem
       ref={ref}
-      className={cn("relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className)}
+      className={cn(
+        // 复用基础样式 - 与DropdownMenuItem保持一致
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors",
+        // 复用交互样式
+        "focus:bg-accent focus:text-accent-foreground",
+        // 复用禁用状态
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className
+      )}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}
@@ -144,7 +160,15 @@ const DropdownMenuRadioItem = React.forwardRef<
   return (
     <DropdownMenuPrimitive.RadioItem
       ref={ref}
-      className={cn("relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50", className)}
+      className={cn(
+        // 复用基础样式 - 与CheckboxItem保持一致
+        "relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none transition-colors",
+        // 复用交互样式
+        "focus:bg-accent focus:text-accent-foreground",
+        // 复用禁用状态
+        "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        className
+      )}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}

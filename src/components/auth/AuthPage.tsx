@@ -222,8 +222,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                                     <Label className="text-sm">日期</Label>
                                                     <Popover>
                                                         <PopoverTrigger asChild>
-                                                            <button 
-                                                                type="button" 
+                                                            <button
+                                                                type="button"
                                                                 className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-9 bg-white dark:bg-[#303030] mt-1"
                                                                 style={{
                                                                     transition: 'none',
@@ -243,7 +243,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                                                 mode="single"
                                                                 captionLayout="dropdown"
                                                                 selected={new Date()}
-                                                                onSelect={() => {}}
+                                                                onSelect={() => { }}
                                                                 initialFocus={false}
                                                                 locale={zhCN}
                                                             />
@@ -282,7 +282,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             titleClassName="text-yellow-600 dark:text-yellow-400"
                             descriptionClassName="text-yellow-500/80 dark:text-yellow-300/80"
                             iconClassName="text-yellow-600 dark:text-yellow-400"
-                            onCtaClick={showLoginNotification} // Changed from href to onClick
+                            onCtaClick={showLoginNotification}
                         />
                         <BentoCard
                             name="学习计划"
@@ -325,8 +325,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
                                     {/* Pie chart visualization */}
                                     <div className="absolute left-0 top-0 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="w-full h-64 relative bg-white/50 dark:bg-[#101010] backdrop-blur-md rounded-lg p-4">
-                                            <ModulePieChart 
+                                        <div className="w-full h-64 relative bg-white/50 dark:bg-[#1E1E1F] backdrop-blur-md rounded-lg p-4">
+                                            <ModulePieChart
                                                 data={[
                                                     { date: '2023-01-01', module: '资料分析', score: 1.5, duration: 25 },
                                                     { date: '2023-01-02', module: '政治理论', score: 1.2, duration: 30 },
@@ -340,7 +340,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                                     { date: '2023-01-10', module: '常识判断', score: 1.5, duration: 29 },
                                                     { date: '2023-01-11', module: '言语理解', score: 1.4, duration: 33 },
                                                     { date: '2023-01-12', module: '判断推理', score: 1.6, duration: 23 }
-                                                ]} 
+                                                ]}
                                                 showLegend={false}
                                             />
                                         </div>
@@ -370,7 +370,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                                 ]}
                                                 data={mockKnowledgeData}
                                                 selected={[]}
-                                                onSelect={() => {}}
+                                                onSelect={() => { }}
                                                 rowKey={(row) => row.id}
                                                 selectable={false}
                                                 className="text-xs bg-transparent"

@@ -262,7 +262,6 @@ export function MainApp() {
             await signOut();
             notify({
                 message: "已退出登录",
-                description: "您已成功退出登录",
                 type: "success"
             });
         } catch (error) {

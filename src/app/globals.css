@@ -266,7 +266,7 @@ th .mixed-text-part {
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #161618;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -318,7 +318,8 @@ th .mixed-text-part {
   }
 }
 
-/* ========== Utility Classes for Border Colors ========== */
+/* ========== 边框颜色工具类 ========== */
+/* 合并重复的边框样式定义 */
 .border-input-border {
   border-color: var(--input-border);
 }

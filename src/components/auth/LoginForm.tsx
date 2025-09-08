@@ -5,12 +5,13 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { Alert, AlertDescription } from '../ui/alert'
+
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { Checkbox } from '../ui/checkbox'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useNotification } from '../magicui/NotificationProvider'
 
 interface LoginFormProps {
     onSwitchToSignUp: () => void
@@ -20,30 +21,58 @@ interface LoginFormProps {
 export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginFormProps) {
     const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState('')
     const [rememberMe, setRememberMe] = useState(false)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
     const { signIn } = useAuth()
     const router = useRouter()
+    const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification()
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         setLoading(true)
-        setError('')
+
+        // Show loading toast
+        const loadingToastId = notifyLoading?.('正在登录中，请稍候...')
 
         try {
             const result = await signIn(email, password);
             if (!result.success) {
-                setError(result.error || '登录失败');
+                // Update to error toast or show error notification
+                if (loadingToastId && updateToError) {
+                    updateToError(loadingToastId, '登录失败', result.error || '请检查邮箱和密码后重试')
+                } else {
+                    notify({
+                        type: 'error',
+                        message: '登录失败',
+                        description: result.error || '请检查邮箱和密码后重试'
+                    })
+                }
             } else {
-                setError('');
+                // Update to success toast or show success notification
+                if (loadingToastId && updateToSuccess) {
+                    updateToSuccess(loadingToastId, '登录成功')
+                } else {
+                    notify({
+                        type: 'success',
+                        message: '登录成功'
+                    })
+                }
                 router.push('/');
             }
         } catch (err) {
             console.error('Unexpected error during login:', err)
-            setError('登录过程中发生错误，请稍后重试')
+            // Update to error toast or show error notification
+            if (loadingToastId && updateToError) {
+                updateToError(loadingToastId, '登录失败', '网络错误，请稍后重试')
+            } else {
+                notify({
+                    type: 'error',
+                    message: '登录失败',
+                    description: '网络错误，请稍后重试'
+                })
+            }
         } finally {
             setLoading(false)
         }
@@ -61,13 +90,6 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                    <Alert variant="destructive">
-                        <AlertDescription className="text-xs sm:text-sm">
-                            <MixedText text={error} />
-                        </AlertDescription>
-                    </Alert>
-                )}
 
                 <div className="space-y-2 mb-4">
                     <Label htmlFor="email" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">

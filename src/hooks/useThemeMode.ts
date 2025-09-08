@@ -23,7 +23,7 @@ export function useThemeMode() {
 
         return {
             background: isDarkMode
-                ? 'rgb(27, 28, 29)'
+                ? '#161618'
                 : '#F8F7F6'
         };
     };
