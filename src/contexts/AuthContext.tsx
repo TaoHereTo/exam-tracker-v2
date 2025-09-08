@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
     }, []);
 
-    const signIn = async (email: string, password: string) => {
+    const signIn = useCallback(async (email: string, password: string) => {
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
@@ -80,13 +80,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             });
 
             if (error) throw error;
-            
+
             setUser(data.user);
             return { success: true };
         } catch (error) {
             return { success: false, error: (error as Error).message };
         }
-    };
+    }, []);
 
     const signUp = useCallback(async (email: string, password: string) => {
         const { error } = await supabase.auth.signUp({

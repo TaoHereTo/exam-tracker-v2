@@ -17,7 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle } from 'lucide-react';
+import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle, Eye } from 'lucide-react';
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
@@ -330,25 +330,44 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                         {processedImages.map((image) => (
                                             <div
                                                 key={image.id}
-                                                className={`group relative cursor-pointer rounded-lg border-2 ${selectedImage === image.id
-                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                                    : 'border-gray-200 dark:border-gray-700'
+                                                className={`group relative cursor-pointer rounded-lg transition-all duration-200 ${selectedImage === image.id
+                                                    ? 'ring-4 ring-blue-500 ring-offset-4 bg-blue-50 dark:bg-blue-900/20 shadow-lg z-10 m-2'
+                                                    : 'border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                                                     }`}
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
-                                                <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden">
-                                                    <PhotoView src={image.url}>
-                                                        <Image
-                                                            src={image.url}
-                                                            alt={image.originalName}
-                                                            width={200}
-                                                            height={200}
-                                                            className="object-cover w-full h-full cursor-pointer"
-                                                            onError={() => {
-                                                                setImageLoadErrors(prev => new Set(prev).add(image.id));
-                                                            }}
-                                                        />
-                                                    </PhotoView>
+                                                <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden relative group/image">
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={image.originalName}
+                                                        width={200}
+                                                        height={200}
+                                                        className="object-cover w-full h-full"
+                                                        onError={() => {
+                                                            setImageLoadErrors(prev => new Set(prev).add(image.id));
+                                                        }}
+                                                    />
+
+                                                    {/* 预览按钮 */}
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
+                                                        <PhotoView src={image.url}>
+                                                            <Button
+                                                                type="button"
+                                                                size="sm"
+                                                                className={`h-8 px-3 text-xs ${
+                                                                    isDarkMode
+                                                                        ? 'bg-white text-black hover:bg-gray-100'
+                                                                        : 'bg-black text-white hover:bg-gray-800'
+                                                                }`}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation(); // 阻止事件冒泡，避免触发图片选择
+                                                                }}
+                                                            >
+                                                                <Eye className="h-4 w-4 mr-1" />
+                                                                <MixedText text="预览" />
+                                                            </Button>
+                                                        </PhotoView>
+                                                    </div>
                                                 </div>
 
                                                 <div className="p-2">
@@ -365,8 +384,8 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
 
                                                 {/* 选择指示器 */}
                                                 {selectedImage === image.id && (
-                                                    <div className="absolute top-2 right-2">
-                                                        <div className="bg-blue-500 rounded-full p-1">
+                                                    <div className="absolute top-2 right-2 z-20">
+                                                        <div className="bg-blue-500 rounded-full p-1 shadow-md">
                                                             <Check className="h-5 w-5 text-white" />
                                                         </div>
                                                     </div>
@@ -379,7 +398,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                             <Button
                                                                 variant="destructive"
                                                                 size="sm"
-                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 border-0"
+                                                                className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 border-0 z-20"
                                                                 onClick={(e: React.MouseEvent) => handleDeleteImage(image.id, e)}
                                                             >
                                                                 <Trash2 className="h-4 w-4" />
@@ -451,30 +470,3 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

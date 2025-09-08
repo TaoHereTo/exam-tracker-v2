@@ -1018,19 +1018,27 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                 onDragLeave={handleDragLeave}
                                 onDrop={handleDrop}
                                 onPaste={async (e) => {
-                                    e.preventDefault(); // 阻止默认粘贴行为
                                     const items = e.clipboardData?.items;
                                     if (!items) return;
 
+                                    let hasImage = false;
                                     for (let i = 0; i < items.length; i++) {
                                         const item = items[i];
                                         if (item.type.startsWith('image/')) {
                                             const file = item.getAsFile();
                                             if (file) {
+                                                e.preventDefault(); // 只在有图片时阻止默认行为
                                                 await handleFileUpload(file);
+                                                hasImage = true;
                                                 break;
                                             }
                                         }
+                                    }
+
+                                    // 如果没有图片，让浏览器处理默认的文本粘贴行为
+                                    if (!hasImage) {
+                                        // 不阻止默认行为，让浏览器正常处理文本粘贴
+                                        return;
                                     }
                                 }}
                                 placeholder={placeholder}

@@ -19,12 +19,36 @@ function parseMarkdown(content: string): React.ReactNode[] {
     let isInUnorderedList = false;
     let isInOrderedList = false;
 
+    // 处理文本中的 Markdown 语法
+    const processInlineMarkdown = (text: string): string => {
+        let processedText = text;
+
+        // 处理颜色
+        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #dc2626;">$1</span>');
+        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #3b82f6;">$1</span>');
+        processedText = processedText.replace(/\{green\}(.*?)\{\/green\}/g, '<span style="color: #10b981;">$1</span>');
+        processedText = processedText.replace(/\{orange\}(.*?)\{\/orange\}/g, '<span style="color: #f97316;">$1</span>');
+
+        // 处理粗体和斜体
+        processedText = processedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        processedText = processedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        processedText = processedText.replace(/~~(.*?)~~/g, '<del>$1</del>');
+
+        // 处理链接
+        processedText = processedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
+
+        // 处理内联代码
+        processedText = processedText.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-[#171717] px-1 py-0.5 rounded text-sm font-mono">$1</code>');
+
+        return processedText;
+    };
+
     const finishCurrentList = (index: number) => {
         if (isInUnorderedList && currentUnorderedList.length > 0) {
             elements.push(
                 <ul key={`ul-${index}`} className="list-disc mb-3 pl-5">
                     {currentUnorderedList.map((item, i) => (
-                        <li key={i} className="leading-normal pl-1">{item}</li>
+                        <li key={i} className="leading-normal pl-1" dangerouslySetInnerHTML={{ __html: processInlineMarkdown(item) }} />
                     ))}
                 </ul>
             );
@@ -35,7 +59,7 @@ function parseMarkdown(content: string): React.ReactNode[] {
             elements.push(
                 <ol key={`ol-${index}`} className="list-decimal mb-3 pl-5">
                     {currentOrderedList.map((item, i) => (
-                        <li key={i} className="leading-normal pl-1">{item}</li>
+                        <li key={i} className="leading-normal pl-1" dangerouslySetInnerHTML={{ __html: processInlineMarkdown(item) }} />
                     ))}
                 </ol>
             );
