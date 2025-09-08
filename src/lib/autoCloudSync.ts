@@ -503,19 +503,37 @@ export class AutoCloudSync {
      * 自动删除刷题历史从云端
      */
     static async autoDeleteRecord(recordId: string, notify: ExtendedNotificationContext) {
+        // Create loading notification
+        const toastId = notify.notifyLoading ? notify.notifyLoading('正在从云端删除记录...', '刷题记录正在从云端同步删除') : null;
+
         try {
             await recordService.deleteRecord(recordId);
+
+            // Update to success
+            if (toastId && notify.updateToSuccess) {
+                notify.updateToSuccess(toastId, '记录已从云端删除', '刷题记录已从云端同步删除');
+            } else {
+                notify.notify({
+                    type: 'success',
+                    message: '记录已从云端删除',
+                    description: '刷题记录已从云端同步删除'
+                });
+            }
         } catch (error) {
             // 改进错误日志，提供更详细的错误信息
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('自动删除记录从云端失败:', error);
-            
-            // Only show error notifications, not success ones
-            notify.notify({
-                type: 'error',
-                message: '云端删除失败',
-                description: `记录已从本地删除，但云端同步失败: ${errorMessage}`
-            });
+
+            // Update to error
+            if (toastId && notify.updateToError) {
+                notify.updateToError(toastId, '云端删除失败', `记录已从本地删除，但云端同步失败: ${errorMessage}`);
+            } else {
+                notify.notify({
+                    type: 'error',
+                    message: '云端删除失败',
+                    description: `记录已从本地删除，但云端同步失败: ${errorMessage}`
+                });
+            }
         }
     }
 
@@ -605,11 +623,11 @@ export class AutoCloudSync {
      */
     static async autoDeleteKnowledge(knowledgeId: string, notify: ExtendedNotificationContext) {
         // Create loading notification
-        const toastId = notify.notifyLoading ? notify.notifyLoading('正在删除知识点从云端...', '知识点正在从云端同步删除') : null;
-        
+        const toastId = notify.notifyLoading ? notify.notifyLoading('正在从云端删除知识点...', '知识点正在从云端同步删除') : null;
+
         try {
             await knowledgeService.deleteKnowledge(knowledgeId);
-            
+
             // Update to success
             if (toastId && notify.updateToSuccess) {
                 notify.updateToSuccess(toastId, '知识点已从云端删除', '知识点已从云端同步删除');

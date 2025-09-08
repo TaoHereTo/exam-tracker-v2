@@ -456,25 +456,25 @@ export function MainApp() {
     };
 
     const handleConfirmDelete = async () => {
-        const recordIds = recordsToDelete;
-        setRecords(prev => prev.filter(record => !recordsToDelete.includes(record.id)));
+        const recordIds = [...recordsToDelete]; // 创建副本以避免引用问题
+
+        // 先更新本地数据
+        setRecords(prev => prev.filter(record => !recordIds.includes(record.id)));
         setSelectedRecordIds([]); // 清空选中状态
 
         // 批量从云端删除选中的记录
         for (const id of recordIds) {
-            await AutoCloudSync.autoDeleteRecord(id, {
-                notify,
-                notifyLoading,
-                updateToSuccess,
-                updateToError
-            });
+            try {
+                await AutoCloudSync.autoDeleteRecord(id, {
+                    notify,
+                    notifyLoading,
+                    updateToSuccess,
+                    updateToError
+                });
+            } catch (error) {
+                console.error('删除记录失败:', id, error);
+            }
         }
-
-        notify({
-            message: "删除成功",
-            description: `已删除 ${recordsToDelete.length} 条刷题历史`,
-            type: "success"
-        });
 
         setDeleteDialogOpen(false);
         setRecordsToDelete([]);
