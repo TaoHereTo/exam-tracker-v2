@@ -1,4 +1,4 @@
-/* 通用按钮hover效果样式 */
+/* ========== Markdown编辑器工具栏按钮样式 ========== */
 
 /* 工具栏按钮基础样式 */
 .toolbar-button-base {
@@ -22,8 +22,6 @@
   @apply bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 shadow-md border border-green-200 dark:border-green-700;
 }
 
-
-
 /* Markdown编辑器工具栏按钮样式 */
 .md-toolbar-button-base {
   @apply h-7 w-7 p-0 border border-transparent;
@@ -37,84 +35,20 @@
   @apply h-7 w-7 p-0;
 }
 
-.md-toolbar-button-strikethrough {}
-
 .md-toolbar-button-strikethrough.active {
   @apply bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 shadow-md border-red-200 dark:border-red-700;
 }
-
-.md-toolbar-button-divider {}
 
 .md-toolbar-button-divider.active {
   @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 shadow-md border-blue-200 dark:border-blue-700;
 }
 
-.md-toolbar-button-list {}
-
-.md-toolbar-button-link {}
-
-.md-toolbar-button-preview {}
-
 .md-toolbar-button-preview.active {
   @apply bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 shadow-md border-orange-200 dark:border-orange-700;
-}
-
-.md-toolbar-button-fullscreen {}
-
-.md-toolbar-button-fullscreen.active {
-  /* Removed visual effects for fullscreen button active state */
-}
-
-/* 通用按钮hover效果 */
-.button-hover-primary {
-}
-
-/* 黑色填充按钮的hover效果 */
-.button-hover-primary[data-variant="primary"] {}
-
-.button-hover-secondary {
-}
-
-.button-hover-success {
-}
-
-/* 绿色填充按钮的hover效果 */
-.button-hover-success[style*="bg-[#15803d]"] {
-}
-
-/* 绿色outline按钮的hover效果 */
-.button-hover-success:not([style*="bg-[#15803d]"]) {
-}
-
-.button-hover-warning {
-}
-
-.button-hover-danger {
-}
-
-.button-hover-info {
-}
-
-/* 图标按钮特殊样式 */
-.icon-button-hover {
-}
-
-/* 卡片按钮样式 */
-.card-button-hover {
-}
-
-/* 取消对所有按钮的默认 hover/active 浮起与阴影效果，改为按需启用 */
-/* 原规则已移除，避免影响 Select/Date/Tab 等交互控件 */
-
-/* 特殊处理outline按钮的hover效果 */
-[variant="outline"].button-hover-info {
 }
 
 /* 修复黑色按钮的hover效果 */
 .bg-black:hover,
 .bg-gray-900:hover {
-}
-
-/* 修复主要按钮的hover效果 */
-[data-variant="primary"].button-hover-primary {
+  /* 保持原有样式 */
 }

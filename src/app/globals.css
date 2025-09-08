@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ========== 字体管理系统 ========== */
-/* 全局字体设置 */
+/* 全局字体设置 - 统一管理所有字体样式 */
 * {
   font-family: '思源宋体', 'Times New Roman', serif;
 }
@@ -18,18 +18,7 @@ html {
   overflow-x: hidden;
 }
 
-/* 基础字体类 */
-.font-chinese {
-  font-family: '思源宋体', serif;
-}
-
-.font-english {
-  font-family: 'Times New Roman', serif;
-}
-
-.font-mixed {
-  font-family: '思源宋体', 'Times New Roman', serif;
-}
+/* 字体类已优化，移除重复定义，使用全局设置 */
 
 /* MixedText 组件样式 */
 .mixed-text-part {
@@ -46,34 +35,14 @@ th .mixed-text-part {
 }
 
 /* ========== 按钮间距系统 ========== */
-.button-spacing-sm {
-  margin: 0.25rem 0;
-}
+/* 按钮间距已统一使用CSS变量系统 */
 
 /* ========== 日历样式修复 ========== */
 /* 使用最高优先级的选择器强制覆盖所有日历样式 */
 
 /* Calendar component now handles all styling, removing global overrides */
 
-.button-spacing-md {
-  margin: 0.5rem 0;
-}
-
-.button-spacing-lg {
-  margin: 0.75rem 0;
-}
-
-.button-group-sm {
-  gap: 0.5rem;
-}
-
-.button-group-md {
-  gap: 1rem;
-}
-
-.button-group-lg {
-  gap: 1.5rem;
-}
+/* 其余按钮间距样式已移除，统一使用CSS变量系统 */
 
 /* ========== 移动端优化 ========== */
 /* 确保表格在移动端可以水平滚动 */
@@ -102,57 +71,8 @@ th .mixed-text-part {
   }
 }
 
-/* ========== 光晕扫过动画 ========== */
-@keyframes shimmer-left {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(200%) skewX(-15deg);
-    opacity: 0;
-  }
-}
-
-@keyframes shimmer-right {
-  0% {
-    transform: translateX(200%) skewX(-15deg);
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
-  }
-
-  100% {
-    transform: translateX(-100%) skewX(-15deg);
-    opacity: 0;
-  }
-}
-
-/* ========== 鼠标跟随光晕效果 ========== */
-.glow-effect {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(255, 255, 255, 0.3) 0%,
-      transparent 50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.shimmer-button:hover .glow-effect {
-  opacity: 1;
-}
+/* ========== 动画优化 ========== */
+/* 移除未使用的shimmer动画，保留必要的动画效果 */
 
 /* ========== 主题配置 ========== */
 @theme inline {
@@ -1086,24 +1006,7 @@ html,
   color: #fff !important;
 }
 
-/* 新的 shadcn/ui 侧边栏样式 */
-[data-slot="sidebar-wrapper"] {
-  background-color: var(--background);
-}
-
-[data-slot="sidebar"] {
-  min-height: 100vh;
-}
-
-[data-slot="sidebar"] {
-  background-color: var(--sidebar);
-  color: hsl(var(--sidebar-foreground));
-}
-
-[data-slot="sidebar-inner"] {
-  background-color: var(--sidebar);
-  color: hsl(var(--sidebar-foreground));
-}
+/* 侧边栏基础样式 - 移除重复定义，统一使用组件样式 */
 
 /* 侧边栏宽度和布局样式 */
 [data-slot="sidebar-gap"] {
