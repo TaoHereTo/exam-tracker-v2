@@ -1695,6 +1695,8 @@ body.eye-care.dark .text-muted-foreground,
   text-overflow: ellipsis;
 }
 
+
+
 /* 移动端响应式优化 - 合并重复的媒体查询 */
 @media (max-width: 480px) {
   .sidebar-parent,

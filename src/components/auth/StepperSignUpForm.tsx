@@ -1,0 +1,582 @@
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { supabase } from '../../supabaseClient'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Alert, AlertDescription } from '../ui/alert'
+import { Mail, Lock, Eye, EyeOff, User, CheckCircle, ArrowLeft } from 'lucide-react'
+import { MixedText } from '../ui/MixedText'
+import { UiverseSpinner } from '../ui/UiverseSpinner'
+import { Stepper, Step } from '../ui/Stepper'
+import { OTPInput } from '../ui/OTPInput'
+import toast from 'react-hot-toast'
+
+interface StepperSignUpFormProps {
+    onSwitchToLogin: () => void
+}
+
+export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
+    const [email, setEmail] = useState('')
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [verificationCode, setVerificationCode] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState('')
+    const [currentStep, setCurrentStep] = useState(1)
+    const [resendCooldown, setResendCooldown] = useState(0)
+
+    // 发送验证码
+    const sendVerificationCode = async () => {
+        if (resendCooldown > 0) return
+
+        setIsLoading(true)
+        setError('')
+
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                email: email.trim(),
+                options: {
+                    shouldCreateUser: true,
+                }
+            })
+
+            if (error) {
+                setError(error.message)
+            } else {
+                toast.success('验证码已发送到您的邮箱！')
+                setResendCooldown(60) // 60秒冷却时间
+            }
+        } catch (err) {
+            setError('发送验证码失败，请稍后重试')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    // 发送验证码到邮箱
+    const sendOtpToEmail = async () => {
+        if (resendCooldown > 0) return toast.error('请稍后再试')
+
+        setIsLoading(true)
+        setError('')
+
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                email: email.trim(),
+                options: {
+                    shouldCreateUser: true,
+                }
+            })
+
+            if (error) {
+                setError(error.message)
+            } else {
+                toast.success('验证码已发送到您的邮箱！')
+                setResendCooldown(60)
+            }
+        } catch (err) {
+            setError('发送验证码失败，请稍后重试')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    // 验证验证码
+    const verifyCode = async () => {
+        if (!verificationCode.trim()) {
+            toast.error('请输入验证码')
+            return false
+        }
+
+        setIsLoading(true)
+        setError('')
+
+        try {
+            const { error } = await supabase.auth.verifyOtp({
+                email: email.trim(),
+                token: verificationCode.trim(),
+                type: 'email'
+            })
+
+            if (error) {
+                setError(error.message)
+                return false
+            } else {
+                toast.success('邮箱验证成功！')
+                return true
+            }
+        } catch (err) {
+            setError('验证失败，请检查验证码是否正确')
+            return false
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    // 密码注册
+    const handlePasswordSignUp = async () => {
+        setIsLoading(true)
+        setError('')
+
+        if (!email.trim()) {
+            setError('请输入邮箱地址')
+            setIsLoading(false)
+            return false
+        }
+
+        if (!username.trim()) {
+            setError('请输入用户名')
+            setIsLoading(false)
+            return false
+        }
+
+        if (!password.trim()) {
+            setError('请输入密码')
+            setIsLoading(false)
+            return false
+        }
+
+        if (password !== confirmPassword) {
+            setError('两次输入的密码不一致')
+            setIsLoading(false)
+            return false
+        }
+
+        if (password.length < 6) {
+            setError('密码长度至少6位')
+            setIsLoading(false)
+            return false
+        }
+
+        try {
+            const { error } = await supabase.auth.signUp({
+                email: email.trim(),
+                password: password.trim(),
+            })
+
+            if (error) {
+                setError(error.message)
+                return false
+            } else {
+                // 保存用户名到用户资料
+                try {
+                    const { UserProfileService } = await import('../../lib/userProfileService')
+                    await UserProfileService.upsertUserProfile({
+                        username: username.trim(),
+                        display_name: username.trim(),
+                        bio: null
+                    })
+                } catch (profileError) {
+                    console.error('保存用户名失败:', profileError)
+                }
+
+                setError('')
+                return true
+            }
+        } catch (err) {
+            setError('注册失败，请稍后重试')
+            return false
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleStepChange = (step: number) => {
+        setCurrentStep(step)
+        setError('')
+    }
+
+    const handleFinalStepCompleted = async () => {
+        const success = await handlePasswordSignUp()
+        if (success) {
+            // 注册成功，显示成功信息
+            setError('注册成功！请检查您的邮箱以验证账户')
+            // 清空表单
+            setEmail('')
+            setUsername('')
+            setPassword('')
+            setConfirmPassword('')
+        }
+    }
+
+    // 检查用户是否存在
+    const checkUserExists = async (email: string) => {
+        try {
+            const { data, error } = await supabase
+                .from('user_profiles')
+                .select('username')
+                .eq('user_email', email)
+                .single()
+
+            if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+                throw error
+            }
+
+            return data !== null
+        } catch (err) {
+            console.error('检查用户是否存在失败:', err)
+            return false // 如果检查失败，默认允许注册
+        }
+    }
+
+    const validateStep1 = async () => {
+        if (!email.trim()) {
+            toast.error('请输入邮箱地址')
+            return false
+        }
+
+        if (!username.trim()) {
+            toast.error('请输入用户名')
+            return false
+        }
+
+        // 检查邮箱是否已被注册
+        const userExists = await checkUserExists(email.trim())
+        if (userExists) {
+            const errorMsg = '此邮箱已被注册，请使用其他邮箱或返回登录'
+            setError(errorMsg)
+            toast.error('邮箱已被注册')
+            return false
+        }
+
+        toast.success('基本信息填写完成！')
+        return true
+    }
+
+    const validateStep2 = async () => {
+        if (!password.trim()) {
+            toast.error('请输入密码')
+            return false
+        }
+        if (password !== confirmPassword) {
+            toast.error('两次输入的密码不一致')
+            return false
+        }
+        if (password.length < 6) {
+            toast.error('密码长度至少6位')
+            return false
+        }
+
+        // 密码验证通过，直接进入下一步
+        toast.success('密码设置完成！')
+        return true
+    }
+
+    // 倒计时效果
+    useEffect(() => {
+        if (resendCooldown > 0) {
+            const timer = setTimeout(() => {
+                setResendCooldown(resendCooldown - 1)
+            }, 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [resendCooldown])
+
+    const handleNextStep = () => {
+        if (currentStep === 1 && !validateStep1()) {
+            return
+        }
+        if (currentStep === 2 && !validateStep2()) {
+            return
+        }
+        // 如果验证通过，stepper会自动处理下一步
+    }
+
+    return (
+        <div className="w-full">
+            <div className="text-left mb-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                    创建账户
+                </h2>
+            </div>
+
+            <Stepper
+                initialStep={1}
+                onStepChange={handleStepChange}
+                onFinalStepCompleted={handleFinalStepCompleted}
+                onBeforeNext={async (currentStep) => {
+                    if (currentStep === 1) {
+                        return validateStep1()
+                    } else if (currentStep === 2) {
+                        return validateStep2()
+                    } else if (currentStep === 3) {
+                        return await verifyCode()
+                    }
+                    return true
+                }}
+                backButtonText="上一步"
+                nextButtonText="下一步"
+            >
+                {/* 第一步：邮箱和用户名 */}
+                <Step>
+                    <div className="space-y-4">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                基本信息
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                请填写您的邮箱地址和用户名
+                            </p>
+                        </div>
+
+                        {error && (
+                            <Alert variant="destructive">
+                                <AlertDescription className="text-xs sm:text-sm">
+                                    <MixedText text={error} />
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="email" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                                <MixedText text="邮箱地址" />
+                            </Label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="请输入邮箱"
+                                    className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="username" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                                <MixedText text="用户名" />
+                            </Label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5" style={{zIndex: 100}} />
+                                <Input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="请输入用户名"
+                                    className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
+                                    style={{zIndex: 100}}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </Step>
+
+                {/* 第二步：密码设置 */}
+                <Step>
+                    <div className="space-y-4">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                设置密码
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                请设置您的登录密码
+                            </p>
+                        </div>
+
+                        {error && (
+                            <Alert variant="destructive">
+                                <AlertDescription className="text-xs sm:text-sm">
+                                    <MixedText text={error} />
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                                <MixedText text="密码" />
+                            </Label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                                <Input
+                                    id="password"
+                                    type={showPassword ? 'text' : 'password'}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="请输入密码"
+                                    className="pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 z-10"
+                                >
+                                    {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="confirmPassword" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                                <MixedText text="确认密码" />
+                            </Label>
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                                <Input
+                                    id="confirmPassword"
+                                    type={showConfirmPassword ? 'text' : 'password'}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder="请确认密码"
+                                    className="pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 z-10"
+                                >
+                                    {showConfirmPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </Step>
+
+                {/* 第三步：邮箱验证 */}
+                <Step>
+                    <div className="space-y-4">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                邮箱验证
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                请向 {email} 发送验证码
+                            </p>
+                        </div>
+
+                        {error && (
+                            <Alert variant="destructive">
+                                <AlertDescription className="text-xs sm:text-sm">
+                                    <MixedText text={error} />
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="text-center">
+                                {resendCooldown === 0 && !verificationCode && (
+                                    <div className="mb-6">
+                                        <Button
+                                            type="button"
+                                            onClick={sendVerificationCode}
+                                            disabled={isLoading}
+                                            className="mb-4"
+                                        >
+                                            {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> 发送中...</> : '发送验证码'}
+                                        </Button>
+                                        <p className="text-xs text-muted-foreground">
+                                            验证码将发送到您的邮箱，请稍后确认邮箱验证
+                                        </p>
+                                    </div>
+                                )}
+
+                                {(resendCooldown > 0 || verificationCode) && (
+                                    <>
+                                        <Label className="text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-4">
+                                            <MixedText text="请输入6位验证码" />
+                                        </Label>
+                                        <div className="otp-input">
+                                            <OTPInput
+                                                value={verificationCode}
+                                                onChange={setVerificationCode}
+                                                length={6}
+                                                className="mb-4"
+                                            />
+                                        </div>
+                                        <p className="text-xs text-muted-foreground mb-4">
+                                            {resendCooldown > 0
+                                                ? `${resendCooldown}秒后可重新发送验证码`
+                                                : '验证码已发送到您的邮箱，请检查收件箱或垃圾邮件文件夹'
+                                            }
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {(resendCooldown > 0 || verificationCode) && (
+                            <div className="flex justify-center">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    onClick={sendVerificationCode}
+                                    disabled={isLoading || resendCooldown > 0}
+                                    className="text-sm"
+                                >
+                                    {resendCooldown > 0 ? `${resendCooldown}s` : '重新发送验证码'}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </Step>
+
+                {/* 第四步：完成注册 */}
+                <Step>
+                    <div className="space-y-4">
+                        <div className="text-center mb-6">
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                完成注册
+                            </h3>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                确认信息并完成账户创建
+                            </p>
+                        </div>
+
+                        {error && (
+                            <Alert variant={error === '注册成功！请检查您的邮箱以验证账户' ? 'default' : 'destructive'}>
+                                <AlertDescription className="text-xs sm:text-sm">
+                                    <MixedText text={error} />
+                                </AlertDescription>
+                            </Alert>
+                        )}
+
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">邮箱地址:</span>
+                                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{email}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">用户名:</span>
+                                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{username}</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">密码:</span>
+                                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">已设置</span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">邮箱验证:</span>
+                                <span className="text-sm font-medium text-green-600 dark:text-green-400">已验证</span>
+                            </div>
+                        </div>
+
+                        <div className="text-center">
+                            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                点击"完成"按钮创建您的账户
+                            </p>
+                        </div>
+                    </div>
+                </Step>
+            </Stepper>
+
+            <div className="text-center mt-6">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    <MixedText text="已有账号？" />
+                </span>
+                <button
+                    onClick={onSwitchToLogin}
+                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 hover:text-blue-800 dark:hover:text-blue-300"
+                >
+                    <MixedText text="返回登录" />
+                </button>
+            </div>
+        </div>
+    )
+}

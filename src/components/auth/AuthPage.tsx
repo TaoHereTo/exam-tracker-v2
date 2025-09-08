@@ -1,19 +1,18 @@
 'use client'
 
-import React, { useState, useEffect, useCallback } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import React, { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { LoginForm } from './LoginForm'
-import { SignUpForm } from './SignUpForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { MagicCard } from '../magicui/magic-card'
 import { BentoGrid, BentoCard } from '../magicui/bento-grid'
 import { useThemeMode } from '@/hooks/useThemeMode'
 import { useAuth } from '@/contexts/AuthContext'
 import { useNotification } from '@/components/magicui/NotificationProvider' // Added notification import
-import { BarChart3, BookOpen, Calendar as CalendarIcon, TrendingUp, FileText, Target, BookCopy, Flower } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
+import { BarChart3, BookOpen, Calendar as CalendarIcon, BookCopy } from 'lucide-react'
+import { Card } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,12 +22,9 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TimePicker } from '@/components/ui/TimePicker'
 import { MODULES } from '@/config/exam'
-import { MixedText } from '@/components/ui/MixedText'
 import { UnifiedTable } from '@/components/ui/UnifiedTable'
 import { ModulePieChart } from '@/components/ui/ModulePieChart'
 import { AnimatedThemeToggler } from '@/components/magicui/animated-theme-toggler' // Added import for theme toggler
-import type { RecordItem } from '@/types/record'
-import { format } from 'date-fns'
 import { zhCN } from 'date-fns/locale'
 
 interface AuthPageProps {
@@ -116,26 +112,10 @@ const mockPlans = [
 ]
 
 export function AuthPage({ initialView }: AuthPageProps) {
-    const pathname = usePathname()
     const router = useRouter()
     const { user, loading } = useAuth()
     const { notify } = useNotification() // Added notification hook
     const { isDarkMode, getBackgroundStyle } = useThemeMode();
-
-    // Determine the current view based on the pathname
-    const getDefaultView = useCallback(() => {
-        if (initialView) return initialView
-        if (pathname?.includes('/signup')) return 'signup'
-        if (pathname?.includes('/forgot-password')) return 'forgot-password'
-        return 'login'
-    }, [initialView, pathname])
-
-    const [currentView, setCurrentView] = useState<'login' | 'signup' | 'forgot-password'>(getDefaultView())
-
-    // Update the view when the pathname changes
-    useEffect(() => {
-        setCurrentView(getDefaultView())
-    }, [getDefaultView])
 
     // 登录成功后跳转到主页面
     useEffect(() => {
@@ -155,8 +135,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
 
     return (
         <div className="min-h-screen flex flex-col lg:flex-row relative" style={getBackgroundStyle() as React.CSSProperties}>
-            {/* 顶部左侧应用图标和主题切换器 */}
-            <div className="absolute left-4 top-4 z-[3] inline-flex items-center gap-3">
+            {/* 顶部右侧应用图标和主题切换器 */}
+            <div className="absolute right-4 top-4 z-[50] inline-flex items-center gap-3">
                 <Link href="/" className="inline-flex items-center gap-3">
                     <Image src="/trace.svg" alt="App Icon" className="h-10 w-10 sm:h-12 sm:w-12" width={48} height={48} />
                     <span className="hidden sm:inline text-lg sm:text-xl font-semibold text-foreground/90">行测每日记录</span>
@@ -164,35 +144,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                 <AnimatedThemeToggler className="w-10 h-10" />
             </div>
 
-            {/* 左侧登录表单 */}
+            {/* 左侧功能展示 - 交换位置 */}
             <div className="flex-1 flex items-center justify-center p-4 lg:p-8 order-2 lg:order-1">
-                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
-                    <MagicCard
-                        className="rounded-xl w-full p-6 sm:p-8"
-                        gradientSize={240}
-                        gradientColor="rgba(0, 0, 0, 0.08)"
-                        gradientOpacity={0.5}
-                    >
-                        <div className="w-full">
-                            {currentView === 'login' && (
-                                <LoginForm
-                                    onSwitchToSignUp={() => setCurrentView('signup')}
-                                    onSwitchToForgotPassword={() => setCurrentView('forgot-password')}
-                                />
-                            )}
-                            {currentView === 'signup' && (
-                                <SignUpForm onSwitchToLogin={() => setCurrentView('login')} />
-                            )}
-                            {currentView === 'forgot-password' && (
-                                <ForgotPasswordForm onSwitchToLogin={() => setCurrentView('login')} />
-                            )}
-                        </div>
-                    </MagicCard>
-                </div>
-            </div>
-
-            {/* 右侧功能展示 */}
-            <div className="flex-1 flex items-center justify-center p-4 lg:p-8 order-1 lg:order-2">
                 <div className="w-full max-w-4xl">
                     <BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
                         <BentoCard
@@ -388,6 +341,30 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                     </BentoGrid>
+                </div>
+            </div>
+
+            {/* 右侧登录表单 - 交换位置 */}
+            <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8 order-1 lg:order-2">
+                {/* 卡片 - 独立元素 */}
+                <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
+                    <div className="space-y-4">
+                        {/* 根据页面URL动态显示相应表单 */}
+                        <MagicCard
+                            className="rounded-xl w-full overflow-hidden"
+                            gradientSize={240}
+                            gradientColor="rgba(0, 0, 0, 0.08)"
+                            gradientOpacity={0.5}
+                        >
+                            <div className="w-full p-6 sm:p-8">
+                                {typeof window !== 'undefined' && window.location.pathname === '/auth/forgot-password' ? (
+                                    <ForgotPasswordForm onSwitchToLogin={() => router.push('/auth/login')} />
+                                ) : (
+                                    <LoginForm />
+                                )}
+                            </div>
+                        </MagicCard>
+                    </div>
                 </div>
             </div>
         </div>

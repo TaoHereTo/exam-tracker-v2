@@ -12,33 +12,26 @@ type props = {
 
 export const AnimatedThemeToggler = ({ className }: props) => {
   const { theme, setTheme } = useTheme();
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
-  
+
   const changeTheme = async () => {
-    if (!buttonRef.current || isAnimating) return;
-    
-    setIsAnimating(true);
-    
+    if (!buttonRef.current) return;
+
     const newTheme = theme === "dark" ? "light" : "dark";
-    
+
     // 检查浏览器是否支持 View Transition API
     if (!document.startViewTransition) {
       // 如果不支持，直接切换主题
       setTheme(newTheme);
-      setTimeout(() => setIsAnimating(false), 200);
       return;
     }
-    
+
     try {
       await document.startViewTransition(() => {
-        flushSync(() => {
-          setTheme(newTheme);
-        });
+        setTheme(newTheme);
       }).ready;
 
-      const { top, left, width, height } =
-        buttonRef.current.getBoundingClientRect();
+      const { top, left, width, height } = buttonRef.current.getBoundingClientRect();
       const y = top + height / 2;
       const x = left + width / 2;
 
@@ -53,31 +46,26 @@ export const AnimatedThemeToggler = ({ className }: props) => {
           ],
         },
         {
-          duration: 400, // 减少动画时间
-          easing: "ease-out", // 使用更简单的缓动函数
+          duration: 400,
+          easing: "ease-out",
           pseudoElement: "::view-transition-new(root)",
         },
       );
-      
-      // Reset animation state after a delay
-      setTimeout(() => setIsAnimating(false), 400);
     } catch (error) {
       // 如果动画失败，直接切换主题
       console.warn('Theme transition animation failed:', error);
       setTheme(newTheme);
-      setTimeout(() => setIsAnimating(false), 200);
     }
   };
-  
+
   return (
-    <button 
-      ref={buttonRef} 
-      onClick={changeTheme} 
+    <button
+      ref={buttonRef}
+      onClick={changeTheme}
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full border border-input-border shadow-sm",
+        "flex items-center justify-center w-10 h-10 rounded-full border border-input-border shadow-sm hover:bg-accent transition-colors",
         className
       )}
-      disabled={isAnimating}
     >
       {theme === "dark" ? <SunDim className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
     </button>

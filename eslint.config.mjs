@@ -14,6 +14,8 @@ const eslintConfig = [
   {
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "react/no-unescaped-entities": "off",
       "react-hooks/exhaustive-deps": "warn" // 将错误降级为警告，因为有些依赖是有意移除的
     }
   }

@@ -6,8 +6,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Alert, AlertDescription } from '../ui/alert'
-import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react'
-
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { UiverseSpinner } from '../ui/UiverseSpinner'
 import Link from 'next/link'
@@ -25,20 +24,30 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
 
-    const signUp = async (email: string, password: string) => {
-        return await supabase.auth.signUp({
-            email,
-            password,
-        })
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    // 密码注册
+    const handlePasswordSignUp = async (e: React.FormEvent) => {
         e.preventDefault()
         setIsLoading(true)
         setError('')
-        setSuccess('')
+
+        if (!email.trim()) {
+            setError('请输入邮箱地址')
+            setIsLoading(false)
+            return
+        }
+
+        if (!username.trim()) {
+            setError('请输入用户名')
+            setIsLoading(false)
+            return
+        }
+
+        if (!password.trim()) {
+            setError('请输入密码')
+            setIsLoading(false)
+            return
+        }
 
         if (password !== confirmPassword) {
             setError('两次输入的密码不一致')
@@ -52,19 +61,41 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
             return
         }
 
-        const { error } = await signUp(email, password)
+        try {
+            const { error } = await supabase.auth.signUp({
+                email: email.trim(),
+                password: password.trim(),
+            })
 
-        if (error) {
-            setError(error.message)
-        } else {
-            setSuccess('注册成功！请检查您的邮箱以验证账户')
-            // 注册成功后清空表单数据
-            setEmail('')
-            setPassword('')
-            setConfirmPassword('')
+            if (error) {
+                setError(error.message)
+            } else {
+                // 保存用户名到用户资料
+                try {
+                    const { UserProfileService } = await import('../../lib/userProfileService')
+                    await UserProfileService.upsertUserProfile({
+                        username: username.trim(),
+                        display_name: username.trim(),
+                        bio: null
+                    })
+                } catch (profileError) {
+                    console.error('保存用户名失败:', profileError)
+                }
+
+                setError('')
+                // 显示成功消息
+                setError('注册成功！请检查您的邮箱以验证账户')
+                // 清空表单
+                setEmail('')
+                setUsername('')
+                setPassword('')
+                setConfirmPassword('')
+            }
+        } catch (err) {
+            setError('注册失败，请稍后重试')
+        } finally {
+            setIsLoading(false)
         }
-
-        setIsLoading(false)
     }
 
     return (
@@ -78,19 +109,11 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                 </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handlePasswordSignUp} className="space-y-4">
                 {error && (
-                    <Alert variant="destructive">
+                    <Alert variant={error === '注册成功！请检查您的邮箱以验证账户' ? 'default' : 'destructive'}>
                         <AlertDescription className="text-xs sm:text-sm">
                             <MixedText text={error} />
-                        </AlertDescription>
-                    </Alert>
-                )}
-
-                {success && (
-                    <Alert>
-                        <AlertDescription className="text-xs sm:text-sm">
-                            <MixedText text={success} />
                         </AlertDescription>
                     </Alert>
                 )}
@@ -139,7 +162,7 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="password"
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
@@ -164,7 +187,7 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
                         <Input
                             id="confirmPassword"
-                            type="password"
+                            type={showConfirmPassword ? 'text' : 'password'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="请确认密码"
@@ -181,26 +204,29 @@ export function SignUpForm({ onSwitchToLogin }: SignUpFormProps) {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6">
-                    <Link href="/auth/login">
-                        <Button
-                            type="button"
-                            variant="outline"
-                            className="flex items-center gap-2"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            <MixedText text="返回登录" />
-                        </Button>
-                    </Link>
+                <div className="w-full flex justify-center">
                     <Button
                         type="submit"
                         disabled={isLoading}
+                        className="w-full h-9 sm:h-10 text-sm"
                         variant="default"
                     >
                         {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> <MixedText text="注册中..." /></> : <MixedText text="注册" />}
                     </Button>
                 </div>
             </form>
+
+            <div className="text-center mt-6">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    <MixedText text="已有账号？" />
+                </span>
+                <Link
+                    href="/auth/login"
+                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1"
+                >
+                    <MixedText text="返回登录" />
+                </Link>
+            </div>
         </div>
     )
 }

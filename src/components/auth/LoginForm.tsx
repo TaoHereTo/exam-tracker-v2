@@ -5,7 +5,6 @@ import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { Checkbox } from '../ui/checkbox'
@@ -14,8 +13,8 @@ import { useRouter } from 'next/navigation'
 import { useNotification } from '../magicui/NotificationProvider'
 
 interface LoginFormProps {
-    onSwitchToSignUp: () => void
-    onSwitchToForgotPassword: () => void
+    onSwitchToSignUp?: () => void
+    onSwitchToForgotPassword?: () => void
 }
 
 export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginFormProps) {
@@ -80,7 +79,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
 
     return (
         <div className="w-full">
-            <div className="text-left mb-6 mt-0">
+            <div className="text-left mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-1">
                     <MixedText text="欢迎回来" />
                 </h2>
@@ -90,8 +89,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                     <Label htmlFor="email" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
                         <MixedText text="邮箱地址" />
                     </Label>
@@ -109,7 +107,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     </div>
                 </div>
 
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2">
                     <Label htmlFor="password" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
                         <MixedText text="密码" />
                     </Label>
@@ -135,7 +133,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                 </div>
 
                 {/* 记住我和忘记密码行 - 响应式设计 */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="rememberMe"
@@ -156,7 +154,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                 </div>
 
                 {/* 登录按钮 */}
-                <div className="w-full mb-4 flex justify-center">
+                <div className="w-full flex justify-center">
                     <Button
                         type="submit"
                         disabled={loading}
@@ -166,20 +164,20 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         <MixedText text={loading ? '登录中...' : '登录'} />
                     </Button>
                 </div>
-
-                {/* 注册链接 - 响应式设计 */}
-                <div className="text-center">
-                    <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        <MixedText text="还没有账号？" />
-                    </span>
-                    <Link
-                        href="/auth/signup"
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1"
-                    >
-                        <MixedText text="注册账号" />
-                    </Link>
-                </div>
             </form>
+
+            {/* 注册链接 - 响应式设计 */}
+            <div className="text-center mt-6">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    <MixedText text="还没有账号？" />
+                </span>
+                <Link
+                    href="/auth/signup"
+                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1"
+                >
+                    <MixedText text="注册账号" />
+                </Link>
+            </div>
         </div>
     )
 }
