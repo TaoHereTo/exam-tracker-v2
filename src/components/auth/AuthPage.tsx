@@ -120,7 +120,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
     const { isDarkMode, getBackgroundStyle } = useThemeMode();
 
     // Determine if we need to show BentoGrid based on pathname - All auth pages show BentoGrid
-    const shouldShowBentoGrid = pathname.startsWith('/auth/')
+    const shouldShowBentoGrid = pathname === '/' || pathname.startsWith('/auth/')
 
     // 登录成功后跳转到主页面
     useEffect(() => {
