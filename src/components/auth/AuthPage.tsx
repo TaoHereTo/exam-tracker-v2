@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { LoginForm } from './LoginForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
+import { StepperSignUpForm } from './StepperSignUpForm'
 import { MagicCard } from '../magicui/magic-card'
 import { BentoGrid, BentoCard } from '../magicui/bento-grid'
 import { useThemeMode } from '@/hooks/useThemeMode'
@@ -113,9 +114,13 @@ const mockPlans = [
 
 export function AuthPage({ initialView }: AuthPageProps) {
     const router = useRouter()
+    const pathname = usePathname()
     const { user, loading } = useAuth()
     const { notify } = useNotification() // Added notification hook
     const { isDarkMode, getBackgroundStyle } = useThemeMode();
+
+    // Determine if we need to show BentoGrid based on pathname - All auth pages show BentoGrid
+    const shouldShowBentoGrid = pathname.startsWith('/auth/')
 
     // 登录成功后跳转到主页面
     useEffect(() => {
@@ -145,16 +150,17 @@ export function AuthPage({ initialView }: AuthPageProps) {
             </div>
 
             {/* 左侧功能展示 - 交换位置 */}
-            <div className="flex-1 flex items-center justify-center p-4 lg:p-8 order-2 lg:order-1">
-                <div className="w-full max-w-4xl">
-                    <BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
-                        <BentoCard
+            {shouldShowBentoGrid && (
+                <div className="flex-1 flex items-center justify-center p-4 lg:p-8 order-2 lg:order-1">
+                    <div className="w-full max-w-4xl">
+                        <BentoGrid className="grid-cols-1 md:grid-cols-3 gap-4">
+                            <BentoCard
                             name="刷题记录"
                             className="col-span-1 md:col-span-2"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-lg bg-background/50">
-                                    <div className="absolute left-25 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <Card className="p-4 w-full max-w-[70%]">
+                  <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/60">
+                                    <div className="absolute left-10 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
+                                        <Card className="blur-sm group-hover:blur-none p-4 w-full max-w-[70%] transition-all duration-300 ease-out ml-8">
                                             <div className="space-y-3">
                                                 <div>
                                                     <Label className="text-sm">模块</Label>
@@ -232,20 +238,20 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={BookCopy}
                             description="快速录入和管理刷题记录"
                             cta="开始记录"
-                            titleClassName="text-yellow-600 dark:text-yellow-400"
-                            descriptionClassName="text-yellow-500/80 dark:text-yellow-300/80"
-                            iconClassName="text-yellow-600 dark:text-yellow-400"
+                            titleClassName="[color:#404040] dark:[color:#404040]"
+                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
+                            iconClassName="text-[#404040] dark:text-[#404040]"
                             onCtaClick={showLoginNotification}
                         />
                         <BentoCard
                             name="学习计划"
                             className="col-span-1"
                             background={
-                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-lg bg-background/50">
-                                    <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
+                                <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/60">
+                                    <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
                                         <div className="flex-1 space-y-3 w-full max-w-[100%]">
                                             {mockPlans.map(plan => (
-                                                <Card key={plan.id} className="p-3">
+                                            <Card key={plan.id} className="p-3 blur-sm group-hover:blur-none transition-all duration-300 ease-out">
                                                     <div className="flex justify-between items-center mb-2">
                                                         <span className="text-sm font-medium truncate">{plan.name}</span>
                                                         <span className="text-xs text-muted-foreground">{plan.progress}/{plan.target}</span>
@@ -266,9 +272,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={CalendarIcon}
                             description="制定个性化学习计划"
                             cta="制定计划"
-                            titleClassName="text-orange-600 dark:text-orange-400"
-                            descriptionClassName="text-orange-500/80 dark:text-orange-300/80"
-                            iconClassName="text-orange-600 dark:text-orange-400"
+                            titleClassName="[color:#404040] dark:[color:#404040]"
+                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
+                            iconClassName="text-[#404040] dark:text-[#404040]"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
@@ -277,8 +283,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             background={
                                 <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
                                     {/* Pie chart visualization */}
-                                    <div className="absolute left-0 top-0 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="w-full h-64 relative bg-white/50 dark:bg-[#1E1E1F] backdrop-blur-md rounded-lg p-4">
+                                    <div className="absolute left-4 top-0 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
+                                        <div className="w-full h-64 relative bg-white/50 dark:bg-[#1E1E1F] backdrop-blur-md rounded-lg p-4 ml-4 blur-sm group-hover:blur-none transition-all duration-300 ease-out">
                                             <ModulePieChart
                                                 data={[
                                                     { date: '2023-01-01', module: '资料分析', score: 1.5, duration: 25 },
@@ -301,11 +307,11 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 </div>
                             }
                             Icon={BarChart3}
-                            description="直观的图表展示学习进度和成绩趋势"
+                            description="图表展示学习趋势"
                             cta="了解更多"
-                            titleClassName="text-blue-600 dark:text-blue-400"
-                            descriptionClassName="text-blue-500/80 dark:text-blue-300/80"
-                            iconClassName="text-blue-600 dark:text-blue-400"
+                            titleClassName="[color:#404040] dark:[color:#404040]"
+                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
+                            iconClassName="text-[#404040] dark:text-[#404040]"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
@@ -313,8 +319,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             className="col-span-1 md:col-span-2"
                             background={
                                 <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
-                                    <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out [mask-image:linear-gradient(to_right,black_70%,transparent_100%)]">
-                                        <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-md border border-white/40 dark:border-white/30 rounded-lg p-2">
+                                    <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
+                                        <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-md border border-white/40 dark:border-white/30 rounded-lg p-2 blur-sm group-hover:blur-none transition-all duration-300 ease-out">
                                             <UnifiedTable
                                                 columns={[
                                                     { key: 'module', label: '模块', className: 'w-24 text-xs' },
@@ -335,14 +341,15 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={BookOpen}
                             description="便捷录入和整理知识点"
                             cta="开始使用"
-                            titleClassName="text-green-600 dark:text-green-400"
-                            descriptionClassName="text-green-500/80 dark:text-green-300/80"
-                            iconClassName="text-green-600 dark:text-green-400"
+                            titleClassName="[color:#404040] dark:[color:#404040]"
+                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
+                            iconClassName="text-[#404040] dark:text-[#404040]"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                     </BentoGrid>
                 </div>
             </div>
+            )}
 
             {/* 右侧登录表单 - 交换位置 */}
             <div className="flex-1 flex flex-col items-center justify-center p-4 lg:p-8 order-1 lg:order-2">
@@ -357,8 +364,10 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             gradientOpacity={0.5}
                         >
                             <div className="w-full p-6 sm:p-8">
-                                {typeof window !== 'undefined' && window.location.pathname === '/auth/forgot-password' ? (
+                                {pathname === '/auth/forgot-password' ? (
                                     <ForgotPasswordForm onSwitchToLogin={() => router.push('/auth/login')} />
+                                ) : pathname === '/auth/signup' ? (
+                                    <StepperSignUpForm onSwitchToLogin={() => router.push('/auth/login')} />
                                 ) : (
                                     <LoginForm />
                                 )}

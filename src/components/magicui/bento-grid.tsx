@@ -53,8 +53,8 @@ const BentoCard = ({
 }: BentoCardProps) => {
   // Determine which element to use for the CTA button
   const CtaElement = onCtaClick ? "button" : "a";
-  const ctaProps = onCtaClick 
-    ? { onClick: onCtaClick } 
+  const ctaProps = onCtaClick
+    ? { onClick: onCtaClick }
     : { href: href || "#" };
 
   return (
