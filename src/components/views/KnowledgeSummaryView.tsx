@@ -63,7 +63,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>类型</span>
                             </div>
                         ),
-                        className: 'w-24',
+                        className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
@@ -84,7 +84,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-48',
+                        className: 'w-[75%]',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
 
@@ -105,7 +105,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>推理类型</span>
                             </div>
                         ),
-                        className: 'w-20'
+                        className: 'w-[10%]'
                     },
                     {
                         key: 'type',
@@ -114,7 +114,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>类型</span>
                             </div>
                         ),
-                        className: 'w-24',
+                        className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
@@ -135,7 +135,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52',
+                        className: 'w-[55%]',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
@@ -155,7 +155,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>常识类型</span>
                             </div>
                         ),
-                        className: 'w-20'
+                        className: 'w-[10%]'
                     },
                     {
                         key: 'type',
@@ -164,7 +164,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>类型</span>
                             </div>
                         ),
-                        className: 'w-24',
+                        className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
@@ -185,7 +185,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52',
+                        className: 'w-[55%]',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
@@ -205,7 +205,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>发布日期</span>
                             </div>
                         ),
-                        className: 'w-24',
+                        className: 'w-[12%]',
                         render: (row: KnowledgeItem) => {
                             const value = (row as Record<string, unknown>).date as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
@@ -238,7 +238,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>文件来源</span>
                             </div>
                         ),
-                        className: 'w-32'
+                        className: 'w-[25%]'
                     },
                     {
                         key: 'note',
@@ -247,7 +247,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>相关重点</span>
                             </div>
                         ),
-                        className: 'w-48',
+                        className: 'w-[60%]',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
@@ -267,7 +267,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>言语类型</span>
                             </div>
                         ),
-                        className: 'w-20'
+                        className: 'w-[10%]'
                     },
                     {
                         key: 'type',
@@ -276,7 +276,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>类型</span>
                             </div>
                         ),
-                        className: 'w-24',
+                        className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
                             const imagePath = (row as Record<string, unknown>).imagePath as string;
@@ -297,7 +297,7 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                                 <span>技巧记录</span>
                             </div>
                         ),
-                        className: 'w-52',
+                        className: 'w-[55%]',
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
@@ -571,7 +571,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 selected={selectedRows}
                 onSelect={(v: string[]) => setSelectedRows(v)}
                 rowKey={(row) => row.id}
-                checkboxColClassName="w-6"
+                checkboxColClassName=""
                 filters={filters}
                 pagination={{
                     currentPage: page,

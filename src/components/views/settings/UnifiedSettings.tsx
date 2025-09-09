@@ -319,7 +319,7 @@ export function UnifiedSettings({
             </div>
             <div className="w-auto">
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger className="w-auto min-w-[100px] sm:min-w-[140px] h-8 sm:h-10 text-sm">
+                <SelectTrigger className="w-auto min-w-[80px] sm:min-w-[100px] h-8 sm:h-10 text-sm">
                   <SelectValue placeholder="选择外观" className="text-sm" />
                 </SelectTrigger>
                 <SelectContent>

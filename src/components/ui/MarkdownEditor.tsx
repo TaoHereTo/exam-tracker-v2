@@ -656,7 +656,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                                 formatText('{red}', '{/red}');
                                             }}
                                         >
-                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#dc2626' }}></div>
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#EE0000' }}></div>
                                         </Button>
                                         <Button
                                             variant="ghost"
@@ -668,7 +668,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                                 formatText('{blue}', '{/blue}');
                                             }}
                                         >
-                                            <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+                                            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#0066FF' }}></div>
                                         </Button>
                                         <Button
                                             variant="ghost"

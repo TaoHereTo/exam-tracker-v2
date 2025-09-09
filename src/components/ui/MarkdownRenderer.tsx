@@ -24,8 +24,8 @@ function parseMarkdown(content: string): React.ReactNode[] {
         let processedText = text;
 
         // 处理颜色
-        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #dc2626;">$1</span>');
-        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #3b82f6;">$1</span>');
+        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #EE0000;">$1</span>');
+        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #0066FF;">$1</span>');
         processedText = processedText.replace(/\{green\}(.*?)\{\/green\}/g, '<span style="color: #10b981;">$1</span>');
         processedText = processedText.replace(/\{orange\}(.*?)\{\/orange\}/g, '<span style="color: #f97316;">$1</span>');
 
@@ -137,8 +137,8 @@ function parseMarkdown(content: string): React.ReactNode[] {
 
         // 处理颜色
         let processedText = trimmedLine;
-        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #dc2626;">$1</span>');
-        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #3b82f6;">$1</span>');
+        processedText = processedText.replace(/\{red\}(.*?)\{\/red\}/g, '<span style="color: #EE0000;">$1</span>');
+        processedText = processedText.replace(/\{blue\}(.*?)\{\/blue\}/g, '<span style="color: #0066FF;">$1</span>');
         processedText = processedText.replace(/\{green\}(.*?)\{\/green\}/g, '<span style="color: #10b981;">$1</span>');
         processedText = processedText.replace(/\{orange\}(.*?)\{\/orange\}/g, '<span style="color: #f97316;">$1</span>');
 

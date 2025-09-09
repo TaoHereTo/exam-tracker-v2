@@ -158,19 +158,21 @@ export function UnifiedTable<T, K extends string | number = string | number>({
             <table className="min-w-full border-collapse text-sm table-fixed">
                 <thead>
                     <tr>
-                        {selectable && (
-                            <th className={`border-b px-4 py-2 text-center bg-gray-100 dark:bg-[#303030] dark:text-gray-100 ${checkboxColClassName}`}>
-                                <Checkbox
-                                    checked={allSelected}
-                                    indeterminate={indeterminate}
-                                    onCheckedChange={(checked) => {
-                                        if (checked) {
-                                            onSelect(data.map((row, idx) => rowKey(row, idx)));
-                                        } else {
-                                            onSelect([]);
-                                        }
-                                    }}
-                                />
+                                        {selectable && (
+                            <th className={`border-b px-4 py-2 text-center bg-gray-100 dark:bg-[#303030] dark:text-gray-100 w-[7%] min-w-[48px] ${checkboxColClassName}`}>
+                                <div className="flex items-center justify-center h-full py-2">
+                                    <Checkbox
+                                        checked={allSelected}
+                                        indeterminate={indeterminate}
+                                        onCheckedChange={(checked) => {
+                                            if (checked) {
+                                                onSelect(data.map((row, idx) => rowKey(row, idx)));
+                                            } else {
+                                                onSelect([]);
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </th>
                         )}
                         {columns.map(col => (
@@ -222,16 +224,18 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         >
                                             {selectable && (
                                                 <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
-                                                    <Checkbox
-                                                        checked={isSelected}
-                                                        onCheckedChange={(checked) => {
-                                                            if (checked) {
-                                                                onSelect([...selected, key]);
-                                                            } else {
-                                                                onSelect(selected.filter(id => id !== key));
-                                                            }
-                                                        }}
-                                                    />
+                                                    <div className="flex items-center justify-center h-full py-2">
+                                                        <Checkbox
+                                                            checked={isSelected}
+                                                            onCheckedChange={(checked) => {
+                                                                if (checked) {
+                                                                    onSelect([...selected, key]);
+                                                                } else {
+                                                                    onSelect(selected.filter(id => id !== key));
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </td>
                                             )}
                                             {columns.map(col => (
@@ -268,16 +272,18 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 >
                                     {selectable && (
                                         <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
-                                            <Checkbox
-                                                checked={isSelected}
-                                                onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        onSelect([...selected, key]);
-                                                    } else {
-                                                        onSelect(selected.filter(id => id !== key));
-                                                    }
-                                                }}
-                                            />
+                                            <div className="flex items-center justify-center h-full py-2">
+                                                <Checkbox
+                                                    checked={isSelected}
+                                                    onCheckedChange={(checked) => {
+                                                        if (checked) {
+                                                            onSelect([...selected, key]);
+                                                        } else {
+                                                            onSelect(selected.filter(id => id !== key));
+                                                        }
+                                                    }}
+                                                />
+                                            </div>
                                         </td>
                                     )}
                                     {columns.map(col => (
@@ -474,4 +480,4 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     } else {
         return renderTableContent();
     }
-} 
+}
