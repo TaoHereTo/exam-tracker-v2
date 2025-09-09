@@ -239,9 +239,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={BookCopy}
                             description="快速录入和管理刷题记录"
                             cta="开始记录"
-                            titleClassName="[color:#404040] dark:[color:#404040]"
-                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
-                            iconClassName="text-[#404040] dark:text-[#404040]"
+                            titleClassName="text-[#404040] dark:text-white"
+                            descriptionClassName="text-[#404040]/80 dark:text-white/60"
+                            iconClassName="text-[#404040] dark:text-white"
                             onCtaClick={showLoginNotification}
                         />
                         <BentoCard
@@ -273,9 +273,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={CalendarIcon}
                             description="制定个性化学习计划"
                             cta="制定计划"
-                            titleClassName="[color:#404040] dark:[color:#404040]"
-                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
-                            iconClassName="text-[#404040] dark:text-[#404040]"
+                            titleClassName="text-[#404040] dark:text-white"
+                            descriptionClassName="text-[#404040]/80 dark:text-white/60"
+                            iconClassName="text-[#404040] dark:text-white"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
@@ -310,9 +310,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={BarChart3}
                             description="图表展示学习趋势"
                             cta="了解更多"
-                            titleClassName="[color:#404040] dark:[color:#404040]"
-                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
-                            iconClassName="text-[#404040] dark:text-[#404040]"
+                            titleClassName="text-[#404040] dark:text-white"
+                            descriptionClassName="text-[#404040]/80 dark:text-white/60"
+                            iconClassName="text-[#404040] dark:text-white"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                         <BentoCard
@@ -342,9 +342,9 @@ export function AuthPage({ initialView }: AuthPageProps) {
                             Icon={BookOpen}
                             description="便捷录入和整理知识点"
                             cta="开始使用"
-                            titleClassName="[color:#404040] dark:[color:#404040]"
-                            descriptionClassName="[color:#40404080] dark:[color:#40404060]"
-                            iconClassName="text-[#404040] dark:text-[#404040]"
+                            titleClassName="text-[#404040] dark:text-white"
+                            descriptionClassName="text-[#404040]/80 dark:text-white/60"
+                            iconClassName="text-[#404040] dark:text-white"
                             onCtaClick={showLoginNotification} // Changed from href to onClick
                         />
                     </BentoGrid>
