@@ -26,6 +26,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     const [showPassword, setShowPassword] = useState(false)
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
+    const [validationLoading, setValidationLoading] = useState(false)
     const [error, setError] = useState('')
     const [currentStep, setCurrentStep] = useState(1)
     const [resendCooldown, setResendCooldown] = useState(0)
@@ -204,67 +205,117 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
         }
     }
 
-    // 检查用户是否存在
-    const checkUserExists = async (email: string) => {
+    // 检查用户是否存在 - 通过auth API间接检测
+    const checkUserExists = async (email: string): Promise<boolean> => {
         try {
-            const { data, error } = await supabase
-                .from('user_profiles')
-                .select('username')
-                .eq('user_email', email)
-                .single()
+            console.log('开始检查邮箱是否存在, email:', email)
 
-            if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
-                throw error
+            // 检查邮箱格式是否有效
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            const isValidEmail = emailRegex.test(email.trim())
+
+            if (!isValidEmail) {
+                toast.error('请输入有效的邮箱地址')
+                return true // 返回true阻止继续
             }
 
-            return data !== null
+            // 尝试通过登录方式检测邮箱是否已注册
+            // 如果邮箱未注册，会返回特定的错误，我们根据错误类型判断
+            try {
+                // 使用一个不可能成功的随机密码来测试登录
+                const { error } = await supabase.auth.signInWithPassword({
+                    email: email.trim(),
+                    password: 'check_if_user_exists___' + Math.random().toString(36)
+                })
+
+                if (error) {
+                    // Invalid login credentials通常意味着用户存在但密码错误
+                    if (error.message.includes('Invalid login credentials') ||
+                        error.message.includes('Email not confirmed') ||
+                        error.message.includes('Too many requests')) {
+                        console.log('邮箱已存在，用户已注册')
+                        toast.error('此邮箱已被注册，请使用其他邮箱或返回登录')
+                        return true // 用户已存在，阻止继续
+                    } else {
+                        // 其他错误（如Email rate limit等）默认认为邮箱可用
+                        console.log('邮箱检查无明确结果，允许继续:', error.message)
+                        return false
+                    }
+                } else {
+                    // 登录成功，邮箱已被注册
+                    console.log('邮箱已存在，已成功登录')
+                    toast.error('此邮箱已被注册，请使用其他邮箱或返回登录')
+                    return true
+                }
+            } catch (signInError: unknown) {
+                console.log('登录测试异常，默认认为邮箱未注册:', (signInError as Error)?.message || '未知错误')
+                return false // 默认允许注册
+            }
         } catch (err) {
-            console.error('检查用户是否存在失败:', err)
+            console.error('检查邮箱存在失败:', err)
             return false // 如果检查失败，默认允许注册
         }
     }
 
     const validateStep1 = async () => {
-        if (!email.trim()) {
-            toast.error('请输入邮箱地址')
-            return false
-        }
+        setValidationLoading(true)
 
-        if (!username.trim()) {
-            toast.error('请输入用户名')
-            return false
-        }
+        try {
+            if (!email.trim()) {
+                toast.error('请输入邮箱地址')
+                return false
+            }
 
-        // 检查邮箱是否已被注册
-        const userExists = await checkUserExists(email.trim())
-        if (userExists) {
-            const errorMsg = '此邮箱已被注册，请使用其他邮箱或返回登录'
-            setError(errorMsg)
-            toast.error('邮箱已被注册')
-            return false
-        }
+            if (!username.trim()) {
+                toast.error('请输入用户名')
+                return false
+            }
 
-        toast.success('基本信息填写完成！')
-        return true
+            // 检查邮箱是否已被注册
+            const userExists = await checkUserExists(email.trim())
+            if (userExists) {
+                const errorMsg = '此邮箱已被注册，请使用其他邮箱或返回登录'
+                setError(errorMsg)
+                // toast错误提示已在checkUserExists函数中处理，这里不重复提示
+                return false
+            }
+
+            toast.success('基本信息填写完成！')
+            return true
+        } catch (error) {
+            console.error('验证第1步失败:', error)
+            return false
+        } finally {
+            setValidationLoading(false)
+        }
     }
 
     const validateStep2 = async () => {
-        if (!password.trim()) {
-            toast.error('请输入密码')
-            return false
-        }
-        if (password !== confirmPassword) {
-            toast.error('两次输入的密码不一致')
-            return false
-        }
-        if (password.length < 6) {
-            toast.error('密码长度至少6位')
-            return false
-        }
+        setValidationLoading(true)
 
-        // 密码验证通过，直接进入下一步
-        toast.success('密码设置完成！')
-        return true
+        try {
+            if (!password.trim()) {
+                toast.error('请输入密码')
+                return false
+            }
+            if (password !== confirmPassword) {
+                toast.error('两次输入的密码不一致')
+                return false
+            }
+            if (password.length < 6) {
+                toast.error('密码长度至少6位')
+                return false
+            }
+
+            // 密码验证通过，直接进入下一步
+            toast.success('密码设置完成！')
+            return true
+        } catch (error) {
+            console.error('验证第2步失败:', error)
+            return false
+        } finally {
+            setValidationLoading(false)
+        }
     }
 
     // 倒计时效果
@@ -311,6 +362,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                 }}
                 backButtonText="上一步"
                 nextButtonText="下一步"
+                isLoading={validationLoading}
             >
                 {/* 第一步：邮箱和用户名 */}
                 <Step>

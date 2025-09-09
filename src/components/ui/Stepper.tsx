@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useLayoutEffect, Children } from 'r
 import { motion, AnimatePresence, Variants } from 'motion/react'
 import { Button } from './button'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { UiverseSpinner } from './UiverseSpinner'
 
 interface StepperProps {
   initialStep?: number
@@ -12,6 +13,7 @@ interface StepperProps {
   onBeforeNext?: (currentStep: number) => boolean | Promise<boolean>
   backButtonText?: string
   nextButtonText?: string
+  isLoading?: boolean
   children: React.ReactNode
 }
 
@@ -28,6 +30,7 @@ export function Stepper({
   onBeforeNext,
   backButtonText = '上一步',
   nextButtonText = '下一步',
+  isLoading = false,
   children
 }: StepperProps) {
   const [currentStep, setCurrentStep] = useState(initialStep)
@@ -147,7 +150,7 @@ export function Stepper({
             type="button"
             variant="outline"
             onClick={handlePrevious}
-            disabled={isFirstStep}
+            disabled={isFirstStep || isLoading}
             className="flex items-center gap-2"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -157,10 +160,22 @@ export function Stepper({
           <Button
             type="button"
             onClick={isLastStep ? handleComplete : handleNext}
+            disabled={isLoading}
             className="flex items-center gap-2 dark:bg-white dark:text-black bg-black text-white hover:bg-gray-800 dark:hover:bg-gray-200"
           >
-            {isLastStep ? '完成' : nextButtonText}
-            {!isLastStep && <ChevronRight className="w-4 h-4" />}
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <UiverseSpinner size={18} />
+                <span>验证中...</span>
+              </div>
+            ) : isLastStep ? (
+              '完成'
+            ) : (
+              <>
+                {nextButtonText}
+                <ChevronRight className="w-4 h-4" />
+              </>
+            )}
           </Button>
         </div>
       )}

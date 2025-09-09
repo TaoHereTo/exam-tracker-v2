@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { LoginForm } from './LoginForm'
 import { ForgotPasswordForm } from './ForgotPasswordForm'
 import { StepperSignUpForm } from './StepperSignUpForm'
+import { FormTransitionWrapper } from './FormTransitionWrapper'
 import { MagicCard } from '../magicui/magic-card'
 import { BentoGrid, BentoCard } from '../magicui/bento-grid'
 import { useThemeMode } from '@/hooks/useThemeMode'
@@ -357,22 +358,39 @@ export function AuthPage({ initialView }: AuthPageProps) {
                 <div className="w-full max-w-xs sm:max-w-sm md:max-w-md">
                     <div className="space-y-4">
                         {/* 根据页面URL动态显示相应表单 */}
-                        <MagicCard
-                            className="rounded-xl w-full overflow-hidden"
-                            gradientSize={240}
-                            gradientColor="rgba(0, 0, 0, 0.08)"
-                            gradientOpacity={0.5}
-                        >
-                            <div className="w-full p-6 sm:p-8">
-                                {pathname === '/auth/forgot-password' ? (
-                                    <ForgotPasswordForm onSwitchToLogin={() => router.push('/auth/login')} />
-                                ) : pathname === '/auth/signup' ? (
+                        {/* 根据页面路径选择显示对应的表单 */}
+                        {pathname === '/auth/signup' ? (
+                            // 注册页面不使用FormTransitionWrapper，避免冲突
+                            <MagicCard
+                                className="rounded-xl w-full overflow-hidden"
+                                gradientSize={240}
+                                gradientColor="rgba(0, 0, 0, 0.08)"
+                                gradientOpacity={0.5}
+                            >
+                                <div className="w-full p-6 sm:p-8">
                                     <StepperSignUpForm onSwitchToLogin={() => router.push('/auth/login')} />
-                                ) : (
-                                    <LoginForm />
-                                )}
-                            </div>
-                        </MagicCard>
+                                </div>
+                            </MagicCard>
+                        ) : (
+                            // 登录和忘记密码页面使用动画包装器
+                            <FormTransitionWrapper currentPath={pathname} className="w-full">
+                                <MagicCard
+                                    className="rounded-xl w-full overflow-visible"
+                                    gradientSize={240}
+                                    gradientColor="rgba(0, 0, 0, 0.08)"
+                                    gradientOpacity={0.5}
+                                >
+                                    <div className="w-full p-6 sm:p-8">
+                                        {pathname === '/auth/forgot-password' ? (
+                                            <ForgotPasswordForm onSwitchToLogin={() => router.push('/auth/login')} />
+                                        ) : (
+                                            // 默认显示登录表单 (包括首页 '/')
+                                            <LoginForm />
+                                        )}
+                                    </div>
+                                </MagicCard>
+                            </FormTransitionWrapper>
+                        )}
                     </div>
                 </div>
             </div>
