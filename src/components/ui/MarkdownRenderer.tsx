@@ -9,7 +9,7 @@ interface MarkdownRendererProps {
 }
 
 // 简单的 Markdown 解析函数
-function parseMarkdown(content: string): React.ReactNode[] {
+function parseMarkdown(content: string, className?: string): React.ReactNode[] {
     if (!content) return [];
 
     const lines = content.split('\n');
@@ -155,7 +155,7 @@ function parseMarkdown(content: string): React.ReactNode[] {
 
         // 创建段落元素
         elements.push(
-            <p key={`p-${index}`} className="mb-3 leading-normal"
+            <p key={`p-${index}`} className={`${className || ''} leading-normal`}
                 dangerouslySetInnerHTML={{ __html: processedText }} />
         );
     });
@@ -176,7 +176,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({
         return null;
     }
 
-    const parsedContent = parseMarkdown(content);
+    const parsedContent = parseMarkdown(content, className);
 
     return (
         <div className={`markdown-content ${className}`} data-color-mode={isDarkMode ? 'dark' : 'light'}>

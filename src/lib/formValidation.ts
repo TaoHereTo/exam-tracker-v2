@@ -31,6 +31,12 @@ export function validateField(
 ): string | null {
     // 必填验证
     if (rule.required && (!value || (typeof value === 'string' && !value.trim()))) {
+        // 如果有自定义错误消息，优先使用它
+        if (rule.custom) {
+            const customError = rule.custom(value);
+            if (customError) return customError;
+        }
+        // 默认的必填消息
         return `请填写此项`;
     }
 

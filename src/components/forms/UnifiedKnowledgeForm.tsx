@@ -11,7 +11,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import toast from 'react-hot-toast';
 
-import { ValidationSchema, validateForm, FormData } from "@/lib/formValidation";
+import { ValidationSchema, validateForm, FormData, FormErrors } from "@/lib/formValidation";
 
 import { MixedText } from "@/components/ui/MixedText";
 import type { KnowledgeItem } from "@/types/record";
@@ -179,6 +179,27 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
 
+  // 获取模块特定的字段配置
+  const getFieldConfig = () => {
+    if (module === 'verbal') {
+      const subCategory = (initialData as Record<string, unknown>)?.subCategory as string || config.subCategories?.[0] || '';
+      const isIdiomMode = subCategory === '成语积累';
+      return {
+        firstLabel: isIdiomMode ? '成语' : '类型',
+        secondLabel: isIdiomMode ? '含义' : '技巧记录',
+        firstPlaceholder: isIdiomMode ? '请输入成语' : '请输入类型...',
+        secondPlaceholder: isIdiomMode ? '请输入成语含义...' : '请输入技巧记录...'
+      };
+    }
+
+    return {
+      firstLabel: config.firstFieldLabel || '类型',
+      secondLabel: config.secondFieldLabel || '技巧记录',
+      firstPlaceholder: config.firstFieldPlaceholder || config.typePlaceholder || '请输入类型...',
+      secondPlaceholder: config.secondFieldPlaceholder || config.notePlaceholder || '请输入技巧记录...'
+    };
+  };
+
   // 构建初始数据
   const getInitialData = (): FormData => {
     const data: FormData = {};
@@ -202,47 +223,59 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
   // 验证规则
   const getValidationSchema = (module: string, config: ModuleConfig): ValidationSchema => {
+    const fieldConfig = getFieldConfig();
+    
     const schema: ValidationSchema = {
-      firstField: { required: true, minLength: 1 },
-      secondField: { required: true, minLength: 1 }
+      firstField: { 
+        required: true, 
+        minLength: 1,
+        custom: (value) => {
+          if (!value || !String(value).trim()) {
+            return `请输入${fieldConfig.firstLabel}`;
+          }
+          return null;
+        }
+      },
+      secondField: { 
+        required: true, 
+        minLength: 1,
+        custom: (value) => {
+          if (!value || !String(value).trim()) {
+            return `请输入${fieldConfig.secondLabel}`;
+          }
+          return null;
+        }
+      }
     };
 
     if (config.hasSubCategory) {
-      schema.subCategory = { required: true };
+      schema.subCategory = { 
+        required: true,
+        custom: () => '请选择子分类'
+      };
     }
 
     if (config.hasDateField) {
-      schema.date = { required: true };
+      schema.date = { 
+        required: true,
+        custom: () => '请选择日期'
+      };
     }
 
     return schema;
   };
 
   // 处理表单提交
-  const handleSubmit = (data: FormData) => {
-    // 验证必填字段
-    if (!data.firstField?.toString().trim()) {
-      toast.error('请填写第一个字段');
+  const handleSubmit = (data: FormData, errors?: FormErrors) => {
+    // 如果有验证错误，显示第一个错误的toast消息
+    if (errors && Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      toast.error(firstError);
       return;
     }
-
-    if (!data.secondField?.toString().trim()) {
-      toast.error('请填写第二个字段');
-      return;
-    }
-
+    
     const config = getModuleConfig(module);
     
-    if (config.hasSubCategory && !data.subCategory) {
-      toast.error('请选择子分类');
-      return;
-    }
-
-    if (config.hasDateField && !data.date) {
-      toast.error('请选择日期');
-      return;
-    }
-
     try {
       const knowledgeData: Partial<KnowledgeItem> = {
         module: module as 'math' | 'data-analysis' | 'logic' | 'common' | 'politics' | 'verbal',
@@ -261,7 +294,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       };
 
       onAddKnowledge(knowledgeData);
-      toast.success('知识点保存成功！');
       
       // 如果不是在对话框中，重置表单
       if (!isInDialog) {
@@ -271,27 +303,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       console.error('保存知识点失败:', error);
       toast.error('保存知识点失败，请重试');
     }
-  };
-
-  // 获取模块特定的字段配置
-  const getFieldConfig = () => {
-    if (module === 'verbal') {
-      const subCategory = (initialData as Record<string, unknown>)?.subCategory as string || config.subCategories?.[0] || '';
-      const isIdiomMode = subCategory === '成语积累';
-      return {
-        firstLabel: isIdiomMode ? '成语' : '类型',
-        secondLabel: isIdiomMode ? '含义' : '技巧记录',
-        firstPlaceholder: isIdiomMode ? '请输入成语' : '请输入类型...',
-        secondPlaceholder: isIdiomMode ? '请输入成语含义...' : '请输入技巧记录...'
-      };
-    }
-
-    return {
-      firstLabel: config.firstFieldLabel || '类型',
-      secondLabel: config.secondFieldLabel || '技巧记录',
-      firstPlaceholder: config.firstFieldPlaceholder || config.typePlaceholder || '请输入类型...',
-      secondPlaceholder: config.secondFieldPlaceholder || config.notePlaceholder || '请输入技巧记录...'
-    };
   };
 
   const fieldConfig = getFieldConfig();

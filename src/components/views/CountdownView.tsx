@@ -130,10 +130,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
         if (editId) {
             onUpdate(countdownData);
-            toast.success('考试倒计时更新成功！');
         } else {
             onCreate(countdownData);
-            toast.success('考试倒计时创建成功！');
         }
 
         handleCloseForm();
@@ -141,7 +139,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
     const handleDelete = (id: string) => {
         onDelete(id);
-        toast.success('考试倒计时删除成功！');
     };
 
     // 计算倒计时
@@ -244,10 +241,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm" margin="none">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-11 px-6 rounded-xl font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                        className="h-9 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
                         variant="default"
                     >
-                        <Plus className="w-5 h-5 mr-1" />
+                        <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="添加考试" />
                     </Button>
                 </ButtonGroup>
@@ -326,7 +323,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </Card>
                     ))
                 ) : (
-                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center bg-muted/50 rounded-2xl">
+                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center rounded-2xl">
                         <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                             <Clock className="w-8 h-8 text-muted-foreground" />
                         </div>

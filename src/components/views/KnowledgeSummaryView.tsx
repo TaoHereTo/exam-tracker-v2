@@ -89,8 +89,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                             const note = (row as Record<string, unknown>).note as string;
 
                             return (
-                                <div className="text-sm leading-relaxed">
-                                    <MarkdownRenderer content={note || ''} />
+                                <div className="text-sm leading-relaxed flex items-center h-full">
+                                    <MarkdownRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -139,8 +139,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed">
-                                    <MarkdownRenderer content={note || ''} />
+                                <div className="text-sm leading-relaxed flex items-center h-full">
+                                    <MarkdownRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -189,8 +189,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed">
-                                    <MarkdownRenderer content={note || ''} />
+                                <div className="text-sm leading-relaxed flex items-center h-full">
+                                    <MarkdownRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -251,8 +251,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed">
-                                    <MarkdownRenderer content={note || ''} />
+                                <div className="text-sm leading-relaxed flex items-center h-full">
+                                    <MarkdownRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -301,8 +301,8 @@ const getColumns = (module: string): DataTableColumn<KnowledgeItem>[] => {
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed">
-                                    <MarkdownRenderer content={note || ''} />
+                                <div className="text-sm leading-relaxed flex items-center h-full">
+                                    <MarkdownRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }

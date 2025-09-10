@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 
 // 基础表单属性
 export interface BaseFormProps {
-    onSubmit: (data: FormData) => void;
+    onSubmit: (data: FormData, errors?: FormErrors) => void;
     validationSchema?: ValidationSchema;
     children: React.ReactNode;
     className?: string;
@@ -122,14 +122,20 @@ export function BaseForm({
         if (e) e.preventDefault();
 
         // 提交前进行一次强制校验并显示每个字段的错误
-        const isValid = validateFormLocal();
-        if (!isValid) {
-            toast.error('请完善表单内容');
-            return;
-        }
-
+        const newErrors = validateForm(values, validationSchema);
+        setErrors(newErrors);
+        // 每次触发验证都递增版本，以便错误提示重新显示
+        setErrorsVersion(prev => prev + 1);
+        
+        // 总是调用onSubmit，将验证结果传递给它
         try {
-            onSubmit(values);
+            onSubmit(values, newErrors);
+
+            // 如果有验证错误，不继续处理（但已经调用了onSubmit让子组件处理错误显示）
+            if (Object.keys(newErrors).length > 0) {
+                return;
+            }
+
             // showSuccess(); // Removed per user request - only show notification on knowledge save
 
             if (resetOnSubmit) {

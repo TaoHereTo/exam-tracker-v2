@@ -335,10 +335,13 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         zIndex: 9999,
         backgroundColor: 'var(--background)', // 使用CSS变量
         padding: '20px',
+        borderRadius: '0.375rem', // Add border radius to match rounded-md
+        display: 'flex',
+        flexDirection: 'column' as const,
     } : {};
 
     // 动态计算高度
-    const dynamicHeight = isFullscreen ? 'calc(100vh - 120px)' : `${height}px`;
+    const dynamicHeight = isFullscreen ? '100%' : `${height}px`;
 
     const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newValue = e.target.value;
@@ -514,7 +517,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     return (
         <TooltipProvider>
             <div className={`w-full markdown-editor-container ${className}`} style={fullscreenStyle}>
-                <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+                <div className="border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden h-full flex flex-col">
                     {/* 工具栏 */}
                     <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-[#0A0A0A]">
                         <div className="flex items-center gap-1">
@@ -974,7 +977,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>{isFullscreen ? '退出全屏' : '全屏'}</p>
+                                    <p>{isFullscreen ? '退出全屏' : '放大'}</p>
                                 </TooltipContent>
                             </Tooltip>
                         </div>
@@ -982,7 +985,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
 
                     {/* 内容区域 */}
                     {isPreview ? (
-                        <div className="flex" style={{ height: dynamicHeight }}>
+                        <div className="flex overflow-hidden" style={{ height: dynamicHeight }}>
                             {/* 左侧编辑区域 */}
                             <div className="w-1/2 border-r border-gray-200 dark:border-gray-700 flex flex-col">
                                 <textarea
@@ -1006,7 +1009,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                             </div>
                         </div>
                     ) : (
-                        <div style={{ height: dynamicHeight }} className="flex flex-col">
+                        <div style={{ height: dynamicHeight }} className="flex flex-col overflow-hidden">
                             <textarea
                                 ref={textareaRef}
                                 value={textValue}

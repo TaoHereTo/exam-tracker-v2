@@ -19,6 +19,7 @@ import type { RecordItem } from '@/types/record';
 import { TimePicker } from '@/components/ui/TimePicker';
 import { useThemeMode } from "@/hooks/useThemeMode";
 import toast from 'react-hot-toast';
+import type { FormErrors } from '@/lib/formValidation';
 
 interface NewRecordFormProps {
     onAddRecord?: (newRecord: RecordItem) => void;
@@ -30,7 +31,14 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     const [currentMonth, setCurrentMonth] = useState<Date | undefined>(new Date());
     const { isDarkMode } = useThemeMode();
 
-    const handleSubmit = (data: Record<string, string | number | boolean | undefined>) => {
+    const handleSubmit = (data: Record<string, string | number | boolean | undefined>, errors?: FormErrors) => {
+        // 如果有验证错误，显示第一个错误的toast消息
+        if (errors && Object.keys(errors).length > 0) {
+            const firstError = Object.values(errors)[0];
+            toast.error(firstError);
+            return;
+        }
+        
         // 优先使用表单中的日期值，避免总是使用今天
         const selectedDateStr = String(data.date || '');
         const dateToFormat = selectedDateStr ? new Date(selectedDateStr) : new Date();
@@ -171,11 +179,24 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         className="form-stack"
                         validationSchema={{
                             // 顺序即校验顺序：从上到下
-                            module: { required: true },
+                            module: { 
+                                required: true,
+                                custom: (value) => {
+                                    if (value === undefined || value === null || String(value).trim() === '') return '请选择模块';
+                                    return null;
+                                }
+                            },
+                            date: {
+                                required: true,
+                                custom: (value) => {
+                                    if (value === undefined || value === null || String(value).trim() === '') return '请选择做题日期';
+                                    return null;
+                                }
+                            },
                             total: {
                                 required: true,
                                 custom: (value) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请填写此项';
+                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入总题数';
                                     const num = Number(value);
                                     if (!Number.isFinite(num) || num <= 0) return '总题数必须大于0';
                                     return null;
@@ -184,7 +205,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                             correct: {
                                 required: true,
                                 custom: (value, allValues?: Record<string, unknown>) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请填写此项';
+                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入正确题数';
                                     const num = Number(value);
                                     if (!Number.isFinite(num) || num < 0) return '正确数不能为负数';
                                     const totalRaw = allValues?.total as unknown;
@@ -196,7 +217,13 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                                     return null;
                                 }
                             },
-                            duration: { required: true }
+                            duration: { 
+                                required: true,
+                                custom: (value) => {
+                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入做题时长';
+                                    return null;
+                                }
+                            }
                         }}
                         onSubmit={handleSubmit}
                         initialData={{
