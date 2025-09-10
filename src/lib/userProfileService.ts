@@ -37,8 +37,8 @@ export class UserProfileService {
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                console.error('upsertUserProfile: 用户未登录');
-                // Return null instead of throwing to prevent crashes
+                // 在未登录状态下静默返回，避免在登出流程中造成误报
+                console.warn('upsertUserProfile: 用户未登录');
                 return null;
             }
 
@@ -150,6 +150,12 @@ export class UserProfileService {
 
             // 如果资料不存在，创建默认资料
             if (!profile) {
+                // 再次确认当前仍为登录态，避免登出时竞态触发
+                const { data: { user: currentUser } } = await supabase.auth.getUser();
+                if (!currentUser) {
+                    return null;
+                }
+
                 profile = await this.upsertUserProfile({
                     username: null,
                     display_name: null,

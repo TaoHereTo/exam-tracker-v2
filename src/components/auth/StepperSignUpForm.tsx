@@ -108,7 +108,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
         try {
             const { error } = await supabase.auth.verifyOtp({
-                email: email.trim(),
+                email: email.trim().toLowerCase(),
                 token: verificationCode.trim(),
                 type: 'email'
             })
@@ -124,10 +124,28 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                     toast.error('验证失败，请重试')
                 }
                 return false
-            } else {
-                toast.success('验证成功')
-                return true
             }
+
+            // 验证成功后，当前用户已通过 OTP 登录，立即为其设置密码
+            const normalizedPassword = password.trim()
+            if (!normalizedPassword || normalizedPassword.length < 6) {
+                toast.error('密码无效，请返回上一步重新设置密码')
+                return false
+            }
+
+            const { error: updateError } = await supabase.auth.updateUser({ password: normalizedPassword })
+            if (updateError) {
+                setError(updateError.message)
+                if (updateError.message.toLowerCase().includes('weak')) {
+                    toast.error('密码强度不够，请返回上一步重新设置')
+                } else {
+                    toast.error('设置密码失败，请重试')
+                }
+                return false
+            }
+
+            toast.success('验证成功，密码已设置')
+            return true
         } catch (err) {
             setError('验证失败，请重试')
             toast.error('验证失败，请重试')
