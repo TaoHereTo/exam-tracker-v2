@@ -11,6 +11,7 @@ import { Mail, ArrowLeft } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
 import { UiverseSpinner } from '../ui/UiverseSpinner'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 
 interface ForgotPasswordFormProps {
     onSwitchToLogin: () => void
@@ -28,18 +29,45 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
         setError('')
         setSuccess('')
 
-        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${window.location.origin}/auth?reset=true`,
-        })
-
-        if (error) {
-            setError(error.message)
-        } else {
-            setSuccess('重置密码邮件已发送，请检查您的邮箱')
-            setEmail('')
+        // Validate email field
+        if (!email.trim()) {
+            toast.error('请输入邮箱地址')
+            setIsLoading(false)
+            return
         }
 
-        setIsLoading(false)
+        try {
+            const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/auth/update-password`,
+            })
+
+            if (error) {
+                setError(error.message)
+                // Translate common Supabase error messages to Chinese
+                if (error.message.includes('rate limit') || error.message.includes('too many requests')) {
+                    toast.error('请求过于频繁，请稍后重试')
+                } else if (error.message.includes('email') && error.message.includes('invalid')) {
+                    toast.error('邮箱格式不正确')
+                } else if (error.message.includes('not found') || error.message.includes('not exist')) {
+                    // Don't show an error for non-existent emails to prevent user enumeration
+                    setSuccess('重置邮件已发送')
+                    toast.success('重置邮件已发送')
+                    setEmail('')
+                    return
+                } else {
+                    toast.error('发送失败，请稍后重试')
+                }
+            } else {
+                setSuccess('重置邮件已发送')
+                toast.success('重置邮件已发送')
+                setEmail('')
+            }
+        } catch (err) {
+            setError('发送失败，请稍后重试')
+            toast.error('发送失败，请稍后重试')
+        } finally {
+            setIsLoading(false)
+        }
     }
 
     return (
@@ -83,7 +111,7 @@ export function ForgotPasswordForm({ onSwitchToLogin }: ForgotPasswordFormProps)
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入注册邮箱"
                             className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                            required
+                            // Removed required attribute to prevent browser validation
                         />
                     </div>
                 </div>

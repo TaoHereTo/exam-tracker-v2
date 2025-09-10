@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
-import { useFormNotification } from "@/hooks/useFormNotification";
+import toast from 'react-hot-toast';
 import { validateField, validateForm, ValidationSchema, FormErrors, FormData } from "@/lib/formValidation";
 import { FormError } from "@/components/ui/form-error";
 import { Select, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
@@ -59,7 +59,6 @@ export function BaseForm({
     const [values, setValues] = useState<FormData>(initialData);
     const [errors, setErrors] = useState<FormErrors>({});
     const [errorsVersion, setErrorsVersion] = useState<number>(0);
-    const { showError, showSuccess } = useFormNotification();
     const initialDataRef = useRef(initialData);
 
     // 当初始数据变化时重置表单
@@ -125,7 +124,7 @@ export function BaseForm({
         // 提交前进行一次强制校验并显示每个字段的错误
         const isValid = validateFormLocal();
         if (!isValid) {
-            showError('请完善表单内容');
+            toast.error('请完善表单内容');
             return;
         }
 
@@ -138,7 +137,7 @@ export function BaseForm({
                 setErrors({});
             }
         } catch (error) {
-            showError(error instanceof Error ? error.message : '保存失败');
+            toast.error(error instanceof Error ? error.message : '保存失败');
         }
     };
 

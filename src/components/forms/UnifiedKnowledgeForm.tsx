@@ -9,7 +9,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
-import { useFormNotification } from "@/hooks/useFormNotification";
+import toast from 'react-hot-toast';
 
 import { ValidationSchema, validateForm, FormData } from "@/lib/formValidation";
 
@@ -178,7 +178,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   isInDialog = false
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
-  const { showError, showSuccess } = useFormNotification();
 
   // 构建初始数据
   const getInitialData = (): FormData => {
@@ -194,108 +193,87 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     }
 
     // 设置默认值
-    if (!data.firstField) data.firstField = '';
-    if (!data.secondField) data.secondField = '';
-    if (!data.subCategory && config.subCategories) data.subCategory = config.subCategories[0];
-    if (!data.date) data.date = '';
-    if (!data.imagePath) data.imagePath = '';
+    if (!data.date) {
+      data.date = format(new Date(), 'yyyy-MM-dd');
+    }
 
     return data;
   };
 
-  // 构建验证规则
-  const getValidationSchema = (): ValidationSchema => {
+  // 验证规则
+  const getValidationSchema = (module: string, config: ModuleConfig): ValidationSchema => {
     const schema: ValidationSchema = {
-      firstField: {
-        custom: (value: string | number | boolean | undefined, allValues?: Record<string, unknown>) => {
-          if (!value?.toString().trim() && !allValues?.secondField?.toString().trim()) {
-            return "请至少填写一项";
-          }
-          return null;
-        }
-      },
-      secondField: {
-        custom: (value: string | number | boolean | undefined, allValues?: Record<string, unknown>) => {
-          if (!value?.toString().trim() && !allValues?.firstField?.toString().trim()) {
-            return "请至少填写一项";
-          }
-          return null;
-        }
-      }
+      firstField: { required: true, minLength: 1 },
+      secondField: { required: true, minLength: 1 }
     };
 
-    // 为政治理论模块添加日期验证
-    if (module === 'politics') {
-      schema.date = {
-        custom: (value: string | number | boolean | undefined) => {
-          if (!value?.toString().trim()) {
-            return "请选择发布日期";
-          }
-          return null;
-        }
-      };
+    if (config.hasSubCategory) {
+      schema.subCategory = { required: true };
+    }
+
+    if (config.hasDateField) {
+      schema.date = { required: true };
     }
 
     return schema;
   };
 
   // 处理表单提交
-  const handleSubmit = (data: Record<string, unknown>) => {
-    // 根据模块构建不同的数据格式
-    let knowledgeData: Partial<KnowledgeItem> | Record<string, unknown> = {
-      imagePath: data.imagePath
-    };
-
-    switch (module) {
-      case 'verbal':
-        // 言语理解：统一使用 type/note 字段
-        knowledgeData = {
-          type: data.firstField,
-          note: data.secondField,
-          subCategory: data.subCategory as '逻辑填空' | '片段阅读' | '成语积累',
-          imagePath: data.imagePath
-        };
-        break;
-      case 'politics':
-        // 政治理论：source/note + date
-        knowledgeData = {
-          source: data.firstField,
-          note: data.secondField,
-          date: data.date,
-          imagePath: data.imagePath
-        };
-        break;
-      case 'logic':
-        // 判断推理：type/note + subCategory
-        knowledgeData = {
-          type: data.firstField,
-          note: data.secondField,
-          subCategory: data.subCategory as '图形推理' | '定义判断' | '类比推理' | '逻辑判断',
-          imagePath: data.imagePath
-        };
-        break;
-      case 'common':
-        // 常识判断：type/note + subCategory
-        knowledgeData = {
-          type: data.firstField,
-          note: data.secondField,
-          subCategory: data.subCategory as '经济常识' | '法律常识' | '科技常识' | '人文常识' | '地理国情',
-          imagePath: data.imagePath
-        };
-        break;
-      default:
-        // 其他模块：type/note
-        knowledgeData = {
-          type: data.firstField,
-          note: data.secondField,
-          imagePath: data.imagePath
-        };
+  const handleSubmit = (data: FormData) => {
+    // 验证必填字段
+    if (!data.firstField?.toString().trim()) {
+      toast.error('请填写第一个字段');
+      return;
     }
 
-    onAddKnowledge(knowledgeData);
+    if (!data.secondField?.toString().trim()) {
+      toast.error('请填写第二个字段');
+      return;
+    }
+
+    const config = getModuleConfig(module);
+    
+    if (config.hasSubCategory && !data.subCategory) {
+      toast.error('请选择子分类');
+      return;
+    }
+
+    if (config.hasDateField && !data.date) {
+      toast.error('请选择日期');
+      return;
+    }
+
+    try {
+      const knowledgeData: Partial<KnowledgeItem> = {
+        module: module as 'math' | 'data-analysis' | 'logic' | 'common' | 'politics' | 'verbal',
+        subCategory: config.hasSubCategory ? String(data.subCategory || '') as KnowledgeItem['subCategory'] : undefined,
+        date: config.hasDateField ? String(data.date || '') : undefined,
+        // 根据模块类型设置字段
+        ...(module === 'politics' 
+          ? { 
+              source: String(data.firstField || ''), 
+              note: String(data.secondField || '') 
+            }
+          : { 
+              type: String(data.firstField || ''), 
+              note: String(data.secondField || '') 
+            })
+      };
+
+      onAddKnowledge(knowledgeData);
+      toast.success('知识点保存成功！');
+      
+      // 如果不是在对话框中，重置表单
+      if (!isInDialog) {
+        // 表单重置逻辑可以在这里添加
+      }
+    } catch (error) {
+      console.error('保存知识点失败:', error);
+      toast.error('保存知识点失败，请重试');
+    }
   };
 
-  // 获取字段标签和占位符
+  // 获取模块特定的字段配置
   const getFieldConfig = () => {
     if (module === 'verbal') {
       const subCategory = (initialData as Record<string, unknown>)?.subCategory as string || config.subCategories?.[0] || '';
@@ -356,7 +334,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
             <BaseForm
               className="form-stack"
-              validationSchema={getValidationSchema()}
+              validationSchema={getValidationSchema(module, config)}
               onSubmit={handleSubmit}
               initialData={getInitialData()}
             >
@@ -427,9 +405,10 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             </CardHeader>
           )}
           <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+            {/* 非对话框模式下的表单 */}
             <BaseForm
               className="form-stack"
-              validationSchema={getValidationSchema()}
+              validationSchema={getValidationSchema(module, config)}
               onSubmit={handleSubmit}
               initialData={getInitialData()}
             >

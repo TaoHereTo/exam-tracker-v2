@@ -11,6 +11,7 @@ import { Checkbox } from '../ui/checkbox'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useNotification } from '../magicui/NotificationProvider'
+import toast from 'react-hot-toast'
 
 interface LoginFormProps {
     onSwitchToSignUp?: () => void
@@ -32,11 +33,24 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
         e.preventDefault()
         setLoading(true)
 
+        // Validate fields before submitting
+        if (!email.trim()) {
+            toast.error('请输入邮箱地址')
+            setLoading(false)
+            return
+        }
+
+        if (!password.trim()) {
+            toast.error('请输入密码')
+            setLoading(false)
+            return
+        }
+
         // Show loading toast
         const loadingToastId = notifyLoading?.('正在登录中，请稍候...')
 
         try {
-            const result = await signIn(email, password);
+            const result = await signIn(email, password)
             if (!result.success) {
                 // Update to error toast or show error notification
                 if (loadingToastId && updateToError) {
@@ -58,7 +72,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         message: '登录成功'
                     })
                 }
-                router.push('/');
+                router.push('/')
             }
         } catch (err) {
             console.error('Unexpected error during login:', err)
@@ -102,7 +116,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱"
                             className="w-full pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                            required
+                            // Removed required attribute to prevent browser validation
                         />
                     </div>
                 </div>
@@ -120,7 +134,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
                             className="w-full pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                            required
+                            // Removed required attribute to prevent browser validation
                         />
                         <button
                             type="button"

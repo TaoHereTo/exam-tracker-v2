@@ -133,10 +133,11 @@ export function OTPInput({
                         "bg-background text-foreground relative",
                         "focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none",
                         "disabled:opacity-50 disabled:cursor-not-allowed",
+                        "border-input-border", // Use the custom border class for better consistency
                         focusedIndex === index
                             ? "border-primary ring-2 ring-primary/20 z-50"
-                            : "border-input hover:border-primary/50",
-                        value[index] ? "border-primary bg-primary/5" : "border-input",
+                            : "hover:border-primary/50",
+                        value[index] ? "border-primary bg-primary/5" : "",
                         "transition-colors duration-200"
                     )}
                     style={{

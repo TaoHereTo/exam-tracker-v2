@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
+import toast from 'react-hot-toast';
 
 interface StudyPlan {
     id: string;
@@ -113,30 +114,55 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
 
         if (!form.name?.trim()) {
             newErrors.name = '计划名称不能为空';
+            toast.error('计划名称不能为空');
+            return false;
+        }
+
+        if (!form.module) {
+            newErrors.module = '请选择模块';
+            toast.error('请选择模块');
+            return false;
+        }
+
+        if (!form.type) {
+            newErrors.type = '请选择计划类型';
+            toast.error('请选择计划类型');
+            return false;
         }
 
         if (!form.startDate) {
             newErrors.startDate = '请选择开始日期';
+            toast.error('请选择开始日期');
+            return false;
         }
 
         if (!form.endDate) {
             newErrors.endDate = '请选择结束日期';
+            toast.error('请选择结束日期');
+            return false;
         }
 
-        if (form.startDate && form.endDate && new Date(form.startDate) > new Date(form.endDate)) {
-            newErrors.endDate = '结束日期不能早于开始日期';
+        if (form.startDate && form.endDate) {
+            const startDate = new Date(form.startDate);
+            const endDate = new Date(form.endDate);
+            if (startDate > endDate) {
+                newErrors.endDate = '结束日期不能早于开始日期';
+                toast.error('结束日期不能早于开始日期');
+                return false;
+            }
         }
 
-        if (!form.module) {
-            newErrors.module = '请选择板块';
+        if (!form.target) {
+            newErrors.target = '请输入目标值';
+            toast.error('请输入目标值');
+            return false;
         }
 
-        if (!form.type) {
-            newErrors.type = '请选择目标类型';
-        }
-
-        if (!form.target || form.target <= 0) {
-            newErrors.target = '目标值必须大于0';
+        const target = parseInt(form.target.toString());
+        if (isNaN(target) || target <= 0) {
+            newErrors.target = '目标值必须是大于0的数字';
+            toast.error('目标值必须是大于0的数字');
+            return false;
         }
 
         setErrors(newErrors);
@@ -162,8 +188,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
 
         if (editId) {
             onUpdate(planData);
+            toast.success('计划更新成功！');
         } else {
             onCreate(planData);
+            toast.success('计划创建成功！');
         }
 
         handleCloseForm();
@@ -171,6 +199,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
 
     const handleDelete = (id: string) => {
         onDelete(id);
+        toast.success('计划删除成功！');
     };
 
     const getProgressPercentage = (plan: StudyPlan) => {
@@ -473,7 +502,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                 name="name"
                                                 value={form.name || ''}
                                                 onChange={handleFormChange}
-                                                required
                                                 className={``}
                                             />
                                         </FormField>
@@ -563,7 +591,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                                 type="number"
                                                 value={form.target || ''}
                                                 onChange={handleFormChange}
-                                                required
                                                 className={``}
                                             />
                                         </FormField>

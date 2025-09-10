@@ -18,6 +18,7 @@ import { BaseForm, FormInput, FormSelect, useFormContext, FormField } from './Ba
 import type { RecordItem } from '@/types/record';
 import { TimePicker } from '@/components/ui/TimePicker';
 import { useThemeMode } from "@/hooks/useThemeMode";
+import toast from 'react-hot-toast';
 
 interface NewRecordFormProps {
     onAddRecord?: (newRecord: RecordItem) => void;
@@ -33,16 +34,49 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         // 优先使用表单中的日期值，避免总是使用今天
         const selectedDateStr = String(data.date || '');
         const dateToFormat = selectedDateStr ? new Date(selectedDateStr) : new Date();
+        
+        // Validate required fields
+        const moduleValue = String(data.module);
+        const total = parseInt(String(data.total));
+        const correct = parseInt(String(data.correct));
+        const duration = String(data.duration);
+
+        if (!moduleValue) {
+            toast.error('请选择模块');
+            return;
+        }
+
+        if (isNaN(total) || total <= 0) {
+            toast.error('请输入有效的总题数');
+            return;
+        }
+
+        if (isNaN(correct) || correct < 0) {
+            toast.error('请输入有效的正确题数');
+            return;
+        }
+
+        if (correct > total) {
+            toast.error('正确题数不能超过总题数');
+            return;
+        }
+
+        if (!duration) {
+            toast.error('请输入做题时长');
+            return;
+        }
+
         const newRecord: RecordItem = {
             id: generateUUID(),
             date: format(dateToFormat, 'yyyy-MM-dd'),
-            module: String(data.module) as 'data-analysis' | 'politics' | 'math' | 'common' | 'verbal' | 'logic',
-            total: parseInt(String(data.total)),
-            correct: parseInt(String(data.correct)),
-            duration: String(data.duration)
+            module: moduleValue as 'data-analysis' | 'politics' | 'math' | 'common' | 'verbal' | 'logic',
+            total: total,
+            correct: correct,
+            duration: duration
         };
 
         onAddRecord?.(newRecord);
+        toast.success('记录保存成功！');
     };
 
     // 日期字段组件

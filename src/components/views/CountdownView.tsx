@@ -17,6 +17,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar"; // Use existing calendar component
 import { cn } from "@/lib/utils";
+import toast from 'react-hot-toast';
 
 interface ExamCountdown {
     id: string;
@@ -99,10 +100,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
         if (!form.name?.trim()) {
             newErrors.name = '考试名称不能为空';
+            toast.error('考试名称不能为空');
+            return false;
         }
 
         if (!form.examDate) {
             newErrors.examDate = '请选择考试日期';
+            toast.error('请选择考试日期');
+            return false;
         }
 
         setErrors(newErrors);
@@ -125,8 +130,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
         if (editId) {
             onUpdate(countdownData);
+            toast.success('考试倒计时更新成功！');
         } else {
             onCreate(countdownData);
+            toast.success('考试倒计时创建成功！');
         }
 
         handleCloseForm();
@@ -134,6 +141,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
     const handleDelete = (id: string) => {
         onDelete(id);
+        toast.success('考试倒计时删除成功！');
     };
 
     // 计算倒计时
@@ -347,7 +355,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 name="name"
                                                 value={form.name || ''}
                                                 onChange={handleFormChange}
-                                                required
                                                 className="h-11"
                                                 placeholder="请输入考试名称"
                                             />

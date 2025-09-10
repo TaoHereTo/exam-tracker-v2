@@ -19,7 +19,6 @@ interface StepperSignUpFormProps {
 
 export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     const [email, setEmail] = useState('')
-    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [verificationCode, setVerificationCode] = useState('')
@@ -30,10 +29,32 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     const [error, setError] = useState('')
     const [currentStep, setCurrentStep] = useState(1)
     const [resendCooldown, setResendCooldown] = useState(0)
+    const [otpUIVisible, setOtpUIVisible] = useState(false)
+
+    // Reset cooldown when component mounts
+    useEffect(() => {
+        setResendCooldown(0);
+        setVerificationCode('');
+        setOtpUIVisible(false);
+    }, []); // Only run on mount
+
+    // Reset verification code when email changes
+    useEffect(() => {
+        setVerificationCode('');
+        // Only reset OTP UI visibility if we're not on step 3
+        if (currentStep !== 3) {
+            setOtpUIVisible(false);
+            // Also reset cooldown when email changes and we're not on step 3
+            setResendCooldown(0);
+        }
+    }, [email, currentStep]);
 
     // 发送验证码
     const sendVerificationCode = async () => {
-        if (resendCooldown > 0) return
+        if (resendCooldown > 0) {
+            toast.error(`请等待 ${resendCooldown} 秒后重试`);
+            return;
+        }
 
         setIsLoading(true)
         setError('')
@@ -48,44 +69,31 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
             if (error) {
                 setError(error.message)
-            } else {
-                toast.success('验证码已发送到您的邮箱！')
-                setResendCooldown(60) // 60秒冷却时间
-            }
-        } catch (err) {
-            setError('发送验证码失败，请稍后重试')
-        } finally {
-            setIsLoading(false)
-        }
-    }
-
-    // 发送验证码到邮箱
-    const sendOtpToEmail = async () => {
-        if (resendCooldown > 0) return toast.error('请稍后再试')
-
-        setIsLoading(true)
-        setError('')
-
-        try {
-            const { error } = await supabase.auth.signInWithOtp({
-                email: email.trim(),
-                options: {
-                    shouldCreateUser: true,
+                // Translate common Supabase error messages to Chinese
+                if (error.message.includes('rate limit') || error.message.includes('too many requests')) {
+                    toast.error('请求过于频繁，请稍后重试')
+                } else if (error.message.includes('email') && error.message.includes('invalid')) {
+                    toast.error('邮箱格式不正确')
+                } else {
+                    toast.error('发送失败，请稍后重试')
                 }
-            })
-
-            if (error) {
-                setError(error.message)
             } else {
-                toast.success('验证码已发送到您的邮箱！')
-                setResendCooldown(60)
+                toast.success('验证码已发送')
+                setOtpUIVisible(true)
+                // Use a small delay to ensure the UI state is properly set before starting cooldown
+                setTimeout(() => {
+                    setResendCooldown(60) // 60秒冷却时间
+                }, 50)
             }
         } catch (err) {
-            setError('发送验证码失败，请稍后重试')
+            setError('发送失败，请稍后重试')
+            toast.error('发送失败，请稍后重试')
         } finally {
             setIsLoading(false)
         }
     }
+
+
 
     // 验证验证码
     const verifyCode = async () => {
@@ -95,6 +103,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
         }
 
         setIsLoading(true)
+        setValidationLoading(true)
         setError('')
 
         try {
@@ -106,16 +115,60 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
             if (error) {
                 setError(error.message)
+                // Translate common Supabase error messages to Chinese
+                if (error.message.includes('invalid') && error.message.includes('code')) {
+                    toast.error('验证码不正确')
+                } else if (error.message.includes('expired') || error.message.includes('timeout')) {
+                    toast.error('验证码已过期，请重新发送')
+                } else {
+                    toast.error('验证失败，请重试')
+                }
                 return false
             } else {
-                toast.success('邮箱验证成功！')
+                toast.success('验证成功')
                 return true
             }
         } catch (err) {
-            setError('验证失败，请检查验证码是否正确')
+            setError('验证失败，请重试')
+            toast.error('验证失败，请重试')
             return false
         } finally {
             setIsLoading(false)
+            setValidationLoading(false)
+        }
+    }
+
+    // 检查用户是否存在 - 验证邮箱是否已被注册
+    const checkUserExists = async (email: string): Promise<boolean> => {
+        try {
+            const emailToCheck = email.trim()
+
+            // 检查邮箱格式是否有效
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            if (!emailRegex.test(emailToCheck)) {
+                toast.error('请输入有效的邮箱地址')
+                return true // 返回true阻止继续
+            }
+
+            // 调用后端 API 使用 service role 检查
+            const res = await fetch(`/api/check-email?email=${encodeURIComponent(emailToCheck)}`)
+            if (!res.ok) {
+                // Don't show error for backend unavailable to avoid confusion
+                return false
+            }
+            const data = await res.json() as { exists?: boolean; error?: string }
+            if (data?.error) {
+                // Don't show specific error details to user
+                return false
+            }
+            if (data?.exists) {
+                toast.error('此邮箱已被使用，请返回登录')
+                return true
+            }
+            return false
+        } catch (err) {
+            // Don't show network errors to user to avoid confusion
+            return false
         }
     }
 
@@ -126,61 +179,59 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
         if (!email.trim()) {
             setError('请输入邮箱地址')
-            setIsLoading(false)
-            return false
-        }
-
-        if (!username.trim()) {
-            setError('请输入用户名')
+            toast.error('请输入邮箱地址')
             setIsLoading(false)
             return false
         }
 
         if (!password.trim()) {
             setError('请输入密码')
+            toast.error('请输入密码')
             setIsLoading(false)
             return false
         }
 
         if (password !== confirmPassword) {
             setError('两次输入的密码不一致')
+            toast.error('两次输入的密码不一致')
             setIsLoading(false)
             return false
         }
 
         if (password.length < 6) {
             setError('密码长度至少6位')
+            toast.error('密码长度至少6位')
             setIsLoading(false)
             return false
         }
 
         try {
-            const { error } = await supabase.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email: email.trim(),
                 password: password.trim(),
             })
 
             if (error) {
                 setError(error.message)
+                // Check if it's a duplicate user error
+                if (error.message.includes('already') || error.message.includes('exists')) {
+                    toast.error('此邮箱已被使用，请返回登录')
+                } else if (error.message.includes('weak password')) {
+                    toast.error('密码强度不够')
+                } else if (error.message.includes('email') && error.message.includes('invalid')) {
+                    toast.error('邮箱格式不正确')
+                } else {
+                    toast.error('注册失败，请稍后重试')
+                }
                 return false
             } else {
-                // 保存用户名到用户资料
-                try {
-                    const { UserProfileService } = await import('../../lib/userProfileService')
-                    await UserProfileService.upsertUserProfile({
-                        username: username.trim(),
-                        display_name: username.trim(),
-                        bio: null
-                    })
-                } catch (profileError) {
-                    console.error('保存用户名失败:', profileError)
-                }
-
                 setError('')
+                toast.success('注册成功！请检查邮箱')
                 return true
             }
         } catch (err) {
             setError('注册失败，请稍后重试')
+            toast.error('注册失败，请稍后重试')
             return false
         } finally {
             setIsLoading(false)
@@ -190,6 +241,17 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     const handleStepChange = (step: number) => {
         setCurrentStep(step)
         setError('')
+        // Reset cooldown when entering verification step if no code has been sent and OTP UI is not visible
+        if (step === 3 && !verificationCode && !otpUIVisible) {
+            setResendCooldown(0);
+            // Don't reset otpUIVisible here as it should persist when navigating between steps
+        }
+        // Reset verification code and cooldown when leaving step 3
+        if (currentStep === 3 && step !== 3) {
+            setVerificationCode('');
+            setOtpUIVisible(false);
+            setResendCooldown(0);
+        }
     }
 
     const handleFinalStepCompleted = async () => {
@@ -199,61 +261,8 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
             setError('注册成功！请检查您的邮箱以验证账户')
             // 清空表单
             setEmail('')
-            setUsername('')
             setPassword('')
             setConfirmPassword('')
-        }
-    }
-
-    // 检查用户是否存在 - 通过auth API间接检测
-    const checkUserExists = async (email: string): Promise<boolean> => {
-        try {
-            console.log('开始检查邮箱是否存在, email:', email)
-
-            // 检查邮箱格式是否有效
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-            const isValidEmail = emailRegex.test(email.trim())
-
-            if (!isValidEmail) {
-                toast.error('请输入有效的邮箱地址')
-                return true // 返回true阻止继续
-            }
-
-            // 尝试通过登录方式检测邮箱是否已注册
-            // 如果邮箱未注册，会返回特定的错误，我们根据错误类型判断
-            try {
-                // 使用一个不可能成功的随机密码来测试登录
-                const { error } = await supabase.auth.signInWithPassword({
-                    email: email.trim(),
-                    password: 'check_if_user_exists___' + Math.random().toString(36)
-                })
-
-                if (error) {
-                    // Invalid login credentials通常意味着用户存在但密码错误
-                    if (error.message.includes('Invalid login credentials') ||
-                        error.message.includes('Email not confirmed') ||
-                        error.message.includes('Too many requests')) {
-                        console.log('邮箱已存在，用户已注册')
-                        toast.error('此邮箱已被注册，请使用其他邮箱或返回登录')
-                        return true // 用户已存在，阻止继续
-                    } else {
-                        // 其他错误（如Email rate limit等）默认认为邮箱可用
-                        console.log('邮箱检查无明确结果，允许继续:', error.message)
-                        return false
-                    }
-                } else {
-                    // 登录成功，邮箱已被注册
-                    console.log('邮箱已存在，已成功登录')
-                    toast.error('此邮箱已被注册，请使用其他邮箱或返回登录')
-                    return true
-                }
-            } catch (signInError: unknown) {
-                console.log('登录测试异常，默认认为邮箱未注册:', (signInError as Error)?.message || '未知错误')
-                return false // 默认允许注册
-            }
-        } catch (err) {
-            console.error('检查邮箱存在失败:', err)
-            return false // 如果检查失败，默认允许注册
         }
     }
 
@@ -266,24 +275,26 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                 return false
             }
 
-            if (!username.trim()) {
-                toast.error('请输入用户名')
+            // 检查邮箱格式是否有效
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+            const isValidEmail = emailRegex.test(email.trim())
+
+            if (!isValidEmail) {
+                toast.error('请输入有效的邮箱地址')
                 return false
             }
 
-            // 检查邮箱是否已被注册
-            const userExists = await checkUserExists(email.trim())
+            // 检查用户是否已经存在
+            const userExists = await checkUserExists(email)
             if (userExists) {
-                const errorMsg = '此邮箱已被注册，请使用其他邮箱或返回登录'
-                setError(errorMsg)
-                // toast错误提示已在checkUserExists函数中处理，这里不重复提示
                 return false
             }
 
-            toast.success('基本信息填写完成！')
+            // 邮箱格式有效且未被注册，可以继续
             return true
         } catch (error) {
             console.error('验证第1步失败:', error)
+            toast.error('验证失败')
             return false
         } finally {
             setValidationLoading(false)
@@ -312,6 +323,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
             return true
         } catch (error) {
             console.error('验证第2步失败:', error)
+            toast.error('验证失败')
             return false
         } finally {
             setValidationLoading(false)
@@ -320,20 +332,29 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
     // 倒计时效果
     useEffect(() => {
+        let timer: NodeJS.Timeout;
         if (resendCooldown > 0) {
-            const timer = setTimeout(() => {
+            timer = setTimeout(() => {
                 setResendCooldown(resendCooldown - 1)
             }, 1000)
-            return () => clearTimeout(timer)
+        }
+        return () => {
+            if (timer) clearTimeout(timer)
         }
     }, [resendCooldown])
 
-    const handleNextStep = () => {
-        if (currentStep === 1 && !validateStep1()) {
-            return
+    const handleNextStep = async () => {
+        if (currentStep === 1) {
+            const isValid = await validateStep1();
+            if (!isValid) {
+                return;
+            }
         }
-        if (currentStep === 2 && !validateStep2()) {
-            return
+        if (currentStep === 2) {
+            const isValid = await validateStep2();
+            if (!isValid) {
+                return;
+            }
         }
         // 如果验证通过，stepper会自动处理下一步
     }
@@ -362,7 +383,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                 }}
                 backButtonText="上一步"
                 nextButtonText="下一步"
-                isLoading={validationLoading}
+                isLoading={validationLoading || isLoading}
             >
                 {/* 第一步：邮箱和用户名 */}
                 <Step>
@@ -372,7 +393,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                 基本信息
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                请填写您的邮箱地址和用户名
+                                请填写您的邮箱地址
                             </p>
                         </div>
 
@@ -397,24 +418,6 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="请输入邮箱"
                                     className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="username" className="text-gray-700 dark:text-gray-300 text-sm sm:text-base">
-                                <MixedText text="用户名" />
-                            </Label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5" style={{zIndex: 100}} />
-                                <Input
-                                    id="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    placeholder="请输入用户名"
-                                    className="pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                                    style={{zIndex: 100}}
                                 />
                             </div>
                         </div>
@@ -499,7 +502,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                 邮箱验证
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                请向 {email} 发送验证码
+                                向 {email} 发送验证码
                             </p>
                         </div>
 
@@ -513,8 +516,8 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
 
                         <div className="space-y-4">
                             <div className="text-center">
-                                {resendCooldown === 0 && !verificationCode && (
-                                    <div className="mb-6">
+                                <div className="mb-6">
+                                    {!otpUIVisible ? (
                                         <Button
                                             type="button"
                                             onClick={sendVerificationCode}
@@ -523,46 +526,42 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                         >
                                             {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> 发送中...</> : '发送验证码'}
                                         </Button>
-                                        <p className="text-xs text-muted-foreground">
-                                            验证码将发送到您的邮箱，请稍后确认邮箱验证
-                                        </p>
-                                    </div>
-                                )}
-
-                                {(resendCooldown > 0 || verificationCode) && (
-                                    <>
-                                        <Label className="text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-4">
-                                            <MixedText text="请输入6位验证码" />
-                                        </Label>
-                                        <div className="otp-input">
-                                            <OTPInput
-                                                value={verificationCode}
-                                                onChange={setVerificationCode}
-                                                length={6}
-                                                className="mb-4"
-                                            />
-                                        </div>
-                                        <p className="text-xs text-muted-foreground mb-4">
-                                            {resendCooldown > 0
-                                                ? `${resendCooldown}秒后可重新发送验证码`
-                                                : '验证码已发送到您的邮箱，请检查收件箱或垃圾邮件文件夹'
-                                            }
-                                        </p>
-                                    </>
-                                )}
+                                    ) : (
+                                        <>
+                                            <Label className="text-gray-700 dark:text-gray-300 text-sm sm:text-base block mb-4">
+                                                <MixedText text="请输入6位验证码" />
+                                            </Label>
+                                            <div className="otp-input">
+                                                <OTPInput
+                                                    value={verificationCode}
+                                                    onChange={setVerificationCode}
+                                                    length={6}
+                                                    className="mb-4"
+                                                />
+                                            </div>
+                                        </>
+                                    )}
+                                    <p className="text-xs text-muted-foreground">
+                                        {otpUIVisible
+                                            ? (resendCooldown > 0
+                                                ? `${resendCooldown}秒后可重新发送`
+                                                : '验证码已发送，请检查邮箱')
+                                            : '点击发送验证码'}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        {(resendCooldown > 0 || verificationCode) && (
+                        {otpUIVisible && (
                             <div className="flex justify-center">
                                 <Button
                                     type="button"
                                     variant="outline"
                                     onClick={sendVerificationCode}
-                                    disabled={isLoading || resendCooldown > 0}
+                                    disabled={isLoading || resendCooldown > 0 || !otpUIVisible}
                                     className="text-sm"
                                 >
-                                    {resendCooldown > 0 ? `${resendCooldown}s` : '重新发送验证码'}
+                                    {resendCooldown > 0 ? `${resendCooldown}s` : '重新发送'}
                                 </Button>
                             </div>
                         )}
@@ -593,10 +592,6 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">邮箱地址:</span>
                                 <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{email}</span>
-                            </div>
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">用户名:</span>
-                                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{username}</span>
                             </div>
                             <div className="flex items-center justify-between">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">密码:</span>

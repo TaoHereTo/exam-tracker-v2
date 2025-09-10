@@ -111,7 +111,6 @@
 
 ## 相关代码位置
 
-- 注册验证码发送：`src/components/auth/SignUpForm.tsx`
+- 注册验证码发送：`src/components/auth/StepperSignUpForm.tsx`
 - 登录验证码发送：`src/components/auth/LoginForm.tsx`
-- 验证码验证：`src/components/auth/EmailVerificationForm.tsx`
 - 验证码输入组件：`src/components/ui/OTPInput.tsx`

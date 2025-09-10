@@ -51,7 +51,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
             console.error('加载用户资料失败:', error);
             notify({
                 type: 'error',
-                message: '加载用户资料失败',
+                message: '加载失败',
                 description: '请稍后重试'
             });
         } finally {
@@ -197,4 +197,4 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
             </DialogContent>
         </Dialog>
     );
-} 
+}
