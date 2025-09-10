@@ -63,15 +63,19 @@ export function BaseForm({
 
     // 当初始数据变化时重置表单
     useEffect(() => {
-        const currentInitialDataStr = JSON.stringify(initialDataRef.current);
-        const newInitialDataStr = JSON.stringify(initialData);
-
-        if (currentInitialDataStr !== newInitialDataStr) {
+        // 只有当initialData实际发生变化时才重置表单
+        // 使用useRef来存储前一个initialData的引用
+        const prevInitialData = initialDataRef.current;
+        
+        // 深度比较两个对象
+        const hasChanged = JSON.stringify(prevInitialData) !== JSON.stringify(initialData);
+        
+        if (hasChanged) {
             initialDataRef.current = initialData;
             setValues(initialData);
             setErrors({});
         }
-    }, [initialData]);
+    }, [JSON.stringify(initialData)]); // 使用JSON.stringify作为依赖项
 
     // 设置字段值
     const setValue = (field: string, value: string | number | boolean | undefined) => {
@@ -139,8 +143,11 @@ export function BaseForm({
             // showSuccess(); // Removed per user request - only show notification on knowledge save
 
             if (resetOnSubmit) {
-                setValues(initialData);
-                setErrors({});
+                // 使用setTimeout来避免在同一个渲染周期中设置状态
+                setTimeout(() => {
+                    setValues(initialData);
+                    setErrors({});
+                }, 0);
             }
         } catch (error) {
             toast.error(error instanceof Error ? error.message : '保存失败');

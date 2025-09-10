@@ -459,17 +459,60 @@ export function MainApp() {
         setRecords(prev => prev.filter(record => !recordIds.includes(record.id)));
         setSelectedRecordIds([]); // 清空选中状态
 
+        // 显示批量删除的加载通知
+        let toastId: string | undefined;
+        if (notifyLoading) {
+            toastId = notifyLoading('正在删除记录...', `正在从云端删除 ${recordIds.length} 条刷题历史`);
+        } else {
+            notify({
+                type: 'info',
+                message: '正在删除记录',
+                description: `正在从云端删除 ${recordIds.length} 条刷题历史`
+            });
+        }
+
+        // 统计删除成功和失败的数量
+        let successCount = 0;
+        let errorCount = 0;
+
         // 批量从云端删除选中的记录
         for (const id of recordIds) {
             try {
                 await AutoCloudSync.autoDeleteRecord(id, {
-                    notify,
-                    notifyLoading,
-                    updateToSuccess,
-                    updateToError
+                    notify: () => {}, // 完全禁用单个记录的通知
+                    notifyLoading: undefined, // 不显示单个记录的加载通知
+                    updateToSuccess: undefined, // 不更新单个记录的成功状态
+                    updateToError: undefined // 不更新单个记录的错误状态
                 });
+                successCount++;
             } catch (error) {
                 console.error('删除记录失败:', id, error);
+                errorCount++;
+            }
+        }
+
+        // 更新批量删除的最终状态
+        if (toastId && updateToSuccess && errorCount === 0) {
+            updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 条刷题历史`);
+        } else if (toastId && updateToError) {
+            if (errorCount > 0) {
+                updateToError(toastId, '删除完成', `成功删除 ${successCount} 条记录，${errorCount} 条记录删除失败`);
+            } else if (updateToSuccess) {
+                updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 条刷题历史`);
+            }
+        } else {
+            if (errorCount > 0) {
+                notify({
+                    type: 'warning',
+                    message: '删除完成',
+                    description: `成功删除 ${successCount} 条记录，${errorCount} 条记录删除失败`
+                });
+            } else {
+                notify({
+                    type: 'success',
+                    message: '删除成功',
+                    description: `已成功删除 ${successCount} 条刷题历史`
+                });
             }
         }
 

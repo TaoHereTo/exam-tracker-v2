@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -94,38 +94,42 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
         const [dateOpen, setDateOpen] = useState(false);
         const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : new Date());
+        // 使用useRef来存储date的前一个值，避免无限循环
+        const prevDateRef = useRef<Date | undefined>(undefined);
         const dateTimestamp = date?.getTime();
 
         // 当外部表单值或已选日期变化时，同步月份到已选日期
+        // 只有当date实际发生变化时才更新currentMonth
         useEffect(() => {
-            if (date) setCurrentMonth(date);
-        }, [date, dateTimestamp]);
-
-        // 设置默认日期值到表单中
-        useEffect(() => {
-            if (date) {
-                const formatted = format(date, 'yyyy-MM-dd');
-                setValue('date', formatted);
+            if (date && date.getTime() !== prevDateRef.current?.getTime()) {
+                setCurrentMonth(date);
+                prevDateRef.current = date;
             }
-        }, [date, setValue]);
+        }, [date, dateTimestamp]);
 
         const handleOpenChange = (open: boolean) => {
             if (open) {
                 // 打开时对齐到当前已选日期
                 if (date) setCurrentMonth(date);
             }
-            setDateOpen(open);
+            // 使用防抖来避免频繁的状态更新
+            setTimeout(() => {
+                setDateOpen(open);
+            }, 0);
         };
 
         return (
             <Popover open={dateOpen} onOpenChange={handleOpenChange}>
                 <PopoverTrigger asChild>
-                    <button type="button" className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]"
+                    <button 
+                        type="button" 
+                        className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]"
                         style={{
                             transition: 'none',
                             transform: 'none',
                             boxShadow: 'none'
-                        }}>
+                        }}
+                    >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-muted-foreground text-sm">选择日期</span>}
                     </button>
@@ -143,10 +147,15 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         onSelect={(d) => {
                             setDate(d);
                             const formatted = d ? format(d, 'yyyy-MM-dd') : '';
-                            setValue('date', formatted);
-                            if (errors['date']) clearError('date');
-                            // 选择日期后关闭
-                            setDateOpen(false);
+                            // 使用防抖来避免频繁的setValue调用
+                            setTimeout(() => {
+                                setValue('date', formatted);
+                                if (errors['date']) clearError('date');
+                                // 选择日期后关闭，使用setTimeout确保状态更新完成后再关闭
+                                setTimeout(() => {
+                                    setDateOpen(false);
+                                }, 0);
+                            }, 0);
                         }}
                         initialFocus={false}
                         locale={zhCN}

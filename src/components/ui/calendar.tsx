@@ -182,9 +182,16 @@ function CalendarDayButton({
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)
-  React.useEffect(() => {
-    if (modifiers.focused) ref.current?.focus()
-  }, [modifiers.focused])
+  // 使用useLayoutEffect代替useEffect，避免无限循环
+  // 只有当focused状态实际发生变化时才聚焦
+  const prevFocusedRef = React.useRef(modifiers.focused);
+  
+  React.useLayoutEffect(() => {
+    if (modifiers.focused && !prevFocusedRef.current) {
+      ref.current?.focus();
+    }
+    prevFocusedRef.current = modifiers.focused;
+  }, [modifiers.focused]);
 
   return (
     <Button

@@ -503,16 +503,17 @@ export class AutoCloudSync {
      * 自动删除刷题历史从云端
      */
     static async autoDeleteRecord(recordId: string, notify: ExtendedNotificationContext) {
-        // Create loading notification
+        // Create loading notification only if notifyLoading is provided
         const toastId = notify.notifyLoading ? notify.notifyLoading('正在从云端删除记录...', '刷题记录正在从云端同步删除') : null;
 
         try {
             await recordService.deleteRecord(recordId);
 
-            // Update to success
+            // Update to success only if updateToSuccess is provided
             if (toastId && notify.updateToSuccess) {
                 notify.updateToSuccess(toastId, '记录已从云端删除', '刷题记录已从云端同步删除');
-            } else {
+            } else if (!toastId && notify.notify) {
+                // Only show notification if no toastId was created (meaning notifyLoading was not provided)
                 notify.notify({
                     type: 'success',
                     message: '记录已从云端删除',
@@ -524,10 +525,11 @@ export class AutoCloudSync {
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error('自动删除记录从云端失败:', error);
 
-            // Update to error
+            // Update to error only if updateToError is provided
             if (toastId && notify.updateToError) {
                 notify.updateToError(toastId, '云端删除失败', `记录已从本地删除，但云端同步失败: ${errorMessage}`);
-            } else {
+            } else if (!toastId && notify.notify) {
+                // Only show notification if no toastId was created (meaning notifyLoading was not provided)
                 notify.notify({
                     type: 'error',
                     message: '云端删除失败',
@@ -542,7 +544,7 @@ export class AutoCloudSync {
      */
     static async autoDeletePlan(planId: string, notify: ExtendedNotificationContext) {
         // Create loading notification
-        const toastId = notify.notifyLoading ? notify.notifyLoading('正在删除计划从云端...', '学习计划正在从云端同步删除') : null;
+        const toastId = notify.notifyLoading ? notify.notifyLoading('正在从云端删除计划...', '学习计划正在从云端同步删除') : null;
         
         try {
             await planService.deletePlan(planId);
@@ -583,7 +585,7 @@ export class AutoCloudSync {
      */
     static async autoDeleteCountdown(countdownId: string, notify: ExtendedNotificationContext) {
         // Create loading notification
-        const toastId = notify.notifyLoading ? notify.notifyLoading('正在删除倒计时从云端...', '考试倒计时正在从云端同步删除') : null;
+        const toastId = notify.notifyLoading ? notify.notifyLoading('正在从云端删除倒计时...', '考试倒计时正在从云端同步删除') : null;
         
         try {
             await countdownService.deleteCountdown(countdownId);
