@@ -527,14 +527,51 @@ export function MainApp() {
             return filtered;
         });
 
+        // 创建批量删除的加载通知
+        const toastId = notifyLoading ? notifyLoading('正在从云端删除知识点...', `正在删除 ${ids.length} 个知识点`) : null;
+
+        let successCount = 0;
+        let errorCount = 0;
+
         // 批量从云端删除，只删除UUID格式的ID（新格式）
         for (const id of ids) {
             if (isUUID(id)) {
-                await AutoCloudSync.autoDeleteKnowledge(id, {
-                    notify,
-                    notifyLoading,
-                    updateToSuccess,
-                    updateToError
+                try {
+                    await AutoCloudSync.autoDeleteKnowledge(id, {
+                        notify: () => {}, // 禁用单个通知
+                        notifyLoading: undefined, // 不显示单个加载通知
+                        updateToSuccess: undefined, // 不更新单个成功状态
+                        updateToError: undefined // 不更新单个错误状态
+                    });
+                    successCount++;
+                } catch (error) {
+                    console.error('删除知识点失败:', id, error);
+                    errorCount++;
+                }
+            }
+        }
+
+        // 更新批量删除的最终状态
+        if (toastId && updateToSuccess && errorCount === 0) {
+            updateToSuccess(toastId, '知识点删除成功', `已成功删除 ${successCount} 个知识点`);
+        } else if (toastId && updateToError) {
+            if (errorCount > 0) {
+                updateToError(toastId, '删除完成', `成功删除 ${successCount} 个知识点，${errorCount} 个知识点删除失败`);
+            } else if (updateToSuccess) {
+                updateToSuccess(toastId, '知识点删除成功', `已成功删除 ${successCount} 个知识点`);
+            }
+        } else {
+            if (errorCount > 0) {
+                notify({
+                    type: 'warning',
+                    message: '删除完成',
+                    description: `成功删除 ${successCount} 个知识点，${errorCount} 个知识点删除失败`
+                });
+            } else {
+                notify({
+                    type: 'success',
+                    message: '知识点删除成功',
+                    description: `已成功删除 ${successCount} 个知识点`
                 });
             }
         }
