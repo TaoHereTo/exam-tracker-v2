@@ -4,7 +4,6 @@ export interface UserProfile {
     user_id: string;
     username?: string;
     email?: string;
-    display_name?: string;
     bio?: string;
     created_at: string;
     updated_at: string;
@@ -13,7 +12,6 @@ export interface UserProfile {
 export interface UserProfileInput {
     username?: string | null;
     email?: string | null;
-    display_name?: string | null;
     bio?: string | null;
 }
 
@@ -65,4 +63,4 @@ export const AVATAR_CATEGORIES: Record<string, AvatarCategory> = {
 };
 
 // 兼容旧版本
-export const DEFAULT_AVATARS: AvatarOption[] = AVATAR_CATEGORIES.cool.avatars.slice(0, 6); 
+export const DEFAULT_AVATARS: AvatarOption[] = AVATAR_CATEGORIES.cool.avatars.slice(0, 6);

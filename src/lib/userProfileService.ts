@@ -65,8 +65,6 @@ export class UserProfileService {
                     // 唯一约束冲突
                     if (error.message.includes('username')) {
                         throw new Error('用户名已被其他用户使用，请选择其他用户名');
-                    } else if (error.message.includes('display_name')) {
-                        throw new Error('显示名称已被其他用户使用，请选择其他显示名称');
                     } else if (error.message.includes('email')) {
                         throw new Error('邮箱已被其他用户使用');
                     } else {
@@ -158,7 +156,6 @@ export class UserProfileService {
 
                 profile = await this.upsertUserProfile({
                     username: null,
-                    display_name: null,
                     bio: null
                 });
 
@@ -194,7 +191,6 @@ export class UserProfileService {
                     user_id: user.id,
                     email: user.email,
                     username: null,
-                    display_name: null,
                     bio: null
                 })
                 .select()
@@ -207,7 +203,7 @@ export class UserProfileService {
 
             return data;
         } catch (error) {
-            console.error('创建用户资料失败:', error);
+            console.error('创建用户资料时出错:', error);
             return null;
         }
     }

@@ -291,8 +291,7 @@ export function MainApp() {
         }
 
         const getInitials = () => {
-            const displayName = ('display_name' in userInfo && userInfo.display_name) || 
-                              ('username' in userInfo && userInfo.username) || 
+            const displayName = ('username' in userInfo && userInfo.username) || 
                               userInfo.email || 
                               'U';
             return displayName.charAt(0).toUpperCase();
@@ -300,8 +299,7 @@ export function MainApp() {
 
         // 获取用户名显示文本
         const getDisplayName = () => {
-            return ('display_name' in userInfo && userInfo.display_name) || 
-                   ('username' in userInfo && userInfo.username) || 
+            return ('username' in userInfo && userInfo.username) || 
                    userInfo.email || 
                    '用户';
         };

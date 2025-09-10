@@ -25,7 +25,6 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         username: '',
-        displayName: '',
         motto: ''
     });
 
@@ -43,7 +42,6 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
             if (userProfile) {
                 setFormData({
                     username: userProfile.username || '',
-                    displayName: userProfile.display_name || '',
                     motto: userProfile.bio || ''
                 });
             }
@@ -71,7 +69,6 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
             setLoading(true);
             await UserProfileService.upsertUserProfile({
                 username: formData.username,
-                display_name: formData.displayName,
                 bio: formData.motto
             });
 
@@ -95,13 +92,8 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
         }
     };
 
-
-
     // 获取显示名称
     const getDisplayName = () => {
-        if (profile?.display_name) {
-            return profile.display_name;
-        }
         if (profile?.username) {
             return profile.username;
         }
@@ -135,21 +127,6 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             />
                             <p className="text-xs text-muted-foreground">
                                 <MixedText text="用户名用于登录和显示，最多20个字符" />
-                            </p>
-                        </div>
-
-                        {/* 显示名称设置 */}
-                        <div className="space-y-2">
-                            <Label htmlFor="displayName"><MixedText text="显示名称" /></Label>
-                            <Input
-                                id="displayName"
-                                value={formData.displayName}
-                                onChange={(e) => setFormData(prev => ({ ...prev, displayName: e.target.value }))}
-                                placeholder="请输入显示名称"
-                                maxLength={30}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                <MixedText text="显示名称将作为您的主要标识，最多30个字符" />
                             </p>
                         </div>
 

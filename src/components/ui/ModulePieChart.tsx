@@ -63,7 +63,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
     }
 
     // 根据主题动态设置颜色
-    const backgroundColor = isDarkMode ? '#1E1E1F' : '#FBFAF9';
+    const backgroundColor = isDarkMode ? '#101010' : '#F8F7F6';
     const textColor = isDarkMode ? '#e5e5e5' : '#333';
     // 图例文字在深色模式下使用黑色以提高可读性
     const legendTextColor = isDarkMode ? '#333' : '#333';
@@ -116,8 +116,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
             {
                 name: '模块耗时分布',
                 type: 'pie',
-                radius: ['40%', '70%'],  // Increased size: inner radius from 30% to 40%, outer from 50% to 70%
-                center: ['50%', '50%'],  // Center the chart when no legend is shown
+                radius: ['45%', '85%'],  // Increased size to better fill the container
+                center: ['50%', '40%'],  // Move chart further upward
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
