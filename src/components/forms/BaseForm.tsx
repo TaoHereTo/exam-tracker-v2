@@ -75,7 +75,7 @@ export function BaseForm({
             setValues(initialData);
             setErrors({});
         }
-    }, [JSON.stringify(initialData)]); // 使用JSON.stringify作为依赖项
+    }, [initialData]); // 使用initialData作为依赖项
 
     // 设置字段值
     const setValue = (field: string, value: string | number | boolean | undefined) => {

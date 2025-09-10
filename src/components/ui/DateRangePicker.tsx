@@ -34,24 +34,27 @@ export function DateRangePicker({
     error = false
 }: DateRangePickerProps) {
     const [open, setOpen] = React.useState(false)
-    const [currentMonth, setCurrentMonth] = React.useState<Date | undefined>(
-        dateRange?.to ?? dateRange?.from
-    )
+    // Initialize currentMonth to the 'from' date if available, otherwise to 'to' date or current date
+    const [currentMonth, setCurrentMonth] = React.useState<Date | undefined>(() => {
+        if (dateRange?.from) return dateRange.from
+        if (dateRange?.to) return dateRange.to
+        return new Date()
+    })
 
     const fromTimestamp = dateRange?.from?.getTime();
     const toTimestamp = dateRange?.to?.getTime();
 
     React.useEffect(() => {
-        // 当外部传入的日期变化时，保持月份定位到已选择的末端（有 to 用 to，否则用 from）
-        if (dateRange?.to) setCurrentMonth(dateRange.to)
-        else if (dateRange?.from) setCurrentMonth(dateRange.from)
+        // When external date changes, align month to the start date if available
+        if (dateRange?.from) setCurrentMonth(dateRange.from)
+        else if (dateRange?.to) setCurrentMonth(dateRange.to)
     }, [dateRange?.from, dateRange?.to, fromTimestamp, toTimestamp])
 
     const handleSelect = React.useCallback(
         (range: DateRange | undefined) => {
-            // 先更新月份再回调，保证界面定位不跳回默认月份
-            if (range?.to) setCurrentMonth(range.to)
-            else if (range?.from) setCurrentMonth(range.from)
+            // Update month to the start date to maintain proper view
+            if (range?.from) setCurrentMonth(range.from)
+            else if (range?.to) setCurrentMonth(range.to)
             onDateRangeChange?.(range)
         },
         [onDateRangeChange]
@@ -59,9 +62,9 @@ export function DateRangePicker({
 
     const handleOpenChange = React.useCallback((nextOpen: boolean) => {
         if (nextOpen) {
-            // 打开时将月份对齐到已选日期
-            if (dateRange?.to) setCurrentMonth(dateRange.to)
-            else if (dateRange?.from) setCurrentMonth(dateRange.from)
+            // When opening, align month to the start date if available
+            if (dateRange?.from) setCurrentMonth(dateRange.from)
+            else if (dateRange?.to) setCurrentMonth(dateRange.to)
         }
         setOpen(nextOpen)
     }, [dateRange?.from, dateRange?.to])

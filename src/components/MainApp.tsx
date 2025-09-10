@@ -462,11 +462,11 @@ export function MainApp() {
         // 显示批量删除的加载通知
         let toastId: string | undefined;
         if (notifyLoading) {
-            toastId = notifyLoading('正在删除记录...', `正在从云端删除 ${recordIds.length} 条刷题历史`);
+            toastId = notifyLoading('正在从云端删除记录', `正在从云端删除 ${recordIds.length} 条刷题历史`);
         } else {
             notify({
                 type: 'info',
-                message: '正在删除记录',
+                message: '正在从云端删除记录',
                 description: `正在从云端删除 ${recordIds.length} 条刷题历史`
             });
         }
