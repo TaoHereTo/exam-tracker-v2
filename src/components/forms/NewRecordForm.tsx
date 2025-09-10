@@ -39,7 +39,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
             return;
         }
         
-        // 优先使用表单中的日期值，避免总是使用今天
+        // 优先使用表单中的日期值，如果为空则使用默认的今天日期
         const selectedDateStr = String(data.date || '');
         const dateToFormat = selectedDateStr ? new Date(selectedDateStr) : new Date();
         
@@ -100,6 +100,14 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         useEffect(() => {
             if (date) setCurrentMonth(date);
         }, [date, dateTimestamp]);
+
+        // 设置默认日期值到表单中
+        useEffect(() => {
+            if (date) {
+                const formatted = format(date, 'yyyy-MM-dd');
+                setValue('date', formatted);
+            }
+        }, [date, setValue]);
 
         const handleOpenChange = (open: boolean) => {
             if (open) {
@@ -231,7 +239,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                             total: '',
                             correct: '',
                             duration: '',
-                            date: ''
+                            date: format(new Date(), 'yyyy-MM-dd') // 设置默认日期为今天
                         }}
                     >
                         {/* 模块选择 */}
