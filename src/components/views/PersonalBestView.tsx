@@ -30,7 +30,7 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                         return acc;
                     }, null);
                     return (
-                        <Card key={module.key} className="shadow-md" style={{ borderLeft: `6px solid ${getModuleColor(module.label)}` }}>
+                        <Card key={module.key} style={{ borderLeft: `6px solid ${getModuleColor(module.label)}` }}>
                             <CardHeader>
                                 <CardTitle><MixedText text={module.label} /></CardTitle>
                             </CardHeader>

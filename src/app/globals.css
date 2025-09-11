@@ -371,7 +371,7 @@ th .mixed-text-part {
 .dark {
   --background: #161618;
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: #171717;
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
@@ -1699,7 +1699,7 @@ body.eye-care.dark .text-muted-foreground,
 [data-slot="card"],
 .card,
 .shadow-md {
-  transition-duration: 300ms !important;
+  transition: none !important;
 }
 
 /* Switch 组件保持原有过渡效果 */

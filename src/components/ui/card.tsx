@@ -41,8 +41,7 @@ const Card = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
         data-slot="card"
         onMouseEnter={checkInteractive}
         className={cn(
-          "card bg-card text-card-foreground flex flex-col gap-3 rounded-xl border py-6 shadow-md transition-all duration-200",
-          canHover && "hover:shadow-lg hover:-translate-y-1",
+          "card bg-card text-card-foreground flex flex-col gap-3 rounded-xl border border-border py-6 shadow-md",
           className
         )}
         {...props}

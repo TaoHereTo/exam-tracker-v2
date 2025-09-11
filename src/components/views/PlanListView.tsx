@@ -211,11 +211,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
             case "进行中":
                 return <Clock className="w-5 h-5" style={{ color: '#10b981' }} />;
             case "未开始":
-                return <Clock className="w-5 h-5 text-gray-500" />;
+                return <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />;
             case "未达成":
                 return <AlertCircle className="w-5 h-5 text-red-500" />;
             default:
-                return <Clock className="w-5 h-5 text-gray-500" />;
+                return <Clock className="w-5 h-5 text-gray-700 dark:text-gray-300" />;
         }
     };
 
@@ -330,12 +330,13 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
                 {(showCompleted ? completedPlans : activePlans).length > 0 ? (
                     (showCompleted ? completedPlans : activePlans).map(plan => (
-                        <Card key={plan.id} className="shadow-md hover:shadow-lg transition-all duration-300 min-h-[220px] w-full flex flex-col">
+                        <Card key={plan.id} className="min-h-[220px] w-full flex flex-col">
                             <CardHeader className="pb-3">
                                 <CardTitle className="flex justify-between items-center gap-3">
                                     <div className="flex items-center gap-2 flex-1">
-                                        {getStatusIcon(plan.status)}
-                                        <MixedText text={plan.name} className="text-lg font-semibold truncate" />
+                                        <span className="text-lg truncate">
+                                            <MixedText text={plan.name} className="font-bold" style={{ fontWeight: 'bold' }} />
+                                        </span>
                                     </div>
                                     <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
                                         <TooltipProvider>
@@ -398,7 +399,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                             <CardContent className="pt-0 flex-1 flex flex-col justify-center">
                                 <div className="space-y-4">
                                     <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
-                                    <div className="text-xs text-gray-500 break-words">
+                                    <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
                                         <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
                                     </div>
                                     <div className="text-xs break-words">
@@ -407,9 +408,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                                         </span>
                                     </div>
                                     {plan.description && (
-                                        <div className="text-xs text-gray-400 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
+                                        <div className="text-xs text-gray-700 dark:text-gray-300 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
                                     )}
-                                    <div className="text-xs text-gray-500 break-words">
+                                    <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
                                         进度：{plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`} />}
                                     </div>
                                     <div className="mt-3">
@@ -425,21 +426,21 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                     ))
                 ) : (
                     <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                        <div className="text-gray-400 mb-4">
+                        <div className="text-gray-700 dark:text-gray-300 mb-4">
                             {showCompleted ? (
                                 <CheckCircle className="w-16 h-16" />
                             ) : (
                                 <Clock className="w-16 h-16" />
                             )}
                         </div>
-                        <h3 className="text-lg font-medium text-gray-600 mb-2">
+                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                             {showCompleted ? (
                                 <MixedText text="暂无已完成的计划" />
                             ) : (
                                 <MixedText text="暂无进行中的计划" />
                             )}
                         </h3>
-                        <p className="text-sm text-gray-500 mb-4">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
                             {showCompleted ? (
                                 <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
                             ) : (

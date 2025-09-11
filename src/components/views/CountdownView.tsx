@@ -253,7 +253,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full items-stretch">
                 {countdowns.length > 0 ? (
                     countdowns.map(countdown => (
-                        <Card key={countdown.id} className="shadow-sm hover:shadow-md transition-all duration-300 w-full flex flex-col border-0 rounded-2xl overflow-hidden p-0">
+                        <Card key={countdown.id} className="w-full flex flex-col rounded-2xl overflow-hidden p-0">
                             <div className="px-8 py-6">
                                 <div className="flex flex-col">
                                     <div className="flex items-center justify-between mb-6">
@@ -338,7 +338,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             </div>
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl shadow-xl">
+                    <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl">
                         <CardHeader className="border-b border-border">
                             <CardTitle className="text-xl">{editId ? <MixedText text="编辑考试" /> : <MixedText text="添加考试" />}</CardTitle>
                         </CardHeader>

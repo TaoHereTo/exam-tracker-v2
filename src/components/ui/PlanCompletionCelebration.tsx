@@ -147,7 +147,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
             <CheckCircle className="w-6 h-6 text-green-500" />
             <MixedText text="恭喜完成！" />
           </h2>
-          <p className="text-gray-600 dark:text-gray-300">
+          <p className="text-gray-700 dark:text-gray-300">
             <MixedText text={`学习计划"${planName}"已完成！`} />
           </p>
         </div>
@@ -161,7 +161,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
             <p className="text-lg font-medium text-gray-800 dark:text-gray-200">
               <MixedText text="🎉 太棒了！继续保持！" />
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
               <MixedText text="坚持不懈的努力终于有了回报" />
             </p>
           </div>

@@ -41,12 +41,12 @@ export default function PlanDetailView({ plan, onBack }: PlanDetailProps) {
                 </CardHeader>
                 <CardContent>
                     <div className="text-sm text-muted-foreground"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={plan.description || ''} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={`类型：${plan.type}`} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={`板块：${MODULES.find(m => m.value === plan.module)?.label || plan.module}`} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={`目标：${plan.type === '题量' ? `${plan.target}题` : plan.type === '正确率' ? `${plan.target}%` : `${plan.target}道错题`}`} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={`进度：${plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}`} /></div>
-                    <div className="mt-2 text-xs text-gray-400"><MixedText text={`状态：${plan.status}`} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={plan.description || ''} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={`类型：${plan.type}`} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={`板块：${MODULES.find(m => m.value === plan.module)?.label || plan.module}`} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={`目标：${plan.type === '题量' ? `${plan.target}题` : plan.type === '正确率' ? `${plan.target}%` : `${plan.target}道错题`}`} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={`进度：${plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`}`} /></div>
+                    <div className="mt-2 text-xs text-gray-700 dark:text-gray-300"><MixedText text={`状态：${plan.status}`} /></div>
                     <div className="mt-4">
                         <Progress
                             value={getProgressPercentage(plan)}
