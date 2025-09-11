@@ -177,19 +177,17 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             const remainingHours = differenceInHours(exam, now) % 24;
             const remainingMinutes = differenceInMinutes(exam, now) % 60;
             return (
-                <div className="flex items-end justify-center gap-1 sm:gap-2">
+                <div className="flex items-center justify-center gap-6 sm:gap-8">
                     <div className="text-center">
-                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffDays}</div>
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffDays}</div>
                         <div className="text-xs sm:text-sm text-muted-foreground mt-1">天</div>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
                     <div className="text-center">
-                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingHours}</div>
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingHours}</div>
                         <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
                     </div>
-                    <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
                     <div className="text-center">
-                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingMinutes}</div>
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingMinutes}</div>
                         <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
                     </div>
                 </div>
@@ -199,14 +197,13 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             if (diffHours > 0) {
                 const remainingMinutes = differenceInMinutes(exam, now) % 60;
                 return (
-                    <div className="flex items-end justify-center gap-1 sm:gap-2">
+                    <div className="flex items-center justify-center gap-6 sm:gap-8">
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffHours}</div>
+                            <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffHours}</div>
                             <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
                         </div>
-                        <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingMinutes}</div>
+                            <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingMinutes}</div>
                             <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
                         </div>
                     </div>
@@ -216,19 +213,19 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 if (diffMinutes > 0) {
                     return (
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffMinutes}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                          <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffMinutes}</div>
+                          <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
                         </div>
-                    );
+                      );
                 } else {
                     return <div className="text-center">
-                        <div className="text-3xl sm:text-4xl font-bold text-green-500">已开始</div>
+                        <div className="text-3xl sm:text-4xl font-bold text-green-500 leading-none">已开始</div>
                     </div>;
                 }
             }
         } else {
             return <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-red-500">已过期</div>
+                <div className="text-3xl sm:text-4xl font-bold text-red-500 leading-none">已过期</div>
             </div>;
         }
     };
@@ -268,7 +265,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
                 {countdowns.length > 0 ? (
                     countdowns.map(countdown => (
-                        <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+                        <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden">
                             <div className="p-6 flex flex-col h-full">
                                 {/* Header with title and actions */}
                                 <div className="flex justify-between items-start mb-6">
@@ -305,7 +302,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                     <TooltipTrigger asChild>
                                                         <AlertDialogTrigger asChild>
                                                             <Button
-                                                                variant="outline"
+                                                                variant="destructive"
                                                                 size="icon"
                                                                 className="h-8 w-8 rounded-full"
                                                             >

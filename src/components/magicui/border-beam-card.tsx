@@ -29,7 +29,7 @@ export function BorderBeamCard({
   return (
     <div
       className={cn(
-        "relative rounded-xl border border-border bg-card text-card-foreground shadow-md overflow-hidden",
+        "relative rounded-xl border border-border bg-card text-card-foreground shadow-md overflow-hidden transition-none hover:shadow-md",
         className
       )}
       {...props}
