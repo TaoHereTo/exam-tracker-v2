@@ -1,4 +1,4 @@
-﻿﻿'use client'
+﻿﻿﻿﻿﻿﻿'use client'
 
 import React, { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -96,8 +96,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 className="col-span-1 md:col-span-2"
                                 background={(
                                     <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/60">
-                                        <div className="absolute left-10 top-7 w-full origin-top-left scale-100 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
-                                            <Card className="blur-sm group-hover:blur-none p-4 w-full max-w-[70%] transition-all duration-300 ease-out ml-8">
+                                        <div className="absolute left-10 top-7 w-full origin-top-left scale-100 rounded-md blur-sm transition-all duration-300 ease-out group-hover:blur-none">
+                                            <Card className="p-4 w-full max-w-[70%] transition-all duration-300 ease-out ml-8">
                                                 <div className="space-y-3">
                                                     <div>
                                                         <Label className="text-sm">模块</Label>
@@ -163,10 +163,10 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 className="col-span-1"
                                 background={(
                                     <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/60">
-                                        <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
+                                        <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md blur-sm transition-all duration-300 ease-out group-hover:blur-none">
                                             <div className="flex-1 space-y-3 w-full max-w-[100%]">
                                                 {mockPlans.map(plan => (
-                                                    <Card key={plan.id} className="p-3 blur-sm group-hover:blur-none transition-all duration-300 ease-out">
+                                                    <Card key={plan.id} className="p-3 transition-all duration-300 ease-out">
                                                         <div className="flex justify-between items-center mb-2">
                                                             <span className="text-sm font-medium truncate">{plan.name}</span>
                                                             <span className="text-xs text-muted-foreground">{plan.progress}/{plan.target}</span>
@@ -198,7 +198,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 background={(
                                     <div className="absolute inset-0 rounded-xl flex items-center justify-center p-0 backdrop-blur-md bg-background/40 dark:bg-background/30">
                                         <div className="w-full h-full flex items-center justify-center p-0">
-                                            <div className="w-full h-full bg-white/50 dark:bg-[#101010] backdrop-blur-md rounded-lg p-0 blur-sm group-hover:blur-none transition-all duration-300 ease-out flex items-center justify-center">
+                                            <div className="w-full h-full bg-white/50 dark:bg-[#101010] backdrop-blur-md rounded-lg p-0 blur-sm transition-all duration-300 ease-out group-hover:blur-none flex items-center justify-center">
                                                 <ModulePieChart
                                                     data={[
                                                         { date: '2023-01-01', module: '资料分析', score: 1.5, duration: 25 },
@@ -227,8 +227,8 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                 className="col-span-1 md:col-span-2"
                                 background={(
                                     <div className="absolute inset-0 rounded-xl flex items-center justify-center p-4 backdrop-blur-md bg-background/40 dark:bg-background/30">
-                                        <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md transition-all duration-300 ease-out group-hover:blur-none">
-                                            <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-md border border-white/40 dark:border-white/30 rounded-lg p-2 blur-sm group-hover:blur-none transition-all duration-300 ease-out">
+                                        <div className="absolute left-10 top-10 w-full h-full origin-top-left scale-110 rounded-md blur-sm transition-all duration-300 ease-out group-hover:blur-none">
+                                            <div className="flex-1 overflow-hidden w-full max-w-[90%] bg-white/50 dark:bg-[#1a1a1a]/50 backdrop-blur-md border border-white/40 dark:border-white/30 rounded-lg p-2 transition-all duration-300 ease-out">
                                                 <UnifiedTable
                                                     columns={[
                                                         { key: 'module', label: '模块', className: 'w-24 text-xs' },
