@@ -84,7 +84,6 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
         };
 
         onAddRecord?.(newRecord);
-        toast.success('记录保存成功！');
     };
 
     // 日期字段组件
