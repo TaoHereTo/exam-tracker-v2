@@ -62,6 +62,7 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { normalizePageTitle } from "@/config/exam";
 import { clearLocalStorageData } from "@/lib/storageUtils";
+import { useHighDPIFontOptimization } from "@/hooks/useHighDPIFontOptimization";
 
 // 懒加载组件
 const PlanListView = lazy(() =>
@@ -127,6 +128,9 @@ export function MainApp() {
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const { isDarkMode, mounted, getBackgroundStyle } = useThemeMode();
+    
+    // 使用高DPI字体优化hook
+    useHighDPIFontOptimization();
 
     // 移除dock模式，只保留sidebar模式
     const navMode = "sidebar";
@@ -368,6 +372,11 @@ export function MainApp() {
                             align={isCollapsed ? "start" : "end"}
                             sideOffset={4}
                             className="w-[--radix-popper-anchor-width] shadow-xl bg-white/95 dark:bg-[#262626] backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-lg"
+                            style={{
+                                WebkitFontSmoothing: 'subpixel-antialiased',
+                                MozOsxFontSmoothing: 'grayscale',
+                                textRendering: 'optimizeLegibility'
+                            } as React.CSSProperties}
                         >
                             <DropdownMenuLabel className="p-0 font-normal">
                                 <div className="flex items-center justify-center px-2 py-2 text-center">
@@ -398,13 +407,30 @@ export function MainApp() {
                                 </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={handleSignOutClick} className="flex justify-center text-red-600 focus:text-red-700">
-                                <div className="flex items-center gap-4">
-                                    <LogOut className="h-4 w-4 text-red-600" />
-                                    <MixedText text="退出登录" />
-                                </div>
+                            <DropdownMenuItem 
+                              onClick={handleSignOutClick} 
+                              className="flex justify-center text-red-600 focus:text-red-700 logout-menu-item"
+                              style={{
+                                WebkitFontSmoothing: 'subpixel-antialiased',
+                                MozOsxFontSmoothing: 'grayscale',
+                                textRendering: 'optimizeLegibility'
+                              } as React.CSSProperties}
+                            >
+                              <div className="flex items-center gap-4">
+                                <LogOut className="h-4 w-4 text-red-600" />
+                                <MixedText 
+                                  text="退出登录" 
+                                  className="font-medium logout-text"
+                                  style={{
+                                    WebkitFontSmoothing: 'subpixel-antialiased',
+                                    MozOsxFontSmoothing: 'grayscale',
+                                    textRendering: 'optimizeLegibility',
+                                    fontWeight: 500
+                                  } as React.CSSProperties} 
+                                />
+                              </div>
                             </DropdownMenuItem>
-                        </DropdownMenuContent>
+                          </DropdownMenuContent>
                     </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>

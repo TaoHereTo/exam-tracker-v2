@@ -7,7 +7,7 @@ export interface FontConfig {
     fallbackFont: string;
 }
 
-// 默认字体配置
+// 默认字体配置 - 优化高DPI显示
 export const defaultFontConfig: FontConfig = {
     chineseFont: '思源宋体',
     englishFont: 'Times New Roman',
@@ -38,7 +38,7 @@ export function getTextType(text: string): 'chinese' | 'english' | 'mixed' {
     return 'mixed';
 }
 
-// 生成字体样式
+// 生成字体样式 - 添加高DPI优化
 export function generateFontStyle(text: string, config: FontConfig = defaultFontConfig): React.CSSProperties {
     const textType = getTextType(text);
 
@@ -46,22 +46,34 @@ export function generateFontStyle(text: string, config: FontConfig = defaultFont
         case 'chinese':
             return {
                 fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         case 'english':
             return {
                 fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         case 'mixed':
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         default:
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
     }
 }
@@ -106,33 +118,45 @@ export function splitMixedText(text: string): Array<{ text: string; type: 'chine
     return parts;
 }
 
-// 生成混合文本的字体样式
+// 生成混合文本的字体样式 - 添加高DPI优化
 export function generateMixedTextStyle(part: { text: string; type: 'chinese' | 'english' | 'other' }, config: FontConfig = defaultFontConfig): React.CSSProperties {
     switch (part.type) {
         case 'chinese':
             return {
                 fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         case 'english':
             return {
                 fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         case 'other':
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
         default:
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400
+                fontWeight: 400,
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                textRendering: 'optimizeLegibility'
             };
     }
 }
 
-// Function to parse and render formatted text
+// Function to parse and render formatted text - 添加字体平滑优化
 export const renderFormattedText = (text: string) => {
     if (!text || typeof text !== 'string') {
         return text;
@@ -237,7 +261,9 @@ export const renderFormattedText = (text: string) => {
                     className: 'font-bold',
                     style: {
                         fontWeight: 'bold',
-                        fontFamily: 'inherit'
+                        fontFamily: 'inherit',
+                        WebkitFontSmoothing: 'antialiased',
+                        MozOsxFontSmoothing: 'grayscale'
                     }
                 }, part.text);
             case 'italic':
@@ -246,7 +272,9 @@ export const renderFormattedText = (text: string) => {
                     className: 'italic',
                     style: {
                         fontStyle: 'italic',
-                        fontFamily: 'inherit'
+                        fontFamily: 'inherit',
+                        WebkitFontSmoothing: 'antialiased',
+                        MozOsxFontSmoothing: 'grayscale'
                     }
                 }, part.text);
             case 'red':
@@ -255,7 +283,9 @@ export const renderFormattedText = (text: string) => {
                     className: 'text-red-500',
                     style: {
                         color: '#ef4444',
-                        fontFamily: 'inherit'
+                        fontFamily: 'inherit',
+                        WebkitFontSmoothing: 'antialiased',
+                        MozOsxFontSmoothing: 'grayscale'
                     }
                 }, part.text);
             default:

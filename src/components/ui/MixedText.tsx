@@ -43,14 +43,28 @@ export const MixedText = memo(function MixedText({
     const hasRedFormatting = /\{red\}[^}]+\{\/red\}/.test(content);
     const hasFormatting = hasBoldFormatting || hasItalicFormatting || hasRedFormatting;
     
-
+    // 添加字体平滑属性到基础样式
+    const baseStyle = {
+        ...style,
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
+    
+    // 特别优化"退出登录"文本
+    if (content === "退出登录") {
+        baseStyle.WebkitFontSmoothing = 'subpixel-antialiased';
+        baseStyle.MozOsxFontSmoothing = 'auto';
+        baseStyle.fontWeight = '600';
+        baseStyle.letterSpacing = '0.02em';
+    }
 
     if (hasFormatting) {
         // Render formatted text
         return (
             <Component
                 className={cn("mixed-text", className)}
-                style={{ ...style, fontFamily: 'inherit' }}
+                style={{ ...baseStyle, fontFamily: 'inherit' }}
                 onClick={onClick}
             >
                 {renderFormattedText(content)}
@@ -66,7 +80,7 @@ export const MixedText = memo(function MixedText({
         return (
             <Component
                 className={cn("mixed-text", className)}
-                style={{ ...fontStyle, ...style }}
+                style={{ ...fontStyle, ...baseStyle }}
                 onClick={onClick}
             >
                 {content}
@@ -78,7 +92,7 @@ export const MixedText = memo(function MixedText({
     const parts = splitMixedText(content);
 
     return (
-        <Component className={cn('mixed-text-container', className)} style={style} onClick={onClick}>
+        <Component className={cn('mixed-text-container', className)} style={baseStyle} onClick={onClick}>
             {parts.map((part, index) => (
                 <span
                     key={index}
@@ -117,24 +131,32 @@ export const MixedTitle = memo(function MixedTitle({
         6: 'text-sm font-medium'
     };
 
+    // 添加字体平滑属性到标题样式
+    const titleStyle: React.CSSProperties = {
+        ...style,
+        WebkitFontSmoothing: 'subpixel-antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
+
     const renderTitle = () => {
         const titleContent = <MixedText text={text} />;
 
         switch (level) {
             case 1:
-                return <h1 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h1>;
+                return <h1 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h1>;
             case 2:
-                return <h2 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h2>;
+                return <h2 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h2>;
             case 3:
-                return <h3 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h3>;
+                return <h3 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h3>;
             case 4:
-                return <h4 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h4>;
+                return <h4 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h4>;
             case 5:
-                return <h5 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h5>;
+                return <h5 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h5>;
             case 6:
-                return <h6 className={cn(levelStyles[level], className)} style={style} onClick={onClick}>{titleContent}</h6>;
+                return <h6 className={cn(levelStyles[level], className)} style={titleStyle} onClick={onClick}>{titleContent}</h6>;
             default:
-                return <h1 className={cn(levelStyles[1], className)} style={style} onClick={onClick}>{titleContent}</h1>;
+                return <h1 className={cn(levelStyles[1], className)} style={titleStyle} onClick={onClick}>{titleContent}</h1>;
         }
     };
 
@@ -155,8 +177,16 @@ export const MixedParagraph = memo(function MixedParagraph({
     style,
     onClick
 }: MixedParagraphProps) {
+    // 添加字体平滑属性到段落样式
+    const paragraphStyle: React.CSSProperties = {
+        ...style,
+        WebkitFontSmoothing: 'subpixel-antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
+
     return (
-        <p className={cn('text-base leading-relaxed', className)} style={style} onClick={onClick}>
+        <p className={cn('text-base leading-relaxed', className)} style={paragraphStyle} onClick={onClick}>
             <MixedText text={text} />
         </p>
     );
@@ -176,8 +206,16 @@ export const MixedLabel = memo(function MixedLabel({
     style,
     onClick
 }: MixedLabelProps) {
+    // 添加字体平滑属性到标签样式
+    const labelStyle: React.CSSProperties = {
+        ...style,
+        WebkitFontSmoothing: 'subpixel-antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
+
     return (
-        <label className={cn('text-sm font-medium', className)} style={style} onClick={onClick}>
+        <label className={cn('text-sm font-medium', className)} style={labelStyle} onClick={onClick}>
             <MixedText text={text} />
         </label>
     );

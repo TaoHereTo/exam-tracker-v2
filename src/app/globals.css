@@ -4,10 +4,105 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ========== 字体管理系统 ========== */
-/* 全局字体设置 - 统一管理所有字体样式 */
+/* ========== 字体渲染优化 for 2K/高DPI 显示器 ========== */
+/* 添加字体平滑和抗锯齿优化 */
 * {
   font-family: '思源宋体', 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-font-smoothing: subpixel-antialiased; /* 优化高分辨率显示 */
+  font-feature-settings: "liga" 1; /* 启用连字 */
+}
+
+/* 针对高DPI屏幕的媒体查询优化 */
+@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
+  * {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+  
+  /* 高DPI字体优化变量 */
+  :root {
+    --font-smoothing: subpixel-antialiased;
+    --text-rendering: optimizeLegibility;
+  }
+}
+
+/* 针对2K及以上分辨率的优化 */
+@media (min-width: 2048px) {
+  * {
+    -webkit-font-smoothing: subpixel-antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+  }
+  
+  /* 2K分辨率字体优化变量 */
+  :root {
+    --font-smoothing: subpixel-antialiased;
+    --text-rendering: optimizeLegibility;
+    --font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+  }
+}
+
+/* 高DPI类 */
+.high-dpi {
+  -webkit-font-smoothing: var(--font-smoothing, subpixel-antialiased);
+  -moz-osx-font-smoothing: var(--moz-font-smoothing, auto);
+  text-rendering: var(--text-rendering, optimizeLegibility);
+}
+
+/* 下拉菜单字体优化 */
+[data-radix-popper-content-wrapper] {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+[data-radix-popper-content-wrapper] * {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.dark [data-radix-popper-content-wrapper] {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* 深色模式下拉菜单特殊优化 */
+.dark [data-radix-popper-content-wrapper] * {
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 500 !important;
+}
+
+/* 特别优化退出登录按钮文本 */
+.dark [data-radix-popper-content-wrapper] [data-slot="menu-item"] > div > span {
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 500 !important;
+}
+
+/* 特别优化"退出登录"文本在深色模式下的清晰度 */
+.dark .logout-menu-item .logout-text {
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  -moz-osx-font-smoothing: auto !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  color: #dc2626 !important; /* Ensure red color is vibrant */
+}
+
+/* 确保深色模式下所有菜单项文本清晰 */
+.dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
+  -webkit-font-smoothing: subpixel-antialiased !important;
+  -moz-osx-font-smoothing: auto !important;
+  text-rendering: optimizeLegibility !important;
 }
 
 body,
@@ -23,6 +118,9 @@ html {
 /* MixedText 组件样式 */
 .mixed-text-part {
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* 表格标题字体粗细设置 */
@@ -205,6 +303,11 @@ th .mixed-text-part {
   /* 统一的 hover 颜色 */
   --hover-light: #EEEDEC;
   --hover-dark: #262626;
+  
+  /* 高DPI字体渲染变量 */
+  --font-smoothing: antialiased;
+  --text-rendering: optimizeLegibility;
+  --moz-font-smoothing: grayscale;
 }
 
 /* 按钮主题适配：默认按钮在浅色模式下为黑色背景白色文字，深色模式下为白色背景黑色文字 */

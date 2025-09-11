@@ -55,7 +55,11 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       data-slot="dropdown-menu-content"
       className={cn("z-50 min-w-[8rem] overflow-hidden rounded-md border border-gray-200 bg-popover p-1 text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 text-left", className)}
-
+      style={{
+        WebkitFontSmoothing: 'subpixel-antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+      } as React.CSSProperties}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}
@@ -97,6 +101,11 @@ const DropdownMenuItem = React.forwardRef<
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
         className
       )}
+      style={{
+        WebkitFontSmoothing: 'subpixel-antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+      } as React.CSSProperties}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}
