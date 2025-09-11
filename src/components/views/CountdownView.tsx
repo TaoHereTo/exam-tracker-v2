@@ -17,6 +17,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar"; // Use existing calendar component
 import { cn } from "@/lib/utils";
+import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
 
 interface ExamCountdown {
@@ -253,9 +254,9 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full items-stretch">
                 {countdowns.length > 0 ? (
                     countdowns.map(countdown => (
-                        <Card key={countdown.id} className="w-full flex flex-col rounded-2xl overflow-hidden p-0">
-                            <div className="px-8 py-6">
-                                <div className="flex flex-col">
+                        <BorderBeamCard key={countdown.id} className="w-full flex flex-col rounded-2xl overflow-hidden p-0">
+                            <div className="px-8 py-6 flex flex-col h-full">
+                                <div className="flex flex-col flex-1">
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="text-xl font-medium text-foreground">
                                             距离<span className="font-bold">{countdown.name}</span>开始还有
@@ -303,7 +304,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                         <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
                                                     </AlertDialogHeader>
                                                     <AlertDialogDescription>
-                                                        此操作将永久删除考试倒计时&quot;{countdown.name}&quot;，删除后无法恢复。
+                                                        此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
                                                     </AlertDialogDescription>
                                                     <AlertDialogFooter>
                                                         <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
@@ -315,12 +316,12 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                             </AlertDialog>
                                         </div>
                                     </div>
-                                    <div className="text-foreground">
+                                    <div className="text-foreground flex-1 flex items-center">
                                         {calculateDetailedCountdown(countdown.examDate)}
                                     </div>
                                 </div>
                             </div>
-                        </Card>
+                        </BorderBeamCard>
                     ))
                 ) : (
                     <div className="col-span-full flex flex-col items-center justify-center py-20 text-center rounded-2xl">

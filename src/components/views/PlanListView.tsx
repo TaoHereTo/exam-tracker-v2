@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { DateRangePicker } from "@/components/ui/DateRangePicker";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
+import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
 
 interface StudyPlan {
@@ -330,99 +331,101 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full items-stretch">
                 {(showCompleted ? completedPlans : activePlans).length > 0 ? (
                     (showCompleted ? completedPlans : activePlans).map(plan => (
-                        <Card key={plan.id} className="min-h-[220px] w-full flex flex-col">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="flex justify-between items-center gap-3">
-                                    <div className="flex items-center gap-2 flex-1">
-                                        <span className="text-lg truncate">
-                                            <MixedText text={plan.name} className="font-bold" style={{ fontWeight: 'bold' }} />
-                                        </span>
-                                    </div>
-                                    <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        onClick={() => handleOpenForm(plan)}
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="h-9 w-9"
-                                                    >
-                                                        <Edit className="w-5 h-5" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p><MixedText text="编辑" /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                        <AlertDialog>
+                        <BorderBeamCard key={plan.id} className="min-h-[220px] w-full flex flex-col rounded-xl">
+                            <div className="flex flex-col h-full">
+                                <div className="pb-3 px-6 pt-6">
+                                    <div className="flex justify-between items-center gap-3">
+                                        <div className="flex items-center gap-2 flex-1">
+                                            <span className="text-lg truncate">
+                                                <MixedText text={plan.name} className="font-bold" style={{ fontWeight: 'bold' }} />
+                                            </span>
+                                        </div>
+                                        <ButtonGroup spacing="sm" margin="none" className="flex-shrink-0">
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <AlertDialogTrigger asChild>
-                                                            <Button
-                                                                variant="destructive"
-                                                                size="icon"
-                                                                className="h-9 w-9"
-                                                            >
-                                                                <Trash2 className="w-5 h-5" />
-                                                            </Button>
-                                                        </AlertDialogTrigger>
+                                                        <Button
+                                                            onClick={() => handleOpenForm(plan)}
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-9 w-9"
+                                                        >
+                                                            <Edit className="w-5 h-5" />
+                                                        </Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p><MixedText text="删除" /></p>
+                                                        <p><MixedText text="编辑" /></p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle><MixedText text="确认删除计划？" /></AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        此操作将永久删除学习计划&quot;{plan.name}&quot;，删除后无法恢复。
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                    <AlertDialogAction 
-                                                        onClick={() => handleDelete(plan.id)}
-                                                        className="bg-[#dc2626] text-white shadow-xs hover:bg-[#dc2626]/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
-                                                    >
-                                                        <MixedText text="确认删除" />
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </ButtonGroup>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="pt-0 flex-1 flex flex-col justify-center">
-                                <div className="space-y-4">
-                                    <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
-                                    <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
-                                        <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
-                                    </div>
-                                    <div className="text-xs break-words">
-                                        <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
-                                            <MixedText text={`状态：${getStatusText(plan.status)}`} />
-                                        </span>
-                                    </div>
-                                    {plan.description && (
-                                        <div className="text-xs text-gray-700 dark:text-gray-300 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
-                                    )}
-                                    <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
-                                        进度：{plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`} />}
-                                    </div>
-                                    <div className="mt-3">
-                                        <Progress
-                                            value={getProgressPercentage(plan)}
-                                            variant="plan"
-                                            showText={true}
-                                        />
+                                            <AlertDialog>
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <AlertDialogTrigger asChild>
+                                                                <Button
+                                                                    variant="destructive"
+                                                                    size="icon"
+                                                                    className="h-9 w-9"
+                                                                >
+                                                                    <Trash2 className="w-5 h-5" />
+                                                                </Button>
+                                                            </AlertDialogTrigger>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="删除" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle><MixedText text="确认删除计划？" /></AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            此操作将永久删除学习计划"{plan.name}"，删除后无法恢复。
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                        <AlertDialogAction 
+                                                            onClick={() => handleDelete(plan.id)}
+                                                            className="bg-[#dc2626] text-white shadow-xs hover:bg-[#dc2626]/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40"
+                                                        >
+                                                            <MixedText text="确认删除" />
+                                                        </AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </ButtonGroup>
                                     </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <div className="pt-0 flex-1 flex flex-col justify-center px-6 pb-6">
+                                    <div className="space-y-4">
+                                        <div className="text-sm text-muted-foreground break-words"><MixedText text={`${plan.startDate} ~ ${plan.endDate}`} /></div>
+                                        <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
+                                            <MixedText text={`板块：${normalizeModuleName(plan.module)}`} />
+                                        </div>
+                                        <div className="text-xs break-words">
+                                            <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
+                                                <MixedText text={`状态：${getStatusText(plan.status)}`} />
+                                            </span>
+                                        </div>
+                                        {plan.description && (
+                                            <div className="text-xs text-gray-700 dark:text-gray-300 line-clamp-3 break-words"><MixedText text={plan.description} /></div>
+                                        )}
+                                        <div className="text-xs text-gray-700 dark:text-gray-300 break-words">
+                                            进度：{plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道错题' : ''}`} />}
+                                        </div>
+                                        <div className="mt-3">
+                                            <Progress
+                                                value={getProgressPercentage(plan)}
+                                                variant="plan"
+                                                showText={true}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </BorderBeamCard>
                     ))
                 ) : (
                     <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
