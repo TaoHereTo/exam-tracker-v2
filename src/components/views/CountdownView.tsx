@@ -177,45 +177,59 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             const remainingHours = differenceInHours(exam, now) % 24;
             const remainingMinutes = differenceInMinutes(exam, now) % 60;
             return (
-                <span>
-                    <span className="text-3xl font-bold">{diffDays}</span>
-                    <span className="text-lg font-medium text-gray-400">天</span>
-                    <span className="mx-2"></span>
-                    <span className="text-3xl font-bold">{remainingHours}</span>
-                    <span className="text-lg font-medium text-gray-400">小时</span>
-                    <span className="mx-2"></span>
-                    <span className="text-3xl font-bold">{remainingMinutes}</span>
-                    <span className="text-lg font-medium text-gray-400">分钟</span>
-                </span>
+                <div className="flex items-end justify-center gap-1 sm:gap-2">
+                    <div className="text-center">
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffDays}</div>
+                        <div className="text-xs sm:text-sm text-muted-foreground mt-1">天</div>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
+                    <div className="text-center">
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingHours}</div>
+                        <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
+                    </div>
+                    <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
+                    <div className="text-center">
+                        <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingMinutes}</div>
+                        <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                    </div>
+                </div>
             );
         } else if (diffDays === 0) {
             const diffHours = differenceInHours(exam, now);
             if (diffHours > 0) {
                 const remainingMinutes = differenceInMinutes(exam, now) % 60;
                 return (
-                    <span>
-                        <span className="text-3xl font-bold">{diffHours}</span>
-                        <span className="text-lg font-medium text-gray-400">小时</span>
-                        <span className="mx-2"></span>
-                        <span className="text-3xl font-bold">{remainingMinutes}</span>
-                        <span className="text-lg font-medium text-gray-400">分钟</span>
-                    </span>
+                    <div className="flex items-end justify-center gap-1 sm:gap-2">
+                        <div className="text-center">
+                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffHours}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
+                        </div>
+                        <div className="text-2xl sm:text-3xl font-light text-muted-foreground mb-1">:</div>
+                        <div className="text-center">
+                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{remainingMinutes}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                        </div>
+                    </div>
                 );
             } else {
                 const diffMinutes = differenceInMinutes(exam, now);
                 if (diffMinutes > 0) {
                     return (
-                        <span>
-                            <span className="text-3xl font-bold">{diffMinutes}</span>
-                            <span className="text-lg font-medium text-gray-400">分钟</span>
-                        </span>
+                        <div className="text-center">
+                            <div className="text-3xl sm:text-4xl font-bold text-foreground">{diffMinutes}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                        </div>
                     );
                 } else {
-                    return <span className="text-3xl font-bold">已开始</span>;
+                    return <div className="text-center">
+                        <div className="text-3xl sm:text-4xl font-bold text-green-500">已开始</div>
+                    </div>;
                 }
             }
         } else {
-            return <span className="text-3xl font-bold">已过期</span>;
+            return <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-red-500">已过期</div>
+            </div>;
         }
     };
 
@@ -251,89 +265,117 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 </ButtonGroup>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 w-full items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
                 {countdowns.length > 0 ? (
                     countdowns.map(countdown => (
-                        <BorderBeamCard key={countdown.id} className="w-full flex flex-col rounded-2xl overflow-hidden p-0">
-                            <div className="px-8 py-6 flex flex-col h-full">
-                                <div className="flex flex-col flex-1">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="text-xl font-medium text-foreground">
-                                            距离<span className="font-bold">{countdown.name}</span>开始还有
-                                        </div>
-                                        {/* Action buttons */}
-                                        <div className="flex gap-2 flex-shrink-0">
+                        <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-lg">
+                            <div className="p-6 flex flex-col h-full">
+                                {/* Header with title and actions */}
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-xl font-bold text-foreground truncate">
+                                            {countdown.name}
+                                        </h3>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            考试倒计时
+                                        </p>
+                                    </div>
+                                    {/* Action buttons */}
+                                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                                        <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        onClick={() => handleOpenForm(countdown)}
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-full"
+                                                    >
+                                                        <Edit className="w-4 h-4" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p><MixedText text="编辑" /></p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </TooltipProvider>
+                                        <AlertDialog>
                                             <TooltipProvider>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Button
-                                                            onClick={() => handleOpenForm(countdown)}
-                                                            variant="outline"
-                                                            size="sm"
-                                                            className="h-9 w-9 p-0"
-                                                        >
-                                                            <Edit className="w-4 h-4" />
-                                                        </Button>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </AlertDialogTrigger>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
-                                                        <p><MixedText text="编辑" /></p>
+                                                        <p><MixedText text="删除" /></p>
                                                     </TooltipContent>
                                                 </Tooltip>
                                             </TooltipProvider>
-                                            <AlertDialog>
-                                                <TooltipProvider>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <AlertDialogTrigger asChild>
-                                                                <Button
-                                                                    variant="destructive"
-                                                                    size="icon"
-                                                                    className="h-9 w-9"
-                                                                >
-                                                                    <Trash2 className="w-5 h-5" />
-                                                                </Button>
-                                                            </AlertDialogTrigger>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p><MixedText text="删除" /></p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                                <AlertDialogContent>
-                                                    <AlertDialogHeader>
-                                                        <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
-                                                    </AlertDialogHeader>
-                                                    <AlertDialogDescription>
-                                                        此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
-                                                    </AlertDialogDescription>
-                                                    <AlertDialogFooter>
-                                                        <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                        <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
-                                                            <MixedText text="确认删除" />
-                                                        </AlertDialogAction>
-                                                    </AlertDialogFooter>
-                                                </AlertDialogContent>
-                                            </AlertDialog>
-                                        </div>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
+                                                </AlertDialogHeader>
+                                                <AlertDialogDescription>
+                                                    此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
+                                                </AlertDialogDescription>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
+                                                        <MixedText text="确认删除" />
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </div>
-                                    <div className="text-foreground flex-1 flex items-center">
+                                </div>
+
+                                {/* Countdown display - main focus */}
+                                <div className="flex-1 flex flex-col items-center justify-center my-4">
+                                    <div className="text-center">
                                         {calculateDetailedCountdown(countdown.examDate)}
+                                    </div>
+                                </div>
+
+                                {/* Footer with exam date */}
+                                <div className="mt-4 pt-4 border-t border-border">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">考试日期</span>
+                                        <span className="font-medium">{format(new Date(countdown.examDate), 'yyyy年MM月dd日')}</span>
                                     </div>
                                 </div>
                             </div>
                         </BorderBeamCard>
                     ))
                 ) : (
-                    <div className="col-span-full flex flex-col items-center justify-center py-20 text-center rounded-2xl">
-                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                            <Clock className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                        <h3 className="text-2xl font-bold text-foreground mb-3">
-                            <MixedText text="暂无考试倒计时" />
-                        </h3>
-                        <p className="text-muted-foreground mb-6 max-w-md text-lg">
-                            <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
-                        </p>
+                    <div className="col-span-full">
+                        <BorderBeamCard className="rounded-2xl overflow-hidden">
+                            <div className="p-12 text-center">
+                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                    <Clock className="w-8 h-8 text-muted-foreground" />
+                                </div>
+                                <h3 className="text-2xl font-bold text-foreground mb-3">
+                                    <MixedText text="暂无考试倒计时" />
+                                </h3>
+                                <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                    <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
+                                </p>
+                                <Button
+                                    onClick={() => handleOpenForm()}
+                                    className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                                    variant="default"
+                                >
+                                    <Plus className="w-5 h-5 mr-2" />
+                                    <MixedText text="添加考试" />
+                                </Button>
+                            </div>
+                        </BorderBeamCard>
                     </div>
                 )}
             </div>
