@@ -110,11 +110,12 @@ const getModuleConfig = (module: string): ModuleConfig => {
 
 // 日期字段组件
 function DateField() {
-  const { setValue, errors, clearError, getValue } = useFormContext();
+  const { setValue, errors, clearError, getValue, validateField } = useFormContext();
   const currentDate = getValue('date') as string;
   const [date, setDate] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
   const [dateOpen, setDateOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState<Date | undefined>(currentDate ? new Date(currentDate) : undefined);
+  const [pendingDate, setPendingDate] = useState<string | null>(null);
 
   // 当表单数据变化时，同步更新本地状态
   useEffect(() => {
@@ -125,12 +126,39 @@ function DateField() {
     }
   }, [currentDate]);
 
+  // 当日期值更新时，验证字段
+  useEffect(() => {
+    if (pendingDate !== null) {
+      // Validate the date field after state has been updated
+      const validationError = validateField('date', pendingDate);
+      if (validationError) {
+        // Keep the error if validation fails
+      } else if (errors['date']) {
+        // Clear the error if validation passes
+        clearError('date');
+      }
+      setPendingDate(null);
+    }
+  }, [pendingDate, validateField, errors, clearError]);
+
   const handleOpenChange = (open: boolean) => {
     if (open) {
       // 打开时对齐到当前已选日期
       if (date) setCurrentMonth(date);
     }
     setDateOpen(open);
+  };
+
+  const handleDateSelect = (d: Date | undefined) => {
+    setDate(d);
+    const formatted = d ? format(d, 'yyyy-MM-dd') : '';
+    setValue('date', formatted);
+    
+    // Set pending date to trigger validation after state update
+    setPendingDate(formatted);
+    
+    // Automatically close the popover after selecting a date
+    setDateOpen(false);
   };
 
   return (
@@ -153,14 +181,7 @@ function DateField() {
           month={currentMonth}
           onMonthChange={setCurrentMonth}
           selected={date}
-          onSelect={(d) => {
-            setDate(d);
-            const formatted = d ? format(d, 'yyyy-MM-dd') : '';
-            setValue('date', formatted);
-            if (errors['date']) clearError('date');
-            // Automatically close the popover after selecting a date
-            setDateOpen(false);
-          }}
+          onSelect={handleDateSelect}
           initialFocus={false}
           locale={zhCN}
         />
@@ -258,7 +279,13 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     if (config.hasDateField) {
       schema.date = { 
         required: true,
-        custom: () => '请选择日期'
+        custom: (value) => {
+          // Check if value exists and is not empty
+          if (!value || !String(value).trim()) {
+            return '请选择日期';
+          }
+          return null; // No error if value exists
+        }
       };
     }
 
