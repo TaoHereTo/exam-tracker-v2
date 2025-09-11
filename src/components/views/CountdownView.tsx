@@ -446,7 +446,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                     {showCompleted ? (
                                         <MixedText text="已完成的考试将显示在这里，帮助您回顾考试历程" />
                                     ) : (
-                                        <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
+                                        <MixedText text="点击上方的按钮，添加第一个考试倒计时" />
                                     )}
                                 </p>
                                 {!showCompleted && (

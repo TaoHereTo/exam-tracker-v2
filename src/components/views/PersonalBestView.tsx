@@ -9,7 +9,7 @@ import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 export function PersonalBestView({ records }: { records: RecordItem[] }) {
     return (
         <div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
                 {[
                     { key: 'politics', label: '政治理论' },
                     { key: 'common', label: '常识判断' },
@@ -36,9 +36,10 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                     return (
                         <BorderBeamCard 
                             key={module.key} 
-                            className="rounded-2xl overflow-hidden"
+                            className="w-full rounded-2xl overflow-hidden"
                             colorFrom={moduleColor}
                             colorTo={moduleColor}
+                            size={100}
                         >
                             <div className="p-6">
                                 <div className="pb-3">
