@@ -7,7 +7,7 @@ import { FormField } from "@/components/ui/FormField";
 import { FormError } from "@/components/ui/form-error";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { Plus, Edit, Trash2, Clock } from "lucide-react";
+import { Plus, Edit, Trash2, Clock, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
@@ -42,8 +42,9 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     const [form, setForm] = useState<Partial<ExamCountdown>>({});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [date, setDate] = useState<Date>();
-    const [dateOpen, setDateOpen] = useState(false); // Add state to control popover
-    const [currentMonth, setCurrentMonth] = useState<Date>(new Date()); // Add state for month navigation
+    const [dateOpen, setDateOpen] = useState(false);
+    const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+    const [showCompleted, setShowCompleted] = useState(false); // Add state for toggle
 
     const handleOpenForm = (countdown?: ExamCountdown) => {
         if (countdown) {
@@ -247,6 +248,46 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         }
     };
 
+    // 根据剩余时间显示不同的阶段
+    const getExamPhase = (examDate: string) => {
+        const now = new Date();
+        const exam = new Date(examDate);
+        const diffDays = differenceInDays(exam, now);
+
+        if (diffDays > 150) { // 5个月以上
+            return "准备阶段";
+        } else if (diffDays > 90) { // 3-5个月
+            return "强化阶段";
+        } else if (diffDays > 30) { // 1-3个月
+            return "冲刺阶段";
+        } else if (diffDays >= 0) { // 1个月内
+            return "即将开始";
+        } else { // 已过期
+            return "已过期";
+        }
+    };
+
+    // 获取考试状态
+    const getExamStatus = (examDate: string) => {
+        const now = new Date();
+        const exam = new Date(examDate);
+        const diffDays = differenceInDays(exam, now);
+
+        // 如果考试日期已过，显示"已考完"，否则显示"准备中"
+        return diffDays < 0 ? "已考完" : "准备中";
+    };
+
+    // 获取状态显示文本和颜色
+    const getStatusDisplay = (examDate: string) => {
+        const status = getExamStatus(examDate);
+        const color = status === "已考完" ? "#0284c7" : "#10b981"; // 蓝色表示已考完，绿色表示准备中
+        return { text: status, color };
+    };
+
+    // 分离准备中和已考完的考试
+    const activeCountdowns = countdowns.filter(countdown => getExamStatus(countdown.examDate) !== "已考完");
+    const completedCountdowns = countdowns.filter(countdown => getExamStatus(countdown.examDate) === "已考完");
+
     return (
         <div className="space-y-6 w-full">
             <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
@@ -262,9 +303,41 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 </ButtonGroup>
             </div>
 
+            {/* 切换按钮 */}
+            <div className="flex gap-2">
+                <Button
+                    variant={!showCompleted ? "default" : "outline"}
+                    onClick={() => setShowCompleted(false)}
+                    className="flex items-center gap-2 shadow-sm"
+                    style={{
+                        ...((!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {})),
+                        transition: 'none',
+                        transform: 'none'
+                    }}
+                >
+                    <Clock className="w-5 h-5" />
+                    <MixedText text="准备中" />
+                </Button>
+                <Button
+                    variant={showCompleted ? "default" : "outline"}
+                    onClick={() => setShowCompleted(true)}
+                    className="flex items-center gap-2 shadow-sm"
+                    style={{
+                        ...(showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}),
+                        transition: 'none',
+                        transform: 'none'
+                    }}
+                >
+                    <CheckCircle className="w-5 h-5" />
+                    <MixedText text="已考完" />
+                </Button>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
-                {countdowns.length > 0 ? (
-                    countdowns.map(countdown => (
+                {(showCompleted ? completedCountdowns : activeCountdowns).length > 0 ? (
+                    (showCompleted ? completedCountdowns : activeCountdowns).map(countdown => {
+                        const statusDisplay = getStatusDisplay(countdown.examDate);
+                        return (
                         <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden">
                             <div className="p-6 flex flex-col h-full">
                                 {/* Header with title and actions */}
@@ -274,7 +347,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                             {countdown.name}
                                         </h3>
                                         <p className="text-sm text-muted-foreground mt-1">
-                                            考试倒计时
+                                            {getExamPhase(countdown.examDate)}
                                         </p>
                                     </div>
                                     {/* Action buttons */}
@@ -342,35 +415,50 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
                                 {/* Footer with exam date */}
                                 <div className="mt-4 pt-4 border-t border-border">
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">考试日期</span>
+                                    <div className="text-sm">
+                                        <span className="text-muted-foreground">考试日期：</span>
                                         <span className="font-medium">{format(new Date(countdown.examDate), 'yyyy年MM月dd日')}</span>
                                     </div>
                                 </div>
                             </div>
                         </BorderBeamCard>
-                    ))
+                        )
+                    })
                 ) : (
                     <div className="col-span-full">
                         <BorderBeamCard className="rounded-2xl overflow-hidden">
                             <div className="p-12 text-center">
                                 <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                    <Clock className="w-8 h-8 text-muted-foreground" />
+                                    {showCompleted ? (
+                                        <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                                    ) : (
+                                        <Clock className="w-8 h-8 text-muted-foreground" />
+                                    )}
                                 </div>
                                 <h3 className="text-2xl font-bold text-foreground mb-3">
-                                    <MixedText text="暂无考试倒计时" />
+                                    {showCompleted ? (
+                                        <MixedText text="暂无已完成的考试" />
+                                    ) : (
+                                        <MixedText text="暂无考试倒计时" />
+                                    )}
                                 </h3>
                                 <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                    <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
+                                    {showCompleted ? (
+                                        <MixedText text="已完成的考试将显示在这里，帮助您回顾考试历程" />
+                                    ) : (
+                                        <MixedText text="点击右上方的按钮，添加第一个考试倒计时" />
+                                    )}
                                 </p>
-                                <Button
-                                    onClick={() => handleOpenForm()}
-                                    className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
-                                    variant="default"
-                                >
-                                    <Plus className="w-5 h-5 mr-2" />
-                                    <MixedText text="添加考试" />
-                                </Button>
+                                {!showCompleted && (
+                                    <Button
+                                        onClick={() => handleOpenForm()}
+                                        className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                                        variant="default"
+                                    >
+                                        <Plus className="w-5 h-5 mr-2" />
+                                        <MixedText text="添加考试" />
+                                    </Button>
+                                )}
                             </div>
                         </BorderBeamCard>
                     </div>

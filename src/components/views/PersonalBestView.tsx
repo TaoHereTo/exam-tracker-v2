@@ -1,9 +1,9 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScorePredictor } from "@/components/features/ScorePredictor";
-import { MODULE_SCORES, normalizeModuleName, getModuleScore, getModuleColor } from "@/config/exam";
+import { MODULE_SCORES, normalizeModuleName, getModuleColor, getModuleScore } from "@/config/exam";
 import type { RecordItem } from "@/types/record";
 import { timeStringToMinutes } from "@/lib/utils";
 import { MixedText } from "@/components/ui/MixedText";
+import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 
 
 export function PersonalBestView({ records }: { records: RecordItem[] }) {
@@ -29,24 +29,48 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
                         }
                         return acc;
                     }, null);
+                    
+                    // 获取模块颜色
+                    const moduleColor = getModuleColor(module.label);
+                    
                     return (
-                        <Card key={module.key} style={{ borderLeft: `6px solid ${getModuleColor(module.label)}` }}>
-                            <CardHeader>
-                                <CardTitle><MixedText text={module.label} /></CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {best ? (
-                                    <div>
-                                        <div className="text-2xl font-bold mb-2">
-                                            <MixedText text={`${best.perMinute?.toFixed(2) || '0.00'} 分/分钟`} />
-                                        </div>
-                                        <div className="text-sm text-gray-500"><MixedText text={`日期：${best.record.date}`} /></div>
+                        <BorderBeamCard 
+                            key={module.key} 
+                            className="rounded-2xl overflow-hidden"
+                            colorFrom={moduleColor}
+                            colorTo={moduleColor}
+                        >
+                            <div className="p-6">
+                                <div className="pb-3">
+                                    <div className="text-lg font-bold flex items-center">
+                                        <div 
+                                            className="w-3 h-3 rounded-full mr-2" 
+                                            style={{ backgroundColor: moduleColor }}
+                                        />
+                                        <MixedText text={module.label} />
                                     </div>
-                                ) : (
-                                    <div className="text-gray-400"><MixedText text="暂无记录" /></div>
-                                )}
-                            </CardContent>
-                        </Card>
+                                </div>
+                                <div className="pt-0">
+                                    {best ? (
+                                        <div className="text-center">
+                                            <div className="text-3xl font-bold mb-2">
+                                                <MixedText text={`${best.perMinute?.toFixed(2) || '0.00'}`} />
+                                                <span className="text-lg text-muted-foreground ml-1">分/分钟</span>
+                                            </div>
+                                            <div className="text-sm text-muted-foreground">
+                                                <MixedText text={`日期：${best.record.date}`} />
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center py-4">
+                                            <div className="text-muted-foreground">
+                                                <MixedText text="暂无记录" />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </BorderBeamCard>
                     );
                 })}
             </div>
@@ -60,4 +84,4 @@ export function PersonalBestView({ records }: { records: RecordItem[] }) {
             </div>
         </div>
     );
-} 
+}

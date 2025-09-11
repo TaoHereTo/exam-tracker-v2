@@ -464,57 +464,42 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
                         </BorderBeamCard>
                     ))
                 ) : (
-                    <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                        <div className="text-gray-700 dark:text-gray-300 mb-4">
-                            {showCompleted ? (
-                                <CheckCircle className="w-16 h-16" />
-                            ) : (
-                                <Clock className="w-16 h-16" />
-                            )}
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {showCompleted ? (
-                                <MixedText text="暂无已完成的计划" />
-                            ) : (
-                                <MixedText text="暂无进行中的计划" />
-                            )}
-                        </h3>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-4">
-                            {showCompleted ? (
-                                <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
-                            ) : (
-                                <MixedText text="创建一个新的学习计划开始您的学习之旅" />
-                            )}
-                        </p>
-                        {!showCompleted && (
-                            <Button
-                                onClick={() => handleOpenForm()}
-                                className="h-9 text-white"
-                                style={{ 
-                                    backgroundColor: '#1d4ed8', 
-                                    color: 'white',
-                                    transition: 'none',
-                                    transform: 'none',
-                                    boxShadow: 'inherit'
-                                }}
-                                data-plan-button
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                    e.currentTarget.style.color = 'white';
-                                    e.currentTarget.style.transform = 'none';
-                                    e.currentTarget.style.boxShadow = 'inherit';
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                    e.currentTarget.style.color = 'white';
-                                    e.currentTarget.style.transform = 'none';
-                                    e.currentTarget.style.boxShadow = 'inherit';
-                                }}
-                            >
-                                <Plus className="w-5 h-5 mr-2" />
-                                <MixedText text="创建第一个计划" />
-                            </Button>
-                        )}
+                    <div className="col-span-full">
+                        <BorderBeamCard className="rounded-2xl overflow-hidden">
+                            <div className="p-12 text-center">
+                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                    {showCompleted ? (
+                                        <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                                    ) : (
+                                        <Clock className="w-8 h-8 text-muted-foreground" />
+                                    )}
+                                </div>
+                                <h3 className="text-2xl font-bold text-foreground mb-3">
+                                    {showCompleted ? (
+                                        <MixedText text="暂无已完成的计划" />
+                                    ) : (
+                                        <MixedText text="暂无进行中的计划" />
+                                    )}
+                                </h3>
+                                <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                    {showCompleted ? (
+                                        <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
+                                    ) : (
+                                        <MixedText text="创建一个新的学习计划开始您的学习之旅" />
+                                    )}
+                                </p>
+                                {!showCompleted && (
+                                    <Button
+                                        onClick={() => handleOpenForm()}
+                                        className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90 dark:bg-[#1d4ed8] dark:hover:bg-[#1d4ed8]/90 dark:text-white"
+                                        variant="default"
+                                    >
+                                        <Plus className="w-5 h-5 mr-2" />
+                                        <MixedText text="创建第一个计划" />
+                                    </Button>
+                                )}
+                            </div>
+                        </BorderBeamCard>
                     </div>
                 )}
             </div>
