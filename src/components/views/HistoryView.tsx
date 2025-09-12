@@ -31,9 +31,9 @@ export function ExerciseRecordView({
 }: ExerciseRecordViewProps) {
 
     return (
-        // Added proper container with horizontal scrolling for mobile
-        <div className="w-full overflow-x-auto -mx-2 sm:mx-0 px-2 sm:px-4 md:px-8">
-            <div className="min-w-full sm:min-w-0">
+        // Simplified container to match KnowledgeSummaryView approach
+        <div className="pt-4 px-2 md:px-8">
+            <div className="w-full">
                 <UnifiedTable<RecordItem, string>
                     columns={[
                         {

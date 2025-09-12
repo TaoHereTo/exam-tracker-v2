@@ -1278,7 +1278,7 @@ html,
   transition: none;
   position: relative;
   border-radius: 0.5rem;
-  margin: 0.25rem 0.25rem;
+  margin: 0.1rem 0.25rem;
   width: calc(100% - 0.5rem);
   box-sizing: border-box;
   margin-left: 0;
@@ -1289,7 +1289,7 @@ html,
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
   justify-content: center !important;
   text-align: center !important;
-  margin: 0.25rem 0.25rem !important;
+  margin: 0.1rem 0.25rem !important;
   width: calc(100% - 0.5rem) !important;
 }
 

@@ -840,7 +840,7 @@ export function MainApp() {
                                             </PageTitle>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <AnimatedThemeToggler className="w-8 h-8 sm:w-10 sm:h-10" />
+                                            <AnimatedThemeToggler className="w-8 h-8" />
                                         </div>
                                     </div>
 

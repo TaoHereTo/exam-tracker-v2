@@ -63,11 +63,11 @@ export const AnimatedThemeToggler = ({ className }: props) => {
       ref={buttonRef}
       onClick={changeTheme}
       className={cn(
-        "flex items-center justify-center w-10 h-10 rounded-full border border-input-border shadow-sm hover:bg-accent transition-colors",
+        "flex items-center justify-center w-8 h-8 rounded-full border border-input-border shadow-sm hover:bg-accent transition-colors",
         className
       )}
     >
-      {theme === "dark" ? <SunDim className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+      {theme === "dark" ? <SunDim className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
     </button>
   );
 };

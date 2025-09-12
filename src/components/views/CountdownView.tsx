@@ -19,6 +19,7 @@ import { Calendar } from "@/components/ui/calendar"; // Use existing calendar co
 import { cn } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Add Tabs import
 
 interface ExamCountdown {
     id: string;
@@ -45,7 +46,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     const [date, setDate] = useState<Date>();
     const [dateOpen, setDateOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-    const [showCompleted, setShowCompleted] = useState(false); // Add state for toggle
+    const [activeTab, setActiveTab] = useState<"active" | "completed">("active"); // Replace showCompleted with activeTab
     const [recentlyCompletedCountdowns, setRecentlyCompletedCountdowns] = useState<ExamCountdown[]>([]); // Track recently completed countdowns
 
     // Check for completed countdowns
@@ -326,167 +327,252 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 </ButtonGroup>
             </div>
 
-            {/* 切换按钮 */}
-            <div className="flex gap-2">
-                <Button
-                    variant={!showCompleted ? "default" : "outline"}
-                    onClick={() => setShowCompleted(false)}
-                    className="flex items-center gap-2 shadow-sm"
-                    style={{
-                        ...((!showCompleted ? { backgroundColor: '#10b981', color: 'white' } : {})),
-                        transition: 'none',
-                        transform: 'none'
-                    }}
-                >
-                    <Clock className="w-5 h-5" />
-                    <MixedText text="准备中" />
-                </Button>
-                <Button
-                    variant={showCompleted ? "default" : "outline"}
-                    onClick={() => setShowCompleted(true)}
-                    className="flex items-center gap-2 shadow-sm"
-                    style={{
-                        ...(showCompleted ? { backgroundColor: '#0284c7', color: 'white' } : {}),
-                        transition: 'none',
-                        transform: 'none'
-                    }}
-                >
-                    <CheckCircle className="w-5 h-5" />
-                    <MixedText text="已考完" />
-                </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
-                {(showCompleted ? completedCountdowns : activeCountdowns).length > 0 ? (
-                    (showCompleted ? completedCountdowns : activeCountdowns).map(countdown => {
-                        const statusDisplay = getStatusDisplay(countdown.examDate);
-                        return (
-                        <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden">
-                            <div className="p-6 flex flex-col h-full">
-                                {/* Header with title and actions */}
-                                <div className="flex justify-between items-start mb-6">
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="text-xl font-bold text-foreground truncate">
-                                            {countdown.name}
-                                        </h3>
-                                        <p className="text-sm text-muted-foreground mt-1">
-                                            {getExamPhase(countdown.examDate)}
-                                        </p>
-                                    </div>
-                                    {/* Action buttons */}
-                                    <div className="flex gap-1 ml-2 flex-shrink-0">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button
-                                                        onClick={() => handleOpenForm(countdown)}
-                                                        variant="outline"
-                                                        size="icon"
-                                                        className="h-8 w-8 rounded-full"
-                                                    >
-                                                        <Edit className="w-4 h-4" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p><MixedText text="编辑" /></p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                        <AlertDialog>
-                                            <TooltipProvider>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <AlertDialogTrigger asChild>
+            {/* 使用 Tabs 替换按钮 */}
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "active" | "completed")} className="w-full">
+                <TabsList className="grid w-fit min-w-[200px] grid-cols-2 mx-auto">
+                    <TabsTrigger value="active" className="flex items-center gap-2">
+                        <Clock className="w-5 h-5" />
+                        <MixedText text="准备中" />
+                    </TabsTrigger>
+                    <TabsTrigger value="completed" className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5" />
+                        <MixedText text="已考完" />
+                    </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="active" className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
+                        {activeCountdowns.length > 0 ? (
+                            activeCountdowns.map(countdown => {
+                                const statusDisplay = getStatusDisplay(countdown.examDate);
+                                return (
+                                <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden">
+                                    <div className="p-6 flex flex-col h-full">
+                                        {/* Header with title and actions */}
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-xl font-bold text-foreground truncate">
+                                                    {countdown.name}
+                                                </h3>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    {getExamPhase(countdown.examDate)}
+                                                </p>
+                                            </div>
+                                            {/* Action buttons */}
+                                            <div className="flex gap-1 ml-2 flex-shrink-0">
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
                                                             <Button
-                                                                variant="destructive"
+                                                                onClick={() => handleOpenForm(countdown)}
+                                                                variant="outline"
                                                                 size="icon"
                                                                 className="h-8 w-8 rounded-full"
                                                             >
-                                                                <Trash2 className="w-4 h-4" />
+                                                                <Edit className="w-4 h-4" />
                                                             </Button>
-                                                        </AlertDialogTrigger>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p><MixedText text="删除" /></p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </TooltipProvider>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
-                                                </AlertDialogHeader>
-                                                <AlertDialogDescription>
-                                                    此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
-                                                </AlertDialogDescription>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
-                                                        <MixedText text="确认删除" />
-                                                    </AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
-                                    </div>
-                                </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="编辑" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <AlertDialog>
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button
+                                                                        variant="destructive"
+                                                                        size="icon"
+                                                                        className="h-8 w-8 rounded-full"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p><MixedText text="删除" /></p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogDescription>
+                                                            此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
+                                                        </AlertDialogDescription>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
+                                                                <MixedText text="确认删除" />
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </div>
 
-                                {/* Countdown display - main focus */}
-                                <div className="flex-1 flex flex-col items-center justify-center my-4">
-                                    <div className="text-center">
-                                        {calculateDetailedCountdown(countdown.examDate)}
-                                    </div>
-                                </div>
+                                        {/* Countdown display - main focus */}
+                                        <div className="flex-1 flex flex-col items-center justify-center my-4">
+                                            <div className="text-center">
+                                                {calculateDetailedCountdown(countdown.examDate)}
+                                            </div>
+                                        </div>
 
-                                {/* Footer with exam date */}
-                                <div className="mt-4 pt-4 border-t border-border">
-                                    <div className="text-sm">
-                                        <span className="text-muted-foreground">考试日期：</span>
-                                        <span className="font-medium">{format(new Date(countdown.examDate), 'yyyy年MM月dd日')}</span>
+                                        {/* Footer with exam date */}
+                                        <div className="mt-4 pt-4 border-t border-border">
+                                            <div className="text-sm">
+                                                <span className="text-muted-foreground">考试日期：</span>
+                                                <span className="font-medium">{format(new Date(countdown.examDate), 'yyyy年MM月dd日')}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
+                                </BorderBeamCard>
+                                )
+                            })
+                        ) : (
+                            <div className="col-span-full">
+                                <BorderBeamCard className="rounded-2xl overflow-hidden">
+                                    <div className="p-12 text-center">
+                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                            <Clock className="w-8 h-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-foreground mb-3">
+                                            <MixedText text="暂无考试倒计时" />
+                                        </h3>
+                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                            <MixedText text="点击上方的按钮，添加第一个考试倒计时" />
+                                        </p>
+                                        <Button
+                                            onClick={() => handleOpenForm()}
+                                            className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                                            variant="default"
+                                        >
+                                            <Plus className="w-5 h-5 mr-2" />
+                                            <MixedText text="添加考试" />
+                                        </Button>
+                                    </div>
+                                </BorderBeamCard>
                             </div>
-                        </BorderBeamCard>
-                        )
-                    })
-                ) : (
-                    <div className="col-span-full">
-                        <BorderBeamCard className="rounded-2xl overflow-hidden">
-                            <div className="p-12 text-center">
-                                <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                    {showCompleted ? (
-                                        <CheckCircle className="w-8 h-8 text-muted-foreground" />
-                                    ) : (
-                                        <Clock className="w-8 h-8 text-muted-foreground" />
-                                    )}
-                                </div>
-                                <h3 className="text-2xl font-bold text-foreground mb-3">
-                                    {showCompleted ? (
-                                        <MixedText text="暂无已完成的考试" />
-                                    ) : (
-                                        <MixedText text="暂无考试倒计时" />
-                                    )}
-                                </h3>
-                                <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                    {showCompleted ? (
-                                        <MixedText text="已完成的考试将显示在这里，帮助您回顾考试历程" />
-                                    ) : (
-                                        <MixedText text="点击上方的按钮，添加第一个考试倒计时" />
-                                    )}
-                                </p>
-                                {!showCompleted && (
-                                    <Button
-                                        onClick={() => handleOpenForm()}
-                                        className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
-                                        variant="default"
-                                    >
-                                        <Plus className="w-5 h-5 mr-2" />
-                                        <MixedText text="添加考试" />
-                                    </Button>
-                                )}
-                            </div>
-                        </BorderBeamCard>
+                        )}
                     </div>
-                )}
-            </div>
+                </TabsContent>
+                
+                <TabsContent value="completed" className="mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 w-full items-stretch">
+                        {completedCountdowns.length > 0 ? (
+                            completedCountdowns.map(countdown => {
+                                const statusDisplay = getStatusDisplay(countdown.examDate);
+                                return (
+                                <BorderBeamCard key={countdown.id} className="w-full rounded-2xl overflow-hidden">
+                                    <div className="p-6 flex flex-col h-full">
+                                        {/* Header with title and actions */}
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="text-xl font-bold text-foreground truncate">
+                                                    {countdown.name}
+                                                </h3>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    {getExamPhase(countdown.examDate)}
+                                                </p>
+                                            </div>
+                                            {/* Action buttons */}
+                                            <div className="flex gap-1 ml-2 flex-shrink-0">
+                                                <TooltipProvider>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                onClick={() => handleOpenForm(countdown)}
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full"
+                                                            >
+                                                                <Edit className="w-4 h-4" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="编辑" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                                <AlertDialog>
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <AlertDialogTrigger asChild>
+                                                                    <Button
+                                                                        variant="destructive"
+                                                                        size="icon"
+                                                                        className="h-8 w-8 rounded-full"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </AlertDialogTrigger>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p><MixedText text="删除" /></p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle><MixedText text="确认删除考试？" /></AlertDialogTitle>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogDescription>
+                                                            此操作将永久删除考试倒计时"{countdown.name}"，删除后无法恢复。
+                                                        </AlertDialogDescription>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel><MixedText text="取消" /></AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(countdown.id)} variant="destructive">
+                                                                <MixedText text="确认删除" />
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </div>
+                                        </div>
+
+                                        {/* Countdown display - main focus */}
+                                        <div className="flex-1 flex flex-col items-center justify-center my-4">
+                                            <div className="text-center">
+                                                {calculateDetailedCountdown(countdown.examDate)}
+                                            </div>
+                                        </div>
+
+                                        {/* Footer with exam date */}
+                                        <div className="mt-4 pt-4 border-t border-border">
+                                            <div className="text-sm">
+                                                <span className="text-muted-foreground">考试日期：</span>
+                                                <span className="font-medium">{format(new Date(countdown.examDate), 'yyyy年MM月dd日')}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </BorderBeamCard>
+                                )
+                            })
+                        ) : (
+                            <div className="col-span-full">
+                                <BorderBeamCard className="rounded-2xl overflow-hidden">
+                                    <div className="p-12 text-center">
+                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                            <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-foreground mb-3">
+                                            <MixedText text="暂无已完成的考试" />
+                                        </h3>
+                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                            <MixedText text="已完成的考试将显示在这里，帮助您回顾考试历程" />
+                                        </p>
+                                    </div>
+                                </BorderBeamCard>
+                            </div>
+                        )}
+                    </div>
+                </TabsContent>
+            </Tabs>
+            
             {showForm && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-xl">

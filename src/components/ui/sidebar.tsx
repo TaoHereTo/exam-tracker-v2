@@ -482,14 +482,14 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
     <li
       data-slot="sidebar-menu-item"
       data-sidebar="menu-item"
-      className={cn("group/menu-item relative", className)}
+      className={cn("group/menu-item relative py-0.5", className)}
       {...props}
     />
   )
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button flex w-full items-baseline gap-3 overflow-hidden rounded-md px-2 py-1 text-left text-base outline-hidden disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 hover:bg-[var(--hover-light)] data-[active=true]:bg-[var(--hover-light)] dark:hover:bg-[var(--hover-dark)] dark:data-[active=true]:bg-[var(--hover-dark)] [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:text-center group-data-[collapsible=icon]:group-data-[state=collapsed]:p-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:p-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:p-0 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:w-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:h-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:p-0 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:w-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:h-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:p-0",
+  "peer/menu-button flex w-full items-baseline gap-3 overflow-hidden rounded-md px-2 py-0.5 text-left text-base outline-hidden disabled:pointer-events-none disabled:opacity-50 group-has-data-[sidebar=menu-action]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 hover:bg-[var(--hover-light)] data-[active=true]:bg-[var(--hover-light)] dark:hover:bg-[var(--hover-dark)] dark:data-[active=true]:bg-[var(--hover-dark)] [&>span:last-child]:truncate [&>svg]:size-5 [&>svg]:shrink-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:justify-center group-data-[collapsible=icon]:group-data-[state=collapsed]:gap-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:text-center group-data-[collapsible=icon]:group-data-[state=collapsed]:p-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:p-0 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:w-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:h-10 group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:p-0 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:w-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:h-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:hover:p-0 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:w-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:h-10 dark:group-data-[collapsible=icon]:group-data-[state=collapsed]:data-[active=true]:p-0",
   {
     variants: {
       variant: {
@@ -498,9 +498,9 @@ const sidebarMenuButtonVariants = cva(
           "bg-input",
       },
       size: {
-        default: "h-10 text-base",
-        sm: "h-8 text-sm",
-        lg: "h-14 text-base",
+        default: "h-8 text-base",
+        sm: "h-7 text-sm",
+        lg: "h-10 text-base",
       },
     },
     defaultVariants: {

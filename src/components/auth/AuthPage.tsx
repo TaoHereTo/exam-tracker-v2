@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿'use client'
+﻿﻿﻿﻿﻿﻿﻿﻿'use client'
 
 import React, { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -83,7 +83,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                     <Image src="/trace.svg" alt="App Icon" className="h-10 w-10 sm:h-12 sm:w-12" width={48} height={48} />
                     <span className="hidden sm:inline text-lg sm:text-xl font-semibold text-foreground/90">行测每日记录</span>
                 </Link>
-                <AnimatedThemeToggler className="w-10 h-10" />
+                <AnimatedThemeToggler className="w-8 h-8" />
             </div>
 
             {/* 左侧功能展示 */}
