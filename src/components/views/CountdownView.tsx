@@ -8,7 +8,7 @@ import { FormError } from "@/components/ui/form-error";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { Plus, Edit, Trash2, Clock, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -34,9 +34,10 @@ interface CountdownViewProps {
     onCreate: (countdown: ExamCountdown) => void;
     onUpdate: (countdown: ExamCountdown) => void;
     onDelete: (id: string) => void;
+    onCountdownComplete?: (countdown: ExamCountdown) => void; // Add this prop
 }
 
-export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete }: CountdownViewProps) {
+export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete, onCountdownComplete }: CountdownViewProps) {
     const [showForm, setShowForm] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
     const [form, setForm] = useState<Partial<ExamCountdown>>({});
@@ -45,6 +46,26 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     const [dateOpen, setDateOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
     const [showCompleted, setShowCompleted] = useState(false); // Add state for toggle
+    const [recentlyCompletedCountdowns, setRecentlyCompletedCountdowns] = useState<ExamCountdown[]>([]); // Track recently completed countdowns
+
+    // Check for completed countdowns
+    useEffect(() => {
+        const now = new Date();
+        const newlyCompleted = countdowns.filter(countdown => {
+            const examDate = new Date(countdown.examDate);
+            // Check if the exam date has passed within the last minute and we haven't already notified
+            const isCompleted = examDate <= now && examDate > new Date(now.getTime() - 60000);
+            const alreadyNotified = recentlyCompletedCountdowns.some(c => c.id === countdown.id);
+            return isCompleted && !alreadyNotified;
+        });
+
+        if (newlyCompleted.length > 0 && onCountdownComplete) {
+            // Call the completion callback for the first completed countdown
+            onCountdownComplete(newlyCompleted[0]);
+            // Add to completed countdowns to prevent duplicate notifications
+            setRecentlyCompletedCountdowns(prev => [...prev, ...newlyCompleted]);
+        }
+    }, [countdowns, onCountdownComplete, recentlyCompletedCountdowns]);
 
     const handleOpenForm = (countdown?: ExamCountdown) => {
         if (countdown) {
@@ -103,12 +124,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         if (!form.name?.trim()) {
             newErrors.name = '考试名称不能为空';
             toast.error('考试名称不能为空');
+            setErrors(newErrors);
             return false;
         }
 
         if (!form.examDate) {
             newErrors.examDate = '请选择考试日期';
             toast.error('请选择考试日期');
+            setErrors(newErrors);
             return false;
         }
 

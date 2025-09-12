@@ -552,53 +552,66 @@ export class CloudSyncService {
     }
 
     // 从云端下载数据到本地
-    static async downloadFromCloud(): Promise<SyncResult> {
+    static async downloadFromCloud(
+        onProgress?: (progress: { current: number; total: number; currentItem: string }) => void
+    ): Promise<SyncResult> {
         try {
-            let downloadedRecords = 0;
-            let downloadedPlans = 0;
-            let downloadedKnowledge = 0;
-            let settingsDownloaded = false;
+            let downloadedRecords: RecordItem[] = [];
+            let downloadedPlans: StudyPlan[] = [];
+            let downloadedKnowledge: KnowledgeItem[] = [];
+            let settingsDownloaded: UserSettings | null = null;
+
+            // Report initial progress
+            onProgress?.({ current: 0, total: 4, currentItem: "开始下载数据..." });
 
             // 下载刷题历史
             try {
-                const cloudRecords = await recordService.getRecords();
-                downloadedRecords = cloudRecords.length;
+                onProgress?.({ current: 1, total: 4, currentItem: "正在下载刷题历史..." });
+                downloadedRecords = await recordService.getRecords();
             } catch (error) {
-                // 下载记录失败
+                console.error('下载记录失败:', error);
             }
 
             // 下载学习计划
             try {
-                const cloudPlans = await planService.getPlans();
-                downloadedPlans = cloudPlans.length;
+                onProgress?.({ current: 2, total: 4, currentItem: "正在下载学习计划..." });
+                downloadedPlans = await planService.getPlans();
             } catch (error) {
-                // 下载计划失败
+                console.error('下载计划失败:', error);
             }
 
             // 下载知识点
             try {
-                const cloudKnowledge = await knowledgeService.getKnowledge();
-                downloadedKnowledge = cloudKnowledge.length;
+                onProgress?.({ current: 3, total: 4, currentItem: "正在下载知识点..." });
+                downloadedKnowledge = await knowledgeService.getKnowledge();
             } catch (error) {
-                // 下载知识点失败
+                console.error('下载知识点失败:', error);
             }
 
             // 下载设置
             try {
-                const cloudSettings = await settingsService.getSettings();
-                settingsDownloaded = Object.keys(cloudSettings).length > 0;
+                onProgress?.({ current: 4, total: 4, currentItem: "正在下载设置..." });
+                settingsDownloaded = await settingsService.getSettings();
             } catch (error) {
-                // 下载设置失败
+                console.error('下载设置失败:', error);
             }
+
+            // Report completion
+            onProgress?.({ current: 4, total: 4, currentItem: "下载完成" });
 
             return {
                 success: true,
-                message: `成功下载 ${downloadedRecords} 条记录、${downloadedPlans} 个计划、${downloadedKnowledge} 条知识点`,
+                message: `成功下载 ${downloadedRecords.length} 条记录、${downloadedPlans.length} 个计划、${downloadedKnowledge.length} 条知识点`,
                 details: {
-                    records: { uploaded: 0, downloaded: downloadedRecords, skipped: 0 },
-                    plans: { uploaded: 0, downloaded: downloadedPlans, skipped: 0 },
-                    knowledge: { uploaded: 0, downloaded: downloadedKnowledge, skipped: 0 },
-                    settings: { uploaded: false, downloaded: settingsDownloaded }
+                    records: { uploaded: 0, downloaded: downloadedRecords.length, skipped: 0 },
+                    plans: { uploaded: 0, downloaded: downloadedPlans.length, skipped: 0 },
+                    knowledge: { uploaded: 0, downloaded: downloadedKnowledge.length, skipped: 0 },
+                    settings: { uploaded: false, downloaded: !!settingsDownloaded }
+                },
+                report: {
+                    records: downloadedRecords.map(record => ({ item: record, action: 'uploaded' as const })),
+                    plans: downloadedPlans.map(plan => ({ item: plan, action: 'uploaded' as const })),
+                    knowledge: downloadedKnowledge.map(knowledge => ({ item: knowledge, action: 'uploaded' as const }))
                 }
             };
         } catch (error) {

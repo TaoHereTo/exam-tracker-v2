@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -32,11 +33,16 @@ import type { UploadProgress } from "@/lib/cloudSyncService";
 import type { SyncReportItem } from "@/types/common";
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+import { CloudDataOverview } from "@/components/views/CloudDataOverview";
+import { CloudSyncService } from "@/lib/cloudSyncService";
 
 export function UnifiedSettings({
   onExport, 
   onImport, 
   onClearLocalData,
+  setRecords,  // Add setter functions
+  setPlans,
+  setKnowledge,
   records = [],
   plans = [],
   knowledge = [],
@@ -47,6 +53,9 @@ export function UnifiedSettings({
   onExport?: () => void;
   onImport?: () => void;
   onClearLocalData?: () => void;
+  setRecords?: React.Dispatch<React.SetStateAction<RecordItem[]>>;  // Add setter types
+  setPlans?: React.Dispatch<React.SetStateAction<StudyPlan[]>>;
+  setKnowledge?: React.Dispatch<React.SetStateAction<KnowledgeItem[]>>;
   records?: RecordItem[];
   plans?: StudyPlan[];
   knowledge?: KnowledgeItem[];
@@ -77,6 +86,7 @@ export function UnifiedSettings({
   const [isDownloading, setIsDownloading] = useState(false);
   const [syncStatus, setSyncStatus] = useState('');
   const [uploadProgress, setUploadProgress] = useState<UploadProgress | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState<{ current: number; total: number; currentItem: string } | null>(null);
   const [syncReport, setSyncReport] = useState<{
     records: SyncReportItem<RecordItem>[];
     plans: SyncReportItem<StudyPlan>[];
@@ -85,6 +95,9 @@ export function UnifiedSettings({
   const [showCloudOverview, setShowCloudOverview] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
+  // Add state for confirmation dialogs
+  const [uploadConfirmDialogOpen, setUploadConfirmDialogOpen] = useState(false);
+  const [downloadConfirmDialogOpen, setDownloadConfirmDialogOpen] = useState(false);
 
   // Eye care mode effect
   useEffect(() => {
@@ -275,21 +288,123 @@ export function UnifiedSettings({
 
   // Cloud sync functions
   const handleUploadToCloud = async () => {
-    // This would integrate with your cloud sync service
-    notify({
-      message: "功能开发中",
-      description: "云端同步功能正在开发中",
-      type: "info"
-    });
+    setUploadConfirmDialogOpen(true);
+  };
+
+  const confirmUploadToCloud = async () => {
+    setUploadConfirmDialogOpen(false);
+    try {
+      // Set uploading state
+      setIsUploading(true);
+      setUploadProgress({
+        current: 0,
+        total: 4,
+        currentItem: "准备上传...",
+        stage: 'checking',
+        isPaused: false,
+        isCancelled: false
+      });
+
+      // Upload data to cloud with progress reporting
+      const result = await CloudSyncService.uploadToCloud(
+        records || [],
+        plans || [],
+        knowledge || [],
+        settings || {},
+        (progress) => {
+          setUploadProgress(progress);
+        }
+      );
+
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      if (result.success) {
+        // Show success notification
+        notify({
+          type: "success",
+          message: "上传成功",
+          description: result.message
+        });
+      } else {
+        // Show error notification
+        notify({
+          type: "error",
+          message: "上传失败",
+          description: result.message
+        });
+      }
+    } catch (error) {
+      notify({
+        type: "error",
+        message: "上传失败",
+        description: error instanceof Error ? error.message : "未知错误"
+      });
+    } finally {
+      // Reset uploading state
+      setIsUploading(false);
+      setUploadProgress(null);
+    }
   };
 
   const handleDownloadFromCloud = async () => {
-    // This would integrate with your cloud sync service
-    notify({
-      message: "功能开发中",
-      description: "云端下载功能正在开发中",
-      type: "info"
-    });
+    setDownloadConfirmDialogOpen(true);
+  };
+
+  const confirmDownloadFromCloud = async () => {
+    setDownloadConfirmDialogOpen(false);
+    try {
+      // Set downloading state
+      setIsDownloading(true);
+      setDownloadProgress({ current: 0, total: 4, currentItem: "准备下载..." });
+
+      // Download data from cloud with progress reporting
+      const result = await CloudSyncService.downloadFromCloud((progress) => {
+        setDownloadProgress(progress);
+      });
+
+      // Small delay to show completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      if (result.success && result.report) {
+        // Update local state with downloaded data
+        if (setRecords && result.report.records) {
+          setRecords(result.report.records.map(item => item.item));
+        }
+        
+        if (setPlans && result.report.plans) {
+          setPlans(result.report.plans.map(item => item.item));
+        }
+        
+        if (setKnowledge && result.report.knowledge) {
+          setKnowledge(result.report.knowledge.map(item => item.item));
+        }
+
+        // Show success notification
+        notify({
+          type: "success",
+          message: "下载成功",
+          description: result.message
+        });
+      } else {
+        // Show error notification
+        notify({
+          type: "error",
+          message: "下载失败",
+          description: result.message
+        });
+      }
+    } catch (error) {
+      notify({
+        type: "error",
+        message: "下载失败",
+        description: error instanceof Error ? error.message : "未知错误"
+      });
+    } finally {
+      // Reset downloading state
+      setIsDownloading(false);
+      setDownloadProgress(null);
+    }
   };
 
   const handleViewCloudData = () => {
@@ -417,7 +532,7 @@ export function UnifiedSettings({
                   <TooltipTrigger asChild>
                     <Button
                       onClick={handleUploadToCloud}
-                      disabled={isUploading}
+                      disabled={isUploading || isDownloading}
                       variant="outline"
                       size="sm"
                       className="h-8 sm:h-9 w-8 sm:w-9"
@@ -433,7 +548,7 @@ export function UnifiedSettings({
                   <TooltipTrigger asChild>
                     <Button
                       onClick={handleDownloadFromCloud}
-                      disabled={isDownloading}
+                      disabled={isUploading || isDownloading}
                       variant="outline"
                       size="sm"
                       className="h-8 sm:h-9 w-8 sm:w-9"
@@ -449,6 +564,7 @@ export function UnifiedSettings({
                   <TooltipTrigger asChild>
                     <Button
                       onClick={handleViewCloudData}
+                      disabled={isUploading || isDownloading}
                       variant="outline"
                       size="sm"
                       className="h-8 sm:h-9 w-8 sm:w-9"
@@ -462,6 +578,36 @@ export function UnifiedSettings({
                 </Tooltip>
               </div>
             </div>
+
+            {/* Upload Progress Bar */}
+            {isUploading && uploadProgress && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="font-medium"><MixedText text={uploadProgress.currentItem} /></span>
+                  <span>{uploadProgress.current}/{uploadProgress.total}</span>
+                </div>
+                <Progress 
+                  value={(uploadProgress.current / uploadProgress.total) * 100} 
+                  variant="upload" 
+                  showText={true} 
+                />
+              </div>
+            )}
+
+            {/* Download Progress Bar */}
+            {isDownloading && downloadProgress && (
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="font-medium"><MixedText text={downloadProgress.currentItem} /></span>
+                  <span>{downloadProgress.current}/{downloadProgress.total}</span>
+                </div>
+                <Progress 
+                  value={(downloadProgress.current / downloadProgress.total) * 100} 
+                  variant="upload" 
+                  showText={true} 
+                />
+              </div>
+            )}
           </div>
 
           {/* Clear Local Data */}
@@ -788,9 +934,57 @@ export function UnifiedSettings({
         </CardContent>
       </Card>
 
+      {/* Upload Confirmation Dialog */}
+      <AlertDialog open={uploadConfirmDialogOpen} onOpenChange={setUploadConfirmDialogOpen}>
+        <AlertDialogContent className="p-4 sm:p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base sm:text-lg"><MixedText text="确认上传数据到云端？" /></AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
+              此操作将把本地的所有刷题历史、学习计划和知识点数据上传到云端进行备份。如果云端已有数据，可能会被覆盖。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row sm:flex-row gap-2">
+            <AlertDialogCancel
+              onClick={() => setUploadConfirmDialogOpen(false)}
+              className="h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              <MixedText text="取消" />
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmUploadToCloud}
+              className="bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              <MixedText text="确认上传" />
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-
-
+      {/* Download Confirmation Dialog */}
+      <AlertDialog open={downloadConfirmDialogOpen} onOpenChange={setDownloadConfirmDialogOpen}>
+        <AlertDialogContent className="p-4 sm:p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-base sm:text-lg"><MixedText text="确认从云端下载数据？" /></AlertDialogTitle>
+            <AlertDialogDescription className="text-xs sm:text-sm">
+              此操作将从云端下载所有数据到本地，可能会覆盖您当前的本地数据。请确保您已备份重要数据。
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row sm:flex-row gap-2">
+            <AlertDialogCancel
+              onClick={() => setDownloadConfirmDialogOpen(false)}
+              className="h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              <MixedText text="取消" />
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDownloadFromCloud}
+              className="bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              <MixedText text="确认下载" />
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Image Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={(open) => {
@@ -835,7 +1029,10 @@ export function UnifiedSettings({
         </AlertDialogContent>
       </AlertDialog>
 
-
+      <CloudDataOverview 
+        isOpen={showCloudOverview} 
+        onClose={() => setShowCloudOverview(false)} 
+      />
     </div>
   );
 }

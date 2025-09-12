@@ -115,26 +115,36 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
 
         if (!form.name?.trim()) {
             newErrors.name = '计划名称不能为空';
+            toast.error('计划名称不能为空');
+            setErrors(newErrors);
             return false;
         }
 
         if (!form.module) {
             newErrors.module = '请选择模块';
+            toast.error('请选择模块');
+            setErrors(newErrors);
             return false;
         }
 
         if (!form.type) {
             newErrors.type = '请选择计划类型';
+            toast.error('请选择计划类型');
+            setErrors(newErrors);
             return false;
         }
 
         if (!form.startDate) {
             newErrors.startDate = '请选择开始日期';
+            toast.error('请选择开始日期');
+            setErrors(newErrors);
             return false;
         }
 
         if (!form.endDate) {
             newErrors.endDate = '请选择结束日期';
+            toast.error('请选择结束日期');
+            setErrors(newErrors);
             return false;
         }
 
@@ -143,18 +153,24 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete }: Pl
             const endDate = new Date(form.endDate);
             if (startDate > endDate) {
                 newErrors.endDate = '结束日期不能早于开始日期';
+                toast.error('结束日期不能早于开始日期');
+                setErrors(newErrors);
                 return false;
             }
         }
 
         if (!form.target) {
             newErrors.target = '请输入目标值';
+            toast.error('请输入目标值');
+            setErrors(newErrors);
             return false;
         }
 
         const target = parseInt(form.target.toString());
         if (isNaN(target) || target <= 0) {
             newErrors.target = '目标值必须是大于0的数字';
+            toast.error('目标值必须是大于0的数字');
+            setErrors(newErrors);
             return false;
         }
 

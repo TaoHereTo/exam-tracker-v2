@@ -9,7 +9,7 @@ import { Download, Upload, Eye, Trash2, CloudUpload, CloudDownload } from "lucid
 import { useState } from "react";
 import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
 import { useNotification } from "@/components/magicui/NotificationProvider";
-import { CloudDataOverview } from "./CloudDataOverview";
+import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { SyncReportItem } from "@/types/common";
 import { RecordItem, StudyPlan, KnowledgeItem, UserSettings } from "@/types/record";
 import { MixedText } from "@/components/ui/MixedText";
@@ -24,6 +24,7 @@ import { UnifiedSettings } from "./settings/UnifiedSettings";
 
 export function SettingsView({
     onExport, onImport, onClearLocalData,
+    setRecords, setPlans, setKnowledge,  // Add setter functions
     activeTab,
     navMode,
     records = [],
@@ -34,6 +35,9 @@ export function SettingsView({
     onExport?: () => void;
     onImport?: () => void;
     onClearLocalData?: () => void;
+    setRecords?: React.Dispatch<React.SetStateAction<RecordItem[]>>;  // Add setter types
+    setPlans?: React.Dispatch<React.SetStateAction<StudyPlan[]>>;
+    setKnowledge?: React.Dispatch<React.SetStateAction<KnowledgeItem[]>>;
     activeTab?: string;
     navMode?: string;
     records?: RecordItem[];
@@ -47,6 +51,9 @@ export function SettingsView({
             onExport={onExport}
             onImport={onImport}
             onClearLocalData={onClearLocalData}
+            setRecords={setRecords}  // Pass setter functions
+            setPlans={setPlans}
+            setKnowledge={setKnowledge}
             records={records}
             plans={plans}
             knowledge={knowledge}

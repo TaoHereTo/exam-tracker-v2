@@ -19,7 +19,7 @@ export const MODULE_NAME_MAP: Record<string, string> = {
 
 // 页面标题映射（英文到中文）
 export const PAGE_TITLE_MAP: Record<string, string> = {
-    'overview': '数据概览',
+    'overview': '成绩概览',
     'charts': '数据图表',
     'history': '刷题历史',
     'personal-best': '最佳成绩',

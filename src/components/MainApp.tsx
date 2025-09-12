@@ -45,6 +45,7 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 
 import { AnimatedThemeToggler } from "@/components/magicui/animated-theme-toggler";
 import { PlanCompletionCelebration } from "@/components/ui/PlanCompletionCelebration";
+import { CountdownCompletionCelebration } from "@/components/ui/CountdownCompletionCelebration";
 
 import { PageTitle } from "@/components/ui/PageTitle";
 import { LoadingWrapper, SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -124,7 +125,7 @@ const CountdownView = lazy(() =>
 );
 
 export function MainApp() {
-    const [activeTab, setActiveTab] = useState('overview'); // 默认显示'数据概览'
+    const [activeTab, setActiveTab] = useState('overview'); // 默认显示'成绩概览'
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const { isDarkMode, mounted, getBackgroundStyle } = useThemeMode();
@@ -148,6 +149,10 @@ export function MainApp() {
     // 计划完成庆祝弹窗状态
     const [celebrationOpen, setCelebrationOpen] = useState(false);
     const [completedPlan, setCompletedPlan] = useState<StudyPlan | null>(null);
+    
+    // 考试倒计时完成庆祝弹窗状态
+    const [countdownCelebrationOpen, setCountdownCelebrationOpen] = useState(false);
+    const [completedCountdown, setCompletedCountdown] = useState<ExamCountdown | null>(null);
 
     const loadUserProfile = useCallback(async () => {
         try {
@@ -194,16 +199,27 @@ export function MainApp() {
         setCelebrationOpen(true);
     }, []);
 
-    // 处理庆祝弹窗关闭
+    // 处理计划庆祝弹窗关闭
     const handleCelebrationClose = useCallback(() => {
         setCelebrationOpen(false);
         setCompletedPlan(null);
+    }, []);
+
+    // 处理倒计时庆祝弹窗关闭
+    const handleCountdownCelebrationClose = useCallback(() => {
+        setCountdownCelebrationOpen(false);
+        setCompletedCountdown(null);
     }, []);
 
     // 处理查看计划
     const handleViewCompletedPlans = useCallback(() => {
         setActiveTab('plan-list');
         // 可以在这里添加滚动到已完成计划的逻辑
+    }, []);
+    
+    // 处理查看倒计时
+    const handleViewCompletedCountdowns = useCallback(() => {
+        setActiveTab('countdown');
     }, []);
 
     useEffect(() => {
@@ -1118,6 +1134,10 @@ export function MainApp() {
                                                             console.error('MainApp - 删除倒计时失败:', error);
                                                         }
                                                     }}
+                                                    onCountdownComplete={(countdown) => {
+                                                        setCompletedCountdown(countdown);
+                                                        setCountdownCelebrationOpen(true);
+                                                    }}
                                                 />
                                             </Suspense>
                                         )}
@@ -1132,6 +1152,9 @@ export function MainApp() {
                                                     onExport={handleExportData}
                                                     onImport={handleImportData}
                                                     onClearLocalData={handleClearLocalData}
+                                                    setRecords={setRecords}
+                                                    setPlans={setPlans}
+                                                    setKnowledge={setKnowledge}
                                                     activeTab={activeTab}
                                                     navMode={navMode}
                                                     records={records}
@@ -1231,6 +1254,14 @@ export function MainApp() {
                         onClose={handleCelebrationClose}
                         onViewPlans={handleViewCompletedPlans}
                         planName={completedPlan?.name || ''}
+                    />
+                    
+                    {/* 倒计时完成庆祝弹窗 */}
+                    <CountdownCompletionCelebration
+                        isOpen={countdownCelebrationOpen}
+                        onClose={handleCountdownCelebrationClose}
+                        onViewCountdowns={handleViewCompletedCountdowns}
+                        countdownName={completedCountdown?.name || ''}
                     />
 
                     {/* 用户资料对话框 - 响应式设计 */}

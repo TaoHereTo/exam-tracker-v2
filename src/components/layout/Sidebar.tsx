@@ -77,10 +77,10 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                         <SidebarMenu className="gap-0">
                             <SidebarMenuItem>
                                 <SidebarMenuItemWrapper onNavigate={() => setActiveTab('overview')}>
-                                    <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="数据概览">
+                                    <SidebarMenuButton asChild isActive={activeTab === 'overview'} tooltip="成绩概览">
                                         <a href="#">
                                             <GalleryVerticalEnd className="h-4 w-4 sm:h-5 sm:w-5" />
-                                            <span className="text-sm sm:text-base"><MixedText text="数据概览" /></span>
+                                            <span className="text-sm sm:text-base"><MixedText text="成绩概览" /></span>
                                         </a>
                                     </SidebarMenuButton>
                                 </SidebarMenuItemWrapper>
