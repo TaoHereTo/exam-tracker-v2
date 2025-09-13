@@ -269,10 +269,17 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       }
     };
 
+    // For subCategory, it's always required for modules that have subCategories
+    // The validation will check the actual form values, not the initial data
     if (config.hasSubCategory) {
       schema.subCategory = { 
         required: true,
-        custom: () => '请选择子分类'
+        custom: (value) => {
+          if (!value || !String(value).trim()) {
+            return '请选择子分类';
+          }
+          return null;
+        }
       };
     }
 

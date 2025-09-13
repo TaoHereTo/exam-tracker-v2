@@ -15,20 +15,19 @@
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  -webkit-font-smoothing: subpixel-antialiased; /* 优化高分辨率显示 */
   font-feature-settings: "liga" 1; /* 启用连字 */
 }
 
 /* 针对高DPI屏幕的媒体查询优化 */
 @media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
   * {
-    -webkit-font-smoothing: subpixel-antialiased;
-    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   /* 高DPI字体优化变量 */
   :root {
-    --font-smoothing: subpixel-antialiased;
+    --font-smoothing: antialiased;
     --text-rendering: optimizeLegibility;
   }
 }
@@ -36,14 +35,14 @@
 /* 针对2K及以上分辨率的优化 */
 @media (min-width: 2048px) {
   * {
-    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
   }
   
   /* 2K分辨率字体优化变量 */
   :root {
-    --font-smoothing: subpixel-antialiased;
+    --font-smoothing: antialiased;
     --text-rendering: optimizeLegibility;
     --font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
   }
@@ -51,47 +50,84 @@
 
 /* 高DPI类 */
 .high-dpi {
-  -webkit-font-smoothing: var(--font-smoothing, subpixel-antialiased);
-  -moz-osx-font-smoothing: var(--moz-font-smoothing, auto);
+  -webkit-font-smoothing: var(--font-smoothing, antialiased);
+  -moz-osx-font-smoothing: var(--moz-font-smoothing, grayscale);
   text-rendering: var(--text-rendering, optimizeLegibility);
+}
+
+/* 优化中文字符在100%缩放下的清晰度 */
+.mixed-text-part {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-weight: 400;
+  /* 为细线字符添加特殊渲染优化 */
+  font-feature-settings: "kern" 1, "liga" 1;
+  /* 添加轻微的文本阴影来增强细线的可见性 */
+  text-shadow: 0 0 0.2px currentColor;
+}
+
+/* 深色模式下的中文字符优化 */
+.dark .mixed-text-part {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-weight: 400;
+  /* 为细线字符添加特殊渲染优化 */
+  font-feature-settings: "kern" 1, "liga" 1;
+  /* 添加轻微的文本阴影来增强细线的可见性 */
+  text-shadow: 0 0 0.2px currentColor;
+}
+
+/* 特别优化包含横线的常见中文字符 */
+.mixed-text-part:contains("一"):not(.dark *),
+.mixed-text-part:contains("二"):not(.dark *),
+.mixed-text-part:contains("三"):not(.dark *) {
+  text-shadow: 0 0 0.3px currentColor;
+}
+
+.dark .mixed-text-part:contains("一"),
+.dark .mixed-text-part:contains("二"),
+.dark .mixed-text-part:contains("三") {
+  text-shadow: 0 0 0.3px currentColor;
 }
 
 /* 下拉菜单字体优化 */
 [data-radix-popper-content-wrapper] {
-  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 [data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 .dark [data-radix-popper-content-wrapper] {
-  -webkit-font-smoothing: subpixel-antialiased;
-  -moz-osx-font-smoothing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* 深色模式下拉菜单特殊优化 */
 .dark [data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: subpixel-antialiased !important;
+  -webkit-font-smoothing: antialiased !important;
   text-rendering: optimizeLegibility !important;
   font-weight: 500 !important;
 }
 
 /* 特别优化退出登录按钮文本 */
 .dark [data-radix-popper-content-wrapper] [data-slot="menu-item"] > div > span {
-  -webkit-font-smoothing: subpixel-antialiased !important;
+  -webkit-font-smoothing: antialiased !important;
   text-rendering: optimizeLegibility !important;
   font-weight: 500 !important;
 }
 
 /* 特别优化"退出登录"文本在深色模式下的清晰度 */
 .dark .logout-menu-item .logout-text {
-  -webkit-font-smoothing: subpixel-antialiased !important;
-  -moz-osx-font-smoothing: auto !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
   font-weight: 600 !important;
   letter-spacing: 0.02em !important;
@@ -100,8 +136,8 @@
 
 /* 确保深色模式下所有菜单项文本清晰 */
 .dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
-  -webkit-font-smoothing: subpixel-antialiased !important;
-  -moz-osx-font-smoothing: auto !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
   text-rendering: optimizeLegibility !important;
 }
 
