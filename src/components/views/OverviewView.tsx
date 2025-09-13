@@ -11,6 +11,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { HelpCircle } from "lucide-react";
+import { Marquee } from "@/components/magicui/marquee";
 
 interface OverviewViewProps {
     records: Array<{
@@ -276,12 +277,21 @@ export function OverviewView({ records }: OverviewViewProps) {
         },
     ];
 
+    // 将cards分成两半，就像官网例子一样
+    const firstRow = cards.slice(0, Math.ceil(cards.length / 2));
+    const secondRow = cards.slice(Math.ceil(cards.length / 2));
+
     return (
         <TooltipProvider>
-            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 sm:gap-8">
-                <div className="w-full grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6 px-2 sm:px-6 py-4 sm:py-6">
-                    {cards.map((item, idx) => (
-                        <Card className="min-w-[140px] w-full sm:min-w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0" key={item.title + idx}>
+            <div className="relative flex w-full flex-col items-center justify-center overflow-hidden min-h-[60vh] gap-6 sm:gap-8">
+                {/* 第一行 - 前半部分数据，正向滚动 */}
+                <Marquee
+                    className="w-full [--duration:60s] [--gap:1.5rem]"
+                    pauseOnHover={true}
+                    repeat={2}
+                >
+                    {firstRow.map((item, idx) => (
+                        <Card className="min-w-[140px] w-[140px] sm:min-w-[220px] sm:w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0 flex-shrink-0" key={`row1-${item.title}-${idx}`}>
                             <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                 <div className="flex flex-row items-center justify-center">
                                     <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
@@ -309,7 +319,49 @@ export function OverviewView({ records }: OverviewViewProps) {
                             </div>
                         </Card>
                     ))}
-                </div>
+                </Marquee>
+
+                {/* 第二行 - 后半部分数据，逆向滚动 */}
+                <Marquee
+                    className="w-full [--duration:60s] [--gap:1.5rem]"
+                    pauseOnHover={true}
+                    repeat={2}
+                    reverse={true}
+                >
+                    {secondRow.map((item, idx) => (
+                        <Card className="min-w-[140px] w-[140px] sm:min-w-[220px] sm:w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0 flex-shrink-0" key={`row2-${item.title}-${idx}`}>
+                            <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
+                                <div className="flex flex-row items-center justify-center">
+                                    <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
+                                    {item.tooltip && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <HelpCircle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground cursor-help ml-1" />
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p><MixedText text={item.tooltip} /></p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                </div>
+                                <div className="flex flex-col items-center justify-center py-1 flex-grow">
+                                    <div className="text-lg sm:text-2xl font-bold">
+                                        <MixedText text={String(item.value)} />
+                                    </div>
+                                    {item.extra && (
+                                        <div className="text-xs text-muted-foreground mt-1">
+                                            <MixedText text={item.extra} />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </Marquee>
+
+                {/* 添加渐变遮罩，就像官网例子一样 */}
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
             </div>
         </TooltipProvider>
     );

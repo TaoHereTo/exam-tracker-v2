@@ -176,6 +176,35 @@ main,
   z-index: 50 !important;
 }
 
+/* Marquee动画 */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
 /* 字体类已优化，移除重复定义，使用全局设置 */
 
 /* MixedText 组件样式 */
@@ -288,7 +317,27 @@ th .mixed-text-part {
       background-position: 200%;
     }
   }
-}
+
+  --animate-marquee: marquee var(--duration) infinite linear;
+
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite
+;
+  @keyframes marquee {
+  from {
+    transform: translateX(0);
+    }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+  @keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+    }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+    }
+  }}
 
 /* ========== 颜色变量 ========== */
 :root {
@@ -1862,8 +1911,6 @@ body.eye-care.dark .text-muted-foreground,
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-
 
 /* 移动端响应式优化 - 合并重复的媒体查询 */
 @media (max-width: 480px) {

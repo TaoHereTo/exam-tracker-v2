@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 import { ComponentPropsWithoutRef } from "react";
-import React from "react";
 
 interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
   /**
@@ -42,8 +41,6 @@ export function Marquee({
   repeat = 4,
   ...props
 }: MarqueeProps) {
-  const content = React.Children.toArray(children);
-  const displayContent = reverse ? [...content].reverse() : content;
   return (
     <div
       {...props}
@@ -52,7 +49,6 @@ export function Marquee({
         {
           "flex-row": !vertical,
           "flex-col": vertical,
-          "whitespace-nowrap": !vertical,
         },
         className,
       )}
@@ -62,13 +58,16 @@ export function Marquee({
         .map((_, i) => (
           <div
             key={i}
-            className={cn("inline-block", {
-              "animate-marquee": !vertical,
-              "animate-marquee-vertical": vertical,
+            className={cn("flex shrink-0 justify-around [gap:var(--gap)]", {
+              "animate-marquee flex-row": !vertical,
+              "animate-marquee-vertical flex-col": vertical,
               "group-hover:[animation-play-state:paused]": pauseOnHover,
             })}
+            style={{
+              animationDirection: reverse ? 'reverse' : 'normal'
+            }}
           >
-            {displayContent}
+            {children}
           </div>
         ))}
     </div>
