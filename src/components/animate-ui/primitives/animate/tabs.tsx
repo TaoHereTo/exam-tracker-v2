@@ -277,13 +277,13 @@ function TabsContents({
     <motion.div
       ref={containerRef}
       data-slot="tabs-contents"
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: 'visible' }}
       animate={{ height }}
       transition={transition}
       {...props}
     >
       <motion.div
-        className="flex -mx-2"
+        className="flex"
         animate={{ x: activeIndex * -100 + '%' }}
         transition={transition}
       >
@@ -293,7 +293,7 @@ function TabsContents({
             ref={(el) => {
               itemRefs.current[index] = el;
             }}
-            className="w-full shrink-0 px-2 h-full"
+            className="w-full shrink-0 h-full"
           >
             {child}
           </div>
@@ -325,7 +325,7 @@ function TabsContent({
     <Component
       role="tabpanel"
       data-slot="tabs-content"
-      style={{ overflow: 'hidden', ...style }}
+      style={{ overflow: 'visible', ...style }}
       initial={{ filter: 'blur(0px)' }}
       animate={{ filter: isActive ? 'blur(0px)' : 'blur(4px)' }}
       exit={{ filter: 'blur(0px)' }}

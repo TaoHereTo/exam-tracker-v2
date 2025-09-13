@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/animate-ui/components/animate/tabs";
 import { normalizeModuleName, getModuleScore, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { TrendChart } from "@/components/ui/TrendChart";
 import { ModulePieChart } from "@/components/ui/ModulePieChart";
@@ -298,41 +298,43 @@ export function ChartsView({ records }: ChartsViewProps) {
                         <TabsTrigger value="radar" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
-                <TabsContent value="perMinute" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
-                        <div className="w-full h-full overflow-visible">
-                            <TrendChart data={perMinuteData} yMax={2} />
+                <TabsContents className="p-0 border-0 overflow-visible">
+                    <TabsContent value="perMinute" className="outline-none">
+                        <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
+                            <div className="w-full h-full overflow-visible">
+                                <TrendChart data={perMinuteData} yMax={2} />
+                            </div>
                         </div>
-                    </div>
-                </TabsContent>
-                <TabsContent value="accuracy" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
-                        <div className="w-full h-full overflow-visible">
-                            <TrendChart data={accuracyData} yMax={100} />
+                    </TabsContent>
+                    <TabsContent value="accuracy" className="outline-none">
+                        <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
+                            <div className="w-full h-full overflow-visible">
+                                <TrendChart data={accuracyData} yMax={100} />
+                            </div>
                         </div>
-                    </div>
-                </TabsContent>
-                <TabsContent value="pie" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
-                        <div className="w-full h-full overflow-visible">
-                            <ModulePieChart data={records.map(r => {
-                                return {
-                                    date: r.date,
-                                    module: normalizeModuleName(r.module),
-                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                    duration: timeStringToMinutes(r.duration) || 0
-                                };
-                            })} />
+                    </TabsContent>
+                    <TabsContent value="pie" className="outline-none">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
+                            <div className="w-full h-full overflow-visible">
+                                <ModulePieChart data={records.map(r => {
+                                    return {
+                                        date: r.date,
+                                        module: normalizeModuleName(r.module),
+                                        score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                        duration: timeStringToMinutes(r.duration) || 0
+                                    };
+                                })} />
+                            </div>
                         </div>
-                    </div>
-                </TabsContent>
-                <TabsContent value="radar" className="p-0 border-0">
-                    <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
-                        <div className="w-full h-full overflow-visible">
-                            <ModuleRadarChart data={records} />
+                    </TabsContent>
+                    <TabsContent value="radar" className="outline-none">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
+                            <div className="w-full h-full overflow-visible">
+                                <ModuleRadarChart data={records} />
+                            </div>
                         </div>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
+                </TabsContents>
             </Tabs>
         </div>
     );
