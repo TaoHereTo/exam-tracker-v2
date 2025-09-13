@@ -167,6 +167,15 @@ main,
   overflow-x: hidden !important;
 }
 
+/* 确保卡片组件有足够高的z-index，不被背景遮挡 */
+.card,
+[data-card],
+.border-beam-card,
+.magic-card {
+  position: relative !important;
+  z-index: 50 !important;
+}
+
 /* 字体类已优化，移除重复定义，使用全局设置 */
 
 /* MixedText 组件样式 */
@@ -1767,7 +1776,7 @@ body.eye-care.dark .text-muted-foreground,
 .page-title-sticky {
   position: sticky;
   top: 0;
-  z-index: 10;
+  z-index: 20;
   background: var(--background);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);

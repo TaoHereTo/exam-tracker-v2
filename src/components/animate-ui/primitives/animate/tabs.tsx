@@ -277,7 +277,7 @@ function TabsContents({
     <motion.div
       ref={containerRef}
       data-slot="tabs-contents"
-      style={{ overflow: 'hidden' }}
+      style={{ overflow: 'hidden', padding: '16px' }}
       animate={{ height }}
       transition={transition}
       {...props}
