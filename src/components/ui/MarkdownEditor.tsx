@@ -1142,23 +1142,23 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                 </div>
 
                 {/* 图片预览区域 */}
-                <div className="mt-4">
+                <div className="mt-1">
                     <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
                         <AccordionItem value="preview">
-                            <AccordionTrigger className="text-sm font-medium">
+                            <AccordionTrigger className="text-sm font-medium py-1">
                                 图片预览 ({previewImages.length})
                             </AccordionTrigger>
                             <AccordionContent>
                                 {isUploading ? (
-                                    <div className="p-8 text-center">
+                                    <div className="p-2 text-center">
                                         <LoadingSpinner size="sm" text="正在上传图片..." />
                                     </div>
                                 ) : previewImages.length > 0 ? (
                                     <PhotoProvider>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-1">
                                             {previewImages.map((imageUrl, index) => (
                                                 <div key={index} className="relative group">
-                                                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-200">
+                                                    <div className="aspect-video relative overflow-hidden rounded-md border border-gray-200 dark:border-gray-700 cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-200">
                                                         <PhotoView src={imageUrl}>
                                                             <Image
                                                                 src={imageUrl}
@@ -1182,8 +1182,8 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                         </div>
                                     </PhotoProvider>
                                 ) : (
-                                    <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                                        <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                                    <div className="p-2 text-center text-gray-500 dark:text-gray-400">
+                                        <ImageIcon className="h-10 w-10 mx-auto mb-2 opacity-50" />
                                         <p className="text-sm">暂无图片</p>
                                         <p className="text-xs mt-1">使用工具栏按钮上传或选择图片</p>
                                     </div>

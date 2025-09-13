@@ -429,7 +429,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     <div className="flex items-start justify-center w-full">
       {isInDialog ? (
         // When in dialog, render without Card wrapper to avoid nested card appearance
-        <div className="w-full max-w-2xl flex flex-col">
+        <div className="w-full max-w-xl flex flex-col">
           <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-4`}>
             <BaseForm
               className="form-stack"
@@ -485,7 +485,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              <div className="form-actions pt-4">
+              <div className="form-actions pt-1">
                 <Button type="submit" variant="default" className="w-full py-2 text-sm h-10">
                   <MixedText text="保存知识点" />
                 </Button>
@@ -495,7 +495,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         </div>
       ) : (
         // When not in dialog, render with Card wrapper as usual
-        <Card className="w-full max-w-2xl flex flex-col">
+        <Card className="w-full max-w-xl flex flex-col">
           {!initialData && (
             <CardHeader className="pb-2">
               <CardTitle className="text-2xl">
@@ -503,7 +503,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               </CardTitle>
             </CardHeader>
           )}
-          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-4`}>
+          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
             {/* 非对话框模式下的表单 */}
             <BaseForm
               className="form-stack"
@@ -559,7 +559,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              <div className="form-actions pt-4">
+              <div className="form-actions pt-1">
                 <Button type="submit" variant="default" className="w-full py-2 text-sm h-10">
                   <MixedText text="保存知识点" />
                 </Button>
