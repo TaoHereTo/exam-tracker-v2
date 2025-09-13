@@ -123,40 +123,34 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
             },
             legend: {
                 data: allModules,
-                // Change to horizontal legend at the bottom for all screen sizes
                 orient: 'horizontal',
                 left: 'center',
                 top: 'bottom',
-                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 30,  // Increased spacing for visibility
-                itemGap: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 15,
-                itemWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 15 : 25,
-                itemHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
-                padding: typeof window !== 'undefined' && window.innerWidth < 768 ? [5, 10, 5, 10] : [10, 20, 10, 20],
-                // Set width to 90% of container for better legend sizing
+                bottom: 15,
+                itemGap: 15,
+                itemWidth: 20,
+                itemHeight: 12,
+                padding: [8, 15, 8, 15],
                 width: '90%',
                 height: 'auto',
                 align: 'auto',
                 type: 'plain',
                 formatter: function (name: string) {
-                    // On mobile, limit the name length to prevent overflow
                     if (typeof window !== 'undefined' && window.innerWidth < 768) {
                         return name.length > 4 ? name.substring(0, 4) : name;
                     }
                     return name;
                 },
-                // Match pie chart legend styling exactly
-                borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
-                icon: UNIFIED_LEGEND_STYLE.icon,
-                // 覆盖主题相关的样式
+                borderRadius: 6,
+                icon: 'roundRect',
                 backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
                 borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
-                borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
-                shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
-                shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
+                borderWidth: 1,
+                shadowColor: 'rgba(51,102,255,0.08)',
+                shadowBlur: 8,
                 textStyle: {
-                    ...UNIFIED_LEGEND_STYLE.textStyle,
                     color: legendTextColor,
-                    fontSize: typeof window !== 'undefined' && window.innerWidth < 768 ? 14 : 14,  // Match pie chart font size
+                    fontSize: 13,
                     fontWeight: 'bold',
                     fontFamily: 'Times New Roman, 思源宋体, serif'
                 }
@@ -166,7 +160,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 left: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
                 right: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
                 top: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 40,
-                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 70 : 80,  // Increased to accommodate legend
+                bottom: 60,  // Space for legend
                 borderColor: borderColor,
                 borderWidth: 1,
                 containLabel: true
@@ -238,7 +232,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
     }
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="chart-wrapper w-full h-full">
+        <div className="w-full h-full">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
@@ -246,7 +240,6 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 notMerge={true}
                 lazyUpdate={false}
                 opts={{ renderer: 'canvas' }}
-                className="chart-container w-full h-full trend-chart"
             />
         </div>
     );

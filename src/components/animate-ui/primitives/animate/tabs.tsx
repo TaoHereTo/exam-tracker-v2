@@ -111,7 +111,7 @@ function Tabs({
 type TabsHighlightProps = Omit<HighlightProps, 'controlledItems' | 'value'>;
 
 function TabsHighlight({
-  transition = { type: 'spring', stiffness: 300, damping: 20, mass: 0.5 },
+  transition = { type: 'spring', stiffness: 400, damping: 30, mass: 0.3 },
   ...props
 }: TabsHighlightProps) {
   const { activeValue } = useTabs();

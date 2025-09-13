@@ -127,7 +127,7 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
             indicator,
             splitNumber: 5,
             radius: typeof window !== 'undefined' && window.innerWidth < 768 ? '60%' : '75%',
-            center: ['50%', typeof window !== 'undefined' && window.innerWidth < 768 ? '45%' : '50%'],  // Moved down further from 40%/45% to 45%/50%
+            center: ['50%', '50%'],  // 居中显示
             axisName: {
                 color: textColor,
                 fontWeight: 'bold',
@@ -208,18 +208,16 @@ function ModuleRadarChart({ data }: { data: RecordItem[] }) {
         ]
     };
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 0 100px 0' }} className="chart-wrapper">
-            <div style={{ flex: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div className="w-full h-full flex flex-col">
+            <div className="flex-1">
                 <ReactECharts
                     option={option}
                     style={{ height: '100%', width: '100%' }}
                     key={`radar-${isDarkMode}`}
-                    className="chart-container"
                 />
             </div>
-            <div className="flex items-center justify-center mt-2 text-sm text-gray-500">
-                能力值 =
-                <span className="mx-1 font-bold"><MixedText text="正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2" /></span>
+            <div className="text-center text-xs text-gray-500 mt-2 pb-2">
+                能力值 = <span className="font-bold"><MixedText text="正确率 × 0.5 + 每分钟得分 × 0.3 + 做题量 × 0.2" /></span>
             </div>
         </div>
     );
@@ -288,50 +286,46 @@ export function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div className="flex flex-col items-center justify-start min-h-[80vh] mt-6 w-full">
-            <Tabs defaultValue="perMinute" className="w-full mb-6">
-                <div className="flex justify-center mb-4 w-full">
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full mx-auto">
+        <div className="w-full px-4 py-6">
+            <Tabs defaultValue="perMinute" className="w-full">
+                <div className="flex justify-center mb-6">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full">
                         <TabsTrigger value="perMinute" className="py-1 whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
                         <TabsTrigger value="accuracy" className="py-1 whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
                         <TabsTrigger value="pie" className="py-1 whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
                         <TabsTrigger value="radar" className="py-1 whitespace-nowrap"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
-                <TabsContents className="p-0 border-0 overflow-visible pb-20">
+
+                <TabsContents className="w-full">
                     <TabsContent value="perMinute" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
-                            <div className="w-full h-full overflow-visible">
-                                <TrendChart data={perMinuteData} yMax={2} />
-                            </div>
+                        <div className="w-full h-[350px] sm:h-[400px]">
+                            <TrendChart data={perMinuteData} yMax={2} />
                         </div>
                     </TabsContent>
+
                     <TabsContent value="accuracy" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
-                            <div className="w-full h-full overflow-visible">
-                                <TrendChart data={accuracyData} yMax={100} />
-                            </div>
+                        <div className="w-full h-[350px] sm:h-[400px]">
+                            <TrendChart data={accuracyData} yMax={100} />
                         </div>
                     </TabsContent>
+
                     <TabsContent value="pie" className="outline-none">
-                        <div className="w-full max-w-full min-h-[450px] h-[450px] sm:h-[650px] overflow-visible mb-16">
-                            <div className="w-full h-full overflow-visible">
-                                <ModulePieChart data={records.map(r => {
-                                    return {
-                                        date: r.date,
-                                        module: normalizeModuleName(r.module),
-                                        score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
-                                        duration: timeStringToMinutes(r.duration) || 0
-                                    };
-                                })} />
-                            </div>
+                        <div className="w-full h-[350px] sm:h-[400px]">
+                            <ModulePieChart data={records.map(r => {
+                                return {
+                                    date: r.date,
+                                    module: normalizeModuleName(r.module),
+                                    score: r.total > 0 ? Math.round((r.correct / r.total) * 100) : 0,
+                                    duration: timeStringToMinutes(r.duration) || 0
+                                };
+                            })} />
                         </div>
                     </TabsContent>
+
                     <TabsContent value="radar" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
-                            <div className="w-full h-full overflow-visible">
-                                <ModuleRadarChart data={records} />
-                            </div>
+                        <div className="w-full h-[350px] sm:h-[400px]">
+                            <ModuleRadarChart data={records} />
                         </div>
                     </TabsContent>
                 </TabsContents>

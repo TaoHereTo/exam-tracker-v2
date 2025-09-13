@@ -77,34 +77,29 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
             show: false // Disable tooltip entirely
         },
         legend: showLegend ? {
-            // Change to horizontal legend at the bottom for all screen sizes
             orient: 'horizontal',
             left: 'center',
             top: 'bottom',
-            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 70,  // Increased spacing to avoid overlap
+            bottom: 15,
             itemGap: 15,
-            itemWidth: 25,
-            itemHeight: 14,
-            padding: [10, 20, 10, 20],
-            // Set width to 90% of container for better legend sizing
+            itemWidth: 20,
+            itemHeight: 12,
+            padding: [8, 15, 8, 15],
             width: '90%',
             height: 'auto',
             align: 'auto',
             type: 'plain',
             formatter: (name: string) => name,
-            // Manually apply the unified legend style properties we want
-            borderRadius: UNIFIED_LEGEND_STYLE.borderRadius,
-            icon: UNIFIED_LEGEND_STYLE.icon,
-            // 覆盖主题相关的样式
+            borderRadius: 6,
+            icon: 'roundRect',
             backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
             borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
-            borderWidth: UNIFIED_LEGEND_STYLE.borderWidth,
-            shadowColor: UNIFIED_LEGEND_STYLE.shadowColor,
-            shadowBlur: UNIFIED_LEGEND_STYLE.shadowBlur,
+            borderWidth: 1,
+            shadowColor: 'rgba(51,102,255,0.08)',
+            shadowBlur: 8,
             textStyle: {
-                ...UNIFIED_LEGEND_STYLE.textStyle,
                 color: legendTextColor,
-                fontSize: 14,
+                fontSize: 13,
                 fontWeight: 'bold',
                 fontFamily: 'Times New Roman, 思源宋体, serif'
             }
@@ -117,7 +112,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
                 name: '模块耗时分布',
                 type: 'pie',
                 radius: ['45%', '85%'],  // Increased size to better fill the container
-                center: ['50%', '45%'],  // Move chart slightly upward
+                center: ['50%', '45%'],  // Center the chart with space for legend
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
@@ -146,14 +141,13 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: showLegend ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '10px 0 140px 0' : '10px 0 120px 0') : '10px 0 20px 0' }} className="chart-wrapper pie-chart-wrapper">
+        <div className="w-full h-full">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
                 theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
                 key={`pie-${isDarkMode}`}
-                className="chart-container pie-chart"
             />
         </div>
     );

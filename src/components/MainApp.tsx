@@ -129,7 +129,7 @@ export function MainApp() {
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const { isDarkMode, mounted, getBackgroundStyle } = useThemeMode();
-    
+
     // 使用高DPI字体优化hook
     useHighDPIFontOptimization();
 
@@ -149,7 +149,7 @@ export function MainApp() {
     // 计划完成庆祝弹窗状态
     const [celebrationOpen, setCelebrationOpen] = useState(false);
     const [completedPlan, setCompletedPlan] = useState<StudyPlan | null>(null);
-    
+
     // 考试倒计时完成庆祝弹窗状态
     const [countdownCelebrationOpen, setCountdownCelebrationOpen] = useState(false);
     const [completedCountdown, setCompletedCountdown] = useState<ExamCountdown | null>(null);
@@ -215,7 +215,7 @@ export function MainApp() {
         setActiveTab('plan-list');
         // 可以在这里添加滚动到已完成计划的逻辑
     }, []);
-    
+
     // 处理查看倒计时
     const handleViewCompletedCountdowns = useCallback(() => {
         setActiveTab('countdown');
@@ -310,17 +310,17 @@ export function MainApp() {
         }
 
         const getInitials = () => {
-            const displayName = ('username' in userInfo && userInfo.username) || 
-                              userInfo.email || 
-                              'U';
+            const displayName = ('username' in userInfo && userInfo.username) ||
+                userInfo.email ||
+                'U';
             return displayName.charAt(0).toUpperCase();
         };
 
         // 获取用户名显示文本
         const getDisplayName = () => {
-            return ('username' in userInfo && userInfo.username) || 
-                   userInfo.email || 
-                   '用户';
+            return ('username' in userInfo && userInfo.username) ||
+                userInfo.email ||
+                '用户';
         };
 
         // 获取邮箱显示文本
@@ -422,30 +422,30 @@ export function MainApp() {
                                 </div>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              onClick={handleSignOutClick} 
-                              className="flex justify-center text-red-600 focus:text-red-700 logout-menu-item"
-                              style={{
-                                WebkitFontSmoothing: 'subpixel-antialiased',
-                                MozOsxFontSmoothing: 'grayscale',
-                                textRendering: 'optimizeLegibility'
-                              } as React.CSSProperties}
-                            >
-                              <div className="flex items-center gap-4">
-                                <LogOut className="h-4 w-4 text-red-600" />
-                                <MixedText 
-                                  text="退出登录" 
-                                  className="font-medium logout-text"
-                                  style={{
+                            <DropdownMenuItem
+                                onClick={handleSignOutClick}
+                                className="flex justify-center text-red-600 focus:text-red-700 logout-menu-item"
+                                style={{
                                     WebkitFontSmoothing: 'subpixel-antialiased',
                                     MozOsxFontSmoothing: 'grayscale',
-                                    textRendering: 'optimizeLegibility',
-                                    fontWeight: 500
-                                  } as React.CSSProperties} 
-                                />
-                              </div>
+                                    textRendering: 'optimizeLegibility'
+                                } as React.CSSProperties}
+                            >
+                                <div className="flex items-center gap-4">
+                                    <LogOut className="h-4 w-4 text-red-600" />
+                                    <MixedText
+                                        text="退出登录"
+                                        className="font-medium logout-text"
+                                        style={{
+                                            WebkitFontSmoothing: 'subpixel-antialiased',
+                                            MozOsxFontSmoothing: 'grayscale',
+                                            textRendering: 'optimizeLegibility',
+                                            fontWeight: 500
+                                        } as React.CSSProperties}
+                                    />
+                                </div>
                             </DropdownMenuItem>
-                          </DropdownMenuContent>
+                        </DropdownMenuContent>
                     </DropdownMenu>
                 </SidebarMenuItem>
             </SidebarMenu>
@@ -520,7 +520,7 @@ export function MainApp() {
         for (const id of recordIds) {
             try {
                 await AutoCloudSync.autoDeleteRecord(id, {
-                    notify: () => {}, // 完全禁用单个记录的通知
+                    notify: () => { }, // 完全禁用单个记录的通知
                     notifyLoading: undefined, // 不显示单个记录的加载通知
                     updateToSuccess: undefined, // 不更新单个记录的成功状态
                     updateToError: undefined // 不更新单个记录的错误状态
@@ -579,7 +579,7 @@ export function MainApp() {
             if (isUUID(id)) {
                 try {
                     await AutoCloudSync.autoDeleteKnowledge(id, {
-                        notify: () => {}, // 禁用单个通知
+                        notify: () => { }, // 禁用单个通知
                         notifyLoading: undefined, // 不显示单个加载通知
                         updateToSuccess: undefined, // 不更新单个成功状态
                         updateToError: undefined // 不更新单个错误状态
@@ -781,25 +781,25 @@ export function MainApp() {
     const UpdateToastPositioning = () => {
         const { state } = useSidebar();
         const isCollapsed = state === 'collapsed';
-        
+
         React.useEffect(() => {
             // Update CSS variable based on sidebar state
             const updateCSSVariables = () => {
-                const sidebarWidth = isCollapsed ? 
+                const sidebarWidth = isCollapsed ?
                     parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width-icon') || '68') :
                     parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width') || '256');
-                
+
                 const offset = isCollapsed ? sidebarWidth / 2 : sidebarWidth / 2;
                 document.documentElement.style.setProperty('--sidebar-offset', `${offset}px`);
             };
-            
+
             updateCSSVariables();
-            
+
             // Also update on window resize
             window.addEventListener('resize', updateCSSVariables);
             return () => window.removeEventListener('resize', updateCSSVariables);
         }, [isCollapsed]);
-        
+
         return null; // This component doesn't render anything
     };
 
@@ -821,15 +821,15 @@ export function MainApp() {
                         >
                             {/* This component handles sidebar state and updates CSS variables for toast positioning */}
                             <UpdateToastPositioning />
-                            <div className="flex h-screen w-full relative z-[2] flex-col md:flex-row" data-sidebar="sidebar">
+                            <div className="flex h-screen w-full max-w-full relative z-[2] flex-col md:flex-row overflow-hidden" data-sidebar="sidebar">
                                 <Sidebar
                                     activeTab={activeTab}
                                     setActiveTab={setActiveTab}
                                     userInfo={<SidebarUserInfo />}
                                 />
-                                <SidebarInset className="flex flex-col flex-1">
+                                <SidebarInset className="flex flex-col flex-1 min-w-0 max-w-full overflow-hidden">
                                     {/* 固定的侧边栏触发器和标题栏 - 响应式设计 */}
-                                    <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left">
+                                    <div className="page-title-sticky flex items-center gap-2 p-2 sm:gap-4 sm:p-4 border-b border-border text-left min-w-0 max-w-full">
                                         <SidebarTrigger className="size-8 sm:size-10 [&>svg]:!h-5 [&>svg]:!w-5 sm:[&>svg]:!h-6 sm:[&>svg]:!w-6 font-normal" />
                                         <div className="min-w-0 flex-1">
                                             <PageTitle
@@ -838,12 +838,12 @@ export function MainApp() {
                                                 {normalizePageTitle(activeTab)}
                                             </PageTitle>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-shrink-0">
                                             <AnimatedThemeToggler className="w-8 h-8" />
                                         </div>
                                     </div>
 
-                                    <div className={`content-scrollable w-full flex-1 ${activeTab === 'overview' ? 'p-0' : 'p-4 sm:p-6'} max-w-7xl mx-auto`}>
+                                    <div className={`content-scrollable w-full flex-1 min-w-0 max-w-full overflow-hidden ${activeTab === 'overview' ? 'p-0' : 'p-4 sm:p-6'}`}>
                                         {activeTab === 'overview' && (
                                             <Suspense fallback={
                                                 <div className="flex items-center justify-center min-h-[60vh]">
@@ -1254,7 +1254,7 @@ export function MainApp() {
                         onViewPlans={handleViewCompletedPlans}
                         planName={completedPlan?.name || ''}
                     />
-                    
+
                     {/* 倒计时完成庆祝弹窗 */}
                     <CountdownCompletionCelebration
                         isOpen={countdownCelebrationOpen}
