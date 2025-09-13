@@ -73,6 +73,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
 
     const option = {
         backgroundColor,
+        // 移除grid配置，改用center位置调整
         tooltip: {
             show: false // Disable tooltip entirely
         },
@@ -80,7 +81,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
             orient: 'horizontal',
             left: 'center',
             top: 'bottom',
-            bottom: 15,
+            bottom: 10,  // 减少图例的bottom值，让它更靠近容器底部
             itemGap: 15,
             itemWidth: 20,
             itemHeight: 12,
@@ -111,8 +112,8 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
             {
                 name: '模块耗时分布',
                 type: 'pie',
-                radius: ['45%', '85%'],  // Increased size to better fill the container
-                center: ['50%', '45%'],  // Center the chart with space for legend
+                radius: ['35%', '70%'],  // 调小扇形图大小，适应更大的容器
+                center: ['50%', '45%'],  // 稍微向下移动，增加上方留白
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,

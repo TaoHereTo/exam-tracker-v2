@@ -311,7 +311,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                     </TabsContent>
 
                     <TabsContent value="pie" className="outline-none">
-                        <div className="w-full h-[350px] sm:h-[400px]">
+                        <div className="w-full h-[450px] sm:h-[500px]">
                             <ModulePieChart data={records.map(r => {
                                 return {
                                     date: r.date,
