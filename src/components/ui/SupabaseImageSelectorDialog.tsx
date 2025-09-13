@@ -332,7 +332,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                                 key={image.id}
                                                 className={`group relative cursor-pointer rounded-lg transition-all duration-200 ${selectedImage === image.id
                                                     ? 'ring-4 ring-blue-500 ring-offset-4 bg-blue-50 dark:bg-blue-900/20 shadow-lg z-10 m-2'
-                                                    : 'border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                                    : 'border-2 border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 shadow-md hover:shadow-lg'
                                                     }`}
                                                 onClick={() => handleImageSelect(image.id)}
                                             >
@@ -470,3 +470,5 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
         </>
     );
 };
+
+

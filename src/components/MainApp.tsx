@@ -172,14 +172,13 @@ export function MainApp() {
         setKnowledge(prev => [knowledgeWithId, ...prev]);
 
         // 异步保存到云端，不阻塞UI
-        setTimeout(() => {
-            AutoCloudSync.autoSaveKnowledge(knowledgeWithId, {
-                notify,
-                notifyLoading,
-                updateToSuccess,
-                updateToError
-            });
-        }, 0);
+        // 不显示重复通知，因为表单已经显示了通知
+        AutoCloudSync.autoSaveKnowledge(knowledgeWithId, {
+            notify,
+            notifyLoading,
+            updateToSuccess,
+            updateToError
+        }, false); // 传递 false 以避免重复通知
     }, [setKnowledge, notify, notifyLoading, updateToSuccess, updateToError]);
 
     // 加载用户资料 - 优化性能

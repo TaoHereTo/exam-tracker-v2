@@ -27,6 +27,10 @@ interface MarkdownEditorProps {
     height?: number;
     disabled?: boolean;
     onImageChange?: (imageIds: string[]) => void; // Add this new prop
+    deferImageUpload?: boolean; // 新增属性：是否延迟上传图片
+    onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void; // 新增属性：传递待上传图片
+    clearPreviewImages?: boolean; // 新增属性：是否清空预览图片
+    onClearPreviewImagesChange?: (clear: boolean) => void; // 新增属性：通知父组件预览图片已清空
 }
 
 const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
@@ -36,7 +40,11 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     className = '',
     height = 200,
     disabled = false,
-    onImageChange // Add this new prop
+    onImageChange, // Add this new prop
+    deferImageUpload = false, // 默认不延迟上传
+    onPendingImagesChange, // 传递待上传图片的回调
+    clearPreviewImages = false, // 是否清空预览图片
+    onClearPreviewImagesChange // 通知父组件预览图片已清空的回调
 }) => {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const previewTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -56,6 +64,9 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
     const [isUploading, setIsUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
     const [accordionValue, setAccordionValue] = useState<string>("");
+    
+    // 待上传的图片列表
+    const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
 
     // 添加主题切换检测
     const [isThemeTransitioning, setIsThemeTransitioning] = useState(false);
@@ -65,6 +76,21 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         setTextValue(value);
         setPreviewText(value);
     }, [value]);
+
+    // 清空预览图片的副作用
+    useEffect(() => {
+        if (clearPreviewImages) {
+            // 清空预览图片
+            setPreviewImages([]);
+            setPendingImages([]);
+            setAccordionValue("");
+            
+            // 通知父组件预览图片已清空
+            if (onClearPreviewImagesChange) {
+                onClearPreviewImagesChange(false);
+            }
+        }
+    }, [clearPreviewImages, onClearPreviewImagesChange]);
 
     // 通知和粘贴上下文
     const { notify } = useNotification();
@@ -350,7 +376,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         onChange(newValue);
     };
 
-    // 图片处理函数
+    // 图片处理函数 - 修改为支持延迟上传
     const handleFileUpload = useCallback(async (file: File) => {
         const isImageByMime = file.type.startsWith('image/');
         const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
@@ -363,6 +389,27 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
             return;
         }
 
+        // 如果启用了延迟上传，只添加到待上传列表
+        if (deferImageUpload) {
+            const localUrl = URL.createObjectURL(file);
+            const newPendingImage = { localUrl, file, imageId: null };
+            const newPendingImages = [...pendingImages, newPendingImage];
+            setPendingImages(newPendingImages);
+            
+            // 更新预览图片显示本地URL
+            setPreviewImages(prev => [...prev, localUrl]);
+            
+            // 通知父组件有待上传的图片
+            if (onPendingImagesChange) {
+                onPendingImagesChange(newPendingImages);
+            }
+            
+            // 展开预览区域
+            setAccordionValue("preview");
+            return;
+        }
+
+        // 立即上传模式
         setIsUploading(true);
         setAccordionValue("preview"); // 展开accordion
         try {
@@ -395,7 +442,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         } finally {
             setIsUploading(false);
         }
-    }, [onImageChange, previewImages]);
+    }, [deferImageUpload, onImageChange, onPendingImagesChange, pendingImages, previewImages]);
 
     // 处理文件选择
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -451,41 +498,83 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
         }
     };
 
-  // 处理图片选择
-  const handleImageSelected = (imageId: string) => {
-    const cloudUrl = supabaseImageManager.getImageUrl(imageId);
-    if (cloudUrl) {
-      setPreviewImages(prev => [...prev, cloudUrl]);
-      // 自动展开预览区域
-      setAccordionValue("preview");
-      
-      // Pass the image ID back to the parent
-      if (onImageChange) {
-        // Get all current image IDs from previewImages
-        const currentImageIds = previewImages.map(url => {
-          // Extract image ID from URL (filename part)
-          try {
-            const urlObj = new URL(url);
-            const pathParts = urlObj.pathname.split('/');
-            return pathParts[pathParts.length - 1];
-          } catch (e) {
-            // Fallback: use the full URL as ID
-            return url;
-          }
-        });
-        
-        // Add the new image ID
-        onImageChange([...currentImageIds, imageId]);
-      }
-    }
-  };
+    // 处理图片选择
+    const handleImageSelected = (imageId: string) => {
+        const cloudUrl = supabaseImageManager.getImageUrl(imageId);
+        if (cloudUrl) {
+            // 如果启用了延迟上传，只添加到待上传列表
+            if (deferImageUpload) {
+                const newPendingImage = { localUrl: cloudUrl, file: null, imageId };
+                const newPendingImages = [...pendingImages, newPendingImage];
+                setPendingImages(newPendingImages);
+                
+                // 更新预览图片
+                setPreviewImages(prev => [...prev, cloudUrl]);
+                
+                // 通知父组件有待上传的图片
+                if (onPendingImagesChange) {
+                    onPendingImagesChange(newPendingImages);
+                }
+                
+                // 自动展开预览区域
+                setAccordionValue("preview");
+                return;
+            }
+            
+            // 立即上传模式
+            setPreviewImages(prev => [...prev, cloudUrl]);
+            // 自动展开预览区域
+            setAccordionValue("preview");
+            
+            // Pass the image ID back to the parent
+            if (onImageChange) {
+                // Get all current image IDs from previewImages
+                const currentImageIds = previewImages.map(url => {
+                    // Extract image ID from URL (filename part)
+                    try {
+                        const urlObj = new URL(url);
+                        const pathParts = urlObj.pathname.split('/');
+                        return pathParts[pathParts.length - 1];
+                    } catch (e) {
+                        // Fallback: use the full URL as ID
+                        return url;
+                    }
+                });
+                
+                // Add the new image ID
+                onImageChange([...currentImageIds, imageId]);
+            }
+        }
+    };
 
     // 移除图片
     const removeImage = (index: number) => {
+        const imageToRemove = previewImages[index];
         const newPreviewImages = previewImages.filter((_, i) => i !== index);
         setPreviewImages(newPreviewImages);
         
-        // Update the image IDs passed back to the parent
+        // 如果启用了延迟上传，也要从待上传列表中移除
+        if (deferImageUpload) {
+            // 查找待上传列表中的对应项
+            const pendingIndex = pendingImages.findIndex(pending => 
+                pending.localUrl === imageToRemove || pending.imageId === imageToRemove
+            );
+            
+            if (pendingIndex !== -1) {
+                const newPendingImages = [...pendingImages];
+                newPendingImages.splice(pendingIndex, 1);
+                setPendingImages(newPendingImages);
+                
+                // 通知父组件更新待上传列表
+                if (onPendingImagesChange) {
+                    onPendingImagesChange(newPendingImages);
+                }
+            }
+            
+            return;
+        }
+        
+        // 立即上传模式下的处理
         if (onImageChange) {
             // Get all current image IDs from previewImages
             const currentImageIds = newPreviewImages.map(url => {
@@ -1069,7 +1158,7 @@ const MarkdownEditorComponent: React.FC<MarkdownEditorProps> = React.memo(({
                                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
                                             {previewImages.map((imageUrl, index) => (
                                                 <div key={index} className="relative group">
-                                                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer">
+                                                    <div className="aspect-square relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 cursor-pointer shadow-md hover:shadow-lg transition-shadow duration-200">
                                                         <PhotoView src={imageUrl}>
                                                             <Image
                                                                 src={imageUrl}

@@ -477,7 +477,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
             {previewUrl && (
                 <>
                     <div className="relative">
-                        <div className="border rounded-lg p-2 bg-gray-50 dark:bg-[#171717]">
+                        <div className="border rounded-lg p-2 bg-gray-50 dark:bg-[#171717] shadow-md">
                             <Image
                                 src={previewUrl}
                                 alt="图片预览"

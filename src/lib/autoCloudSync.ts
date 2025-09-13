@@ -197,9 +197,9 @@ export class AutoCloudSync {
     /**
      * 自动保存知识点到云端
      */
-    static async autoSaveKnowledge(knowledge: KnowledgeItem, notify: ExtendedNotificationContext) {
-        // Create loading notification
-        const toastId = notify.notifyLoading ? notify.notifyLoading('正在保存知识点到云端...', '新的知识点正在同步到云端') : null;
+    static async autoSaveKnowledge(knowledge: KnowledgeItem, notify: ExtendedNotificationContext, showNotifications: boolean = true) {
+        // Create loading notification only if notifications should be shown
+        const toastId = showNotifications && notify.notifyLoading ? notify.notifyLoading('正在保存知识点到云端...', '新的知识点正在同步到云端') : null;
         
         try {
             const knowledgeRecord = knowledge as Record<string, unknown>;
@@ -257,16 +257,18 @@ export class AutoCloudSync {
 
             await knowledgeService.addKnowledge(knowledgeData);
 
-            // Update to success
-            if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '知识点已保存到云端', '新的知识点已自动同步到云端');
-            } else {
-                // Restored per user request - show cloud sync status when saving knowledge
-                notify.notify({
-                    type: 'success',
-                    message: '知识点已保存到云端',
-                    description: '新的知识点已自动同步到云端'
-                });
+            // Update to success only if notifications should be shown
+            if (showNotifications) {
+                if (toastId && notify.updateToSuccess) {
+                    notify.updateToSuccess(toastId, '知识点已保存到云端', '新的知识点已自动同步到云端');
+                } else {
+                    // Restored per user request - show cloud sync status when saving knowledge
+                    notify.notify({
+                        type: 'success',
+                        message: '知识点已保存到云端',
+                        description: '新的知识点已自动同步到云端'
+                    });
+                }
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
@@ -274,16 +276,18 @@ export class AutoCloudSync {
 
             console.error('自动保存知识点到云端失败:', error);
 
-            // Update to error
-            if (toastId && notify.updateToError) {
-                notify.updateToError(toastId, '云端保存失败', `知识点已保存到本地，但云端同步失败: ${errorMessage}`);
-            } else {
-                // Restored per user request - show cloud sync status when saving knowledge
-                notify.notify({
-                    type: 'error',
-                    message: '云端保存失败',
-                    description: `知识点已保存到本地，但云端同步失败: ${errorMessage}`
-                });
+            // Update to error only if notifications should be shown
+            if (showNotifications) {
+                if (toastId && notify.updateToError) {
+                    notify.updateToError(toastId, '云端保存失败', `知识点已保存到本地，但云端同步失败: ${errorMessage}`);
+                } else {
+                    // Restored per user request - show cloud sync status when saving knowledge
+                    notify.notify({
+                        type: 'error',
+                        message: '云端保存失败',
+                        description: `知识点已保存到本地，但云端同步失败: ${errorMessage}`
+                    });
+                }
             }
         }
     }

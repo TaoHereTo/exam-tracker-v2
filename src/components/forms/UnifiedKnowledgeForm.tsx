@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -30,6 +30,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
+import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -190,8 +191,6 @@ function DateField() {
   );
 }
 
-
-
 export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   module,
   onAddKnowledge,
@@ -199,6 +198,8 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   isInDialog = false
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
+  const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
+  const [clearPreviewImages, setClearPreviewImages] = useState(false);
 
   // 获取模块特定的字段配置
   const getFieldConfig = () => {
@@ -300,7 +301,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   };
 
   // 处理表单提交
-  const handleSubmit = (data: FormData, errors?: FormErrors) => {
+  const handleSubmit = async (data: FormData, errors?: FormErrors) => {
     // 如果有验证错误，显示第一个错误的toast消息
     if (errors && Object.keys(errors).length > 0) {
       const firstError = Object.values(errors)[0];
@@ -310,11 +311,45 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     
     const config = getModuleConfig(module);
     
+    // 显示"正在保存到云端"的通知（立即显示）
+    const toastId = toast.loading('正在保存知识点到云端...');
+    
     try {
+      // 上传待处理的图片到云端
+      let imagePath = '';
+      if (pendingImagesRef.current.length > 0) {
+        // 上传所有待处理的图片
+        const uploadedImageIds: string[] = [];
+        
+        for (const pendingImage of pendingImagesRef.current) {
+          if (pendingImage.file) {
+            // 上传文件到云端
+            try {
+              const imageInfo = await supabaseImageManager.uploadImage(pendingImage.file);
+              uploadedImageIds.push(imageInfo.id);
+            } catch (uploadError) {
+              console.error('图片上传失败:', uploadError);
+              toast.error('图片上传失败，请重试');
+              return; // 如果上传失败，停止保存操作
+            }
+          } else if (pendingImage.imageId) {
+            // 如果是已有的云端图片，直接使用其ID
+            uploadedImageIds.push(pendingImage.imageId);
+          }
+        }
+        
+        // 使用第一个上传的图片ID作为imagePath（保持与现有逻辑一致）
+        imagePath = uploadedImageIds.length > 0 ? uploadedImageIds[0] : '';
+      } else if (data.imagePath && typeof data.imagePath === 'string') {
+        // 如果没有待处理的图片但有imagePath，保持原值
+        imagePath = data.imagePath;
+      }
+      
       const knowledgeData: Partial<KnowledgeItem> = {
         module: module as 'math' | 'data-analysis' | 'logic' | 'common' | 'politics' | 'verbal',
         subCategory: config.hasSubCategory ? String(data.subCategory || '') as KnowledgeItem['subCategory'] : undefined,
         date: config.hasDateField ? String(data.date || '') : undefined,
+        imagePath: imagePath, // 使用处理后的图片路径
         // 根据模块类型设置字段
         ...(module === 'politics' 
           ? { 
@@ -327,14 +362,22 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
             })
       };
 
+      // 在这里协调所有UI更新：
+      // 1. 先触发清空预览图片（立即执行）
+      setClearPreviewImages(true);
+      
+      // 2. 然后调用onAddKnowledge（这会触发表单重置等操作）
       onAddKnowledge(knowledgeData);
       
-      // 如果不是在对话框中，重置表单
-      if (!isInDialog) {
-        // 表单重置逻辑可以在这里添加
-      }
+      // 3. 清空待处理图片列表
+      pendingImagesRef.current = [];
+      
+      // 4. 更新toast提示为成功状态
+      toast.dismiss(toastId);
+      toast.success('知识点已保存到云端');
     } catch (error) {
       console.error('保存知识点失败:', error);
+      toast.dismiss(toastId);
       toast.error('保存知识点失败，请重试');
     }
   };
@@ -350,9 +393,12 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
     // Handle image changes from MarkdownEditor
     const handleImageChange = (imageIds: string[]) => {
-      // For now, we'll use the first image ID if any images are selected
+      // Store pending images that need to be uploaded on save
+      // For now, we'll store the image IDs from the editor
       // In a more advanced implementation, we might want to handle multiple images
       if (imageIds.length > 0) {
+        // We don't immediately upload - we just store the IDs for later processing
+        // The actual upload will happen in handleSubmit
         setValue('imagePath', imageIds[0]);
       } else {
         setValue('imagePath', '');
@@ -367,6 +413,14 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         placeholder={fieldConfig.secondPlaceholder}
         height={200}
         className="w-full"
+        // Add a prop to defer image uploads until save
+        deferImageUpload={true}
+        onPendingImagesChange={(pendingImages) => {
+          // Store pending images that need to be uploaded on save
+          pendingImagesRef.current = pendingImages;
+        }}
+        clearPreviewImages={clearPreviewImages}
+        onClearPreviewImagesChange={(clear) => setClearPreviewImages(clear)}
       />
     );
   };

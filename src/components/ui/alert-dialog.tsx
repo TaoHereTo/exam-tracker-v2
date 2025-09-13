@@ -131,20 +131,41 @@ const AlertDialogTitle = React.forwardRef<
 })
 AlertDialogTitle.displayName = "AlertDialogTitle"
 
+// Modified AlertDialogDescription to handle both inline and block content
+interface AlertDialogDescriptionProps extends React.ComponentProps<typeof AlertDialogPrimitive.Description> {
+  asChild?: boolean;
+}
+
 const AlertDialogDescription = React.forwardRef<
-  HTMLParagraphElement,
-  React.ComponentProps<typeof AlertDialogPrimitive.Description>
->(function AlertDialogDescription({ className, children, ...props }, ref) {
+  HTMLParagraphElement | HTMLDivElement,
+  AlertDialogDescriptionProps
+>(function AlertDialogDescription({ className, children, asChild, ...props }, ref) {
+  // If asChild is true and children contains block elements, render as div
+  // Otherwise render as paragraph (default behavior)
+  if (asChild) {
+    return (
+      <AlertDialogPrimitive.Description
+        ref={ref as React.ForwardedRef<HTMLDivElement>}
+        data-slot="alert-dialog-description"
+        className={cn("text-muted-foreground text-sm", className)}
+        {...props}
+        asChild
+      >
+        {typeof children === 'string' ? <MixedText text={children} /> : children}
+      </AlertDialogPrimitive.Description>
+    );
+  }
+
   return (
     <AlertDialogPrimitive.Description
-      ref={ref}
+      ref={ref as React.ForwardedRef<HTMLParagraphElement>}
       data-slot="alert-dialog-description"
       className={cn("text-muted-foreground text-sm", className)}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </AlertDialogPrimitive.Description>
-  )
+  );
 })
 AlertDialogDescription.displayName = "AlertDialogDescription"
 
