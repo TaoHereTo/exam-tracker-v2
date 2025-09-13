@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿'use client'
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿'use client'
 
 import React, { useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
@@ -118,7 +118,7 @@ export function AuthPage({ initialView }: AuthPageProps) {
                                                         <Label className="text-sm">日期</Label>
                                                         <Popover>
                                                             <PopoverTrigger asChild>
-                                                                <button className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-9 bg-white dark:bg-[#303030] mt-1">
+                                                                <button className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-9 bg-white dark:bg-[#303030] mt-1">
                                                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                                                     <span className="text-muted-foreground text-sm">选择日期</span>
                                                                 </button>

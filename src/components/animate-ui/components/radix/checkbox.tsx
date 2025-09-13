@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const checkboxVariants = cva(
-  'peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 focus-visible:ring-offset-2 [&[data-state=checked],&[data-state=indeterminate]]:bg-primary [&[data-state=checked],&[data-state=indeterminate]]:text-primary-foreground',
+  'peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 [&[data-state=checked],&[data-state=indeterminate]]:bg-primary [&[data-state=checked],&[data-state=indeterminate]]:text-primary-foreground border border-gray-300 dark:border-input',
   {
     variants: {
       variant: {
@@ -18,7 +18,8 @@ const checkboxVariants = cva(
       },
       size: {
         default: 'size-5 rounded-sm',
-        sm: 'size-4.5 rounded-[5px]',
+        sm: 'size-4 rounded-[4px]',
+        xs: 'size-3.5 rounded-[3px]',
         lg: 'size-6 rounded-[7px]',
       },
     },
@@ -33,7 +34,8 @@ const checkboxIndicatorVariants = cva('', {
   variants: {
     size: {
       default: 'size-3.5',
-      sm: 'size-3',
+      sm: 'size-2.5',
+      xs: 'size-2',
       lg: 'size-4',
     },
   },

@@ -165,7 +165,7 @@ function DateField() {
   return (
     <Popover open={dateOpen} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <button type="button" className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]"
+        <button type="button" className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]"
           style={{
             transition: 'none',
             transform: 'none',
@@ -430,7 +430,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       {isInDialog ? (
         // When in dialog, render without Card wrapper to avoid nested card appearance
         <div className="w-full max-w-2xl flex flex-col">
-          <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+          <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-4`}>
             <BaseForm
               className="form-stack"
               validationSchema={getValidationSchema(module, config)}
@@ -485,8 +485,8 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              <div className="form-actions">
-                <Button type="submit" variant="default" className="w-full py-4">
+              <div className="form-actions pt-4">
+                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>
@@ -503,7 +503,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               </CardTitle>
             </CardHeader>
           )}
-          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-4`}>
             {/* 非对话框模式下的表单 */}
             <BaseForm
               className="form-stack"
@@ -559,8 +559,8 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <MarkdownEditorField />
               </FormField>
 
-              <div className="form-actions">
-                <Button type="submit" variant="default" className="w-full py-4">
+              <div className="form-actions pt-4">
+                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>

@@ -41,7 +41,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 </TabsList>
                 
                 <TabsContents 
-                    className="py-6"
+                    className="py-6 px-2"
                     transition={{ 
                         type: "spring", 
                         stiffness: 500, 
@@ -53,11 +53,13 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                 >
                     {MODULES.map(({ value }) => (
                         <TabsContent key={value} value={value} className="outline-none flex flex-col gap-6">
-                            <div className="w-full max-w-lg mx-auto">
-                                <ModuleForm 
-                                    module={value as 'math' | 'logic' | 'data-analysis' | 'common' | 'verbal' | 'politics'} 
-                                    onAddKnowledge={handleAdd(value)} 
-                                />
+                            <div className="w-full max-w-2xl mx-auto pb-4">
+                                <div className="min-h-[500px]">
+                                    <ModuleForm 
+                                        module={value as 'math' | 'logic' | 'data-analysis' | 'common' | 'verbal' | 'politics'} 
+                                        onAddKnowledge={handleAdd(value)} 
+                                    />
+                                </div>
                             </div>
                         </TabsContent>
                     ))}

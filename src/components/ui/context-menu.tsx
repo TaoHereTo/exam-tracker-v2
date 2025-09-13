@@ -15,7 +15,7 @@ function ContextMenu({
 
 function ContextMenuTrigger({ className, children, ...props }: React.ComponentProps<typeof ContextMenuPrimitive.Trigger>) {
   return (
-    <ContextMenuPrimitive.Trigger className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)} {...props}>
+    <ContextMenuPrimitive.Trigger className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </ContextMenuPrimitive.Trigger>
   )

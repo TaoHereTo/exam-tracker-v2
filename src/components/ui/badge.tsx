@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { MixedText } from "./MixedText"
 
 const badgeVariants = cva(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-ring",
     {
         variants: {
             variant: {

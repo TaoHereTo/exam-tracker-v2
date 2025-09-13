@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Checkbox } from "@/components/ui/checkbox";
+import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
@@ -162,8 +162,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             <th className={`border-b px-4 py-2 text-center bg-gray-100 dark:bg-[#303030] dark:text-gray-100 w-[7%] min-w-[48px] ${checkboxColClassName}`}>
                                 <div className="flex items-center justify-center h-full py-2">
                                     <Checkbox
-                                        checked={allSelected}
-                                        indeterminate={indeterminate}
+                                        size="xs"
+                                        checked={indeterminate ? "indeterminate" : allSelected}
                                         onCheckedChange={(checked) => {
                                             if (checked) {
                                                 onSelect(data.map((row, idx) => rowKey(row, idx)));
@@ -226,6 +226,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
                                                     <div className="flex items-center justify-center h-full py-2">
                                                         <Checkbox
+                                                            size="xs"
                                                             checked={isSelected}
                                                             onCheckedChange={(checked) => {
                                                                 if (checked) {
@@ -274,6 +275,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <td className={`border-b px-4 py-2 text-center ${checkboxColClassName}`}>
                                             <div className="flex items-center justify-center h-full py-2">
                                                 <Checkbox
+                                                    size="xs"
                                                     checked={isSelected}
                                                     onCheckedChange={(checked) => {
                                                         if (checked) {

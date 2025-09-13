@@ -15,7 +15,7 @@ function Popover({
 
 function PopoverTrigger({ className, children, ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
   return (
-    <PopoverPrimitive.Trigger className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)} {...props}>
+    <PopoverPrimitive.Trigger className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring", className)} {...props}>
       {typeof children === 'string' ? <MixedText text={children} /> : children}
     </PopoverPrimitive.Trigger>
   )

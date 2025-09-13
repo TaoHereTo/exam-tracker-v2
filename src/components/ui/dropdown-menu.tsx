@@ -36,7 +36,7 @@ const DropdownMenuTrigger = React.forwardRef<
   return (
     <DropdownMenuPrimitive.Trigger
       ref={ref}
-      className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2", className)}
+      className={cn("outline-none focus-visible:ring-2 focus-visible:ring-ring", className)}
       {...props}
     >
       {typeof children === 'string' ? <MixedText text={children} /> : children}

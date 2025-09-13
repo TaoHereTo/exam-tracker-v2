@@ -7,7 +7,7 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import { MixedText } from '../ui/MixedText'
-import { Checkbox } from '../ui/checkbox'
+import { Checkbox } from '@/components/animate-ui/components/radix/checkbox'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useNotification } from '../magicui/NotificationProvider'
@@ -151,9 +151,9 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="rememberMe"
+                            size="xs"
                             checked={rememberMe}
                             onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                            className="size-4 sm:size-5"
                         />
                         <Label htmlFor="rememberMe" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             <MixedText text="记住我" />

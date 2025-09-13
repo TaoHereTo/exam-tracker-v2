@@ -821,7 +821,7 @@ export function UnifiedSettings({
                         <div
                           key={image.id}
                           className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
-                            ? 'ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900'
+                            ? 'ring-2 ring-blue-500'
                             : ''
                             } p-1 sm:p-2`}
                           onClick={() => {
