@@ -292,29 +292,29 @@ export function ChartsView({ records }: ChartsViewProps) {
             <Tabs defaultValue="perMinute" className="w-full mb-6">
                 <div className="flex justify-center mb-4 w-full">
                     <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full mx-auto">
-                        <TabsTrigger value="perMinute" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="每分钟得分" /></TabsTrigger>
-                        <TabsTrigger value="accuracy" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="正确率" /></TabsTrigger>
-                        <TabsTrigger value="pie" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="模块耗时分布" /></TabsTrigger>
-                        <TabsTrigger value="radar" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="模块能力" /></TabsTrigger>
+                        <TabsTrigger value="perMinute" className="py-1 whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy" className="py-1 whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie" className="py-1 whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar" className="py-1 whitespace-nowrap"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
-                <TabsContents className="p-0 border-0 overflow-visible min-h-[500px] sm:min-h-[700px]">
+                <TabsContents className="p-0 border-0 overflow-visible pb-20">
                     <TabsContent value="perMinute" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
                             <div className="w-full h-full overflow-visible">
                                 <TrendChart data={perMinuteData} yMax={2} />
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="accuracy" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
                             <div className="w-full h-full overflow-visible">
                                 <TrendChart data={accuracyData} yMax={100} />
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="pie" className="outline-none">
-                        <div className="w-full max-w-full min-h-[450px] h-[450px] sm:h-[650px] overflow-visible pb-8">
+                        <div className="w-full max-w-full min-h-[450px] h-[450px] sm:h-[650px] overflow-visible mb-16">
                             <div className="w-full h-full overflow-visible">
                                 <ModulePieChart data={records.map(r => {
                                     return {
@@ -328,7 +328,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                         </div>
                     </TabsContent>
                     <TabsContent value="radar" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible mb-16">
                             <div className="w-full h-full overflow-visible">
                                 <ModuleRadarChart data={records} />
                             </div>
