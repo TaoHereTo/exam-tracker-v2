@@ -81,7 +81,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
             orient: 'horizontal',
             left: 'center',
             top: 'bottom',
-            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 60 : 50,  // Increased mobile spacing
+            bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 70,  // Increased spacing to avoid overlap
             itemGap: 15,
             itemWidth: 25,
             itemHeight: 14,
@@ -117,7 +117,7 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
                 name: '模块耗时分布',
                 type: 'pie',
                 radius: ['45%', '85%'],  // Increased size to better fill the container
-                center: ['50%', '40%'],  // Move chart further upward
+                center: ['50%', '45%'],  // Move chart slightly upward
                 avoidLabelOverlap: false,
                 itemStyle: {
                     borderRadius: 8,
@@ -146,14 +146,14 @@ export const ModulePieChart: React.FC<ModulePieChartProps> = ({ data, showLegend
     };
     const baseTextStyle = { fontFamily: 'Times New Roman, 思源宋体, serif' } as const;
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: showLegend ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '0 0 120px 0' : '0 0 100px 0') : '0' }} className="chart-wrapper">
+        <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: showLegend ? (typeof window !== 'undefined' && window.innerWidth < 768 ? '10px 0 140px 0' : '10px 0 120px 0') : '10px 0 20px 0' }} className="chart-wrapper pie-chart-wrapper">
             <ReactECharts
                 option={option}
                 style={{ height: '100%', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
                 theme={{ textStyle: baseTextStyle } as Record<string, unknown>}
                 key={`pie-${isDarkMode}`}
-                className="chart-container"
+                className="chart-container pie-chart"
             />
         </div>
     );

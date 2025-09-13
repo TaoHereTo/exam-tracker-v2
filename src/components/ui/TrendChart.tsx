@@ -127,7 +127,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 orient: 'horizontal',
                 left: 'center',
                 top: 'bottom',
-                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 30 : 50,  // Match pie chart spacing
+                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 30,  // Increased spacing for visibility
                 itemGap: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 15,
                 itemWidth: typeof window !== 'undefined' && window.innerWidth < 768 ? 15 : 25,
                 itemHeight: typeof window !== 'undefined' && window.innerWidth < 768 ? 8 : 14,
@@ -137,7 +137,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 height: 'auto',
                 align: 'auto',
                 type: 'plain',
-                formatter: function(name: string) {
+                formatter: function (name: string) {
                     // On mobile, limit the name length to prevent overflow
                     if (typeof window !== 'undefined' && window.innerWidth < 768) {
                         return name.length > 4 ? name.substring(0, 4) : name;
@@ -166,7 +166,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 left: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
                 right: typeof window !== 'undefined' && window.innerWidth < 768 ? 10 : 20,
                 top: typeof window !== 'undefined' && window.innerWidth < 768 ? 20 : 40,
-                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 80 : 120,  // Increased to match pie chart spacing
+                bottom: typeof window !== 'undefined' && window.innerWidth < 768 ? 70 : 80,  // Increased to accommodate legend
                 borderColor: borderColor,
                 borderWidth: 1,
                 containLabel: true
@@ -246,7 +246,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 notMerge={true}
                 lazyUpdate={false}
                 opts={{ renderer: 'canvas' }}
-                className="chart-container w-full h-full"
+                className="chart-container w-full h-full trend-chart"
             />
         </div>
     );

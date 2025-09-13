@@ -298,23 +298,23 @@ export function ChartsView({ records }: ChartsViewProps) {
                         <TabsTrigger value="radar" className="py-1 whitespace-nowrap data-[state=active]:border data-[state=active]:border-input-border data-[state=active]:bg-white dark:data-[state=active]:border dark:data-[state=active]:border-[#4E4E4E] dark:data-[state=active]:bg-transparent"><MixedText text="模块能力" /></TabsTrigger>
                     </TabsList>
                 </div>
-                <TabsContents className="p-0 border-0 overflow-visible">
+                <TabsContents className="p-0 border-0 overflow-visible min-h-[500px] sm:min-h-[700px]">
                     <TabsContent value="perMinute" className="outline-none">
-                        <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
                             <div className="w-full h-full overflow-visible">
                                 <TrendChart data={perMinuteData} yMax={2} />
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="accuracy" className="outline-none">
-                        <div className="w-full max-w-full min-h-[350px] h-[350px] sm:h-[550px] overflow-visible">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
                             <div className="w-full h-full overflow-visible">
                                 <TrendChart data={accuracyData} yMax={100} />
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="pie" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
+                        <div className="w-full max-w-full min-h-[450px] h-[450px] sm:h-[650px] overflow-visible pb-8">
                             <div className="w-full h-full overflow-visible">
                                 <ModulePieChart data={records.map(r => {
                                     return {
@@ -328,7 +328,7 @@ export function ChartsView({ records }: ChartsViewProps) {
                         </div>
                     </TabsContent>
                     <TabsContent value="radar" className="outline-none">
-                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible">
+                        <div className="w-full max-w-full min-h-[400px] h-[400px] sm:h-[600px] overflow-visible pb-8">
                             <div className="w-full h-full overflow-visible">
                                 <ModuleRadarChart data={records} />
                             </div>

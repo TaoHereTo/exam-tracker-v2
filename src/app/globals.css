@@ -15,16 +15,18 @@
   -moz-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  font-feature-settings: "liga" 1; /* 启用连字 */
+  font-feature-settings: "liga" 1;
+  /* 启用连字 */
 }
 
 /* 针对高DPI屏幕的媒体查询优化 */
-@media (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) {
+@media (-webkit-min-device-pixel-ratio: 1.25),
+(min-resolution: 120dpi) {
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-  
+
   /* 高DPI字体优化变量 */
   :root {
     --font-smoothing: antialiased;
@@ -39,7 +41,7 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
   }
-  
+
   /* 2K分辨率字体优化变量 */
   :root {
     --font-smoothing: antialiased;
@@ -118,7 +120,7 @@
 }
 
 /* 特别优化退出登录按钮文本 */
-.dark [data-radix-popper-content-wrapper] [data-slot="menu-item"] > div > span {
+.dark [data-radix-popper-content-wrapper] [data-slot="menu-item"]>div>span {
   -webkit-font-smoothing: antialiased !important;
   text-rendering: optimizeLegibility !important;
   font-weight: 500 !important;
@@ -131,7 +133,8 @@
   text-rendering: optimizeLegibility !important;
   font-weight: 600 !important;
   letter-spacing: 0.02em !important;
-  color: #dc2626 !important; /* Ensure red color is vibrant */
+  color: #dc2626 !important;
+  /* Ensure red color is vibrant */
 }
 
 /* 确保深色模式下所有菜单项文本清晰 */
@@ -339,7 +342,7 @@ th .mixed-text-part {
   /* 统一的 hover 颜色 */
   --hover-light: #EEEDEC;
   --hover-dark: #262626;
-  
+
   /* 高DPI字体渲染变量 */
   --font-smoothing: antialiased;
   --text-rendering: optimizeLegibility;
@@ -535,6 +538,7 @@ html {
     transform: translate3d(0, -100%, 0) scale(0.8);
     opacity: 0;
   }
+
   to {
     transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
@@ -546,6 +550,7 @@ html {
     transform: translate3d(0, 0, 0) scale(1);
     opacity: 1;
   }
+
   to {
     transform: translate3d(0, -100%, 0) scale(0.8);
     opacity: 0;
@@ -1838,6 +1843,7 @@ body.eye-care.dark .text-muted-foreground,
 
 /* 移动端响应式优化 - 合并重复的媒体查询 */
 @media (max-width: 480px) {
+
   .sidebar-parent,
   .sidebar-child {
     font-size: 0.8rem;
@@ -1870,6 +1876,8 @@ body.eye-care.dark .text-muted-foreground,
 .echarts-for-react {
   width: 100% !important;
   max-width: 100% !important;
+  position: relative;
+  z-index: 100;
 }
 
 .chart-container {
@@ -1878,6 +1886,23 @@ body.eye-care.dark .text-muted-foreground,
 
 .chart-wrapper {
   height: 100% !important;
+}
+
+/* 确保图例不被遮挡 - 为每个图表类型单独设置 */
+.trend-chart .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+.pie-chart .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+/* 确保所有ECharts图例都有足够高的z-index */
+.echarts-for-react .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
 }
 
 /* 移动端图表优化 */
@@ -1894,6 +1919,8 @@ body.eye-care.dark .text-muted-foreground,
 
   .echarts-for-react .chart-legend {
     width: 90% !important;
+    position: relative;
+    z-index: 999;
   }
 
   [data-tab-content] .chart-wrapper,
@@ -1924,7 +1951,7 @@ body.eye-care.dark .text-muted-foreground,
   pointer-events: none;
 }
 
-#toast-container > * {
+#toast-container>* {
   pointer-events: auto;
 }
 
