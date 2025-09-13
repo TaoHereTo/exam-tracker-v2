@@ -289,7 +289,7 @@ export function ChartsView({ records }: ChartsViewProps) {
         <div className="w-full px-4 py-6">
             <Tabs defaultValue="perMinute" className="w-full">
                 <div className="flex justify-center mb-6">
-                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit">
                         <TabsTrigger value="perMinute" className="py-1 whitespace-nowrap"><MixedText text="每分钟得分" /></TabsTrigger>
                         <TabsTrigger value="accuracy" className="py-1 whitespace-nowrap"><MixedText text="正确率" /></TabsTrigger>
                         <TabsTrigger value="pie" className="py-1 whitespace-nowrap"><MixedText text="模块耗时分布" /></TabsTrigger>
