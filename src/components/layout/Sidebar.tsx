@@ -189,7 +189,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     };
 
     return (
-        <AnimateSidebar collapsible="icon" className="transition-all duration-500 ease-in-out">
+        <AnimateSidebar collapsible="icon">
             <SidebarHeader>
                 {/* 应用标题 */}
                 <SidebarMenu>

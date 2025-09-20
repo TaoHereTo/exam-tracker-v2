@@ -769,7 +769,7 @@ export function UnifiedSettings({
                     <SelectTrigger className="h-8 sm:h-9">
                       <SelectValue placeholder="排序" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent position="item-aligned">
                       <SelectItem value="time_desc">时间降序</SelectItem>
                       <SelectItem value="time_asc">时间升序</SelectItem>
                       <SelectItem value="name_asc">名称升序</SelectItem>

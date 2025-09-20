@@ -5,7 +5,7 @@ import toast, { Toaster, ToastBar } from "react-hot-toast";
 import { CheckCircle2, XCircle, Info, AlertTriangle, Flower } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import { usePathname } from "next/navigation";
-import { useSidebar } from "@/components/ui/sidebar";
+import { useSidebar } from "@/components/animate-ui/components/radix/sidebar";
 
 // 自定义hook来安全地使用useSidebar
 function useSidebarSafe() {
