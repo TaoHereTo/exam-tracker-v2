@@ -1,0 +1,54 @@
+/* ========== Markdown编辑器工具栏按钮样式 ========== */
+
+/* 工具栏按钮基础样式 */
+.toolbar-button-base {
+  @apply border border-transparent;
+}
+
+/* 工具栏按钮颜色变体 */
+.toolbar-button-bold {
+  @apply border border-transparent;
+}
+
+.toolbar-button-bold.active {
+  @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 shadow-md border border-blue-200 dark:border-blue-700;
+}
+
+.toolbar-button-italic {
+  @apply border border-transparent;
+}
+
+.toolbar-button-italic.active {
+  @apply bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 shadow-md border border-green-200 dark:border-green-700;
+}
+
+/* Markdown编辑器工具栏按钮样式 */
+.md-toolbar-button-base {
+  @apply h-7 w-7 p-0 border border-transparent;
+}
+
+.md-toolbar-button-heading {
+  @apply h-7 w-7 p-0;
+}
+
+.md-toolbar-button-color {
+  @apply h-7 w-7 p-0;
+}
+
+.md-toolbar-button-strikethrough.active {
+  @apply bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300 shadow-md border-red-200 dark:border-red-700;
+}
+
+.md-toolbar-button-divider.active {
+  @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 shadow-md border-blue-200 dark:border-blue-700;
+}
+
+.md-toolbar-button-preview.active {
+  @apply bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 shadow-md border-orange-200 dark:border-orange-700;
+}
+
+/* 修复黑色按钮的hover效果 */
+.bg-black:hover,
+.bg-gray-900:hover {
+  /* 保持原有样式 */
+}

@@ -1,0 +1,1998 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "../styles/button-variants.css";
+
+
+
+
+
+@custom-variant dark (&:is(.dark *));
+
+/* ========== 字体渲染优化 for 2K/高DPI 显示器 ========== */
+/* 添加字体平滑和抗锯齿优化 */
+* {
+  font-family: '思源宋体', 'Times New Roman', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  font-feature-settings: "liga" 1;
+  /* 启用连字 */
+}
+
+/* 针对高DPI屏幕的媒体查询优化 */
+@media (-webkit-min-device-pixel-ratio: 1.25),
+(min-resolution: 120dpi) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* 高DPI字体优化变量 */
+  :root {
+    --font-smoothing: antialiased;
+    --text-rendering: optimizeLegibility;
+  }
+}
+
+/* 针对2K及以上分辨率的优化 */
+@media (min-width: 2048px) {
+  * {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+  }
+
+  /* 2K分辨率字体优化变量 */
+  :root {
+    --font-smoothing: antialiased;
+    --text-rendering: optimizeLegibility;
+    --font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+  }
+}
+
+/* 高DPI类 */
+.high-dpi {
+  -webkit-font-smoothing: var(--font-smoothing, antialiased);
+  -moz-osx-font-smoothing: var(--moz-font-smoothing, grayscale);
+  text-rendering: var(--text-rendering, optimizeLegibility);
+}
+
+/* 优化中文字符在100%缩放下的清晰度 */
+.mixed-text-part {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-weight: 400;
+  /* 为细线字符添加特殊渲染优化 */
+  font-feature-settings: "kern" 1, "liga" 1;
+  /* 添加轻微的文本阴影来增强细线的可见性 */
+  text-shadow: 0 0 0.2px currentColor;
+}
+
+/* 深色模式下的中文字符优化 */
+.dark .mixed-text-part {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+  font-weight: 400;
+  /* 为细线字符添加特殊渲染优化 */
+  font-feature-settings: "kern" 1, "liga" 1;
+  /* 添加轻微的文本阴影来增强细线的可见性 */
+  text-shadow: 0 0 0.2px currentColor;
+}
+
+/* 特别优化包含横线的常见中文字符 */
+.mixed-text-part:contains("一"):not(.dark *),
+.mixed-text-part:contains("二"):not(.dark *),
+.mixed-text-part:contains("三"):not(.dark *) {
+  text-shadow: 0 0 0.3px currentColor;
+}
+
+.dark .mixed-text-part:contains("一"),
+.dark .mixed-text-part:contains("二"),
+.dark .mixed-text-part:contains("三") {
+  text-shadow: 0 0 0.3px currentColor;
+}
+
+/* 下拉菜单字体优化 */
+[data-radix-popper-content-wrapper] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+[data-radix-popper-content-wrapper] * {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.dark [data-radix-popper-content-wrapper] {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 深色模式下拉菜单特殊优化 */
+.dark [data-radix-popper-content-wrapper] * {
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 500 !important;
+}
+
+/* 特别优化退出登录按钮文本 */
+.dark [data-radix-popper-content-wrapper] [data-slot="menu-item"]>div>span {
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 500 !important;
+}
+
+/* 特别优化"退出登录"文本在深色模式下的清晰度 */
+.dark .logout-menu-item .logout-text {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+  color: var(--destructive) !important;
+  /* Ensure red color is vibrant */
+}
+
+/* 确保深色模式下所有菜单项文本清晰 */
+.dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: optimizeLegibility !important;
+}
+
+body,
+html {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* 强制限制所有容器的最大宽度 */
+#__next,
+#root,
+main,
+.content-scrollable {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+}
+
+/* 确保卡片组件有足够高的z-index，不被背景遮挡 */
+.card,
+[data-card],
+.border-beam-card,
+.magic-card {
+  position: relative !important;
+  z-index: 50 !important;
+}
+
+/* Marquee动画 */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+/* Marquee hover pause */
+.group:hover .animate-marquee,
+.group:hover .animate-marquee-vertical {
+  animation-play-state: paused;
+}
+
+/* 字体类已优化，移除重复定义，使用全局设置 */
+
+/* MixedText 组件样式 */
+.mixed-text-part {
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 表格标题字体粗细设置 */
+th {
+  font-weight: 600 !important;
+}
+
+th .mixed-text-part {
+  font-weight: 600 !important;
+}
+
+/* ========== 按钮间距系统 ========== */
+/* 按钮间距已统一使用CSS变量系统 */
+
+/* ========== 日历样式修复 ========== */
+/* 使用最高优先级的选择器强制覆盖所有日历样式 */
+
+/* Calendar component now handles all styling, removing global overrides */
+
+/* 其余按钮间距样式已移除，统一使用CSS变量系统 */
+
+/* ========== 移动端优化 ========== */
+/* 确保表格在移动端可以水平滚动 */
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 优化表格在小屏幕上的显示 */
+@media (max-width: 640px) {
+  .table-fixed {
+    min-width: 600px;
+  }
+
+  /* 确保设置页面的开关和按钮在移动端正确对齐 */
+  .settings-row {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .settings-row>div:first-child {
+    flex: 1;
+  }
+
+  .settings-row>div:last-child {
+    margin-top: 0 !important;
+  }
+}
+
+/* ========== 动画优化 ========== */
+/* 移除未使用的shimmer动画，保留必要的动画效果 */
+
+/* ========== 主题配置 ========== */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
+
+  /* 彩虹色变量已在上方定义，这里移除重复 */
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+
+    100% {
+      background-position: 200%;
+    }
+  }
+
+  --animate-marquee: marquee var(--duration) infinite linear;
+
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+/* ========== 颜色变量 ========== */
+:root {
+  --radius: 0.625rem;
+  /* 通用间距刻度（可复用） */
+  --space-0: 0px;
+  --space-1: 0.25rem;
+  /* 4px */
+  --space-2: 0.5rem;
+  /* 8px */
+  --space-3: 0.75rem;
+  /* 12px */
+  --space-4: 1rem;
+  /* 16px */
+  --space-5: 1.25rem;
+  /* 20px */
+  --space-6: 1.5rem;
+  /* 24px */
+  --space-8: 2rem;
+  /* 32px */
+
+  /* 表单/卡片统一间距令牌 */
+  --form-gap: var(--space-4);
+  --form-section-gap: var(--space-5);
+  --form-field-gap: var(--space-2);
+  --form-grid-gap: var(--space-4);
+  --form-card-padding-x: 1.5rem;
+  --form-card-padding-y: 1.25rem;
+
+  /* 主题颜色 */
+  --background: #FFFFFF;
+  --foreground: oklch(0.145 0 0);
+  --card: transparent;
+  --card-foreground: oklch(0.145 0 0);
+  --popover: #FAFAFA;
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: #F5F5F5;
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: #F0F0F0;
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: #F5F5F5;
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #E0E0E0;
+  --input: #FFFFFF;
+  --input-border: #E0E0E0;
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+
+  /* 侧边栏颜色 */
+  --sidebar: #FAFAFA;
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: #EEEDED;
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: #E0E0E0;
+  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-width: 280px;
+  --sidebar-width-icon: 4rem;
+
+  /* 强制侧边栏动画 */
+  --sidebar-transition-duration: 400ms;
+  --sidebar-transition-timing: cubic-bezier(0.75, 0, 0.25, 1);
+
+  /* 彩虹色彩 */
+  --color-1: oklch(66.2% 0.225 25.9);
+  --color-2: oklch(60.4% 0.26 302);
+  --color-3: oklch(69.6% 0.165 251);
+  --color-4: oklch(80.2% 0.134 225);
+  --color-5: oklch(90.7% 0.231 133);
+
+
+  /* 高DPI字体渲染变量 */
+  --font-smoothing: antialiased;
+  --text-rendering: optimizeLegibility;
+  --moz-font-smoothing: grayscale;
+}
+
+/* 按钮主题适配：默认按钮在浅色模式下为黑色背景白色文字，深色模式下为白色背景黑色文字 */
+[data-slot="button"][variant="default"],
+[data-slot="button"].variant-default {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="default"],
+.dark [data-slot="button"].variant-default {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* 按钮主题适配：secondary按钮在浅色模式下为灰色背景黑色文字，深色模式下为白色背景黑色文字 */
+[data-slot="button"][variant="secondary"],
+[data-slot="button"].variant-secondary {
+  background-color: #F5F5F5 !important;
+  color: #000000 !important;
+}
+
+.dark [data-slot="button"][variant="secondary"],
+.dark [data-slot="button"].variant-secondary {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+/* 按钮主题适配：outline按钮在浅色模式下为白色背景黑色文字，深色模式下为黑色背景白色文字 */
+[data-slot="button"][variant="outline"],
+[data-slot="button"].variant-outline {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark [data-slot="button"][variant="outline"],
+.dark [data-slot="button"].variant-outline {
+  background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+/* 特殊处理带图标按钮的背景色 */
+[data-slot="button"][variant="outline"] svg,
+.dark [data-slot="button"][variant="outline"] svg {
+  color: inherit !important;
+}
+
+/* destructive 按钮样式 */
+[data-slot="button"][variant="destructive"],
+[data-slot="button"].variant-destructive {
+  background-color: var(--destructive) !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="destructive"],
+.dark [data-slot="button"].variant-destructive {
+  background-color: var(--destructive) !important;
+  color: #FFFFFF !important;
+}
+
+.dark {
+  --background: #161618;
+  --foreground: oklch(0.985 0 0);
+  --card: transparent;
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: #D42422;
+  --border: oklch(1 0 0 / 10%);
+  --input: #242628;
+  --input-border: #313335;
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-width: 280px;
+  --sidebar-width-icon: 4rem;
+  --color-1: oklch(66.2% 0.225 25.9);
+  --color-2: oklch(60.4% 0.26 302);
+  --color-3: oklch(69.6% 0.165 251);
+  --color-4: oklch(80.2% 0.134 225);
+  --color-5: oklch(90.7% 0.231 133);
+}
+
+/* ========== 基础样式 ========== */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* 统一所有placeholder颜色 - 纯黑色（浅色模式）和纯白色（深色模式） */
+  input::placeholder,
+  textarea::placeholder,
+  select::placeholder {
+    color: #000000 !important;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder,
+  .dark select::placeholder {
+    color: #FFFFFF !important;
+  }
+
+  /* 统一所有组件的占位符颜色 - 纯黑色（浅色模式）和纯白色（深色模式） */
+  [data-radix-select-trigger][data-placeholder] span,
+  [data-radix-select-value][data-placeholder] span,
+  .time-picker-trigger span,
+  [data-slot="button"][variant="outline"] span {
+    color: #000000 !important;
+  }
+
+  .dark [data-radix-select-trigger][data-placeholder] span,
+  .dark [data-radix-select-value][data-placeholder] span,
+  .dark .time-picker-trigger span,
+  .dark [data-slot="button"][variant="outline"] span {
+    color: #FFFFFF !important;
+  }
+}
+
+/* ========== 边框颜色工具类 ========== */
+/* 合并重复的边框样式定义 */
+.border-input-border {
+  border-color: var(--input-border);
+}
+
+.dark .border-input-border {
+  border-color: var(--input-border);
+}
+
+/* ========== 统一的表单/卡片布局工具类 ========== */
+@layer utilities {
+
+  /* 整体纵向栈 */
+  .form-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-gap);
+  }
+
+  /* 分区块（区块之间更大的间距） */
+  .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-section-gap);
+  }
+
+  /* 单个字段（标签与控件的间距） */
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--form-field-gap);
+  }
+
+  /* 两列网格 */
+  .form-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--form-grid-gap);
+  }
+
+  /* 操作按钮区域 */
+  .form-actions {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ========== 主题切换优化 ========== */
+/* 为主题切换添加硬件加速和性能优化 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease-out;
+  will-change: clip-path;
+  transform: translateZ(0);
+  /* 启用硬件加速 */
+}
+
+/* 减少重绘和回流 */
+html {
+  contain: layout style paint;
+}
+
+/* 优化动画性能 */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.1s;
+  }
+}
+
+/* ========== Toast Animations ========== */
+@keyframes toast-enter {
+  from {
+    transform: translate3d(0, 100%, 0) scale(0.8);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: translate3d(0, 100%, 0) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* 移除重复的动画定义，已在keyframes中定义 */
+
+/* ========== MarkdownEditor 性能优化 ========== */
+/* 为MarkdownEditor组件添加性能优化 */
+.markdown-editor-container {
+  contain: layout style;
+  will-change: auto;
+  /* 避免不必要的合成层 */
+}
+
+/* 优化textarea的渲染性能 */
+.markdown-editor-textarea {
+  contain: layout style;
+  transform: translateZ(0);
+  /* 启用硬件加速 */
+}
+
+/* 减少工具栏按钮在主题切换时的重绘 */
+.md-toolbar-button-base {
+  contain: layout style;
+  will-change: transform, background-color, border-color;
+}
+
+/* 在主题切换动画期间暂时禁用某些过渡效果 */
+::view-transition-group(root) * {
+  transition-duration: 0s !important;
+}
+
+/* 恢复过渡效果 */
+html:not(:has(::view-transition-group(root))) * {
+  transition-duration: inherit;
+}
+
+/* 在主题切换期间优化MarkdownEditor性能 */
+::view-transition-group(root) .knowledge-entry-container {
+  pointer-events: none;
+  /* 暂时禁用交互 */
+}
+
+::view-transition-group(root) .knowledge-editor-textarea {
+  will-change: auto;
+  /* 移除will-change以减少合成层 */
+}
+
+/* 主题切换完成后恢复 */
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container {
+  pointer-events: auto;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+/* 为不支持 :has() 的浏览器提供备用方案 */
+@supports not (selector(:has(*))) {
+  .knowledge-entry-container .knowledge-entry-container {
+    transition: opacity 0.1s ease;
+  }
+
+  .theme-transitioning .knowledge-entry-container .knowledge-entry-container {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ========== 知识点录入页面优化 ========== */
+/* 为知识点录入页面添加特殊的性能优化 */
+.knowledge-entry-container {
+  /* 确保容器可以正常滚动 */
+  overflow: visible;
+  /* 移除 contain 属性以允许正常滚动 */
+  /* contain: layout style; */
+}
+
+/* 在主题切换期间优化知识点录入页面 */
+::view-transition-group(root) .knowledge-entry-container {
+  /* 移除 contain: strict 以允许正常滚动 */
+  /* contain: strict; */
+  transform: translateZ(0);
+  /* 强制硬件加速 */
+}
+
+::view-transition-group(root) .knowledge-entry-container .knowledge-entry-container {
+  display: none !important;
+  /* 完全隐藏编辑器 */
+}
+
+::view-transition-group(root) .knowledge-entry-container .knowledge-entry-container {
+  display: none !important;
+}
+
+/* 主题切换完成后恢复 */
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container {
+  /* 移除 contain 属性以允许正常滚动 */
+  /* contain: layout style; */
+  transform: none;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowledge-entry-container {
+  display: block !important;
+}
+
+/* 为不支持 :has() 的浏览器提供备用方案 */
+@supports not (selector(:has(*))) {
+  .knowledge-entry-container .knowledge-entry-container {
+    transition: opacity 0.1s ease;
+  }
+
+  .theme-transitioning .knowledge-entry-container .knowledge-entry-container {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ========== 计划完成庆祝动画 ========== */
+@keyframes confetti {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes celebration-bounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(-90deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes celebration-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.6), 0 0 60px rgba(255, 215, 0, 0.4);
+  }
+}
+
+.animate-confetti {
+  animation: confetti linear infinite;
+}
+
+.animate-sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+.animate-celebration-bounce {
+  animation: celebration-bounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-celebration-glow {
+  animation: celebration-glow 2s ease-in-out infinite;
+}
+
+/* 庆祝弹窗的渐变背景 */
+.celebration-gradient {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 庆祝弹窗的闪光边框 */
+.celebration-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.celebration-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7, #dda0dd);
+  background-size: 400% 400%;
+  border-radius: inherit;
+  z-index: -1;
+  animation: celebration-border-glow 3s ease infinite;
+}
+
+@keyframes celebration-border-glow {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+
+
+
+/* ========== 主题切换按钮样式 ========== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.switch #input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #2196f3;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.sun-moon {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 4px;
+  background-color: yellow;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  -webkit-animation: rotate-center-reverse 0.4s ease-in-out both;
+  animation: rotate-center-reverse 0.4s ease-in-out both;
+}
+
+#input:checked+.slider {
+  background-color: black;
+}
+
+#input:focus+.slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+#input:checked+.slider .sun-moon {
+  -webkit-transform: translateX(22px);
+  -ms-transform: translateX(22px);
+  transform: translateX(22px);
+  background-color: white;
+  -webkit-animation: rotate-center 0.4s ease-in-out both;
+  animation: rotate-center 0.4s ease-in-out both;
+}
+
+.moon-dot {
+  opacity: 0;
+  transition: 0.4s;
+  fill: gray;
+}
+
+#input:checked+.slider .sun-moon .moon-dot {
+  opacity: 1;
+}
+
+.slider.round {
+  border-radius: 28px;
+}
+
+.slider.round .sun-moon {
+  border-radius: 50%;
+}
+
+#moon-dot-1 {
+  left: 10px;
+  top: 3px;
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  z-index: 4;
+}
+
+#moon-dot-2 {
+  left: 2px;
+  top: 10px;
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  z-index: 4;
+}
+
+#moon-dot-3 {
+  left: 16px;
+  top: 18px;
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  z-index: 4;
+}
+
+#light-ray-1 {
+  left: -8px;
+  top: -8px;
+  position: absolute;
+  width: 43px;
+  height: 43px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+#light-ray-2 {
+  left: -50%;
+  top: -50%;
+  position: absolute;
+  width: 55px;
+  height: 55px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+#light-ray-3 {
+  left: -18px;
+  top: -18px;
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: -1;
+  fill: white;
+  opacity: 10%;
+}
+
+.light-ray {
+  opacity: 0;
+  transition: 0.4s;
+  fill: yellow;
+}
+
+#input:checked+.slider .sun-moon .light-ray {
+  opacity: 0;
+}
+
+.cloud-light {
+  position: absolute;
+  fill: #eee;
+  animation-name: cloud-move;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+}
+
+.cloud-dark {
+  position: absolute;
+  fill: #ccc;
+  animation-name: cloud-move;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+  animation-delay: 1s;
+}
+
+#cloud-1 {
+  left: 20px;
+  top: 8px;
+  width: 40px;
+}
+
+#cloud-2 {
+  left: 34px;
+  top: 3px;
+  width: 20px;
+}
+
+#cloud-3 {
+  left: 8px;
+  top: 17px;
+  width: 30px;
+}
+
+#cloud-4 {
+  left: 26px;
+  top: 11px;
+  width: 40px;
+}
+
+#cloud-5 {
+  left: 38px;
+  top: 7px;
+  width: 20px;
+}
+
+#cloud-6 {
+  left: 12px;
+  top: 19px;
+  width: 30px;
+}
+
+@keyframes cloud-move {
+  0% {
+    transform: translateX(0px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  80% {
+    transform: translateX(-4px);
+  }
+
+  100% {
+    transform: translateX(0px);
+  }
+}
+
+.stars {
+  transform: translateY(-32px);
+  opacity: 0;
+  transition: 0.4s;
+}
+
+.star {
+  fill: white;
+  position: absolute;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+  animation-name: star-twinkle;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+#input:checked+.slider .stars {
+  -webkit-transform: translateY(0);
+  -ms-transform: translateY(0);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#star-1 {
+  width: 20px;
+  top: 2px;
+  left: 3px;
+  animation-delay: 0.3s;
+}
+
+#star-2 {
+  width: 6px;
+  top: 16px;
+  left: 3px;
+}
+
+#star-3 {
+  width: 12px;
+  top: 20px;
+  left: 10px;
+  animation-delay: 0.6s;
+}
+
+#star-4 {
+  width: 18px;
+  top: 0px;
+  left: 18px;
+  animation-delay: 1.3s;
+}
+
+@keyframes star-twinkle {
+  0% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(1.2);
+  }
+
+  80% {
+    transform: scale(0.8);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes rotate-center {
+  0% {
+    transform: translateX(0px) rotate(0deg);
+  }
+
+  100% {
+    transform: translateX(22px) rotate(360deg);
+  }
+}
+
+@keyframes rotate-center-reverse {
+  0% {
+    transform: translateX(22px) rotate(360deg);
+  }
+
+  100% {
+    transform: translateX(0px) rotate(0deg);
+  }
+}
+
+/* 悬停效果 */
+.switch:hover .slider {
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+.switch:hover .sun-moon {
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.6);
+}
+
+#input:checked+.slider:hover .sun-moon {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.4);
+}
+
+/* 激活状态 */
+.switch:active .sun-moon {
+  transform: scale(0.95);
+}
+
+#input:checked+.slider:active .sun-moon {
+  transform: translateX(26px) rotate(360deg) scale(0.95);
+}
+
+/* ========== 用户选择控制 ========== */
+/* 只对特定需要禁用选择的元素应用，而不是全局禁用 */
+.unselectable {
+  user-select: none !important;
+}
+
+/* 对UI组件中的特定元素禁用选择，但保持内容可选择性 */
+[data-slot="button"],
+[data-slot="card"],
+[data-slot="sidebar-menu-button"] {
+  user-select: none;
+}
+
+/* 确保输入框和文本区域可以正常选择 */
+input,
+textarea,
+[data-slot="input"],
+[data-slot="textarea"] {
+  user-select: text !important;
+}
+
+/* 确保卡片内容可以正常选择 */
+.card-content,
+.card-body,
+[data-slot="card-content"] {
+  user-select: text;
+}
+
+/* ========== 侧边栏样式 ========== */
+/* 修正sonner提示框深色模式下主内容颜色 */
+.dark .toaster .toast-title,
+.dark .toaster .sonner-title,
+.dark .toaster [data-title] {
+  color: #fff !important;
+}
+
+/* 侧边栏基础样式 - 移除重复定义，统一使用组件样式 */
+
+/* 侧边栏宽度和布局样式 */
+[data-slot="sidebar-gap"] {
+  width: var(--sidebar-width);
+  transition: width 0.2s ease-linear;
+  background-color: var(--sidebar) !important;
+}
+
+[data-slot="sidebar-container"] {
+  width: var(--sidebar-width);
+  transition: width 0.2s ease-linear;
+  overflow: hidden;
+  background-color: var(--sidebar);
+}
+
+/* 当侧边栏处于icon模式时的宽度 */
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-gap"] {
+  width: var(--sidebar-width-icon);
+}
+
+[data-slot="sidebar"][data-collapsible="icon"] [data-slot="sidebar-container"] {
+  width: var(--sidebar-width-icon);
+  overflow: hidden;
+}
+
+/* ========== 侧边栏文字动画修复 ========== */
+/* 为侧边栏文字添加平滑过渡动画 */
+[data-slot="sidebar-group-label"] span,
+[data-slot="sidebar-menu-button"] span,
+[data-slot="sidebar-header"] span {
+  transition: all 0.2s ease-linear;
+  display: inline-block;
+  opacity: 1;
+  transform: translateX(0);
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* 当侧边栏处于icon模式且收起状态时，平滑隐藏文字 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] span,
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] span,
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] span {
+  opacity: 0;
+  transform: translateX(-6px);
+  max-width: 0;
+  pointer-events: none;
+}
+
+/* 确保侧边栏组标签在收起状态时完全隐藏 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: all 0.2s ease-linear;
+}
+
+/* 增加侧边栏文字大小以提高可读性 */
+[data-slot="sidebar-group-label"] span {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* 深色模式下侧边栏头部增强可见性 */
+.dark [data-slot="sidebar-header"] span {
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: hsl(var(--sidebar-foreground) / 0.95);
+}
+
+/* 增加侧边栏图标大小 */
+[data-slot="sidebar-group-label"] svg,
+[data-slot="sidebar-menu-button"] svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* 收起状态下图标大小调整 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* 侧边栏头部图标在收起状态下的样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] [data-slot="sidebar-menu-button"] {
+  justify-content: center !important;
+  padding: 0.75rem !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] [data-slot="sidebar-menu-button"]>div {
+  justify-content: center !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] [data-slot="sidebar-menu-button"] img {
+  width: 2rem !important;
+  height: 2rem !important;
+  flex-shrink: 0 !important;
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* 侧边栏头部在收起状态下的样式 - 简化版本 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.5rem !important;
+}
+
+/* 修复footer区域（地球图标）在收起状态下的对齐问题 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.75rem !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"]>div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] svg {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* 确保侧边栏底部用户信息在展开状态下也居中显示 */
+[data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+[data-slot="sidebar-footer"]>div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* 组标签样式 - 去掉左边框 */
+[data-slot="sidebar-group-label"] {
+  color: hsl(var(--sidebar-foreground) / 0.7);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 0.75rem 0.5rem 0.75rem;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  margin-left: 0;
+  width: 100%;
+  border-left: none;
+}
+
+/* 深色模式下组标签增强可见性 */
+.dark [data-slot="sidebar-group-label"] {
+  color: hsl(var(--sidebar-foreground) / 0.8);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 子项按钮样式 - 去掉缩进 */
+[data-slot="sidebar-menu-button"] {
+  transition: none;
+  position: relative;
+  border-radius: 0.5rem;
+  margin: 0.1rem 0.25rem;
+  width: calc(100% - 0.5rem);
+  box-sizing: border-box;
+  margin-left: 0;
+  width: calc(100% - 0.5rem);
+}
+
+/* 收起状态下按钮居中对齐 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
+  justify-content: center !important;
+  text-align: center !important;
+  margin: 0.1rem 0.25rem !important;
+  width: calc(100% - 0.5rem) !important;
+}
+
+/* 确保内部按钮元素也居中对齐 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"]>button {
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+/* 收起状态下图标居中 - 简化版本 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] svg {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* 增加侧边栏菜单按钮的左边距，让图标距离左边更远 */
+[data-slot="sidebar-menu-button"]:not([data-slot="sidebar-footer"] *),
+button[data-slot="sidebar-menu-button"]:not([data-slot="sidebar-footer"] *),
+[data-sidebar="menu-button"]:not([data-slot="sidebar-footer"] *),
+.peer\/menu-button:not([data-slot="sidebar-footer"] *) {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  height: 2rem !important;
+  /* 32px - 稍微增加 */
+  min-height: 2rem !important;
+  /* 32px */
+  max-height: 2rem !important;
+  /* 32px */
+}
+
+/* 覆盖 shadcn/ui 的默认高度设置 */
+[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+[data-sidebar="menu-button"][data-size="default"]:not([data-slot="sidebar-footer"] *),
+.peer\/menu-button[data-size="default"]:not([data-slot="sidebar-footer"] *) {
+  height: 2rem !important;
+  /* 32px - 稍微增加 */
+  min-height: 2rem !important;
+  /* 32px */
+  max-height: 2rem !important;
+  /* 32px */
+}
+
+/* 确保下拉菜单项内图标和文字间距正确 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.375rem 0.5rem !important;
+}
+
+/* 修复下拉菜单中图标占用空间过大的问题 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"] svg {
+  width: 1rem !important;
+  height: 1rem !important;
+  flex-shrink: 0 !important;
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* 确保下拉菜单中的文本正常显示，不受侧边栏收起状态影响 */
+[data-slot="dropdown-menu-content"] span {
+  opacity: 1 !important;
+  transform: none !important;
+  max-width: none !important;
+  pointer-events: auto !important;
+  white-space: nowrap !important;
+  flex: 1 !important;
+}
+
+/* 强制覆盖任何可能影响下拉菜单图标布局的样式 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"]>svg:first-child {
+  min-width: 1rem !important;
+  max-width: 1rem !important;
+}
+
+/* 确保图标后的内容紧贴图标，不留多余空间 */
+[data-slot="dropdown-menu-content"] [data-slot="dropdown-menu-item"]>svg+* {
+  margin-left: 0.5rem !important;
+  flex: 1 !important;
+}
+
+/* 展开状态下的菜单按钮样式 */
+[data-slot="sidebar"][data-state="expanded"] [data-slot="sidebar-menu-button"] {
+  padding-left: 1.25rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 收起状态下的菜单按钮样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+/* 修复footer区域（地球图标）在收起状态下的对齐问题 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  padding: 0.75rem !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"]>div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] svg {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+
+/* 去除点击/聚焦时的外边框与阴影 */
+[data-slot="sidebar-menu-button"]:focus,
+[data-slot="sidebar-menu-button"]:focus-visible,
+[data-slot="sidebar-menu-button"]:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* 侧边栏间距和布局 */
+[data-slot="sidebar-inner"] {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+[data-slot="sidebar-container"] {
+  overflow: hidden;
+}
+
+/* 侧边栏组标签样式 */
+[data-slot="sidebar-group-label"] {
+  padding-left: 1.25rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 侧边栏头部和底部的内边距 */
+[data-slot="sidebar-header"],
+[data-slot="sidebar-footer"] {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+/* 确保侧边栏底部用户信息区域不被遮挡 */
+/* Sidebar component now handles all styling, removing global overrides */
+
+[data-slot="sidebar-footer"]>div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* 侧边栏底部用户信息内容样式 */
+[data-slot="sidebar-footer"]>* {
+  height: auto !important;
+  min-height: auto !important;
+  max-height: none !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/* 确保侧边栏容器底部有足够空间，并使用 flex 布局 */
+[data-slot="sidebar-inner"] {
+  padding-bottom: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+}
+
+/* 确保侧边栏内容区域能够伸展 */
+[data-slot="sidebar-content"] {
+  flex: 1 !important;
+}
+
+/* 用户信息按钮或内容的特殊处理 */
+[data-slot="sidebar-footer"] button,
+[data-slot="sidebar-footer"] [role="button"],
+[data-slot="sidebar-footer"] [data-slot="sidebar-menu-button"] {
+  height: 3rem !important;
+  /* 48px - 比子菜单稍大但比原来小 */
+  min-height: 3rem !important;
+  max-height: 3rem !important;
+  padding: 0.75rem 1rem !important;
+}
+
+/* 侧边栏组内容的内边距 */
+[data-slot="sidebar-group-content"] {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+/* 收起状态下的样式 */
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  text-align: center !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"],
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+  padding-bottom: 0.5rem !important;
+}
+
+[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-content"] {
+  padding-left: 0.25rem !important;
+  padding-right: 0.25rem !important;
+}
+
+/* 侧边栏按钮样式 */
+/* 移除旧版自定义侧边栏样式（.sidebar-parent/.sidebar-child），统一使用 shadcn/ui Sidebar */
+
+
+/* ========== 护眼模式 ========== */
+body.eye-care {
+  background: #f7f3e8 !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care .card,
+body.eye-care .bg-background,
+body.eye-care .bg-white,
+body.eye-care [data-slot="card"],
+body.eye-care .bg-card {
+  background: #f9f6ee !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care .border,
+body.eye-care .border-input {
+  border-color: #e2d9c3 !important;
+}
+
+body.eye-care .text-muted-foreground {
+  color: #b0a98b !important;
+}
+
+/* 确保夜间护眼模式在深色模式下也能正常工作 */
+body.eye-care.dark,
+.dark body.eye-care {
+  background: #f7f3e8 !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care.dark .card,
+body.eye-care.dark .bg-background,
+body.eye-care.dark .bg-white,
+body.eye-care.dark [data-slot="card"],
+body.eye-care.dark .bg-card,
+.dark body.eye-care .card,
+.dark body.eye-care .bg-background,
+.dark body.eye-care .bg-white,
+.dark body.eye-care [data-slot="card"],
+.dark body.eye-care .bg-card {
+  background: #f9f6ee !important;
+  color: #3a3a2a !important;
+}
+
+body.eye-care.dark .border,
+body.eye-care.dark .border-input,
+.dark body.eye-care .border,
+.dark body.eye-care .border-input {
+  border-color: #e2d9c3 !important;
+}
+
+body.eye-care.dark .text-muted-foreground,
+.dark body.eye-care .text-muted-foreground {
+  color: #b0a98b !important;
+}
+
+/* ========== Checkbox 动效 ========== */
+/* Checkbox component now handles all styling, removing global overrides */
+
+/* ========== 响应式设计优化 ========== */
+
+
+/* Dark mode border color for dropdown menus */
+/* DropdownMenu component now handles all styling, removing global overrides */
+
+
+/* destructive 按钮样式 */
+/* Button component now handles all styling, removing global overrides */
+
+/* 禁用特定组件的 Hover 效果 */
+[data-plan-button]:hover,
+[data-plan-button]:focus,
+[data-plan-button]:active,
+[data-plan-button]:focus-visible {
+  transform: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+  transition: none !important;
+}
+
+/* tabs 选中状态增强可见性 */
+/* Tabs component now handles all styling, removing global overrides */
+
+/* Calendar: 强制禁用 outside 与 aria-disabled 的点击 */
+/* Calendar component now handles all styling, removing global overrides */
+
+/* 过渡效果优化 */
+.transition-colors {
+  transition-duration: 1ms !important;
+}
+
+/* 卡片保持优雅的过渡效果 */
+[data-slot="card"],
+.card,
+.shadow-md {
+  transition: none !important;
+}
+
+/* Switch 组件保持原有过渡效果 */
+/* Switch component now handles all styling, removing global overrides */
+
+
+/* 固定页面标题样式 */
+.page-title-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--background);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dark .page-title-sticky {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* 确保内容区域正确滚动 */
+.content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 优化滚动条样式 */
+.content-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-scrollable::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+.dark .content-scrollable::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 响应式优化 */
+@media (max-width: 640px) {
+
+  .sidebar-parent,
+  .sidebar-child {
+    font-size: 0.875rem;
+  }
+
+  .sidebar-child {
+    @apply py-2;
+  }
+
+  [data-slot="sidebar-menu-button"],
+  button[data-slot="sidebar-menu-button"],
+  [data-sidebar="menu-button"],
+  .peer\/menu-button {
+    height: 2.5rem !important;
+    /* 40px - 保持移动端触摸友好 */
+    min-height: 2.5rem !important;
+    /* 40px */
+    max-height: 2.5rem !important;
+    /* 40px */
+  }
+
+  [data-slot="sidebar-menu-button"][data-size="default"],
+  button[data-slot="sidebar-menu-button"][data-size="default"],
+  [data-sidebar="menu-button"][data-size="default"],
+  .peer\/menu-button[data-size="default"] {
+    height: 2.5rem !important;
+    /* 40px */
+    min-height: 2.5rem !important;
+    /* 40px */
+    max-height: 2.5rem !important;
+    /* 40px */
+  }
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 移动端响应式优化 - 合并重复的媒体查询 */
+@media (max-width: 480px) {
+
+  .sidebar-parent,
+  .sidebar-child {
+    font-size: 0.8rem;
+  }
+
+  .flex-shrink-0 {
+    flex-shrink: 0;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  .page-title-sticky {
+    padding: 0.5rem !important;
+  }
+}
+
+/* Chart legend improvements for mobile */
+@media (max-width: 768px) {
+  .echarts-for-react chart-legend {
+    width: 90% !important;
+  }
+}
+
+/* ========== 图表样式优化 ========== */
+/* 统一的图表容器样式 */
+.chart-container,
+.chart-wrapper,
+.echarts-for-react {
+  width: 100% !important;
+  max-width: 100% !important;
+  position: relative;
+  z-index: 100;
+}
+
+.chart-container {
+  height: 100% !important;
+}
+
+.chart-wrapper {
+  height: 100% !important;
+}
+
+/* 确保图例不被遮挡 - 为每个图表类型单独设置 */
+.trend-chart .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+.pie-chart .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+/* 确保所有ECharts图例都有足够高的z-index */
+.echarts-for-react .echarts-legend {
+  position: relative !important;
+  z-index: 999 !important;
+}
+
+/* 移动端图表优化 */
+@media (max-width: 768px) {
+  .chart-container {
+    padding: 0 5px;
+  }
+
+  .chart-wrapper {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .echarts-for-react .chart-legend {
+    width: 90% !important;
+    position: relative;
+    z-index: 999;
+  }
+
+  [data-tab-content] .chart-wrapper,
+  .tabs-content .chart-wrapper,
+  [data-tab-content] .chart-container,
+  .tabs-content .chart-container {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .min-h-\[400px\] {
+    min-height: 300px !important;
+  }
+
+  .h-\[500px\] {
+    height: 400px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .h-\[500px\] {
+    height: 350px !important;
+  }
+}
+
+/* Toast positioning within main content area */
+#toast-container {
+  pointer-events: none;
+}
+
+#toast-container>* {
+  pointer-events: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // 配置 1: 调试 Next.js 服务器端代码
+            "name": "Next.js: 调试服务器端",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "npm run dev",
+            "serverReadyAction": {
+                "pattern": "started server on .+, url: (https?://.+)",
+                "uriFormat": "%s",
+                "action": "openExternally"
+            }
+        },
+        {
+            // 配置 2: 调试 Next.js 客户端代码
+            "name": "Next.js: 调试客户端",
+            "type": "msedge", // 如果您使用 Edge，可以改为 "msedge"
+            "request": "launch",
+            "url": "http://localhost:3000",
+            "webRoot": "${workspaceFolder}"
+        },
+    ],
+    "compounds": [
+        {
+            // 复合配置：一键启动前后端调试
+            "name": "Next.js: 全栈调试",
+            "configurations": [
+                "Next.js: 调试服务器端",
+                "Next.js: 调试客户端"
+            ]
+        }
+    ]
+}
