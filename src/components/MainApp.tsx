@@ -41,7 +41,7 @@ import {
 import { UserProfileService } from "@/lib/userProfileService";
 import type { UserProfile } from "@/types/user";
 
-import { UserProfileDialog } from "./auth/UserProfileDialog";
+import { UserProfileSheet } from "./auth/UserProfileSheet";
 import { AutoCloudSync } from "@/lib/autoCloudSync";
 import { useThemeMode } from "@/hooks/useThemeMode";
 
@@ -967,12 +967,21 @@ export function MainApp() {
 
                                                         // 自动保存到云端
                                                         try {
-                                                            await AutoCloudSync.autoSavePlan(formattedPlan, {
+                                                            const savedPlan = await AutoCloudSync.autoSavePlan(formattedPlan, {
                                                                 notify,
                                                                 notifyLoading,
                                                                 updateToSuccess,
                                                                 updateToError
                                                             });
+
+                                                            // 如果云端保存成功，使用云端返回的ID更新本地记录
+                                                            if (savedPlan) {
+                                                                setPlans(prev => prev.map(p =>
+                                                                    p.id === formattedPlan.id
+                                                                        ? { ...p, id: savedPlan.id }
+                                                                        : p
+                                                                ));
+                                                            }
                                                         } catch (error) {
                                                             console.error('MainApp - 创建计划失败:', error);
                                                         }
@@ -985,12 +994,25 @@ export function MainApp() {
                                                         setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
                                                         // 自动更新到云端
-                                                        await AutoCloudSync.autoUpdatePlan(formattedPlan, {
-                                                            notify,
-                                                            notifyLoading,
-                                                            updateToSuccess,
-                                                            updateToError
-                                                        });
+                                                        try {
+                                                            const updatedPlan = await AutoCloudSync.autoUpdatePlan(formattedPlan, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
+
+                                                            // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
+                                                            if (updatedPlan && updatedPlan.id !== formattedPlan.id) {
+                                                                setPlans(prev => prev.map(p =>
+                                                                    p.id === formattedPlan.id
+                                                                        ? { ...p, id: updatedPlan.id }
+                                                                        : p
+                                                                ));
+                                                            }
+                                                        } catch (error) {
+                                                            console.error('MainApp - 更新计划失败:', error);
+                                                        }
                                                     }}
                                                     onDelete={async (id) => {
                                                         // 只进行本地删除，不显示toast
@@ -1004,13 +1026,13 @@ export function MainApp() {
                                                             return;
                                                         }
 
-                                                        // 自动从云端删除，但不显示toast
+                                                        // 自动从云端删除，显示toast
                                                         try {
                                                             await AutoCloudSync.autoDeletePlan(id, {
-                                                                notify: () => { }, // 禁用单个删除的toast
-                                                                notifyLoading: undefined,
-                                                                updateToSuccess: undefined,
-                                                                updateToError: undefined
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
                                                             });
                                                         } catch (error) {
                                                             console.error('MainApp - 删除计划失败:', error);
@@ -1155,12 +1177,21 @@ export function MainApp() {
 
                                                         // 自动保存到云端
                                                         try {
-                                                            await AutoCloudSync.autoSaveCountdown(formattedCountdown, {
+                                                            const savedCountdown = await AutoCloudSync.autoSaveCountdown(formattedCountdown, {
                                                                 notify,
                                                                 notifyLoading,
                                                                 updateToSuccess,
                                                                 updateToError
                                                             });
+
+                                                            // 如果云端保存成功，使用云端返回的ID更新本地记录
+                                                            if (savedCountdown) {
+                                                                setCountdowns(prev => prev.map(c =>
+                                                                    c.id === formattedCountdown.id
+                                                                        ? { ...c, id: savedCountdown.id }
+                                                                        : c
+                                                                ));
+                                                            }
                                                         } catch (error) {
                                                             console.error('MainApp - 创建倒计时失败:', error);
                                                         }
@@ -1172,12 +1203,25 @@ export function MainApp() {
                                                         setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
 
                                                         // 自动更新到云端
-                                                        await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
-                                                            notify,
-                                                            notifyLoading,
-                                                            updateToSuccess,
-                                                            updateToError
-                                                        });
+                                                        try {
+                                                            const updatedCountdown = await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
+
+                                                            // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
+                                                            if (updatedCountdown && updatedCountdown.id !== formattedCountdown.id) {
+                                                                setCountdowns(prev => prev.map(c =>
+                                                                    c.id === formattedCountdown.id
+                                                                        ? { ...c, id: updatedCountdown.id }
+                                                                        : c
+                                                                ));
+                                                            }
+                                                        } catch (error) {
+                                                            console.error('MainApp - 更新倒计时失败:', error);
+                                                        }
                                                     }}
                                                     onDelete={async (id) => {
                                                         // 只进行本地删除，不显示toast
@@ -1416,8 +1460,8 @@ export function MainApp() {
                         countdownName={completedCountdown?.name || ''}
                     />
 
-                    {/* 用户资料对话框 - 响应式设计 */}
-                    <UserProfileDialog
+                    {/* 用户资料侧边栏 - 使用Sheet组件 */}
+                    <UserProfileSheet
                         isOpen={showProfileDialog}
                         onClose={() => setShowProfileDialog(false)}
                         onProfileUpdate={loadUserProfile}

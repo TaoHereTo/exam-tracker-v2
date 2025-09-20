@@ -114,20 +114,20 @@ const playNotificationSound = (type: NotificationType) => {
 const getIcon = (notification: Notification) => {
     // If a custom icon is specified and it's "flower", use the Flower icon
     if (notification.icon === "flower") {
-        return <Flower className="text-green-500 w-5 h-5" />;
+        return <Flower className="text-green-500 w-5 h-5 unselectable" />;
     }
 
     // Otherwise, use the default icons based on type
     switch (notification.type) {
         case "success":
-            return <CheckCircle2 className="text-green-500 w-5 h-5" />;
+            return <CheckCircle2 className="text-green-500 w-5 h-5 unselectable" />;
         case "error":
-            return <XCircle className="text-red-500 w-5 h-5" />;
+            return <XCircle className="text-red-500 w-5 h-5 unselectable" />;
         case "warning":
-            return <AlertTriangle className="text-yellow-500 w-5 h-5" />;
+            return <AlertTriangle className="text-yellow-500 w-5 h-5 unselectable" />;
         case "info":
         default:
-            return <Info className="text-blue-500 w-5 h-5" />;
+            return <Info className="text-blue-500 w-5 h-5 unselectable" />;
     }
 };
 
@@ -139,18 +139,18 @@ const ToastContent = ({ notification, showIcon }: { notification: Notification; 
     const icon = shouldShowIcon ? getIcon(notification) : null;
 
     return (
-        <div className="flex items-start gap-1.5">
+        <div className="flex items-start gap-1.5 unselectable">
             {icon && (
-                <span className="mt-0.5 flex-shrink-0">
+                <span className="mt-0.5 flex-shrink-0 unselectable">
                     {icon}
                 </span>
             )}
-            <div>
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+            <div className="unselectable">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
                     <MixedText text={notification.message} />
                 </div>
                 {notification.description && (
-                    <div className="text-xs text-gray-500 mt-1 notification-description dark:text-gray-300">
+                    <div className="text-xs text-gray-500 mt-1 notification-description dark:text-gray-300 unselectable">
                         <MixedText text={notification.description} />
                     </div>
                 )}
@@ -235,8 +235,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // New function for loading notifications that can transition to success/error
     const notifyLoading = useCallback((message: string, description?: string) => {
         const id = toast.loading(
-            <div className="flex items-start gap-1.5">
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+            <div className="flex items-start gap-1.5 unselectable">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
                     <MixedText text={message} />
                 </div>
             </div>,
@@ -258,8 +258,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // New function to update a loading notification to success
     const updateToSuccess = useCallback((id: string, message: string, description?: string) => {
         toast.success(
-            <div className="flex items-start gap-1.5">
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+            <div className="flex items-start gap-1.5 unselectable">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
                     <MixedText text={message} />
                 </div>
             </div>,
@@ -281,8 +281,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // New function to update a loading notification to error
     const updateToError = useCallback((id: string, message: string, description?: string) => {
         toast.error(
-            <div className="flex items-start gap-1.5">
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white">
+            <div className="flex items-start gap-1.5 unselectable">
+                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
                     <MixedText text={message} />
                 </div>
             </div>,

@@ -866,4 +866,31 @@ export class CloudSyncService {
             };
         }
     }
+
+    // 保存设置到云端
+    static async saveSettingsToCloud(settings: UserSettings): Promise<{ success: boolean; message: string }> {
+        try {
+            const userId = await getCurrentUserId();
+            if (!userId) {
+                return {
+                    success: false,
+                    message: '用户未登录，无法保存设置到云端'
+                };
+            }
+
+            // 使用settingsService保存设置
+            await settingsService.saveSettings(settings);
+
+            return {
+                success: true,
+                message: '设置已成功保存到云端'
+            };
+        } catch (error) {
+            console.error('保存设置到云端失败:', error);
+            return {
+                success: false,
+                message: `保存设置失败: ${error instanceof Error ? error.message : '未知错误'}`
+            };
+        }
+    }
 } 

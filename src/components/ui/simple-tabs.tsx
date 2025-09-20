@@ -78,7 +78,7 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg', className)}
+            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg unselectable', className)}
             style={{ zIndex: 10 }}
         >
             {/* 高亮背景 */}
@@ -114,7 +114,7 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
         <button
             data-tab-value={value}
             className={cn(
-                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none',
+                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
                 isActive
                     ? 'text-white dark:text-black'
                     : 'text-muted-foreground hover:text-foreground',

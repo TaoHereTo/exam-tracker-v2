@@ -478,7 +478,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               </FormField>
 
               <div className="form-actions pt-1">
-                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full">
+                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>
@@ -552,7 +552,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               </FormField>
 
               <div className="form-actions pt-1">
-                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full">
+                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white">
                   <MixedText text="保存知识点" />
                 </Button>
               </div>

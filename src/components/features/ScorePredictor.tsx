@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { UnifiedTable } from "@/components/ui/UnifiedTable";
 import { MODULES, MODULE_SCORES, FULL_EXAM_CONFIG, normalizeModuleName } from "@/config/exam";
 import { minutesToTimeString } from "@/lib/utils";
@@ -144,41 +143,56 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
     ];
 
     return (
-        <Card className="max-w-full mx-auto">
-            <CardHeader>
-                <CardTitle><MixedText text="预期成绩分析" /></CardTitle>
-                <CardDescription>
-                    根据您的历史&ldquo;每分钟得分&rdquo;数据，结合标准行测考试结构，为您预测理论上的最高得分。
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="relative pb-20">
+        <div className="pt-4 px-2 md:px-8">
+            <div className="w-full">
+                {/* 标题和描述 */}
+                <div className="mb-6">
+                    <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white mb-2" style={{
+                        fontWeight: '700',
+                        fontSize: '1.5rem'
+                    }}>
+                        <MixedText text="预期成绩分析" style={{ fontWeight: '700' }} />
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                        根据您的历史"每分钟得分"数据，结合标准行测考试结构，为您预测理论上的最高得分。
+                    </p>
+                </div>
+
+                {/* 预测按钮 */}
                 <div className="mb-6">
                     <Button
                         onClick={handlePredictScore}
                         variant="default"
-                        className="h-9"
+                        className="h-9 rounded-full bg-[#6d28d9] hover:bg-[#6d28d9]/90 text-white"
                     >
                         <Bot className="w-5 h-5 mr-0.5" />
                         <MixedText text="预测我的行测总分" />
                     </Button>
                 </div>
+
+                {/* 预测结果 */}
                 {prediction && (
                     <>
-                        <UnifiedTable
-                            columns={columns}
-                            data={prediction.details}
-                            rowKey={(row) => row.moduleName}
-                            selectable={false}
-                            selected={[]}
-                            onSelect={() => { }}
-                            showNew={false}
-                            showEdit={false}
-                            showDelete={false}
-                            showExport={false}
-                        />
-                        {/* 预测总分右下角渐变大号数字 */}
-                        <div className="absolute right-8 bottom-4 flex flex-row items-end gap-3">
-                            <span className="text-2xl font-bold text-gray-700 mb-1"><MixedText text="预测总分" /></span>
+                        <div className="mb-6">
+                            <UnifiedTable
+                                columns={columns}
+                                data={prediction.details}
+                                rowKey={(row) => row.moduleName}
+                                selectable={false}
+                                selected={[]}
+                                onSelect={() => { }}
+                                showNew={false}
+                                showEdit={false}
+                                showDelete={false}
+                                showExport={false}
+                            />
+                        </div>
+
+                        {/* 预测总分显示 */}
+                        <div className="flex justify-center items-center gap-4 py-8">
+                            <span className="text-2xl font-bold text-gray-700 dark:text-gray-300">
+                                <MixedText text="预测总分" />
+                            </span>
                             <SparklesText
                                 colors={{ first: "#9E7AFF", second: "#FE8BBB" }}
                                 sparklesCount={8}
@@ -194,7 +208,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                         </div>
                     </>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 } 

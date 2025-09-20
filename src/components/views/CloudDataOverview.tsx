@@ -71,7 +71,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
         if (isOpen) {
             loadCloudData();
         }
-    }, [isOpen]); // 移除 loadCloudData 依赖，避免无限循环
+    }, [isOpen, loadCloudData]);
 
     const handleClearCloudData = async () => {
         setShowClearDialog(false);

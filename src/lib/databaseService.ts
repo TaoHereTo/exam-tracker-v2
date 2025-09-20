@@ -166,8 +166,19 @@ export const planService = {
 
         if (error) {
             console.error('学习计划上传错误:', error);
+
+            // 检查是否是重复记录错误
+            if (error.code === '23505') {
+                throw new Error(`学习计划上传失败: 已存在相同的学习计划记录`);
+            }
+
             throw new Error(`学习计划上传失败: ${error.message || '未知错误'}`);
         }
+
+        if (!data) {
+            throw new Error(`上传后未返回数据`);
+        }
+
         return data
     },
 
@@ -188,6 +199,39 @@ export const planService = {
                 delete updateData.endDate;
             }
 
+            // 首先检查记录是否存在，并检查是否有重复记录
+            const { data: existingData, error: checkError } = await supabase
+                .from('plans')
+                .select('id, name, "startDate", "endDate"')
+                .eq('id', id)
+                .eq('user_id', userId);
+
+            if (checkError) {
+                throw new Error(`检查学习计划记录失败: ${checkError.message || '未知错误'}`);
+            }
+
+            if (!existingData || existingData.length === 0) {
+                throw new Error(`学习计划记录不存在或您没有权限访问该记录`);
+            }
+
+            // 如果发现多条记录，说明有重复记录，需要清理
+            if (existingData.length > 1) {
+                console.warn(`发现重复的学习计划记录，ID: ${id}，用户: ${userId}，记录数: ${existingData.length}`);
+
+                // 保留第一条记录，删除其他重复记录
+                const recordsToDelete = existingData.slice(1);
+                for (const record of recordsToDelete) {
+                    await supabase
+                        .from('plans')
+                        .delete()
+                        .eq('id', record.id)
+                        .eq('user_id', userId);
+                }
+
+                console.log(`已清理 ${recordsToDelete.length} 条重复记录`);
+            }
+
+            // 执行更新操作
             const { data, error } = await supabase
                 .from('plans')
                 .update(updateData)
@@ -197,7 +241,29 @@ export const planService = {
                 .single()
 
             if (error) {
+                console.error('更新学习计划详细错误:', {
+                    error,
+                    id,
+                    userId,
+                    updateData,
+                    existingData
+                });
+
+                // 检查是否是重复记录错误
+                if (error.code === '23505') {
+                    throw new Error(`学习计划更新失败: 已存在相同的学习计划记录`);
+                }
+
+                // 检查是否是406错误（多行或无行返回）
+                if (error.message && error.message.includes('JSON object requested, multiple (or no) rows returned')) {
+                    throw new Error(`学习计划更新失败: 数据库中存在重复记录或记录不存在`);
+                }
+
                 throw new Error(`学习计划更新失败: ${error.message || '未知错误'}`);
+            }
+
+            if (!data) {
+                throw new Error(`更新后未返回数据`);
             }
 
             return data
@@ -267,8 +333,19 @@ export const countdownService = {
 
         if (error) {
             console.error('考试倒计时上传错误:', error);
+
+            // 检查是否是重复记录错误
+            if (error.code === '23505') {
+                throw new Error(`考试倒计时上传失败: 已存在相同的倒计时记录`);
+            }
+
             throw new Error(`考试倒计时上传失败: ${error.message || '未知错误'}`);
         }
+
+        if (!data) {
+            throw new Error(`上传后未返回数据`);
+        }
+
         return data
     },
 
@@ -285,6 +362,39 @@ export const countdownService = {
                 delete updateData.examDate;
             }
 
+            // 首先检查记录是否存在，并检查是否有重复记录
+            const { data: existingData, error: checkError } = await supabase
+                .from('exam_countdowns')
+                .select('id, name, "examDate"')
+                .eq('id', id)
+                .eq('user_id', userId);
+
+            if (checkError) {
+                throw new Error(`检查倒计时记录失败: ${checkError.message || '未知错误'}`);
+            }
+
+            if (!existingData || existingData.length === 0) {
+                throw new Error(`倒计时记录不存在或您没有权限访问该记录`);
+            }
+
+            // 如果发现多条记录，说明有重复记录，需要清理
+            if (existingData.length > 1) {
+                console.warn(`发现重复的倒计时记录，ID: ${id}，用户: ${userId}，记录数: ${existingData.length}`);
+
+                // 保留第一条记录，删除其他重复记录
+                const recordsToDelete = existingData.slice(1);
+                for (const record of recordsToDelete) {
+                    await supabase
+                        .from('exam_countdowns')
+                        .delete()
+                        .eq('id', record.id)
+                        .eq('user_id', userId);
+                }
+
+                console.log(`已清理 ${recordsToDelete.length} 条重复记录`);
+            }
+
+            // 执行更新操作
             const { data, error } = await supabase
                 .from('exam_countdowns')
                 .update(updateData)
@@ -294,7 +404,29 @@ export const countdownService = {
                 .single()
 
             if (error) {
+                console.error('更新倒计时详细错误:', {
+                    error,
+                    id,
+                    userId,
+                    updateData,
+                    existingData
+                });
+
+                // 检查是否是重复记录错误
+                if (error.code === '23505') {
+                    throw new Error(`考试倒计时更新失败: 已存在相同的倒计时记录`);
+                }
+
+                // 检查是否是406错误（多行或无行返回）
+                if (error.message && error.message.includes('JSON object requested, multiple (or no) rows returned')) {
+                    throw new Error(`考试倒计时更新失败: 数据库中存在重复记录或记录不存在`);
+                }
+
                 throw new Error(`考试倒计时更新失败: ${error.message || '未知错误'}`);
+            }
+
+            if (!data) {
+                throw new Error(`更新后未返回数据`);
             }
 
             return data

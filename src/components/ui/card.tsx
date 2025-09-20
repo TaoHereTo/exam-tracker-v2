@@ -79,7 +79,7 @@ const CardTitle = React.forwardRef<HTMLDivElement, React.ComponentProps<"div">>(
       <div
         ref={ref}
         data-slot="card-title"
-        className={cn("leading-none font-semibold", className)}
+        className={cn("leading-none font-semibold unselectable", className)}
         {...props}
       >
         {typeof children === 'string' ? <MixedText text={children} /> : children}

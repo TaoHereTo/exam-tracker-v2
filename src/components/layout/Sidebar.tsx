@@ -194,7 +194,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                 {/* 应用标题 */}
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <div className="flex items-center justify-center gap-3 px-2 py-4">
+                        <div className="flex items-center justify-center gap-3 px-2 py-4 unselectable">
                             <Image src="/trace.svg" alt="App Icon" className="size-8" width={32} height={32} />
                             <span className="truncate font-semibold text-lg leading-none">
                                 <MixedText text="行测记录" />
@@ -214,6 +214,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                 <SidebarMenuButton
                                     tooltip={item.title}
                                     onClick={() => handleCollapsibleClick(item.title)}
+                                    className="unselectable"
                                 >
                                     {item.icon && <item.icon />}
                                     <span><MixedText text={item.title} /></span>
@@ -231,11 +232,11 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                                 <SidebarMenuSubButton
                                                     asChild
                                                     isActive={activeTab === subItem.tab}
-                                                    className="data-[state=open]:bg-[#EEEDED] dark:data-[state=open]:bg-muted"
+                                                    className="data-[state=open]:bg-[#EEEDED] dark:data-[state=open]:bg-muted unselectable"
                                                 >
                                                     <button
                                                         onClick={() => handleMenuClick(subItem.tab || '')}
-                                                        className="w-full text-left"
+                                                        className="w-full text-left unselectable"
                                                     >
                                                         <span><MixedText text={subItem.title} /></span>
                                                     </button>

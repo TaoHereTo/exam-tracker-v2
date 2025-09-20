@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetClose
+} from "@/components/animate-ui/components/radix/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,22 +13,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { UserProfileService } from "@/lib/userProfileService";
 import { type UserProfile } from "@/types/user";
-import { User, Save } from "lucide-react";
+import { User, Save, X } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import { InlineLoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { useLoading } from "@/hooks/useLoading";
 import { useToast } from "@/hooks/useToast";
-import { UiverseSpinner } from '@/components/ui/UiverseSpinner';
 
-interface UserProfileDialogProps {
+interface UserProfileSheetProps {
     isOpen: boolean;
     onClose: () => void;
     onProfileUpdate?: () => void;
 }
 
-export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProfileDialogProps) {
+export function UserProfileSheet({ isOpen, onClose, onProfileUpdate }: UserProfileSheetProps) {
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [formData, setFormData] = useState({
         username: '',
@@ -99,77 +104,87 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-xl w-[500px] sm:w-[550px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <User className="h-5 w-5" />
-                        <MixedText text="个人资料设置" />
-                    </DialogTitle>
-                </DialogHeader>
+        <Sheet open={isOpen} onOpenChange={onClose}>
+            <SheetContent side="right" className="w-[350px] sm:w-[400px] p-6">
+                <SheetHeader className="px-0 pb-4">
+                    <SheetTitle className="flex items-center gap-2 text-xl font-bold">
+                        <User className="w-6 h-6" />
+                        <MixedText text="个人资料" />
+                    </SheetTitle>
+                </SheetHeader>
 
-                <div className="space-y-6">
-                    {/* 个人信息设置 */}
+                <div className="flex flex-col gap-6 px-0">
+                    {/* 用户信息显示 */}
+                    <div className="space-y-2">
+                        <Label className="text-sm font-medium text-muted-foreground">
+                            <MixedText text="当前用户" />
+                        </Label>
+                        <div className="p-3 rounded-lg bg-muted/50">
+                            <p className="text-sm">
+                                <span className="font-medium"><MixedText text="邮箱" />: </span>
+                                {user?.email || '未登录'}
+                            </p>
+                            <p className="text-sm">
+                                <span className="font-medium"><MixedText text="用户名" />: </span>
+                                {getDisplayName()}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* 表单 */}
                     <div className="space-y-4">
-                        <h3 className="font-medium"><MixedText text="个人信息" /></h3>
-
-                        {/* 用户名设置 */}
                         <div className="space-y-2">
-                            <Label htmlFor="username"><MixedText text="用户名" /></Label>
+                            <Label htmlFor="username">
+                                <MixedText text="用户名" />
+                            </Label>
                             <Input
                                 id="username"
                                 value={formData.username}
                                 onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
-                                placeholder="请输入用户名"
-                                maxLength={20}
+                                placeholder="请输入您的用户名"
+                                className="w-full"
                             />
-                            <p className="text-xs text-muted-foreground">
-                                <MixedText text="用户名用于登录和显示，最多20个字符" />
-                            </p>
                         </div>
 
-                        {/* 座右铭设置 */}
                         <div className="space-y-2">
-                            <Label htmlFor="motto"><MixedText text="座右铭" /></Label>
+                            <Label htmlFor="motto">
+                                <MixedText text="个人简介" />
+                            </Label>
                             <Textarea
                                 id="motto"
                                 value={formData.motto}
                                 onChange={(e) => setFormData(prev => ({ ...prev, motto: e.target.value }))}
-                                placeholder="写下一句激励自己的话..."
-                                maxLength={100}
-                                rows={2}
+                                placeholder="请输入您的个人简介"
+                                className="w-full min-h-[100px] resize-none"
                             />
-                            <p className="text-xs text-muted-foreground">
-                                <MixedText text="座右铭最多100个字符" />
-                            </p>
                         </div>
                     </div>
 
-
                     {/* 操作按钮 */}
-                    <div className="flex justify-end gap-2 pt-4">
-                        <Button variant="outline" onClick={onClose} className="h-10 rounded-full">
-                            <MixedText text="取消" />
-                        </Button>
+                    <div className="flex gap-3 pt-4">
                         <Button
-                            type="submit"
-                            variant="default"
-                            disabled={loading}
                             onClick={handleSaveProfile}
-                            className="flex items-center justify-center h-10 rounded-full"
+                            disabled={loading}
+                            className="flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
                         >
                             {loading ? (
-                                <div className="flex items-center justify-center w-full">
-                                    <UiverseSpinner size={18} className="inline-block" />
-                                    <span className="ml-2"><MixedText text="更新中..." /></span>
-                                </div>
+                                <InlineLoadingSpinner />
                             ) : (
-                                <MixedText text="更新资料" />
+                                <>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    <MixedText text="保存" />
+                                </>
                             )}
                         </Button>
+                        <SheetClose asChild>
+                            <Button variant="outline" className="px-6 rounded-full">
+                                <X className="w-4 h-4 mr-2" />
+                                <MixedText text="关闭" />
+                            </Button>
+                        </SheetClose>
                     </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            </SheetContent>
+        </Sheet>
     );
 }

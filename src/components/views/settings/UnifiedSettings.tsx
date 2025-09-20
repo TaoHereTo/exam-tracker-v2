@@ -422,6 +422,57 @@ export function UnifiedSettings({
     }
   };
 
+  // Save all settings to cloud
+  const handleSaveAllSettings = async () => {
+    try {
+      // Show loading notification
+      const toastId = notifyLoading ? notifyLoading('正在保存设置到云端...', '正在同步所有设置到云端') : null;
+
+      // Collect all current settings
+      const currentSettings: UserSettings = {
+        theme: theme || 'system',
+        'eye-care-enabled': eyeCare ? 'true' : 'false',
+        // Add other settings as needed
+      };
+
+      // Save settings to cloud using CloudSyncService
+      const result = await CloudSyncService.saveSettingsToCloud(currentSettings);
+
+      if (result.success) {
+        // Update to success notification
+        if (toastId && updateToSuccess) {
+          updateToSuccess(toastId, '设置已保存到云端', '所有设置已成功同步到云端');
+        } else {
+          notify({
+            type: 'success',
+            message: '设置已保存到云端',
+            description: '所有设置已成功同步到云端'
+          });
+        }
+      } else {
+        // Update to error notification
+        if (toastId && updateToError) {
+          updateToError(toastId, '设置保存失败', result.message || '保存设置时发生错误');
+        } else {
+          notify({
+            type: 'error',
+            message: '设置保存失败',
+            description: result.message || '保存设置时发生错误'
+          });
+        }
+      }
+    } catch (error) {
+      console.error('保存设置到云端失败:', error);
+
+      // Show error notification
+      notify({
+        type: 'error',
+        message: '设置保存失败',
+        description: error instanceof Error ? error.message : '保存设置时发生未知错误'
+      });
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className="px-2 sm:px-4 -mx-4" style={{
@@ -982,6 +1033,18 @@ export function UnifiedSettings({
           isOpen={showCloudOverview}
           onClose={() => setShowCloudOverview(false)}
         />
+
+        {/* Save Settings Button - Bottom of content */}
+        <div className="flex justify-start mt-8 mb-6">
+          <Button
+            onClick={handleSaveAllSettings}
+            variant="default"
+            className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-blue-600 hover:bg-blue-700"
+          >
+            <Save className="w-4 h-4 mr-2" />
+            <MixedText text="保存设置" />
+          </Button>
+        </div>
       </div>
     </TooltipProvider>
   );

@@ -1272,28 +1272,99 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
 /* 只对特定需要禁用选择的元素应用，而不是全局禁用 */
 .unselectable {
   user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
 /* 对UI组件中的特定元素禁用选择，但保持内容可选择性 */
 [data-slot="button"],
 [data-slot="card"],
-[data-slot="sidebar-menu-button"] {
-  user-select: none;
+[data-slot="sidebar-menu-button"],
+button,
+.btn,
+.tab,
+.tabs-trigger,
+.tabs-list,
+.sidebar,
+.sidebar-header,
+.sidebar-content,
+.sidebar-footer,
+.sidebar-menu,
+.sidebar-menu-item,
+.sidebar-menu-button,
+.sidebar-group-label,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-title,
+.title,
+.header,
+/* Toast 和 Tooltip 组件 */
+[data-radix-tooltip-content],
+[data-radix-tooltip-arrow],
+.toast,
+.toast-bar,
+.notification-message,
+.notification-description,
+[data-sonner-toast],
+[data-sonner-toast-content],
+[data-sonner-toast-title],
+[data-sonner-toast-description],
+/* react-hot-toast 图标和内容 */
+.go3958317564,
+.go3958317564 *,
+.go3958317564 svg,
+.go3958317564 path,
+.go3958317564 circle,
+.go3958317564 rect,
+.go3958317564 line,
+.go3958317564 polygon,
+.go3958317564 polyline,
+/* 通用toast图标选择器 */
+[data-hot-toast],
+[data-hot-toast] *,
+[data-hot-toast] svg,
+[data-hot-toast] path,
+[data-hot-toast] circle,
+[data-hot-toast] rect,
+[data-hot-toast] line,
+[data-hot-toast] polygon,
+[data-hot-toast] polyline {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
 }
 
 /* 确保输入框和文本区域可以正常选择 */
 input,
 textarea,
 [data-slot="input"],
-[data-slot="textarea"] {
+[data-slot="textarea"],
+.content,
+.text-content,
+.editable,
+[contenteditable="true"] {
   user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }
 
 /* 确保卡片内容可以正常选择 */
 .card-content,
 .card-body,
-[data-slot="card-content"] {
-  user-select: text;
+[data-slot="card-content"],
+.card-text,
+.card-description {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
 }
 
 /* ========== 侧边栏样式 ========== */
