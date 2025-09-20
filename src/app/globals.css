@@ -245,6 +245,18 @@ h6 .mixed-text-part {
   font-weight: inherit !important;
 }
 
+/* 修复下拉框位置问题 */
+[data-radix-select-content] {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+/* 确保下拉框容器不会裁剪内容 */
+[data-radix-select-trigger] {
+  position: relative;
+  z-index: 1;
+}
+
 /* ========== 按钮间距系统 ========== */
 /* 按钮间距已统一使用CSS变量系统 */
 
@@ -1690,7 +1702,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
 /* 侧边栏间距和布局 */
 [data-slot="sidebar-inner"] {
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding-right: 0.25rem;
 }
 

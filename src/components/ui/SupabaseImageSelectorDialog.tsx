@@ -269,7 +269,7 @@ export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogPr
                                     <SelectTrigger className="h-9">
                                         <SelectValue placeholder="排序" />
                                     </SelectTrigger>
-                                    <SelectContent position="item-aligned">
+                                    <SelectContent>
                                         <SelectItem value="time_desc">时间降序</SelectItem>
                                         <SelectItem value="time_asc">时间升序</SelectItem>
                                         <SelectItem value="name_asc">名称升序</SelectItem>

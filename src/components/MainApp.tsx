@@ -819,7 +819,7 @@ export function MainApp() {
     return (
         <PasteProvider>
             <NavModeContext.Provider value={navMode}>
-                <div className="min-h-screen w-full relative" style={getBackgroundStyle() as React.CSSProperties}>
+                <div className="h-screen w-full relative" style={getBackgroundStyle() as React.CSSProperties}>
                     <LoadingWrapper loading={isLoading}>
                         <SidebarProvider>
                             <CloudDataProvider>
@@ -845,7 +845,7 @@ export function MainApp() {
                                         </div>
                                     </header>
 
-                                    <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
+                                    <div className="flex flex-1 flex-col gap-4 p-4 pt-6 overflow-y-auto">
                                         {activeTab === 'overview' && (
                                             <Suspense fallback={
                                                 <div className="flex items-center justify-center min-h-[60vh]">
