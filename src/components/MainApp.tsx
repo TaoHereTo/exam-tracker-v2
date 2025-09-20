@@ -839,11 +839,13 @@ export function MainApp() {
                                                     {normalizePageTitle(activeTab)}
                                                 </PageTitle>
                                             </div>
-                                            <div className="flex items-center gap-2 flex-shrink-0">
-                                                <AnimatedThemeToggler className="w-8 h-8" />
-                                            </div>
                                         </div>
                                     </header>
+
+                                    {/* 主题切换按钮 - 固定在右上角 */}
+                                    <div className="fixed top-4 right-4 z-50">
+                                        <AnimatedThemeToggler className="w-8 h-8" />
+                                    </div>
 
                                     <div className="flex flex-1 flex-col gap-4 p-4 pt-6 overflow-y-auto">
                                         {activeTab === 'overview' && (
