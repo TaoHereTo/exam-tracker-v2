@@ -40,6 +40,7 @@ export interface TableAction {
     disabled?: boolean;
     variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
     className?: string;
+    tooltip?: string; // 添加 tooltip 支持
 }
 
 // 表格过滤器定义
@@ -400,242 +401,262 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
     // 渲染容器包装 - 按照官网推荐的方式，将控件放在卡片外侧
     const renderContainer = () => (
-        <div className={className}>
-            {/* 标题和操作区域 - 放在卡片外侧 */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4">
-                {title && <h2 className="text-2xl font-bold"><MixedText text={title} /></h2>}
+        <TooltipProvider>
+            <div className={className}>
+                {/* 标题和操作区域 - 放在卡片外侧 */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 py-4">
+                    {title && <h2 className="text-2xl font-bold"><MixedText text={title} /></h2>}
 
-                {/* 左侧过滤器和搜索 */}
-                <div className="flex flex-row mr-4">
-                    {filters.map((filter, index) => (
-                        <div
-                            key={`filter-${index}`}
-                            className={filter.className}
-                            style={{
-                                marginRight: index < filters.length - 1 ? '12px' : '0',
-                                minWidth: 'fit-content'
-                            }}
-                        >
-                            {filter.type === 'select' && filter.options && (
-                                <Select value={filter.value} onValueChange={filter.onChange}>
-                                    <SelectTrigger className="w-36">
-                                        <SelectValue placeholder={filter.placeholder} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {filter.options.map(option => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                <MixedText text={option.label} />
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            )}
-                            {filter.type === 'search' && (
-                                <div className="relative w-36">
-                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 w-5 h-5 z-10 pointer-events-none" />
-                                    <Input
-                                        placeholder={filter.placeholder || "搜索..."}
-                                        value={filter.value}
-                                        onChange={e => filter.onChange(e.target.value)}
-                                        className="w-full h-10 py-2 pl-10"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                    {/* 左侧过滤器和搜索 */}
+                    <div className="flex flex-row mr-4">
+                        {filters.map((filter, index) => (
+                            <div
+                                key={`filter-${index}`}
+                                className={filter.className}
+                                style={{
+                                    marginRight: index < filters.length - 1 ? '12px' : '0',
+                                    minWidth: 'fit-content'
+                                }}
+                            >
+                                {filter.type === 'select' && filter.options && (
+                                    <Select value={filter.value} onValueChange={filter.onChange}>
+                                        <SelectTrigger className="w-36">
+                                            <SelectValue placeholder={filter.placeholder} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {filter.options.map(option => (
+                                                <SelectItem key={option.value} value={option.value}>
+                                                    <MixedText text={option.label} />
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+                                {filter.type === 'search' && (
+                                    <div className="relative w-36">
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 w-5 h-5 z-10 pointer-events-none" />
+                                        <Input
+                                            placeholder={filter.placeholder || "搜索..."}
+                                            value={filter.value}
+                                            onChange={e => filter.onChange(e.target.value)}
+                                            className="w-full h-10 py-2 pl-10"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 右侧按钮组 */}
+                    <div className="flex gap-2 shrink-0 flex-wrap">
+                        {/* 自定义操作按钮 */}
+                        {actions.map((action, index) => {
+                            const button = (
+                                <Button
+                                    key={`action-${index}`}
+                                    onClick={action.onClick}
+                                    disabled={action.disabled}
+                                    variant={action.variant || "default"}
+                                    size="sm"
+                                    className={`${action.className} h-9`}
+                                >
+                                    {action.icon}
+                                    {action.label}
+                                </Button>
+                            );
+
+                            // 如果有 tooltip，包装在 Tooltip 中
+                            if (action.tooltip) {
+                                return (
+                                    <Tooltip key={`action-${index}`}>
+                                        <TooltipTrigger asChild>
+                                            {button}
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text={action.tooltip} /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                );
+                            }
+
+                            return button;
+                        })}
+
+                        {/* 新建按钮 */}
+                        {showNew && onNew && (
+                            <Button
+                                onClick={onNew}
+                                variant="default"
+                                size="sm"
+                                className="h-9"
+                            >
+                                新建
+                            </Button>
+                        )}
+
+                        {/* 导出按钮 */}
+                        {showExport && onExport && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={onExport}
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                        >
+                                            <Upload className="w-5 h-5" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="导出为Excel" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+
+                        {/* 编辑按钮 */}
+                        {showEdit && onEdit && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={onEdit}
+                                            disabled={editDisabled}
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                        >
+                                            <Edit className="w-5 h-5" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="编辑" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+
+                        {/* 删除按钮 */}
+                        {showDelete && onDelete && (
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={onDelete}
+                                            disabled={deleteDisabled}
+                                            variant="destructive"
+                                            size="icon"
+                                            className="h-9 w-9"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p><MixedText text="批量删除" /></p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+
+                    </div>
                 </div>
 
-                {/* 右侧按钮组 */}
-                <div className="flex gap-2 shrink-0 flex-wrap">
-                    {/* 自定义操作按钮 */}
-                    {actions.map((action, index) => (
-                        <Button
-                            key={`action-${index}`}
-                            onClick={action.onClick}
-                            disabled={action.disabled}
-                            variant={action.variant || "default"}
-                            size="sm"
-                            className={`${action.className} h-9`}
-                        >
-                            {action.icon}
-                            {action.label}
-                        </Button>
-                    ))}
-
-                    {/* 新建按钮 */}
-                    {showNew && onNew && (
-                        <Button
-                            onClick={onNew}
-                            variant="default"
-                            size="sm"
-                            className="h-9"
-                        >
-                            新建
-                        </Button>
-                    )}
-
-                    {/* 导出按钮 */}
-                    {showExport && onExport && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={onExport}
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-9 w-9"
-                                    >
-                                        <Upload className="w-5 h-5" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p><MixedText text="导出为Excel" /></p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-
-                    {/* 编辑按钮 */}
-                    {showEdit && onEdit && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={onEdit}
-                                        disabled={editDisabled}
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-9 w-9"
-                                    >
-                                        <Edit className="w-5 h-5" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p><MixedText text="编辑" /></p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-
-                    {/* 删除按钮 */}
-                    {showDelete && onDelete && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        onClick={onDelete}
-                                        disabled={deleteDisabled}
-                                        variant="destructive"
-                                        size="icon"
-                                        className="h-9 w-9"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p><MixedText text="批量删除" /></p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-
+                {/* 表格内容 - 只有表格放在卡片内 */}
+                <div className="overflow-hidden rounded-md border">
+                    {renderTableContent()}
                 </div>
+
+                {/* 分页组件 - 放在卡片外侧 */}
+                {pagination && pagination.totalPages > 1 && (
+                    <div className="flex items-center justify-end gap-4 w-full py-4">
+                        {/* 页码信息 */}
+                        {renderPaginationInfo()}
+
+                        {/* 分页按钮组 */}
+                        <TooltipProvider>
+                            <div className="flex items-center gap-2">
+                                {/* 第一页按钮 */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => pagination.onPageChange(1)}
+                                            disabled={pagination.currentPage <= 1}
+                                            className="h-8 w-8 p-0"
+                                            aria-label="Go to first page"
+                                        >
+                                            <ChevronsLeftIcon className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>第一页</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
+                                {/* 上一页按钮 */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
+                                            disabled={pagination.currentPage <= 1}
+                                            className="h-8 w-8 p-0"
+                                            aria-label="Go to previous page"
+                                        >
+                                            <ChevronLeftIcon className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>上一页</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
+                                {/* 下一页按钮 */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
+                                            disabled={pagination.currentPage >= pagination.totalPages}
+                                            className="h-8 w-8 p-0"
+                                            aria-label="Go to next page"
+                                        >
+                                            <ChevronRightIcon className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>下一页</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
+                                {/* 最后一页按钮 */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => pagination.onPageChange(pagination.totalPages)}
+                                            disabled={pagination.currentPage >= pagination.totalPages}
+                                            className="h-8 w-8 p-0"
+                                            aria-label="Go to last page"
+                                        >
+                                            <ChevronsRightIcon className="h-4 w-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>最后一页</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </TooltipProvider>
+                    </div>
+                )}
             </div>
-
-            {/* 表格内容 - 只有表格放在卡片内 */}
-            <div className="overflow-hidden rounded-md border">
-                {renderTableContent()}
-            </div>
-
-            {/* 分页组件 - 放在卡片外侧 */}
-            {pagination && pagination.totalPages > 1 && (
-                <div className="flex items-center justify-end gap-4 w-full py-4">
-                    {/* 页码信息 */}
-                    {renderPaginationInfo()}
-
-                    {/* 分页按钮组 */}
-                    <TooltipProvider>
-                        <div className="flex items-center gap-2">
-                            {/* 第一页按钮 */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => pagination.onPageChange(1)}
-                                        disabled={pagination.currentPage <= 1}
-                                        className="h-8 w-8 p-0"
-                                        aria-label="Go to first page"
-                                    >
-                                        <ChevronsLeftIcon className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>第一页</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            {/* 上一页按钮 */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => pagination.onPageChange(pagination.currentPage - 1)}
-                                        disabled={pagination.currentPage <= 1}
-                                        className="h-8 w-8 p-0"
-                                        aria-label="Go to previous page"
-                                    >
-                                        <ChevronLeftIcon className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>上一页</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            {/* 下一页按钮 */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => pagination.onPageChange(pagination.currentPage + 1)}
-                                        disabled={pagination.currentPage >= pagination.totalPages}
-                                        className="h-8 w-8 p-0"
-                                        aria-label="Go to next page"
-                                    >
-                                        <ChevronRightIcon className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>下一页</p>
-                                </TooltipContent>
-                            </Tooltip>
-
-                            {/* 最后一页按钮 */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => pagination.onPageChange(pagination.totalPages)}
-                                        disabled={pagination.currentPage >= pagination.totalPages}
-                                        className="h-8 w-8 p-0"
-                                        aria-label="Go to last page"
-                                    >
-                                        <ChevronsRightIcon className="h-4 w-4" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>最后一页</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </div>
-                    </TooltipProvider>
-                </div>
-            )}
-        </div>
+        </TooltipProvider>
     );
 
     // 根据是否有容器功能决定渲染方式

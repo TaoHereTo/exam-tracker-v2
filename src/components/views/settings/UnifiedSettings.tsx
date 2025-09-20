@@ -35,6 +35,7 @@ import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
 import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { CloudSyncService } from "@/lib/cloudSyncService";
+import { UnifiedTable, type DataTableColumn } from "@/components/ui/UnifiedTable";
 
 export function UnifiedSettings({
   onExport,
@@ -76,6 +77,10 @@ export function UnifiedSettings({
   const [imageSearchTerm, setImageSearchTerm] = useState('');
   const [isLoadingImages, setIsLoadingImages] = useState(false);
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set());
+
+  // Pagination for image management
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Advanced settings - delete images
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -733,234 +738,181 @@ export function UnifiedSettings({
 
         {/* Image Management Interface */}
         {showImageManager && (
-          <div className="p-3 sm:p-6 border border-gray-200 dark:border-gray-700 rounded-xl bg-card dark:bg-card shadow-sm mt-3">
-            {/* Toolbar */}
-            <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:flex-none">
-                  <Search className="absolute left-2 sm:left-3 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-300 z-10 pointer-events-none" />
-                  <Input
-                    placeholder="搜索图片..."
-                    value={imageSearchTerm}
-                    onChange={(e) => setImageSearchTerm(e.target.value)}
-                    className="pl-7 sm:pl-10 w-full border-gray-200 dark:border-gray-600 focus:border-gray-400 dark:focus:border-gray-500 h-8 sm:h-10 text-sm"
-                  />
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={loadCloudImages}
-                        disabled={isLoadingImages}
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                      >
-                        <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="text-xs">
-                      <p><MixedText text="刷新" /></p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-2">
-                {/* Add sorting dropdown like in SupabaseImageSelectorDialog */}
-                <div className="flex items-center gap-2 min-w-[140px]">
-                  <Select
-                    value={`${sortKey}_${sortOrder}`}
-                    onValueChange={(v) => {
-                      const [k, o] = v.split('_');
-                      setSortKey(k as 'time' | 'name');
-                      setSortOrder(o as 'asc' | 'desc');
-                    }}
-                  >
-                    <SelectTrigger className="h-8 sm:h-9">
-                      <SelectValue placeholder="排序" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="time_desc">时间降序</SelectItem>
-                      <SelectItem value="time_asc">时间升序</SelectItem>
-                      <SelectItem value="name_asc">名称升序</SelectItem>
-                      <SelectItem value="name_desc">名称降序</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleUploadImage}
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                      >
-                        <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="text-xs">
-                      <p><MixedText text="上传图片" /></p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={handleDeleteSelectedImages}
-                        variant="destructive"
-                        size="icon"
-                        disabled={selectedImages.size === 0}
-                        className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                      >
-                        <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent className="text-xs">
-                      <p><MixedText text={selectedImages.size > 0 ? `删除选中的 ${selectedImages.size} 张图片` : '请选择要删除的图片'} /></p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            </div>
+          <div className="mt-3">
+            {(() => {
+              // 定义表格列
+              const imageColumns: DataTableColumn<SupabaseImageInfo>[] = [
+                {
+                  key: 'thumbnail',
+                  label: '缩略图',
+                  className: 'w-20',
+                  render: (image) => (
+                    <PhotoProvider>
+                      <PhotoView src={image.url}>
+                        <div className="relative w-12 h-12 rounded overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity">
+                          <Image
+                            src={image.url}
+                            alt={image.originalName}
+                            width={48}
+                            height={48}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.backgroundColor = '#f3f4f6';
+                              target.style.display = 'flex';
+                              target.style.alignItems = 'center';
+                              target.style.justifyContent = 'center';
+                              target.style.color = '#6b7280';
+                              target.style.fontSize = '8px';
+                              target.textContent = '加载失败';
+                            }}
+                          />
+                        </div>
+                      </PhotoView>
+                    </PhotoProvider>
+                  )
+                },
+                {
+                  key: 'originalName',
+                  label: '文件名',
+                  className: 'min-w-[200px]',
+                  render: (image) => (
+                    <div className="font-medium text-gray-900 dark:text-gray-100 truncate" title={image.originalName}>
+                      {image.originalName}
+                    </div>
+                  )
+                },
+                {
+                  key: 'size',
+                  label: '大小',
+                  className: 'w-24',
+                  render: (image) => (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatFileSize(image.size)}
+                    </span>
+                  )
+                },
+                {
+                  key: 'uploadedAt',
+                  label: '上传时间',
+                  className: 'w-32',
+                  render: (image) => (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatUploadTime(image.uploadedAt)}
+                    </span>
+                  )
+                }
+              ];
 
-            {/* Image List */}
-            <div className="space-y-3 sm:space-y-4">
-              {isLoadingImages ? (
-                <div className="flex items-center justify-center py-8 sm:py-12">
-                  <div className="flex items-center gap-2 sm:gap-3 text-gray-500">
-                    <InlineLoadingSpinner className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="text-xs sm:text-sm"><MixedText text="正在加载..." /></span>
-                  </div>
-                </div>
-              ) : filteredImages.length === 0 ? (
-                <div className="flex items-center justify-center py-8 sm:py-12">
-                  <div className="text-center">
-                    <ImageIcon className="h-10 w-10 sm:h-12 sm:w-12 mx-auto mb-2 sm:mb-3 text-gray-300" />
-                    <p className="text-gray-500 text-sm mb-1">
-                      <MixedText text={imageSearchTerm ? '没有找到匹配的图片' : '暂无图片'} />
-                    </p>
-                    {!imageSearchTerm && (
-                      <p className="text-xs sm:text-sm text-gray-400"><MixedText text="点击&quot;上传&quot;开始添加图片" /></p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <PhotoProvider>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-4">
-                    {filteredImages.map((image: SupabaseImageInfo) => (
-                      <div
-                        key={image.id}
-                        className={`group relative border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${selectedImages.has(image.id)
-                          ? 'ring-2 ring-blue-500'
-                          : ''
-                          } p-1 sm:p-2`}
-                        onClick={() => {
-                          const newSelected = new Set(selectedImages);
-                          if (newSelected.has(image.id)) {
-                            newSelected.delete(image.id);
-                          } else {
-                            newSelected.add(image.id);
-                          }
-                          setSelectedImages(newSelected);
-                        }}
-                      >
-                        {/* Checkbox */}
-                        <input
-                          type="checkbox"
-                          checked={selectedImages.has(image.id)}
-                          onChange={(e) => {
-                            e.stopPropagation();
+              // 渲染操作按钮
+              const renderImageActions = (image: SupabaseImageInfo) => (
+                <div className="flex items-center gap-1">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => {
                             const newSelected = new Set(selectedImages);
-                            if (e.target.checked) {
-                              newSelected.add(image.id);
-                            } else {
+                            if (newSelected.has(image.id)) {
                               newSelected.delete(image.id);
+                            } else {
+                              newSelected.add(image.id);
                             }
                             setSelectedImages(newSelected);
                           }}
-                          className="absolute top-1 sm:top-2 left-1 sm:left-2 z-10 w-3 h-3 sm:w-4 sm:h-4 text-blue-600 bg-card dark:bg-card border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                        />
-
-                        {/* Image Preview */}
-                        <div
-                          className={`w-full aspect-square rounded overflow-hidden relative transition-transform duration-200 group-hover:scale-105`}
-                          style={{
-                            border: '1px solid #e5e7eb',
-                            backgroundColor: 'white'
-                          }}
                         >
-                          <PhotoView src={image.url}>
-                            <div className="relative w-full h-full">
-                              <Image
-                                src={image.url}
-                                alt={image.originalName}
-                                width={200}
-                                height={200}
-                                className="w-full h-full object-cover cursor-pointer"
-                                style={{
-                                  backgroundColor: 'transparent',
-                                  display: 'block'
-                                }}
-                                onLoad={() => {
-                                  // Image loaded successfully
-                                }}
-                                onError={(e) => {
-                                  // Image loading failed
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.backgroundColor = '#f3f4f6';
-                                  target.style.display = 'flex';
-                                  target.style.alignItems = 'center';
-                                  target.style.justifyContent = 'center';
-                                  target.style.color = '#6b7280';
-                                  target.style.fontSize = '8px';
-                                  target.textContent = '加载失败';
-                                }}
-                              />
-                              {/* Preview Overlay */}
-                              <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-200 flex items-center justify-center opacity-0 hover:opacity-100">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="bg-card/90 dark:bg-card/90 rounded-full p-2 shadow-sm">
-                                        <Eye className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 dark:text-gray-300" />
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent className="text-xs">
-                                      <p><MixedText text="点击预览图片" /></p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            </div>
-                          </PhotoView>
-                        </div>
-
-                        {/* Image Info */}
-                        <div className={`mt-1 sm:mt-2 space-y-1`}>
-                          <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
-                            {image.originalName}
-                          </div>
-                          <div className="flex items-center gap-1 sm:gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <span><MixedText text={formatFileSize(image.size)} /></span>
-                            <span className="hidden sm:inline">•</span>
-                            <span><MixedText text={formatUploadTime(image.uploadedAt)} /></span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </PhotoProvider>
-              )}
-
-              {/* Statistics */}
-              {filteredImages.length > 0 && (
-                <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-700 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  <MixedText text={`共 ${filteredImages.length} 张图片${selectedImages.size > 0 ? `，选中 ${selectedImages.size} 张` : ''}`} />
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>删除此图片</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
-              )}
-            </div>
+              );
+
+              // 计算分页数据
+              const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+              const startIndex = (currentPage - 1) * itemsPerPage;
+              const endIndex = startIndex + itemsPerPage;
+              const paginatedImages = filteredImages.slice(startIndex, endIndex);
+
+              return (
+                <UnifiedTable
+                  columns={imageColumns}
+                  data={paginatedImages}
+                  selected={Array.from(selectedImages)}
+                  onSelect={(selected) => setSelectedImages(new Set(selected))}
+                  rowKey={(image) => image.id}
+                  renderActions={renderImageActions}
+                  onBatchDelete={handleDeleteSelectedImages}
+                  batchDeleteText={`删除选中的 ${selectedImages.size} 张图片`}
+                  filters={[
+                    {
+                      type: 'search',
+                      placeholder: '搜索图片...',
+                      value: imageSearchTerm,
+                      onChange: setImageSearchTerm
+                    },
+                    {
+                      type: 'select',
+                      placeholder: '排序方式',
+                      value: `${sortKey}_${sortOrder}`,
+                      onChange: (value) => {
+                        const [k, o] = value.split('_');
+                        setSortKey(k as 'time' | 'name');
+                        setSortOrder(o as 'asc' | 'desc');
+                      },
+                      options: [
+                        { value: 'time_desc', label: '时间降序' },
+                        { value: 'time_asc', label: '时间升序' },
+                        { value: 'name_asc', label: '名称升序' },
+                        { value: 'name_desc', label: '名称降序' }
+                      ]
+                    }
+                  ]}
+                  actions={[
+                    {
+                      label: '',
+                      icon: <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />,
+                      onClick: loadCloudImages,
+                      disabled: isLoadingImages,
+                      variant: 'outline',
+                      className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                      tooltip: '刷新图片列表'
+                    },
+                    {
+                      label: '',
+                      icon: <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />,
+                      onClick: handleUploadImage,
+                      variant: 'outline',
+                      className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                      tooltip: '上传图片'
+                    },
+                    {
+                      label: '',
+                      icon: <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />,
+                      onClick: handleDeleteSelectedImages,
+                      disabled: selectedImages.size === 0,
+                      variant: 'destructive',
+                      className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                      tooltip: selectedImages.size > 0 ? `删除选中的 ${selectedImages.size} 张图片` : '请选择要删除的图片'
+                    }
+                  ]}
+                  pagination={{
+                    currentPage,
+                    totalPages,
+                    onPageChange: setCurrentPage,
+                    totalItems: filteredImages.length
+                  }}
+                  className="w-full"
+                />
+              );
+            })()}
           </div>
         )}
       </div>
