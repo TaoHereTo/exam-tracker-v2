@@ -2,7 +2,6 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { DataImportExport } from "@/components/features/DataImportExport";
-import SaveSettingsButton from "./settings/SaveSettingsButton";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Download, Upload, Eye, Trash2, CloudUpload, CloudDownload } from "lucide-react";

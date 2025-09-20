@@ -78,11 +78,11 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex h-9 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground', className)}
+            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground', className)}
         >
             {/* 高亮背景 */}
             <motion.div
-                className="absolute inset-y-1 bg-background rounded-md shadow-sm"
+                className="absolute inset-y-1 bg-background rounded-full shadow-sm"
                 initial={false}
                 animate={{
                     left: highlightStyle.left,
@@ -113,7 +113,7 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
         <button
             data-tab-value={value}
             className={cn(
-                'relative inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
                 isActive
                     ? 'text-foreground'
                     : 'text-muted-foreground hover:text-foreground',

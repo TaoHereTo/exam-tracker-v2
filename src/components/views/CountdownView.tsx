@@ -485,7 +485,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                        className="h-9 px-6 rounded-full font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
                         variant="default"
                     >
                         <Plus className="w-5 h-5 mr-2" />
@@ -746,14 +746,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                 type="button"
                                 variant="outline"
                                 onClick={handleCloseForm}
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto rounded-full"
                             >
                                 <MixedText text="取消" />
                             </Button>
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto rounded-full"
                             >
                                 {editId ? <MixedText text="更新" /> : <MixedText text="添加倒计时" />}
                             </Button>
@@ -776,13 +776,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                     </DialogHeader>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">
+                            <Button variant="outline" className="rounded-full">
                                 <MixedText text="取消" />
                             </Button>
                         </DialogClose>
                         <Button
                             onClick={confirmDelete}
                             variant="destructive"
+                            className="rounded-full"
                         >
                             <MixedText text="确认删除" />
                         </Button>

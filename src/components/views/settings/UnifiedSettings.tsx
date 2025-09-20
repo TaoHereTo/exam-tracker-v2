@@ -893,13 +893,13 @@ export function UnifiedSettings({
             <DialogFooter className="flex flex-row sm:flex-row gap-2">
               <Button variant="outline"
                 onClick={() => setUploadConfirmDialogOpen(false)}
-                className="h-8 sm:h-9 text-xs sm:text-sm"
+                className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="取消" />
               </Button>
               <Button
                 onClick={confirmUploadToCloud}
-                className="bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm"
+                className="bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="确认上传" />
               </Button>
@@ -919,13 +919,13 @@ export function UnifiedSettings({
             <DialogFooter className="flex flex-row sm:flex-row gap-2">
               <Button variant="outline"
                 onClick={() => setDownloadConfirmDialogOpen(false)}
-                className="h-8 sm:h-9 text-xs sm:text-sm"
+                className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="取消" />
               </Button>
               <Button
                 onClick={confirmDownloadFromCloud}
-                className="bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm"
+                className="bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="确认下载" />
               </Button>
@@ -963,14 +963,14 @@ export function UnifiedSettings({
                   setDeleteDialogOpen(false);
                   setImagesToDelete([]);
                 }}
-                className="h-8 sm:h-9 text-xs sm:text-sm"
+                className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="取消" />
               </Button>
               <Button
                 onClick={confirmDeleteImages}
                 variant="destructive"
-                className="shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm"
+                className="shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
               >
                 <MixedText text="确认删除" />
               </Button>

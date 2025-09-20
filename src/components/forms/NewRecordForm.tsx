@@ -311,7 +311,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         </FormField>
 
                         <div className="form-actions pt-4">
-                            <Button type="submit" variant="default" className="w-full py-2 text-sm h-10">
+                            <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full">
                                 <MixedText text="保存记录" />
                             </Button>
                         </div>

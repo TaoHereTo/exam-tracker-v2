@@ -338,7 +338,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 text-white shadow-sm"
+                        className="h-9 text-white shadow-sm rounded-full"
                         style={{
                             backgroundColor: '#1d4ed8',
                             color: 'white',
@@ -837,14 +837,14 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                 type="button"
                                 variant="outline"
                                 onClick={handleCloseForm}
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto rounded-full"
                             >
                                 <MixedText text="取消" />
                             </Button>
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto"
+                                className="w-full sm:w-auto rounded-full"
                             >
                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                             </Button>
@@ -867,13 +867,14 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                     </DialogHeader>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline">
+                            <Button variant="outline" className="rounded-full">
                                 <MixedText text="取消" />
                             </Button>
                         </DialogClose>
                         <Button
                             onClick={confirmDelete}
                             variant="destructive"
+                            className="rounded-full"
                         >
                             <MixedText text="确认删除" />
                         </Button>
