@@ -480,7 +480,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     }, [countdowns, getExamStatus]);
 
     return (
-        <div className="space-y-6 w-full">
+        <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
                 <ButtonGroup spacing="sm">
                     <Button
@@ -789,6 +789,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div >
+        </div>
     );
 }

@@ -334,41 +334,39 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <div className="space-y-6 w-full">
-            <UnifiedTabs defaultValue="perMinute" className="w-full">
-                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-4 mx-auto">
-                    <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="pie" className="flex items-center gap-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
-                </UnifiedTabsList>
+        <UnifiedTabs defaultValue="perMinute" className="w-full">
+            <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-4 mx-auto">
+                <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
+                <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
+                <UnifiedTabsTrigger value="pie" className="flex items-center gap-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
+                <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
+            </UnifiedTabsList>
 
-                <UnifiedTabsContents className="py-6">
-                    <UnifiedTabsContent value="perMinute" className="outline-none">
-                        <div className="w-full h-[450px] sm:h-[500px] relative">
-                            <TrendChart data={perMinuteData} yMax={2} />
-                        </div>
-                    </UnifiedTabsContent>
+            <UnifiedTabsContents className="py-6">
+                <UnifiedTabsContent value="perMinute" className="outline-none">
+                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                        <TrendChart data={perMinuteData} yMax={2} />
+                    </div>
+                </UnifiedTabsContent>
 
-                    <UnifiedTabsContent value="accuracy" className="outline-none">
-                        <div className="w-full h-[450px] sm:h-[500px] relative">
-                            <TrendChart data={accuracyData} yMax={100} />
-                        </div>
-                    </UnifiedTabsContent>
+                <UnifiedTabsContent value="accuracy" className="outline-none">
+                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                        <TrendChart data={accuracyData} yMax={100} />
+                    </div>
+                </UnifiedTabsContent>
 
-                    <UnifiedTabsContent value="pie" className="outline-none">
-                        <div className="w-full h-[450px] sm:h-[500px] relative">
-                            <ModulePieChart data={pieChartData} />
-                        </div>
-                    </UnifiedTabsContent>
+                <UnifiedTabsContent value="pie" className="outline-none">
+                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                        <ModulePieChart data={pieChartData} />
+                    </div>
+                </UnifiedTabsContent>
 
-                    <UnifiedTabsContent value="radar" className="outline-none">
-                        <div className="w-full h-[350px] sm:h-[400px] relative">
-                            <ModuleRadarChart data={records} />
-                        </div>
-                    </UnifiedTabsContent>
-                </UnifiedTabsContents>
-            </UnifiedTabs>
-        </div>
+                <UnifiedTabsContent value="radar" className="outline-none">
+                    <div className="w-full h-[350px] sm:h-[400px] relative">
+                        <ModuleRadarChart data={records} />
+                    </div>
+                </UnifiedTabsContent>
+            </UnifiedTabsContents>
+        </UnifiedTabs>
     );
 };

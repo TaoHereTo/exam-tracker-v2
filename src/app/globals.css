@@ -235,6 +235,16 @@ th .mixed-text-part {
   font-weight: 600 !important;
 }
 
+/* 标题中的 MixedText 组件字体粗细 */
+h1 .mixed-text-part,
+h2 .mixed-text-part,
+h3 .mixed-text-part,
+h4 .mixed-text-part,
+h5 .mixed-text-part,
+h6 .mixed-text-part {
+  font-weight: inherit !important;
+}
+
 /* ========== 按钮间距系统 ========== */
 /* 按钮间距已统一使用CSS变量系统 */
 

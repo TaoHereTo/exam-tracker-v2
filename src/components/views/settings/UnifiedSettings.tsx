@@ -418,11 +418,18 @@ export function UnifiedSettings({
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-4xl mx-auto px-2 sm:px-4">
+    <div className="px-2 sm:px-4 -mx-4" style={{
+      maxWidth: '1000px',
+      width: '100%',
+      margin: '0 auto'
+    }}>
       {/* Appearance Settings */}
       <div className="space-y-6">
         <div className="mb-6 -ml-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-muted-foreground"><MixedText text="外观模式" /></h2>
+          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white" style={{
+            fontWeight: '700',
+            fontSize: '1.5rem'
+          }}><MixedText text="外观模式" style={{ fontWeight: '700' }} /></h2>
         </div>
 
         {/* Theme Switch */}
@@ -474,7 +481,10 @@ export function UnifiedSettings({
       {/* Data Management */}
       <div className="space-y-6">
         <div className="mb-6 -ml-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-muted-foreground"><MixedText text="数据与存储管理" /></h2>
+          <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white" style={{
+            fontWeight: '700',
+            fontSize: '1.5rem'
+          }}><MixedText text="数据与存储管理" style={{ fontWeight: '700' }} /></h2>
         </div>
 
         {/* Backup and Restore */}

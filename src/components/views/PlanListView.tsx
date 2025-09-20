@@ -333,555 +333,553 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
 
     return (
         <TooltipProvider>
-            <div className="space-y-6 w-full">
-                <div className="flex justify-between items-center">
-                    <div></div> {/* Empty div to maintain layout structure */}
-                    <ButtonGroup spacing="sm">
-                        <Button
-                            onClick={() => handleOpenForm()}
-                            className="h-9 text-white shadow-sm"
-                            style={{
-                                backgroundColor: '#1d4ed8',
-                                color: 'white',
-                                transition: 'none',
-                                transform: 'none'
-                            }}
-                            data-plan-button
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                e.currentTarget.style.color = 'white';
-                                e.currentTarget.style.transform = 'none';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = '#1d4ed8';
-                                e.currentTarget.style.color = 'white';
-                                e.currentTarget.style.transform = 'none';
-                            }}
-                        >
-                            <Plus className="w-5 h-5 mr-2" />
-                            <MixedText text="新建计划" />
-                        </Button>
-                    </ButtonGroup>
-                </div>
+            <div className="flex justify-between items-center">
+                <div></div> {/* Empty div to maintain layout structure */}
+                <ButtonGroup spacing="sm">
+                    <Button
+                        onClick={() => handleOpenForm()}
+                        className="h-9 text-white shadow-sm"
+                        style={{
+                            backgroundColor: '#1d4ed8',
+                            color: 'white',
+                            transition: 'none',
+                            transform: 'none'
+                        }}
+                        data-plan-button
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.color = 'white';
+                            e.currentTarget.style.transform = 'none';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.color = 'white';
+                            e.currentTarget.style.transform = 'none';
+                        }}
+                    >
+                        <Plus className="w-5 h-5 mr-2" />
+                        <MixedText text="新建计划" />
+                    </Button>
+                </ButtonGroup>
+            </div>
 
-                {/* 使用统一的 Tabs 组件 */}
-                <UnifiedTabs defaultValue="active" className="w-full">
-                    <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 mx-auto">
-                        <UnifiedTabsTrigger value="active" className="flex items-center gap-2">
-                            <Clock className="w-5 h-5" />
-                            <MixedText text="进行中" />
-                        </UnifiedTabsTrigger>
-                        <UnifiedTabsTrigger value="completed" className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5" />
-                            <MixedText text="已完成" />
-                        </UnifiedTabsTrigger>
-                    </UnifiedTabsList>
+            {/* 使用统一的 Tabs 组件 */}
+            <UnifiedTabs defaultValue="active" className="w-full">
+                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 mx-auto">
+                    <UnifiedTabsTrigger value="active" className="flex items-center gap-2">
+                        <Clock className="w-5 h-5" />
+                        <MixedText text="进行中" />
+                    </UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="completed" className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5" />
+                        <MixedText text="已完成" />
+                    </UnifiedTabsTrigger>
+                </UnifiedTabsList>
 
-                    <UnifiedTabsContents className="py-6 px-2">
-                        <UnifiedTabsContent value="active" className="outline-none">
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
-                                {activePlans.map(plan => (
-                                    <HoverCard key={plan.id}>
-                                        <HoverCardTrigger asChild>
-                                            <BorderBeamCard className="w-full rounded-2xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">
-                                                <div className="p-6 flex flex-col h-full">
-                                                    {/* Header with title and actions */}
-                                                    <div className="flex justify-between items-start mb-6">
-                                                        <div className="flex-1 min-w-0">
-                                                            <h3 className="text-xl font-bold text-foreground truncate">
-                                                                {plan.name}
-                                                            </h3>
-                                                            <p className="text-sm text-muted-foreground mt-1">
-                                                                {plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}
-                                                            </p>
-                                                        </div>
-                                                        {/* Action buttons */}
-                                                        <div className="flex gap-1 ml-2 flex-shrink-0">
+                <UnifiedTabsContents className="py-6 px-2">
+                    <UnifiedTabsContent value="active" className="outline-none">
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
+                            {activePlans.map(plan => (
+                                <HoverCard key={plan.id}>
+                                    <HoverCardTrigger asChild>
+                                        <BorderBeamCard className="w-full rounded-2xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">
+                                            <div className="p-6 flex flex-col h-full">
+                                                {/* Header with title and actions */}
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="flex-1 min-w-0">
+                                                        <h3 className="text-xl font-bold text-foreground truncate">
+                                                            {plan.name}
+                                                        </h3>
+                                                        <p className="text-sm text-muted-foreground mt-1">
+                                                            {plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}
+                                                        </p>
+                                                    </div>
+                                                    {/* Action buttons */}
+                                                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    onClick={() => handleOpenForm(plan)}
+                                                                    variant="outline"
+                                                                    size="icon"
+                                                                    className="h-8 w-8 rounded-full"
+                                                                >
+                                                                    <Edit className="w-4 h-4" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p><MixedText text="编辑" /></p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                        <Dialog>
                                                             <Tooltip>
                                                                 <TooltipTrigger asChild>
-                                                                    <Button
-                                                                        onClick={() => handleOpenForm(plan)}
-                                                                        variant="outline"
-                                                                        size="icon"
-                                                                        className="h-8 w-8 rounded-full"
-                                                                    >
-                                                                        <Edit className="w-4 h-4" />
-                                                                    </Button>
+                                                                    <DialogTrigger asChild>
+                                                                        <Button
+                                                                            variant="destructive"
+                                                                            size="icon"
+                                                                            className="h-8 w-8 rounded-full"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4" />
+                                                                        </Button>
+                                                                    </DialogTrigger>
                                                                 </TooltipTrigger>
                                                                 <TooltipContent>
-                                                                    <p><MixedText text="编辑" /></p>
+                                                                    <p><MixedText text="删除" /></p>
                                                                 </TooltipContent>
                                                             </Tooltip>
-                                                            <Dialog>
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <DialogTrigger asChild>
-                                                                            <Button
-                                                                                variant="destructive"
-                                                                                size="icon"
-                                                                                className="h-8 w-8 rounded-full"
-                                                                            >
-                                                                                <Trash2 className="w-4 h-4" />
-                                                                            </Button>
-                                                                        </DialogTrigger>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p><MixedText text="删除" /></p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                                <DialogContent>
-                                                                    <DialogHeader>
-                                                                        <DialogTitle><MixedText text="确认删除" /></DialogTitle>
-                                                                    </DialogHeader>
-                                                                    <DialogDescription>
-                                                                        <MixedText text={`确定要删除学习计划"${plan.name}"吗？`} />
-                                                                        <br />
-                                                                        <br />
-                                                                        <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                                                                    </DialogDescription>
-                                                                    <DialogFooter>
-                                                                        <DialogClose asChild>
-                                                                            <Button variant="outline">
-                                                                                <MixedText text="取消" />
-                                                                            </Button>
-                                                                        </DialogClose>
-                                                                        <Button
-                                                                            onClick={() => handleDelete(plan.id)}
-                                                                            variant="destructive"
-                                                                        >
-                                                                            <MixedText text="确认删除" />
+                                                            <DialogContent>
+                                                                <DialogHeader>
+                                                                    <DialogTitle><MixedText text="确认删除" /></DialogTitle>
+                                                                </DialogHeader>
+                                                                <DialogDescription>
+                                                                    <MixedText text={`确定要删除学习计划"${plan.name}"吗？`} />
+                                                                    <br />
+                                                                    <br />
+                                                                    <MixedText text="此操作不可撤销，删除后无法恢复。" />
+                                                                </DialogDescription>
+                                                                <DialogFooter>
+                                                                    <DialogClose asChild>
+                                                                        <Button variant="outline">
+                                                                            <MixedText text="取消" />
                                                                         </Button>
-                                                                    </DialogFooter>
-                                                                </DialogContent>
-                                                            </Dialog>
-                                                        </div>
+                                                                    </DialogClose>
+                                                                    <Button
+                                                                        onClick={() => handleDelete(plan.id)}
+                                                                        variant="destructive"
+                                                                    >
+                                                                        <MixedText text="确认删除" />
+                                                                    </Button>
+                                                                </DialogFooter>
+                                                            </DialogContent>
+                                                        </Dialog>
                                                     </div>
+                                                </div>
 
-                                                    {/* Plan progress display - main focus */}
-                                                    <div className="flex-1 flex flex-col justify-center my-4">
-                                                        <div className="space-y-4">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="text-sm text-muted-foreground">
-                                                                    <MixedText text={`${plan.startDate} ~ ${plan.endDate}`} />
-                                                                </div>
-                                                                <div className="text-sm font-medium">
-                                                                    <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
-                                                                        <MixedText text={getStatusText(plan.status)} />
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-2">
-                                                                <div className="flex justify-between text-sm">
-                                                                    <span className="text-muted-foreground">
-                                                                        {plan.type === '正确率' ? <MixedText text="目标正确率" /> : <MixedText text={`目标${plan.type === '题量' ? '题量' : '错题数'}`} />}
-                                                                    </span>
-                                                                    <span className="font-medium">
-                                                                        {plan.type === '正确率' ? <MixedText text={`${plan.target}%`} /> : <MixedText text={`${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
-                                                                    </span>
-                                                                </div>
-
-                                                                <div className="flex justify-between text-sm">
-                                                                    <span className="text-muted-foreground">
-                                                                        <MixedText text="当前进度" />
-                                                                    </span>
-                                                                    <span className="font-medium">
-                                                                        {plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="pt-2">
-                                                                <Progress
-                                                                    value={getProgressPercentage(plan)}
-                                                                    variant="plan"
-                                                                    showText={true}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Footer with module and description */}
-                                                    <div className="mt-4 pt-4 border-t border-border">
+                                                {/* Plan progress display - main focus */}
+                                                <div className="flex-1 flex flex-col justify-center my-4">
+                                                    <div className="space-y-4">
                                                         <div className="flex items-center justify-between">
-                                                            <div className="text-sm">
-                                                                <span className="text-muted-foreground"><MixedText text="板块：" /></span>
-                                                                <span className="font-medium"><MixedText text={normalizeModuleName(plan.module)} /></span>
+                                                            <div className="text-sm text-muted-foreground">
+                                                                <MixedText text={`${plan.startDate} ~ ${plan.endDate}`} />
                                                             </div>
+                                                            <div className="text-sm font-medium">
+                                                                <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
+                                                                    <MixedText text={getStatusText(plan.status)} />
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-2">
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-muted-foreground">
+                                                                    {plan.type === '正确率' ? <MixedText text="目标正确率" /> : <MixedText text={`目标${plan.type === '题量' ? '题量' : '错题数'}`} />}
+                                                                </span>
+                                                                <span className="font-medium">
+                                                                    {plan.type === '正确率' ? <MixedText text={`${plan.target}%`} /> : <MixedText text={`${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
+                                                                </span>
+                                                            </div>
+
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-muted-foreground">
+                                                                    <MixedText text="当前进度" />
+                                                                </span>
+                                                                <span className="font-medium">
+                                                                    {plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="pt-2">
+                                                            <Progress
+                                                                value={getProgressPercentage(plan)}
+                                                                variant="plan"
+                                                                showText={true}
+                                                            />
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </BorderBeamCard>
-                                        </HoverCardTrigger>
-                                        <HoverCardContent className="w-80">
-                                            <div className="space-y-2">
-                                                <h4 className="text-sm font-semibold">
-                                                    <MixedText text="计划描述" />
-                                                </h4>
-                                                <p className="text-sm text-muted-foreground">
-                                                    <MixedText text={plan.description || '暂无描述'} />
-                                                </p>
-                                            </div>
-                                        </HoverCardContent>
-                                    </HoverCard>
-                                ))}
 
-                                {/* 空状态 - 始终渲染，使用CSS控制显示 */}
-                                <div className="col-span-full" style={{ display: activePlans.length > 0 ? 'none' : 'block' }}>
-                                    <div className="p-12 text-center">
-                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                            <Clock className="w-8 h-8 text-muted-foreground" />
+                                                {/* Footer with module and description */}
+                                                <div className="mt-4 pt-4 border-t border-border">
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="text-sm">
+                                                            <span className="text-muted-foreground"><MixedText text="板块：" /></span>
+                                                            <span className="font-medium"><MixedText text={normalizeModuleName(plan.module)} /></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </BorderBeamCard>
+                                    </HoverCardTrigger>
+                                    <HoverCardContent className="w-80">
+                                        <div className="space-y-2">
+                                            <h4 className="text-sm font-semibold">
+                                                <MixedText text="计划描述" />
+                                            </h4>
+                                            <p className="text-sm text-muted-foreground">
+                                                <MixedText text={plan.description || '暂无描述'} />
+                                            </p>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3">
-                                            <MixedText text="暂无进行中的计划" />
-                                        </h3>
-                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                            <MixedText text="创建一个新的学习计划开始您的学习之旅" />
-                                        </p>
-                                        <Button
-                                            onClick={() => handleOpenForm()}
-                                            className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90 dark:bg-[#1d4ed8] dark:hover:bg-[#1d4ed8]/90 dark:text-white"
-                                            variant="default"
-                                        >
-                                            <Plus className="w-5 h-5 mr-2" />
-                                            <MixedText text="创建第一个计划" />
-                                        </Button>
+                                    </HoverCardContent>
+                                </HoverCard>
+                            ))}
+
+                            {/* 空状态 - 始终渲染，使用CSS控制显示 */}
+                            <div className="col-span-full" style={{ display: activePlans.length > 0 ? 'none' : 'block' }}>
+                                <div className="p-12 text-center">
+                                    <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                        <Clock className="w-8 h-8 text-muted-foreground" />
                                     </div>
+                                    <h3 className="text-2xl font-bold text-foreground mb-3">
+                                        <MixedText text="暂无进行中的计划" />
+                                    </h3>
+                                    <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                        <MixedText text="创建一个新的学习计划开始您的学习之旅" />
+                                    </p>
+                                    <Button
+                                        onClick={() => handleOpenForm()}
+                                        className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90 dark:bg-[#1d4ed8] dark:hover:bg-[#1d4ed8]/90 dark:text-white"
+                                        variant="default"
+                                    >
+                                        <Plus className="w-5 h-5 mr-2" />
+                                        <MixedText text="创建第一个计划" />
+                                    </Button>
                                 </div>
                             </div>
-                        </UnifiedTabsContent>
+                        </div>
+                    </UnifiedTabsContent>
 
-                        <UnifiedTabsContent value="completed" className="outline-none flex flex-col gap-6">
-                            <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
-                                <div className="min-h-[500px]">
-                                    {completedPlans.length > 0 ? (
-                                        <div className="space-y-4">
-                                            {/* 批量操作栏 */}
-                                            <div className="flex items-center justify-between px-6 py-3 bg-muted/50 rounded-lg">
-                                                <div className="flex items-center gap-3">
-                                                    <Checkbox
-                                                        checked={selectedPlans.size === completedPlans.length && completedPlans.length > 0}
-                                                        onCheckedChange={handleSelectAll}
-                                                        size="sm"
-                                                    />
-                                                    <span className="text-sm text-muted-foreground">
-                                                        已选择 {selectedPlans.size} / {completedPlans.length} 项
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                onClick={handleBulkEdit}
-                                                                variant="outline"
-                                                                size="icon"
-                                                                className="h-8 w-8 rounded-full"
-                                                                disabled={selectedPlans.size === 0}
-                                                            >
-                                                                <Edit className="w-4 h-4" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p><MixedText text="编辑选中项" /></p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <Button
-                                                                onClick={handleBulkDelete}
-                                                                variant="destructive"
-                                                                size="icon"
-                                                                className="h-8 w-8 rounded-full"
-                                                                disabled={selectedPlans.size === 0}
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            <p><MixedText text="删除选中项" /></p>
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </div>
+                    <UnifiedTabsContent value="completed" className="outline-none flex flex-col gap-6">
+                        <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
+                            <div className="min-h-[500px]">
+                                {completedPlans.length > 0 ? (
+                                    <div className="space-y-4">
+                                        {/* 批量操作栏 */}
+                                        <div className="flex items-center justify-between px-6 py-3 bg-muted/50 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <Checkbox
+                                                    checked={selectedPlans.size === completedPlans.length && completedPlans.length > 0}
+                                                    onCheckedChange={handleSelectAll}
+                                                    size="sm"
+                                                />
+                                                <span className="text-sm text-muted-foreground">
+                                                    已选择 {selectedPlans.size} / {completedPlans.length} 项
+                                                </span>
                                             </div>
+                                            <div className="flex items-center gap-2">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            onClick={handleBulkEdit}
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 rounded-full"
+                                                            disabled={selectedPlans.size === 0}
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="编辑选中项" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            onClick={handleBulkDelete}
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="h-8 w-8 rounded-full"
+                                                            disabled={selectedPlans.size === 0}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="删除选中项" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </div>
+                                        </div>
 
-                                            {/* 横向长条卡片列表 */}
-                                            <div className="space-y-2">
-                                                {completedPlans.map(plan => {
-                                                    const isSelected = selectedPlans.has(plan.id);
-                                                    return (
-                                                        <HoverCard key={plan.id}>
-                                                            <HoverCardTrigger asChild>
-                                                                <Card
-                                                                    className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
-                                                                    onClick={() => handlePlanSelect(plan.id, !isSelected)}
-                                                                >
-                                                                    <div className="px-6 py-0.5 flex items-center gap-3">
-                                                                        {/* 复选框 */}
-                                                                        <Checkbox
-                                                                            checked={isSelected}
-                                                                            onCheckedChange={(checked) => handlePlanSelect(plan.id, checked as boolean)}
-                                                                            size="sm"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        />
+                                        {/* 横向长条卡片列表 */}
+                                        <div className="space-y-2">
+                                            {completedPlans.map(plan => {
+                                                const isSelected = selectedPlans.has(plan.id);
+                                                return (
+                                                    <HoverCard key={plan.id}>
+                                                        <HoverCardTrigger asChild>
+                                                            <Card
+                                                                className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
+                                                                onClick={() => handlePlanSelect(plan.id, !isSelected)}
+                                                            >
+                                                                <div className="px-6 py-0.5 flex items-center gap-3">
+                                                                    {/* 复选框 */}
+                                                                    <Checkbox
+                                                                        checked={isSelected}
+                                                                        onCheckedChange={(checked) => handlePlanSelect(plan.id, checked as boolean)}
+                                                                        size="sm"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    />
 
-                                                                        {/* 计划信息 */}
-                                                                        <div className="flex-1 min-w-0">
+                                                                    {/* 计划信息 */}
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <div className="flex items-center gap-4">
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <h3 className="text-base font-bold text-foreground truncate">
+                                                                                    {plan.name}
+                                                                                </h3>
+                                                                                <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
+                                                                                    <span>{plan.startDate} ~ {plan.endDate}</span>
+                                                                                    <span>•</span>
+                                                                                    <span>{normalizeModuleName(plan.module)}</span>
+                                                                                    <span>•</span>
+                                                                                    <span>{plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}</span>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            {/* 进度和状态显示 */}
                                                                             <div className="flex items-center gap-4">
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <h3 className="text-base font-bold text-foreground truncate">
-                                                                                        {plan.name}
-                                                                                    </h3>
-                                                                                    <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
-                                                                                        <span>{plan.startDate} ~ {plan.endDate}</span>
-                                                                                        <span>•</span>
-                                                                                        <span>{normalizeModuleName(plan.module)}</span>
-                                                                                        <span>•</span>
-                                                                                        <span>{plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}</span>
+                                                                                <div className="text-right">
+                                                                                    <div className="text-xs font-medium">
+                                                                                        {plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`}
+                                                                                    </div>
+                                                                                    <div className="text-xs text-muted-foreground">
+                                                                                        {plan.type === '正确率' ? '目标' : '进度'}
                                                                                     </div>
                                                                                 </div>
 
-                                                                                {/* 进度和状态显示 */}
-                                                                                <div className="flex items-center gap-4">
-                                                                                    <div className="text-right">
-                                                                                        <div className="text-xs font-medium">
-                                                                                            {plan.type === '正确率' ? `${plan.progress}%` : `${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`}
-                                                                                        </div>
-                                                                                        <div className="text-xs text-muted-foreground">
-                                                                                            {plan.type === '正确率' ? '目标' : '进度'}
-                                                                                        </div>
-                                                                                    </div>
-
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <CheckCircle className="w-4 h-4" style={{ color: '#0284c7' }} />
-                                                                                        <span className="text-xs font-medium" style={{ color: '#0284c7' }}>
-                                                                                            {getStatusText(plan.status)}
-                                                                                        </span>
-                                                                                    </div>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <CheckCircle className="w-4 h-4" style={{ color: '#0284c7' }} />
+                                                                                    <span className="text-xs font-medium" style={{ color: '#0284c7' }}>
+                                                                                        {getStatusText(plan.status)}
+                                                                                    </span>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
-
                                                                     </div>
-                                                                </Card>
-                                                            </HoverCardTrigger>
-                                                            <HoverCardContent className="w-80">
-                                                                <div className="space-y-2">
-                                                                    <h4 className="text-sm font-semibold">
-                                                                        <MixedText text="计划描述" />
-                                                                    </h4>
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        <MixedText text={plan.description || '暂无描述'} />
-                                                                    </p>
+
                                                                 </div>
-                                                            </HoverCardContent>
-                                                        </HoverCard>
-                                                    )
-                                                })}
-                                            </div>
+                                                            </Card>
+                                                        </HoverCardTrigger>
+                                                        <HoverCardContent className="w-80">
+                                                            <div className="space-y-2">
+                                                                <h4 className="text-sm font-semibold">
+                                                                    <MixedText text="计划描述" />
+                                                                </h4>
+                                                                <p className="text-sm text-muted-foreground">
+                                                                    <MixedText text={plan.description || '暂无描述'} />
+                                                                </p>
+                                                            </div>
+                                                        </HoverCardContent>
+                                                    </HoverCard>
+                                                )
+                                            })}
                                         </div>
-                                    ) : (
-                                        /* 空状态 */
-                                        <div className="p-12 text-center">
-                                            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                                <CheckCircle className="w-8 h-8 text-muted-foreground" />
-                                            </div>
-                                            <h3 className="text-2xl font-bold text-foreground mb-3">
-                                                <MixedText text="暂无已完成的计划" />
-                                            </h3>
-                                            <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                                <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
-                                            </p>
+                                    </div>
+                                ) : (
+                                    /* 空状态 */
+                                    <div className="p-12 text-center">
+                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                            <CheckCircle className="w-8 h-8 text-muted-foreground" />
                                         </div>
-                                    )}
-                                </div>
+                                        <h3 className="text-2xl font-bold text-foreground mb-3">
+                                            <MixedText text="暂无已完成的计划" />
+                                        </h3>
+                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                            <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
+                                        </p>
+                                    </div>
+                                )}
                             </div>
-                        </UnifiedTabsContent>
-                    </UnifiedTabsContents>
-                </UnifiedTabs>
+                        </div>
+                    </UnifiedTabsContent>
+                </UnifiedTabsContents>
+            </UnifiedTabs>
 
-                <Dialog open={showForm} onOpenChange={(open) => {
-                    if (!open) {
-                        handleDialogClose();
-                    }
-                    setShowForm(open);
-                }}>
-                    <DialogContent className="w-11/12 max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
-                        <DialogHeader>
-                            <DialogTitle className="text-xl">
-                                {editId ? <MixedText text="编辑计划" /> : <MixedText text="新建计划" />}
-                            </DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-5">
+            <Dialog open={showForm} onOpenChange={(open) => {
+                if (!open) {
+                    handleDialogClose();
+                }
+                setShowForm(open);
+            }}>
+                <DialogContent className="w-11/12 max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl">
+                            {editId ? <MixedText text="编辑计划" /> : <MixedText text="新建计划" />}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        <div className="space-y-2">
+                            <FormField label={<MixedText text="计划名称" />} htmlFor="name" required>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    value={form.name || ''}
+                                    onChange={handleFormChange}
+                                    className="h-11"
+                                    placeholder="请输入计划名称"
+                                />
+                            </FormField>
+                            <FormError error={errors.name} />
+                        </div>
+
+                        <div className="space-y-2">
+                            <FormField label={<MixedText text="计划时间范围" />}>
+                                <DateRangePicker
+                                    dateRange={dateRange}
+                                    onDateRangeChange={handleDateRangeChange}
+                                    placeholder="选择开始和结束日期"
+                                    error={!!errors.startDate || !!errors.endDate}
+                                />
+                            </FormField>
+                            <FormError error={errors.startDate || errors.endDate} />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <FormField label={<MixedText text="计划名称" />} htmlFor="name" required>
-                                    <Input
-                                        id="name"
-                                        name="name"
-                                        value={form.name || ''}
-                                        onChange={handleFormChange}
-                                        className="h-11"
-                                        placeholder="请输入计划名称"
-                                    />
+                                <FormField label={<MixedText text="板块" />} htmlFor="module">
+                                    <Select
+                                        value={form.module || ''}
+                                        onValueChange={v => {
+                                            setForm(f => ({ ...f, module: v }));
+                                            if (errors.module) {
+                                                setErrors(prev => {
+                                                    const newErrors = { ...prev };
+                                                    delete newErrors.module;
+                                                    return newErrors;
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-11">
+                                            <SelectValue placeholder="请选择板块">
+                                                {form.module ? normalizeModuleName(form.module) : '请选择板块'}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {/* 统一顺序：资料分析、政治理论、数量关系、言语理解、常识判断、判断推理 */}
+                                            <SelectItem value="data-analysis"><MixedText text="资料分析" /></SelectItem>
+                                            <SelectItem value="politics"><MixedText text="政治理论" /></SelectItem>
+                                            <SelectItem value="math"><MixedText text="数量关系" /></SelectItem>
+                                            <SelectItem value="verbal"><MixedText text="言语理解" /></SelectItem>
+                                            <SelectItem value="common"><MixedText text="常识判断" /></SelectItem>
+                                            <SelectItem value="logic"><MixedText text="判断推理" /></SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </FormField>
-                                <FormError error={errors.name} />
-                            </div>
-
-                            <div className="space-y-2">
-                                <FormField label={<MixedText text="计划时间范围" />}>
-                                    <DateRangePicker
-                                        dateRange={dateRange}
-                                        onDateRangeChange={handleDateRangeChange}
-                                        placeholder="选择开始和结束日期"
-                                        error={!!errors.startDate || !!errors.endDate}
-                                    />
-                                </FormField>
-                                <FormError error={errors.startDate || errors.endDate} />
-                            </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <FormField label={<MixedText text="板块" />} htmlFor="module">
-                                        <Select
-                                            value={form.module || ''}
-                                            onValueChange={v => {
-                                                setForm(f => ({ ...f, module: v }));
-                                                if (errors.module) {
-                                                    setErrors(prev => {
-                                                        const newErrors = { ...prev };
-                                                        delete newErrors.module;
-                                                        return newErrors;
-                                                    });
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger className="h-11">
-                                                <SelectValue placeholder="请选择板块">
-                                                    {form.module ? normalizeModuleName(form.module) : '请选择板块'}
-                                                </SelectValue>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {/* 统一顺序：资料分析、政治理论、数量关系、言语理解、常识判断、判断推理 */}
-                                                <SelectItem value="data-analysis"><MixedText text="资料分析" /></SelectItem>
-                                                <SelectItem value="politics"><MixedText text="政治理论" /></SelectItem>
-                                                <SelectItem value="math"><MixedText text="数量关系" /></SelectItem>
-                                                <SelectItem value="verbal"><MixedText text="言语理解" /></SelectItem>
-                                                <SelectItem value="common"><MixedText text="常识判断" /></SelectItem>
-                                                <SelectItem value="logic"><MixedText text="判断推理" /></SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormField>
-                                    <FormError error={errors.module} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <FormField label={<MixedText text="目标类型" />} htmlFor="type">
-                                        <Select
-                                            value={form.type || ''}
-                                            onValueChange={v => {
-                                                setForm(f => ({ ...f, type: v as "题量" | "正确率" | "错题数" }));
-                                                if (errors.type) {
-                                                    setErrors(prev => {
-                                                        const newErrors = { ...prev };
-                                                        delete newErrors.type;
-                                                        return newErrors;
-                                                    });
-                                                }
-                                            }}
-                                        >
-                                            <SelectTrigger className="h-11">
-                                                <SelectValue placeholder="选择类型">
-                                                    {form.type || '选择类型'}
-                                                </SelectValue>
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="题量"><MixedText text="题量" /></SelectItem>
-                                                <SelectItem value="正确率"><MixedText text="正确率" /></SelectItem>
-                                                <SelectItem value="错题数"><MixedText text="错题数" /></SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormField>
-                                    <FormError error={errors.type} />
-                                </div>
+                                <FormError error={errors.module} />
                             </div>
 
                             <div className="space-y-2">
-                                <FormField label={<MixedText text="目标值" />} htmlFor="target" required>
-                                    <Input
-                                        id="target"
-                                        name="target"
-                                        type="number"
-                                        value={form.target || ''}
-                                        onChange={handleFormChange}
-                                        className="h-11"
-                                        placeholder="请输入目标值"
-                                    />
+                                <FormField label={<MixedText text="目标类型" />} htmlFor="type">
+                                    <Select
+                                        value={form.type || ''}
+                                        onValueChange={v => {
+                                            setForm(f => ({ ...f, type: v as "题量" | "正确率" | "错题数" }));
+                                            if (errors.type) {
+                                                setErrors(prev => {
+                                                    const newErrors = { ...prev };
+                                                    delete newErrors.type;
+                                                    return newErrors;
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="h-11">
+                                            <SelectValue placeholder="选择类型">
+                                                {form.type || '选择类型'}
+                                            </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="题量"><MixedText text="题量" /></SelectItem>
+                                            <SelectItem value="正确率"><MixedText text="正确率" /></SelectItem>
+                                            <SelectItem value="错题数"><MixedText text="错题数" /></SelectItem>
+                                        </SelectContent>
+                                    </Select>
                                 </FormField>
-                                <FormError error={errors.target} />
+                                <FormError error={errors.type} />
                             </div>
+                        </div>
 
-                            <div className="space-y-2">
-                                <FormField label={<MixedText text="计划描述" />} htmlFor="description">
-                                    <Textarea
-                                        id="description"
-                                        name="description"
-                                        value={form.description || ''}
-                                        onChange={handleFormChange}
-                                        rows={3}
-                                        placeholder="可选：添加计划描述"
-                                        className="resize-none"
-                                    />
-                                </FormField>
-                            </div>
+                        <div className="space-y-2">
+                            <FormField label={<MixedText text="目标值" />} htmlFor="target" required>
+                                <Input
+                                    id="target"
+                                    name="target"
+                                    type="number"
+                                    value={form.target || ''}
+                                    onChange={handleFormChange}
+                                    className="h-11"
+                                    placeholder="请输入目标值"
+                                />
+                            </FormField>
+                            <FormError error={errors.target} />
+                        </div>
 
-                            <DialogFooter className="flex-col sm:flex-row">
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={handleCloseForm}
-                                    className="w-full sm:w-auto"
-                                >
-                                    <MixedText text="取消" />
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    variant="default"
-                                    className="w-full sm:w-auto"
-                                >
-                                    {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                        <div className="space-y-2">
+                            <FormField label={<MixedText text="计划描述" />} htmlFor="description">
+                                <Textarea
+                                    id="description"
+                                    name="description"
+                                    value={form.description || ''}
+                                    onChange={handleFormChange}
+                                    rows={3}
+                                    placeholder="可选：添加计划描述"
+                                    className="resize-none"
+                                />
+                            </FormField>
+                        </div>
 
-                {/* 删除确认对话框 */}
-                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle><MixedText text="确认删除" /></DialogTitle>
-                            <DialogDescription>
-                                <MixedText text={`确定要删除选中的 ${selectedPlans.size} 个学习计划吗？`} />
-                                <br />
-                                <br />
-                                <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                            </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">
-                                    <MixedText text="取消" />
-                                </Button>
-                            </DialogClose>
+                        <DialogFooter className="flex-col sm:flex-row">
                             <Button
-                                onClick={confirmDelete}
-                                variant="destructive"
+                                type="button"
+                                variant="outline"
+                                onClick={handleCloseForm}
+                                className="w-full sm:w-auto"
                             >
-                                <MixedText text="确认删除" />
+                                <MixedText text="取消" />
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="default"
+                                className="w-full sm:w-auto"
+                            >
+                                {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                             </Button>
                         </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
+
+            {/* 删除确认对话框 */}
+            <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle><MixedText text="确认删除" /></DialogTitle>
+                        <DialogDescription>
+                            <MixedText text={`确定要删除选中的 ${selectedPlans.size} 个学习计划吗？`} />
+                            <br />
+                            <br />
+                            <MixedText text="此操作不可撤销，删除后无法恢复。" />
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <DialogClose asChild>
+                            <Button variant="outline">
+                                <MixedText text="取消" />
+                            </Button>
+                        </DialogClose>
+                        <Button
+                            onClick={confirmDelete}
+                            variant="destructive"
+                        >
+                            <MixedText text="确认删除" />
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </TooltipProvider>
     );
 }

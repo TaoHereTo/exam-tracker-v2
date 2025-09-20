@@ -12,6 +12,7 @@ import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { PasteProvider } from "@/contexts/PasteContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { CloudDataProvider } from "@/contexts/CloudDataContext";
 import { MODULES, normalizeModuleName } from '@/config/exam';
 
 import { LogOut, User, Settings, SlidersHorizontal, PieChart, Trophy, ChevronDown } from "lucide-react";
@@ -821,282 +822,159 @@ export function MainApp() {
                 <div className="min-h-screen w-full relative" style={getBackgroundStyle() as React.CSSProperties}>
                     <LoadingWrapper loading={isLoading}>
                         <SidebarProvider>
-                            <Sidebar
-                                activeTab={activeTab}
-                                setActiveTab={setActiveTab}
-                                userInfo={<SidebarUserInfo />}
-                            />
-                            <SidebarInset>
-                                <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-                                    <div className="flex items-center gap-2 px-4">
-                                        <SidebarTrigger className="-ml-1" />
-                                        <div className="min-w-0 flex-1">
-                                            <PageTitle
-                                                className="text-lg sm:text-xl md:text-2xl truncate cursor-pointer"
-                                            >
-                                                {normalizePageTitle(activeTab)}
-                                            </PageTitle>
+                            <CloudDataProvider>
+                                <Sidebar
+                                    activeTab={activeTab}
+                                    setActiveTab={setActiveTab}
+                                    userInfo={<SidebarUserInfo />}
+                                />
+                                <SidebarInset>
+                                    <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
+                                        <div className="flex items-center gap-2 px-4">
+                                            <SidebarTrigger className="-ml-1" />
+                                            <div className="min-w-0 flex-1">
+                                                <PageTitle
+                                                    className="text-lg sm:text-xl md:text-2xl truncate cursor-pointer"
+                                                >
+                                                    {normalizePageTitle(activeTab)}
+                                                </PageTitle>
+                                            </div>
+                                            <div className="flex items-center gap-2 flex-shrink-0">
+                                                <AnimatedThemeToggler className="w-8 h-8" />
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                            <AnimatedThemeToggler className="w-8 h-8" />
-                                        </div>
-                                    </div>
-                                </header>
+                                    </header>
 
-                                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                                    {activeTab === 'overview' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <OverviewView
-                                                records={records}
-                                            />
-                                        </Suspense>
-                                    )}
+                                    <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
+                                        {activeTab === 'overview' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <OverviewView
+                                                    records={records}
+                                                />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'charts' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <ChartsView records={records} />
-                                        </Suspense>
-                                    )}
+                                        {activeTab === 'charts' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <ChartsView records={records} />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'history' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <ExerciseRecordView
-                                                records={filteredRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
-                                                allRecords={filteredRecords}
-                                                selectedRecordIds={selectedRecordIds}
-                                                onSelectIds={setSelectedRecordIds}
-                                                onBatchDelete={handleBatchDelete}
-                                                historyPage={historyPage}
-                                                setHistoryPage={setHistoryPage}
-                                                totalPages={Math.ceil(filteredRecords.length / pageSize)}
-                                                totalRecords={filteredRecords.length}
-                                                moduleFilter={historyModuleFilter}
-                                                onModuleFilterChange={setHistoryModuleFilter}
-                                            />
-                                        </Suspense>
-                                    )}
+                                        {activeTab === 'history' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <ExerciseRecordView
+                                                    records={filteredRecords.slice((historyPage - 1) * pageSize, historyPage * pageSize)}
+                                                    allRecords={filteredRecords}
+                                                    selectedRecordIds={selectedRecordIds}
+                                                    onSelectIds={setSelectedRecordIds}
+                                                    onBatchDelete={handleBatchDelete}
+                                                    historyPage={historyPage}
+                                                    setHistoryPage={setHistoryPage}
+                                                    totalPages={Math.ceil(filteredRecords.length / pageSize)}
+                                                    totalRecords={filteredRecords.length}
+                                                    moduleFilter={historyModuleFilter}
+                                                    onModuleFilterChange={setHistoryModuleFilter}
+                                                />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'personal-best' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <PersonalBestView records={records} />
-                                        </Suspense>
-                                    )}
+                                        {activeTab === 'personal-best' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <PersonalBestView records={records} />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'knowledge-summary' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <KnowledgeSummaryView
-                                                knowledge={knowledge}
-                                                onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
-                                                onEditKnowledge={handleEditKnowledge}
-                                            />
-                                        </Suspense>
-                                    )}
+                                        {activeTab === 'knowledge-summary' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <KnowledgeSummaryView
+                                                    knowledge={knowledge}
+                                                    onBatchDeleteKnowledge={handleBatchDeleteKnowledge}
+                                                    onEditKnowledge={handleEditKnowledge}
+                                                />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'knowledge-entry' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <KnowledgeEntryView
-                                                onAddKnowledge={addKnowledge}
-                                            />
-                                        </Suspense>
-                                    )}
+                                        {activeTab === 'knowledge-entry' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <KnowledgeEntryView
+                                                    onAddKnowledge={addKnowledge}
+                                                />
+                                            </Suspense>
+                                        )}
 
-                                    {activeTab === 'form' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <NewRecordForm
-                                                onAddRecord={async (newRecord) => {
-                                                    setRecords(prev => [newRecord, ...prev]);
+                                        {activeTab === 'form' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <NewRecordForm
+                                                    onAddRecord={async (newRecord) => {
+                                                        setRecords(prev => [newRecord, ...prev]);
 
-                                                    // 自动保存到云端
-                                                    await AutoCloudSync.autoSaveRecord(newRecord, {
-                                                        notify,
-                                                        notifyLoading,
-                                                        updateToSuccess,
-                                                        updateToError
-                                                    });
-                                                }}
-                                            />
-                                        </Suspense>
-                                    )}
-
-                                    {activeTab === 'plan-list' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <PlanListView
-                                                plans={plansWithProgress}
-                                                onCreate={async (plan) => {
-                                                    const formattedPlan: StudyPlan = {
-                                                        ...plan,
-                                                        module: plan.module as StudyPlan['module']
-                                                    };
-                                                    setPlans(prev => [formattedPlan, ...prev]);
-
-                                                    // 自动保存到云端
-                                                    try {
-                                                        await AutoCloudSync.autoSavePlan(formattedPlan, {
+                                                        // 自动保存到云端
+                                                        await AutoCloudSync.autoSaveRecord(newRecord, {
                                                             notify,
                                                             notifyLoading,
                                                             updateToSuccess,
                                                             updateToError
                                                         });
-                                                    } catch (error) {
-                                                        console.error('MainApp - 创建计划失败:', error);
-                                                    }
-                                                }}
-                                                onUpdate={async (plan) => {
-                                                    const formattedPlan: StudyPlan = {
-                                                        ...plan,
-                                                        module: plan.module as StudyPlan['module']
-                                                    };
-                                                    setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
+                                                    }}
+                                                />
+                                            </Suspense>
+                                        )}
 
-                                                    // 自动更新到云端
-                                                    await AutoCloudSync.autoUpdatePlan(formattedPlan, {
-                                                        notify,
-                                                        notifyLoading,
-                                                        updateToSuccess,
-                                                        updateToError
-                                                    });
-                                                }}
-                                                onDelete={async (id) => {
-                                                    // 只进行本地删除，不显示toast
-                                                    setPlans(prev => prev.filter(p => p.id !== id));
+                                        {activeTab === 'plan-list' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <PlanListView
+                                                    plans={plansWithProgress}
+                                                    onCreate={async (plan) => {
+                                                        const formattedPlan: StudyPlan = {
+                                                            ...plan,
+                                                            module: plan.module as StudyPlan['module']
+                                                        };
+                                                        setPlans(prev => [formattedPlan, ...prev]);
 
-                                                    // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                    if (!isUUID) {
-                                                        // 旧格式ID，静默处理，不显示toast
-                                                        return;
-                                                    }
-
-                                                    // 自动从云端删除，但不显示toast
-                                                    try {
-                                                        await AutoCloudSync.autoDeletePlan(id, {
-                                                            notify: () => { }, // 禁用单个删除的toast
-                                                            notifyLoading: undefined,
-                                                            updateToSuccess: undefined,
-                                                            updateToError: undefined
-                                                        });
-                                                    } catch (error) {
-                                                        console.error('MainApp - 删除计划失败:', error);
-                                                    }
-                                                }}
-                                                onBatchDelete={async (ids) => {
-                                                    // 先更新本地数据
-                                                    setPlans(prev => prev.filter(p => !ids.includes(p.id)));
-
-                                                    // 显示批量删除的加载通知
-                                                    let toastId: string | undefined;
-                                                    if (notifyLoading) {
-                                                        toastId = notifyLoading('正在从云端删除计划', `正在从云端删除 ${ids.length} 个学习计划`);
-                                                    } else {
-                                                        notify({
-                                                            type: 'info',
-                                                            message: '正在从云端删除计划',
-                                                            description: `正在从云端删除 ${ids.length} 个学习计划`
-                                                        });
-                                                    }
-
-                                                    // 统计删除成功和失败的数量
-                                                    let successCount = 0;
-                                                    let errorCount = 0;
-
-                                                    // 批量从云端删除选中的计划
-                                                    for (const id of ids) {
-                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                        if (!isUUID) {
-                                                            // 旧格式ID，跳过云端删除
-                                                            successCount++;
-                                                            continue;
-                                                        }
-
+                                                        // 自动保存到云端
                                                         try {
-                                                            await AutoCloudSync.autoDeletePlan(id, {
-                                                                notify: () => { }, // 完全禁用单个计划的通知
-                                                                notifyLoading: undefined, // 不显示单个计划的加载通知
-                                                                updateToSuccess: undefined, // 不更新单个计划的成功状态
-                                                                updateToError: undefined // 不更新单个计划的错误状态
+                                                            await AutoCloudSync.autoSavePlan(formattedPlan, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
                                                             });
-                                                            successCount++;
                                                         } catch (error) {
-                                                            console.error('删除计划失败:', id, error);
-                                                            errorCount++;
+                                                            console.error('MainApp - 创建计划失败:', error);
                                                         }
-                                                    }
-
-                                                    // 更新批量删除的最终状态
-                                                    if (toastId && updateToSuccess && errorCount === 0) {
-                                                        updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个学习计划`);
-                                                    } else if (toastId && updateToError) {
-                                                        if (errorCount > 0) {
-                                                            updateToError(toastId, '删除完成', `成功删除 ${successCount} 个计划，${errorCount} 个计划删除失败`);
-                                                        } else if (updateToSuccess) {
-                                                            updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个学习计划`);
-                                                        }
-                                                    } else {
-                                                        if (errorCount > 0) {
-                                                            notify({
-                                                                type: 'warning',
-                                                                message: '删除完成',
-                                                                description: `成功删除 ${successCount} 个计划，${errorCount} 个计划删除失败`
-                                                            });
-                                                        } else {
-                                                            notify({
-                                                                type: 'success',
-                                                                message: '删除成功',
-                                                                description: `已成功删除 ${successCount} 个学习计划`
-                                                            });
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                        </Suspense>
-                                    )}
-
-                                    {activeTab === 'plan-detail' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            {plansWithProgress.length > 0 ? (
-                                                <PlanDetailView
-                                                    plan={plansWithProgress[0]}
-                                                    onBack={() => setActiveTab('plan-list')}
-                                                    onEdit={() => { }}
+                                                    }}
                                                     onUpdate={async (plan) => {
                                                         const formattedPlan: StudyPlan = {
                                                             ...plan,
@@ -1112,198 +990,323 @@ export function MainApp() {
                                                             updateToError
                                                         });
                                                     }}
+                                                    onDelete={async (id) => {
+                                                        // 只进行本地删除，不显示toast
+                                                        setPlans(prev => prev.filter(p => p.id !== id));
+
+                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                        if (!isUUID) {
+                                                            // 旧格式ID，静默处理，不显示toast
+                                                            return;
+                                                        }
+
+                                                        // 自动从云端删除，但不显示toast
+                                                        try {
+                                                            await AutoCloudSync.autoDeletePlan(id, {
+                                                                notify: () => { }, // 禁用单个删除的toast
+                                                                notifyLoading: undefined,
+                                                                updateToSuccess: undefined,
+                                                                updateToError: undefined
+                                                            });
+                                                        } catch (error) {
+                                                            console.error('MainApp - 删除计划失败:', error);
+                                                        }
+                                                    }}
+                                                    onBatchDelete={async (ids) => {
+                                                        // 先更新本地数据
+                                                        setPlans(prev => prev.filter(p => !ids.includes(p.id)));
+
+                                                        // 显示批量删除的加载通知
+                                                        let toastId: string | undefined;
+                                                        if (notifyLoading) {
+                                                            toastId = notifyLoading('正在从云端删除计划', `正在从云端删除 ${ids.length} 个学习计划`);
+                                                        } else {
+                                                            notify({
+                                                                type: 'info',
+                                                                message: '正在从云端删除计划',
+                                                                description: `正在从云端删除 ${ids.length} 个学习计划`
+                                                            });
+                                                        }
+
+                                                        // 统计删除成功和失败的数量
+                                                        let successCount = 0;
+                                                        let errorCount = 0;
+
+                                                        // 批量从云端删除选中的计划
+                                                        for (const id of ids) {
+                                                            // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                            if (!isUUID) {
+                                                                // 旧格式ID，跳过云端删除
+                                                                successCount++;
+                                                                continue;
+                                                            }
+
+                                                            try {
+                                                                await AutoCloudSync.autoDeletePlan(id, {
+                                                                    notify: () => { }, // 完全禁用单个计划的通知
+                                                                    notifyLoading: undefined, // 不显示单个计划的加载通知
+                                                                    updateToSuccess: undefined, // 不更新单个计划的成功状态
+                                                                    updateToError: undefined // 不更新单个计划的错误状态
+                                                                });
+                                                                successCount++;
+                                                            } catch (error) {
+                                                                console.error('删除计划失败:', id, error);
+                                                                errorCount++;
+                                                            }
+                                                        }
+
+                                                        // 更新批量删除的最终状态
+                                                        if (toastId && updateToSuccess && errorCount === 0) {
+                                                            updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个学习计划`);
+                                                        } else if (toastId && updateToError) {
+                                                            if (errorCount > 0) {
+                                                                updateToError(toastId, '删除完成', `成功删除 ${successCount} 个计划，${errorCount} 个计划删除失败`);
+                                                            } else if (updateToSuccess) {
+                                                                updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个学习计划`);
+                                                            }
+                                                        } else {
+                                                            if (errorCount > 0) {
+                                                                notify({
+                                                                    type: 'warning',
+                                                                    message: '删除完成',
+                                                                    description: `成功删除 ${successCount} 个计划，${errorCount} 个计划删除失败`
+                                                                });
+                                                            } else {
+                                                                notify({
+                                                                    type: 'success',
+                                                                    message: '删除成功',
+                                                                    description: `已成功删除 ${successCount} 个学习计划`
+                                                                });
+                                                            }
+                                                        }
+                                                    }}
                                                 />
-                                            ) : (
-                                                <div className="flex items-center justify-center h-64">
-                                                    <div className="text-center">
-                                                        <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
-                                                    </div>
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'plan-detail' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
                                                 </div>
-                                            )}
-                                        </Suspense>
-                                    )}
+                                            }>
+                                                {plansWithProgress.length > 0 ? (
+                                                    <PlanDetailView
+                                                        plan={plansWithProgress[0]}
+                                                        onBack={() => setActiveTab('plan-list')}
+                                                        onEdit={() => { }}
+                                                        onUpdate={async (plan) => {
+                                                            const formattedPlan: StudyPlan = {
+                                                                ...plan,
+                                                                module: plan.module as StudyPlan['module']
+                                                            };
+                                                            setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
-                                    {activeTab === 'countdown' && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <CountdownView
-                                                countdowns={countdowns}
-                                                onCreate={async (countdown) => {
-                                                    const formattedCountdown: ExamCountdown = {
-                                                        ...countdown
-                                                    };
-                                                    setCountdowns(prev => [formattedCountdown, ...prev]);
+                                                            // 自动更新到云端
+                                                            await AutoCloudSync.autoUpdatePlan(formattedPlan, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <div className="flex items-center justify-center h-64">
+                                                        <div className="text-center">
+                                                            <p className="text-gray-500"><MixedText text="未找到学习计划" /></p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </Suspense>
+                                        )}
 
-                                                    // 检查 ID 格式，只有 UUID 格式的才保存到云端
-                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(countdown.id);
+                                        {activeTab === 'countdown' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <CountdownView
+                                                    countdowns={countdowns}
+                                                    onCreate={async (countdown) => {
+                                                        const formattedCountdown: ExamCountdown = {
+                                                            ...countdown
+                                                        };
+                                                        setCountdowns(prev => [formattedCountdown, ...prev]);
 
-                                                    if (!isUUID) {
-                                                        notify({
-                                                            type: 'warning',
-                                                            message: '本地保存成功',
-                                                            description: '倒计时已保存到本地，但云端同步跳过（旧格式ID）'
-                                                        });
-                                                        return;
-                                                    }
+                                                        // 检查 ID 格式，只有 UUID 格式的才保存到云端
+                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(countdown.id);
 
-                                                    // 自动保存到云端
-                                                    try {
-                                                        await AutoCloudSync.autoSaveCountdown(formattedCountdown, {
+                                                        if (!isUUID) {
+                                                            notify({
+                                                                type: 'warning',
+                                                                message: '本地保存成功',
+                                                                description: '倒计时已保存到本地，但云端同步跳过（旧格式ID）'
+                                                            });
+                                                            return;
+                                                        }
+
+                                                        // 自动保存到云端
+                                                        try {
+                                                            await AutoCloudSync.autoSaveCountdown(formattedCountdown, {
+                                                                notify,
+                                                                notifyLoading,
+                                                                updateToSuccess,
+                                                                updateToError
+                                                            });
+                                                        } catch (error) {
+                                                            console.error('MainApp - 创建倒计时失败:', error);
+                                                        }
+                                                    }}
+                                                    onUpdate={async (countdown) => {
+                                                        const formattedCountdown: ExamCountdown = {
+                                                            ...countdown
+                                                        };
+                                                        setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
+
+                                                        // 自动更新到云端
+                                                        await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
                                                             notify,
                                                             notifyLoading,
                                                             updateToSuccess,
                                                             updateToError
                                                         });
-                                                    } catch (error) {
-                                                        console.error('MainApp - 创建倒计时失败:', error);
-                                                    }
-                                                }}
-                                                onUpdate={async (countdown) => {
-                                                    const formattedCountdown: ExamCountdown = {
-                                                        ...countdown
-                                                    };
-                                                    setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
+                                                    }}
+                                                    onDelete={async (id) => {
+                                                        // 只进行本地删除，不显示toast
+                                                        setCountdowns(prev => prev.filter(c => c.id !== id));
 
-                                                    // 自动更新到云端
-                                                    await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
-                                                        notify,
-                                                        notifyLoading,
-                                                        updateToSuccess,
-                                                        updateToError
-                                                    });
-                                                }}
-                                                onDelete={async (id) => {
-                                                    // 只进行本地删除，不显示toast
-                                                    setCountdowns(prev => prev.filter(c => c.id !== id));
-
-                                                    // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                    if (!isUUID) {
-                                                        // 旧格式ID，静默处理，不显示toast
-                                                        return;
-                                                    }
-
-                                                    // 自动从云端删除，但不显示toast
-                                                    try {
-                                                        await AutoCloudSync.autoDeleteCountdown(id, {
-                                                            notify: () => { }, // 禁用单个删除的toast
-                                                            notifyLoading: undefined,
-                                                            updateToSuccess: undefined,
-                                                            updateToError: undefined
-                                                        });
-                                                    } catch (error) {
-                                                        console.error('MainApp - 删除倒计时失败:', error);
-                                                    }
-                                                }}
-                                                onBatchDelete={async (ids) => {
-                                                    // 先更新本地数据
-                                                    setCountdowns(prev => prev.filter(c => !ids.includes(c.id)));
-
-                                                    // 显示批量删除的加载通知
-                                                    let toastId: string | undefined;
-                                                    if (notifyLoading) {
-                                                        toastId = notifyLoading('正在从云端删除倒计时', `正在从云端删除 ${ids.length} 个考试倒计时`);
-                                                    } else {
-                                                        notify({
-                                                            type: 'info',
-                                                            message: '正在从云端删除倒计时',
-                                                            description: `正在从云端删除 ${ids.length} 个考试倒计时`
-                                                        });
-                                                    }
-
-                                                    // 统计删除成功和失败的数量
-                                                    let successCount = 0;
-                                                    let errorCount = 0;
-
-                                                    // 批量从云端删除选中的倒计时
-                                                    for (const id of ids) {
                                                         // 检查 ID 格式，只有 UUID 格式的才从云端删除
                                                         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
 
                                                         if (!isUUID) {
-                                                            // 旧格式ID，跳过云端删除
-                                                            successCount++;
-                                                            continue;
+                                                            // 旧格式ID，静默处理，不显示toast
+                                                            return;
                                                         }
 
+                                                        // 自动从云端删除，但不显示toast
                                                         try {
                                                             await AutoCloudSync.autoDeleteCountdown(id, {
-                                                                notify: () => { }, // 完全禁用单个倒计时的通知
-                                                                notifyLoading: undefined, // 不显示单个倒计时的加载通知
-                                                                updateToSuccess: undefined, // 不更新单个倒计时的成功状态
-                                                                updateToError: undefined // 不更新单个倒计时的错误状态
+                                                                notify: () => { }, // 禁用单个删除的toast
+                                                                notifyLoading: undefined,
+                                                                updateToSuccess: undefined,
+                                                                updateToError: undefined
                                                             });
-                                                            successCount++;
                                                         } catch (error) {
-                                                            console.error('删除倒计时失败:', id, error);
-                                                            errorCount++;
+                                                            console.error('MainApp - 删除倒计时失败:', error);
                                                         }
-                                                    }
+                                                    }}
+                                                    onBatchDelete={async (ids) => {
+                                                        // 先更新本地数据
+                                                        setCountdowns(prev => prev.filter(c => !ids.includes(c.id)));
 
-                                                    // 更新批量删除的最终状态
-                                                    if (toastId && updateToSuccess && errorCount === 0) {
-                                                        updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个考试倒计时`);
-                                                    } else if (toastId && updateToError) {
-                                                        if (errorCount > 0) {
-                                                            updateToError(toastId, '删除完成', `成功删除 ${successCount} 个倒计时，${errorCount} 个倒计时删除失败`);
-                                                        } else if (updateToSuccess) {
-                                                            updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个考试倒计时`);
-                                                        }
-                                                    } else {
-                                                        if (errorCount > 0) {
-                                                            notify({
-                                                                type: 'warning',
-                                                                message: '删除完成',
-                                                                description: `成功删除 ${successCount} 个倒计时，${errorCount} 个倒计时删除失败`
-                                                            });
+                                                        // 显示批量删除的加载通知
+                                                        let toastId: string | undefined;
+                                                        if (notifyLoading) {
+                                                            toastId = notifyLoading('正在从云端删除倒计时', `正在从云端删除 ${ids.length} 个考试倒计时`);
                                                         } else {
                                                             notify({
-                                                                type: 'success',
-                                                                message: '删除成功',
-                                                                description: `已成功删除 ${successCount} 个考试倒计时`
+                                                                type: 'info',
+                                                                message: '正在从云端删除倒计时',
+                                                                description: `正在从云端删除 ${ids.length} 个考试倒计时`
                                                             });
                                                         }
-                                                    }
-                                                }}
-                                                onCountdownComplete={(countdown) => {
-                                                    setCompletedCountdown(countdown);
-                                                    setCountdownCelebrationOpen(true);
-                                                }}
-                                            />
-                                        </Suspense>
-                                    )}
 
-                                    {(activeTab === 'settings') && (
-                                        <Suspense fallback={
-                                            <div className="flex items-center justify-center min-h-[60vh]">
-                                                <SimpleUiverseSpinner />
-                                            </div>
-                                        }>
-                                            <SettingsView
-                                                onExport={handleExportData}
-                                                onImport={handleImportData}
-                                                onClearLocalData={handleClearLocalData}
-                                                setRecords={setRecords}
-                                                setPlans={setPlans}
-                                                setKnowledge={setKnowledge}
-                                                activeTab={activeTab}
-                                                navMode={navMode}
-                                                records={records}
-                                                plans={plans}
-                                                knowledge={knowledge}
-                                                settings={{
-                                                    'exam-tracker-nav-mode': navMode,
-                                                    // 可以添加更多设置项
-                                                }}
-                                            />
-                                        </Suspense>
-                                    )}
-                                </div>
-                            </SidebarInset>
+                                                        // 统计删除成功和失败的数量
+                                                        let successCount = 0;
+                                                        let errorCount = 0;
+
+                                                        // 批量从云端删除选中的倒计时
+                                                        for (const id of ids) {
+                                                            // 检查 ID 格式，只有 UUID 格式的才从云端删除
+                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+                                                            if (!isUUID) {
+                                                                // 旧格式ID，跳过云端删除
+                                                                successCount++;
+                                                                continue;
+                                                            }
+
+                                                            try {
+                                                                await AutoCloudSync.autoDeleteCountdown(id, {
+                                                                    notify: () => { }, // 完全禁用单个倒计时的通知
+                                                                    notifyLoading: undefined, // 不显示单个倒计时的加载通知
+                                                                    updateToSuccess: undefined, // 不更新单个倒计时的成功状态
+                                                                    updateToError: undefined // 不更新单个倒计时的错误状态
+                                                                });
+                                                                successCount++;
+                                                            } catch (error) {
+                                                                console.error('删除倒计时失败:', id, error);
+                                                                errorCount++;
+                                                            }
+                                                        }
+
+                                                        // 更新批量删除的最终状态
+                                                        if (toastId && updateToSuccess && errorCount === 0) {
+                                                            updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个考试倒计时`);
+                                                        } else if (toastId && updateToError) {
+                                                            if (errorCount > 0) {
+                                                                updateToError(toastId, '删除完成', `成功删除 ${successCount} 个倒计时，${errorCount} 个倒计时删除失败`);
+                                                            } else if (updateToSuccess) {
+                                                                updateToSuccess(toastId, '删除成功', `已成功删除 ${successCount} 个考试倒计时`);
+                                                            }
+                                                        } else {
+                                                            if (errorCount > 0) {
+                                                                notify({
+                                                                    type: 'warning',
+                                                                    message: '删除完成',
+                                                                    description: `成功删除 ${successCount} 个倒计时，${errorCount} 个倒计时删除失败`
+                                                                });
+                                                            } else {
+                                                                notify({
+                                                                    type: 'success',
+                                                                    message: '删除成功',
+                                                                    description: `已成功删除 ${successCount} 个考试倒计时`
+                                                                });
+                                                            }
+                                                        }
+                                                    }}
+                                                    onCountdownComplete={(countdown) => {
+                                                        setCompletedCountdown(countdown);
+                                                        setCountdownCelebrationOpen(true);
+                                                    }}
+                                                />
+                                            </Suspense>
+                                        )}
+
+                                        {(activeTab === 'settings') && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <SettingsView
+                                                    onExport={handleExportData}
+                                                    onImport={handleImportData}
+                                                    onClearLocalData={handleClearLocalData}
+                                                    setRecords={setRecords}
+                                                    setPlans={setPlans}
+                                                    setKnowledge={setKnowledge}
+                                                    activeTab={activeTab}
+                                                    navMode={navMode}
+                                                    records={records}
+                                                    plans={plans}
+                                                    knowledge={knowledge}
+                                                    settings={{
+                                                        'exam-tracker-nav-mode': navMode,
+                                                        // 可以添加更多设置项
+                                                    }}
+                                                />
+                                            </Suspense>
+                                        )}
+                                    </div>
+                                </SidebarInset>
+                            </CloudDataProvider>
                         </SidebarProvider>
                     </LoadingWrapper>
 
