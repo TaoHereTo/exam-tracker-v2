@@ -403,8 +403,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                     variant="outline"
                                                                     size="icon"
                                                                     className="h-8 w-8 rounded-full"
+                                                                    style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                                 >
-                                                                    <Edit className="w-4 h-4" />
+                                                                    <Edit className="w-4 h-4 text-white" />
                                                                 </Button>
                                                             </TooltipTrigger>
                                                             <TooltipContent>
@@ -576,8 +577,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                             size="icon"
                                                             className="h-8 w-8 rounded-full"
                                                             disabled={selectedPlans.size === 0}
+                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                         >
-                                                            <Edit className="w-4 h-4" />
+                                                            <Edit className="w-4 h-4 text-white" />
                                                         </Button>
                                                     </TooltipTrigger>
                                                     <TooltipContent>

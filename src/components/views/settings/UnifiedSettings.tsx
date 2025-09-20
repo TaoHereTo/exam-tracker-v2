@@ -478,7 +478,8 @@ export function UnifiedSettings({
       <div className="px-2 sm:px-4 -mx-4" style={{
         maxWidth: '1000px',
         width: '100%',
-        margin: '0 auto'
+        margin: '0 auto',
+        caretColor: 'transparent'
       }}>
         {/* Appearance Settings */}
         <div className="space-y-6">

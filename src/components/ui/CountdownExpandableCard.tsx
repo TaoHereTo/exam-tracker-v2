@@ -123,8 +123,9 @@ export default function CountdownExpandableCard({
                                                                 onEdit?.(active);
                                                                 setActive(null);
                                                             }}
+                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                         >
-                                                            <Edit className="w-4 h-4" />
+                                                            <Edit className="w-4 h-4 text-white" />
                                                         </Button>
                                                     </motion.div>
                                                 </TooltipTrigger>
@@ -222,8 +223,9 @@ export default function CountdownExpandableCard({
                                                             e.stopPropagation();
                                                             onEdit?.(countdown);
                                                         }}
+                                                        style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                     >
-                                                        <Edit className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                                        <Edit className="w-4 h-4 text-white" />
                                                     </motion.button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>

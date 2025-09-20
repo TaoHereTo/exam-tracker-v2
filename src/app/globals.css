@@ -1367,6 +1367,113 @@ textarea,
   -ms-user-select: text !important;
 }
 
+/* ========== 光标控制 ========== */
+/* 禁用表格和加载组件中的巨大光标 */
+table,
+table td,
+table th,
+.loading-container,
+.loading-spinner,
+[data-loading],
+.spinner,
+.animate-spin,
+/* 禁用所有非输入元素的光标 */
+div:not([contenteditable="true"]):not(input):not(textarea):not(select),
+span:not([contenteditable="true"]):not(input):not(textarea):not(select),
+p:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h1:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h2:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h3:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h4:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h5:not([contenteditable="true"]):not(input):not(textarea):not(select),
+h6:not([contenteditable="true"]):not(input):not(textarea):not(select) {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 确保输入框和文本区域保持正常光标 */
+input,
+textarea,
+select,
+[contenteditable="true"] {
+  caret-color: auto !important;
+  -webkit-caret-color: auto !important;
+}
+
+/* 禁用表格单元格的焦点状态 */
+table td:focus,
+table th:focus {
+  outline: none !important;
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 禁用加载组件中的光标 */
+.loading-container *,
+.loading-spinner *,
+[data-loading] *,
+.spinner *,
+.animate-spin * {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 禁用卡片和容器中的光标 */
+.card,
+[data-slot="card"],
+.card-content,
+.card-body,
+.card-header,
+.card-footer,
+[data-slot="card-content"],
+[data-slot="card-body"],
+[data-slot="card-header"],
+[data-slot="card-footer"],
+/* 页面容器 */
+main,
+section,
+article,
+aside,
+nav,
+header,
+footer,
+/* 布局容器 */
+.container,
+.wrapper,
+.content,
+.page,
+.view,
+/* 禁用所有可能的容器元素 */
+section:not([contenteditable="true"]),
+article:not([contenteditable="true"]),
+aside:not([contenteditable="true"]),
+nav:not([contenteditable="true"]),
+header:not([contenteditable="true"]),
+footer:not([contenteditable="true"]),
+main:not([contenteditable="true"]) {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 禁用所有可能的容器元素的子元素 */
+.card *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+[data-slot="card"] *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+.card-content *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+.card-body *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+main *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+section *:not(input):not(textarea):not(select):not([contenteditable="true"]),
+article *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 禁用焦点状态的光标 */
+*:focus:not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+  outline: none !important;
+}
+
 /* ========== 侧边栏样式 ========== */
 /* 修正sonner提示框深色模式下主内容颜色 */
 .dark .toaster .toast-title,

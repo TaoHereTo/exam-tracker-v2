@@ -183,14 +183,14 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     }
 
     return (
-        <div className="flex items-start justify-center min-h-screen p-4 pt-6 sm:pt-10">
-            <Card className="w-full max-w-md flex flex-col">
-                <CardHeader className="pb-3">
+        <div className="flex items-start justify-center min-h-screen p-4 pt-6 sm:pt-10" style={{ caretColor: 'transparent' }}>
+            <Card className="w-full max-w-md flex flex-col" style={{ caretColor: 'transparent' }}>
+                <CardHeader className="pb-3" style={{ caretColor: 'transparent' }}>
                     <CardTitle className="text-2xl">
                         <MixedText text="新增做题记录" />
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-0 pb-3">
+                <CardContent className="pt-0 pb-3" style={{ caretColor: 'transparent' }}>
                     <BaseForm
                         className="form-stack"
                         validationSchema={{
