@@ -265,7 +265,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
-                        {renderActions && <th className="border-b px-4 py-3 bg-muted/50 text-left"><MixedText text="操作" /></th>}
+                        {renderActions && <th className="border-b px-4 py-3 bg-muted/50 text-left w-20"><MixedText text="操作" /></th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -338,7 +338,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                                 </td>
                                             ))}
                                             {renderActions && (
-                                                <td className="border-b px-4 py-3 text-center">{renderActions(row)}</td>
+                                                <td className="border-b px-4 py-3 text-center w-20">{renderActions(row)}</td>
                                             )}
                                         </tr>
                                     </ContextMenuTrigger>
@@ -388,7 +388,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </td>
                                     ))}
                                     {renderActions && (
-                                        <td className="border-b px-4 py-3 text-center">{renderActions(row)}</td>
+                                        <td className="border-b px-4 py-3 text-center w-20">{renderActions(row)}</td>
                                     )}
                                 </tr>
                             );
