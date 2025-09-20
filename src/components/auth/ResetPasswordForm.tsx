@@ -211,9 +211,9 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full" style={{ caretColor: 'transparent' }}>
             <div className="text-left mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 unselectable">
                     <MixedText text="重置密码" />
                 </h2>
             </div>
@@ -317,7 +317,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
                                 variant="outline"
                                 onClick={resendCode}
                                 disabled={loading || resendCooldown > 0}
-                                className="text-sm"
+                                className="text-sm unselectable"
                             >
                                 {resendCooldown > 0 ? (
                                     <MixedText text={`重新发送 (${resendCooldown}s)`} />
@@ -404,7 +404,7 @@ export function ResetPasswordForm({ onSwitchToLogin }: ResetPasswordFormProps) {
                 <Button
                     type="button"
                     variant="outline"
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 unselectable"
                     onClick={onSwitchToLogin}
                 >
                     <ArrowLeft className="h-4 w-4" />

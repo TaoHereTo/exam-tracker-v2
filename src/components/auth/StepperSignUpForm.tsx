@@ -382,9 +382,9 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full" style={{ caretColor: 'transparent' }}>
             <div className="text-left mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 unselectable">
                     创建账户
                 </h2>
             </div>
@@ -544,7 +544,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                             type="button"
                                             onClick={sendVerificationCode}
                                             disabled={isLoading}
-                                            className="mb-4"
+                                            className="mb-4 unselectable"
                                         >
                                             {isLoading ? <><UiverseSpinner size="sm" className="mr-2 h-4 w-4" /> 发送中...</> : '发送验证码'}
                                         </Button>
@@ -581,7 +581,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                                     variant="outline"
                                     onClick={sendVerificationCode}
                                     disabled={isLoading || resendCooldown > 0 || !otpUIVisible}
-                                    className="text-sm"
+                                    className="text-sm unselectable"
                                 >
                                     {resendCooldown > 0 ? `${resendCooldown}s` : '重新发送'}
                                 </Button>
@@ -641,7 +641,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
                 </span>
                 <button
                     onClick={onSwitchToLogin}
-                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 hover:text-blue-800 dark:hover:text-blue-300"
+                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 hover:text-blue-800 dark:hover:text-blue-300 unselectable"
                 >
                     <MixedText text="返回登录" />
                 </button>

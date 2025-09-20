@@ -211,10 +211,16 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         switch (n.type) {
             case "success":
-                toast.success(<ToastContent notification={n} showIcon={false} />, toastOptions);
+                toast.success(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions,
+                    icon: null
+                });
                 break;
             case "error":
-                toast.error(<ToastContent notification={n} showIcon={false} />, toastOptions);
+                toast.error(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions,
+                    icon: null
+                });
                 break;
             case "warning":
                 toast(<ToastContent notification={n} />, {

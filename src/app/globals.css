@@ -2,10 +2,6 @@
 @import "tw-animate-css";
 @import "../styles/button-variants.css";
 
-
-
-
-
 @custom-variant dark (&:is(.dark *));
 
 /* ========== 字体渲染优化 for 2K/高DPI 显示器 ========== */
@@ -368,6 +364,16 @@ h6 .mixed-text-part {
 
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 
+  --color-color-5: var(--color-5);
+
+  --color-color-4: var(--color-4);
+
+  --color-color-3: var(--color-3);
+
+  --color-color-2: var(--color-2);
+
+  --color-color-1: var(--color-1);
+
   @keyframes marquee {
     from {
       transform: translateX(0);
@@ -385,6 +391,16 @@ h6 .mixed-text-part {
 
     to {
       transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes rainbow {
+    0% {
+      background-position: 0%;
+    }
+
+    100% {
+      background-position: 200%;
     }
   }
 }
@@ -465,7 +481,6 @@ h6 .mixed-text-part {
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
-
 
   /* 高DPI字体渲染变量 */
   --font-smoothing: antialiased;
@@ -936,9 +951,6 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
     background-position: 100% 50%;
   }
 }
-
-
-
 
 /* ========== 主题切换按钮样式 ========== */
 .switch {
@@ -1474,6 +1486,49 @@ article *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
   outline: none !important;
 }
 
+/* 输入框高亮效果 */
+.shadow-input {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+.dark .shadow-input {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 输入框悬停和焦点效果 */
+input:hover {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.dark input:hover {
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+input:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.dark input:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Rainbow button animation */
+@keyframes rainbow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /* ========== 侧边栏样式 ========== */
 /* 修正sonner提示框深色模式下主内容颜色 */
 .dark .toaster .toast-title,
@@ -1880,7 +1935,6 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   display: block !important;
 }
 
-
 /* 去除点击/聚焦时的外边框与阴影 */
 [data-slot="sidebar-menu-button"]:focus,
 [data-slot="sidebar-menu-button"]:focus-visible,
@@ -1984,7 +2038,6 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
 /* 侧边栏按钮样式 */
 /* 移除旧版自定义侧边栏样式（.sidebar-parent/.sidebar-child），统一使用 shadcn/ui Sidebar */
 
-
 /* ========== 护眼模式 ========== */
 body.eye-care {
   background: #f7f3e8 !important;
@@ -2047,10 +2100,8 @@ body.eye-care.dark .text-muted-foreground,
 
 /* ========== 响应式设计优化 ========== */
 
-
 /* Dark mode border color for dropdown menus */
 /* DropdownMenu component now handles all styling, removing global overrides */
-
 
 /* destructive 按钮样式 */
 /* Button component now handles all styling, removing global overrides */
@@ -2086,7 +2137,6 @@ body.eye-care.dark .text-muted-foreground,
 
 /* Switch 组件保持原有过渡效果 */
 /* Switch component now handles all styling, removing global overrides */
-
 
 /* 固定页面标题样式 */
 .page-title-sticky {

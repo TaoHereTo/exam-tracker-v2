@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { Button } from '../ui/button'
+import { RainbowButton } from '../ui/rainbow-button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
@@ -14,6 +15,7 @@ import { useNotification } from '../magicui/NotificationProvider'
 import { useLoading } from '../../hooks/useLoading'
 import { useToast } from '../../hooks/useToast'
 import toast from 'react-hot-toast'
+import { cn } from '@/lib/utils'
 
 interface LoginFormProps {
     onSwitchToSignUp?: () => void
@@ -92,62 +94,58 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
     }
 
     return (
-        <div className="w-full">
-            <div className="text-left mb-6">
-                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-1">
-                    <MixedText text="欢迎回来" />
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-                    <MixedText text="请登录或注册" />
-                </p>
-            </div>
+        <div className="w-full" style={{ caretColor: 'transparent' }}>
+            <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-200 unselectable">
+                <MixedText text="欢迎回来" />
+            </h2>
+            <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300 unselectable">
+                <MixedText text="请登录您的账号开始记录" />
+            </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2">
-                    <Label htmlFor="email" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
+            <form className="my-6" onSubmit={handleSubmit} style={{ caretColor: 'transparent' }}>
+                <LabelInputContainer className="mb-4">
+                    <Label htmlFor="email" className="unselectable">
                         <MixedText text="邮箱地址" />
                     </Label>
-                    <div className="relative w-full">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                    <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 z-10" />
                         <Input
                             id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="请输入邮箱"
-                            className="w-full pl-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                        // Removed required attribute to prevent browser validation
+                            className="pl-10"
                         />
                     </div>
-                </div>
+                </LabelInputContainer>
 
-                <div className="space-y-2">
-                    <Label htmlFor="password" className="text-left text-gray-700 dark:text-gray-300 block text-sm sm:text-base">
+                <LabelInputContainer className="mb-4">
+                    <Label htmlFor="password" className="unselectable">
                         <MixedText text="密码" />
                     </Label>
-                    <div className="relative w-full">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 sm:h-5 sm:w-5 z-10" />
+                    <div className="relative">
+                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4 z-10" />
                         <Input
                             id="password"
                             type={showPassword ? 'text' : 'password'}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             placeholder="请输入密码"
-                            className="w-full pl-10 pr-10 border-input-border focus:border-ring focus:ring-ring/50 text-sm sm:text-base h-9 sm:h-10"
-                        // Removed required attribute to prevent browser validation
+                            className="pl-10 pr-10"
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
                         >
-                            {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" />}
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
                     </div>
-                </div>
+                </LabelInputContainer>
 
-                {/* 记住我和忘记密码行 - 响应式设计 */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                {/* 记住我和忘记密码行 */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
                     <div className="flex items-center space-x-2">
                         <Checkbox
                             id="rememberMe"
@@ -155,45 +153,60 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                             checked={rememberMe}
                             onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                         />
-                        <Label htmlFor="rememberMe" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <Label htmlFor="rememberMe" className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 unselectable">
                             <MixedText text="记住我" />
                         </Label>
                     </div>
-                    <button
+                    <Button
                         type="button"
+                        variant="ghost"
+                        size="sm"
                         onClick={onSwitchToForgotPassword}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0 h-auto rounded-full unselectable"
                     >
                         <MixedText text="忘记密码？" />
-                    </button>
+                    </Button>
                 </div>
 
                 {/* 登录按钮 */}
-                <div className="w-full flex justify-center">
-                    <Button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full h-9 sm:h-10 text-sm"
-                        variant="default"
-                    >
-                        <MixedText text={loading ? '登录中...' : '登录'} />
-                    </Button>
-                </div>
-            </form>
-
-            {/* 注册链接 - 响应式设计 */}
-            <div className="text-center mt-6">
-                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    <MixedText text="还没有账号？" />
-                </span>
-                <button
-                    type="button"
-                    onClick={onSwitchToSignUp}
-                    className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 underline ml-1 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                <RainbowButton
+                    type="submit"
+                    disabled={loading}
+                    size="lg"
+                    className="w-full rounded-full unselectable text-base font-semibold"
                 >
-                    <MixedText text="注册账号" />
-                </button>
-            </div>
+                    <MixedText text={loading ? '登录中...' : '登录'} />
+                </RainbowButton>
+
+                <div className="my-4 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+
+                {/* 注册按钮 */}
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={onSwitchToSignUp}
+                    className="group/btn shadow-input relative flex h-10 w-full items-center justify-center space-x-2 rounded-full bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] unselectable"
+                >
+                    <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                        <MixedText text="注册账号" />
+                    </span>
+                </Button>
+            </form>
         </div>
     )
 }
+
+
+const LabelInputContainer = ({
+    children,
+    className,
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) => {
+    return (
+        <div className={cn("flex w-full flex-col space-y-2", className)}>
+            {children}
+        </div>
+    );
+};
