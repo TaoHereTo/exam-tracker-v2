@@ -17,14 +17,14 @@ export function useThemeMode() {
         if (!mounted) {
             // 服务端渲染时返回默认样式
             return {
-                background: '#F8F7F6'
+                background: '#F5F4F7'
             };
         }
 
         return {
             background: isDarkMode
                 ? '#161618'
-                : '#F8F7F6'
+                : '#F5F4F7'
         };
     };
 

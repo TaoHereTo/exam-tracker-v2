@@ -79,7 +79,7 @@ export function TabsList({ className, children }: TabsListProps) {
         <div
             ref={containerRef}
             className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg', className)}
-            style={{ zIndex: 9999 }}
+            style={{ zIndex: 10 }}
         >
             {/* 高亮背景 */}
             <motion.div

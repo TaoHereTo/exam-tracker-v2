@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocalStorageBoolean } from "@/hooks/useLocalStorage";
 import { normalizeModuleName } from "@/config/exam";
 import { timeStringToMinutes, minutesToTimeString } from "@/lib/utils";
@@ -28,6 +28,19 @@ interface OverviewViewProps {
 }
 
 export const OverviewView = function OverviewView({ records }: OverviewViewProps) {
+    // 动态计算屏幕高度
+    const [screenHeight, setScreenHeight] = useState(0);
+
+    useEffect(() => {
+        const updateHeight = () => {
+            setScreenHeight(window.innerHeight);
+        };
+
+        updateHeight();
+        window.addEventListener('resize', updateHeight);
+
+        return () => window.removeEventListener('resize', updateHeight);
+    }, []);
 
     // 使用useMemo优化模块数据计算，避免tabs切换时重新计算
     const moduleData = useMemo(() => {
@@ -585,18 +598,22 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
             <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
 
-            {/* 学习分析区域 */}
-            <div className="w-full mt-12 mb-12">
+            {/* 添加间距，让tabs显示在屏幕底部 */}
+            <div style={{ height: `${screenHeight * 0.2}px` }}></div>
 
+            {/* 学习分析区域 - 放在屏幕底部 */}
+            <div className="w-full mt-12 mb-12">
                 {/* 使用Animate Tabs展示分析卡片 */}
                 <UnifiedTabs defaultValue="data-analysis" className="w-full">
-                    <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-6 mx-auto">
-                        {moduleData.map((module) => (
-                            <UnifiedTabsTrigger key={module.module} value={module.module} className="text-sm px-4 py-1 h-full">
-                                {module.name}
-                            </UnifiedTabsTrigger>
-                        ))}
-                    </UnifiedTabsList>
+                    <div className="flex justify-center mb-8">
+                        <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-6">
+                            {moduleData.map((module) => (
+                                <UnifiedTabsTrigger key={module.module} value={module.module} className="text-sm px-4 py-1 h-full">
+                                    {module.name}
+                                </UnifiedTabsTrigger>
+                            ))}
+                        </UnifiedTabsList>
+                    </div>
                     <UnifiedTabsContents className="py-6 px-2">
                         {moduleData.map((module) => (
                             <UnifiedTabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">

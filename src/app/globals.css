@@ -405,7 +405,7 @@ h6 .mixed-text-part {
   --form-card-padding-y: 1.25rem;
 
   /* 主题颜色 */
-  --background: #FFFFFF;
+  --background: #F5F4F7;
   --foreground: oklch(0.145 0 0);
   --card: transparent;
   --card-foreground: oklch(0.145 0 0);

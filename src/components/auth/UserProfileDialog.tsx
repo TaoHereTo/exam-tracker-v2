@@ -100,7 +100,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-2xl w-[600px] sm:w-[700px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-xl w-[500px] sm:w-[550px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <User className="h-5 w-5" />
@@ -148,7 +148,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
 
                     {/* 操作按钮 */}
                     <div className="flex justify-end gap-2 pt-4">
-                        <Button variant="outline" onClick={onClose} className="h-10">
+                        <Button variant="outline" onClick={onClose} className="h-10 rounded-full">
                             <MixedText text="取消" />
                         </Button>
                         <Button
@@ -156,7 +156,7 @@ export function UserProfileDialog({ isOpen, onClose, onProfileUpdate }: UserProf
                             variant="default"
                             disabled={loading}
                             onClick={handleSaveProfile}
-                            className="flex items-center justify-center h-10 rounded-md"
+                            className="flex items-center justify-center h-10 rounded-full"
                         >
                             {loading ? (
                                 <div className="flex items-center justify-center w-full">

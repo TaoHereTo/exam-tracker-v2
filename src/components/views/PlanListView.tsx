@@ -365,14 +365,16 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
 
             {/* 使用统一的 Tabs 组件 */}
             <UnifiedTabs defaultValue="active" className="w-full">
-                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 mx-auto">
-                    <UnifiedTabsTrigger value="active">
-                        <MixedText text="进行中" />
-                    </UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="completed">
-                        <MixedText text="已完成" />
-                    </UnifiedTabsTrigger>
-                </UnifiedTabsList>
+                <div className="flex justify-center mb-8">
+                    <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2">
+                        <UnifiedTabsTrigger value="active">
+                            <MixedText text="进行中" />
+                        </UnifiedTabsTrigger>
+                        <UnifiedTabsTrigger value="completed">
+                            <MixedText text="已完成" />
+                        </UnifiedTabsTrigger>
+                    </UnifiedTabsList>
+                </div>
 
                 <UnifiedTabsContents className="py-6 px-2">
                     <UnifiedTabsContent value="active" className="outline-none">
