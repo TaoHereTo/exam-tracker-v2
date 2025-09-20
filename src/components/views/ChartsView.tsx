@@ -342,7 +342,7 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
                 <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
             </UnifiedTabsList>
 
-            <UnifiedTabsContents className="py-6">
+            <UnifiedTabsContents className="py-8">
                 <UnifiedTabsContent value="perMinute" className="outline-none">
                     <div className="w-full h-[450px] sm:h-[500px] relative">
                         <TrendChart data={perMinuteData} yMax={2} />
@@ -362,7 +362,7 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
                 </UnifiedTabsContent>
 
                 <UnifiedTabsContent value="radar" className="outline-none">
-                    <div className="w-full h-[350px] sm:h-[400px] relative">
+                    <div className="w-full h-[350px] sm:h-[400px] relative mt-4">
                         <ModuleRadarChart data={records} />
                     </div>
                 </UnifiedTabsContent>

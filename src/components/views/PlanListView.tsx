@@ -366,12 +366,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
             {/* 使用统一的 Tabs 组件 */}
             <UnifiedTabs defaultValue="active" className="w-full">
                 <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 mx-auto">
-                    <UnifiedTabsTrigger value="active" className="flex items-center gap-2">
-                        <Clock className="w-5 h-5" />
+                    <UnifiedTabsTrigger value="active">
                         <MixedText text="进行中" />
                     </UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="completed" className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5" />
+                    <UnifiedTabsTrigger value="completed">
                         <MixedText text="已完成" />
                     </UnifiedTabsTrigger>
                 </UnifiedTabsList>

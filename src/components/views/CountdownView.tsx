@@ -498,12 +498,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <Tabs defaultValue="active" className="w-full">
                 <div className="flex justify-center mb-6">
                     <TabsList className="grid w-fit min-w-[200px] grid-cols-2">
-                        <TabsTrigger value="active" className="flex items-center gap-2">
-                            <Clock className="w-5 h-5" />
+                        <TabsTrigger value="active">
                             <MixedText text="未开始" />
                         </TabsTrigger>
-                        <TabsTrigger value="completed" className="flex items-center gap-2">
-                            <CheckCircle className="w-5 h-5" />
+                        <TabsTrigger value="completed">
                             <MixedText text="已完成" />
                         </TabsTrigger>
                     </TabsList>

@@ -23,7 +23,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
         <div className="w-full flex flex-col items-center knowledge-entry-container">
             <UnifiedTabs defaultValue={defaultTab} className="w-full">
                 <div className="flex justify-center w-full mb-4">
-                    <UnifiedTabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-9 px-1 w-fit max-w-full">
+                    <UnifiedTabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-10 px-1 w-fit max-w-full">
                         {MODULES.map(({ value, label }) => (
                             <UnifiedTabsTrigger
                                 key={value}
@@ -36,7 +36,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                     </UnifiedTabsList>
                 </div>
 
-                <UnifiedTabsContents className="py-6 px-2">
+                <UnifiedTabsContents className="py-4 px-2">
                     {MODULES.map(({ value }) => (
                         <UnifiedTabsContent key={value} value={value} className="outline-none flex flex-col gap-6">
                             <div className="w-full max-w-xl mx-auto pb-4">

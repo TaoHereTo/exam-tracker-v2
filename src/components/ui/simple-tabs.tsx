@@ -78,11 +78,12 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted p-1 text-muted-foreground', className)}
+            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg', className)}
+            style={{ zIndex: 9999 }}
         >
             {/* 高亮背景 */}
             <motion.div
-                className="absolute inset-y-1 bg-background rounded-full shadow-sm"
+                className="absolute inset-y-1 bg-black dark:bg-white backdrop-blur-sm rounded-full shadow-md border border-white/20"
                 initial={false}
                 animate={{
                     left: highlightStyle.left,
@@ -113,9 +114,9 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
         <button
             data-tab-value={value}
             className={cn(
-                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none',
                 isActive
-                    ? 'text-foreground'
+                    ? 'text-white dark:text-black'
                     : 'text-muted-foreground hover:text-foreground',
                 className
             )}
