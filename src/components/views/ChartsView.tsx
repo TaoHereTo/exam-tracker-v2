@@ -48,7 +48,7 @@ const ModuleRadarChart = React.memo(function ModuleRadarChart({ data }: { data: 
 
     // 根据主题动态设置颜色 - 使用更稳定的依赖项
     const themeColors = useMemo(() => ({
-        backgroundColor: isDarkMode ? '#161618' : '#FFFFFF',
+        backgroundColor: isDarkMode ? '#161618' : '#F5F4F7',
         textColor: isDarkMode ? '#e5e5e5' : '#333',
         legendTextColor: isDarkMode ? '#333' : '#333',
         borderColor: isDarkMode ? '#404040' : '#e0e6f1',
@@ -335,12 +335,14 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
 
     return (
         <UnifiedTabs defaultValue="perMinute" className="w-full">
-            <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-4 mx-auto">
-                <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
-                <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
-                <UnifiedTabsTrigger value="pie" className="flex items-center gap-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
-                <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
-            </UnifiedTabsList>
+            <div className="flex justify-center mb-8">
+                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-4">
+                    <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="pie" className="flex items-center gap-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
+                </UnifiedTabsList>
+            </div>
 
             <UnifiedTabsContents className="py-8">
                 <UnifiedTabsContent value="perMinute" className="outline-none">

@@ -105,6 +105,19 @@
   text-rendering: optimizeLegibility;
 }
 
+/* 强制SelectContent宽度与trigger一致 */
+.select-content-fixed-width {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
+.select-content-fixed-width [data-radix-select-viewport] {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+}
+
 [data-radix-popper-content-wrapper] * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

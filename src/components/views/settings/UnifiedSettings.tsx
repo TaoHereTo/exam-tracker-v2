@@ -446,10 +446,10 @@ export function UnifiedSettings({
             </div>
             <div className="w-auto">
               <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger className="w-auto min-w-[80px] sm:min-w-[100px] h-8 sm:h-10 text-sm">
+                <SelectTrigger className="w-[120px] h-8 sm:h-10 text-sm">
                   <SelectValue placeholder="选择外观" className="text-sm" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="select-content-fixed-width" position="popper" sideOffset={4}>
                   <SelectItem value="light" className="text-sm"><MixedText text="浅色模式" /></SelectItem>
                   <SelectItem value="dark" className="text-sm"><MixedText text="深色模式" /></SelectItem>
                   <SelectItem value="system" className="text-sm"><MixedText text="跟随系统" /></SelectItem>
