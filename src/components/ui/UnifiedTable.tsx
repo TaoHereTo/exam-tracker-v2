@@ -240,7 +240,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
     // 渲染表格内容
     const renderTableContent = () => (
         <div className="w-full">
-            <table className="min-w-full border-collapse text-sm" style={{ caretColor: 'transparent' }}>
+            <table className="min-w-full border-collapse text-sm">
                 <thead>
                     <tr>
                         {selectable && (
@@ -261,7 +261,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border-b px-4 py-3 bg-muted/50 font-medium text-left ${col.className || ''}`} style={{ caretColor: 'transparent' }}>
+                            <th key={col.key} className={`border-b px-4 py-3 bg-muted/50 font-medium text-left ${col.className || ''}`}>
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
@@ -383,7 +383,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         </td>
                                     )}
                                     {columns.map(col => (
-                                        <td key={col.key} className={`border-b px-4 py-3 ${col.className || ''}`} style={{ caretColor: 'transparent' }}>
+                                        <td key={col.key} className={`border-b px-4 py-3 ${col.className || ''}`}>
                                             {col.render ? col.render(row) : <MixedText text={String((row as Record<string, unknown>)[col.key])} />}
                                         </td>
                                     ))}

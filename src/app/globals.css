@@ -1388,9 +1388,13 @@ table th,
 .loading-spinner,
 [data-loading],
 .spinner,
-.animate-spin,
-/* 禁用所有非输入元素的光标 */
-div:not([contenteditable="true"]):not(input):not(textarea):not(select),
+.animate-spin {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 禁用所有非输入元素的光标，但排除输入框容器 */
+div:not([contenteditable="true"]):not(input):not(textarea):not(select):not(.input-container):not(.form-field):not(.form-stack),
 span:not([contenteditable="true"]):not(input):not(textarea):not(select),
 p:not([contenteditable="true"]):not(input):not(textarea):not(select),
 h1:not([contenteditable="true"]):not(input):not(textarea):not(select),
@@ -1407,7 +1411,39 @@ h6:not([contenteditable="true"]):not(input):not(textarea):not(select) {
 input,
 textarea,
 select,
-[contenteditable="true"] {
+[contenteditable="true"],
+[data-slot="input"],
+[data-slot="textarea"] {
+  caret-color: auto !important;
+  -webkit-caret-color: auto !important;
+}
+
+/* 确保表单容器不会影响输入框光标 */
+.form-field,
+.form-stack,
+.input-container,
+[data-slot="form-field"],
+[data-slot="form-stack"] {
+  caret-color: transparent !important;
+  -webkit-caret-color: transparent !important;
+}
+
+/* 但确保这些容器内的输入框保持正常光标 */
+.form-field input,
+.form-field textarea,
+.form-field select,
+.form-stack input,
+.form-stack textarea,
+.form-stack select,
+.input-container input,
+.input-container textarea,
+.input-container select,
+[data-slot="form-field"] input,
+[data-slot="form-field"] textarea,
+[data-slot="form-field"] select,
+[data-slot="form-stack"] input,
+[data-slot="form-stack"] textarea,
+[data-slot="form-stack"] select {
   caret-color: auto !important;
   -webkit-caret-color: auto !important;
 }

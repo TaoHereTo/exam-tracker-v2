@@ -479,7 +479,6 @@ export function UnifiedSettings({
         maxWidth: '1000px',
         width: '100%',
         margin: '0 auto',
-        caretColor: 'transparent'
       }}>
         {/* Appearance Settings */}
         <div className="space-y-6">

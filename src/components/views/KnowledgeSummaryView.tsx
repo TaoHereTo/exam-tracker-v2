@@ -72,7 +72,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" disabled={true} />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </span>
                             );
@@ -123,7 +123,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" disabled={true} />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </span>
                             );
@@ -173,7 +173,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" disabled={true} />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </span>
                             );
@@ -226,7 +226,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{value}</span>
                                     {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" disabled={true} />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </div>
                             );
@@ -285,7 +285,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
                                     {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" disabled={true} />
+                                        <CloudImageViewer imageId={imagePath} size="sm" />
                                     )}
                                 </span>
                             );

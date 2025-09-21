@@ -515,7 +515,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
     const dataSummaries = generateDataSummary();
 
     return (
-        <div className="relative flex w-full flex-col items-center justify-start min-h-[60vh] gap-6 sm:gap-8 pt-8 sm:pt-12" style={{ caretColor: 'transparent' }}>
+        <div className="relative flex w-full flex-col items-center justify-start min-h-[60vh] gap-6 sm:gap-8 pt-8 sm:pt-12">
 
             {/* 第一行 - 前半部分数据，正向滚动 */}
             <Marquee

@@ -94,7 +94,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
     }
 
     return (
-        <div className="w-full" style={{ caretColor: 'transparent' }}>
+        <div className="w-full">
             <h2 className="text-2xl sm:text-3xl font-bold text-neutral-800 dark:text-neutral-200 unselectable">
                 <MixedText text="欢迎回来" />
             </h2>
@@ -102,7 +102,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                 <MixedText text="请登录您的账号开始记录" />
             </p>
 
-            <form className="my-6" onSubmit={handleSubmit} style={{ caretColor: 'transparent' }}>
+            <form className="my-6" onSubmit={handleSubmit}>
                 <LabelInputContainer className="mb-4">
                     <Label htmlFor="email" className="unselectable">
                         <MixedText text="邮箱地址" />

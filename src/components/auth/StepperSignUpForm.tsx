@@ -382,7 +382,7 @@ export function StepperSignUpForm({ onSwitchToLogin }: StepperSignUpFormProps) {
     }
 
     return (
-        <div className="w-full" style={{ caretColor: 'transparent' }}>
+        <div className="w-full">
             <div className="text-left mb-6">
                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 unselectable">
                     创建账户
