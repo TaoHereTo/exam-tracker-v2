@@ -23,6 +23,7 @@ import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
 import { UnifiedTabs, UnifiedTabsList, UnifiedTabsTrigger, UnifiedTabsContent, UnifiedTabsContents } from "@/components/ui/UnifiedTabs";
 import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
+import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
 
 interface StudyPlan {
     id: string;
@@ -54,6 +55,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
     const [dateRange, setDateRange] = useState<DateRange>();
     const [selectedPlans, setSelectedPlans] = useState<Set<string>>(new Set()); // Track selected plans for bulk operations
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Control delete confirmation dialog
+
+    // 分页相关状态
+    const [completedPage, setCompletedPage] = useState(1);
+    const [completedPageSize, setCompletedPageSize] = useState(7);
 
     const handleOpenForm = (plan?: StudyPlan) => {
         if (plan) {
@@ -250,7 +255,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
     // 处理全选/取消全选
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            setSelectedPlans(new Set(completedPlans.map(p => p.id)));
+            setSelectedPlans(new Set(paginatedCompletedPlans.map(p => p.id)));
         } else {
             setSelectedPlans(new Set());
         }
@@ -263,7 +268,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
         // 如果只选中一个，直接编辑
         if (selectedPlans.size === 1) {
             const planId = Array.from(selectedPlans)[0];
-            const plan = completedPlans.find(p => p.id === planId);
+            const plan = paginatedCompletedPlans.find(p => p.id === planId);
             if (plan) {
                 handleOpenForm(plan);
             }
@@ -327,6 +332,27 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
             // 如果置顶状态相同，按结束时间排序（最近的在前）
             return new Date(b.endDate).getTime() - new Date(a.endDate).getTime();
         });
+
+    // 分页处理
+    const totalCompletedPages = Math.ceil(completedPlans.length / completedPageSize);
+    const paginatedCompletedPlans = completedPlans.slice(
+        (completedPage - 1) * completedPageSize,
+        completedPage * completedPageSize
+    );
+
+    // 处理分页变化
+    const handleCompletedPageChange = (page: number) => {
+        setCompletedPage(page);
+        // 清空选中状态
+        setSelectedPlans(new Set());
+    };
+
+    const handleCompletedPageSizeChange = (size: number) => {
+        setCompletedPageSize(size);
+        setCompletedPage(1); // 重置到第一页
+        // 清空选中状态
+        setSelectedPlans(new Set());
+    };
 
     // 获取状态图标和颜色
     const getStatusIcon = (status: StudyPlan["status"]) => {
@@ -618,12 +644,12 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                         <div className="flex items-center justify-between px-6 py-3 rounded-lg" style={{ backgroundColor: '#EEEDED' }}>
                                             <div className="flex items-center gap-3">
                                                 <Checkbox
-                                                    checked={selectedPlans.size === completedPlans.length && completedPlans.length > 0}
+                                                    checked={selectedPlans.size === paginatedCompletedPlans.length && paginatedCompletedPlans.length > 0}
                                                     onCheckedChange={handleSelectAll}
                                                     size="sm"
                                                 />
                                                 <span className="text-sm text-muted-foreground">
-                                                    已选择 {selectedPlans.size} / {completedPlans.length} 项
+                                                    已选择 {selectedPlans.size} / {paginatedCompletedPlans.length} 项
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -666,7 +692,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                         {/* 横向长条卡片列表 */}
                                         <AnimatePresence mode="popLayout">
                                             <div className="space-y-2">
-                                                {completedPlans.map(plan => {
+                                                {paginatedCompletedPlans.map(plan => {
                                                     const isSelected = selectedPlans.has(plan.id);
                                                     return (
                                                         <HoverCard key={plan.id}>
@@ -758,6 +784,18 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                 })}
                                             </div>
                                         </AnimatePresence>
+
+                                        {/* 分页组件 */}
+                                        {totalCompletedPages > 1 && (
+                                            <div className="mt-6">
+                                                <BeautifulPagination
+                                                    currentPage={completedPage}
+                                                    totalPages={totalCompletedPages}
+                                                    onPageChange={handleCompletedPageChange}
+                                                    totalItems={completedPlans.length}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     /* 空状态 */

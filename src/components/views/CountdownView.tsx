@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/ui/simple-tabs";
 import CountdownExpandableCard from "@/components/ui/CountdownExpandableCard";
+import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
 
 interface ExamCountdown {
     id: string;
@@ -56,6 +57,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     const [recentlyCompletedCountdowns, setRecentlyCompletedCountdowns] = useState<ExamCountdown[]>([]); // Track recently completed countdowns
     const [selectedCountdowns, setSelectedCountdowns] = useState<Set<string>>(new Set()); // Track selected countdowns for bulk operations
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // Control delete confirmation dialog
+
+    // 分页相关状态
+    const [completedPage, setCompletedPage] = useState(1);
+    const [completedPageSize, setCompletedPageSize] = useState(7);
 
     // Check for completed countdowns - 使用useMemo优化，避免频繁重新渲染
     const newlyCompletedCountdowns = useMemo(() => {
@@ -251,7 +256,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     // 处理全选/取消全选
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            setSelectedCountdowns(new Set(completedCountdowns.map(c => c.id)));
+            setSelectedCountdowns(new Set(paginatedCompletedCountdowns.map(c => c.id)));
         } else {
             setSelectedCountdowns(new Set());
         }
@@ -264,7 +269,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         // 如果只选中一个，直接编辑
         if (selectedCountdowns.size === 1) {
             const countdownId = Array.from(selectedCountdowns)[0];
-            const countdown = completedCountdowns.find(c => c.id === countdownId);
+            const countdown = paginatedCompletedCountdowns.find(c => c.id === countdownId);
             if (countdown) {
                 handleOpenForm(countdown);
             }
@@ -519,6 +524,27 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             });
     }, [countdowns, getExamStatus]);
 
+    // 分页处理
+    const totalCompletedPages = Math.ceil(completedCountdowns.length / completedPageSize);
+    const paginatedCompletedCountdowns = completedCountdowns.slice(
+        (completedPage - 1) * completedPageSize,
+        completedPage * completedPageSize
+    );
+
+    // 处理分页变化
+    const handleCompletedPageChange = (page: number) => {
+        setCompletedPage(page);
+        // 清空选中状态
+        setSelectedCountdowns(new Set());
+    };
+
+    const handleCompletedPageSizeChange = (size: number) => {
+        setCompletedPageSize(size);
+        setCompletedPage(1); // 重置到第一页
+        // 清空选中状态
+        setSelectedCountdowns(new Set());
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
@@ -598,12 +624,12 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         <div className="flex items-center justify-between px-6 py-3 rounded-lg" style={{ backgroundColor: '#EEEDED' }}>
                                             <div className="flex items-center gap-3">
                                                 <Checkbox
-                                                    checked={selectedCountdowns.size === completedCountdowns.length && completedCountdowns.length > 0}
+                                                    checked={selectedCountdowns.size === paginatedCompletedCountdowns.length && paginatedCompletedCountdowns.length > 0}
                                                     onCheckedChange={handleSelectAll}
                                                     size="sm"
                                                 />
                                                 <span className="text-sm text-muted-foreground">
-                                                    已选择 {selectedCountdowns.size} / {completedCountdowns.length} 项
+                                                    已选择 {selectedCountdowns.size} / {paginatedCompletedCountdowns.length} 项
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -646,7 +672,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         {/* 横向长条卡片列表 */}
                                         <AnimatePresence mode="popLayout">
                                             <div className="space-y-2">
-                                                {completedCountdowns.map(countdown => {
+                                                {paginatedCompletedCountdowns.map(countdown => {
                                                     const isSelected = selectedCountdowns.has(countdown.id);
                                                     return (
                                                         <HoverCard key={countdown.id}>
@@ -738,6 +764,18 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 })}
                                             </div>
                                         </AnimatePresence>
+
+                                        {/* 分页组件 */}
+                                        {totalCompletedPages > 1 && (
+                                            <div className="mt-6">
+                                                <BeautifulPagination
+                                                    currentPage={completedPage}
+                                                    totalPages={totalCompletedPages}
+                                                    onPageChange={handleCompletedPageChange}
+                                                    totalItems={completedCountdowns.length}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 ) : (
                                     /* 空状态 */
