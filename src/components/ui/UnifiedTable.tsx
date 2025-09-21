@@ -244,7 +244,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                 <thead>
                     <tr>
                         {selectable && (
-                            <th className={`border-b px-4 py-3 text-center bg-muted/50 w-[7%] min-w-[48px] ${checkboxColClassName}`}>
+                            <th className={`border-b px-4 py-3 text-center w-[7%] min-w-[48px] ${checkboxColClassName}`} style={{ backgroundColor: '#EEEDED' }}>
                                 <div className="flex items-center justify-center h-full">
                                     <Checkbox
                                         size="sm"
@@ -261,11 +261,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border-b px-4 py-3 bg-muted/50 font-medium text-left ${col.className || ''}`}>
+                            <th key={col.key} className={`border-b px-4 py-3 font-medium text-left ${col.className || ''}`} style={{ backgroundColor: '#EEEDED' }}>
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
-                        {renderActions && <th className="border-b px-4 py-3 bg-muted/50 text-left w-20"><MixedText text="操作" /></th>}
+                        {renderActions && <th className="border-b px-4 py-3 text-left w-20" style={{ backgroundColor: '#EEEDED' }}><MixedText text="操作" /></th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -312,7 +312,20 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     <ContextMenuTrigger asChild>
                                         <tr
                                             onClick={handleRowClick}
-                                            className={`${enableRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} transition-colors ${isSelected ? 'bg-muted/50' : ''}`}
+                                            className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors`}
+                                            style={{
+                                                backgroundColor: isSelected ? '#EEEDED' : 'transparent'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (enableRowClick) {
+                                                    e.currentTarget.style.backgroundColor = '#EEEDED';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (enableRowClick) {
+                                                    e.currentTarget.style.backgroundColor = isSelected ? '#EEEDED' : 'transparent';
+                                                }
+                                            }}
                                             data-state={isSelected ? "selected" : undefined}
                                         >
                                             {selectable && (
@@ -362,7 +375,20 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 <tr
                                     key={String(key)}
                                     onClick={handleRowClick}
-                                    className={`${enableRowClick ? 'cursor-pointer hover:bg-muted/50' : ''} transition-colors ${isSelected ? 'bg-muted/50' : ''}`}
+                                    className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors`}
+                                    style={{
+                                        backgroundColor: isSelected ? '#EEEDED' : 'transparent'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        if (enableRowClick) {
+                                            e.currentTarget.style.backgroundColor = '#EEEDED';
+                                        }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        if (enableRowClick) {
+                                            e.currentTarget.style.backgroundColor = isSelected ? '#EEEDED' : 'transparent';
+                                        }
+                                    }}
                                     data-state={isSelected ? "selected" : undefined}
                                 >
                                     {selectable && (
