@@ -118,15 +118,15 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
 
     return (
         <Drawer open={isOpen} onOpenChange={onClose}>
-            <DrawerContent className="max-h-[80vh] p-0">
-                <DrawerHeader className="p-4 sm:p-6">
+            <DrawerContent className="max-h-[80vh] p-0 flex flex-col">
+                <DrawerHeader className="p-4 sm:p-6 flex-shrink-0">
                     <DrawerTitle className="text-base sm:text-lg"><MixedText text="云端数据概览" /></DrawerTitle>
                     <DrawerDescription className="text-xs sm:text-sm">
                         查看云端存储的数据统计和最近记录
                     </DrawerDescription>
                 </DrawerHeader>
 
-                <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-3 sm:space-y-4">
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4 space-y-3 sm:space-y-4 flex-1 overflow-y-auto">
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-3">
                             <div className="flex items-center">
@@ -269,7 +269,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                             <>
                                                                 <Button
                                                                     variant="outline"
-                                                                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                                                                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
                                                                     onClick={() => setShowClearDialog(false)}
                                                                 >
                                                                     <MixedText text="取消" />
@@ -277,7 +277,7 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                                                                 <Button
                                                                     onClick={handleClearCloudData}
                                                                     variant="destructive"
-                                                                    className="h-8 sm:h-9 text-xs sm:text-sm"
+                                                                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
                                                                 >
                                                                     确认清空
                                                                 </Button>

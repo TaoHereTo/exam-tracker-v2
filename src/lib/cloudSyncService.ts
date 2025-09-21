@@ -170,6 +170,7 @@ export class CloudSyncService {
         if (!userId) throw new Error('用户未登录');
 
         // 构建批量插入数据
+        // 置顶状态不保存到云端，只保存在本地
         const plansData = plansToUpload.map(plan => ({
             user_id: userId,
             name: plan.name,

@@ -149,7 +149,7 @@ function AuthPageContent() {
                                                     <TimePicker value="" placeholder="选择时长" className="h-9 text-sm" />
                                                 </div>
                                                 <div className="pt-2">
-                                                    <Button className="w-full h-9 text-sm">添加记录</Button>
+                                                    <Button className="w-full h-9 text-sm rounded-full">添加记录</Button>
                                                 </div>
                                             </div>
                                         </Card>

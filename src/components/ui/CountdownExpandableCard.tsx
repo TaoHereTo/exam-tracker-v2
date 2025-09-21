@@ -4,7 +4,7 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useOutsideClick } from "@/hooks/use-outside-click";
 import { format } from "date-fns";
-import { Clock, Edit, Trash2 } from "lucide-react";
+import { Clock, Edit, Trash2, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
 
@@ -13,6 +13,7 @@ interface ExamCountdown {
     name: string;
     examDate: string;
     description?: string;
+    isPinned?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -25,6 +26,7 @@ interface CountdownExpandableCardProps {
     prefix?: string;
     onEdit?: (countdown: ExamCountdown) => void;
     onDelete?: (id: string) => void;
+    onTogglePin?: (countdown: ExamCountdown) => void;
 }
 
 export default function CountdownExpandableCard({
@@ -34,7 +36,8 @@ export default function CountdownExpandableCard({
     getStatusDisplay,
     prefix = "",
     onEdit,
-    onDelete
+    onDelete,
+    onTogglePin
 }: CountdownExpandableCardProps) {
     const [active, setActive] = useState<ExamCountdown | boolean | null>(null);
     const ref = useRef<HTMLDivElement>(null);
@@ -110,6 +113,28 @@ export default function CountdownExpandableCard({
 
                                     <div className="flex gap-1">
                                         <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-full"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onTogglePin?.(active);
+                                                        }}
+                                                        style={{
+                                                            backgroundColor: active.isPinned ? '#f59e0b' : '#6b7280',
+                                                            borderColor: active.isPinned ? '#f59e0b' : '#6b7280'
+                                                        }}
+                                                    >
+                                                        {active.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent className="z-[1001]">
+                                                    <p>{active.isPinned ? '取消置顶' : '置顶'}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <motion.div
@@ -214,6 +239,28 @@ export default function CountdownExpandableCard({
                                     </div>
                                     <div className="flex gap-1 ml-2 flex-shrink-0">
                                         <TooltipProvider>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        className="h-8 w-8 rounded-full"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            onTogglePin?.(countdown);
+                                                        }}
+                                                        style={{
+                                                            backgroundColor: countdown.isPinned ? '#f59e0b' : '#6b7280',
+                                                            borderColor: countdown.isPinned ? '#f59e0b' : '#6b7280'
+                                                        }}
+                                                    >
+                                                        {countdown.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{countdown.isPinned ? '取消置顶' : '置顶'}</p>
+                                                </TooltipContent>
+                                            </Tooltip>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <motion.button

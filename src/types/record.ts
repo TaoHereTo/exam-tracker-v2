@@ -26,6 +26,7 @@ export interface StudyPlan {
     progress: number; // 当前进度（自动计算）
     status: "未开始" | "进行中" | "已完成" | "未达成";
     description?: string;
+    isPinned?: boolean; // 是否置顶
     createdAt?: string; // ISO 8601 格式
     updatedAt?: string; // ISO 8601 格式
 };
@@ -36,6 +37,7 @@ export interface ExamCountdown {
     name: string;
     examDate: string; // YYYY-MM-DD 格式
     description?: string;
+    isPinned?: boolean; // 是否置顶
     createdAt?: string; // ISO 8601 格式
     updatedAt?: string; // ISO 8601 格式
 };

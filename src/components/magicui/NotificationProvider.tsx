@@ -216,28 +216,24 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         switch (n.type) {
             case "success":
-                toast.success(<ToastContent notification={n} showIcon={true} />, {
-                    ...toastOptions,
-                    icon: getIcon(n)
+                toast.success(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions
                 });
                 break;
             case "error":
-                toast.error(<ToastContent notification={n} showIcon={true} />, {
-                    ...toastOptions,
-                    icon: getIcon(n)
+                toast.error(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions
                 });
                 break;
             case "warning":
-                toast(<ToastContent notification={n} />, {
-                    ...toastOptions,
-                    icon: getIcon(n)
+                toast(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions
                 });
                 break;
             case "info":
             default:
-                toast(<ToastContent notification={n} />, {
-                    ...toastOptions,
-                    icon: getIcon(n)
+                toast(<ToastContent notification={n} showIcon={false} />, {
+                    ...toastOptions
                 });
                 break;
         }
@@ -270,11 +266,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const updateToSuccess = useCallback((id: string, message: string, description?: string) => {
         const notification: Notification = { type: "success", message, description };
         toast.success(
-            <ToastContent notification={notification} showIcon={true} />,
+            <ToastContent notification={notification} showIcon={false} />,
             {
                 id,
                 position: getToastPosition(),
-                icon: getIcon(notification),
                 style: {
                     background: 'var(--popover)',
                     border: '1px solid var(--border)',
@@ -291,11 +286,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const updateToError = useCallback((id: string, message: string, description?: string) => {
         const notification: Notification = { type: "error", message, description };
         toast.error(
-            <ToastContent notification={notification} showIcon={true} />,
+            <ToastContent notification={notification} showIcon={false} />,
             {
                 id,
                 position: getToastPosition(),
-                icon: getIcon(notification),
                 style: {
                     background: 'var(--popover)',
                     border: '1px solid var(--border)',

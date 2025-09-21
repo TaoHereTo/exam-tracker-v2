@@ -145,6 +145,7 @@ export const planService = {
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
         // 注意：数据库表中使用了双引号包围的camelCase字段名
+        // 置顶状态不保存到云端，只保存在本地
         const planData = {
             user_id: userId,
             name: plan.name,
@@ -318,6 +319,7 @@ export const countdownService = {
         if (!userId) throw new Error('用户未登录')
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
+        // 置顶状态不保存到云端，只保存在本地
         const countdownData = {
             user_id: userId,
             name: countdown.name,

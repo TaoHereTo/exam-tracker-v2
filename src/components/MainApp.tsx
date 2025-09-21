@@ -249,11 +249,12 @@ export function MainApp() {
     const {
         handleExportData,
         handleImportData,
+        handleConfirmImport,
         importDialogOpen,
         setImportDialogOpen,
         pendingImport,
         setPendingImport,
-    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans, countdowns);
+    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans, setPlans, countdowns, setCountdowns);
 
     // 刷题历史分页和筛选
     const [historyPage, setHistoryPage] = useState(1);
@@ -506,6 +507,13 @@ export function MainApp() {
         setDeleteDialogOpen(true);
     };
 
+    // 更新记录
+    const handleUpdateRecord = (updatedRecord: RecordItem) => {
+        setRecords(prev => prev.map(record =>
+            record.id === updatedRecord.id ? updatedRecord : record
+        ));
+    };
+
     const handleConfirmDelete = async () => {
         const recordIds = [...recordsToDelete]; // 创建副本以避免引用问题
 
@@ -734,56 +742,6 @@ export function MainApp() {
         };
     }, [records, knowledge, plans]);
 
-    // 处理导入确认
-    const handleConfirmImport = useCallback(() => {
-        if (!pendingImport) return;
-
-        // 导入记录（去重）
-        const existingRecordKeys = new Set(records.map(r => `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`));
-        const newRecords = pendingImport.records.filter(r => {
-            const key = `${r.date}__${r.module}__${r.total}__${r.correct}__${r.duration}`;
-            return !existingRecordKeys.has(key);
-        });
-
-        // 导入知识点（去重）- 改进的去重逻辑
-        // 创建现有知识点的内容键集合
-        const existingKnowledgeContentKeys = new Set(knowledge.map(k =>
-            `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
-        ));
-
-        const newKnowledge = pendingImport.knowledge.filter(k => {
-            // 为导入的知识点创建内容键
-            const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;
-            return !existingKnowledgeContentKeys.has(contentKey);
-        });
-
-        // 导入计划（去重）
-        const existingPlanKeys = new Set(plans.map(p => `${p.name}__${p.module}__${p.type}__${p.startDate}__${p.endDate}`));
-        let newPlans = pendingImport.plans || [];
-        newPlans = newPlans.filter(p => {
-            const key = `${p.name}__${p.module}__${p.type}__${p.startDate}__${p.endDate}`;
-            return !existingPlanKeys.has(key);
-        });
-
-        if (newRecords.length > 0) {
-            setRecords(prev => [...newRecords, ...prev]);
-        }
-        if (newKnowledge.length > 0) {
-            setKnowledge(prev => [...newKnowledge, ...prev]);
-        }
-        if (newPlans.length > 0) {
-            setPlans(prev => [...newPlans, ...prev]);
-        }
-
-        notify({
-            message: "导入成功",
-            description: `已导入 ${newRecords.length} 条记录、${newKnowledge.length} 条知识点${newPlans.length > 0 ? `、${newPlans.length} 个计划` : ''}，跳过 ${(pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length) + ((pendingImport.plans?.length || 0) - newPlans.length)} 项重复数据`,
-            type: "success"
-        });
-
-        setImportDialogOpen(false);
-        setPendingImport(undefined);
-    }, [pendingImport, records, knowledge, plans, setRecords, setKnowledge, setPlans, setImportDialogOpen, setPendingImport, notify]);
 
     if (!isClient) {
         return null;
@@ -847,7 +805,7 @@ export function MainApp() {
                                         <AnimatedThemeToggler className="w-8 h-8" />
                                     </div>
 
-                                    <div className="flex flex-1 flex-col gap-4 p-4 pt-6 overflow-y-auto">
+                                    <div className="flex flex-1 flex-col gap-4 p-4 pt-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
                                         {activeTab === 'overview' && (
                                             <Suspense fallback={
                                                 <div className="flex items-center justify-center min-h-[60vh]">
@@ -882,6 +840,7 @@ export function MainApp() {
                                                     selectedRecordIds={selectedRecordIds}
                                                     onSelectIds={setSelectedRecordIds}
                                                     onBatchDelete={handleBatchDelete}
+                                                    onUpdateRecord={handleUpdateRecord}
                                                     historyPage={historyPage}
                                                     setHistoryPage={setHistoryPage}
                                                     totalPages={Math.ceil(filteredRecords.length / pageSize)}
@@ -993,25 +952,33 @@ export function MainApp() {
                                                         };
                                                         setPlans(prev => prev.map(p => p.id === plan.id ? formattedPlan : p));
 
-                                                        // 自动更新到云端
-                                                        try {
-                                                            const updatedPlan = await AutoCloudSync.autoUpdatePlan(formattedPlan, {
-                                                                notify,
-                                                                notifyLoading,
-                                                                updateToSuccess,
-                                                                updateToError
-                                                            });
+                                                        // 检查是否是置顶操作，如果是则不触发云端同步
+                                                        const originalPlan = plans.find(p => p.id === plan.id);
+                                                        const isPinToggle = originalPlan &&
+                                                            originalPlan.isPinned !== plan.isPinned &&
+                                                            JSON.stringify({ ...originalPlan, isPinned: plan.isPinned }) === JSON.stringify(plan);
 
-                                                            // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
-                                                            if (updatedPlan && updatedPlan.id !== formattedPlan.id) {
-                                                                setPlans(prev => prev.map(p =>
-                                                                    p.id === formattedPlan.id
-                                                                        ? { ...p, id: updatedPlan.id }
-                                                                        : p
-                                                                ));
+                                                        if (!isPinToggle) {
+                                                            // 自动更新到云端（置顶操作除外）
+                                                            try {
+                                                                const updatedPlan = await AutoCloudSync.autoUpdatePlan(formattedPlan, {
+                                                                    notify,
+                                                                    notifyLoading,
+                                                                    updateToSuccess,
+                                                                    updateToError
+                                                                });
+
+                                                                // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
+                                                                if (updatedPlan && updatedPlan.id !== formattedPlan.id) {
+                                                                    setPlans(prev => prev.map(p =>
+                                                                        p.id === formattedPlan.id
+                                                                            ? { ...p, id: updatedPlan.id }
+                                                                            : p
+                                                                    ));
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('MainApp - 更新计划失败:', error);
                                                             }
-                                                        } catch (error) {
-                                                            console.error('MainApp - 更新计划失败:', error);
                                                         }
                                                     }}
                                                     onDelete={async (id) => {
@@ -1202,25 +1169,33 @@ export function MainApp() {
                                                         };
                                                         setCountdowns(prev => prev.map(c => c.id === countdown.id ? formattedCountdown : c));
 
-                                                        // 自动更新到云端
-                                                        try {
-                                                            const updatedCountdown = await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
-                                                                notify,
-                                                                notifyLoading,
-                                                                updateToSuccess,
-                                                                updateToError
-                                                            });
+                                                        // 检查是否是置顶操作，如果是则不触发云端同步
+                                                        const originalCountdown = countdowns.find(c => c.id === countdown.id);
+                                                        const isPinToggle = originalCountdown &&
+                                                            originalCountdown.isPinned !== countdown.isPinned &&
+                                                            JSON.stringify({ ...originalCountdown, isPinned: countdown.isPinned }) === JSON.stringify(countdown);
 
-                                                            // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
-                                                            if (updatedCountdown && updatedCountdown.id !== formattedCountdown.id) {
-                                                                setCountdowns(prev => prev.map(c =>
-                                                                    c.id === formattedCountdown.id
-                                                                        ? { ...c, id: updatedCountdown.id }
-                                                                        : c
-                                                                ));
+                                                        if (!isPinToggle) {
+                                                            // 自动更新到云端（置顶操作除外）
+                                                            try {
+                                                                const updatedCountdown = await AutoCloudSync.autoUpdateCountdown(formattedCountdown, {
+                                                                    notify,
+                                                                    notifyLoading,
+                                                                    updateToSuccess,
+                                                                    updateToError
+                                                                });
+
+                                                                // 如果云端返回了新的ID（比如重新创建的情况），更新本地记录
+                                                                if (updatedCountdown && updatedCountdown.id !== formattedCountdown.id) {
+                                                                    setCountdowns(prev => prev.map(c =>
+                                                                        c.id === formattedCountdown.id
+                                                                            ? { ...c, id: updatedCountdown.id }
+                                                                            : c
+                                                                    ));
+                                                                }
+                                                            } catch (error) {
+                                                                console.error('MainApp - 更新倒计时失败:', error);
                                                             }
-                                                        } catch (error) {
-                                                            console.error('MainApp - 更新倒计时失败:', error);
                                                         }
                                                     }}
                                                     onDelete={async (id) => {
@@ -1378,14 +1353,14 @@ export function MainApp() {
                             <DialogFooter className="flex-col sm:flex-row">
                                 <Button
                                     variant="outline"
-                                    className="w-full sm:w-auto"
+                                    className="w-full sm:w-auto rounded-full"
                                     onClick={() => setImportDialogOpen(false)}
                                 >
                                     <MixedText text="取消" />
                                 </Button>
                                 <Button
                                     onClick={handleConfirmImport}
-                                    className="w-full sm:w-auto"
+                                    className="w-full sm:w-auto rounded-full"
                                 >
                                     <MixedText text="确认导入" />
                                 </Button>
@@ -1406,12 +1381,13 @@ export function MainApp() {
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
-                                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-full">
                                     <MixedText text="取消" />
                                 </Button>
                                 <Button
                                     onClick={handleConfirmDelete}
                                     variant="destructive"
+                                    className="rounded-full"
                                 >
                                     <MixedText text="确认删除" />
                                 </Button>
@@ -1431,12 +1407,12 @@ export function MainApp() {
                             <DialogFooter className="flex-col sm:flex-row">
                                 <Button
                                     variant="outline"
-                                    className="w-full sm:w-auto"
+                                    className="w-full sm:w-auto rounded-full"
                                     onClick={() => setSignOutDialogOpen(false)}
                                 >
                                     <MixedText text="取消" />
                                 </Button>
-                                <Button onClick={handleSignOut} variant="destructive" className="w-full sm:w-auto">
+                                <Button onClick={handleSignOut} variant="destructive" className="w-full sm:w-auto rounded-full">
                                     <MixedText text="确认退出" />
                                 </Button>
                             </DialogFooter>

@@ -120,6 +120,7 @@ export class AutoCloudSync {
                 progress: plan.progress,
                 status: plan.status,
                 description: plan.description
+                // 置顶状态不保存到云端，只保存在本地
             });
 
             // Update to success
@@ -167,6 +168,7 @@ export class AutoCloudSync {
                 name: countdown.name,
                 examDate: countdown.examDate,
                 description: countdown.description
+                // 置顶状态不保存到云端，只保存在本地
             });
 
             // Update to success

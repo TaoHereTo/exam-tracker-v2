@@ -7,11 +7,13 @@ import { FormField } from "@/components/ui/FormField";
 import { FormError } from "@/components/ui/form-error";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { zhCN } from "date-fns/locale";
-import { Plus, Edit, Trash2, Clock, CheckCircle, Trash } from "lucide-react";
+import { Plus, Edit, Trash2, Clock, CheckCircle, Trash, Pin, PinOff } from "lucide-react";
 import { useState, useEffect, useMemo } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/animate-ui/components/radix/hover-card";
+import { AnimatePresence, motion } from "motion/react";
 import { generateUUID } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -28,6 +30,7 @@ interface ExamCountdown {
     name: string;
     examDate: string;
     description?: string;
+    isPinned?: boolean;
     createdAt?: string;
     updatedAt?: string;
 }
@@ -300,6 +303,17 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
         }
     };
 
+    // 处理置顶功能
+    const handleTogglePin = (countdown: ExamCountdown) => {
+        const updatedCountdown = {
+            ...countdown,
+            isPinned: !countdown.isPinned
+        };
+        onUpdate(updatedCountdown);
+        toast.success(updatedCountdown.isPinned ? '已置顶' : '已取消置顶');
+    };
+
+
     // 计算倒计时
     const calculateCountdown = (examDate: string) => {
         const now = new Date();
@@ -377,17 +391,27 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                             </div>
                         );
                     } else {
-                        return <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-green-500 leading-none">已开始</div>
-                        </div>;
+                        return (
+                            <div className="flex items-center justify-center gap-6 sm:gap-8">
+                                <div className="text-center">
+                                    <div className="text-3xl sm:text-4xl font-bold text-green-500 leading-none">已开始</div>
+                                    <div className="text-xs sm:text-sm text-muted-foreground mt-1">考试进行中</div>
+                                </div>
+                            </div>
+                        );
                     }
                 }
             } else {
                 // 计算已过天数
                 const daysPassed = Math.max(0, differenceInDays(now, exam));
-                return <div className="text-center">
-                    <div className="text-lg font-medium text-blue-500 leading-none">已过{daysPassed}天</div>
-                </div>;
+                return (
+                    <div className="flex items-center justify-center gap-6 sm:gap-8">
+                        <div className="text-center">
+                            <div className="text-3xl sm:text-4xl font-bold text-blue-500 leading-none">{daysPassed}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">天前</div>
+                        </div>
+                    </div>
+                );
             }
         };
         return calculateCountdown;
@@ -471,12 +495,28 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     // 分离进行中和已完成的倒计时 - 使用useMemo缓存避免每次渲染都重新计算
     const activeCountdowns = useMemo(() => {
         if (countdowns.length === 0) return []; // 空数组时直接返回，避免调用getExamStatus
-        return countdowns.filter(countdown => getExamStatus(countdown.examDate) !== "已完成");
+        return countdowns
+            .filter(countdown => getExamStatus(countdown.examDate) !== "已完成")
+            .sort((a, b) => {
+                // 置顶的排在前面
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                // 如果置顶状态相同，按考试日期排序
+                return new Date(a.examDate).getTime() - new Date(b.examDate).getTime();
+            });
     }, [countdowns, getExamStatus]);
 
     const completedCountdowns = useMemo(() => {
         if (countdowns.length === 0) return []; // 空数组时直接返回，避免调用getExamStatus
-        return countdowns.filter(countdown => getExamStatus(countdown.examDate) === "已完成");
+        return countdowns
+            .filter(countdown => getExamStatus(countdown.examDate) === "已完成")
+            .sort((a, b) => {
+                // 置顶的排在前面
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                // 如果置顶状态相同，按考试日期排序（最近的在前）
+                return new Date(b.examDate).getTime() - new Date(a.examDate).getTime();
+            });
     }, [countdowns, getExamStatus]);
 
     return (
@@ -521,6 +561,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         prefix="active"
                                         onEdit={handleOpenForm}
                                         onDelete={handleDelete}
+                                        onTogglePin={handleTogglePin}
                                     />
                                 ) : (
                                     /* 空状态 */
@@ -552,16 +593,152 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
                             <div className="min-h-[500px]">
                                 {completedCountdowns.length > 0 ? (
-                                    /* 使用 CountdownExpandableCard 组件 */
-                                    <CountdownExpandableCard
-                                        countdowns={completedCountdowns}
-                                        calculateDetailedCountdown={calculateDetailedCountdown}
-                                        getExamPhase={getExamPhase}
-                                        getStatusDisplay={getStatusDisplay}
-                                        prefix="completed"
-                                        onEdit={handleOpenForm}
-                                        onDelete={handleDelete}
-                                    />
+                                    <div className="space-y-4">
+                                        {/* 批量操作栏 */}
+                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg" style={{ backgroundColor: '#EEEDED' }}>
+                                            <div className="flex items-center gap-3">
+                                                <Checkbox
+                                                    checked={selectedCountdowns.size === completedCountdowns.length && completedCountdowns.length > 0}
+                                                    onCheckedChange={handleSelectAll}
+                                                    size="sm"
+                                                />
+                                                <span className="text-sm text-muted-foreground">
+                                                    已选择 {selectedCountdowns.size} / {completedCountdowns.length} 项
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            onClick={handleBulkEdit}
+                                                            variant="outline"
+                                                            size="icon"
+                                                            className="h-8 w-8 rounded-full"
+                                                            disabled={selectedCountdowns.size === 0}
+                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                                        >
+                                                            <Edit className="w-4 h-4 text-white" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="编辑选中项" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Button
+                                                            onClick={handleBulkDelete}
+                                                            variant="destructive"
+                                                            size="icon"
+                                                            className="h-8 w-8 rounded-full"
+                                                            disabled={selectedCountdowns.size === 0}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p><MixedText text="删除选中项" /></p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </div>
+                                        </div>
+
+                                        {/* 横向长条卡片列表 */}
+                                        <AnimatePresence mode="popLayout">
+                                            <div className="space-y-2">
+                                                {completedCountdowns.map(countdown => {
+                                                    const isSelected = selectedCountdowns.has(countdown.id);
+                                                    return (
+                                                        <HoverCard key={countdown.id}>
+                                                            <HoverCardTrigger asChild>
+                                                                <motion.div
+                                                                    layoutId={`completed-countdown-${countdown.id}`}
+                                                                    layout
+                                                                    className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
+                                                                    onClick={() => handleCountdownSelect(countdown.id, !isSelected)}
+                                                                >
+                                                                    <div className="px-6 py-3 flex items-center gap-3">
+                                                                        {/* 复选框 */}
+                                                                        <Checkbox
+                                                                            checked={isSelected}
+                                                                            onCheckedChange={(checked) => handleCountdownSelect(countdown.id, checked as boolean)}
+                                                                            size="sm"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+
+                                                                        {/* 倒计时信息 */}
+                                                                        <div className="flex-1 min-w-0">
+                                                                            <div className="flex items-center gap-4">
+                                                                                <div className="flex-1 min-w-0">
+                                                                                    <h3 className="text-base font-bold text-foreground truncate">{countdown.name}</h3>
+                                                                                    <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
+                                                                                        <span>{countdown.examDate.split('T')[0]}</span>
+                                                                                        {countdown.description && (
+                                                                                            <>
+                                                                                                <span>•</span>
+                                                                                                <span className="truncate">{countdown.description}</span>
+                                                                                            </>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+
+                                                                                {/* 状态显示 */}
+                                                                                <div className="flex items-center gap-4">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <CheckCircle className="w-4 h-4" style={{ color: '#0284c7' }} />
+                                                                                        <span className="text-xs font-medium" style={{ color: '#0284c7' }}>已完成</span>
+                                                                                    </div>
+
+                                                                                    {/* 操作按钮 */}
+                                                                                    <div className="flex gap-1 ml-2 flex-shrink-0">
+                                                                                        <Tooltip>
+                                                                                            <TooltipTrigger asChild>
+                                                                                                <Button
+                                                                                                    onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        handleTogglePin(countdown);
+                                                                                                    }}
+                                                                                                    variant="outline"
+                                                                                                    size="icon"
+                                                                                                    className="h-6 w-6 rounded-full"
+                                                                                                    style={{
+                                                                                                        backgroundColor: countdown.isPinned ? '#f59e0b' : '#6b7280',
+                                                                                                        borderColor: countdown.isPinned ? '#f59e0b' : '#6b7280'
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {countdown.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
+                                                                                                </Button>
+                                                                                            </TooltipTrigger>
+                                                                                            <TooltipContent>
+                                                                                                <p><MixedText text={countdown.isPinned ? "取消置顶" : "置顶"} /></p>
+                                                                                            </TooltipContent>
+                                                                                        </Tooltip>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </motion.div>
+                                                            </HoverCardTrigger>
+                                                            <HoverCardContent className="w-80">
+                                                                <div className="space-y-2">
+                                                                    <h4 className="text-sm font-semibold">
+                                                                        <MixedText text="倒计时详情" />
+                                                                    </h4>
+                                                                    <p className="text-sm text-muted-foreground">
+                                                                        <MixedText text={countdown.description || '暂无描述'} />
+                                                                    </p>
+                                                                    <div className="text-xs text-muted-foreground">
+                                                                        <MixedText text={`考试日期: ${countdown.examDate.split('T')[0]}`} />
+                                                                    </div>
+                                                                </div>
+                                                            </HoverCardContent>
+                                                        </HoverCard>
+                                                    );
+                                                })}
+                                            </div>
+                                        </AnimatePresence>
+                                    </div>
                                 ) : (
                                     /* 空状态 */
                                     <div className="p-12 text-center">

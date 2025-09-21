@@ -21,7 +21,9 @@ export function useImportExport(
     knowledge: KnowledgeItem[],
     setKnowledge: (k: KnowledgeItem[]) => void,
     plans?: StudyPlan[],
-    countdowns?: ExamCountdown[]
+    setPlans?: (p: StudyPlan[]) => void,
+    countdowns?: ExamCountdown[],
+    setCountdowns?: (c: ExamCountdown[]) => void
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -263,19 +265,49 @@ export function useImportExport(
                 return !existingKnowledgeContentKeys.has(contentKey);
             });
 
+            // 导入计划（去重）
+            if (pendingImport.plans && setPlans) {
+                const existingPlanKeys = new Set(plans?.map(p => `${p.name}__${p.module}__${p.description || ''}`) || []);
+                const newPlans = pendingImport.plans.filter(p => {
+                    const key = `${p.name}__${p.module}__${p.description || ''}`;
+                    return !existingPlanKeys.has(key);
+                });
+                setPlans([...newPlans, ...(plans || [])]);
+            }
+
             // 更新状态
             setRecords([...newRecords, ...records]);
             setKnowledge([...newKnowledge, ...knowledge]);
 
             // 导入倒计时（去重）
-            if (pendingImport.countdowns) {
-                // Countdown import logic can be implemented when needed
+            if (pendingImport.countdowns && setCountdowns) {
+                const existingCountdownKeys = new Set(countdowns?.map(c => `${c.name}__${c.examDate}__${c.description || ''}`) || []);
+                const newCountdowns = pendingImport.countdowns.filter(c => {
+                    const key = `${c.name}__${c.examDate}__${c.description || ''}`;
+                    return !existingCountdownKeys.has(key);
+                });
+                setCountdowns([...newCountdowns, ...(countdowns || [])]);
             }
+
+            const newPlansCount = pendingImport.plans && setPlans ?
+                pendingImport.plans.filter(p => {
+                    const key = `${p.name}__${p.module}__${p.description || ''}`;
+                    const existingPlanKeys = new Set(plans?.map(p => `${p.name}__${p.module}__${p.description || ''}`) || []);
+                    return !existingPlanKeys.has(key);
+                }).length : 0;
+
+            const newCountdownsCount = pendingImport.countdowns && setCountdowns ?
+                pendingImport.countdowns.filter(c => {
+                    const key = `${c.name}__${c.examDate}__${c.description || ''}`;
+                    const existingCountdownKeys = new Set(countdowns?.map(c => `${c.name}__${c.examDate}__${c.description || ''}`) || []);
+                    return !existingCountdownKeys.has(key);
+                }).length : 0;
 
             const stats = {
                 total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0) + (pendingImport.countdowns?.length || 0),
-                added: newRecords.length + newKnowledge.length,
-                repeated: (pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length),
+                added: newRecords.length + newKnowledge.length + newPlansCount + newCountdownsCount,
+                repeated: (pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length) +
+                    ((pendingImport.plans?.length || 0) - newPlansCount) + ((pendingImport.countdowns?.length || 0) - newCountdownsCount),
                 updated: 0,
                 failed: 0
             };
