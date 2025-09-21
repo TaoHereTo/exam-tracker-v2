@@ -133,9 +133,8 @@ const getIcon = (notification: Notification) => {
 
 // Custom Toast Content Component
 const ToastContent = ({ notification, showIcon }: { notification: Notification; showIcon?: boolean }) => {
-    // Only show custom icons for warning and info notifications
-    // Success and error notifications use react-hot-toast's built-in icons
-    const shouldShowIcon = showIcon !== false && (notification.type === "warning" || notification.type === "info" || notification.icon === "flower");
+    // Show custom icons for all notification types when showIcon is true
+    const shouldShowIcon = showIcon !== false && (notification.type === "warning" || notification.type === "info" || notification.type === "success" || notification.type === "error" || notification.icon === "flower");
     const icon = shouldShowIcon ? getIcon(notification) : null;
 
     return (
@@ -217,15 +216,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         switch (n.type) {
             case "success":
-                toast.success(<ToastContent notification={n} showIcon={false} />, {
+                toast.success(<ToastContent notification={n} showIcon={true} />, {
                     ...toastOptions,
-                    icon: null
+                    icon: getIcon(n)
                 });
                 break;
             case "error":
-                toast.error(<ToastContent notification={n} showIcon={false} />, {
+                toast.error(<ToastContent notification={n} showIcon={true} />, {
                     ...toastOptions,
-                    icon: null
+                    icon: getIcon(n)
                 });
                 break;
             case "warning":
@@ -269,15 +268,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // New function to update a loading notification to success
     const updateToSuccess = useCallback((id: string, message: string, description?: string) => {
+        const notification: Notification = { type: "success", message, description };
         toast.success(
-            <div className="flex items-start gap-1.5 unselectable">
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
-                    <MixedText text={message} />
-                </div>
-            </div>,
+            <ToastContent notification={notification} showIcon={true} />,
             {
                 id,
                 position: getToastPosition(),
+                icon: getIcon(notification),
                 style: {
                     background: 'var(--popover)',
                     border: '1px solid var(--border)',
@@ -292,15 +289,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // New function to update a loading notification to error
     const updateToError = useCallback((id: string, message: string, description?: string) => {
+        const notification: Notification = { type: "error", message, description };
         toast.error(
-            <div className="flex items-start gap-1.5 unselectable">
-                <div className="font-semibold text-base notification-message text-foreground dark:text-white unselectable">
-                    <MixedText text={message} />
-                </div>
-            </div>,
+            <ToastContent notification={notification} showIcon={true} />,
             {
                 id,
                 position: getToastPosition(),
+                icon: getIcon(notification),
                 style: {
                     background: 'var(--popover)',
                     border: '1px solid var(--border)',

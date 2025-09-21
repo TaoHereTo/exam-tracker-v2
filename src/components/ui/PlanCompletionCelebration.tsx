@@ -127,7 +127,7 @@ export const PlanCompletionCelebration: React.FC<PlanCompletionCelebrationProps>
 
       {/* 主弹窗 */}
       <div className={cn(
-        "relative bg-card dark:bg-card rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform transition-all duration-500",
+        "relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform transition-all duration-500",
         animationPhase >= 1 ? "scale-100 opacity-100" : "scale-75 opacity-0"
       )}>
         {/* 奖杯图标 */}
