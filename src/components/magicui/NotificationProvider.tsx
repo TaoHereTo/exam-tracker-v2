@@ -174,20 +174,26 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // 判断是否为认证页面
     const isAuthPage = pathname === '/auth';
 
-    // 统一使用右下角位置
+
+
+    // 统一使用顶部居中位置
     const getToastPosition = () => {
-        return "bottom-right" as const;
+        return "top-center" as const;
     };
 
     const getContainerStyle = () => {
-        // 所有页面都使用右下角位置
+        // 所有页面都使用主内容区域水平居中
         return {
             position: 'fixed' as const,
-            bottom: '20px',
-            right: '20px',
+            top: '20px',
+            left: 'var(--sidebar-width, 280px)',
+            right: '0px',
             zIndex: 9999,
-            width: 'auto',
-            maxWidth: 'calc(100vw - 40px)',
+            width: 'calc(100vw - var(--sidebar-width, 280px))',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            pointerEvents: 'none' as const, // 允许点击穿透到下方元素
         };
     };
 
@@ -315,12 +321,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 toastOptions={{
                     duration: 5000,
                     style: {
-                        background: 'var(--card)',
-                        border: '1px solid var(--border)',
+                        background: 'var(--toast-bg, hsl(var(--card)))',
+                        border: '1px solid hsl(var(--border))',
+                        color: 'var(--toast-color, hsl(var(--foreground)))',
                         minWidth: '200px',
-                        maxWidth: '280px',
-                        padding: '8px 12px',
+                        maxWidth: '320px',
+                        padding: '8px 16px',
                         boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                        pointerEvents: 'auto', // 确保toast本身可以接收点击事件
+                        margin: '0 auto', // 确保在容器中居中
+                        backdropFilter: 'blur(8px)', // 添加背景模糊效果
+                        WebkitBackdropFilter: 'blur(8px)', // Safari兼容性
+                        opacity: '0.95', // 确保有足够的不透明度
                     },
                 }}
                 containerStyle={getContainerStyle()}
