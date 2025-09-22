@@ -100,6 +100,7 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
     }, [currentView]);
 
     const views = [
+        { value: 'year', label: '年' },
         { value: 'month', label: '月' },
         { value: 'week', label: '周' },
         { value: 'day', label: '日' },
@@ -162,6 +163,8 @@ export default function ScheduleManagementView({
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
     const [view, setView] = useState<View>(Views.MONTH);
     const [date, setDate] = useState(new Date());
+    const [showYearView, setShowYearView] = useState(false);
+    const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
     // 日期选择相关状态
     const [dateRange, setDateRange] = useState<DateRange>();
@@ -176,11 +179,14 @@ export default function ScheduleManagementView({
         // 添加倒计时事件
         countdowns.forEach(countdown => {
             const examDate = new Date(countdown.examDate);
+            // 设置具体时间，比如上午9点
+            examDate.setHours(9, 0, 0, 0);
             calendarEvents.push({
                 id: `countdown-${countdown.id}`,
                 title: countdown.name,
                 start: examDate,
                 end: examDate,
+                allDay: false, // 不是全天事件，显示具体时间
                 type: 'countdown',
                 description: countdown.description || '考试倒计时',
                 color: '#ef4444', // 红色
@@ -255,6 +261,36 @@ export default function ScheduleManagementView({
 
         return calendarEvents;
     }, [countdowns, plans, customEvents]);
+
+    // 强制禁用默认 tooltip 的 useEffect
+    useEffect(() => {
+        const removeDefaultTooltips = () => {
+            // 移除所有日历事件的 title 属性
+            const eventElements = document.querySelectorAll('.rbc-event, .rbc-event *');
+            eventElements.forEach(event => {
+                event.removeAttribute('title');
+            });
+        };
+
+        // 初始移除
+        removeDefaultTooltips();
+
+        // 监听 DOM 变化，当新的事件被添加时也移除 title
+        const observer = new MutationObserver(() => {
+            removeDefaultTooltips();
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['title']
+        });
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [events]); // 当事件变化时重新执行
 
     // 事件样式
     const eventStyleGetter = (event: CalendarEvent) => {
@@ -534,8 +570,125 @@ export default function ScheduleManagementView({
         }
     };
 
+    // 年视图组件 - 集成到大日历样式中
+    const YearView = () => {
+        const months = [
+            '一月', '二月', '三月', '四月', '五月', '六月',
+            '七月', '八月', '九月', '十月', '十一月', '十二月'
+        ];
+
+        const handleMonthSelect = (month: number) => {
+            const newDate = new Date(selectedYear, month, 1);
+            setDate(newDate);
+            setView(Views.MONTH);
+            setShowYearView(false);
+        };
+
+        const handleYearChange = (direction: 'prev' | 'next') => {
+            setSelectedYear(prev => direction === 'prev' ? prev - 1 : prev + 1);
+        };
+
+        // 计算每个月份的事件数量
+        const getMonthEvents = (month: number) => {
+            const monthStart = new Date(selectedYear, month, 1);
+            const monthEnd = new Date(selectedYear, month + 1, 0);
+
+            let countdownCount = 0;
+            let planCount = 0;
+
+            // 统计倒计时事件
+            countdowns.forEach(countdown => {
+                const examDate = new Date(countdown.examDate);
+                if (examDate >= monthStart && examDate <= monthEnd) {
+                    countdownCount++;
+                }
+            });
+
+            // 统计学习计划事件
+            plans.forEach(plan => {
+                const startDate = new Date(plan.startDate);
+                const endDate = new Date(plan.endDate);
+
+                // 检查计划是否与当前月份有重叠
+                if ((startDate <= monthEnd && endDate >= monthStart)) {
+                    planCount++;
+                }
+            });
+
+            return { countdownCount, planCount };
+        };
+
+        return (
+            <div className="h-[600px] flex flex-col">
+                {/* 年视图头部 - 模仿大日历的头部样式 */}
+                <div className="flex items-center justify-between p-4 border-b-2 border-gray-300 dark:border-gray-600">
+                    <button
+                        onClick={() => handleYearChange('prev')}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                        {selectedYear}年
+                    </h2>
+
+                    <button
+                        onClick={() => handleYearChange('next')}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
+                </div>
+
+                {/* 月份网格 - 使用表格样式，显示事件数量 */}
+                <div className="flex-1 p-4">
+                    <div className="grid grid-cols-3 gap-4 h-full">
+                        {months.map((month, index) => {
+                            const { countdownCount, planCount } = getMonthEvents(index);
+                            const totalEvents = countdownCount + planCount;
+
+                            return (
+                                <button
+                                    key={index}
+                                    onClick={() => handleMonthSelect(index)}
+                                    className="flex flex-col items-center justify-center border-2 border-gray-400 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-md p-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-600 dark:hover:border-gray-400"
+                                >
+                                    <div className="font-semibold mb-1">
+                                        <MixedText text={month} />
+                                    </div>
+                                    {totalEvents > 0 && (
+                                        <div className="text-xs space-y-1">
+                                            {countdownCount > 0 && (
+                                                <div className="flex items-center gap-1">
+                                                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                                                    <span>{countdownCount}个倒计时</span>
+                                                </div>
+                                            )}
+                                            {planCount > 0 && (
+                                                <div className="flex items-center gap-1">
+                                                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                                    <span>{planCount}个计划</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                    {totalEvents === 0 && (
+                                        <div className="text-xs text-gray-400 dark:text-gray-500">
+                                            无事件
+                                        </div>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <TooltipProvider>
+        <TooltipProvider openDelay={100} closeDelay={50}>
             <div className="space-y-6">
                 {/* 工具栏 */}
                 <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
@@ -564,7 +717,17 @@ export default function ScheduleManagementView({
                     <div className="lg:col-span-1 space-y-6">
                         {/* 视图切换tabs，位于左侧卡片上方 */}
                         <div className="flex justify-center">
-                            <CalendarViewTabs currentView={view} onViewChange={(viewStr) => setView(viewStr as View)} />
+                            <CalendarViewTabs
+                                currentView={showYearView ? 'year' : view}
+                                onViewChange={(viewStr) => {
+                                    if (viewStr === 'year') {
+                                        setShowYearView(true);
+                                    } else {
+                                        setShowYearView(false);
+                                        setView(viewStr as View);
+                                    }
+                                }}
+                            />
                         </div>
 
                         {/* 日程类型说明 */}
@@ -615,105 +778,102 @@ export default function ScheduleManagementView({
                     {/* 右侧：大日历视图 */}
                     <div className="lg:col-span-3">
                         <div className="h-[600px] relative">
-                            <BigCalendar
-                                localizer={localizer}
-                                events={events}
-                                startAccessor="start"
-                                endAccessor="end"
-                                style={{ height: '100%' }}
-                                view={view}
-                                onView={setView}
-                                date={date}
-                                onNavigate={setDate}
-                                onSelectSlot={handleSelectSlot}
-                                onSelectEvent={handleSelectEvent}
-                                selectable
-                                eventPropGetter={eventStyleGetter}
-                                showMultiDayTimes
-                                step={15}
-                                timeslots={4}
-                                popup={false} // 禁用默认的弹出窗口
-                                popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
-                                doShowMoreDrillDown={false} // 禁用更多事件的下钻
-                                messages={{
-                                    next: '下月',
-                                    previous: '上月',
-                                    today: '今天',
-                                    month: '月',
-                                    week: '周',
-                                    day: '日',
-                                    agenda: '议程',
-                                    date: '日期',
-                                    time: '时间',
-                                    event: '事件',
-                                    noEventsInRange: '此范围内没有事件',
-                                    showMore: (total: number) => `+${total} 更多`,
-                                    allDay: '全天',
-                                    work_week: '工作周'
-                                }}
-                                components={{
-                                    event: ({ event }) => (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <div
-                                                    className="cursor-pointer w-full h-full"
-                                                    title="" // 清空默认的 title 属性
-                                                    style={{ pointerEvents: 'auto' }}
-                                                >
+                            {showYearView ? (
+                                <YearView />
+                            ) : (
+                                <BigCalendar
+                                    localizer={localizer}
+                                    events={events}
+                                    startAccessor="start"
+                                    endAccessor="end"
+                                    style={{ height: '100%' }}
+                                    view={view}
+                                    onView={setView}
+                                    date={date}
+                                    onNavigate={setDate}
+                                    onSelectSlot={handleSelectSlot}
+                                    onSelectEvent={handleSelectEvent}
+                                    selectable
+                                    eventPropGetter={eventStyleGetter}
+                                    showMultiDayTimes
+                                    step={15}
+                                    timeslots={4}
+                                    popup={false} // 禁用默认的弹出窗口
+                                    popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
+                                    doShowMoreDrillDown={false} // 禁用更多事件的下钻
+                                    className="custom-calendar-no-tooltip" // 添加自定义类名
+                                    messages={{
+                                        next: '下月',
+                                        previous: '上月',
+                                        today: '今天',
+                                        month: '月',
+                                        week: '周',
+                                        day: '日',
+                                        agenda: '议程',
+                                        date: '日期',
+                                        time: '时间',
+                                        event: '事件',
+                                        noEventsInRange: '此范围内没有事件',
+                                        showMore: (total: number) => `+${total} 更多`,
+                                        allDay: '全天',
+                                        work_week: '工作周'
+                                    }}
+                                    components={{
+                                        event: ({ event }) => (
+                                            <Tooltip>
+                                                <TooltipTrigger>
                                                     {event.title}
-                                                </div>
-                                            </TooltipTrigger>
-                                            <TooltipContent className="bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-lg z-50">
-                                                <div className="space-y-1">
-                                                    <p className="font-medium text-black dark:text-white">{event.title}</p>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{event.title}</p>
                                                     {event.description && (
-                                                        <p className="text-sm text-black dark:text-white">
-                                                            {event.description}
-                                                        </p>
+                                                        <p className="text-sm">{event.description}</p>
                                                     )}
-                                                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                                                    <p className="text-xs">
                                                         {event.allDay
                                                             ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
-                                                            : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
+                                                            : event.type === 'countdown'
+                                                                ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
+                                                                : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
                                                         }
                                                     </p>
-                                                </div>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    ),
-                                    // 自定义导航按钮
-                                    toolbar: ({ label, onNavigate }) => {
-                                        const navigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
-                                            onNavigate(action);
-                                        };
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        ),
+                                        // 自定义导航按钮
+                                        toolbar: ({ label, onNavigate }) => {
+                                            const navigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+                                                onNavigate(action);
+                                            };
 
-                                        return (
-                                            <div className="flex items-center justify-between mb-4">
-                                                {/* 左侧：导航按钮 */}
-                                                <div className="flex items-center gap-2">
-                                                    <CustomNavigationButton onClick={() => navigate('PREV')}>
-                                                        <ChevronLeft className="w-4 h-4" />
-                                                    </CustomNavigationButton>
-                                                    <CustomNavigationButton onClick={() => navigate('TODAY')}>
-                                                        <MixedText text="今天" />
-                                                    </CustomNavigationButton>
-                                                    <CustomNavigationButton onClick={() => navigate('NEXT')}>
-                                                        <ChevronRight className="w-4 h-4" />
-                                                    </CustomNavigationButton>
-                                                </div>
+                                            return (
+                                                <div className="flex items-center justify-between mb-4">
+                                                    {/* 左侧：导航按钮 */}
+                                                    <div className="flex items-center gap-2">
+                                                        <CustomNavigationButton onClick={() => navigate('PREV')}>
+                                                            <ChevronLeft className="w-4 h-4" />
+                                                        </CustomNavigationButton>
+                                                        <CustomNavigationButton onClick={() => navigate('TODAY')}>
+                                                            <MixedText text="今天" />
+                                                        </CustomNavigationButton>
+                                                        <CustomNavigationButton onClick={() => navigate('NEXT')}>
+                                                            <ChevronRight className="w-4 h-4" />
+                                                        </CustomNavigationButton>
+                                                    </div>
 
-                                                {/* 中间：当前日期标签 */}
-                                                <div className="text-lg font-semibold text-foreground">
-                                                    <MixedText text={label} />
-                                                </div>
+                                                    {/* 中间：当前日期标签 */}
+                                                    <div className="text-lg font-semibold text-foreground">
+                                                        <MixedText text={label} />
+                                                    </div>
 
-                                                {/* 右侧：空白区域，保持布局平衡 */}
-                                                <div className="w-32"></div>
-                                            </div>
-                                        );
-                                    }
-                                }}
-                            />
+                                                    {/* 右侧：空白区域，保持布局平衡 */}
+                                                    <div className="w-32"></div>
+                                                </div>
+                                            );
+                                        }
+                                    }}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
