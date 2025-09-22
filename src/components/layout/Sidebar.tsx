@@ -135,6 +135,12 @@ const NAV_DATA = {
                     tab: 'countdown',
                     icon: AlarmClockCheck,
                 },
+                {
+                    title: '日程管理',
+                    url: '#',
+                    tab: 'calendar',
+                    icon: Calendar,
+                },
             ],
         },
         {

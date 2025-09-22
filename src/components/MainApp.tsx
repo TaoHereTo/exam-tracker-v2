@@ -7,6 +7,7 @@ import { useImportExport } from "@/hooks/useImportExport";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
 import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings, ExamCountdown } from "@/types/record";
+import type { CalendarEvent } from "@/components/views/ScheduleManagementView";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -64,6 +65,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { normalizePageTitle } from "@/config/exam";
 import { clearLocalStorageData } from "@/lib/storageUtils";
 import { useHighDPIFontOptimization } from "@/hooks/useHighDPIFontOptimization";
+import toast from 'react-hot-toast';
 
 // 懒加载组件
 const PlanListView = lazy(() =>
@@ -120,6 +122,13 @@ const SettingsView = lazy(() =>
 // 添加倒计时视图的懒加载
 const CountdownView = lazy(() =>
     import("@/components/views/CountdownView").then(module => ({
+        default: module.default
+    }))
+);
+
+// 添加日程管理视图的懒加载
+const ScheduleManagementView = lazy(() =>
+    import("@/components/views/ScheduleManagementView").then(module => ({
         default: module.default
     }))
 );
@@ -245,6 +254,7 @@ export function MainApp() {
     const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
     const [records, setRecords] = useLocalStorage<RecordItem[]>("exam-tracker-records-v2", []);
     const [countdowns, setCountdowns] = useLocalStorage<ExamCountdown[]>("exam-tracker-countdowns-v2", []);
+    const [customEvents, setCustomEvents] = useLocalStorage<CalendarEvent[]>("exam-tracker-custom-events-v2", []);
 
     const {
         handleExportData,
@@ -1295,6 +1305,35 @@ export function MainApp() {
                                                     onCountdownComplete={(countdown) => {
                                                         setCompletedCountdown(countdown);
                                                         setCountdownCelebrationOpen(true);
+                                                    }}
+                                                />
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'calendar' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <ScheduleManagementView
+                                                    countdowns={countdowns}
+                                                    plans={plansWithProgress}
+                                                    customEvents={customEvents}
+                                                    onCreateEvent={(event) => {
+                                                        // 保存自定义日程到本地存储
+                                                        setCustomEvents(prev => [event, ...prev]);
+                                                        toast.success('自定义日程创建成功');
+                                                    }}
+                                                    onUpdateEvent={(event) => {
+                                                        // 更新自定义日程
+                                                        setCustomEvents(prev => prev.map(e => e.id === event.id ? event : e));
+                                                        toast.success('自定义日程更新成功');
+                                                    }}
+                                                    onDeleteEvent={(id) => {
+                                                        // 删除自定义日程
+                                                        setCustomEvents(prev => prev.filter(e => e.id !== id));
+                                                        toast.success('自定义日程删除成功');
                                                     }}
                                                 />
                                             </Suspense>

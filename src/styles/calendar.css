@@ -1,0 +1,160 @@
+/* 自定义日历样式 */
+.rbc-calendar {
+    font-family: inherit;
+}
+
+.rbc-header {
+    background-color: var(--background);
+    color: var(--foreground);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    padding: 12px 8px;
+}
+
+.rbc-month-view {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rbc-date-cell {
+    color: var(--foreground);
+    padding: 8px;
+}
+
+.rbc-off-range-bg {
+    background-color: var(--muted);
+    opacity: 0.3;
+}
+
+.rbc-today {
+    background-color: var(--accent);
+    opacity: 0.1;
+}
+
+.rbc-event {
+    border-radius: 4px;
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 4px;
+    margin: 1px;
+}
+
+.rbc-event-content {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rbc-toolbar {
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.rbc-toolbar button {
+    background-color: var(--background);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rbc-toolbar button:hover {
+    background-color: var(--accent);
+    border-color: var(--accent-foreground);
+}
+
+.rbc-toolbar button.rbc-active {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    border-color: var(--primary);
+}
+
+.rbc-toolbar-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--foreground);
+}
+
+.rbc-btn-group {
+    display: flex;
+    gap: 4px;
+}
+
+.rbc-btn-group button {
+    border-radius: 6px;
+}
+
+.rbc-btn-group button:first-child {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.rbc-btn-group button:last-child {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.rbc-btn-group button:not(:first-child):not(:last-child) {
+    border-radius: 0;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .rbc-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .rbc-toolbar-label {
+        text-align: center;
+        margin: 8px 0;
+    }
+
+    .rbc-btn-group {
+        justify-content: center;
+    }
+
+    .rbc-event {
+        font-size: 10px;
+        padding: 1px 2px;
+    }
+}
+
+/* 禁用浏览器默认的 title tooltip，但保留自定义 tooltip */
+.rbc-event[title] {
+    title: none !important;
+}
+
+/* 确保事件可以正常交互 */
+.rbc-event {
+    pointer-events: auto !important;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .rbc-calendar {
+        background-color: var(--background);
+        color: var(--foreground);
+    }
+
+    .rbc-month-view {
+        background-color: var(--background);
+    }
+
+    .rbc-date-cell {
+        background-color: var(--background);
+    }
+
+    .rbc-off-range-bg {
+        background-color: var(--muted);
+    }
+}
