@@ -811,7 +811,7 @@ export function MainApp() {
                                     </header>
 
                                     {/* 主题切换按钮 - 固定在右上角 */}
-                                    <div className="fixed top-4 right-4 z-50">
+                                    <div className="fixed top-3 right-4 z-50">
                                         <AnimatedThemeToggler className="w-8 h-8" />
                                     </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { Calendar as BigCalendar, momentLocalizer, Views, View } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/zh-cn';
@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FormField } from "@/components/ui/FormField";
 import { FormError } from "@/components/ui/form-error";
 import { MixedText } from "@/components/ui/MixedText";
-import { Plus, Edit, Trash2, Clock, Target, Calendar as CalendarIcon } from "lucide-react";
+import { Plus, Edit, Trash2, Clock, Target, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { generateUUID } from "@/lib/utils";
 import { format } from "date-fns";
@@ -22,6 +22,8 @@ import toast from 'react-hot-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
 import { normalizeModuleName } from "@/config/exam";
 import type { ExamCountdown, StudyPlan } from "@/types/record";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 // 设置 moment 中文语言
 moment.locale('zh-cn');
@@ -50,6 +52,91 @@ interface CalendarViewProps {
     onDeleteEvent?: (id: string) => void;
 }
 
+
+// 自定义导航按钮组件，使用tabs样式
+function CustomNavigationButton({ onClick, children, className = "" }: { onClick: () => void; children: React.ReactNode; className?: string }) {
+    return (
+        <button
+            onClick={onClick}
+            className={cn(
+                'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
+                'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                className
+            )}
+        >
+            {children}
+        </button>
+    );
+}
+
+// 完全按照simple-tabs组件实现的视图切换组件
+const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentView: string; onViewChange: (view: string) => void }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 });
+
+    useEffect(() => {
+        if (!containerRef.current) return;
+
+        const activeTab = containerRef.current.querySelector(`[data-view="${currentView}"]`) as HTMLElement;
+        if (activeTab) {
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const tabRect = activeTab.getBoundingClientRect();
+
+            setHighlightStyle({
+                left: tabRect.left - containerRect.left,
+                width: tabRect.width
+            });
+        }
+    }, [currentView]);
+
+    const views = [
+        { value: 'month', label: '月' },
+        { value: 'week', label: '周' },
+        { value: 'day', label: '日' },
+        { value: 'agenda', label: '议程' }
+    ];
+
+    return (
+        <div
+            ref={containerRef}
+            className="relative inline-flex h-9 items-center justify-center rounded-full bg-white dark:bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg unselectable"
+            style={{ zIndex: 10 }}
+        >
+            {/* 高亮背景 */}
+            <motion.div
+                className="absolute inset-y-1 bg-black dark:bg-white backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                initial={false}
+                animate={{
+                    left: highlightStyle.left,
+                    width: highlightStyle.width,
+                }}
+                transition={{
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 30,
+                }}
+            />
+            {views.map((viewItem) => (
+                <button
+                    key={viewItem.value}
+                    data-view={viewItem.value}
+                    className={cn(
+                        'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
+                        currentView === viewItem.value
+                            ? 'text-white dark:text-black'
+                            : 'text-muted-foreground hover:text-foreground'
+                    )}
+                    onClick={() => onViewChange(viewItem.value)}
+                >
+                    <MixedText text={viewItem.label} />
+                </button>
+            ))}
+        </div>
+    );
+});
+
+CalendarViewTabs.displayName = 'CalendarViewTabs';
+
 export default function ScheduleManagementView({
     countdowns,
     plans,
@@ -75,7 +162,7 @@ export default function ScheduleManagementView({
             const examDate = new Date(countdown.examDate);
             calendarEvents.push({
                 id: `countdown-${countdown.id}`,
-                title: `📅 ${countdown.name}`,
+                title: countdown.name,
                 start: examDate,
                 end: examDate,
                 type: 'countdown',
@@ -93,7 +180,7 @@ export default function ScheduleManagementView({
             // 为计划的开始和结束日期创建全天事件
             calendarEvents.push({
                 id: `plan-start-${plan.id}`,
-                title: `🎯 ${plan.name} (开始)`,
+                title: `${plan.name} (开始)`,
                 start: startDate,
                 end: startDate,
                 allDay: true, // 设置为全天事件
@@ -105,7 +192,7 @@ export default function ScheduleManagementView({
 
             calendarEvents.push({
                 id: `plan-end-${plan.id}`,
-                title: `✅ ${plan.name} (结束)`,
+                title: `${plan.name} (结束)`,
                 start: endDate,
                 end: endDate,
                 allDay: true, // 设置为全天事件
@@ -122,7 +209,7 @@ export default function ScheduleManagementView({
             while (currentDate < endDate) {
                 calendarEvents.push({
                     id: `plan-duration-${plan.id}-${currentDate.toISOString().split('T')[0]}`,
-                    title: `📚 ${plan.name}`,
+                    title: plan.name,
                     start: new Date(currentDate),
                     end: new Date(currentDate),
                     allDay: true, // 设置为全天事件
@@ -313,31 +400,7 @@ export default function ScheduleManagementView({
         <TooltipProvider>
             <div className="space-y-6">
                 {/* 工具栏 */}
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                    <div className="flex items-center gap-4">
-                        <Button
-                            onClick={() => setView(Views.MONTH)}
-                            variant={view === Views.MONTH ? "default" : "outline"}
-                            size="sm"
-                        >
-                            <MixedText text="月视图" />
-                        </Button>
-                        <Button
-                            onClick={() => setView(Views.WEEK)}
-                            variant={view === Views.WEEK ? "default" : "outline"}
-                            size="sm"
-                        >
-                            <MixedText text="周视图" />
-                        </Button>
-                        <Button
-                            onClick={() => setView(Views.DAY)}
-                            variant={view === Views.DAY ? "default" : "outline"}
-                            size="sm"
-                        >
-                            <MixedText text="日视图" />
-                        </Button>
-                    </div>
-
+                <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
                     <Button
                         onClick={() => {
                             setForm({
@@ -360,144 +423,166 @@ export default function ScheduleManagementView({
                 {/* 左右布局 */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     {/* 左侧：日程说明和日历 */}
-                    <div className="lg:col-span-1">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-lg">
-                                    <MixedText text="日程管理" />
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                {/* 日程类型说明 */}
-                                <div>
-                                    <h4 className="text-sm font-medium mb-3">
-                                        <MixedText text="日程类型说明" />
-                                    </h4>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }}></div>
-                                            <span className="text-xs">
-                                                <MixedText text="📅 考试倒计时" />
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
-                                            <span className="text-xs">
-                                                <MixedText text="🎯 学习计划开始" />
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }}></div>
-                                            <span className="text-xs">
-                                                <MixedText text="✅ 学习计划结束" />
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8b5cf6' }}></div>
-                                            <span className="text-xs">
-                                                <MixedText text="📝 自定义日程" />
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                    <div className="lg:col-span-1 space-y-6">
+                        {/* 视图切换tabs，位于左侧卡片上方 */}
+                        <div className="flex justify-center">
+                            <CalendarViewTabs currentView={view} onViewChange={(viewStr) => setView(viewStr as View)} />
+                        </div>
 
-                                {/* 快速日期选择日历 */}
-                                <div>
-                                    <h4 className="text-sm font-medium mb-3">
-                                        <MixedText text="快速日期选择" />
-                                    </h4>
-                                    <div className="flex justify-center">
-                                        <DatePicker
-                                            mode="single"
-                                            selected={date}
-                                            onSelect={(selectedDate) => {
-                                                if (selectedDate) {
-                                                    setDate(selectedDate);
-                                                }
-                                            }}
-                                            className="rounded-md border scale-90"
-                                            locale={zhCN}
-                                        />
-                                    </div>
+                        {/* 日程类型说明 */}
+                        <div className="text-center">
+                            <h4 className="text-sm font-medium mb-3">
+                                <MixedText text="日程类型说明" />
+                            </h4>
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }}></div>
+                                    <span className="text-xs">
+                                        <MixedText text="考试倒计时" />
+                                    </span>
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
+                                    <span className="text-xs">
+                                        <MixedText text="学习计划开始" />
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }}></div>
+                                    <span className="text-xs">
+                                        <MixedText text="学习计划结束" />
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#8b5cf6' }}></div>
+                                    <span className="text-xs">
+                                        <MixedText text="自定义日程" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 快速日期选择日历 */}
+                        <div className="text-center">
+                            <div className="flex justify-center">
+                                <DatePicker
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={(selectedDate) => {
+                                        if (selectedDate) {
+                                            setDate(selectedDate);
+                                        }
+                                    }}
+                                    className="rounded-md border scale-100"
+                                    locale={zhCN}
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     {/* 右侧：大日历视图 */}
                     <div className="lg:col-span-3">
-                        <Card>
-                            <CardContent className="p-4">
-                                <div className="h-[600px]">
-                                    <BigCalendar
-                                        localizer={localizer}
-                                        events={events}
-                                        startAccessor="start"
-                                        endAccessor="end"
-                                        style={{ height: '100%' }}
-                                        view={view}
-                                        onView={setView}
-                                        date={date}
-                                        onNavigate={setDate}
-                                        onSelectSlot={handleSelectSlot}
-                                        onSelectEvent={handleSelectEvent}
-                                        selectable
-                                        eventPropGetter={eventStyleGetter}
-                                        showMultiDayTimes
-                                        step={15}
-                                        timeslots={4}
-                                        popup={false} // 禁用默认的弹出窗口
-                                        popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
-                                        doShowMoreDrillDown={false} // 禁用更多事件的下钻
-                                        messages={{
-                                            next: '下月',
-                                            previous: '上月',
-                                            today: '今天',
-                                            month: '月',
-                                            week: '周',
-                                            day: '日',
-                                            agenda: '议程',
-                                            date: '日期',
-                                            time: '时间',
-                                            event: '事件',
-                                            noEventsInRange: '此范围内没有事件',
-                                            showMore: (total: number) => `+${total} 更多`
-                                        }}
-                                        components={{
-                                            event: ({ event }) => (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div
-                                                            className="cursor-pointer w-full h-full"
-                                                            title="" // 清空默认的 title 属性
-                                                            style={{ pointerEvents: 'auto' }}
-                                                        >
-                                                            {event.title}
-                                                        </div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent className="bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-lg z-50">
-                                                        <div className="space-y-1">
-                                                            <p className="font-medium text-black dark:text-white">{event.title}</p>
-                                                            {event.description && (
-                                                                <p className="text-sm text-black dark:text-white">
-                                                                    {event.description}
-                                                                </p>
-                                                            )}
-                                                            <p className="text-xs text-gray-600 dark:text-gray-300">
-                                                                {event.allDay
-                                                                    ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
-                                                                    : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            )
-                                        }}
-                                    />
-                                </div>
-                            </CardContent>
-                        </Card>
+                        <div className="h-[600px] relative">
+                            <BigCalendar
+                                localizer={localizer}
+                                events={events}
+                                startAccessor="start"
+                                endAccessor="end"
+                                style={{ height: '100%' }}
+                                view={view}
+                                onView={setView}
+                                date={date}
+                                onNavigate={setDate}
+                                onSelectSlot={handleSelectSlot}
+                                onSelectEvent={handleSelectEvent}
+                                selectable
+                                eventPropGetter={eventStyleGetter}
+                                showMultiDayTimes
+                                step={15}
+                                timeslots={4}
+                                popup={false} // 禁用默认的弹出窗口
+                                popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
+                                doShowMoreDrillDown={false} // 禁用更多事件的下钻
+                                messages={{
+                                    next: '下月',
+                                    previous: '上月',
+                                    today: '今天',
+                                    month: '月',
+                                    week: '周',
+                                    day: '日',
+                                    agenda: '议程',
+                                    date: '日期',
+                                    time: '时间',
+                                    event: '事件',
+                                    noEventsInRange: '此范围内没有事件',
+                                    showMore: (total: number) => `+${total} 更多`,
+                                    allDay: '全天',
+                                    work_week: '工作周'
+                                }}
+                                components={{
+                                    event: ({ event }) => (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div
+                                                    className="cursor-pointer w-full h-full"
+                                                    title="" // 清空默认的 title 属性
+                                                    style={{ pointerEvents: 'auto' }}
+                                                >
+                                                    {event.title}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent className="bg-white dark:bg-black border border-gray-200 dark:border-gray-700 shadow-lg z-50">
+                                                <div className="space-y-1">
+                                                    <p className="font-medium text-black dark:text-white">{event.title}</p>
+                                                    {event.description && (
+                                                        <p className="text-sm text-black dark:text-white">
+                                                            {event.description}
+                                                        </p>
+                                                    )}
+                                                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                                                        {event.allDay
+                                                            ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
+                                                            : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
+                                                        }
+                                                    </p>
+                                                </div>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    ),
+                                    // 自定义导航按钮
+                                    toolbar: ({ label, onNavigate }) => {
+                                        const navigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+                                            onNavigate(action);
+                                        };
+
+                                        return (
+                                            <div className="flex items-center justify-between mb-4">
+                                                {/* 左侧：导航按钮 */}
+                                                <div className="flex items-center gap-2">
+                                                    <CustomNavigationButton onClick={() => navigate('PREV')}>
+                                                        <ChevronLeft className="w-4 h-4" />
+                                                    </CustomNavigationButton>
+                                                    <CustomNavigationButton onClick={() => navigate('TODAY')}>
+                                                        <MixedText text="今天" />
+                                                    </CustomNavigationButton>
+                                                    <CustomNavigationButton onClick={() => navigate('NEXT')}>
+                                                        <ChevronRight className="w-4 h-4" />
+                                                    </CustomNavigationButton>
+                                                </div>
+
+                                                {/* 中间：当前日期标签 */}
+                                                <div className="text-lg font-semibold text-foreground">
+                                                    <MixedText text={label} />
+                                                </div>
+
+                                                {/* 右侧：空白区域，保持布局平衡 */}
+                                                <div className="w-32"></div>
+                                            </div>
+                                        );
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -535,13 +620,13 @@ export default function ScheduleManagementView({
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="custom">
-                                                <MixedText text="📝 自定义日程" />
+                                                <MixedText text="自定义日程" />
                                             </SelectItem>
                                             <SelectItem value="countdown">
-                                                <MixedText text="📅 考试倒计时" />
+                                                <MixedText text="考试倒计时" />
                                             </SelectItem>
                                             <SelectItem value="plan">
-                                                <MixedText text="🎯 学习计划" />
+                                                <MixedText text="学习计划" />
                                             </SelectItem>
                                         </SelectContent>
                                     </Select>
