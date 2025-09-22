@@ -78,7 +78,7 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg unselectable', className)}
+            className={cn('relative inline-flex h-9 items-center justify-center rounded-full bg-white dark:bg-muted/40 backdrop-blur-md border border-white/20 dark:border-white/20 border-white p-1 text-muted-foreground shadow-lg unselectable', className)}
             style={{ zIndex: 10 }}
         >
             {/* 高亮背景 */}

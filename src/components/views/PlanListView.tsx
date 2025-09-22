@@ -641,7 +641,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                 {completedPlans.length > 0 ? (
                                     <div className="space-y-4">
                                         {/* 批量操作栏 */}
-                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg" style={{ backgroundColor: '#EEEDED' }}>
+                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
                                             <div className="flex items-center gap-3">
                                                 <Checkbox
                                                     checked={selectedPlans.size === paginatedCompletedPlans.length && paginatedCompletedPlans.length > 0}

@@ -400,7 +400,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                             <div className="flex items-center justify-center gap-6 sm:gap-8">
                                 <div className="text-center">
                                     <div className="text-3xl sm:text-4xl font-bold text-green-500 leading-none">已开始</div>
-                                    <div className="text-xs sm:text-sm text-muted-foreground mt-1">考试进行中</div>
+                                    <div className="text-xs sm:text-sm text-muted-foreground mt-1">倒计时进行中</div>
                                 </div>
                             </div>
                         );
@@ -506,7 +506,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 // 置顶的排在前面
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
-                // 如果置顶状态相同，按考试日期排序
+                // 如果置顶状态相同，按目标日期排序
                 return new Date(a.examDate).getTime() - new Date(b.examDate).getTime();
             });
     }, [countdowns, getExamStatus]);
@@ -519,7 +519,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 // 置顶的排在前面
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
-                // 如果置顶状态相同，按考试日期排序（最近的在前）
+                // 如果置顶状态相同，按目标日期排序（最近的在前）
                 return new Date(b.examDate).getTime() - new Date(a.examDate).getTime();
             });
     }, [countdowns, getExamStatus]);
@@ -621,7 +621,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                 {completedCountdowns.length > 0 ? (
                                     <div className="space-y-4">
                                         {/* 批量操作栏 */}
-                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg" style={{ backgroundColor: '#EEEDED' }}>
+                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
                                             <div className="flex items-center gap-3">
                                                 <Checkbox
                                                     checked={selectedCountdowns.size === paginatedCompletedCountdowns.length && paginatedCompletedCountdowns.length > 0}
@@ -755,7 +755,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                         <MixedText text={countdown.description || '暂无描述'} />
                                                                     </p>
                                                                     <div className="text-xs text-muted-foreground">
-                                                                        <MixedText text={`考试日期: ${countdown.examDate.split('T')[0]}`} />
+                                                                        <MixedText text={`目标日期: ${countdown.examDate.split('T')[0]}`} />
                                                                     </div>
                                                                 </div>
                                                             </HoverCardContent>
