@@ -28,6 +28,7 @@ import type { ExamCountdown, StudyPlan } from "@/types/record";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Stepper, Step } from "@/components/ui/Stepper";
+import CustomAgendaView from './CustomAgendaView';
 
 // 设置 moment 中文语言
 moment.locale('zh-cn');
@@ -45,6 +46,8 @@ export interface CalendarEvent {
     color?: string;
     sourceId?: string; // 关联的倒计时或计划ID
     isDuration?: boolean; // 标记为持续时间事件
+    isPlanStart?: boolean; // 标记为计划开始事件
+    isPlanEnd?: boolean; // 标记为计划结束事件
     // 考试倒计时特定字段
     examDate?: string; // YYYY-MM-DD 格式
     // 学习计划特定字段
@@ -780,6 +783,19 @@ export default function ScheduleManagementView({
                         <div className="h-[600px] relative">
                             {showYearView ? (
                                 <YearView />
+                            ) : view === 'agenda' ? (
+                                <CustomAgendaView
+                                    events={events.filter(event => {
+                                        // 过滤掉学习计划的持续时间事件（中间日期）
+                                        if (event.type === 'plan' && event.isDuration) {
+                                            return false;
+                                        }
+                                        // 其他事件正常显示
+                                        return true;
+                                    })}
+                                    currentDate={date}
+                                    onEventClick={handleSelectEvent}
+                                />
                             ) : (
                                 <BigCalendar
                                     localizer={localizer}
@@ -801,7 +817,7 @@ export default function ScheduleManagementView({
                                     popup={false} // 禁用默认的弹出窗口
                                     popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
                                     doShowMoreDrillDown={false} // 禁用更多事件的下钻
-                                    className="custom-calendar-no-tooltip" // 添加自定义类名
+                                    className="" // 移除阻止tooltip的类名
                                     messages={{
                                         next: '下月',
                                         previous: '上月',

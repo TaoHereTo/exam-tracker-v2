@@ -9,17 +9,82 @@
     border-bottom: 1px solid var(--border);
     font-weight: 600;
     padding: 12px 8px;
+    font-size: 14px;
+    /* 与日期数字保持一致的字体大小 */
 }
 
 .rbc-month-view {
-    border: 1px solid var(--border);
+    border: none !important;
     border-radius: 8px;
     overflow: hidden;
+}
+
+/* 月视图中只保留日期上方的横线，去掉所有其他框线 */
+.rbc-month-view .rbc-date-cell {
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+.rbc-month-view .rbc-header {
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border) !important;
+}
+
+/* 强制去掉所有可能的竖直框线和下方框线 */
+.rbc-month-view * {
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+
+/* 专门去掉事项方格的所有框线 */
+.rbc-month-view .rbc-event {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.rbc-month-view .rbc-events-container {
+    border: none !important;
+    background: transparent !important;
+}
+
+.rbc-month-view .rbc-event * {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* 确保月视图中所有表格单元格只保留上方横线 */
+.rbc-month-view table {
+    border-collapse: collapse;
+}
+
+.rbc-month-view td,
+.rbc-month-view th {
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border) !important;
 }
 
 .rbc-date-cell {
     color: var(--foreground);
     padding: 8px;
+    text-align: center;
+    /* 让日期数字水平居中 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 水平居中 */
+    justify-content: flex-start;
+    /* 垂直顶部对齐 */
+    font-size: 14px;
+    /* 缩小日期数字的字体大小 */
 }
 
 .rbc-off-range-bg {
@@ -316,6 +381,8 @@
     margin-right: 0 !important;
 }
 
+
+
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
     .rbc-calendar {
@@ -325,89 +392,109 @@
 
     .rbc-month-view {
         background-color: var(--background);
-        border-color: #374151 !important;
-        /* 深灰色边框 */
+        border: none !important;
+        /* 去掉外边框 */
     }
 
     .rbc-date-cell {
         background-color: var(--background);
-        border-color: #374151 !important;
-        /* 深灰色边框 */
     }
 
     .rbc-off-range-bg {
         background-color: var(--muted);
     }
 
-    /* 深色模式下的表格线条颜色 */
+    /* 深色模式下只保留日期上方的横线，去掉所有其他框线 */
     .rbc-month-view .rbc-date-cell {
-        border-right: 1px solid #374151 !important;
-        /* 深灰色右边框 */
-        border-bottom: 1px solid #374151 !important;
-        /* 深灰色下边框 */
+        border-right: none !important;
+        border-bottom: none !important;
+        border-left: none !important;
+        border-top: 1px solid #374151 !important;
     }
 
+    /* 深色模式下强制去掉所有可能的竖直框线和下方框线 */
+    .rbc-month-view * {
+        border-left: none !important;
+        border-right: none !important;
+        border-bottom: none !important;
+    }
+
+    /* 深色模式下专门去掉事项方格的所有框线 */
+    .rbc-month-view .rbc-event {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .rbc-month-view .rbc-events-container {
+        border: none !important;
+        background: transparent !important;
+    }
+
+    .rbc-month-view .rbc-event * {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    /* 深色模式下但保留上方横线 */
+    .rbc-month-view .rbc-date-cell,
     .rbc-month-view .rbc-header {
-        border-right: 1px solid #374151 !important;
-        /* 深灰色右边框 */
-        border-bottom: 1px solid #374151 !important;
-        /* 深灰色下边框 */
+        border-top: 1px solid #374151 !important;
     }
 
-    /* 确保所有表格线条都是深灰色 */
-    .rbc-month-view table {
-        border-collapse: collapse;
-    }
 
-    .rbc-month-view td,
-    .rbc-month-view th {
-        border-color: #374151 !important;
-        /* 深灰色边框 */
-    }
+
 }
 
 /* 支持手动切换的深色模式 */
 .dark .rbc-month-view {
-    border-color: #374151 !important;
-    /* 深灰色边框 */
+    border: none !important;
+    /* 去掉外边框 */
 }
 
-.dark .rbc-date-cell {
-    border-color: #374151 !important;
-    /* 深灰色边框 */
-}
 
 .dark .rbc-month-view .rbc-date-cell {
-    border-right: 1px solid #374151 !important;
-    /* 深灰色右边框 */
-    border-bottom: 1px solid #374151 !important;
-    /* 深灰色下边框 */
+    border-right: none !important;
+    border-bottom: none !important;
+    border-left: none !important;
+    border-top: 1px solid #374151 !important;
 }
 
+/* 手动深色模式下强制去掉所有可能的竖直框线和下方框线 */
+.dark .rbc-month-view * {
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+
+/* 手动深色模式下专门去掉事项方格的所有框线 */
+.dark .rbc-month-view .rbc-event {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.dark .rbc-month-view .rbc-events-container {
+    border: none !important;
+    background: transparent !important;
+}
+
+.dark .rbc-month-view .rbc-event * {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* 手动深色模式下但保留上方横线 */
+.dark .rbc-month-view .rbc-date-cell,
 .dark .rbc-month-view .rbc-header {
-    border-right: 1px solid #374151 !important;
-    /* 深灰色右边框 */
-    border-bottom: 1px solid #374151 !important;
-    /* 深灰色下边框 */
+    border-top: 1px solid #374151 !important;
 }
 
-.dark .rbc-month-view td,
-.dark .rbc-month-view th {
-    border-color: #374151 !important;
-    /* 深灰色边框 */
-}
 
-/* 确保深色模式下所有日历相关的边框都是深灰色 */
-.dark .rbc-calendar,
-.dark .rbc-month-view,
-.dark .rbc-week-view,
-.dark .rbc-day-view {
-    border-color: #374151 !important;
-}
 
-.dark .rbc-calendar * {
-    border-color: #374151 !important;
-}
+
 
 /* 隐藏日视图中小时内部的横线 */
 .rbc-time-view .rbc-time-content .rbc-time-gutter .rbc-timeslot-group {
@@ -457,3 +544,43 @@
 .dark .rbc-time-view .rbc-time-content .rbc-timeslot-group {
     border-bottom: 1px solid #374151 !important;
 }
+
+
+/* 确保周视图中事件不会影响边框 */
+.rbc-time-view .rbc-event {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+
+/* 确保周视图中的表格结构保持一致 */
+.rbc-time-view table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.rbc-time-view .rbc-time-content table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+/* 确保周视图中所有单元格都有统一的边框 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot,
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot:first-child,
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot:last-child {
+    border-right: 1px solid var(--border) !important;
+    border-bottom: none !important;
+    border-top: none !important;
+}
+
+/* 深色模式下周视图单元格边框 */
+.dark .rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot,
+.dark .rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot:first-child,
+.dark .rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot:last-child {
+    border-right: 1px solid #374151 !important;
+    border-bottom: none !important;
+    border-top: none !important;
+}
+
+/* 自定义议程视图样式已移至 CustomAgendaView 组件中 */
