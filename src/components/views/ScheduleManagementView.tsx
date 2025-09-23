@@ -821,8 +821,25 @@ export default function ScheduleManagementView({
                                     components={{
                                         event: ({ event }) => (
                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                    {event.title}
+                                                <TooltipTrigger asChild>
+                                                    <div
+                                                        className="w-full h-full cursor-pointer"
+                                                        style={{
+                                                            minHeight: '20px',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center'
+                                                        }}
+                                                    >
+                                                        {/* 完全透明的触发器，但保持完整的点击区域 */}
+                                                        <div
+                                                            className="absolute inset-0 w-full h-full"
+                                                            style={{
+                                                                backgroundColor: 'transparent',
+                                                                zIndex: 2
+                                                            }}
+                                                        />
+                                                    </div>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>{event.title}</p>

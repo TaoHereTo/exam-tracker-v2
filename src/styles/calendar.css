@@ -33,31 +33,104 @@
 }
 
 .rbc-event {
-    border-radius: 4px;
+    border-radius: 2px;
+    /* 进一步减小圆角 */
     border: none;
     font-size: 12px;
     font-weight: 500;
-    padding: 2px 4px;
+    padding: 0px 4px;
+    /* 保持最小垂直内边距 */
     margin: 1px;
+    width: 100% !important;
+    /* 强制事件占满整个宽度 */
+    position: relative !important;
+    /* 确保事件可以正确定位 */
+    min-height: 8px !important;
+    /* 最小化高度 */
+    max-height: 12px !important;
+    /* 最小化最大高度 */
 }
 
 .rbc-event-content {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    /* 隐藏事件文字内容 */
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
 }
 
-/* 只针对倒计时事件调整样式 */
+/* 针对所有事件调整样式 */
 .rbc-event[style*="background-color: rgb(239, 68, 68)"],
-.rbc-event[style*="background-color: #ef4444"] {
-    padding: 6px 8px;
-    min-height: 32px;
+.rbc-event[style*="background-color: #ef4444"],
+.rbc-event[style*="background-color: rgb(59, 130, 246)"],
+.rbc-event[style*="background-color: #3b82f6"],
+.rbc-event[style*="background-color: rgb(16, 185, 129)"],
+.rbc-event[style*="background-color: #10b981"] {
+    padding: 0px 6px;
+    /* 最小化垂直内边距 */
+    min-height: 10px;
+    /* 最小化高度 */
+    max-height: 14px;
+    /* 最小化最大高度 */
     display: flex;
     align-items: center;
+    width: 100% !important;
+    /* 确保所有事件都占满宽度 */
+}
+
+/* 强制所有事件竖直排列，避免横向重叠 */
+.rbc-event {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* 确保事件容器支持竖直排列 */
+.rbc-event-content {
+    width: 100%;
+    box-sizing: border-box;
+    /* 隐藏所有事件文字内容 */
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+
+/* 隐藏所有事件中的文字内容，但保留tooltip触发器 */
+.rbc-event * {
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+
+/* 确保所有事件都能正常显示tooltip */
+.rbc-event {
+    position: relative !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* 确保事件内容区域可以接收鼠标事件 */
+.rbc-event>div {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* 确保事件标签也被隐藏 */
+.rbc-event-label {
+    display: none !important;
 }
 
 .rbc-event[style*="background-color: rgb(239, 68, 68)"] .rbc-event-content,
-.rbc-event[style*="background-color: #ef4444"] .rbc-event-content {
+.rbc-event[style*="background-color: #ef4444"] .rbc-event-content,
+.rbc-event[style*="background-color: rgb(59, 130, 246)"] .rbc-event-content,
+.rbc-event[style*="background-color: #3b82f6"] .rbc-event-content,
+.rbc-event[style*="background-color: rgb(16, 185, 129)"] .rbc-event-content,
+.rbc-event[style*="background-color: #10b981"] .rbc-event-content {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: normal;
@@ -66,11 +139,19 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    /* 隐藏所有事件文字内容 */
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
 }
 
-/* 隐藏倒计时事件中的时间信息，只显示标题 */
+/* 隐藏所有事件中的时间信息，只显示标题 */
 .rbc-event[style*="background-color: rgb(239, 68, 68)"] .rbc-event-label,
-.rbc-event[style*="background-color: #ef4444"] .rbc-event-label {
+.rbc-event[style*="background-color: #ef4444"] .rbc-event-label,
+.rbc-event[style*="background-color: rgb(59, 130, 246)"] .rbc-event-label,
+.rbc-event[style*="background-color: #3b82f6"] .rbc-event-label,
+.rbc-event[style*="background-color: rgb(16, 185, 129)"] .rbc-event-label,
+.rbc-event[style*="background-color: #10b981"] .rbc-event-label {
     display: none !important;
 }
 
@@ -158,8 +239,12 @@
     /* 移动端只针对倒计时事件调整样式 */
     .rbc-event[style*="background-color: rgb(239, 68, 68)"],
     .rbc-event[style*="background-color: #ef4444"] {
-        padding: 4px 6px;
-        min-height: 28px;
+        padding: 0px 4px;
+        /* 最小化移动端垂直内边距 */
+        min-height: 8px;
+        /* 最小化移动端高度 */
+        max-height: 12px;
+        /* 最小化移动端最大高度 */
     }
 }
 
@@ -201,6 +286,36 @@
     display: none !important;
 }
 
+/* 月视图中事件的竖直排列样式 */
+.rbc-month-view .rbc-events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.rbc-month-view .rbc-event {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 !important;
+    position: relative !important;
+    display: block !important;
+}
+
+/* 确保月视图中同一时间段的事件竖直排列 */
+.rbc-month-view .rbc-date-cell .rbc-events-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.rbc-month-view .rbc-date-cell .rbc-event {
+    width: 100% !important;
+    margin-bottom: 1px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
     .rbc-calendar {
@@ -210,13 +325,135 @@
 
     .rbc-month-view {
         background-color: var(--background);
+        border-color: #374151 !important;
+        /* 深灰色边框 */
     }
 
     .rbc-date-cell {
         background-color: var(--background);
+        border-color: #374151 !important;
+        /* 深灰色边框 */
     }
 
     .rbc-off-range-bg {
         background-color: var(--muted);
     }
+
+    /* 深色模式下的表格线条颜色 */
+    .rbc-month-view .rbc-date-cell {
+        border-right: 1px solid #374151 !important;
+        /* 深灰色右边框 */
+        border-bottom: 1px solid #374151 !important;
+        /* 深灰色下边框 */
+    }
+
+    .rbc-month-view .rbc-header {
+        border-right: 1px solid #374151 !important;
+        /* 深灰色右边框 */
+        border-bottom: 1px solid #374151 !important;
+        /* 深灰色下边框 */
+    }
+
+    /* 确保所有表格线条都是深灰色 */
+    .rbc-month-view table {
+        border-collapse: collapse;
+    }
+
+    .rbc-month-view td,
+    .rbc-month-view th {
+        border-color: #374151 !important;
+        /* 深灰色边框 */
+    }
+}
+
+/* 支持手动切换的深色模式 */
+.dark .rbc-month-view {
+    border-color: #374151 !important;
+    /* 深灰色边框 */
+}
+
+.dark .rbc-date-cell {
+    border-color: #374151 !important;
+    /* 深灰色边框 */
+}
+
+.dark .rbc-month-view .rbc-date-cell {
+    border-right: 1px solid #374151 !important;
+    /* 深灰色右边框 */
+    border-bottom: 1px solid #374151 !important;
+    /* 深灰色下边框 */
+}
+
+.dark .rbc-month-view .rbc-header {
+    border-right: 1px solid #374151 !important;
+    /* 深灰色右边框 */
+    border-bottom: 1px solid #374151 !important;
+    /* 深灰色下边框 */
+}
+
+.dark .rbc-month-view td,
+.dark .rbc-month-view th {
+    border-color: #374151 !important;
+    /* 深灰色边框 */
+}
+
+/* 确保深色模式下所有日历相关的边框都是深灰色 */
+.dark .rbc-calendar,
+.dark .rbc-month-view,
+.dark .rbc-week-view,
+.dark .rbc-day-view {
+    border-color: #374151 !important;
+}
+
+.dark .rbc-calendar * {
+    border-color: #374151 !important;
+}
+
+/* 隐藏日视图中小时内部的横线 */
+.rbc-time-view .rbc-time-content .rbc-time-gutter .rbc-timeslot-group {
+    border-bottom: none !important;
+}
+
+.rbc-time-view .rbc-time-content .rbc-timeslot-group {
+    border-bottom: none !important;
+}
+
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot {
+    border-bottom: none !important;
+}
+
+/* 隐藏日视图中的时间槽分隔线 */
+.rbc-time-view .rbc-time-content .rbc-time-slot {
+    border-bottom: none !important;
+}
+
+/* 隐藏日视图中的小时分隔线 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group:not(:last-child) {
+    border-bottom: none !important;
+}
+
+/* 确保日视图中只保留主要的小时分隔线，去掉内部的小分隔线 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot:not(:last-child) {
+    border-bottom: none !important;
+}
+
+/* 隐藏日视图中的时间段分隔线 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot+.rbc-time-slot {
+    border-top: none !important;
+}
+
+/* 隐藏日视图中的小时内部的所有分隔线 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group .rbc-time-slot {
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+/* 只保留小时之间的主要分隔线 */
+.rbc-time-view .rbc-time-content .rbc-timeslot-group {
+    border-bottom: 1px solid var(--border) !important;
+}
+
+/* 深色模式下的小时分隔线 */
+.dark .rbc-time-view .rbc-time-content .rbc-timeslot-group {
+    border-bottom: 1px solid #374151 !important;
 }
