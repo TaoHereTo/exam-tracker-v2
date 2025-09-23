@@ -31,13 +31,12 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '记录已保存到云端', `${record.date} ${normalizeModuleName(record.module)} 做题记录已自动同步到云端`);
+                notify.updateToSuccess(toastId, '记录已保存到云端');
             } else {
                 // Fallback to regular notification
                 notify.notify({
                     type: 'success',
-                    message: '记录已保存到云端',
-                    description: `${record.date} ${normalizeModuleName(record.module)} 做题记录已自动同步到云端`
+                    message: '记录已保存到云端'
                 });
             }
         } catch (error) {
@@ -75,12 +74,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '记录已更新到云端', '刷题记录已自动同步到云端');
+                notify.updateToSuccess(toastId, '记录已更新到云端');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '记录已更新到云端',
-                    description: '刷题记录已自动同步到云端'
+                    message: '记录已更新到云端'
                 });
             }
         } catch (error) {
@@ -125,12 +123,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '计划已保存到云端', `学习计划"${plan.name}"已自动同步到云端`);
+                notify.updateToSuccess(toastId, '计划已保存到云端');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '计划已保存到云端',
-                    description: `学习计划"${plan.name}"已自动同步到云端`
+                    message: '计划已保存到云端'
                 });
             }
 
@@ -173,12 +170,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '倒计时已保存到云端', `考试倒计时"${countdown.name}"已自动同步到云端`);
+                notify.updateToSuccess(toastId, '倒计时已保存到云端');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '倒计时已保存到云端',
-                    description: `考试倒计时"${countdown.name}"已自动同步到云端`
+                    message: '倒计时已保存到云端'
                 });
             }
 
@@ -270,13 +266,12 @@ export class AutoCloudSync {
             // Update to success only if notifications should be shown
             if (showNotifications) {
                 if (toastId && notify.updateToSuccess) {
-                    notify.updateToSuccess(toastId, '知识点已保存到云端', '新的知识点已自动同步到云端');
+                    notify.updateToSuccess(toastId, '知识点已保存到云端');
                 } else {
                     // Restored per user request - show cloud sync status when saving knowledge
                     notify.notify({
                         type: 'success',
-                        message: '知识点已保存到云端',
-                        description: '新的知识点已自动同步到云端'
+                        message: '知识点已保存到云端'
                     });
                 }
             }
@@ -338,12 +333,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '计划已更新到云端', `学习计划"${plan.name}"已自动同步到云端`);
+                notify.updateToSuccess(toastId, '计划已更新到云端');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '计划已更新到云端',
-                    description: `学习计划"${plan.name}"已自动同步到云端`
+                    message: '计划已更新到云端'
                 });
             }
 
@@ -373,8 +367,7 @@ export class AutoCloudSync {
 
                     notify.notify({
                         type: 'success',
-                        message: '计划已重新创建到云端',
-                        description: `学习计划"${plan.name}"已重新同步到云端`
+                        message: '计划已重新创建到云端'
                     });
 
                     return savedPlan;
@@ -444,8 +437,7 @@ export class AutoCloudSync {
             // Restored per user request - keep countdown update notifications
             notify.notify({
                 type: 'success',
-                message: '倒计时已更新到云端',
-                description: `考试倒计时"${countdown.name}"已自动同步更新到云端`
+                message: '倒计时已更新到云端'
             });
 
             return result;
@@ -467,8 +459,7 @@ export class AutoCloudSync {
 
                     notify.notify({
                         type: 'success',
-                        message: '倒计时已重新创建到云端',
-                        description: `考试倒计时"${countdown.name}"已重新同步到云端`
+                        message: '倒计时已重新创建到云端'
                     });
 
                     return savedCountdown;
@@ -560,12 +551,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '知识点已更新到云端', '知识点已自动同步到云端');
+                notify.updateToSuccess(toastId, '知识点已更新到云端');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '知识点已更新到云端',
-                    description: '知识点已自动同步到云端'
+                    message: '知识点已更新到云端'
                 });
             }
         } catch (error) {
@@ -599,13 +589,12 @@ export class AutoCloudSync {
 
             // Update to success only if updateToSuccess is provided
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '记录已从云端删除', '刷题记录已从云端同步删除');
+                notify.updateToSuccess(toastId, '记录已从云端删除');
             } else if (!toastId && notify.notify) {
                 // Only show notification if no toastId was created (meaning notifyLoading was not provided)
                 notify.notify({
                     type: 'success',
-                    message: '记录已从云端删除',
-                    description: '刷题记录已从云端同步删除'
+                    message: '记录已从云端删除'
                 });
             }
         } catch (error) {
@@ -639,12 +628,11 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '计划已从云端删除', '学习计划已从云端同步删除');
+                notify.updateToSuccess(toastId, '计划已从云端删除');
             } else {
                 notify.notify({
                     type: 'success',
-                    message: '计划已从云端删除',
-                    description: '学习计划已从云端同步删除'
+                    message: '计划已从云端删除'
                 });
             }
         } catch (error) {
@@ -679,13 +667,12 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '倒计时已从云端删除', '考试倒计时已从云端同步删除');
+                notify.updateToSuccess(toastId, '倒计时已从云端删除');
             } else {
                 // Restored per user request - keep countdown delete notifications
                 notify.notify({
                     type: 'success',
-                    message: '倒计时已从云端删除',
-                    description: '考试倒计时已从云端同步删除'
+                    message: '倒计时已从云端删除'
                 });
             }
         } catch (error) {
@@ -719,13 +706,12 @@ export class AutoCloudSync {
 
             // Update to success
             if (toastId && notify.updateToSuccess) {
-                notify.updateToSuccess(toastId, '知识点已从云端删除', '知识点已从云端同步删除');
+                notify.updateToSuccess(toastId, '知识点已从云端删除');
             } else {
                 // Restored per user request - keep notifications in knowledge summary view
                 notify.notify({
                     type: 'success',
-                    message: '知识点已从云端删除',
-                    description: '知识点已从云端同步删除'
+                    message: '知识点已从云端删除'
                 });
             }
         } catch (error) {

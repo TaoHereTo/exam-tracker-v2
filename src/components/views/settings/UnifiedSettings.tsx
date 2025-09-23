@@ -441,12 +441,11 @@ export function UnifiedSettings({
       if (result.success) {
         // Update to success notification
         if (toastId && updateToSuccess) {
-          updateToSuccess(toastId, '设置已保存到云端', '所有设置已成功同步到云端');
+          updateToSuccess(toastId, '设置已保存到云端');
         } else {
           notify({
             type: 'success',
-            message: '设置已保存到云端',
-            description: '所有设置已成功同步到云端'
+            message: '设置已保存到云端'
           });
         }
       } else {
