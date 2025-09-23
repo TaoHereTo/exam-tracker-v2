@@ -133,6 +133,19 @@ const ScheduleManagementView = lazy(() =>
     }))
 );
 
+// 添加申论相关视图的懒加载
+const TextExtractionView = lazy(() =>
+    import("@/components/views/TextExtractionView").then(module => ({
+        default: module.default
+    }))
+);
+
+const ShenlunPlaceholderView = lazy(() =>
+    import("@/components/views/ShenlunPlaceholderView").then(module => ({
+        default: module.default
+    }))
+);
+
 export function MainApp() {
     const [activeTab, setActiveTab] = useState('overview'); // 默认显示'成绩概览'
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
@@ -1336,6 +1349,26 @@ export function MainApp() {
                                                         toast.success('自定义日程删除成功');
                                                     }}
                                                 />
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'text-extraction' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <TextExtractionView />
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'shenlun-placeholder' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <ShenlunPlaceholderView />
                                             </Suspense>
                                         )}
 

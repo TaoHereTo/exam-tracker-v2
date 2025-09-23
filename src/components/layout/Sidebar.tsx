@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText } from "lucide-react";
+import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText, FileText as FileTextIcon, FileEdit } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     SidebarProvider,
@@ -159,6 +159,25 @@ const NAV_DATA = {
                     url: '#',
                     tab: 'knowledge-summary',
                     icon: BookMarked,
+                },
+            ],
+        },
+        {
+            title: '申论',
+            icon: FileTextIcon,
+            isActive: false,
+            items: [
+                {
+                    title: '文本摘录',
+                    url: '#',
+                    tab: 'text-extraction',
+                    icon: FileText,
+                },
+                {
+                    title: '暂定',
+                    url: '#',
+                    tab: 'shenlun-placeholder',
+                    icon: FileEdit,
                 },
             ],
         },

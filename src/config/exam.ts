@@ -36,6 +36,8 @@ export const PAGE_TITLE_MAP: Record<string, string> = {
     'plan': '制定计划',
     'countdown': '倒计时',
     'calendar': '日程管理',
+    'text-extraction': '文本摘录',
+    'shenlun-placeholder': '暂定',
 };
 
 // 统一的模块颜色配置
