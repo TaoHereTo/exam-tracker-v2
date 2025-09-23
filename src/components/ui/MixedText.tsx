@@ -59,6 +59,18 @@ export const MixedText = memo(function MixedText({
         baseStyle.letterSpacing = '0.02em';
     }
 
+    // 特别优化侧边栏菜单项文本
+    const sidebarMenuItems = [
+        "AI分析", "成绩概览", "数据图表", "最佳成绩", "新的记录", "刷题历史",
+        "学习计划", "倒计时", "日程管理", "知识点录入", "知识点汇总",
+        "文本摘录", "暂定"
+    ];
+
+    if (sidebarMenuItems.includes(content)) {
+        baseStyle.fontWeight = '500';
+        baseStyle.letterSpacing = '0.01em';
+    }
+
     if (hasFormatting) {
         // Render formatted text
         return (

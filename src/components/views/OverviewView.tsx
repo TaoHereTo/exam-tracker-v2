@@ -599,7 +599,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
 
             {/* 添加间距，让tabs显示在屏幕底部 */}
-            <div className="h-38"></div>
+            <div className="h-16"></div>
 
             {/* 学习分析区域 - 放在屏幕底部 */}
             <div className="w-full mt-16 mb-12">
@@ -617,7 +617,8 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                     <UnifiedTabsContents className="py-6 px-2">
                         {moduleData.map((module) => (
                             <UnifiedTabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
-                                <div className="w-full max-w-xl mx-auto pb-4">
+                                <div className="w-full max-w-4xl mx-auto pb-4 space-y-6">
+                                    {/* 原有数据分析卡片 */}
                                     <Card className="p-4">
                                         <div className="space-y-4">
                                             <h3 className="font-medium text-center text-lg">{module.name}</h3>

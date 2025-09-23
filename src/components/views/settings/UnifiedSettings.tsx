@@ -37,6 +37,7 @@ import 'react-photo-view/dist/react-photo-view.css';
 import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { CloudSyncService } from "@/lib/cloudSyncService";
 import { UnifiedTable, type DataTableColumn } from "@/components/ui/UnifiedTable";
+import { AISettings } from "./AISettings";
 
 export function UnifiedSettings({
   onExport,
@@ -485,6 +486,7 @@ export function UnifiedSettings({
             <TabsList className="items-center h-10">
               <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
               <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
+              <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
             </TabsList>
           </div>
 
@@ -952,6 +954,10 @@ export function UnifiedSettings({
                   <MixedText text="保存设置" />
                 </Button>
               </div>
+            </TabsContent>
+
+            <TabsContent value="ai">
+              <AISettings />
             </TabsContent>
           </TabsContents>
 

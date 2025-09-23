@@ -146,6 +146,13 @@ const ShenlunPlaceholderView = lazy(() =>
     }))
 );
 
+// 添加AI分析视图的懒加载
+const AIAnalysisView = lazy(() =>
+    import("@/components/views/AIAnalysisView").then(module => ({
+        default: module.AIAnalysisView
+    }))
+);
+
 export function MainApp() {
     const [activeTab, setActiveTab] = useState('overview'); // 默认显示'成绩概览'
     const [knowledge, setKnowledge] = useLocalStorage<KnowledgeItem[]>("exam-tracker-knowledge-v2", []);
@@ -1369,6 +1376,16 @@ export function MainApp() {
                                                 </div>
                                             }>
                                                 <ShenlunPlaceholderView />
+                                            </Suspense>
+                                        )}
+
+                                        {activeTab === 'ai-analysis' && (
+                                            <Suspense fallback={
+                                                <div className="flex items-center justify-center min-h-[60vh]">
+                                                    <SimpleUiverseSpinner />
+                                                </div>
+                                            }>
+                                                <AIAnalysisView records={records} />
                                             </Suspense>
                                         )}
 

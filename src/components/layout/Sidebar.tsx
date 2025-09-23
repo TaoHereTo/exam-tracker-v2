@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText, FileText as FileTextIcon, FileEdit } from "lucide-react";
+import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText, FileText as FileTextIcon, FileEdit, Brain } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     SidebarProvider,
@@ -90,6 +90,12 @@ const NAV_DATA = {
                     url: '#',
                     tab: 'charts',
                     icon: LineChart,
+                },
+                {
+                    title: 'AI分析',
+                    url: '#',
+                    tab: 'ai-analysis',
+                    icon: Brain,
                 },
                 {
                     title: '最佳成绩',
@@ -257,11 +263,11 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                                 <SidebarMenuSubButton
                                                     asChild
                                                     isActive={activeTab === subItem.tab}
-                                                    className="data-[state=open]:bg-[#EEEDED] dark:data-[state=open]:bg-muted unselectable"
+                                                    className="data-[state=open]:bg-[#EEEDED] dark:data-[state=open]:bg-muted unselectable font-medium"
                                                 >
                                                     <button
                                                         onClick={() => handleMenuClick(subItem.tab || '')}
-                                                        className="w-full text-left unselectable"
+                                                        className="w-full text-left unselectable font-medium"
                                                     >
                                                         <span><MixedText text={subItem.title} /></span>
                                                     </button>
