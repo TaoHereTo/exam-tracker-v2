@@ -655,9 +655,9 @@ export default function ScheduleManagementView({
                                 <button
                                     key={index}
                                     onClick={() => handleMonthSelect(index)}
-                                    className="flex flex-col items-center justify-center border-2 border-gray-400 dark:border-gray-500 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-md p-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-600 dark:hover:border-gray-400"
+                                    className="flex flex-col items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors rounded-md p-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                                 >
-                                    <div className="font-semibold mb-1">
+                                    <div className="font-semibold mb-1 text-lg">
                                         <MixedText text={month} />
                                     </div>
                                     {totalEvents > 0 && (
