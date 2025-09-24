@@ -39,6 +39,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     className
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
+    const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
@@ -54,15 +55,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const html = e.currentTarget.innerHTML;
 
-        // 清理空的div和br标签
-        const cleanedHtml = cleanEmptyContent(html);
-
-        // 如果清理后的内容与当前内容不同，更新DOM
-        if (cleanedHtml !== html) {
-            e.currentTarget.innerHTML = cleanedHtml;
-        }
-
-        onChange(cleanedHtml);
+        // 暂时禁用自动清理，避免干扰正常输入
+        // 只在用户明确需要时手动清理
+        onChange(html);
     };
 
     // 清理空内容的函数
@@ -72,17 +67,29 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             return '';
         }
 
-        // 移除空的div标签和br标签
-        const cleaned = html
-            .replace(/<div><br><\/div>/gi, '') // 移除 <div><br></div>
-            .replace(/<div><\/div>/gi, '') // 移除 <div></div>
-            .replace(/<br>/gi, '') // 移除单独的 <br>
-            .replace(/<p><br><\/p>/gi, '') // 移除 <p><br></p>
-            .replace(/<p><\/p>/gi, '') // 移除 <p></p>
+        // 更温和的清理逻辑，保留必要的换行符
+        let cleaned = html
+            // 只移除完全空的div标签（不包含br的）
+            .replace(/<div[^>]*><\/div>/gi, '')
+            .replace(/<div[^>]*>\s*<\/div>/gi, '')
+            // 只移除完全空的p标签（不包含br的）
+            .replace(/<p[^>]*><\/p>/gi, '')
+            .replace(/<p[^>]*>\s*<\/p>/gi, '')
+            // 移除空的span标签
+            .replace(/<span[^>]*><\/span>/gi, '')
+            .replace(/<span[^>]*>\s*<\/span>/gi, '')
+            // 将 <div><br></div> 转换为 <br>，而不是删除
+            .replace(/<div[^>]*><br><\/div>/gi, '<br>')
+            .replace(/<div[^>]*>\s*<br>\s*<\/div>/gi, '<br>')
+            // 将 <p><br></p> 转换为 <br>，而不是删除
+            .replace(/<p[^>]*><br><\/p>/gi, '<br>')
+            .replace(/<p[^>]*>\s*<br>\s*<\/p>/gi, '<br>')
+            // 清理过多的连续br标签，但保留换行
+            .replace(/<br>\s*<br>\s*<br>/gi, '<br><br>')
             .trim();
 
-        // 如果清理后内容为空，返回空字符串
-        if (!cleaned || cleaned === '') {
+        // 如果清理后只包含br标签或空白字符，返回空字符串
+        if (!cleaned || cleaned === '' || cleaned.replace(/<br>/gi, '').trim() === '') {
             return '';
         }
 
@@ -214,7 +221,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     };
 
-    // 处理格式化命令，专门解决标签内光标问题
+    // 处理格式化命令，保持选区
     const handleFormatCommand = (command: string, value?: string) => {
         if (!editorRef.current) return;
 
@@ -234,40 +241,134 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         const range = selection?.getRangeAt(0);
         if (!range) return;
 
-        // 检查光标是否在格式化标签内
-        let currentNode: Node | null = range.startContainer;
-        let isInsideFormatTag = false;
+        const selectedText = range.toString();
+        console.log('格式化前选中文字:', selectedText);
 
-        while (currentNode && currentNode !== editorRef.current) {
-            if (currentNode.nodeType === Node.ELEMENT_NODE) {
-                const element = currentNode as Element;
-                if (['B', 'STRONG', 'I', 'EM', 'U', 'S', 'STRIKE'].includes(element.tagName)) {
-                    isInsideFormatTag = true;
+        // 保存更精确的位置信息
+        let positionInfo = null;
+        if (selectedText) {
+            // 使用TreeWalker计算选中文字在整个编辑器中的精确位置
+            const walker = document.createTreeWalker(
+                editorRef.current,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            let currentOffset = 0;
+            let startIndex = -1;
+            let endIndex = -1;
+
+            while (walker.nextNode()) {
+                const textNode = walker.currentNode;
+                const text = textNode.textContent || '';
+                const textLength = text.length;
+
+                // 检查选区是否在这个文本节点中
+                if (textNode === range.startContainer) {
+                    startIndex = currentOffset + range.startOffset;
+                }
+                if (textNode === range.endContainer) {
+                    endIndex = currentOffset + range.endOffset;
                     break;
                 }
+
+                currentOffset += textLength;
             }
-            currentNode = currentNode.parentNode;
-        }
 
-        if (isInsideFormatTag) {
-            // 如果在格式化标签内，先退出标签
-            const newRange = document.createRange();
-
-            // 在编辑器末尾创建一个新的文本节点
-            const textNode = document.createTextNode('');
-            editorRef.current.appendChild(textNode);
-
-            // 将光标移到新文本节点
-            newRange.setStart(textNode, 0);
-            newRange.setEnd(textNode, 0);
-            if (selection) {
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
+            positionInfo = {
+                text: selectedText,
+                startIndex: startIndex,
+                endIndex: endIndex,
+                startContainer: range.startContainer,
+                startOffset: range.startOffset,
+                endContainer: range.endContainer,
+                endOffset: range.endOffset
+            };
+            console.log('格式化命令:', command);
+            console.log('保存的位置信息:', positionInfo);
         }
 
         // 执行命令
-        execCommand(command, value);
+        const success = document.execCommand(command, false, value);
+
+        if (success) {
+            // 如果原来有选中文字，尝试重新选中相同位置的文字
+            if (selectedText && positionInfo) {
+                // 延迟执行，确保DOM更新完成
+                setTimeout(() => {
+                    if (editorRef.current) {
+                        // 重新计算整个编辑器的文本内容
+                        const newEditorText = editorRef.current.textContent || '';
+                        console.log('格式化后编辑器文本:', newEditorText);
+
+                        // 使用保存的精确位置来恢复选区
+                        if (positionInfo.startIndex >= 0 && positionInfo.endIndex >= 0) {
+                            // 使用TreeWalker找到对应的文本节点
+                            const walker = document.createTreeWalker(
+                                editorRef.current,
+                                NodeFilter.SHOW_TEXT,
+                                null,
+                                false
+                            );
+
+                            let currentOffset = 0;
+                            let startNode = null;
+                            let startOffset = 0;
+                            let endNode = null;
+                            let endOffset = 0;
+
+                            while (walker.nextNode()) {
+                                const textNode = walker.currentNode;
+                                const text = textNode.textContent || '';
+                                const textLength = text.length;
+
+                                // 检查开始位置是否在这个文本节点中
+                                if (currentOffset <= positionInfo.startIndex &&
+                                    currentOffset + textLength > positionInfo.startIndex &&
+                                    !startNode) {
+                                    startNode = textNode;
+                                    startOffset = positionInfo.startIndex - currentOffset;
+                                }
+
+                                // 检查结束位置是否在这个文本节点中
+                                if (currentOffset <= positionInfo.endIndex &&
+                                    currentOffset + textLength >= positionInfo.endIndex &&
+                                    !endNode) {
+                                    endNode = textNode;
+                                    endOffset = positionInfo.endIndex - currentOffset;
+                                    break;
+                                }
+
+                                currentOffset += textLength;
+                            }
+
+                            if (startNode && endNode) {
+                                // 创建新的选区
+                                const newRange = document.createRange();
+                                newRange.setStart(startNode, startOffset);
+                                newRange.setEnd(endNode, endOffset);
+
+                                const newSelection = window.getSelection();
+                                if (newSelection) {
+                                    newSelection.removeAllRanges();
+                                    newSelection.addRange(newRange);
+                                    console.log('选区已恢复到正确位置:', {
+                                        startIndex: positionInfo.startIndex,
+                                        endIndex: positionInfo.endIndex,
+                                        selectedText: newRange.toString()
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }, 0);
+            }
+
+            // 更新内容
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
     };
 
     const insertLink = () => {
@@ -284,96 +385,298 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     };
 
-    const setTextColor = (color: string) => {
-        console.log('setTextColor 被调用，颜色:', color);
+    // 保存当前选区
+    const saveCurrentSelection = () => {
+        console.log('=== 保存选区 ===');
+        const selection = window.getSelection();
+        console.log('当前选区对象:', selection);
+        console.log('选区数量:', selection?.rangeCount);
+
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+
+            console.log('选中的文字:', `"${selectedText}"`);
+            console.log('选中文字长度:', selectedText.length);
+            console.log('开始容器:', range.startContainer);
+            console.log('结束容器:', range.endContainer);
+            console.log('开始偏移:', range.startOffset);
+            console.log('结束偏移:', range.endOffset);
+
+            // 只有在真正选中文字时才保存选区
+            if (selectedText.length > 0) {
+                savedSelectionRef.current = {
+                    startContainer: range.startContainer,
+                    startOffset: range.startOffset,
+                    endContainer: range.endContainer,
+                    endOffset: range.endOffset
+                };
+                console.log('✅ 选区已保存（有选中文字）');
+            } else {
+                console.log('❌ 没有选中文字，不保存选区');
+            }
+        } else {
+            console.log('❌ 没有选区可保存');
+        }
+    };
+
+    // 恢复保存的选区
+    const restoreSavedSelection = () => {
+        console.log('=== 尝试恢复选区 ===');
+        console.log('保存的选区:', savedSelectionRef.current);
+        console.log('编辑器引用:', editorRef.current);
+
+        if (!savedSelectionRef.current) {
+            console.log('❌ 没有保存的选区');
+            return false;
+        }
 
         if (!editorRef.current) {
-            console.log('editorRef.current 为空');
+            console.log('❌ 编辑器引用为空');
+            return false;
+        }
+
+        try {
+            const selection = window.getSelection();
+            if (!selection) {
+                console.log('❌ 无法获取选区对象');
+                return false;
+            }
+
+            // 检查容器是否仍然存在
+            const startContainerExists = editorRef.current.contains(savedSelectionRef.current.startContainer);
+            const endContainerExists = editorRef.current.contains(savedSelectionRef.current.endContainer);
+
+            console.log('开始容器存在:', startContainerExists);
+            console.log('结束容器存在:', endContainerExists);
+            console.log('开始容器:', savedSelectionRef.current.startContainer);
+            console.log('结束容器:', savedSelectionRef.current.endContainer);
+
+            if (startContainerExists && endContainerExists) {
+                const range = document.createRange();
+                range.setStart(savedSelectionRef.current.startContainer, savedSelectionRef.current.startOffset);
+                range.setEnd(savedSelectionRef.current.endContainer, savedSelectionRef.current.endOffset);
+                selection.removeAllRanges();
+                selection.addRange(range);
+
+                const restoredText = range.toString();
+                console.log('✅ 选区已恢复，恢复的文字:', `"${restoredText}"`);
+                console.log('恢复的文字长度:', restoredText.length);
+                return true;
+            } else {
+                console.log('❌ 选区容器已不存在，无法恢复');
+                return false;
+            }
+        } catch (e) {
+            console.log('❌ 恢复选区失败:', e);
+        }
+        return false;
+    };
+
+    const setTextColor = (color: string) => {
+        console.log('=== setTextColor 开始 ===');
+        console.log('颜色:', color);
+        console.log('编辑器引用:', editorRef.current);
+
+        if (!editorRef.current) {
+            console.log('❌ editorRef.current 为空');
             return;
         }
 
         editorRef.current.focus();
+        console.log('✅ 编辑器已获得焦点');
 
         // 获取当前选择
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) {
-            console.log('没有选择，无法设置颜色');
+        console.log('当前选区:', selection);
+        console.log('选区数量:', selection?.rangeCount);
+
+        let range: Range | null = null;
+
+        // 尝试恢复保存的选区
+        if (restoreSavedSelection()) {
+            console.log('✅ 成功恢复保存的选区');
+            const newSelection = window.getSelection();
+            if (newSelection && newSelection.rangeCount > 0) {
+                range = newSelection.getRangeAt(0);
+                console.log('恢复的选区范围:', range);
+            }
+        } else {
+            console.log('❌ 无法恢复保存的选区');
+        }
+
+        // 如果没有选区，尝试获取当前选区
+        if (!range && selection && selection.rangeCount > 0) {
+            range = selection.getRangeAt(0);
+            console.log('✅ 使用当前选区:', range);
+        }
+
+        // 如果还是没有选区，创建一个在编辑器末尾的选区
+        if (!range) {
+            console.log('❌ 没有选区，尝试创建选区');
+            const newRange = document.createRange();
+            newRange.selectNodeContents(editorRef.current);
+            newRange.collapse(false);
+            if (selection) {
+                selection.addRange(newRange);
+                range = newRange;
+                console.log('✅ 创建了新的选区:', range);
+            }
+        }
+
+        if (!range) {
+            console.log('❌ 无法创建选区，退出');
             return;
         }
 
-        const range = selection.getRangeAt(0);
         const selectedText = range.toString();
+        console.log('选中的文字:', `"${selectedText}"`);
+        console.log('选中文字长度:', selectedText.length);
 
         if (!selectedText) {
-            console.log('没有选中文字，无法设置颜色');
+            console.log('❌ 没有选中文字，无法设置颜色');
             return;
         }
 
-        console.log('选中的文字:', selectedText);
+        console.log('✅ 开始应用颜色');
 
-        // 简单直接的方法：删除选中内容，插入带颜色的span
-        range.deleteContents();
-
+        // 使用更可靠的方法：创建span并替换选中内容，保留原有格式
         const span = document.createElement('span');
         span.style.color = color;
-        span.textContent = selectedText;
 
+        // 获取选中内容的HTML，保留原有格式
+        const contents = range.extractContents();
+        span.appendChild(contents);
+
+        console.log('创建的span元素:', span);
+        console.log('span样式:', span.style.color);
+
+        // 插入新的span
         range.insertNode(span);
+        console.log('✅ span已插入到DOM');
 
-        // 清除选择
-        selection.removeAllRanges();
+        // 将光标移到span后面，但不要强制设置选区
+        // 让浏览器自然处理光标位置
+        if (selection) {
+            selection.removeAllRanges();
+            // 创建一个简单的光标位置
+            const newRange = document.createRange();
+            newRange.setStartAfter(span);
+            newRange.collapse(true);
+            selection.addRange(newRange);
+        }
 
-        console.log('颜色设置成功');
+        console.log('✅ 颜色设置完成');
 
         // 更新内容
         const html = editorRef.current.innerHTML;
+        console.log('更新后的HTML:', html);
         onChange(html);
+
+        console.log('=== setTextColor 结束 ===');
     };
 
     const setBackgroundColor = (color: string) => {
-        console.log('setBackgroundColor 被调用，颜色:', color);
+        console.log('=== setBackgroundColor 开始 ===');
+        console.log('背景颜色:', color);
+        console.log('编辑器引用:', editorRef.current);
 
         if (!editorRef.current) {
-            console.log('editorRef.current 为空');
+            console.log('❌ editorRef.current 为空');
             return;
         }
 
         editorRef.current.focus();
+        console.log('✅ 编辑器已获得焦点');
 
         // 获取当前选择
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) {
-            console.log('没有选择，无法设置背景颜色');
+        console.log('当前选区:', selection);
+        console.log('选区数量:', selection?.rangeCount);
+
+        let range: Range | null = null;
+
+        // 尝试恢复保存的选区
+        if (restoreSavedSelection()) {
+            console.log('✅ 成功恢复保存的选区');
+            const newSelection = window.getSelection();
+            if (newSelection && newSelection.rangeCount > 0) {
+                range = newSelection.getRangeAt(0);
+                console.log('恢复的选区范围:', range);
+            }
+        } else {
+            console.log('❌ 无法恢复保存的选区');
+        }
+
+        // 如果没有选区，尝试获取当前选区
+        if (!range && selection && selection.rangeCount > 0) {
+            range = selection.getRangeAt(0);
+            console.log('✅ 使用当前选区:', range);
+        }
+
+        // 如果还是没有选区，创建一个在编辑器末尾的选区
+        if (!range) {
+            console.log('❌ 没有选区，尝试创建选区');
+            const newRange = document.createRange();
+            newRange.selectNodeContents(editorRef.current);
+            newRange.collapse(false);
+            if (selection) {
+                selection.addRange(newRange);
+                range = newRange;
+                console.log('✅ 创建了新的选区:', range);
+            }
+        }
+
+        if (!range) {
+            console.log('❌ 无法创建选区，退出');
             return;
         }
 
-        const range = selection.getRangeAt(0);
         const selectedText = range.toString();
+        console.log('选中的文字:', `"${selectedText}"`);
+        console.log('选中文字长度:', selectedText.length);
 
         if (!selectedText) {
-            console.log('没有选中文字，无法设置背景颜色');
+            console.log('❌ 没有选中文字，无法设置背景颜色');
             return;
         }
 
-        console.log('选中的文字:', selectedText);
+        console.log('✅ 开始应用背景颜色');
 
-        // 简单直接的方法：删除选中内容，插入带背景颜色的span
-        range.deleteContents();
-
+        // 使用更可靠的方法：创建span并替换选中内容，保留原有格式
         const span = document.createElement('span');
         span.style.backgroundColor = color;
-        span.textContent = selectedText;
 
+        // 获取选中内容的HTML，保留原有格式
+        const contents = range.extractContents();
+        span.appendChild(contents);
+
+        console.log('创建的span元素:', span);
+        console.log('span背景色样式:', span.style.backgroundColor);
+
+        // 插入新的span
         range.insertNode(span);
+        console.log('✅ span已插入到DOM');
 
-        // 清除选择
-        selection.removeAllRanges();
+        // 将光标移到span后面，但不要强制设置选区
+        // 让浏览器自然处理光标位置
+        if (selection) {
+            selection.removeAllRanges();
+            // 创建一个简单的光标位置
+            const newRange = document.createRange();
+            newRange.setStartAfter(span);
+            newRange.collapse(true);
+            selection.addRange(newRange);
+        }
 
-        console.log('背景颜色设置成功');
+        console.log('✅ 背景颜色设置完成');
 
         // 更新内容
         const html = editorRef.current.innerHTML;
+        console.log('更新后的HTML:', html);
         onChange(html);
+
+        console.log('=== setBackgroundColor 结束 ===');
     };
 
     const colors = [
@@ -584,6 +887,21 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     <Button
                                         variant="ghost"
                                         size="sm"
+                                        onMouseDown={() => {
+                                            // 在鼠标按下时检查并保存选区
+                                            console.log('文字颜色按钮被按下，检查选区');
+                                            const selection = window.getSelection();
+                                            if (selection && selection.rangeCount > 0) {
+                                                const range = selection.getRangeAt(0);
+                                                const selectedText = range.toString();
+                                                if (selectedText.length > 0) {
+                                                    console.log('有选中文字，保存选区');
+                                                    saveCurrentSelection();
+                                                } else {
+                                                    console.log('没有选中文字，不保存选区');
+                                                }
+                                            }
+                                        }}
                                     >
                                         <Type className="w-4 h-4" />
                                     </Button>
@@ -620,6 +938,21 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     <Button
                                         variant="ghost"
                                         size="sm"
+                                        onMouseDown={() => {
+                                            // 在鼠标按下时检查并保存选区
+                                            console.log('背景颜色按钮被按下，检查选区');
+                                            const selection = window.getSelection();
+                                            if (selection && selection.rangeCount > 0) {
+                                                const range = selection.getRangeAt(0);
+                                                const selectedText = range.toString();
+                                                if (selectedText.length > 0) {
+                                                    console.log('有选中文字，保存选区');
+                                                    saveCurrentSelection();
+                                                } else {
+                                                    console.log('没有选中文字，不保存选区');
+                                                }
+                                            }
+                                        }}
                                     >
                                         <Palette className="w-4 h-4" />
                                     </Button>
@@ -667,10 +1000,82 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             size="sm"
                             onClick={() => {
                                 console.log('测试按钮被点击');
+                                console.log('当前选区:', window.getSelection());
+                                console.log('编辑器内容:', editorRef.current?.innerHTML);
                                 setTextColor('#FF0000');
                             }}
                         >
                             测试红色
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                console.log('调试选区按钮被点击');
+                                const selection = window.getSelection();
+                                console.log('当前选区:', selection);
+                                if (selection && selection.rangeCount > 0) {
+                                    const range = selection.getRangeAt(0);
+                                    console.log('选区范围:', range);
+                                    console.log('选中文字:', range.toString());
+                                    console.log('选区容器:', range.startContainer, range.endContainer);
+                                } else {
+                                    console.log('没有选区');
+                                }
+                            }}
+                        >
+                            调试选区
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                console.log('测试换行按钮被点击');
+                                if (editorRef.current) {
+                                    console.log('当前HTML:', editorRef.current.innerHTML);
+                                    // 手动插入换行符
+                                    const selection = window.getSelection();
+                                    if (selection && selection.rangeCount > 0) {
+                                        const range = selection.getRangeAt(0);
+                                        const br = document.createElement('br');
+                                        range.deleteContents();
+                                        range.insertNode(br);
+                                        range.setStartAfter(br);
+                                        range.collapse(true);
+                                        selection.removeAllRanges();
+                                        selection.addRange(range);
+                                        console.log('插入换行符后的HTML:', editorRef.current.innerHTML);
+                                    }
+                                }
+                            }}
+                        >
+                            测试换行
+                        </Button>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                console.log('清理HTML按钮被点击');
+                                if (editorRef.current) {
+                                    const html = editorRef.current.innerHTML;
+                                    console.log('清理前HTML:', html);
+                                    const cleanedHtml = cleanEmptyContent(html);
+                                    console.log('清理后HTML:', cleanedHtml);
+
+                                    if (cleanedHtml !== html) {
+                                        editorRef.current.innerHTML = cleanedHtml;
+                                        onChange(cleanedHtml);
+                                        console.log('HTML已清理');
+                                    } else {
+                                        console.log('HTML无需清理');
+                                    }
+                                }
+                            }}
+                        >
+                            清理HTML
                         </Button>
 
                         <Tooltip>
@@ -757,21 +1162,50 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     onMouseDown={(e) => {
                         e.currentTarget.focus();
                     }}
+                    onMouseUp={() => {
+                        // 在鼠标释放时保存选区（只在有选中文字时）
+                        const selection = window.getSelection();
+                        if (selection && selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            const selectedText = range.toString();
+                            if (selectedText.length > 0) {
+                                saveCurrentSelection();
+                            }
+                        }
+                    }}
+                    onKeyUp={() => {
+                        // 在键盘释放时保存选区（只在有选中文字时）
+                        const selection = window.getSelection();
+                        if (selection && selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            const selectedText = range.toString();
+                            if (selectedText.length > 0) {
+                                saveCurrentSelection();
+                            }
+                        }
+                    }}
                     onKeyDown={(e) => {
-                        // 处理删除键，确保删除后内容真正为空
+                        // 处理删除键，只在内容完全为空时清理
                         if (e.key === 'Backspace' || e.key === 'Delete') {
                             setTimeout(() => {
                                 if (editorRef.current) {
                                     const html = editorRef.current.innerHTML;
-                                    const cleanedHtml = cleanEmptyContent(html);
+                                    const textContent = editorRef.current.textContent || '';
 
-                                    if (cleanedHtml !== html) {
-                                        editorRef.current.innerHTML = cleanedHtml;
-                                        onChange(cleanedHtml);
+                                    // 只有在没有可见文字时才清理HTML
+                                    if (textContent.trim() === '') {
+                                        const cleanedHtml = cleanEmptyContent(html);
+                                        if (cleanedHtml !== html) {
+                                            editorRef.current.innerHTML = cleanedHtml;
+                                            onChange(cleanedHtml);
+                                        }
                                     }
                                 }
                             }, 0);
                         }
+
+                        // 让 Enter 键自然工作，不进行额外处理
+                        // 这样可以避免干扰正常的换行行为
                     }}
                     className="min-h-[200px] bg-white dark:bg-gray-900 focus:outline-none prose prose-sm max-w-none cursor-text relative"
                     style={{
