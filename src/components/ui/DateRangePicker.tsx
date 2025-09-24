@@ -111,7 +111,7 @@ export function DateRangePicker({
                                 <MixedText text={format(dateRange.from, "yyyy-MM-dd")} />
                             )
                         ) : (
-                            <MixedText text={placeholder} />
+                            <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>
                         )}
                     </Button>
                 </PopoverTrigger>

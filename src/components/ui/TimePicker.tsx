@@ -113,7 +113,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     }}
                 >
                     <Clock className="mr-2 h-4 w-4" />
-                    {value ? displayValue : <span className="text-black dark:text-white">{placeholder}</span>}
+                    {value ? displayValue : <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>}
                 </div>
             </PopoverTrigger>
             <PopoverContent className="w-80 p-4" align="start">

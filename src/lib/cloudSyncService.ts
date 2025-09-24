@@ -677,66 +677,103 @@ export class CloudSyncService {
         }
     }
 
-    // 获取云端数据概览（用于同步前的检查）
+    // 获取云端数据概览
     static async getCloudDataOverview(): Promise<CloudDataOverview> {
+        const userId = await getCurrentUserId();
+        if (!userId) {
+            throw new Error('用户未登录');
+        }
+
+        const [recordsCount, plansCount, knowledgeCount] = await Promise.all([
+            this.getRecordsCount(userId),
+            this.getPlansCount(userId),
+            this.getKnowledgeCount(userId)
+        ]);
+
+        // 简化设置检查，如果失败就默认为 false
+        const hasSettings = await this.hasUserSettings(userId).catch(() => false);
+
+        return {
+            records: { count: recordsCount, recent: [] },
+            plans: { count: plansCount, recent: [] },
+            knowledge: { count: knowledgeCount, recent: [] },
+            settings: { hasSettings }
+        };
+    }
+
+    // 获取记录数量
+    private static async getRecordsCount(userId: string): Promise<number> {
         try {
-            console.log('开始获取云端数据概览...');
-            const userId = await getCurrentUserId();
-            console.log('用户ID:', userId);
-            if (!userId) {
-                throw new Error('用户未登录');
+            const { count, error } = await supabase
+                .from('exercise_records')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+
+            if (error) {
+                console.warn('获取记录数量失败:', error);
+                return 0;
             }
-
-            // 暂时移除超时控制，直接并行获取数据
-            console.log('开始并行获取数据...');
-            const [cloudRecords, cloudPlans, cloudKnowledge, cloudSettings] = await Promise.all([
-                recordService.getRecords().catch((error) => {
-                    console.error('获取记录失败:', error);
-                    return [];
-                }),
-                planService.getPlans().catch((error) => {
-                    console.error('获取计划失败:', error);
-                    return [];
-                }),
-                knowledgeService.getKnowledge().catch((error) => {
-                    console.error('获取知识点失败:', error);
-                    return [];
-                }),
-                settingsService.getSettings().catch((error) => {
-                    console.error('获取设置失败:', error);
-                    return {};
-                })
-            ]);
-
-            console.log('数据获取完成:', {
-                records: cloudRecords.length,
-                plans: cloudPlans.length,
-                knowledge: cloudKnowledge.length,
-                hasSettings: Object.keys(cloudSettings).length > 0
-            });
-
-            const result: CloudDataOverview = {
-                records: {
-                    count: cloudRecords.length,
-                    recent: cloudRecords.slice(0, 5) // Get the 5 most recent records
-                },
-                plans: {
-                    count: cloudPlans.length,
-                    recent: cloudPlans.slice(0, 5) // Get the 5 most recent plans
-                },
-                knowledge: {
-                    count: cloudKnowledge.length,
-                    recent: cloudKnowledge.slice(0, 5) // Get the 5 most recent knowledge items
-                },
-                settings: {
-                    hasSettings: Object.keys(cloudSettings).length > 0
-                }
-            };
-
-            return result;
+            return count || 0;
         } catch (error) {
-            console.error('获取云端数据概览失败:', error);
-            throw error;
+            console.warn('获取记录数量异常:', error);
+            return 0;
+        }
+    }
+
+    // 获取计划数量
+    private static async getPlansCount(userId: string): Promise<number> {
+        try {
+            const { count, error } = await supabase
+                .from('plans')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+
+            if (error) {
+                console.warn('获取计划数量失败:', error);
+                return 0;
+            }
+            return count || 0;
+        } catch (error) {
+            console.warn('获取计划数量异常:', error);
+            return 0;
+        }
+    }
+
+    // 获取知识点数量
+    private static async getKnowledgeCount(userId: string): Promise<number> {
+        try {
+            const { count, error } = await supabase
+                .from('knowledge')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+
+            if (error) {
+                console.warn('获取知识点数量失败:', error);
+                return 0;
+            }
+            return count || 0;
+        } catch (error) {
+            console.warn('获取知识点数量异常:', error);
+            return 0;
+        }
+    }
+
+    // 检查是否有用户设置
+    private static async hasUserSettings(userId: string): Promise<boolean> {
+        try {
+            const { count, error } = await supabase
+                .from('user_settings')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+
+            if (error) {
+                // 如果表不存在或查询失败，直接返回 false
+                return false;
+            }
+            return (count || 0) > 0;
+        } catch (error) {
+            // 如果出现任何异常，返回 false
+            return false;
         }
     }
 

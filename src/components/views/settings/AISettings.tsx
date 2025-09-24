@@ -31,8 +31,8 @@ export function AISettings() {
     const [aiAnalysisEnabled, setAiAnalysisEnabled] = useLocalStorageString('ai-analysis-enabled', 'false');
     const [autoAnalysisEnabled, setAutoAnalysisEnabled] = useLocalStorageString('auto-analysis-enabled', 'false');
 
-    const [showGeminiKey, setShowGeminiKey] = useState(false);
-    const [showDeepseekKey, setShowDeepseekKey] = useState(false);
+    const [selectedApiType, setSelectedApiType] = useState<'gemini' | 'deepseek'>('gemini');
+    const [showApiKey, setShowApiKey] = useState(false);
     const [isTestingConnection, setIsTestingConnection] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [isSaving, setIsSaving] = useState(false);
@@ -255,209 +255,151 @@ export function AISettings() {
 
     return (
         <div className="space-y-6">
-            {/* 模型选择 */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Settings className="w-5 h-5" />
-                        <MixedText text="AI模型设置" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="ai-model">
-                            <MixedText text="选择AI模型" />
-                        </Label>
-                        <Select value={selectedModel} onValueChange={setSelectedModel}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="选择AI模型" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="gemini-2.5-flash">
-                                    <span>Gemini 2.5 Flash - 快速响应</span>
-                                </SelectItem>
-                                <SelectItem value="gemini-2.5-pro">
-                                    <span>Gemini 2.5 Pro - 高质量分析</span>
-                                </SelectItem>
-                                <SelectItem value="deepseek-chat">
-                                    <span>DeepSeek Chat - 通用对话</span>
-                                </SelectItem>
-                                <SelectItem value="deepseek-reasoner">
-                                    <span>DeepSeek Reasoner - 深度思考</span>
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <p className="text-sm text-muted-foreground">
-                            <MixedText text="选择不同的AI模型来获得不同的分析效果" />
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
+            {/* AI模型选择 */}
+            <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                <div className="flex-1">
+                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="AI模型选择" /></h3>
+                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="选择不同的AI模型来获得不同的分析效果" /></p>
+                </div>
+                <div className="w-auto">
+                    <Select value={selectedModel} onValueChange={setSelectedModel}>
+                        <SelectTrigger className="w-[240px] h-8 sm:h-10 text-sm">
+                            <SelectValue placeholder="选择AI模型" className="text-sm" />
+                        </SelectTrigger>
+                        <SelectContent className="w-[240px]" position="popper" sideOffset={4}>
+                            <SelectItem value="gemini-2.5-flash" className="text-sm">
+                                <span className="font-medium">Gemini 2.5 快速</span>
+                                <span className="text-xs text-muted-foreground ml-2">- 快速响应</span>
+                            </SelectItem>
+                            <SelectItem value="gemini-2.5-pro" className="text-sm">
+                                <span className="font-medium">Gemini 2.5 专业</span>
+                                <span className="text-xs text-muted-foreground ml-2">- 高质量分析</span>
+                            </SelectItem>
+                            <SelectItem value="deepseek-chat" className="text-sm">
+                                <span className="font-medium">DeepSeek 对话</span>
+                                <span className="text-xs text-muted-foreground ml-2">- 通用对话</span>
+                            </SelectItem>
+                            <SelectItem value="deepseek-reasoner" className="text-sm">
+                                <span className="font-medium">DeepSeek 推理</span>
+                                <span className="text-xs text-muted-foreground ml-2">- 深度思考</span>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
             {/* API Key 设置 */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Key className="w-5 h-5" />
-                        <MixedText text="API Key 设置" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {/* Gemini API Key */}
-                    <div className="space-y-2">
-                        <Label htmlFor="gemini-api-key">
-                            <MixedText text="Gemini API Key" />
+            <div className="flex flex-col py-4 gap-3">
+                <div className="flex-1">
+                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="API Key 设置" /></h3>
+                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="选择API类型并输入对应的Key" /></p>
+                </div>
+                <div className="w-full space-y-3">
+                    {/* API类型选择 */}
+                    <div>
+                        <Label className="text-sm font-medium">
+                            <MixedText text="API类型" />
                         </Label>
-                        <div className="relative">
+                        <Select value={selectedApiType} onValueChange={(value) => setSelectedApiType(value as 'gemini' | 'deepseek')}>
+                            <SelectTrigger className="w-full h-8 sm:h-10 text-sm mt-1">
+                                <SelectValue placeholder="选择API类型" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="gemini">Gemini API</SelectItem>
+                                <SelectItem value="deepseek">DeepSeek API</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    {/* API Key输入 */}
+                    <div>
+                        <Label className="text-sm font-medium">
+                            <MixedText text="API Key" />
+                        </Label>
+                        <div className="relative mt-1">
                             <Input
-                                id="gemini-api-key"
-                                type={showGeminiKey ? "text" : "password"}
-                                value={geminiApiKey}
-                                onChange={(e) => setGeminiApiKey(e.target.value)}
-                                placeholder="请输入您的Gemini API Key"
-                                className="pr-20"
+                                type={showApiKey ? "text" : "password"}
+                                value={selectedApiType === 'gemini' ? geminiApiKey : deepseekApiKey}
+                                onChange={(e) => {
+                                    if (selectedApiType === 'gemini') {
+                                        setGeminiApiKey(e.target.value);
+                                    } else {
+                                        setDeepseekApiKey(e.target.value);
+                                    }
+                                }}
+                                placeholder={`请输入${selectedApiType === 'gemini' ? 'Gemini' : 'DeepSeek'} API Key`}
+                                className="pr-20 h-8 sm:h-10 text-sm"
                             />
                             <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
                                 className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                                onClick={() => setShowGeminiKey(!showGeminiKey)}
+                                onClick={() => setShowApiKey(!showApiKey)}
                             >
-                                {showGeminiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                             </Button>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mt-1">
                             <Button
-                                onClick={handleTestGeminiConnection}
-                                disabled={isTestingConnection || !geminiApiKey.trim()}
+                                onClick={selectedApiType === 'gemini' ? handleTestGeminiConnection : handleTestDeepseekConnection}
+                                disabled={isTestingConnection || !(selectedApiType === 'gemini' ? geminiApiKey : deepseekApiKey).trim()}
                                 variant="outline"
                                 size="sm"
-                                className="flex items-center gap-2"
+                                className="flex items-center gap-2 h-7 text-xs"
                             >
-                                <TestTube className="w-4 h-4" />
-                                {isTestingConnection ? '测试中...' : '测试Gemini'}
+                                <TestTube className="w-3 h-3" />
+                                测试连接
                             </Button>
-                            <p className="text-sm text-muted-foreground">
-                                <MixedText text="您可以在Google AI Studio获取免费的Gemini API Key" />
-                            </p>
+                            <span className="text-xs text-muted-foreground">
+                                {selectedApiType === 'gemini' ? 'Google AI Studio获取' : 'DeepSeek官网获取'}
+                            </span>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* DeepSeek API Key */}
-                    <div className="space-y-2">
-                        <Label htmlFor="deepseek-api-key">
-                            <MixedText text="DeepSeek API Key" />
-                        </Label>
-                        <div className="relative">
-                            <Input
-                                id="deepseek-api-key"
-                                type={showDeepseekKey ? "text" : "password"}
-                                value={deepseekApiKey}
-                                onChange={(e) => setDeepseekApiKey(e.target.value)}
-                                placeholder="请输入您的DeepSeek API Key"
-                                className="pr-20"
-                            />
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
-                                onClick={() => setShowDeepseekKey(!showDeepseekKey)}
-                            >
-                                {showDeepseekKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                            </Button>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Button
-                                onClick={handleTestDeepseekConnection}
-                                disabled={isTestingConnection || !deepseekApiKey.trim()}
-                                variant="outline"
-                                size="sm"
-                                className="flex items-center gap-2"
-                            >
-                                <TestTube className="w-4 h-4" />
-                                {isTestingConnection ? '测试中...' : '测试DeepSeek'}
-                            </Button>
-                            <p className="text-sm text-muted-foreground">
-                                <MixedText text="您可以在DeepSeek官网获取API Key" />
-                            </p>
-                        </div>
-                    </div>
+            {/* Divider */}
+            <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-                    {connectionStatus === 'error' && (
-                        <Alert>
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>
-                                <MixedText text="连接测试失败，请检查API Key是否正确，或网络连接是否正常" />
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </CardContent>
-            </Card>
+            {/* 启用AI分析 */}
+            <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                <div className="flex-1">
+                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="启用AI分析" /></h3>
+                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="开启后可以在成绩概览页面使用AI智能分析功能" /></p>
+                </div>
+                <Switch
+                    checked={aiAnalysisEnabled === 'true'}
+                    onCheckedChange={(checked) => setAiAnalysisEnabled(checked ? 'true' : 'false')}
+                    disabled={!geminiApiKey.trim() && !deepseekApiKey.trim()}
+                    className="mt-0"
+                />
+            </div>
 
-            {/* AI功能开关 */}
-            <Card>
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Brain className="w-5 h-5" />
-                        <MixedText text="AI功能设置" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <Label htmlFor="ai-analysis-enabled">
-                                <MixedText text="启用AI分析" />
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                                <MixedText text="开启后可以在成绩概览页面使用AI智能分析功能" />
-                            </p>
-                        </div>
-                        <Switch
-                            id="ai-analysis-enabled"
-                            checked={aiAnalysisEnabled === 'true'}
-                            onCheckedChange={(checked) => setAiAnalysisEnabled(checked ? 'true' : 'false')}
-                            disabled={!geminiApiKey.trim() && !deepseekApiKey.trim()}
-                        />
-                    </div>
+            {/* Divider */}
+            <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <Label htmlFor="auto-analysis-enabled">
-                                <MixedText text="自动分析" />
-                            </Label>
-                            <p className="text-sm text-muted-foreground">
-                                <MixedText text="开启后每次录入新数据时自动进行AI分析" />
-                            </p>
-                        </div>
-                        <Switch
-                            id="auto-analysis-enabled"
-                            checked={autoAnalysisEnabled === 'true'}
-                            onCheckedChange={(checked) => setAutoAnalysisEnabled(checked ? 'true' : 'false')}
-                            disabled={(!geminiApiKey.trim() && !deepseekApiKey.trim()) || aiAnalysisEnabled !== 'true'}
-                        />
-                    </div>
-
-                    {(!geminiApiKey.trim() && !deepseekApiKey.trim()) && (
-                        <Alert>
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertDescription>
-                                <MixedText text="请至少设置一个API Key（Gemini或DeepSeek）" />
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                </CardContent>
-            </Card>
+            {/* 自动分析 */}
+            <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                <div className="flex-1">
+                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="自动分析" /></h3>
+                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="开启后每次录入新数据时自动进行AI分析" /></p>
+                </div>
+                <Switch
+                    checked={autoAnalysisEnabled === 'true'}
+                    onCheckedChange={(checked) => setAutoAnalysisEnabled(checked ? 'true' : 'false')}
+                    disabled={(!geminiApiKey.trim() && !deepseekApiKey.trim()) || aiAnalysisEnabled !== 'true'}
+                    className="mt-0"
+                />
+            </div>
 
             {/* 使用说明 */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>
-                        <MixedText text="使用说明" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <div className="py-4">
+                <h3 className="font-semibold text-base sm:text-lg text-foreground mb-3"><MixedText text="使用说明" /></h3>
+                <div className="space-y-3 text-sm text-muted-foreground">
                     <div>
                         <p className="font-medium mb-1">
                             <MixedText text="1. 选择AI模型" />
@@ -496,15 +438,16 @@ export function AISettings() {
                             <MixedText text="在成绩概览页面的模块分析区域，点击AI分析按钮获取智能分析报告" />
                         </p>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* 保存按钮 */}
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-8 mb-6">
                 <Button
                     onClick={handleSaveSettings}
                     disabled={isSaving}
-                    className="flex items-center gap-2"
+                    variant="default"
+                    className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
                 >
                     <Save className="w-4 h-4" />
                     {isSaving ? '保存中...' : '保存设置'}

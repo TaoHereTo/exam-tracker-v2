@@ -830,14 +830,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                     <PopoverTrigger asChild>
                                         <button
                                             type="button"
-                                            className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
+                                            className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
                                             onClick={() => setDateOpen(true)}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                             {date ? (
                                                 <span>{format(date, 'PPP', { locale: zhCN })}</span>
                                             ) : (
-                                                <span className="text-muted-foreground">请选择目标日期</span>
+                                                <span className="text-gray-400 dark:text-gray-500">请选择目标日期</span>
                                             )}
                                         </button>
                                     </PopoverTrigger>

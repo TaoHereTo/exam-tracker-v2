@@ -598,32 +598,32 @@ h6 .mixed-text-part {
     @apply bg-background text-foreground;
   }
 
-  /* 统一所有placeholder颜色 - 纯黑色（浅色模式）和纯白色（深色模式） */
+  /* 统一所有placeholder颜色 - 浅灰色（浅色模式）和浅灰色（深色模式） */
   input::placeholder,
   textarea::placeholder,
   select::placeholder {
-    color: #000000 !important;
+    color: #9CA3AF !important;
   }
 
   .dark input::placeholder,
   .dark textarea::placeholder,
   .dark select::placeholder {
-    color: #FFFFFF !important;
+    color: #6B7280 !important;
   }
 
-  /* 统一所有组件的占位符颜色 - 纯黑色（浅色模式）和纯白色（深色模式） */
+  /* 统一所有组件的占位符颜色 - 浅灰色（浅色模式）和浅灰色（深色模式） */
   [data-radix-select-trigger][data-placeholder] span,
   [data-radix-select-value][data-placeholder] span,
   .time-picker-trigger span,
   [data-slot="button"][variant="outline"] span {
-    color: #000000 !important;
+    color: #9CA3AF !important;
   }
 
   .dark [data-radix-select-trigger][data-placeholder] span,
   .dark [data-radix-select-value][data-placeholder] span,
   .dark .time-picker-trigger span,
   .dark [data-slot="button"][variant="outline"] span {
-    color: #FFFFFF !important;
+    color: #6B7280 !important;
   }
 }
 

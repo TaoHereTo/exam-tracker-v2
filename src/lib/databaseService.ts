@@ -24,23 +24,37 @@ const getCurrentUserId = async () => {
 export const recordService = {
     // 获取用户的所有刷题历史
     async getRecords(): Promise<RecordItem[]> {
-        const userId = await getCurrentUserId()
-        if (!userId) {
-            console.warn('用户未登录，返回空记录列表');
-            return [];
-        }
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) {
+                console.warn('用户未登录，返回空记录列表');
+                return [];
+            }
 
-        const { data, error } = await supabase
-            .from('exercise_records')
-            .select('*')
-            .eq('user_id', userId)
-            .order('date', { ascending: false })
+            console.log('开始查询用户记录，用户ID:', userId);
+            const startTime = Date.now();
 
-        if (error) {
-            console.error('获取记录失败:', error);
-            return [];
+            const { data, error } = await supabase
+                .from('exercise_records')
+                .select('*')
+                .eq('user_id', userId)
+                .order('date', { ascending: false })
+                .limit(1000) // 限制查询数量，避免查询过多数据
+
+            const endTime = Date.now();
+            console.log(`记录查询完成，耗时: ${endTime - startTime}ms`);
+
+            if (error) {
+                console.error('获取记录失败:', error);
+                throw new Error(`获取记录失败: ${error.message || '未知错误'}`);
+            }
+
+            console.log(`成功获取 ${data?.length || 0} 条记录`);
+            return data || []
+        } catch (error) {
+            console.error('记录查询异常:', error);
+            throw error;
         }
-        return data || []
     },
 
     // 添加新的刷题历史（携带 UUID 写入）
@@ -119,23 +133,37 @@ export const recordService = {
 export const planService = {
     // 获取用户的所有学习计划
     async getPlans(): Promise<StudyPlan[]> {
-        const userId = await getCurrentUserId()
-        if (!userId) {
-            console.warn('用户未登录，返回空计划列表');
-            return [];
-        }
+        try {
+            const userId = await getCurrentUserId()
+            if (!userId) {
+                console.warn('用户未登录，返回空计划列表');
+                return [];
+            }
 
-        const { data, error } = await supabase
-            .from('plans')
-            .select('*')
-            .eq('user_id', userId)
-            .order('created_at', { ascending: false })
+            console.log('开始查询用户计划，用户ID:', userId);
+            const startTime = Date.now();
 
-        if (error) {
-            console.error('获取计划失败:', error);
-            return [];
+            const { data, error } = await supabase
+                .from('plans')
+                .select('*')
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false })
+                .limit(500) // 限制查询数量
+
+            const endTime = Date.now();
+            console.log(`计划查询完成，耗时: ${endTime - startTime}ms`);
+
+            if (error) {
+                console.error('获取计划失败:', error);
+                throw new Error(`获取计划失败: ${error.message || '未知错误'}`);
+            }
+
+            console.log(`成功获取 ${data?.length || 0} 个计划`);
+            return data || []
+        } catch (error) {
+            console.error('计划查询异常:', error);
+            throw error;
         }
-        return data || []
     },
 
     // 添加新的学习计划
@@ -512,18 +540,25 @@ export const knowledgeService = {
         }
 
         try {
+            console.log('开始查询用户知识点，用户ID:', userId);
+            const startTime = Date.now();
+
             const { data, error } = await supabase
                 .from('knowledge')
                 .select('*')
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })
+                .limit(1000) // 限制查询数量
+
+            const endTime = Date.now();
+            console.log(`知识点查询完成，耗时: ${endTime - startTime}ms`);
 
             if (error) {
                 console.error('获取知识点失败:', error);
-                return [];
+                throw new Error(`获取知识点失败: ${error.message || '未知错误'}`);
             }
 
-            return data?.map(item => ({
+            const result = data?.map(item => ({
                 id: item.id,
                 module: item.module,
                 type: item.type || '',
@@ -535,9 +570,12 @@ export const knowledgeService = {
                 created_at: item.created_at,
                 updated_at: item.updated_at
             })) || [];
+
+            console.log(`成功获取 ${result.length} 个知识点`);
+            return result;
         } catch (error) {
             console.error('获取知识点异常:', error);
-            return [];
+            throw error;
         }
     },
 
@@ -809,21 +847,40 @@ export const settingsService = {
         }
 
         try {
+            console.log('开始查询用户设置，用户ID:', userId);
+            const startTime = Date.now();
+
             const { data, error } = await supabase
                 .from('user_settings')
                 .select('*')
                 .eq('user_id', userId)
-                .single()
+                .maybeSingle()
+
+            const endTime = Date.now();
+            console.log(`设置查询完成，耗时: ${endTime - startTime}ms`);
 
             if (error) {
                 // 如果是没有找到记录的错误，返回空对象
                 if (error.code === 'PGRST116') {
+                    console.log('用户设置不存在，返回空对象');
+                    return {};
+                }
+
+                // 处理 400 错误
+                if (error.message.includes('400') || error.message.includes('Bad Request')) {
+                    console.warn('用户设置获取遇到400错误（请求格式问题），返回空对象');
                     return {};
                 }
 
                 // 处理 406 错误或其他 HTTP 错误
                 if (error.message.includes('406') || error.message.includes('Not Acceptable')) {
                     console.warn('用户设置获取遇到406错误（首次使用或数据格式问题），返回空对象');
+                    return {};
+                }
+
+                // 处理其他常见错误
+                if (error.code === 'PGRST301' || error.message.includes('permission denied')) {
+                    console.warn('权限不足，返回空对象');
                     return {};
                 }
 
@@ -837,10 +894,17 @@ export const settingsService = {
                 return {};
             }
 
+            console.log('成功获取用户设置');
             return data?.settings || {};
         } catch (error) {
             // 处理网络错误或其他异常
             const errorMessage = error instanceof Error ? error.message : String(error);
+
+            // 特别处理 400 错误
+            if (errorMessage.includes('400') || errorMessage.includes('Bad Request')) {
+                console.warn('用户设置获取遇到网络级400错误（请求格式问题），返回空对象');
+                return {};
+            }
 
             // 特别处理 406 错误
             if (errorMessage.includes('406') || errorMessage.includes('Not Acceptable')) {

@@ -33,39 +33,34 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
     const [clearing, setClearing] = useState(false);
     const [clearProgress, setClearProgress] = useState<ProgressCallback | null>(null);
     const [showClearDialog, setShowClearDialog] = useState(false);
+    const [loadError, setLoadError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false); // 添加本地加载状态
     const { notify } = useNotification();
     const { loading, withLoading } = useLoading();
     const { showError } = useToast();
-    const { setIsCloudDataLoading } = useCloudData();
+    const { isCloudDataLoading, setIsCloudDataLoading } = useCloudData();
 
     const loadCloudData = useCallback(async () => {
-        setIsCloudDataLoading(true); // 设置全局加载状态
-        try {
-            await withLoading(async () => {
-                // 暂时移除超时控制，直接调用
-                const overview = await CloudSyncService.getCloudDataOverview();
-                setData(overview);
-            });
-        } catch (error) {
-            console.error('获取云端数据失败:', error);
-            console.error('错误类型:', typeof error);
-            console.error('错误详情:', error);
-
-            // 只显示一次错误，避免重复toast
-            const errorMessage = error instanceof Error ? error.message : "未知错误";
-            if (errorMessage.includes('超时')) {
-                showError('网络连接超时，请检查网络后重试');
-            } else if (errorMessage.includes('未登录')) {
-                showError('请先登录后再查看云端数据');
-            } else if (errorMessage.includes('查询超时')) {
-                showError('数据库查询超时，请稍后重试');
-            } else {
-                showError(`获取云端数据失败: ${errorMessage}`);
-            }
-        } finally {
-            setIsCloudDataLoading(false); // 清除全局加载状态
+        if (loading || isCloudDataLoading || isLoading) {
+            return;
         }
-    }, [withLoading, showError, setIsCloudDataLoading]);
+
+        setIsLoading(true);
+        setIsCloudDataLoading(true);
+        setLoadError(null);
+
+        try {
+            const overview = await CloudSyncService.getCloudDataOverview();
+            setData(overview);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : "未知错误";
+            setLoadError(errorMessage);
+            showError(`获取云端数据失败: ${errorMessage}`);
+        } finally {
+            setIsLoading(false);
+            setIsCloudDataLoading(false);
+        }
+    }, [showError, setIsCloudDataLoading, loading, isCloudDataLoading, isLoading]);
 
     useEffect(() => {
         if (isOpen) {
@@ -136,6 +131,32 @@ export function CloudDataOverview({ isOpen, onClose }: CloudDataOverviewProps) {
                             <p className="text-xs text-muted-foreground text-center">
                                 <MixedText text="如果长时间无响应，可能是网络问题" />
                             </p>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={loadCloudData}
+                                className="mt-2"
+                            >
+                                <MixedText text="重试" />
+                            </Button>
+                        </div>
+                    ) : loadError ? (
+                        <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-3">
+                            <div className="text-center">
+                                <div className="text-red-500 text-sm mb-2">
+                                    <MixedText text="加载失败" />
+                                </div>
+                                <p className="text-xs text-muted-foreground mb-4">
+                                    {loadError}
+                                </p>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={loadCloudData}
+                                >
+                                    <MixedText text="重试" />
+                                </Button>
+                            </div>
                         </div>
                     ) : data ? (
                         <>
