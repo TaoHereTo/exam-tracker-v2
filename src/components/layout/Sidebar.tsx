@@ -166,6 +166,12 @@ const NAV_DATA = {
                     tab: 'knowledge-summary',
                     icon: BookMarked,
                 },
+                {
+                    title: '富文本编辑器测试',
+                    url: '/rich-text-test',
+                    tab: 'rich-text-test',
+                    icon: FileEdit,
+                },
             ],
         },
         {
