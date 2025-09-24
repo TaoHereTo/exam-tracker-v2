@@ -1422,7 +1422,7 @@ export function MainApp() {
 
                     {/* 导入确认对话框 - 响应式设计 */}
                     <Dialog open={importDialogOpen} onOpenChange={setImportDialogOpen}>
-                        <DialogContent className="w-11/12 max-w-md sm:max-w-lg">
+                        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg mx-4 sm:mx-auto">
                             <DialogHeader>
                                 <DialogTitle><MixedText text="确认导入数据" /></DialogTitle>
                                 {pendingImport && (
@@ -1486,7 +1486,7 @@ export function MainApp() {
 
                     {/* 退出登录确认对话框 - 响应式设计 */}
                     <Dialog open={signOutDialogOpen} onOpenChange={setSignOutDialogOpen}>
-                        <DialogContent className="w-11/12 max-w-md sm:max-w-lg">
+                        <DialogContent className="w-[95vw] max-w-md sm:max-w-lg mx-4 sm:mx-auto">
                             <DialogHeader>
                                 <DialogTitle><MixedText text="确认退出登录" /></DialogTitle>
                                 <DialogDescription>

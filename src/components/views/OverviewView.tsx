@@ -515,16 +515,16 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
     const dataSummaries = generateDataSummary();
 
     return (
-        <div className="relative w-full flex flex-col items-center justify-start gap-6 sm:gap-8 pt-8 sm:pt-12 pb-8">
+        <div className="relative w-full flex flex-col items-center justify-start gap-4 sm:gap-6 md:gap-8 pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-8">
 
             {/* 第一行 - 前半部分数据，正向滚动 */}
             <Marquee
-                className="w-full [--duration:60s] [--gap:1.5rem]"
+                className="w-full [--duration:60s] [--gap:1rem] sm:[--gap:1.5rem]"
                 pauseOnHover={true}
                 repeat={2}
             >
                 {firstRow.map((item, idx) => (
-                    <Card className="min-w-[140px] w-[140px] sm:min-w-[220px] sm:w-[220px] h-[100px] sm:h-[120px] p-0 flex-shrink-0 hover:bg-muted/50 transition-colors cursor-pointer" key={`row1-${item.title}-${idx}`}>
+                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] p-0 flex-shrink-0 hover:bg-muted/50 transition-colors cursor-pointer" key={`row1-${item.title}-${idx}`}>
                         <FlexCenterBoth className="h-full">
                             <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                 <FlexCenterBoth>
@@ -558,13 +558,13 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
 
             {/* 第二行 - 后半部分数据，逆向滚动 */}
             <Marquee
-                className="w-full [--duration:60s] [--gap:1.5rem]"
+                className="w-full [--duration:60s] [--gap:1rem] sm:[--gap:1.5rem]"
                 pauseOnHover={true}
                 repeat={2}
                 reverse={true}
             >
                 {secondRow.map((item, idx) => (
-                    <Card className="min-w-[140px] w-[140px] sm:min-w-[220px] sm:w-[220px] h-[100px] sm:h-[120px] flex items-center justify-center p-0 flex-shrink-0 hover:bg-muted/50 transition-colors cursor-pointer" key={`row2-${item.title}-${idx}`}>
+                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] flex items-center justify-center p-0 flex-shrink-0 hover:bg-muted/50 transition-colors cursor-pointer" key={`row2-${item.title}-${idx}`}>
                         <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                             <div className="flex flex-row items-center justify-center">
                                 <CardTitle className="text-sm sm:text-base">{item.title}</CardTitle>
@@ -605,28 +605,28 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             <div className="w-full mt-16 mb-12">
                 {/* 使用Animate Tabs展示分析卡片 */}
                 <UnifiedTabs defaultValue="data-analysis" className="w-full">
-                    <div className="flex justify-center mb-8">
-                        <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-6">
+                    <div className="flex justify-center mb-4 sm:mb-8">
+                        <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
                             {moduleData.map((module) => (
-                                <UnifiedTabsTrigger key={module.module} value={module.module} className="text-sm px-4 py-1 h-full">
+                                <UnifiedTabsTrigger key={module.module} value={module.module} className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full">
                                     {module.name}
                                 </UnifiedTabsTrigger>
                             ))}
                         </UnifiedTabsList>
                     </div>
-                    <UnifiedTabsContents className="py-6 px-2">
+                    <UnifiedTabsContents className="py-4 sm:py-6 px-2">
                         {moduleData.map((module) => (
                             <UnifiedTabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
-                                <div className="w-full max-w-4xl mx-auto pb-4 space-y-6">
+                                <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
                                     {/* 原有数据分析卡片 */}
-                                    <Card className="p-4">
-                                        <div className="space-y-4">
-                                            <h3 className="font-medium text-center text-lg">{module.name}</h3>
+                                    <Card className="p-3 sm:p-4">
+                                        <div className="space-y-3 sm:space-y-4">
+                                            <h3 className="font-medium text-center text-base sm:text-lg">{module.name}</h3>
 
                                             {/* 刷题数量 */}
-                                            <div className="p-3 border rounded-lg">
+                                            <div className="p-2 sm:p-3 border rounded-lg">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-medium">刷题数量</span>
+                                                    <span className="font-medium text-sm sm:text-base">刷题数量</span>
                                                     {module.hasWeekData ? (
                                                         <div className={`flex items-center gap-2 ${module.weekChange > 0 ? 'text-green-600' :
                                                             module.weekChange < 0 ? 'text-red-600' :
@@ -644,7 +644,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
 
                                                 {module.hasWeekData ? (
                                                     <>
-                                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                                                             <div>
                                                                 <div className="text-muted-foreground mb-1">今日刷题</div>
                                                                 <div className="font-medium">{module.todayTotal}题</div>
@@ -675,9 +675,9 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                             </div>
 
                                             {/* 每分钟得分 */}
-                                            <div className="p-3 border rounded-lg">
+                                            <div className="p-2 sm:p-3 border rounded-lg">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-medium">每分钟得分</span>
+                                                    <span className="font-medium text-sm sm:text-base">每分钟得分</span>
                                                     {module.hasTodayData ? (
                                                         <div className={`flex items-center gap-2 ${module.scoreChange > 0 ? 'text-green-600' :
                                                             module.scoreChange < 0 ? 'text-red-600' :
@@ -695,7 +695,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
 
                                                 {module.hasTodayData ? (
                                                     <>
-                                                        <div className="grid grid-cols-2 gap-4 text-sm">
+                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                                                             <div>
                                                                 <div className="text-muted-foreground mb-1">今日每分钟得分</div>
                                                                 <div className="font-medium">{module.todayScorePerMinute.toFixed(3)}分/分钟</div>

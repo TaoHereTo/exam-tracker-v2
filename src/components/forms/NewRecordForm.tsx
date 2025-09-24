@@ -183,10 +183,10 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     }
 
     return (
-        <div className="flex items-start justify-center min-h-screen p-4 pt-6 sm:pt-10">
+        <div className="flex items-start justify-center min-h-screen p-2 sm:p-4 pt-4 sm:pt-6 md:pt-10">
             <Card className="w-full max-w-md flex flex-col">
                 <CardHeader className="pb-3">
-                    <CardTitle className="text-2xl">
+                    <CardTitle className="text-xl sm:text-2xl">
                         <MixedText text="新增做题记录" />
                     </CardTitle>
                 </CardHeader>

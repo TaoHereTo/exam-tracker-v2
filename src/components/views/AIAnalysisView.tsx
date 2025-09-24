@@ -269,9 +269,9 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
 
     return (
         <TooltipProvider>
-            <div className="h-full flex flex-col w-full px-4">
+            <div className="h-full flex flex-col w-full px-2 sm:px-4">
                 {/* 聊天区域 */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-3 sm:space-y-4">
                     {messages.map((message) => (
                         <div
                             key={message.id}
@@ -283,11 +283,11 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 </div>
                             )}
 
-                            <div className={`max-w-[80%] ${message.type === 'user' ? 'order-first' : ''}`}>
+                            <div className={`max-w-[85%] sm:max-w-[80%] ${message.type === 'user' ? 'order-first' : ''}`}>
                                 <div
                                     className={`rounded-2xl ${message.type === 'user'
-                                        ? 'bg-blue-500 text-white ml-auto px-3 py-2'
-                                        : 'bg-muted p-4'
+                                        ? 'bg-blue-500 text-white ml-auto px-2 sm:px-3 py-2'
+                                        : 'bg-muted p-3 sm:p-4'
                                         }`}
                                 >
                                     {message.type === 'user' ? (
@@ -358,8 +358,8 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                 </div>
 
                 {/* 输入区域 */}
-                <div className="p-4 border-t bg-background">
-                    <div className="flex items-end gap-3">
+                <div className="p-2 sm:p-4 border-t bg-background">
+                    <div className="flex items-end gap-2 sm:gap-3">
                         {/* 左侧按钮组 */}
                         <div className="flex items-center gap-1">
                             {/* 分析报告按钮 */}
@@ -368,12 +368,12 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                     <button
                                         onClick={handleQuickAnalysis}
                                         disabled={isAnalyzing || records.length === 0}
-                                        className="h-12 w-12 flex items-center justify-center text-orange-500 hover:text-orange-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                                        className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-orange-500 hover:text-orange-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
                                     >
                                         {isAnalyzing ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                                         ) : (
-                                            <BrickWallFire className="w-5 h-5" />
+                                            <BrickWallFire className="w-4 h-4 sm:w-5 sm:h-5" />
                                         )}
                                     </button>
                                 </TooltipTrigger>
@@ -387,8 +387,8 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <SheetTrigger asChild>
-                                            <button className="h-12 w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
-                                                <History className="w-5 h-5" />
+                                            <button className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
+                                                <History className="w-4 h-4 sm:w-5 sm:h-5" />
                                             </button>
                                         </SheetTrigger>
                                     </TooltipTrigger>
@@ -396,7 +396,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                         <p>历史记录</p>
                                     </TooltipContent>
                                 </Tooltip>
-                                <SheetContent side="right" className="w-80">
+                                <SheetContent side="right" className="w-80 sm:w-80">
                                     <SheetHeader>
                                         <SheetTitle>对话历史记录</SheetTitle>
                                     </SheetHeader>
@@ -424,9 +424,9 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={handleClearChat}
-                                        className="h-12 w-12 flex items-center justify-center text-red-500 hover:text-red-600 transition-colors"
+                                        className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-red-500 hover:text-red-600 transition-colors"
                                     >
-                                        <MessageCircleOff className="w-5 h-5" />
+                                        <MessageCircleOff className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -442,9 +442,9 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 onChange={(e) => setCustomPrompt(e.target.value)}
                                 placeholder="输入您的问题，比如：我的刷题表现如何？如何提高正确率？"
                                 className={`w-full resize-none transition-all duration-300 ${isInputExpanded
-                                    ? 'min-h-[120px] rounded-2xl'
-                                    : 'min-h-[48px] rounded-full'
-                                    } pr-32 pl-4 py-3 border-2 border-gray-200 focus:border-blue-500 focus:ring-0`}
+                                    ? 'min-h-[100px] sm:min-h-[120px] rounded-2xl'
+                                    : 'min-h-[40px] sm:min-h-[48px] rounded-full'
+                                    } pr-24 sm:pr-32 pl-3 sm:pl-4 py-2 sm:py-3 border-2 border-gray-200 focus:border-blue-500 focus:ring-0 text-sm sm:text-base`}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();
@@ -454,25 +454,25 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                             />
 
                             {/* 模型选择 - 在输入框内部右侧 */}
-                            <div className="absolute right-16 top-1/2 -translate-y-1/2">
+                            <div className="absolute right-12 sm:right-16 top-1/2 -translate-y-1/2">
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Select value={selectedModel} onValueChange={setSelectedModel}>
-                                            <SelectTrigger className="w-auto min-w-32 h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
-                                                <SelectValue className="text-[10px]" />
+                                            <SelectTrigger className="w-auto min-w-24 sm:min-w-32 h-6 sm:h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
+                                                <SelectValue className="text-[8px] sm:text-[10px]" />
                                             </SelectTrigger>
-                                            <SelectContent className="w-auto min-w-32">
+                                            <SelectContent className="w-auto min-w-24 sm:min-w-32">
                                                 <SelectItem value="gemini-2.5-flash">
-                                                    <span className="text-[10px]">Gemini 2.5 快速版</span>
+                                                    <span className="text-[8px] sm:text-[10px]">Gemini 2.5 快速版</span>
                                                 </SelectItem>
                                                 <SelectItem value="gemini-2.5-pro">
-                                                    <span className="text-[10px]">Gemini 2.5 专业版</span>
+                                                    <span className="text-[8px] sm:text-[10px]">Gemini 2.5 专业版</span>
                                                 </SelectItem>
                                                 <SelectItem value="deepseek-chat">
-                                                    <span className="text-[10px]">DeepSeek 对话版</span>
+                                                    <span className="text-[8px] sm:text-[10px]">DeepSeek 对话版</span>
                                                 </SelectItem>
                                                 <SelectItem value="deepseek-reasoner">
-                                                    <span className="text-[10px]">DeepSeek 推理版</span>
+                                                    <span className="text-[8px] sm:text-[10px]">DeepSeek 推理版</span>
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
@@ -490,12 +490,12 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setIsInputExpanded(!isInputExpanded)}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0 hover:bg-gray-100"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 sm:h-8 sm:w-8 p-0 hover:bg-gray-100"
                                     >
                                         {isInputExpanded ? (
-                                            <Minimize2 className="w-4 h-4" />
+                                            <Minimize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                         ) : (
-                                            <Maximize2 className="w-4 h-4" />
+                                            <Maximize2 className="w-3 h-3 sm:w-4 sm:h-4" />
                                         )}
                                     </Button>
                                 </TooltipTrigger>
@@ -511,12 +511,12 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 <button
                                     onClick={handleSendMessage}
                                     disabled={!customPrompt.trim() || isAnalyzing}
-                                    className="h-12 w-12 flex items-center justify-center text-blue-500 hover:text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                                    className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-blue-500 hover:text-blue-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
                                 >
                                     {isAnalyzing ? (
-                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                                     ) : (
-                                        <Send className="w-5 h-5" />
+                                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
                                     )}
                                 </button>
                             </TooltipTrigger>
@@ -525,7 +525,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2 ml-45">
+                    <p className="text-xs text-muted-foreground mt-2 ml-2 sm:ml-45">
                         <MixedText text="按 Enter 发送，Shift + Enter 换行" />
                     </p>
                 </div>

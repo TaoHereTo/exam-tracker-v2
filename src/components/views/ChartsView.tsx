@@ -335,36 +335,36 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
 
     return (
         <UnifiedTabs defaultValue="perMinute" className="w-full">
-            <div className="flex justify-center mb-8">
-                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-4">
-                    <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="pie" className="flex items-center gap-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="radar" className="flex items-center gap-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
+            <div className="flex justify-center mb-4 sm:mb-8">
+                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
+                    <UnifiedTabsTrigger value="perMinute" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="accuracy" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"><MixedText text="正确率" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="pie" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="radar" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4 py-1 sm:py-2"><MixedText text="模块能力" /></UnifiedTabsTrigger>
                 </UnifiedTabsList>
             </div>
 
-            <UnifiedTabsContents className="py-8">
+            <UnifiedTabsContents className="py-4 sm:py-8">
                 <UnifiedTabsContent value="perMinute" className="outline-none">
-                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <TrendChart data={perMinuteData} yMax={2} />
                     </div>
                 </UnifiedTabsContent>
 
                 <UnifiedTabsContent value="accuracy" className="outline-none">
-                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <TrendChart data={accuracyData} yMax={100} />
                     </div>
                 </UnifiedTabsContent>
 
                 <UnifiedTabsContent value="pie" className="outline-none">
-                    <div className="w-full h-[450px] sm:h-[500px] relative">
+                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <ModulePieChart data={pieChartData} />
                     </div>
                 </UnifiedTabsContent>
 
                 <UnifiedTabsContent value="radar" className="outline-none">
-                    <div className="w-full h-[350px] sm:h-[400px] relative mt-4">
+                    <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] relative mt-2 sm:mt-4">
                         <ModuleRadarChart data={records} />
                     </div>
                 </UnifiedTabsContent>

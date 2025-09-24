@@ -301,6 +301,40 @@ h6 .mixed-text-part {
   .settings-row>div:last-child {
     margin-top: 0 !important;
   }
+
+  /* 移动端对话框优化 */
+  .dialog-content {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 1rem !important;
+  }
+
+  /* 移动端表单优化 */
+  .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 移动端按钮组优化 */
+  .button-group {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  /* 移动端卡片间距优化 */
+  .card-container {
+    padding: 0.5rem !important;
+  }
+
+  /* 移动端文本大小优化 */
+  .text-responsive {
+    font-size: 0.875rem !important;
+  }
+
+  /* 移动端图标大小优化 */
+  .icon-responsive {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
 }
 
 /* ========== 动画优化 ========== */

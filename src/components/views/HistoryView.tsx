@@ -185,7 +185,7 @@ export function ExerciseRecordView({
 
     return (
         // Simplified container to match KnowledgeSummaryView approach
-        <div className="pt-4 px-2 md:px-8">
+        <div className="pt-2 sm:pt-4 px-1 sm:px-2 md:px-8">
             <div className="w-full">
                 <UnifiedTable<RecordItem, string>
                     columns={[
@@ -269,10 +269,10 @@ export function ExerciseRecordView({
 
             {/* 编辑记录Sheet */}
             <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
-                <SheetContent side="right" className="w-[350px] sm:w-[400px] p-6 overflow-y-auto">
+                <SheetContent side="right" className="w-[90vw] sm:w-[350px] md:w-[400px] p-4 sm:p-6 overflow-y-auto">
                     <SheetHeader className="px-0 pb-4">
-                        <SheetTitle className="flex items-center gap-2 text-xl font-bold">
-                            <Edit className="w-6 h-6" />
+                        <SheetTitle className="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                            <Edit className="w-5 h-5 sm:w-6 sm:h-6" />
                             <MixedText text="编辑刷题记录" />
                         </SheetTitle>
                         <SheetDescription>
@@ -280,7 +280,7 @@ export function ExerciseRecordView({
                         </SheetDescription>
                     </SheetHeader>
 
-                    <form onSubmit={handleSubmitEdit} className="flex flex-col gap-6 px-0 relative">
+                    <form onSubmit={handleSubmitEdit} className="flex flex-col gap-4 sm:gap-6 px-0 relative">
                         {/* 日期选择 */}
                         <div className="space-y-2">
                             <Label htmlFor="date">
@@ -352,7 +352,7 @@ export function ExerciseRecordView({
                         </div>
 
                         {/* 总题数和正确数 */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="total">
                                     <MixedText text="总题数" />
@@ -397,7 +397,7 @@ export function ExerciseRecordView({
                         </div>
 
                         {/* 按钮组 */}
-                        <div className="flex gap-3 pt-4">
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
                             <Button
                                 type="submit"
                                 className="flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
