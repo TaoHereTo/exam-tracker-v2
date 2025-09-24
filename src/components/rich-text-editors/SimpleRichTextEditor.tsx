@@ -13,7 +13,6 @@ import {
     Undo,
     Redo,
     Link as LinkIcon,
-    Image as ImageIcon,
     AlignLeft,
     AlignCenter,
     AlignRight,
@@ -24,6 +23,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-with-animation';
 
 interface SimpleRichTextEditorProps {
     content: string;
@@ -40,6 +45,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
+    const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
@@ -68,7 +74,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
 
         // 更温和的清理逻辑，保留必要的换行符
-        let cleaned = html
+        const cleaned = html
             // 只移除完全空的div标签（不包含br的）
             .replace(/<div[^>]*><\/div>/gi, '')
             .replace(/<div[^>]*>\s*<\/div>/gi, '')
@@ -251,8 +257,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             const walker = document.createTreeWalker(
                 editorRef.current,
                 NodeFilter.SHOW_TEXT,
-                null,
-                false
+                null
             );
 
             let currentOffset = 0;
@@ -308,8 +313,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             const walker = document.createTreeWalker(
                                 editorRef.current,
                                 NodeFilter.SHOW_TEXT,
-                                null,
-                                false
+                                null
                             );
 
                             let currentOffset = 0;
@@ -368,6 +372,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 更新内容
             const html = editorRef.current.innerHTML;
             onChange(html);
+
+            // 延迟更新按钮状态，确保DOM更新完成
+            setTimeout(() => {
+                updateButtonStates();
+            }, 10);
         }
     };
 
@@ -378,12 +387,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     };
 
-    const insertImage = () => {
-        const url = window.prompt('请输入图片地址:');
-        if (url) {
-            execCommand('insertImage', url);
-        }
-    };
 
     // 保存当前选区
     const saveCurrentSelection = () => {
@@ -418,6 +421,56 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         } else {
             console.log('❌ 没有选区可保存');
         }
+    };
+
+    // 检测当前选区是否包含特定格式
+    const isFormatActive = (format: string): boolean => {
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return false;
+
+        const range = selection.getRangeAt(0);
+        if (range.collapsed) return false; // 如果没有选中文字，返回false
+
+        // 检查选区是否在对应的格式化标签内
+        let currentNode: Node | null = range.startContainer;
+        while (currentNode && currentNode !== editorRef.current) {
+            if (currentNode.nodeType === Node.ELEMENT_NODE) {
+                const element = currentNode as Element;
+                const tagName = element.tagName.toLowerCase();
+
+                switch (format) {
+                    case 'bold':
+                        if (tagName === 'b' || tagName === 'strong') return true;
+                        break;
+                    case 'italic':
+                        if (tagName === 'i' || tagName === 'em') return true;
+                        break;
+                    case 'underline':
+                        if (tagName === 'u') return true;
+                        break;
+                    case 'strikeThrough':
+                        if (tagName === 's' || tagName === 'strike' || tagName === 'del') return true;
+                        break;
+                }
+            }
+            currentNode = currentNode.parentNode;
+        }
+
+        return false;
+    };
+
+    // 更新按钮激活状态
+    const updateButtonStates = () => {
+        const formats = ['bold', 'italic', 'underline', 'strikeThrough'];
+        const newActiveFormats = new Set<string>();
+
+        formats.forEach(format => {
+            if (isFormatActive(format)) {
+                newActiveFormats.add(format);
+            }
+        });
+
+        setActiveFormats(newActiveFormats);
     };
 
     // 恢复保存的选区
@@ -689,20 +742,52 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     return (
         <TooltipProvider>
-            {/* 调试信息 */}
-            <div style={{ position: 'fixed', top: '10px', right: '10px', background: 'yellow', padding: '10px', zIndex: 10000 }}>
-            </div>
             <div className={cn('rich-text-editor border rounded-lg', className)}>
                 <div className="border-b bg-gray-50 dark:bg-gray-800 p-2 flex flex-wrap gap-1">
+                    {/* 撤销/重做 */}
                     <div className="flex items-center gap-1 border-r pr-2 mr-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() => handleFormatCommand('bold')}
+                                    onClick={() => execCommand('undo')}
                                 >
-                                    <Bold className="w-4 h-4" />
+                                    <Undo className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>撤销</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => execCommand('redo')}
+                                >
+                                    <Redo className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>重做</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {/* 文本格式 */}
+                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    variant={activeFormats.has('bold') ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleFormatCommand('bold')}
+                                    className={activeFormats.has('bold') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
+                                >
+                                    <Bold className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -713,11 +798,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
-                                    variant="ghost"
+                                    variant={activeFormats.has('italic') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('italic')}
+                                    className={activeFormats.has('italic') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
                                 >
-                                    <Italic className="w-4 h-4" />
+                                    <Italic className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -728,11 +814,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
-                                    variant="ghost"
+                                    variant={activeFormats.has('underline') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('underline')}
+                                    className={activeFormats.has('underline') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
                                 >
-                                    <Underline className="w-4 h-4" />
+                                    <Underline className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -743,11 +830,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
-                                    variant="ghost"
+                                    variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('strikeThrough')}
+                                    className={activeFormats.has('strikeThrough') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
                                 >
-                                    <Strikethrough className="w-4 h-4" />
+                                    <Strikethrough className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
@@ -756,130 +844,112 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </Tooltip>
                     </div>
 
+                    {/* 标题选择器 */}
                     <div className="flex items-center gap-1 border-r pr-2 mr-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <select
-                                    className="px-2 py-1 text-sm border rounded bg-white dark:bg-gray-700"
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (value === 'paragraph') {
-                                            execCommand('formatBlock', 'div');
-                                        } else {
-                                            execCommand('formatBlock', value);
-                                        }
-                                    }}
-                                >
-                                    <option value="paragraph">段落</option>
-                                    <option value="h1">标题 1</option>
-                                    <option value="h2">标题 2</option>
-                                    <option value="h3">标题 3</option>
-                                    <option value="h4">标题 4</option>
-                                    <option value="h5">标题 5</option>
-                                    <option value="h6">标题 6</option>
-                                </select>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>选择标题级别</p>
-                            </TooltipContent>
-                        </Tooltip>
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            <span className="text-xs">级别</span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>选择标题级别</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[80px]">
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
+                                    正文
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
+                                    标题 1
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
+                                    标题 2
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
+                                    标题 3
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
+                                    标题 4
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
+                                    标题 5
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
+                                    标题 6
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
+                    {/* 列表下拉菜单 */}
                     <div className="flex items-center gap-1 border-r pr-2 mr-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('insertUnorderedList')}
-                                >
-                                    <List className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>无序列表</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('insertOrderedList')}
-                                >
-                                    <ListOrdered className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>有序列表</p>
-                            </TooltipContent>
-                        </Tooltip>
-
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            <List className="w-3 h-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>列表</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[100px]">
+                                <DropdownMenuItem onClick={() => execCommand('insertUnorderedList')}>
+                                    <List className="w-3 h-3 mr-2" />
+                                    无序列表
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('insertOrderedList')}>
+                                    <ListOrdered className="w-3 h-3 mr-2" />
+                                    有序列表
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
+                    {/* 对齐方式下拉菜单 */}
                     <div className="flex items-center gap-1 border-r pr-2 mr-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('justifyLeft')}
-                                >
-                                    <AlignLeft className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>左对齐</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('justifyCenter')}
-                                >
-                                    <AlignCenter className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>居中</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('justifyRight')}
-                                >
-                                    <AlignRight className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>右对齐</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('justifyFull')}
-                                >
-                                    <AlignJustify className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>两端对齐</p>
-                            </TooltipContent>
-                        </Tooltip>
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="ghost" size="sm">
+                                            <AlignLeft className="w-3 h-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>对齐方式</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[100px]">
+                                <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
+                                    <AlignLeft className="w-3 h-3 mr-2" />
+                                    左对齐
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
+                                    <AlignCenter className="w-3 h-3 mr-2" />
+                                    居中
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
+                                    <AlignRight className="w-3 h-3 mr-2" />
+                                    右对齐
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyFull')}>
+                                    <AlignJustify className="w-3 h-3 mr-2" />
+                                    两端对齐
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
 
+                    {/* 文字颜色 */}
                     <Popover>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -903,7 +973,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                             }
                                         }}
                                     >
-                                        <Type className="w-4 h-4" />
+                                        <Type className="w-3 h-3" />
                                     </Button>
                                 </PopoverTrigger>
                             </TooltipTrigger>
@@ -931,6 +1001,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </PopoverContent>
                     </Popover>
 
+                    {/* 背景颜色 */}
                     <Popover>
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -954,7 +1025,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                             }
                                         }}
                                     >
-                                        <Palette className="w-4 h-4" />
+                                        <Palette className="w-3 h-3" />
                                     </Button>
                                 </PopoverTrigger>
                             </TooltipTrigger>
@@ -982,142 +1053,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </PopoverContent>
                     </Popover>
 
+                    {/* 插入链接 */}
                     <div className="flex items-center gap-1 border-r pr-2 mr-2">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button variant="ghost" size="sm" onClick={insertLink}>
-                                    <LinkIcon className="w-4 h-4" />
+                                    <LinkIcon className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p>插入链接</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* 测试按钮 */}
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                console.log('测试按钮被点击');
-                                console.log('当前选区:', window.getSelection());
-                                console.log('编辑器内容:', editorRef.current?.innerHTML);
-                                setTextColor('#FF0000');
-                            }}
-                        >
-                            测试红色
-                        </Button>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                console.log('调试选区按钮被点击');
-                                const selection = window.getSelection();
-                                console.log('当前选区:', selection);
-                                if (selection && selection.rangeCount > 0) {
-                                    const range = selection.getRangeAt(0);
-                                    console.log('选区范围:', range);
-                                    console.log('选中文字:', range.toString());
-                                    console.log('选区容器:', range.startContainer, range.endContainer);
-                                } else {
-                                    console.log('没有选区');
-                                }
-                            }}
-                        >
-                            调试选区
-                        </Button>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                console.log('测试换行按钮被点击');
-                                if (editorRef.current) {
-                                    console.log('当前HTML:', editorRef.current.innerHTML);
-                                    // 手动插入换行符
-                                    const selection = window.getSelection();
-                                    if (selection && selection.rangeCount > 0) {
-                                        const range = selection.getRangeAt(0);
-                                        const br = document.createElement('br');
-                                        range.deleteContents();
-                                        range.insertNode(br);
-                                        range.setStartAfter(br);
-                                        range.collapse(true);
-                                        selection.removeAllRanges();
-                                        selection.addRange(range);
-                                        console.log('插入换行符后的HTML:', editorRef.current.innerHTML);
-                                    }
-                                }
-                            }}
-                        >
-                            测试换行
-                        </Button>
-
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                                console.log('清理HTML按钮被点击');
-                                if (editorRef.current) {
-                                    const html = editorRef.current.innerHTML;
-                                    console.log('清理前HTML:', html);
-                                    const cleanedHtml = cleanEmptyContent(html);
-                                    console.log('清理后HTML:', cleanedHtml);
-
-                                    if (cleanedHtml !== html) {
-                                        editorRef.current.innerHTML = cleanedHtml;
-                                        onChange(cleanedHtml);
-                                        console.log('HTML已清理');
-                                    } else {
-                                        console.log('HTML无需清理');
-                                    }
-                                }
-                            }}
-                        >
-                            清理HTML
-                        </Button>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant="ghost" size="sm" onClick={insertImage}>
-                                    <ImageIcon className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入图片</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('undo')}
-                                >
-                                    <Undo className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>撤销</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => execCommand('redo')}
-                                >
-                                    <Redo className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>重做</p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -1172,6 +1117,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 saveCurrentSelection();
                             }
                         }
+                        // 更新按钮状态
+                        updateButtonStates();
                     }}
                     onKeyUp={() => {
                         // 在键盘释放时保存选区（只在有选中文字时）
@@ -1183,6 +1130,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 saveCurrentSelection();
                             }
                         }
+                        // 更新按钮状态
+                        updateButtonStates();
                     }}
                     onKeyDown={(e) => {
                         // 处理删除键，只在内容完全为空时清理
