@@ -34,7 +34,8 @@ import {
     Minimize2,
     MessageCircleOff,
     BrickWallFire,
-    History
+    History,
+    ChevronUp
 } from "lucide-react";
 import type { AIAnalysisResult, AIAnalysisRequest } from '@/types/ai';
 
@@ -66,6 +67,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const [isInputExpanded, setIsInputExpanded] = useState(false);
     const [chatHistory, setChatHistory] = useState<ChatMessage[][]>([]);
+    const [isButtonsExpanded, setIsButtonsExpanded] = useState(false);
 
     const aiService = AIService.getInstance();
 
@@ -360,83 +362,103 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                 {/* 输入区域 */}
                 <div className="p-2 sm:p-4 border-t bg-background">
                     <div className="flex items-end gap-2 sm:gap-3">
-                        {/* 左侧按钮组 */}
-                        <div className="flex items-center gap-1">
-                            {/* 分析报告按钮 */}
+                        {/* 左侧按钮组 - 可展开收起 */}
+                        <div className="flex items-center">
+                            {/* 箭头切换按钮 */}
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <button
-                                        onClick={handleQuickAnalysis}
-                                        disabled={isAnalyzing || records.length === 0}
-                                        className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-orange-500 hover:text-orange-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                                        onClick={() => setIsButtonsExpanded(!isButtonsExpanded)}
+                                        className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                                     >
-                                        {isAnalyzing ? (
-                                            <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                                        ) : (
-                                            <BrickWallFire className="w-4 h-4 sm:w-5 sm:h-5" />
-                                        )}
+                                        <ChevronUp className={`w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 ease-in-out ${isButtonsExpanded ? 'rotate-90' : 'rotate-0'
+                                            }`} />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>分析报告</p>
+                                    <p>{isButtonsExpanded ? '收起按钮' : '展开按钮'}</p>
                                 </TooltipContent>
                             </Tooltip>
 
-                            {/* 历史记录按钮 */}
-                            <Sheet>
+                            {/* 按钮组容器 - 带动画 */}
+                            <div className={`flex items-center gap-1 overflow-hidden transition-all duration-500 ease-in-out ${isButtonsExpanded ? 'max-w-48 opacity-100' : 'max-w-0 opacity-0'
+                                }`}>
+                                {/* 分析报告按钮 */}
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <SheetTrigger asChild>
-                                            <button className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
-                                                <History className="w-4 h-4 sm:w-5 sm:h-5" />
-                                            </button>
-                                        </SheetTrigger>
+                                        <button
+                                            onClick={handleQuickAnalysis}
+                                            disabled={isAnalyzing || records.length === 0}
+                                            className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-orange-500 hover:text-orange-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            {isAnalyzing ? (
+                                                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                                            ) : (
+                                                <BrickWallFire className="w-4 h-4 sm:w-5 sm:h-5" />
+                                            )}
+                                        </button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>历史记录</p>
+                                        <p>分析报告</p>
                                     </TooltipContent>
                                 </Tooltip>
-                                <SheetContent side="right" className="w-80 sm:w-80">
-                                    <SheetHeader>
-                                        <SheetTitle>对话历史记录</SheetTitle>
-                                    </SheetHeader>
-                                    <div className="mt-4 space-y-2">
-                                        {chatHistory.length === 0 ? (
-                                            <p className="text-sm text-muted-foreground">暂无历史记录</p>
-                                        ) : (
-                                            chatHistory.map((historyMessages, index) => (
-                                                <div key={index} className="p-3 border rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                                                    <div className="text-sm font-medium">
-                                                        对话 {index + 1}
-                                                    </div>
-                                                    <div className="text-xs text-muted-foreground mt-1">
-                                                        {historyMessages.length} 条消息
-                                                    </div>
-                                                </div>
-                                            ))
-                                        )}
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
 
-                            {/* 清空对话按钮 */}
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={handleClearChat}
-                                        className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-red-500 hover:text-red-600 transition-colors"
-                                    >
-                                        <MessageCircleOff className="w-4 h-4 sm:w-5 sm:h-5" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>清空所有对话记录</p>
-                                </TooltipContent>
-                            </Tooltip>
+                                {/* 历史记录按钮 */}
+                                <Sheet>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <SheetTrigger asChild>
+                                                <button className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
+                                                    <History className="w-4 h-4 sm:w-5 sm:h-5" />
+                                                </button>
+                                            </SheetTrigger>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>历史记录</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                    <SheetContent side="right" className="w-80 sm:w-80">
+                                        <SheetHeader>
+                                            <SheetTitle>对话历史记录</SheetTitle>
+                                        </SheetHeader>
+                                        <div className="mt-4 space-y-2">
+                                            {chatHistory.length === 0 ? (
+                                                <p className="text-sm text-muted-foreground">暂无历史记录</p>
+                                            ) : (
+                                                chatHistory.map((historyMessages, index) => (
+                                                    <div key={index} className="p-3 border rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                                                        <div className="text-sm font-medium">
+                                                            对话 {index + 1}
+                                                        </div>
+                                                        <div className="text-xs text-muted-foreground mt-1">
+                                                            {historyMessages.length} 条消息
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+
+                                {/* 清空对话按钮 */}
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={handleClearChat}
+                                            className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-red-500 hover:text-red-600 transition-colors"
+                                        >
+                                            <MessageCircleOff className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>清空所有对话记录</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
                         </div>
 
                         {/* 输入框区域 */}
-                        <div className="flex-1 max-w-4xl relative">
+                        <div className="flex-1 max-w-4xl relative transition-all duration-500 ease-in-out">
                             <Textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}

@@ -22,15 +22,74 @@ export async function POST(request: NextRequest) {
         const selectedModel = model || 'gemini-2.5-flash';
 
         if (selectedModel.startsWith('deepseek')) {
-            // 重定向到DeepSeek分析API
-            const deepseekResponse = await fetch(`${request.nextUrl.origin}/api/ai/deepseek-analyze`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ apiKey, prompt, model: selectedModel })
-            });
-            return NextResponse.json(await deepseekResponse.json());
+            // 调用DeepSeek API进行分析
+            try {
+                const fetchOptions: RequestInit = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel || 'deepseek-chat',
+                        messages: [
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 2000,
+                        temperature: 0.7
+                    }),
+                    signal: AbortSignal.timeout(60000)
+                };
+
+                const response = await fetch(
+                    'https://api.deepseek.com/v1/chat/completions',
+                    fetchOptions
+                );
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('DeepSeek API错误:', response.status, errorText);
+                    return NextResponse.json(
+                        { success: false, message: `DeepSeek API请求失败: ${response.status} - ${errorText}` },
+                        { status: response.status }
+                    );
+                }
+
+                const data = await response.json();
+
+                if (!data.choices || data.choices.length === 0) {
+                    return NextResponse.json(
+                        { success: false, message: 'AI分析结果为空' },
+                        { status: 500 }
+                    );
+                }
+
+                const analysisText = data.choices[0].message.content;
+
+                return NextResponse.json({
+                    success: true,
+                    analysisText: analysisText
+                });
+
+            } catch (error) {
+                console.error('DeepSeek API分析错误:', error);
+
+                // 如果是网络连接错误，提供详细的错误信息
+                if (error instanceof Error && error.name === 'AbortError') {
+                    return NextResponse.json(
+                        { success: false, message: '分析超时，请检查网络连接' },
+                        { status: 408 }
+                    );
+                }
+
+                return NextResponse.json(
+                    { success: false, message: `网络连接失败: ${error instanceof Error ? error.message : '未知错误'}` },
+                    { status: 500 }
+                );
+            }
         }
 
         // 调用Gemini API
