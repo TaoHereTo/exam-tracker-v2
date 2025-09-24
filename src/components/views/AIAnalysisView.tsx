@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { AIService } from "@/lib/aiService";
@@ -30,7 +31,10 @@ import {
     Target,
     Lightbulb,
     Maximize2,
-    Minimize2
+    Minimize2,
+    MessageCircleOff,
+    BrickWallFire,
+    History
 } from "lucide-react";
 import type { AIAnalysisResult, AIAnalysisRequest } from '@/types/ai';
 
@@ -61,6 +65,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const [isInputExpanded, setIsInputExpanded] = useState(false);
+    const [chatHistory, setChatHistory] = useState<ChatMessage[][]>([]);
 
     const aiService = AIService.getInstance();
 
@@ -205,8 +210,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
             setTimeout(() => setCopiedMessageId(null), 2000);
             notify({
                 type: "success",
-                message: "已复制到剪贴板",
-                description: "内容已成功复制"
+                message: "已复制到剪贴板"
             });
         } catch (error) {
             notify({
@@ -218,6 +222,11 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
     };
 
     const handleClearChat = () => {
+        // 保存当前对话到历史记录（如果有实际对话内容）
+        if (messages.length > 1) { // 除了欢迎消息外还有其他消息
+            setChatHistory(prev => [...prev, messages]);
+        }
+
         setMessages([{
             id: 'welcome',
             type: 'ai',
@@ -231,7 +240,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
             // 处理标题行
             if (line.startsWith('**') && line.endsWith('**')) {
                 return (
-                    <div key={index} className="font-semibold text-base mt-4 mb-2 first:mt-0 text-blue-600 dark:text-blue-400">
+                    <div key={index} className="font-semibold text-base mt-3 mb-1 first:mt-0 text-blue-600 dark:text-blue-400">
                         {line.replace(/\*\*/g, '')}
                     </div>
                 );
@@ -239,16 +248,16 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
             // 处理列表项
             if (line.startsWith('- ')) {
                 return (
-                    <div key={index} className="ml-4 mb-1 flex items-start">
-                        <span className="text-blue-500 mr-2">•</span>
-                        <span>{line.substring(2)}</span>
+                    <div key={index} className="ml-3 mb-0.5 flex items-start">
+                        <span className="text-blue-500 mr-1 text-sm">•</span>
+                        <span className="text-sm">{line.substring(2)}</span>
                     </div>
                 );
             }
             // 处理普通段落
             if (line.trim()) {
                 return (
-                    <div key={index} className="mb-2">
+                    <div key={index} className="mb-1 text-sm">
                         {line}
                     </div>
                 );
@@ -260,49 +269,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
 
     return (
         <TooltipProvider>
-            <div className="h-full flex flex-col max-w-6xl mx-auto px-8">
-                {/* 头部 */}
-                <div className="flex items-center justify-end px-4 py-2 border-b bg-background">
-                    <div className="flex items-center gap-3">
-                        {/* 快速分析按钮 */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={handleQuickAnalysis}
-                                    disabled={isAnalyzing || records.length === 0}
-                                    className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600"
-                                >
-                                    {isAnalyzing ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <BarChart3 className="w-4 h-4" />
-                                    )}
-                                    {isAnalyzing ? '分析中...' : '快速分析'}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>基于您的刷题数据生成智能分析报告</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* 清空对话 */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    onClick={handleClearChat}
-                                    variant="outline"
-                                    size="sm"
-                                >
-                                    <RefreshCw className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>清空所有对话记录</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                </div>
-
+            <div className="h-full flex flex-col w-full px-4">
                 {/* 聊天区域 */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4">
                     {messages.map((message) => (
@@ -328,7 +295,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                             {message.content}
                                         </div>
                                     ) : (
-                                        <div className="prose prose-sm max-w-none dark:prose-invert">
+                                        <div className="prose prose-sm max-w-none dark:prose-invert text-sm">
                                             {formatMessageContent(message.content)}
                                         </div>
                                     )}
@@ -350,14 +317,13 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-6 w-6 p-0"
+                                                    className="h-6 w-6 p-0 transition-all duration-300 ease-in-out"
                                                     onClick={() => handleCopyMessage(message.content, message.id)}
                                                 >
-                                                    {copiedMessageId === message.id ? (
-                                                        <Check className="w-3 h-3 text-green-500" />
-                                                    ) : (
-                                                        <Copy className="w-3 h-3" />
-                                                    )}
+                                                    <div className="relative">
+                                                        <Copy className={`w-3 h-3 transition-all duration-300 ${copiedMessageId === message.id ? 'opacity-0 scale-0 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
+                                                        <Check className={`w-3 h-3 text-green-500 absolute top-0 left-0 transition-all duration-300 ${copiedMessageId === message.id ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-180'}`} />
+                                                    </div>
                                                 </Button>
                                             </TooltipTrigger>
                                             <TooltipContent>
@@ -394,11 +360,87 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                 {/* 输入区域 */}
                 <div className="p-4 border-t bg-background">
                     <div className="flex items-end gap-3">
-                        <div className="flex-1 relative">
+                        {/* 左侧按钮组 */}
+                        <div className="flex items-center gap-1">
+                            {/* 分析报告按钮 */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={handleQuickAnalysis}
+                                        disabled={isAnalyzing || records.length === 0}
+                                        className="h-12 w-12 flex items-center justify-center text-orange-500 hover:text-orange-600 disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        {isAnalyzing ? (
+                                            <Loader2 className="w-5 h-5 animate-spin" />
+                                        ) : (
+                                            <BrickWallFire className="w-5 h-5" />
+                                        )}
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>分析报告</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            {/* 历史记录按钮 */}
+                            <Sheet>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <SheetTrigger asChild>
+                                            <button className="h-12 w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
+                                                <History className="w-5 h-5" />
+                                            </button>
+                                        </SheetTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>历史记录</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <SheetContent side="right" className="w-80">
+                                    <SheetHeader>
+                                        <SheetTitle>对话历史记录</SheetTitle>
+                                    </SheetHeader>
+                                    <div className="mt-4 space-y-2">
+                                        {chatHistory.length === 0 ? (
+                                            <p className="text-sm text-muted-foreground">暂无历史记录</p>
+                                        ) : (
+                                            chatHistory.map((historyMessages, index) => (
+                                                <div key={index} className="p-3 border rounded-lg cursor-pointer hover:bg-muted transition-colors">
+                                                    <div className="text-sm font-medium">
+                                                        对话 {index + 1}
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground mt-1">
+                                                        {historyMessages.length} 条消息
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </SheetContent>
+                            </Sheet>
+
+                            {/* 清空对话按钮 */}
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={handleClearChat}
+                                        className="h-12 w-12 flex items-center justify-center text-red-500 hover:text-red-600 transition-colors"
+                                    >
+                                        <MessageCircleOff className="w-5 h-5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>清空所有对话记录</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        {/* 输入框区域 */}
+                        <div className="flex-1 max-w-4xl relative">
                             <Textarea
                                 value={customPrompt}
                                 onChange={(e) => setCustomPrompt(e.target.value)}
-                                placeholder="输入您的问题，比如：我的数学模块表现如何？如何提高正确率？"
+                                placeholder="输入您的问题，比如：我的刷题表现如何？如何提高正确率？"
                                 className={`w-full resize-none transition-all duration-300 ${isInputExpanded
                                     ? 'min-h-[120px] rounded-2xl'
                                     : 'min-h-[48px] rounded-full'
@@ -416,33 +458,21 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Select value={selectedModel} onValueChange={setSelectedModel}>
-                                            <SelectTrigger className="w-32 h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
-                                                <SelectValue className="text-xs" />
+                                            <SelectTrigger className="w-auto min-w-32 h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
+                                                <SelectValue className="text-[10px]" />
                                             </SelectTrigger>
-                                            <SelectContent>
+                                            <SelectContent className="w-auto min-w-32">
                                                 <SelectItem value="gemini-2.5-flash">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs">Gemini 2.5 Flash</span>
-                                                        <span className="text-xs text-muted-foreground">快速响应</span>
-                                                    </div>
+                                                    <span className="text-[10px]">Gemini 2.5 快速版</span>
                                                 </SelectItem>
                                                 <SelectItem value="gemini-2.5-pro">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs">Gemini 2.5 Pro</span>
-                                                        <span className="text-xs text-muted-foreground">高质量分析</span>
-                                                    </div>
+                                                    <span className="text-[10px]">Gemini 2.5 专业版</span>
                                                 </SelectItem>
                                                 <SelectItem value="deepseek-chat">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs">DeepSeek Chat</span>
-                                                        <span className="text-xs text-muted-foreground">通用对话</span>
-                                                    </div>
+                                                    <span className="text-[10px]">DeepSeek 对话版</span>
                                                 </SelectItem>
                                                 <SelectItem value="deepseek-reasoner">
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium text-xs">DeepSeek Reasoner</span>
-                                                        <span className="text-xs text-muted-foreground">深度思考</span>
-                                                    </div>
+                                                    <span className="text-[10px]">DeepSeek 推理版</span>
                                                 </SelectItem>
                                             </SelectContent>
                                         </Select>
@@ -474,7 +504,8 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                 </TooltipContent>
                             </Tooltip>
                         </div>
-                        {/* 发送按钮 - 移除外边框和填充，只显示图标 */}
+
+                        {/* 发送按钮 */}
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <button
@@ -494,7 +525,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-muted-foreground mt-2 ml-45">
                         <MixedText text="按 Enter 发送，Shift + Enter 换行" />
                     </p>
                 </div>
