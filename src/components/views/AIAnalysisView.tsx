@@ -547,7 +547,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                             </TooltipContent>
                         </Tooltip>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2 ml-2 sm:ml-45">
+                    <p className="text-xs text-muted-foreground mt-2 text-center">
                         <MixedText text="按 Enter 发送，Shift + Enter 换行" />
                     </p>
                 </div>
