@@ -169,20 +169,14 @@ const NAV_DATA = {
             ],
         },
         {
-            title: '申论',
+            title: '笔记管理',
             icon: FileTextIcon,
             isActive: false,
             items: [
                 {
-                    title: '文本摘录',
+                    title: '我的笔记',
                     url: '#',
-                    tab: 'text-extraction',
-                    icon: FileText,
-                },
-                {
-                    title: '暂定',
-                    url: '#',
-                    tab: 'shenlun-placeholder',
+                    tab: 'notes',
                     icon: FileEdit,
                 },
             ],

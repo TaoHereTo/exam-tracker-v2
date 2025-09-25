@@ -39,6 +39,7 @@ export const PAGE_TITLE_MAP: Record<string, string> = {
     'calendar': '日程管理',
     'text-extraction': '文本摘录',
     'shenlun-placeholder': '暂定',
+    'notes': '我的笔记',
 };
 
 // 统一的模块颜色配置

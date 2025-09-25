@@ -133,15 +133,9 @@ const ScheduleManagementView = lazy(() =>
     }))
 );
 
-// 添加申论相关视图的懒加载
-const TextExtractionView = lazy(() =>
-    import("@/components/views/TextExtractionView").then(module => ({
-        default: module.default
-    }))
-);
 
-const ShenlunPlaceholderView = lazy(() =>
-    import("@/components/views/ShenlunPlaceholderView").then(module => ({
+const NotesView = lazy(() =>
+    import("@/components/views/NotesView").then(module => ({
         default: module.default
     }))
 );
@@ -1359,23 +1353,14 @@ export function MainApp() {
                                             </Suspense>
                                         )}
 
-                                        {activeTab === 'text-extraction' && (
-                                            <Suspense fallback={
-                                                <div className="flex items-center justify-center min-h-[60vh]">
-                                                    <SimpleUiverseSpinner />
-                                                </div>
-                                            }>
-                                                <TextExtractionView />
-                                            </Suspense>
-                                        )}
 
-                                        {activeTab === 'shenlun-placeholder' && (
+                                        {activeTab === 'notes' && (
                                             <Suspense fallback={
                                                 <div className="flex items-center justify-center min-h-[60vh]">
                                                     <SimpleUiverseSpinner />
                                                 </div>
                                             }>
-                                                <ShenlunPlaceholderView />
+                                                <NotesView />
                                             </Suspense>
                                         )}
 

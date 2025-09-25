@@ -16,6 +16,8 @@ interface KnowledgeRichTextEditorProps {
     onImageChange?: (imageIds: string[]) => void;
     onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void;
     clearPreviewImages?: boolean; // 新增：用于清理预览图片
+    editorMinHeight?: string; // 新增：自定义编辑器最小高度
+    editorMaxHeight?: string; // 新增：自定义编辑器最大高度
 }
 
 export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = ({
@@ -25,7 +27,9 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
     className,
     onImageChange,
     onPendingImagesChange,
-    clearPreviewImages = false
+    clearPreviewImages = false,
+    editorMinHeight = '200px',
+    editorMaxHeight = '400px'
 }) => {
     const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
     const [accordionValue, setAccordionValue] = useState<string>("");
@@ -139,68 +143,74 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
     };
 
     return (
-        <div className="space-y-2">
-            <SimpleRichTextEditor
-                content={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className={className}
-                onImageChange={onImageChange}
-                deferImageUpload={true} // 延迟上传，在保存时统一处理
-                onPendingImagesChange={handlePendingImagesChange}
-            />
+        <div className="h-full flex flex-col">
+            <div className="flex-1 min-h-0">
+                <SimpleRichTextEditor
+                    content={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className={className}
+                    onImageChange={onImageChange}
+                    deferImageUpload={true} // 延迟上传，在保存时统一处理
+                    onPendingImagesChange={handlePendingImagesChange}
+                    customMinHeight={editorMinHeight}
+                    customMaxHeight={editorMaxHeight}
+                />
+            </div>
 
             {/* 图片预览区域 */}
             {pendingImages.length > 0 && (
-                <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
-                    <AccordionItem value="preview" data-accordion-item="preview">
-                        <AccordionTrigger className="text-sm font-medium py-1">
-                            图片预览 ({pendingImages.length})
-                        </AccordionTrigger>
-                        <AccordionContent>
-                            <PhotoProvider>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-2">
-                                    {pendingImages.map((image, index) => {
-                                        console.log(`渲染图片 ${index}:`, image.localUrl);
-                                        return (
-                                            <div key={index} className="relative group">
-                                                <PhotoView src={image.localUrl}>
-                                                    <div className="cursor-pointer relative">
-                                                        <Image
-                                                            src={image.localUrl}
-                                                            alt={`预览图片 ${index + 1}`}
-                                                            width={120}
-                                                            height={120}
-                                                            className="w-full h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:opacity-80 transition-opacity"
-                                                            onLoad={() => console.log(`图片 ${index} 加载成功`)}
-                                                            onError={() => console.log(`图片 ${index} 加载失败`)}
-                                                        />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <div className="bg-black bg-opacity-50 rounded-full p-2">
-                                                                <Eye className="w-4 h-4 text-white" />
+                <div className="mt-2">
+                    <Accordion type="single" collapsible value={accordionValue} onValueChange={setAccordionValue}>
+                        <AccordionItem value="preview" data-accordion-item="preview">
+                            <AccordionTrigger className="text-sm font-medium py-1">
+                                图片预览 ({pendingImages.length})
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <PhotoProvider>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-2">
+                                        {pendingImages.map((image, index) => {
+                                            console.log(`渲染图片 ${index}:`, image.localUrl);
+                                            return (
+                                                <div key={index} className="relative group">
+                                                    <PhotoView src={image.localUrl}>
+                                                        <div className="cursor-pointer relative">
+                                                            <Image
+                                                                src={image.localUrl}
+                                                                alt={`预览图片 ${index + 1}`}
+                                                                width={120}
+                                                                height={120}
+                                                                className="w-full h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:opacity-80 transition-opacity"
+                                                                onLoad={() => console.log(`图片 ${index} 加载成功`)}
+                                                                onError={() => console.log(`图片 ${index} 加载失败`)}
+                                                            />
+                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <div className="bg-black bg-opacity-50 rounded-full p-2">
+                                                                    <Eye className="w-4 h-4 text-white" />
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </PhotoView>
-                                                {/* 删除按钮 */}
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleDeleteImage(index);
-                                                    }}
-                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                                                    title="删除图片"
-                                                >
-                                                    <X className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </PhotoProvider>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+                                                    </PhotoView>
+                                                    {/* 删除按钮 */}
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteImage(index);
+                                                        }}
+                                                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                        title="删除图片"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </PhotoProvider>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
             )}
         </div>
     );

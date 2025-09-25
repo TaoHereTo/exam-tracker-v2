@@ -45,6 +45,8 @@ interface SimpleRichTextEditorProps {
     onImageChange?: (imageIds: string[]) => void;
     deferImageUpload?: boolean;
     onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void;
+    customMinHeight?: string; // 新增：自定义最小高度
+    customMaxHeight?: string; // 新增：自定义最大高度
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
@@ -54,7 +56,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     className,
     onImageChange,
     deferImageUpload = false,
-    onPendingImagesChange
+    onPendingImagesChange,
+    customMinHeight,
+    customMaxHeight
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
@@ -1448,8 +1452,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         // 这样可以避免干扰正常的换行行为
                     }}
                     className={cn(
-                        "bg-white dark:bg-[#303030] focus:outline-none prose prose-sm max-w-none cursor-text relative",
-                        isFullscreen ? "min-h-[calc(80vh-60px)]" : "min-h-[200px]"
+                        "bg-white dark:bg-[#303030] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
+                        isFullscreen ? "min-h-[calc(80vh-60px)] max-h-[calc(80vh-60px)]" :
+                            customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
                     )}
                     style={{
                         fontSize: '14px',
@@ -1468,6 +1473,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             cursor: text !important;
             padding: 16px !important;
             margin: 0 !important;
+            overflow-y: auto !important;
+            max-height: 100% !important;
           }
           
           .rich-text-editor [contenteditable]:focus {
