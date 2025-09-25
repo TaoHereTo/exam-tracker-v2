@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import {
     Bold,
@@ -18,7 +18,12 @@ import {
     AlignRight,
     AlignJustify,
     Palette,
-    Type
+    Type,
+    Image as ImageIcon,
+    Upload,
+    Maximize2,
+    Minimize2,
+    Heading
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -29,23 +34,38 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-with-animation';
+import { supabaseImageManager } from '@/lib/supabaseImageManager';
+import { useNotification } from '@/components/magicui/NotificationProvider';
 
 interface SimpleRichTextEditorProps {
     content: string;
     onChange: (content: string) => void;
     placeholder?: string;
     className?: string;
+    onImageChange?: (imageIds: string[]) => void;
+    deferImageUpload?: boolean;
+    onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void;
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     content,
     onChange,
     placeholder = '开始输入...',
-    className
+    className,
+    onImageChange,
+    deferImageUpload = false,
+    onPendingImagesChange
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
     const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
+    const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const { notify } = useNotification();
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
@@ -55,8 +75,28 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 editorRef.current.innerHTML = content;
             }
         }
-
     }, [content]);
+
+    // 确保图片状态在组件重新渲染时保持
+    useEffect(() => {
+        if (pendingImagesRef.current.length > 0 && pendingImages.length === 0) {
+            console.log('SimpleRichTextEditor 恢复图片状态:', pendingImagesRef.current);
+            setPendingImages(pendingImagesRef.current);
+        }
+    }, [pendingImages.length]);
+
+    // 强制保持图片状态，防止意外丢失
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (pendingImagesRef.current.length > 0 && pendingImages.length === 0) {
+                console.log('SimpleRichTextEditor 定时检查：恢复图片状态', pendingImagesRef.current);
+                setPendingImages(pendingImagesRef.current);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const html = e.currentTarget.innerHTML;
@@ -386,6 +426,183 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             execCommand('createLink', url);
         }
     };
+
+    // 在编辑器中插入图片
+    const insertImageToEditor = useCallback((imageUrl: string) => {
+        if (!editorRef.current) return;
+
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+
+            // 创建图片元素
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.maxWidth = '100%';
+            img.style.height = 'auto';
+            img.alt = '插入的图片';
+
+            // 插入图片
+            range.deleteContents();
+            range.insertNode(img);
+
+            // 将光标移到图片后面
+            range.setStartAfter(img);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+
+            // 更新内容
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
+    }, [onChange]);
+
+    // 处理文件上传
+    const handleFileUpload = useCallback(async (file: File) => {
+        // 文件类型验证
+        const isImageByMime = file.type.startsWith('image/');
+        const isImageByExtension = /\.(jpg|jpeg|png|gif|bmp|webp|svg)$/i.test(file.name);
+
+        if (!isImageByMime && !isImageByExtension) {
+            notify({
+                type: "error",
+                message: "文件类型错误",
+                description: "请选择图片文件"
+            });
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            notify({
+                type: "error",
+                message: "文件过大",
+                description: "图片大小不能超过5MB"
+            });
+            return;
+        }
+
+        // 如果启用了延迟上传，只添加到待上传列表
+        if (deferImageUpload) {
+            // 使用 FileReader 创建更持久的预览 URL
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const dataUrl = e.target?.result as string;
+                console.log('FileReader 创建 Data URL:', dataUrl.substring(0, 50) + '...');
+                const newPendingImage = { localUrl: dataUrl, file, imageId: null };
+                const newPendingImages = [...pendingImages, newPendingImage];
+                pendingImagesRef.current = newPendingImages;
+                setPendingImages(newPendingImages);
+
+                // 保存到 localStorage
+                try {
+                    localStorage.setItem('pendingImages', JSON.stringify(newPendingImages));
+                } catch (e) {
+                    console.log('无法保存到 localStorage:', e);
+                }
+
+                // 通知父组件有待上传的图片
+                if (onPendingImagesChange) {
+                    onPendingImagesChange(newPendingImages);
+                }
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        // 立即上传模式
+        setIsUploading(true);
+        try {
+            const imageInfo = await supabaseImageManager.uploadImage(file);
+            const imageUrl = imageInfo.url;
+
+            // 不插入图片到编辑器，只添加到预览列表
+
+            // 通知父组件图片已上传
+            if (onImageChange) {
+                onImageChange([imageInfo.id]);
+            }
+
+            notify({
+                type: "success",
+                message: "图片上传成功",
+                description: "图片已插入到编辑器中"
+            });
+        } catch (error) {
+            console.error('上传失败:', error);
+            const errorMessage = error instanceof Error ? error.message : "图片上传失败";
+            notify({
+                type: "error",
+                message: "上传失败",
+                description: errorMessage
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    }, [deferImageUpload, onImageChange, onPendingImagesChange, pendingImages, notify, insertImageToEditor]);
+
+    // 处理文件选择
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            handleFileUpload(file);
+        }
+    };
+
+    // 处理粘贴图片
+    const handlePaste = useCallback(async (e: ClipboardEvent) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                if (file) {
+                    e.preventDefault();
+                    await handleFileUpload(file);
+                    break;
+                }
+            }
+        }
+    }, [handleFileUpload]);
+
+    // 处理拖拽事件
+    const handleDragOver = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(true);
+    }, []);
+
+    const handleDragLeave = useCallback((e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+    }, []);
+
+    const handleDrop = useCallback(async (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+
+        const files = Array.from(e.dataTransfer.files);
+        for (const file of files) {
+            if (file.type.startsWith('image/')) {
+                await handleFileUpload(file);
+            }
+        }
+    }, [handleFileUpload]);
+
+    // 添加粘贴事件监听器
+    useEffect(() => {
+        const editor = editorRef.current;
+        if (editor) {
+            editor.addEventListener('paste', handlePaste);
+            return () => {
+                editor.removeEventListener('paste', handlePaste);
+            };
+        }
+    }, [handlePaste]);
 
 
     // 保存当前选区
@@ -742,15 +959,28 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     return (
         <TooltipProvider>
-            <div className={cn('rich-text-editor border rounded-lg', className)}>
-                <div className="border-b bg-gray-50 dark:bg-gray-800 p-2 flex flex-wrap gap-1">
+            {isFullscreen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    onClick={() => setIsFullscreen(false)}
+                />
+            )}
+            <div
+                className={cn('rich-text-editor border rounded-lg overflow-hidden', isFullscreen ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] max-w-4xl h-[80vh] z-50 bg-white dark:bg-gray-900 shadow-2xl' : '', isDragOver ? 'ring-2 ring-blue-500' : '', className)}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
+                <div className="border-b bg-gray-50 dark:bg-gray-800 p-1 flex flex-wrap gap-0.5">
                     {/* 撤销/重做 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant="ghost"
                                     size="sm"
+                                    className="h-6 w-6 p-0"
                                     onClick={() => execCommand('undo')}
                                 >
                                     <Undo className="w-3 h-3" />
@@ -764,8 +994,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant="ghost"
                                     size="sm"
+                                    className="h-6 w-6 p-0"
                                     onClick={() => execCommand('redo')}
                                 >
                                     <Redo className="w-3 h-3" />
@@ -778,14 +1010,15 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </div>
 
                     {/* 文本格式 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant={activeFormats.has('bold') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('bold')}
-                                    className={activeFormats.has('bold') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
                                 >
                                     <Bold className="w-3 h-3" />
                                 </Button>
@@ -798,10 +1031,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant={activeFormats.has('italic') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('italic')}
-                                    className={activeFormats.has('italic') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
                                 >
                                     <Italic className="w-3 h-3" />
                                 </Button>
@@ -814,10 +1048,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant={activeFormats.has('underline') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('underline')}
-                                    className={activeFormats.has('underline') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
                                 >
                                     <Underline className="w-3 h-3" />
                                 </Button>
@@ -830,10 +1065,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
+                                    type="button"
                                     variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('strikeThrough')}
-                                    className={activeFormats.has('strikeThrough') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
                                 >
                                     <Strikethrough className="w-3 h-3" />
                                 </Button>
@@ -845,13 +1081,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </div>
 
                     {/* 标题选择器 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    <div className="flex items-center gap-0.5 pr-1 mr-1">
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm">
-                                            <span className="text-xs">级别</span>
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                            <Heading className="w-3 h-3" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                 </TooltipTrigger>
@@ -886,12 +1122,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </div>
 
                     {/* 列表下拉菜单 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    <div className="flex items-center gap-0.5 pr-1 mr-1">
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm">
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
                                             <List className="w-3 h-3" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -914,12 +1150,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </div>
 
                     {/* 对齐方式下拉菜单 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="sm">
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
                                             <AlignLeft className="w-3 h-3" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -955,8 +1191,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <PopoverTrigger asChild>
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="sm"
+                                        className="h-6 w-6 p-0"
                                         onMouseDown={() => {
                                             // 在鼠标按下时检查并保存选区
                                             console.log('文字颜色按钮被按下，检查选区');
@@ -1007,8 +1245,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <PopoverTrigger asChild>
                                     <Button
+                                        type="button"
                                         variant="ghost"
                                         size="sm"
+                                        className="h-6 w-6 p-0"
                                         onMouseDown={() => {
                                             // 在鼠标按下时检查并保存选区
                                             console.log('背景颜色按钮被按下，检查选区');
@@ -1053,16 +1293,67 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </PopoverContent>
                     </Popover>
 
-                    {/* 插入链接 */}
-                    <div className="flex items-center gap-1 border-r pr-2 mr-2">
+                    {/* 插入链接和图片 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button variant="ghost" size="sm" onClick={insertLink}>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
                                     <LinkIcon className="w-3 h-3" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p>插入链接</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={isUploading}
+                                >
+                                    {isUploading ? (
+                                        <Upload className="w-3 h-3 animate-spin" />
+                                    ) : (
+                                        <ImageIcon className="w-3 h-3" />
+                                    )}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>插入图片</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        {/* 隐藏的文件输入 */}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            style={{ display: 'none' }}
+                        />
+                    </div>
+
+                    {/* 全屏按钮 */}
+                    <div className="flex items-center gap-0.5 ml-auto">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => setIsFullscreen(!isFullscreen)}
+                                >
+                                    {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -1156,7 +1447,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         // 让 Enter 键自然工作，不进行额外处理
                         // 这样可以避免干扰正常的换行行为
                     }}
-                    className="min-h-[200px] bg-white dark:bg-gray-900 focus:outline-none prose prose-sm max-w-none cursor-text relative"
+                    className={cn(
+                        "bg-white dark:bg-gray-900 focus:outline-none prose prose-sm max-w-none cursor-text relative",
+                        isFullscreen ? "min-h-[calc(80vh-60px)]" : "min-h-[200px]"
+                    )}
                     style={{
                         fontSize: '14px',
                         lineHeight: '1.5',

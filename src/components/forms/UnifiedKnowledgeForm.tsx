@@ -29,6 +29,7 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { MarkdownEditor } from "@/components/ui/MarkdownEditor";
+import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
@@ -377,13 +378,13 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const fieldConfig = getFieldConfig();
   const { isDarkMode } = useThemeMode();
 
-  // Markdown编辑器字段组件
-  const MarkdownEditorField = () => {
+  // 富文本编辑器字段组件
+  const RichTextEditorField = () => {
     const { setValue, getValue } = useFormContext();
     const currentValue = getValue('secondField') as string;
     const currentImagePath = getValue('imagePath') as string;
 
-    // Handle image changes from MarkdownEditor
+    // Handle image changes from RichTextEditor
     const handleImageChange = (imageIds: string[]) => {
       // Store pending images that need to be uploaded on save
       // For now, we'll store the image IDs from the editor
@@ -398,21 +399,16 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     };
 
     return (
-      <MarkdownEditor
+      <KnowledgeRichTextEditor
         value={currentValue || ''}
         onChange={(value) => setValue('secondField', value || '')}
         onImageChange={handleImageChange}
         placeholder={fieldConfig.secondPlaceholder}
-        height={200}
         className="w-full"
-        // Add a prop to defer image uploads until save
-        deferImageUpload={true}
         onPendingImagesChange={(pendingImages) => {
           // Store pending images that need to be uploaded on save
           pendingImagesRef.current = pendingImages;
         }}
-        clearPreviewImages={clearPreviewImages}
-        onClearPreviewImagesChange={(clear) => setClearPreviewImages(clear)}
       />
     );
   };
@@ -474,7 +470,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <Label htmlFor="secondField">
                   <MixedText text={fieldConfig.secondLabel} />
                 </Label>
-                <MarkdownEditorField />
+                <RichTextEditorField />
               </FormField>
 
               <div className="form-actions pt-1">
@@ -548,7 +544,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <Label htmlFor="secondField">
                   <MixedText text={fieldConfig.secondLabel} />
                 </Label>
-                <MarkdownEditorField />
+                <RichTextEditorField />
               </FormField>
 
               <div className="form-actions pt-1">
