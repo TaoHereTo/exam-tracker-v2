@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { UnifiedTabs, UnifiedTabsList, UnifiedTabsTrigger, UnifiedTabsContent, UnifiedTabsContents } from '@/components/ui/UnifiedTabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from '@/components/ui/simple-tabs';
 import { normalizeModuleName, getModuleScore, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { TrendChart } from "@/components/ui/TrendChart";
 import { ModulePieChart } from "@/components/ui/ModulePieChart";
@@ -334,41 +334,41 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <UnifiedTabs defaultValue="perMinute" className="w-full">
+        <Tabs defaultValue="perMinute" className="w-full">
             <div className="flex justify-center mb-4 sm:mb-8">
-                <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
-                    <UnifiedTabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="正确率" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块能力" /></UnifiedTabsTrigger>
-                </UnifiedTabsList>
+                <TabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
+                    <TabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="每分钟得分" /></TabsTrigger>
+                    <TabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="正确率" /></TabsTrigger>
+                    <TabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块耗时分布" /></TabsTrigger>
+                    <TabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块能力" /></TabsTrigger>
+                </TabsList>
             </div>
 
-            <UnifiedTabsContents className="py-4 sm:py-8">
-                <UnifiedTabsContent value="perMinute" className="outline-none">
+            <TabsContents className="py-4 sm:py-8">
+                <TabsContent value="perMinute" className="outline-none">
                     <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <TrendChart data={perMinuteData} yMax={2} />
                     </div>
-                </UnifiedTabsContent>
+                </TabsContent>
 
-                <UnifiedTabsContent value="accuracy" className="outline-none">
+                <TabsContent value="accuracy" className="outline-none">
                     <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <TrendChart data={accuracyData} yMax={100} />
                     </div>
-                </UnifiedTabsContent>
+                </TabsContent>
 
-                <UnifiedTabsContent value="pie" className="outline-none">
+                <TabsContent value="pie" className="outline-none">
                     <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
                         <ModulePieChart data={pieChartData} />
                     </div>
-                </UnifiedTabsContent>
+                </TabsContent>
 
-                <UnifiedTabsContent value="radar" className="outline-none">
+                <TabsContent value="radar" className="outline-none">
                     <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] relative mt-2 sm:mt-4">
                         <ModuleRadarChart data={records} />
                     </div>
-                </UnifiedTabsContent>
-            </UnifiedTabsContents>
-        </UnifiedTabs>
+                </TabsContent>
+            </TabsContents>
+        </Tabs>
     );
 };

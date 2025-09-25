@@ -3,7 +3,7 @@ import ModuleForm from '@/components/forms/ModuleForm';
 import { MixedText } from '@/components/ui/MixedText';
 import type { KnowledgeItem } from "@/types/record";
 import { MODULES } from "@/config/exam";
-import { UnifiedTabs, UnifiedTabsList, UnifiedTabsTrigger, UnifiedTabsContent, UnifiedTabsContents } from '@/components/ui/UnifiedTabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from '@/components/ui/simple-tabs';
 import { cn } from '@/lib/utils';
 
 interface KnowledgeEntryViewProps {
@@ -21,34 +21,34 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
 
     return (
         <div className="w-full flex flex-col items-center knowledge-entry-container">
-            <UnifiedTabs defaultValue={defaultTab} className="w-full">
+            <Tabs defaultValue={defaultTab} className="w-full">
                 <div className="flex justify-center w-full mb-4">
-                    <UnifiedTabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-10 px-1 w-fit max-w-full">
+                    <TabsList className="flex-nowrap overflow-x-auto scrollbar-hide text-base h-10 px-1 w-fit max-w-full">
                         {MODULES.map(({ value, label }) => (
-                            <UnifiedTabsTrigger
+                            <TabsTrigger
                                 key={value}
                                 value={value}
                                 className="py-1 whitespace-nowrap"
                             >
                                 <MixedText text={label} />
-                            </UnifiedTabsTrigger>
+                            </TabsTrigger>
                         ))}
-                    </UnifiedTabsList>
+                    </TabsList>
                 </div>
 
-                <UnifiedTabsContents className="py-4 px-2">
+                <TabsContents className="py-4 px-2">
                     {MODULES.map(({ value }) => (
-                        <UnifiedTabsContent key={value} value={value} className="outline-none flex flex-col gap-6">
+                        <TabsContent key={value} value={value} className="outline-none flex flex-col gap-6">
                             <div className="w-full max-w-xl mx-auto pb-4">
                                 <ModuleForm
                                     module={value as 'math' | 'logic' | 'data-analysis' | 'common' | 'verbal' | 'politics'}
                                     onAddKnowledge={handleAdd(value)}
                                 />
                             </div>
-                        </UnifiedTabsContent>
+                        </TabsContent>
                     ))}
-                </UnifiedTabsContents>
-            </UnifiedTabs>
+                </TabsContents>
+            </Tabs>
         </div>
     );
 };

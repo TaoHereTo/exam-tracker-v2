@@ -12,7 +12,7 @@ import {
 } from "@/components/animate-ui/components/animate/tooltip";
 import { HelpCircle } from "lucide-react";
 import { Marquee } from "@/components/magicui/marquee";
-import { UnifiedTabs, UnifiedTabsList, UnifiedTabsTrigger, UnifiedTabsContent, UnifiedTabsContents } from '@/components/ui/UnifiedTabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from '@/components/ui/simple-tabs';
 import { FlexCenter, FlexCenterBoth } from "@/components/ui/FlexCenter";
 import { CardContainer } from "@/components/ui/CardContainer";
 
@@ -604,19 +604,19 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             {/* 学习分析区域 - 放在屏幕底部 */}
             <div className="w-full mt-16 mb-12">
                 {/* 使用Animate Tabs展示分析卡片 */}
-                <UnifiedTabs defaultValue="data-analysis" className="w-full">
+                <Tabs defaultValue="data-analysis" className="w-full">
                     <div className="flex justify-center mb-4 sm:mb-8">
-                        <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
+                        <TabsList className="grid w-fit min-w-[200px] grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
                             {moduleData.map((module) => (
-                                <UnifiedTabsTrigger key={module.module} value={module.module} className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full">
+                                <TabsTrigger key={module.module} value={module.module} className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center">
                                     {module.name}
-                                </UnifiedTabsTrigger>
+                                </TabsTrigger>
                             ))}
-                        </UnifiedTabsList>
+                        </TabsList>
                     </div>
-                    <UnifiedTabsContents className="py-4 sm:py-6 px-2">
+                    <TabsContents className="py-4 sm:py-6 px-2">
                         {moduleData.map((module) => (
-                            <UnifiedTabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
+                            <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
                                 <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
                                     {/* 原有数据分析卡片 */}
                                     <Card className="p-3 sm:p-4">
@@ -778,10 +778,10 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                         </div>
                                     </Card>
                                 </div>
-                            </UnifiedTabsContent>
+                            </TabsContent>
                         ))}
-                    </UnifiedTabsContents>
-                </UnifiedTabs>
+                    </TabsContents>
+                </Tabs>
             </div>
         </div>
     );

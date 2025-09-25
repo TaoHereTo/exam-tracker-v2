@@ -21,7 +21,7 @@ import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
-import { UnifiedTabs, UnifiedTabsList, UnifiedTabsTrigger, UnifiedTabsContent, UnifiedTabsContents } from "@/components/ui/UnifiedTabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/ui/simple-tabs";
 import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
 
@@ -419,20 +419,20 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
             </div>
 
             {/* 使用统一的 Tabs 组件 */}
-            <UnifiedTabs defaultValue="active" className="w-full">
+            <Tabs defaultValue="active" className="w-full">
                 <div className="flex justify-center mb-8">
-                    <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2">
-                        <UnifiedTabsTrigger value="active">
+                    <TabsList className="grid w-fit min-w-[200px] grid-cols-2">
+                        <TabsTrigger value="active">
                             <MixedText text="进行中" />
-                        </UnifiedTabsTrigger>
-                        <UnifiedTabsTrigger value="completed">
+                        </TabsTrigger>
+                        <TabsTrigger value="completed">
                             <MixedText text="已完成" />
-                        </UnifiedTabsTrigger>
-                    </UnifiedTabsList>
+                        </TabsTrigger>
+                    </TabsList>
                 </div>
 
-                <UnifiedTabsContents className="py-6 px-2">
-                    <UnifiedTabsContent value="active" className="outline-none">
+                <TabsContents className="py-6 px-2">
+                    <TabsContent value="active" className="outline-none">
                         <AnimatePresence mode="popLayout">
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
                                 {activePlans.map(plan => (
@@ -633,9 +633,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                 </div>
                             </div>
                         </AnimatePresence>
-                    </UnifiedTabsContent>
+                    </TabsContent>
 
-                    <UnifiedTabsContent value="completed" className="outline-none flex flex-col gap-6">
+                    <TabsContent value="completed" className="outline-none flex flex-col gap-6">
                         <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
                             <div className="min-h-[500px]">
                                 {completedPlans.length > 0 ? (
@@ -814,9 +814,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                 }
                             </div >
                         </div >
-                    </UnifiedTabsContent >
-                </UnifiedTabsContents >
-            </UnifiedTabs >
+                    </TabsContent >
+                </TabsContents >
+            </Tabs >
 
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {
