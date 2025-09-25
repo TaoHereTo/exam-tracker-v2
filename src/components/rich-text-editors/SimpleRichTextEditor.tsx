@@ -26,7 +26,17 @@ import {
     Heading
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
 import {
     DropdownMenu,
@@ -69,6 +79,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
+    const [showLinkDialog, setShowLinkDialog] = useState(false);
+    const [linkUrl, setLinkUrl] = useState('');
+    const [linkText, setLinkText] = useState('');
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -110,36 +123,64 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         onChange(html);
     };
 
-    // 清理空内容的函数
+    // 清理空内容的函数 - 智能清理HTML标签和空行
     const cleanEmptyContent = (html: string): string => {
         // 如果内容为空或者只包含空白字符，返回空字符串
         if (!html || html.trim() === '') {
             return '';
         }
 
-        // 更温和的清理逻辑，保留必要的换行符
-        const cleaned = html
-            // 只移除完全空的div标签（不包含br的）
+        // 智能清理逻辑
+        let cleaned = html;
+
+        // 1. 清理空的格式化标签（这些是用户删除文字后残留的）
+        const emptyFormatTags = [
+            '<b></b>', '<strong></strong>', '<i></i>', '<em></em>',
+            '<u></u>', '<s></s>', '<strike></strike>', '<del></del>',
+            '<span[^>]*></span>', '<font[^>]*></font>'
+        ];
+
+        emptyFormatTags.forEach(tag => {
+            const regex = new RegExp(tag, 'gi');
+            cleaned = cleaned.replace(regex, '');
+        });
+
+        // 2. 清理只包含空白字符的格式化标签
+        cleaned = cleaned
+            .replace(/<b[^>]*>\s*<\/b>/gi, '')
+            .replace(/<strong[^>]*>\s*<\/strong>/gi, '')
+            .replace(/<i[^>]*>\s*<\/i>/gi, '')
+            .replace(/<em[^>]*>\s*<\/em>/gi, '')
+            .replace(/<u[^>]*>\s*<\/u>/gi, '')
+            .replace(/<s[^>]*>\s*<\/s>/gi, '')
+            .replace(/<strike[^>]*>\s*<\/strike>/gi, '')
+            .replace(/<del[^>]*>\s*<\/del>/gi, '')
+            .replace(/<span[^>]*>\s*<\/span>/gi, '')
+            .replace(/<font[^>]*>\s*<\/font>/gi, '');
+
+        // 3. 清理空的容器标签
+        cleaned = cleaned
             .replace(/<div[^>]*><\/div>/gi, '')
             .replace(/<div[^>]*>\s*<\/div>/gi, '')
-            // 只移除完全空的p标签（不包含br的）
             .replace(/<p[^>]*><\/p>/gi, '')
-            .replace(/<p[^>]*>\s*<\/p>/gi, '')
-            // 移除空的span标签
-            .replace(/<span[^>]*><\/span>/gi, '')
-            .replace(/<span[^>]*>\s*<\/span>/gi, '')
-            // 将 <div><br></div> 转换为 <br>，而不是删除
-            .replace(/<div[^>]*><br><\/div>/gi, '<br>')
-            .replace(/<div[^>]*>\s*<br>\s*<\/div>/gi, '<br>')
-            // 将 <p><br></p> 转换为 <br>，而不是删除
-            .replace(/<p[^>]*><br><\/p>/gi, '<br>')
-            .replace(/<p[^>]*>\s*<br>\s*<\/p>/gi, '<br>')
-            // 清理过多的连续br标签，但保留换行
-            .replace(/<br>\s*<br>\s*<br>/gi, '<br><br>')
+            .replace(/<p[^>]*>\s*<\/p>/gi, '');
+
+        // 4. 清理嵌套的空标签
+        let prevCleaned = '';
+        while (prevCleaned !== cleaned) {
+            prevCleaned = cleaned;
+            cleaned = cleaned
+                .replace(/<([^>]+)>\s*<\/\1>/gi, '')
+                .replace(/<([^>]+)>\s*<\/\1>/gi, '');
+        }
+
+        // 5. 清理多余的连续br标签，但保留必要的换行
+        cleaned = cleaned
+            .replace(/(<br\s*\/?>){3,}/gi, '<br><br>')
             .trim();
 
         // 如果清理后只包含br标签或空白字符，返回空字符串
-        if (!cleaned || cleaned === '' || cleaned.replace(/<br>/gi, '').trim() === '') {
+        if (!cleaned || cleaned === '' || cleaned.replace(/<br\s*\/?>/gi, '').trim() === '') {
             return '';
         }
 
@@ -425,10 +466,86 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     };
 
     const insertLink = () => {
-        const url = window.prompt('请输入链接地址:');
-        if (url) {
-            execCommand('createLink', url);
+        // 获取当前选中的文字作为链接文本
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            setLinkText(selectedText);
+        } else {
+            setLinkText('');
         }
+        setLinkUrl('');
+        setShowLinkDialog(true);
+    };
+
+    const handleInsertLink = () => {
+        if (!linkUrl.trim()) {
+            notify({
+                type: "error",
+                message: "请输入链接地址"
+            });
+            return;
+        }
+
+        // 验证URL格式
+        try {
+            new URL(linkUrl);
+        } catch {
+            // 如果不是完整URL，尝试添加http://前缀
+            if (!linkUrl.startsWith('http://') && !linkUrl.startsWith('https://')) {
+                setLinkUrl('https://' + linkUrl);
+                return; // 重新验证
+            } else {
+                notify({
+                    type: "error",
+                    message: "请输入有效的链接地址"
+                });
+                return;
+            }
+        }
+
+        if (linkText.trim()) {
+            // 如果有链接文本，创建带文本的链接
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+
+                const linkElement = document.createElement('a');
+                linkElement.href = linkUrl;
+                linkElement.textContent = linkText;
+                linkElement.target = '_blank';
+                linkElement.rel = 'noopener noreferrer';
+
+                range.insertNode(linkElement);
+
+                // 将光标移到链接后面
+                range.setStartAfter(linkElement);
+                range.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        } else {
+            // 如果没有链接文本，使用execCommand
+            execCommand('createLink', linkUrl);
+        }
+
+        // 更新内容
+        if (editorRef.current) {
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
+
+        // 关闭对话框并重置状态
+        setShowLinkDialog(false);
+        setLinkUrl('');
+        setLinkText('');
+
+        notify({
+            type: "success",
+            message: "链接插入成功"
+        });
     };
 
     // 在编辑器中插入图片
@@ -970,7 +1087,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 />
             )}
             <div
-                className={cn('rich-text-editor border rounded-lg overflow-hidden', isFullscreen ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] max-w-4xl h-[80vh] z-50 bg-white dark:bg-gray-900 shadow-2xl' : '', isDragOver ? 'ring-2 ring-blue-500' : '', className)}
+                className={cn('rich-text-editor border rounded-lg overflow-hidden flex flex-col', isFullscreen ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] max-w-4xl h-[80vh] z-50 bg-white dark:bg-gray-900 shadow-2xl' : '', isDragOver ? 'ring-2 ring-blue-500' : '', className)}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
@@ -1370,6 +1487,22 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     onFocus={(e) => {
                         e.currentTarget.focus();
                     }}
+                    onBlur={() => {
+                        // 在失去焦点时进行清理，避免在编辑过程中干扰
+                        if (editorRef.current) {
+                            const html = editorRef.current.innerHTML;
+                            const textContent = editorRef.current.textContent || '';
+
+                            // 只有在有内容时才进行清理
+                            if (textContent.trim() !== '') {
+                                const cleanedHtml = cleanEmptyContent(html);
+                                if (cleanedHtml !== html) {
+                                    editorRef.current.innerHTML = cleanedHtml;
+                                    onChange(cleanedHtml);
+                                }
+                            }
+                        }
+                    }}
                     onClick={(e) => {
                         const target = e.currentTarget;
                         target.focus();
@@ -1429,31 +1562,43 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         updateButtonStates();
                     }}
                     onKeyDown={(e) => {
-                        // 处理删除键，只在内容完全为空时清理
+                        // 智能处理删除键
                         if (e.key === 'Backspace' || e.key === 'Delete') {
+                            // 延迟执行，让浏览器先处理删除操作
                             setTimeout(() => {
                                 if (editorRef.current) {
                                     const html = editorRef.current.innerHTML;
                                     const textContent = editorRef.current.textContent || '';
 
-                                    // 只有在没有可见文字时才清理HTML
-                                    if (textContent.trim() === '') {
+                                    // 检查是否有空的HTML标签需要清理
+                                    const hasEmptyTags = /<[^>]+><\/[^>]+>/.test(html) ||
+                                        /<[^>]+>\s*<\/[^>]+>/.test(html);
+
+                                    // 如果内容为空或者有空的HTML标签，进行清理
+                                    if (textContent.trim() === '' || hasEmptyTags) {
                                         const cleanedHtml = cleanEmptyContent(html);
                                         if (cleanedHtml !== html) {
                                             editorRef.current.innerHTML = cleanedHtml;
                                             onChange(cleanedHtml);
+
+                                            // 确保光标在正确位置
+                                            const selection = window.getSelection();
+                                            if (selection) {
+                                                const range = document.createRange();
+                                                range.selectNodeContents(editorRef.current);
+                                                range.collapse(false);
+                                                selection.removeAllRanges();
+                                                selection.addRange(range);
+                                            }
                                         }
                                     }
                                 }
                             }, 0);
                         }
-
-                        // 让 Enter 键自然工作，不进行额外处理
-                        // 这样可以避免干扰正常的换行行为
                     }}
                     className={cn(
                         "bg-white dark:bg-[#303030] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
-                        isFullscreen ? "min-h-[calc(80vh-60px)] max-h-[calc(80vh-60px)]" :
+                        isFullscreen ? "flex-1 min-h-0" :
                             customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
                     )}
                     style={{
@@ -1618,6 +1763,53 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           }
         `}</style>
             </div>
+
+            {/* 链接输入对话框 */}
+            <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>插入链接</DialogTitle>
+                        <DialogDescription>
+                            输入链接地址和显示文本。如果选中了文字，将自动作为链接文本。
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="link-text" className="text-right">
+                                链接文本
+                            </Label>
+                            <Input
+                                id="link-text"
+                                value={linkText}
+                                onChange={(e) => setLinkText(e.target.value)}
+                                className="col-span-3"
+                                placeholder="输入链接显示文本"
+                            />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="link-url" className="text-right">
+                                链接地址
+                            </Label>
+                            <Input
+                                id="link-url"
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                                className="col-span-3"
+                                placeholder="https://example.com"
+                                type="url"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                            取消
+                        </Button>
+                        <Button onClick={handleInsertLink}>
+                            插入链接
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </TooltipProvider>
     );
 };
