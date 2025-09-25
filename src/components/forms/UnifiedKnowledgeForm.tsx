@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import toast from 'react-hot-toast';
+import { useNotification } from '@/components/magicui/NotificationProvider';
 
 import { ValidationSchema, validateForm, FormData, FormErrors } from "@/lib/formValidation";
 
@@ -200,6 +201,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const config = useMemo(() => getModuleConfig(module), [module]);
   const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
   const [clearPreviewImages, setClearPreviewImages] = useState(false);
+  const { notifyLoading, updateToSuccess, updateToError } = useNotification();
 
   // 获取模块特定的字段配置
   const getFieldConfig = () => {
@@ -311,6 +313,12 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
     const config = getModuleConfig(module);
 
+    // 立即显示 loading toast
+    const loadingToastId = notifyLoading?.('正在保存知识点...') || '';
+
+    // 立即触发清空预览图片
+    setClearPreviewImages(true);
+
     try {
       // 上传待处理的图片到云端
       let imagePath = '';
@@ -326,7 +334,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
               uploadedImageIds.push(imageInfo.id);
             } catch (uploadError) {
               console.error('图片上传失败:', uploadError);
-              toast.error('图片上传失败，请重试');
+              updateToError?.(loadingToastId, '图片上传失败，请重试');
               return; // 如果上传失败，停止保存操作
             }
           } else if (pendingImage.imageId) {
@@ -359,18 +367,20 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           })
       };
 
-      // 在这里协调所有UI更新：
-      // 1. 先触发清空预览图片（立即执行）
-      setClearPreviewImages(true);
+      // 更新 toast 为云端保存状态
+      toast.loading('正在保存知识点到云端...', { id: loadingToastId });
 
-      // 2. 调用onAddKnowledge（这会显示loading toast并等待云端保存完成）
+      // 调用onAddKnowledge（禁用其内部的toast显示）
       await onAddKnowledge(knowledgeData);
 
-      // 3. 清空待处理图片列表
+      // 更新 toast 为成功状态
+      updateToSuccess?.(loadingToastId, '知识点保存成功！');
+
+      // 清空待处理图片列表
       pendingImagesRef.current = [];
     } catch (error) {
       console.error('保存知识点失败:', error);
-      toast.error('保存知识点失败，请重试');
+      updateToError?.(loadingToastId, '保存知识点失败，请重试');
     }
   };
 
@@ -408,6 +418,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           // Store pending images that need to be uploaded on save
           pendingImagesRef.current = pendingImages;
         }}
+        clearPreviewImages={clearPreviewImages}
       />
     );
   };

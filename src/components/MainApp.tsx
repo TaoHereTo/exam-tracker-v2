@@ -200,13 +200,13 @@ export function MainApp() {
         const knowledgeWithId = { ...newKnowledge, id: generateUUID() };
         setKnowledge(prev => [knowledgeWithId, ...prev]);
 
-        // 异步保存到云端，显示toast通知
+        // 异步保存到云端，不显示toast通知（由调用方管理）
         await AutoCloudSync.autoSaveKnowledge(knowledgeWithId, {
             notify,
             notifyLoading,
             updateToSuccess,
             updateToError
-        }, true); // 传递 true 以显示toast通知
+        }, false); // 传递 false 以禁用toast通知
     }, [setKnowledge, notify, notifyLoading, updateToSuccess, updateToError]);
 
     // 加载用户资料 - 优化性能

@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
 import Image from 'next/image';
-import { Eye } from 'lucide-react';
+import { Eye, X } from 'lucide-react';
 
 interface KnowledgeRichTextEditorProps {
     value: string;
@@ -15,6 +15,7 @@ interface KnowledgeRichTextEditorProps {
     className?: string;
     onImageChange?: (imageIds: string[]) => void;
     onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void;
+    clearPreviewImages?: boolean; // 新增：用于清理预览图片
 }
 
 export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = ({
@@ -23,7 +24,8 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
     placeholder = '请输入知识点内容...',
     className,
     onImageChange,
-    onPendingImagesChange
+    onPendingImagesChange,
+    clearPreviewImages = false
 }) => {
     const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
     const [accordionValue, setAccordionValue] = useState<string>("");
@@ -34,6 +36,14 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
         console.log('图片状态更新:', images);
         pendingImagesRef.current = images;
         setPendingImages(images);
+
+        // 如果有图片，自动展开 Accordion
+        if (images.length > 0) {
+            setAccordionValue("preview");
+        } else {
+            setAccordionValue("");
+        }
+
         // 保存到 localStorage
         try {
             localStorage.setItem('pendingImages', JSON.stringify(images));
@@ -53,6 +63,8 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
                     console.log('从 localStorage 恢复图片状态:', parsedImages);
                     pendingImagesRef.current = parsedImages;
                     setPendingImages(parsedImages);
+                    // 恢复时也自动展开 Accordion
+                    setAccordionValue("preview");
                 }
             }
         } catch (e) {
@@ -104,6 +116,28 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
         };
     }, [pendingImages.length]);
 
+    // 监听清理预览图片的请求
+    useEffect(() => {
+        if (clearPreviewImages) {
+            console.log('清理预览图片');
+            setPendingImages([]);
+            pendingImagesRef.current = [];
+            setAccordionValue("");
+            // 清理 localStorage
+            try {
+                localStorage.removeItem('pendingImages');
+            } catch (e) {
+                console.log('无法清理 localStorage:', e);
+            }
+        }
+    }, [clearPreviewImages]);
+
+    // 删除单个图片
+    const handleDeleteImage = (index: number) => {
+        const newImages = pendingImages.filter((_, i) => i !== index);
+        handlePendingImagesChange(newImages);
+    };
+
     return (
         <div className="space-y-2">
             <SimpleRichTextEditor
@@ -129,24 +163,37 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
                                     {pendingImages.map((image, index) => {
                                         console.log(`渲染图片 ${index}:`, image.localUrl);
                                         return (
-                                            <PhotoView key={index} src={image.localUrl}>
-                                                <div className="cursor-pointer relative group">
-                                                    <Image
-                                                        src={image.localUrl}
-                                                        alt={`预览图片 ${index + 1}`}
-                                                        width={120}
-                                                        height={120}
-                                                        className="w-full h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:opacity-80 transition-opacity"
-                                                        onLoad={() => console.log(`图片 ${index} 加载成功`)}
-                                                        onError={() => console.log(`图片 ${index} 加载失败`)}
-                                                    />
-                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <div className="bg-black bg-opacity-50 rounded-full p-2">
-                                                            <Eye className="w-4 h-4 text-white" />
+                                            <div key={index} className="relative group">
+                                                <PhotoView src={image.localUrl}>
+                                                    <div className="cursor-pointer relative">
+                                                        <Image
+                                                            src={image.localUrl}
+                                                            alt={`预览图片 ${index + 1}`}
+                                                            width={120}
+                                                            height={120}
+                                                            className="w-full h-24 object-contain rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:opacity-80 transition-opacity"
+                                                            onLoad={() => console.log(`图片 ${index} 加载成功`)}
+                                                            onError={() => console.log(`图片 ${index} 加载失败`)}
+                                                        />
+                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <div className="bg-black bg-opacity-50 rounded-full p-2">
+                                                                <Eye className="w-4 h-4 text-white" />
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </PhotoView>
+                                                </PhotoView>
+                                                {/* 删除按钮 */}
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteImage(index);
+                                                    }}
+                                                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                                                    title="删除图片"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </div>
                                         );
                                     })}
                                 </div>

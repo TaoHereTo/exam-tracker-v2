@@ -313,8 +313,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <tr
                                             onClick={handleRowClick}
                                             className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors ${isSelected
-                                                    ? 'bg-[#EEEDED] dark:bg-[#303030]'
-                                                    : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
+                                                ? 'bg-[#EEEDED] dark:bg-[#303030]'
+                                                : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
                                                 }`}
                                             data-state={isSelected ? "selected" : undefined}
                                         >
@@ -366,8 +366,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     key={String(key)}
                                     onClick={handleRowClick}
                                     className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors ${isSelected
-                                            ? 'bg-[#EEEDED] dark:bg-[#303030]'
-                                            : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
+                                        ? 'bg-[#EEEDED] dark:bg-[#303030]'
+                                        : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
                                         }`}
                                     data-state={isSelected ? "selected" : undefined}
                                 >
@@ -502,68 +502,62 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
                         {/* 导出按钮 */}
                         {showExport && onExport && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            onClick={onExport}
-                                            variant="outline"
-                                            size="icon"
-                                            className="h-9 w-9"
-                                        >
-                                            <Upload className="w-5 h-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="导出为Excel" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={onExport}
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-9 w-9"
+                                    >
+                                        <Upload className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p><MixedText text="导出为Excel" /></p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
 
                         {/* 编辑按钮 */}
                         {showEdit && onEdit && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            onClick={onEdit}
-                                            disabled={editDisabled}
-                                            variant="outline"
-                                            size="icon"
-                                            className="h-9 w-9"
-                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
-                                        >
-                                            <Edit className="w-5 h-5 text-white" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="编辑" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={onEdit}
+                                        disabled={editDisabled}
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-9 w-9"
+                                        style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                    >
+                                        <Edit className="w-5 h-5 text-white" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p><MixedText text="编辑" /></p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
 
                         {/* 删除按钮 */}
                         {showDelete && onDelete && (
-                            <TooltipProvider>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            onClick={onDelete}
-                                            disabled={deleteDisabled}
-                                            variant="destructive"
-                                            size="icon"
-                                            className="h-9 w-9"
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p><MixedText text="批量删除" /></p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        onClick={onDelete}
+                                        disabled={deleteDisabled}
+                                        variant="destructive"
+                                        size="icon"
+                                        className="h-9 w-9"
+                                    >
+                                        <Trash2 className="w-5 h-5" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p><MixedText text="批量删除" /></p>
+                                </TooltipContent>
+                            </Tooltip>
                         )}
 
                     </div>

@@ -971,7 +971,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
-                <div className="border-b bg-gray-50 dark:bg-gray-800 p-1 flex flex-wrap gap-0.5">
+                <div className="border-b bg-gray-50 dark:bg-[#161618] p-1 flex flex-wrap gap-0.5">
                     {/* 撤销/重做 */}
                     <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <Tooltip>
@@ -1018,7 +1018,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     variant={activeFormats.has('bold') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('bold')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
                                 >
                                     <Bold className="w-3 h-3" />
                                 </Button>
@@ -1035,7 +1035,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     variant={activeFormats.has('italic') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('italic')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
                                 >
                                     <Italic className="w-3 h-3" />
                                 </Button>
@@ -1052,7 +1052,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     variant={activeFormats.has('underline') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('underline')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
                                 >
                                     <Underline className="w-3 h-3" />
                                 </Button>
@@ -1069,7 +1069,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
                                     size="sm"
                                     onClick={() => handleFormatCommand('strikeThrough')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] text-white hover:bg-[#1e3a8a]" : ""}`}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
                                 >
                                     <Strikethrough className="w-3 h-3" />
                                 </Button>
@@ -1448,7 +1448,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         // 这样可以避免干扰正常的换行行为
                     }}
                     className={cn(
-                        "bg-white dark:bg-gray-900 focus:outline-none prose prose-sm max-w-none cursor-text relative",
+                        "bg-white dark:bg-[#303030] focus:outline-none prose prose-sm max-w-none cursor-text relative",
                         isFullscreen ? "min-h-[calc(80vh-60px)]" : "min-h-[200px]"
                     )}
                     style={{
@@ -1494,13 +1494,22 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             caret-color: currentColor !important;
           }
           
-          /* 强制显示光标的关键样式 */
+          /* 强制显示光标的关键样式 - 浅色模式 */
           .rich-text-editor [contenteditable]:focus {
             caret-color: #000 !important;
           }
           
           .rich-text-editor [contenteditable]:focus * {
             caret-color: #000 !important;
+          }
+          
+          /* 深色模式下的光标颜色 */
+          .dark .rich-text-editor [contenteditable]:focus {
+            caret-color: #ffffff !important;
+          }
+          
+          .dark .rich-text-editor [contenteditable]:focus * {
+            caret-color: #ffffff !important;
           }
           
           .rich-text-editor [contenteditable]:empty:before {
