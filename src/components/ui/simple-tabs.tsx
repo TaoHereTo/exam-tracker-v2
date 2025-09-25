@@ -115,11 +115,18 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
             data-tab-value={value}
             className={cn(
                 'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
+                'flex items-center justify-center', // 确保垂直和水平居中
                 isActive
                     ? 'text-white dark:text-black'
                     : 'text-muted-foreground hover:text-foreground',
                 className
             )}
+            style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                lineHeight: '1'
+            }}
             onClick={() => setActiveValue(value)}
         >
             {children}

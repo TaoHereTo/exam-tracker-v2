@@ -45,3 +45,4 @@ export const KnowledgeRichTextEditor: React.FC<KnowledgeRichTextEditorProps> = (
         </div>
     );
 };
+

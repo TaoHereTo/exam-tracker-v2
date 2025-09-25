@@ -337,10 +337,10 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
         <UnifiedTabs defaultValue="perMinute" className="w-full">
             <div className="flex justify-center mb-4 sm:mb-8">
                 <UnifiedTabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
-                    <UnifiedTabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full"><MixedText text="正确率" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
-                    <UnifiedTabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 h-full"><MixedText text="模块能力" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="每分钟得分" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="正确率" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块耗时分布" /></UnifiedTabsTrigger>
+                    <UnifiedTabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块能力" /></UnifiedTabsTrigger>
                 </UnifiedTabsList>
             </div>
 

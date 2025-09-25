@@ -425,11 +425,12 @@ export function MainApp() {
                             align="end"
                             sideOffset={8}
                             alignOffset={15}
-                            className="w-[--radix-popper-anchor-width] shadow-xl bg-white dark:bg-[#262626] border border-gray-200 dark:border-gray-700 rounded-lg"
+                            className="w-[--radix-popper-anchor-width] shadow-xl bg-white dark:bg-[#262626] border border-gray-200 dark:border-gray-700 rounded-lg z-[9999]"
                             style={{
                                 WebkitFontSmoothing: 'antialiased',
                                 MozOsxFontSmoothing: 'grayscale',
-                                textRendering: 'optimizeLegibility'
+                                textRendering: 'optimizeLegibility',
+                                zIndex: 9999
                             } as React.CSSProperties}
                         >
                             <DropdownMenuLabel className="p-0 font-normal">

@@ -57,6 +57,7 @@ interface SimpleRichTextEditorProps {
     onPendingImagesChange?: (pendingImages: { localUrl: string; file: File | null; imageId: string | null }[]) => void;
     customMinHeight?: string; // 新增：自定义最小高度
     customMaxHeight?: string; // 新增：自定义最大高度
+    clearPreviewImages?: boolean; // 新增：用于清理预览图片
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
@@ -68,7 +69,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     deferImageUpload = false,
     onPendingImagesChange,
     customMinHeight,
-    customMaxHeight
+    customMaxHeight,
+    clearPreviewImages = false
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
@@ -102,17 +104,45 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     }, [pendingImages.length]);
 
-    // 强制保持图片状态，防止意外丢失
+    // 强制保持图片状态，防止意外丢失 - 优化版本
     useEffect(() => {
         const interval = setInterval(() => {
             if (pendingImagesRef.current.length > 0 && pendingImages.length === 0) {
                 console.log('SimpleRichTextEditor 定时检查：恢复图片状态', pendingImagesRef.current);
                 setPendingImages(pendingImagesRef.current);
             }
-        }, 1000);
+        }, 5000); // 减少频率，从1秒改为5秒
 
         return () => clearInterval(interval);
-    }, []);
+    }, [pendingImages.length]); // 添加依赖，避免不必要的重新创建
+
+    // 处理待上传图片变化 - 简化版本，只用于通知父组件
+    const handlePendingImagesChange = useCallback((images: { localUrl: string; file: File | null; imageId: string | null }[]) => {
+        pendingImagesRef.current = images;
+        setPendingImages(images);
+
+        // 保存到 localStorage
+        try {
+            localStorage.setItem('pendingImages', JSON.stringify(images));
+        } catch (e) {
+            console.log('无法保存到 localStorage:', e);
+        }
+        onPendingImagesChange?.(images);
+    }, [onPendingImagesChange]);
+
+    // 监听清理预览图片的请求
+    useEffect(() => {
+        if (clearPreviewImages) {
+            setPendingImages([]);
+            pendingImagesRef.current = [];
+            // 清理 localStorage
+            try {
+                localStorage.removeItem('pendingImages');
+            } catch (e) {
+                console.log('无法清理 localStorage:', e);
+            }
+        }
+    }, [clearPreviewImages]);
 
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -549,26 +579,165 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     };
 
     // 在编辑器中插入图片
-    const insertImageToEditor = useCallback((imageUrl: string) => {
+    const insertImageToEditor = useCallback((imageUrl: string, isResizable: boolean = true) => {
         if (!editorRef.current) return;
 
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
 
+            // 创建图片容器
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container inline-block relative group';
+            imageContainer.style.display = 'inline-block';
+            imageContainer.style.position = 'relative';
+            imageContainer.style.margin = '8px 0';
+            imageContainer.style.userSelect = 'none';
+            (imageContainer.style as unknown as Record<string, string>).webkitUserSelect = 'none';
+            (imageContainer.style as unknown as Record<string, string>).mozUserSelect = 'none';
+            (imageContainer.style as unknown as Record<string, string>).msUserSelect = 'none';
+
             // 创建图片元素
             const img = document.createElement('img');
             img.src = imageUrl;
             img.style.maxWidth = '100%';
             img.style.height = 'auto';
+            img.style.display = 'block';
+            img.style.borderRadius = '4px';
+            img.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
             img.alt = '插入的图片';
+            img.draggable = false; // 防止图片被拖拽移动
 
-            // 插入图片
+            // 如果启用可调整大小，添加调整大小的功能
+            if (isResizable) {
+                // 添加调整大小的控制点
+                const resizeHandle = document.createElement('div');
+                resizeHandle.className = 'resize-handle';
+                resizeHandle.style.position = 'absolute';
+                resizeHandle.style.bottom = '0';
+                resizeHandle.style.right = '0';
+                resizeHandle.style.width = '12px';
+                resizeHandle.style.height = '12px';
+                resizeHandle.style.backgroundColor = '#3b82f6';
+                resizeHandle.style.border = '2px solid white';
+                resizeHandle.style.borderRadius = '50%';
+                resizeHandle.style.cursor = 'nw-resize';
+                resizeHandle.style.opacity = '0';
+                resizeHandle.style.transition = 'opacity 0.2s';
+                resizeHandle.style.zIndex = '10';
+                resizeHandle.style.userSelect = 'none';
+
+                // 鼠标悬停时显示调整大小控制点
+                imageContainer.addEventListener('mouseenter', () => {
+                    resizeHandle.style.opacity = '1';
+                });
+                imageContainer.addEventListener('mouseleave', () => {
+                    resizeHandle.style.opacity = '0';
+                });
+
+                // 拖拽调整大小功能 - 简化版本
+                let isResizing = false;
+                let startX = 0;
+                let startY = 0;
+                let startWidth = 0;
+                let startHeight = 0;
+
+                const startResize = (e: MouseEvent) => {
+                    console.log('开始调整大小');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+
+                    isResizing = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startWidth = img.offsetWidth;
+                    startHeight = img.offsetHeight;
+
+                    console.log('初始尺寸:', startWidth, startHeight);
+
+                    // 添加全局事件监听器
+                    document.addEventListener('mousemove', doResize, { passive: false });
+                    document.addEventListener('mouseup', stopResize, { passive: false });
+
+                    // 防止文本选择
+                    document.body.style.userSelect = 'none';
+                    document.body.style.cursor = 'nw-resize';
+
+                    return false;
+                };
+
+                const doResize = (e: MouseEvent) => {
+                    if (!isResizing) return;
+
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+
+                    // 计算原始纵横比
+                    const aspectRatio = startWidth / startHeight;
+
+                    // 使用较大的变化量来保持纵横比
+                    const delta = Math.max(deltaX, deltaY);
+
+                    // 计算新尺寸，保持纵横比
+                    let newWidth = Math.max(50, startWidth + delta);
+                    let newHeight = Math.max(50, newWidth / aspectRatio);
+
+                    // 如果高度太小，重新计算
+                    if (newHeight < 50) {
+                        newHeight = 50;
+                        newWidth = newHeight * aspectRatio;
+                    }
+
+                    console.log('调整尺寸:', newWidth, newHeight, '纵横比:', aspectRatio);
+
+                    // 直接设置图片尺寸
+                    img.style.width = newWidth + 'px';
+                    img.style.height = newHeight + 'px';
+                    img.style.maxWidth = 'none';
+                    img.style.minWidth = '50px';
+                    img.style.minHeight = '50px';
+
+                    return false;
+                };
+
+                const stopResize = (e: MouseEvent) => {
+                    if (!isResizing) return;
+
+                    console.log('结束调整大小');
+                    isResizing = false;
+                    document.removeEventListener('mousemove', doResize);
+                    document.removeEventListener('mouseup', stopResize);
+
+                    // 恢复文本选择
+                    document.body.style.userSelect = '';
+                    document.body.style.cursor = '';
+
+                    // 更新内容
+                    if (editorRef.current) {
+                        const html = editorRef.current.innerHTML;
+                        onChange(html);
+                    }
+
+                    return false;
+                };
+
+                // 绑定事件 - 使用更直接的方法
+                resizeHandle.onmousedown = startResize;
+                imageContainer.appendChild(resizeHandle);
+            }
+
+            imageContainer.appendChild(img);
+
+            // 插入图片容器
             range.deleteContents();
-            range.insertNode(img);
+            range.insertNode(imageContainer);
 
             // 将光标移到图片后面
-            range.setStartAfter(img);
+            range.setStartAfter(imageContainer);
             range.collapse(true);
             selection.removeAllRanges();
             selection.addRange(range);
@@ -603,13 +772,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             return;
         }
 
-        // 如果启用了延迟上传，只添加到待上传列表
+        // 如果启用了延迟上传，先插入到编辑器，同时添加到待上传列表
         if (deferImageUpload) {
             // 使用 FileReader 创建更持久的预览 URL
             const reader = new FileReader();
             reader.onload = (e) => {
                 const dataUrl = e.target?.result as string;
                 console.log('FileReader 创建 Data URL:', dataUrl.substring(0, 50) + '...');
+
+                // 直接插入图片到编辑器
+                insertImageToEditor(dataUrl, true);
+
+                // 同时添加到待上传列表（用于后续上传到服务器）
                 const newPendingImage = { localUrl: dataUrl, file, imageId: null };
                 const newPendingImages = [...pendingImages, newPendingImage];
                 pendingImagesRef.current = newPendingImages;
@@ -623,9 +797,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 }
 
                 // 通知父组件有待上传的图片
-                if (onPendingImagesChange) {
-                    onPendingImagesChange(newPendingImages);
-                }
+                handlePendingImagesChange(newPendingImages);
             };
             reader.readAsDataURL(file);
             return;
@@ -637,7 +809,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             const imageInfo = await supabaseImageManager.uploadImage(file);
             const imageUrl = imageInfo.url;
 
-            // 不插入图片到编辑器，只添加到预览列表
+            // 直接插入图片到编辑器（支持调整大小）
+            insertImageToEditor(imageUrl, true);
 
             // 通知父组件图片已上传
             if (onImageChange) {
@@ -660,7 +833,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         } finally {
             setIsUploading(false);
         }
-    }, [deferImageUpload, onImageChange, onPendingImagesChange, pendingImages, notify, insertImageToEditor]);
+    }, [deferImageUpload, onImageChange, pendingImages, notify, insertImageToEditor, handlePendingImagesChange]);
 
     // 处理文件选择
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1681,6 +1854,72 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             border-radius: 8px;
           }
           
+          /* 图片容器样式 */
+          .rich-text-editor .image-container {
+            display: inline-block !important;
+            position: relative !important;
+            margin: 8px 0 !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -moz-user-select: none !important;
+            -ms-user-select: none !important;
+          }
+          
+          .rich-text-editor .image-container img {
+            display: block !important;
+            border-radius: 4px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+          }
+          
+          /* 调整大小控制点样式 */
+          .rich-text-editor .resize-handle {
+            position: absolute !important;
+            bottom: 0 !important;
+            right: 0 !important;
+            width: 12px !important;
+            height: 12px !important;
+            background-color: #3b82f6 !important;
+            border: 2px solid white !important;
+            border-radius: 50% !important;
+            cursor: nw-resize !important;
+            opacity: 0 !important;
+            transition: opacity 0.2s ease !important;
+            z-index: 10 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+            user-select: none !important;
+            pointer-events: auto !important;
+          }
+          
+          .rich-text-editor .image-container:hover .resize-handle {
+            opacity: 1 !important;
+          }
+          
+          .rich-text-editor .resize-handle:hover {
+            background-color: #2563eb !important;
+            transform: scale(1.1) !important;
+          }
+          
+          .rich-text-editor .resize-handle:active {
+            background-color: #1d4ed8 !important;
+            transform: scale(0.95) !important;
+          }
+          
+          /* 深色模式下的调整大小控制点 */
+          .dark .rich-text-editor .resize-handle {
+            background-color: #60a5fa !important;
+            border-color: #1f2937 !important;
+          }
+          
+          .dark .rich-text-editor .resize-handle:hover {
+            background-color: #3b82f6 !important;
+          }
+          
+          .dark .rich-text-editor .resize-handle:active {
+            background-color: #1d4ed8 !important;
+          }
+          
           .rich-text-editor [contenteditable] a {
             color: #3B82F6;
             text-decoration: underline;
@@ -1810,6 +2049,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
         </TooltipProvider>
     );
 };
