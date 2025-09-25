@@ -760,27 +760,6 @@ html {
 
 /* 移除重复的动画定义，已在keyframes中定义 */
 
-/* ========== MarkdownEditor 性能优化 ========== */
-/* 为MarkdownEditor组件添加性能优化 */
-.markdown-editor-container {
-  contain: layout style;
-  will-change: auto;
-  /* 避免不必要的合成层 */
-}
-
-/* 优化textarea的渲染性能 */
-.markdown-editor-textarea {
-  contain: layout style;
-  transform: translateZ(0);
-  /* 启用硬件加速 */
-}
-
-/* 减少工具栏按钮在主题切换时的重绘 */
-.md-toolbar-button-base {
-  contain: layout style;
-  will-change: transform, background-color, border-color;
-}
-
 /* 在主题切换动画期间暂时禁用某些过渡效果 */
 ::view-transition-group(root) * {
   transition-duration: 0s !important;
@@ -791,7 +770,7 @@ html:not(:has(::view-transition-group(root))) * {
   transition-duration: inherit;
 }
 
-/* 在主题切换期间优化MarkdownEditor性能 */
+/* 在主题切换期间优化编辑器性能 */
 ::view-transition-group(root) .knowledge-entry-container {
   pointer-events: none;
   /* 暂时禁用交互 */
