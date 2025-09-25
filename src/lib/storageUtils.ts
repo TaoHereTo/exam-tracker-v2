@@ -65,7 +65,7 @@ export function getLocalStorageInfo(): StorageInfo {
 /**
  * 清理localStorage中的特定数据
  */
-export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'plans' | 'countdowns' | 'settings')[] = []) {
+export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'plans' | 'countdowns' | 'settings' | 'ai' | 'notes' | 'events')[] = []) {
     // 根据指定的数据类型清理对应的键
     const keysToRemove: string[] = [];
 
@@ -81,11 +81,22 @@ export function clearLocalStorageData(dataTypes: ('records' | 'knowledge' | 'pla
     if (dataTypes.length === 0 || dataTypes.includes('countdowns')) {
         keysToRemove.push('exam-tracker-countdowns-v2');
     }
+    if (dataTypes.length === 0 || dataTypes.includes('events')) {
+        keysToRemove.push('exam-tracker-custom-events-v2');
+    }
+    if (dataTypes.length === 0 || dataTypes.includes('ai')) {
+        keysToRemove.push('ai-model');
+        // AI对话历史记录通常存储在组件状态中，不持久化到localStorage
+        // 但如果有其他AI相关的本地设置，可以在这里添加
+    }
+    if (dataTypes.length === 0 || dataTypes.includes('notes')) {
+        // 笔记数据主要存储在云端，但可能有本地缓存或设置
+        // 如果有笔记相关的本地存储键，可以在这里添加
+    }
     if (dataTypes.length === 0 || dataTypes.includes('settings')) {
         keysToRemove.push(
             'exam-tracker-nav-mode',
             'eye-care-enabled',
-
             'notify-change-enabled',
             'page-size',
             'theme',

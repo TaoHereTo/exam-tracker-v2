@@ -21,9 +21,13 @@ import {
     FileUp,
     FileDown,
     List,
-    ChevronDown
+    ChevronDown,
+    Eye,
+    Edit3
 } from "lucide-react";
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { notesService, type Note as CloudNote } from "@/lib/notesService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -65,6 +69,7 @@ export default function NotesView() {
     const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isPreviewMode, setIsPreviewMode] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
     const { user } = useAuth();
@@ -504,8 +509,8 @@ export default function NotesView() {
     if (isLoading) {
         return (
             <div className="h-full flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                    <BookOpen className="h-16 w-16 mx-auto mb-4 opacity-50 animate-pulse" />
+                <div className="flex flex-col items-center text-center text-muted-foreground">
+                    <UiverseSpinner size="lg" className="mb-4" />
                     <h3 className="text-lg font-medium mb-2">加载中...</h3>
                     <p>正在加载你的笔记</p>
                 </div>
@@ -664,21 +669,39 @@ export default function NotesView() {
                     {/* 右侧操作按钮 */}
                     <div className="flex items-center gap-2">
                         {selectedNote && (
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <Button
-                                        size="icon"
-                                        className="h-8 w-8 rounded-full bg-green-600 hover:bg-green-700"
-                                        onClick={handleSaveNote}
-                                        disabled={isSaving}
-                                    >
-                                        <Save className="h-4 w-4 text-white" />
-                                    </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>{isSaving ? "保存中..." : "保存笔记"}</p>
-                                </TooltipContent>
-                            </Tooltip>
+                            <>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8 rounded-full"
+                                            onClick={() => setIsPreviewMode(!isPreviewMode)}
+                                        >
+                                            {isPreviewMode ? <Edit3 className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{isPreviewMode ? "切换到编辑模式" : "切换到预览模式"}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            size="icon"
+                                            className="h-8 w-8 rounded-full bg-green-600 hover:bg-green-700"
+                                            onClick={handleSaveNote}
+                                            disabled={isSaving}
+                                        >
+                                            <Save className="h-4 w-4 text-white" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>{isSaving ? "保存中..." : "保存笔记"}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </>
                         )}
 
                         <Tooltip>
@@ -782,17 +805,28 @@ export default function NotesView() {
                             </div>
 
                             <div className="flex-1 min-h-[500px]">
-                                <KnowledgeRichTextEditor
-                                    value={selectedNote.content}
-                                    onChange={(content) => setSelectedNote({
-                                        ...selectedNote,
-                                        content
-                                    })}
-                                    placeholder="开始编写你的笔记..."
-                                    className="h-full"
-                                    editorMinHeight="500px"
-                                    editorMaxHeight="800px"
-                                />
+                                {isPreviewMode ? (
+                                    <div className="h-full p-6 border rounded-lg bg-background overflow-auto">
+                                        <div className="max-w-none">
+                                            <MarkdownRenderer
+                                                content={selectedNote.content}
+                                                className="text-sm leading-relaxed"
+                                            />
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <KnowledgeRichTextEditor
+                                        value={selectedNote.content}
+                                        onChange={(content) => setSelectedNote({
+                                            ...selectedNote,
+                                            content
+                                        })}
+                                        placeholder="开始编写你的笔记..."
+                                        className="h-full"
+                                        editorMinHeight="500px"
+                                        editorMaxHeight="800px"
+                                    />
+                                )}
                             </div>
                         </>
                     ) : (
@@ -800,7 +834,7 @@ export default function NotesView() {
                             <div className="text-center text-muted-foreground">
                                 <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
                                 <h3 className="text-lg font-medium mb-2">选择一个笔记</h3>
-                                <p>从右侧列表中选择一个笔记开始编辑，或创建新笔记</p>
+                                <p>从列表中选择一个笔记开始编辑，或创建新笔记</p>
                             </div>
                         </div>
                     )}

@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { AIService } from "@/lib/aiService";
 import { MixedText } from "@/components/ui/MixedText";
+import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 import { useLocalStorageString } from "@/hooks/useLocalStorage";
 import {
     Tooltip,
@@ -66,7 +67,6 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
     const [isInputExpanded, setIsInputExpanded] = useState(false);
-    const [chatHistory, setChatHistory] = useState<ChatMessage[][]>([]);
     const [isButtonsExpanded, setIsButtonsExpanded] = useState(false);
 
     const aiService = AIService.getInstance();
@@ -77,7 +77,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
             setMessages([{
                 id: 'welcome',
                 type: 'ai',
-                content: '👋 您好！我是您的AI学习助手。我可以帮您分析刷题数据、提供学习建议，或者回答任何关于学习的问题。\n\n您可以选择：\n• 点击"快速分析"获取智能分析报告\n• 在下方输入框中提问\n• 选择不同的AI模型获得不同的分析效果',
+                content: '👋 您好！我是您的AI学习助手。我可以帮您分析刷题数据、提供学习建议，或者回答任何关于学习的问题。\n\n您可以选择：\n• 点击"分析报告"获取智能分析报告\n• 在下方输入框中提问\n• 选择不同的AI模型获得不同的分析效果',
                 timestamp: new Date()
             }]);
         }
@@ -224,50 +224,15 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
     };
 
     const handleClearChat = () => {
-        // 保存当前对话到历史记录（如果有实际对话内容）
-        if (messages.length > 1) { // 除了欢迎消息外还有其他消息
-            setChatHistory(prev => [...prev, messages]);
-        }
-
+        // 直接清空所有消息，不保存历史记录
         setMessages([{
             id: 'welcome',
             type: 'ai',
-            content: '👋 您好！我是您的AI学习助手。我可以帮您分析刷题数据、提供学习建议，或者回答任何关于学习的问题。\n\n您可以选择：\n• 点击"快速分析"获取智能分析报告\n• 在下方输入框中提问\n• 选择不同的AI模型获得不同的分析效果',
+            content: '👋 您好！我是您的AI学习助手。我可以帮您分析刷题数据、提供学习建议，或者回答任何关于学习的问题。\n\n您可以选择：\n• 点击"分析报告"获取智能分析报告\n• 在下方输入框中提问\n• 选择不同的AI模型获得不同的分析效果',
             timestamp: new Date()
         }]);
     };
 
-    const formatMessageContent = (content: string) => {
-        return content.split('\n').map((line, index) => {
-            // 处理标题行
-            if (line.startsWith('**') && line.endsWith('**')) {
-                return (
-                    <div key={index} className="font-semibold text-base mt-3 mb-1 first:mt-0 text-blue-600 dark:text-blue-400">
-                        {line.replace(/\*\*/g, '')}
-                    </div>
-                );
-            }
-            // 处理列表项
-            if (line.startsWith('- ')) {
-                return (
-                    <div key={index} className="ml-3 mb-0.5 flex items-start">
-                        <span className="text-blue-500 mr-1 text-sm">•</span>
-                        <span className="text-sm">{line.substring(2)}</span>
-                    </div>
-                );
-            }
-            // 处理普通段落
-            if (line.trim()) {
-                return (
-                    <div key={index} className="mb-1 text-sm">
-                        {line}
-                    </div>
-                );
-            }
-            // 空行
-            return <div key={index} className="h-2" />;
-        });
-    };
 
     return (
         <TooltipProvider>
@@ -297,8 +262,11 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                             {message.content}
                                         </div>
                                     ) : (
-                                        <div className="prose prose-sm max-w-none dark:prose-invert text-sm">
-                                            {formatMessageContent(message.content)}
+                                        <div className="text-sm leading-relaxed">
+                                            <MarkdownRenderer
+                                                content={message.content}
+                                                className="text-sm leading-relaxed"
+                                            />
                                         </div>
                                     )}
                                 </div>
@@ -403,42 +371,6 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                     </TooltipContent>
                                 </Tooltip>
 
-                                {/* 历史记录按钮 */}
-                                <Sheet>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <SheetTrigger asChild>
-                                                <button className="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center text-green-500 hover:text-green-600 transition-colors">
-                                                    <History className="w-4 h-4 sm:w-5 sm:h-5" />
-                                                </button>
-                                            </SheetTrigger>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p>历史记录</p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                    <SheetContent side="right" className="w-80 sm:w-80">
-                                        <SheetHeader>
-                                            <SheetTitle>对话历史记录</SheetTitle>
-                                        </SheetHeader>
-                                        <div className="mt-4 space-y-2">
-                                            {chatHistory.length === 0 ? (
-                                                <p className="text-sm text-muted-foreground">暂无历史记录</p>
-                                            ) : (
-                                                chatHistory.map((historyMessages, index) => (
-                                                    <div key={index} className="p-3 border rounded-lg cursor-pointer hover:bg-muted transition-colors">
-                                                        <div className="text-sm font-medium">
-                                                            对话 {index + 1}
-                                                        </div>
-                                                        <div className="text-xs text-muted-foreground mt-1">
-                                                            {historyMessages.length} 条消息
-                                                        </div>
-                                                    </div>
-                                                ))
-                                            )}
-                                        </div>
-                                    </SheetContent>
-                                </Sheet>
 
                                 {/* 清空对话按钮 */}
                                 <Tooltip>
@@ -476,24 +408,24 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                             />
 
                             {/* 模型选择 - 在输入框内部右侧 */}
-                            <div className="absolute right-12 sm:right-16 top-1/2 -translate-y-1/2">
+                            <div className="absolute right-8 sm:right-10 top-1/2 -translate-y-1/2">
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <Select value={selectedModel} onValueChange={setSelectedModel}>
-                                            <SelectTrigger className="w-auto min-w-24 sm:min-w-32 h-6 sm:h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0">
+                                            <SelectTrigger className="w-auto min-w-20 sm:min-w-28 h-6 sm:h-8 border-0 bg-transparent shadow-none focus:ring-0 focus:ring-offset-0 [&>svg]:w-3 [&>svg]:h-3 sm:[&>svg]:w-4 sm:[&>svg]:h-4 flex items-center [&>svg]:self-center">
                                                 <SelectValue className="text-[8px] sm:text-[10px]" />
                                             </SelectTrigger>
-                                            <SelectContent className="w-auto min-w-24 sm:min-w-32">
-                                                <SelectItem value="gemini-2.5-flash">
+                                            <SelectContent className="w-fit min-w-max">
+                                                <SelectItem value="gemini-2.5-flash" className="whitespace-nowrap">
                                                     <span className="text-[8px] sm:text-[10px]">Gemini 2.5 快速版</span>
                                                 </SelectItem>
-                                                <SelectItem value="gemini-2.5-pro">
+                                                <SelectItem value="gemini-2.5-pro" className="whitespace-nowrap">
                                                     <span className="text-[8px] sm:text-[10px]">Gemini 2.5 专业版</span>
                                                 </SelectItem>
-                                                <SelectItem value="deepseek-chat">
+                                                <SelectItem value="deepseek-chat" className="whitespace-nowrap">
                                                     <span className="text-[8px] sm:text-[10px]">DeepSeek 对话版</span>
                                                 </SelectItem>
-                                                <SelectItem value="deepseek-reasoner">
+                                                <SelectItem value="deepseek-reasoner" className="whitespace-nowrap">
                                                     <span className="text-[8px] sm:text-[10px]">DeepSeek 推理版</span>
                                                 </SelectItem>
                                             </SelectContent>
@@ -549,6 +481,9 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                     </div>
                     <p className="text-xs text-muted-foreground mt-2 text-center">
                         <MixedText text="按 Enter 发送，Shift + Enter 换行" />
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1 text-center">
+                        <MixedText text="此程序不会保存任何对话历史记录" />
                     </p>
                 </div>
             </div>

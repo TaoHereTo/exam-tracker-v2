@@ -700,7 +700,7 @@ export function UnifiedSettings({
                   <div>
                     <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="清空本地数据" /></h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      仅删除本地浏览器中的数据，不影响云端。
+                      仅删除本地浏览器中的数据，不影响云端。包括：刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置。
                     </p>
                   </div>
                   <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>

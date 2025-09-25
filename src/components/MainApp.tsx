@@ -494,19 +494,20 @@ export function MainApp() {
     const handleClearLocalData = async () => {
         try {
             // 清空localStorage中的数据
-            clearLocalStorageData(['records', 'knowledge', 'plans', 'countdowns']);
+            clearLocalStorageData(['records', 'knowledge', 'plans', 'countdowns', 'events', 'ai', 'settings']);
 
             // 清空React状态
             setRecords([]);
             setKnowledge([]);
             setPlans([]);
             setCountdowns([]);
+            setCustomEvents([]);
             setSelectedRecordIds([]);
 
             notify({
                 type: 'success',
                 message: '本地数据已清空',
-                description: '已清空本地的刷题历史、知识点、学习计划和考试倒计时'
+                description: '已清空本地的刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置'
             });
         } catch (error) {
             notify({
