@@ -53,7 +53,19 @@ export const recordService = {
             return data || []
         } catch (error) {
             console.error('记录查询异常:', error);
-            throw error;
+
+            // 提供更具体的错误信息
+            if (error instanceof Error) {
+                if (error.message.includes('network') || error.message.includes('fetch')) {
+                    throw new Error('网络连接失败，请检查网络连接后重试');
+                } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+                    throw new Error('权限不足，请重新登录');
+                } else if (error.message.includes('timeout')) {
+                    throw new Error('请求超时，请稍后重试');
+                }
+            }
+
+            throw new Error(`获取记录失败: ${error instanceof Error ? error.message : '未知错误'}`);
         }
     },
 
@@ -61,6 +73,15 @@ export const recordService = {
     async addRecord(record: Omit<RecordItem, 'id'> & { id?: string }): Promise<RecordItem> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
+
+        // 验证输入数据
+        if (!record.date || !record.module || record.total <= 0 || record.correct < 0) {
+            throw new Error('刷题记录数据不完整或无效');
+        }
+
+        if (record.correct > record.total) {
+            throw new Error('正确题数不能超过总题数');
+        }
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
         const finalId = record.id && typeof record.id === 'string' && record.id ? record.id : generateUUID()
@@ -162,7 +183,19 @@ export const planService = {
             return data || []
         } catch (error) {
             console.error('计划查询异常:', error);
-            throw error;
+
+            // 提供更具体的错误信息
+            if (error instanceof Error) {
+                if (error.message.includes('network') || error.message.includes('fetch')) {
+                    throw new Error('网络连接失败，请检查网络连接后重试');
+                } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+                    throw new Error('权限不足，请重新登录');
+                } else if (error.message.includes('timeout')) {
+                    throw new Error('请求超时，请稍后重试');
+                }
+            }
+
+            throw new Error(`获取计划失败: ${error instanceof Error ? error.message : '未知错误'}`);
         }
     },
 
@@ -170,6 +203,19 @@ export const planService = {
     async addPlan(plan: Omit<StudyPlan, 'id'>): Promise<StudyPlan> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
+
+        // 验证输入数据
+        if (!plan.name || !plan.module || !plan.type || !plan.startDate || !plan.endDate) {
+            throw new Error('学习计划数据不完整');
+        }
+
+        if (plan.target <= 0) {
+            throw new Error('目标值必须大于0');
+        }
+
+        if (new Date(plan.startDate) > new Date(plan.endDate)) {
+            throw new Error('开始日期不能晚于结束日期');
+        }
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
         // 注意：数据库表中使用了双引号包围的camelCase字段名
@@ -345,6 +391,15 @@ export const countdownService = {
     async addCountdown(countdown: Omit<ExamCountdown, 'id'>): Promise<ExamCountdown> {
         const userId = await getCurrentUserId()
         if (!userId) throw new Error('用户未登录')
+
+        // 验证输入数据
+        if (!countdown.name || !countdown.examDate) {
+            throw new Error('考试倒计时数据不完整');
+        }
+
+        if (new Date(countdown.examDate) < new Date()) {
+            throw new Error('考试日期不能是过去的日期');
+        }
 
         // 构建正确的数据对象，确保字段名与数据库表匹配
         // 置顶状态不保存到云端，只保存在本地
@@ -575,7 +630,19 @@ export const knowledgeService = {
             return result;
         } catch (error) {
             console.error('获取知识点异常:', error);
-            throw error;
+
+            // 提供更具体的错误信息
+            if (error instanceof Error) {
+                if (error.message.includes('network') || error.message.includes('fetch')) {
+                    throw new Error('网络连接失败，请检查网络连接后重试');
+                } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+                    throw new Error('权限不足，请重新登录');
+                } else if (error.message.includes('timeout')) {
+                    throw new Error('请求超时，请稍后重试');
+                }
+            }
+
+            throw new Error(`获取知识点失败: ${error instanceof Error ? error.message : '未知错误'}`);
         }
     },
 

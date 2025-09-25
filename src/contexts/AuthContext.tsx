@@ -61,20 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            setUser(session?.user || null);
-            setLoading(false);
+            updateAuthState(session);
         });
 
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user || null);
-            setLoading(false);
+            updateAuthState(session);
         });
 
         return () => {
             authListener.subscription.unsubscribe();
         };
-    }, []);
+    }, [updateAuthState]);
 
     const signIn = useCallback(async (email: string, password: string) => {
         try {

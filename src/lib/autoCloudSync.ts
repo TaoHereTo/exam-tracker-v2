@@ -302,18 +302,6 @@ export class AutoCloudSync {
      */
     static async autoUpdatePlan(plan: StudyPlan, notify: ExtendedNotificationContext): Promise<StudyPlan | null> {
         try {
-            // 检查计划ID是否为UUID格式
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(plan.id);
-
-            if (!isUUID) {
-                // Removed per user request - only show notification on knowledge save
-                // notify.notify({
-                //     type: 'warning',
-                //     message: '本地更新成功',
-                //     description: `计划"${plan.name}"已更新到本地，但云端同步跳过（旧格式ID）`
-                // });
-                return null;
-            }
 
             // Create loading notification
             const toastId = notify.notifyLoading ? notify.notifyLoading('正在更新计划到云端...', `学习计划"${plan.name}"正在同步到云端`) : null;
@@ -414,18 +402,6 @@ export class AutoCloudSync {
      */
     static async autoUpdateCountdown(countdown: ExamCountdown, notify: ExtendedNotificationContext): Promise<ExamCountdown | null> {
         try {
-            // 检查倒计时ID是否为UUID格式
-            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(countdown.id);
-
-            if (!isUUID) {
-                // Removed per user request - only show notification on knowledge save
-                // notify({
-                //     type: 'warning',
-                //     message: '本地更新成功',
-                //     description: `倒计时"${countdown.name}"已更新到本地，但云端同步跳过（旧格式ID）`
-                // });
-                return null;
-            }
 
             // Directly update without duplicate checking
             const result = await countdownService.updateCountdown(countdown.id, {

@@ -668,38 +668,7 @@ export function MainApp() {
         // 先更新本地数据
         setKnowledge(prev => prev.map(k => k.id === item.id ? item : k));
 
-        // 检查 ID 格式
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id);
-
-        if (!isUUID) {
-            // 对于旧格式ID，我们需要先将其转换为新格式，然后再同步到云端
-            const newId = generateUUID();
-            const updatedItem = { ...item, id: newId };
-
-            // 更新本地数据为新ID
-            setKnowledge(prev => prev.map(k => k.id === item.id ? updatedItem : k));
-
-            // 通知用户ID已更新
-            notify({
-                type: 'info',
-                message: 'ID格式已更新',
-                description: '知识点ID已更新为新格式，正在同步到云端...'
-            });
-
-            // 对于旧格式ID，应该创建新记录而不是更新
-            try {
-                await AutoCloudSync.autoSaveKnowledge(updatedItem, {
-                    notify,
-                    notifyLoading,
-                    updateToSuccess,
-                    updateToError
-                });
-            } catch (error) {
-            }
-            return;
-        }
-
-        // 对于新格式ID，直接同步到云端
+        // 直接同步到云端
         try {
             await AutoCloudSync.autoUpdateKnowledge(item, {
                 notify,
@@ -708,6 +677,7 @@ export function MainApp() {
                 updateToError
             });
         } catch (error) {
+            console.error('更新知识点失败:', error);
         }
     };
 
@@ -1010,14 +980,6 @@ export function MainApp() {
                                                         // 只进行本地删除，不显示toast
                                                         setPlans(prev => prev.filter(p => p.id !== id));
 
-                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                        if (!isUUID) {
-                                                            // 旧格式ID，静默处理，不显示toast
-                                                            return;
-                                                        }
-
                                                         // 自动从云端删除，显示toast
                                                         try {
                                                             await AutoCloudSync.autoDeletePlan(id, {
@@ -1052,15 +1014,6 @@ export function MainApp() {
 
                                                         // 批量从云端删除选中的计划
                                                         for (const id of ids) {
-                                                            // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                            if (!isUUID) {
-                                                                // 旧格式ID，跳过云端删除
-                                                                successCount++;
-                                                                continue;
-                                                            }
-
                                                             try {
                                                                 await AutoCloudSync.autoDeletePlan(id, {
                                                                     notify: () => { }, // 完全禁用单个计划的通知
@@ -1155,17 +1108,6 @@ export function MainApp() {
                                                         };
                                                         setCountdowns(prev => [formattedCountdown, ...prev]);
 
-                                                        // 检查 ID 格式，只有 UUID 格式的才保存到云端
-                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(countdown.id);
-
-                                                        if (!isUUID) {
-                                                            notify({
-                                                                type: 'warning',
-                                                                message: '本地保存成功',
-                                                                description: '倒计时已保存到本地，但云端同步跳过（旧格式ID）'
-                                                            });
-                                                            return;
-                                                        }
 
                                                         // 自动保存到云端
                                                         try {
@@ -1227,14 +1169,6 @@ export function MainApp() {
                                                         // 只进行本地删除，不显示toast
                                                         setCountdowns(prev => prev.filter(c => c.id !== id));
 
-                                                        // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                        if (!isUUID) {
-                                                            // 旧格式ID，静默处理，不显示toast
-                                                            return;
-                                                        }
-
                                                         // 自动从云端删除，但不显示toast
                                                         try {
                                                             await AutoCloudSync.autoDeleteCountdown(id, {
@@ -1269,15 +1203,6 @@ export function MainApp() {
 
                                                         // 批量从云端删除选中的倒计时
                                                         for (const id of ids) {
-                                                            // 检查 ID 格式，只有 UUID 格式的才从云端删除
-                                                            const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
-
-                                                            if (!isUUID) {
-                                                                // 旧格式ID，跳过云端删除
-                                                                successCount++;
-                                                                continue;
-                                                            }
-
                                                             try {
                                                                 await AutoCloudSync.autoDeleteCountdown(id, {
                                                                     notify: () => { }, // 完全禁用单个倒计时的通知
