@@ -30,7 +30,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuShortcut,
     DropdownMenuTrigger,
-} from '@/components/animate-ui/components/radix/dropdown-menu';
+} from '@/components/ui/dropdown-with-animation';
 import { useSidebar } from '@/components/animate-ui/components/radix/sidebar';
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
