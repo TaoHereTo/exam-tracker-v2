@@ -25,6 +25,8 @@
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "liga" 1;
   }
 
   /* 高DPI字体优化变量 */
@@ -38,6 +40,7 @@
 @media (min-width: 2048px) {
   * {
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
   }
@@ -52,9 +55,10 @@
 
 /* 高DPI类 */
 .high-dpi {
-  -webkit-font-smoothing: var(--font-smoothing, antialiased);
-  -moz-osx-font-smoothing: var(--moz-font-smoothing, grayscale);
-  text-rendering: var(--text-rendering, optimizeLegibility);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
 }
 
 /* 优化中文字符在100%缩放下的清晰度 */
@@ -62,9 +66,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
-  font-weight: 400;
-  /* 为细线字符添加特殊渲染优化 */
   font-feature-settings: "kern" 1, "liga" 1;
+  font-weight: 400;
   /* 添加轻微的文本阴影来增强细线的可见性 */
   text-shadow: 0 0 0.2px currentColor;
 }
@@ -74,9 +77,8 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: geometricPrecision;
-  font-weight: 400;
-  /* 为细线字符添加特殊渲染优化 */
   font-feature-settings: "kern" 1, "liga" 1;
+  font-weight: 400;
   /* 添加轻微的文本阴影来增强细线的可见性 */
   text-shadow: 0 0 0.2px currentColor;
 }
@@ -99,6 +101,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
 }
 
 /* 强制SelectContent宽度与trigger一致 */
@@ -118,32 +121,40 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
 }
 
 .dark [data-radix-popper-content-wrapper] {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
 }
 
 /* 深色模式下拉菜单特殊优化 */
 .dark [data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: antialiased !important;
-  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
   font-weight: 500 !important;
 }
 
 /* 特别优化退出登录按钮文本 */
 .dark [data-radix-popper-content-wrapper] [data-slot="menu-item"]>div>span {
-  -webkit-font-smoothing: antialiased !important;
-  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
   font-weight: 500 !important;
 }
 
 /* 特别优化"退出登录"文本在深色模式下的清晰度 */
 .dark .logout-menu-item .logout-text {
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
   font-weight: 600 !important;
   letter-spacing: 0.02em !important;
   color: var(--destructive) !important;
@@ -152,9 +163,10 @@
 
 /* 确保深色模式下所有菜单项文本清晰 */
 .dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
-  -webkit-font-smoothing: antialiased !important;
-  -moz-osx-font-smoothing: grayscale !important;
-  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
 }
 
 body,
@@ -190,7 +202,7 @@ main,
   z-index: 50 !important;
 }
 
-/* Marquee动画 */
+/* Marquee动画 - 统一定义 */
 @keyframes marquee {
   from {
     transform: translateX(0);
@@ -229,10 +241,11 @@ main,
 
 /* MixedText 组件样式 */
 .mixed-text-part {
-  font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "liga" 1;
+  font-weight: 400;
 }
 
 /* 表格标题字体粗细设置 */
@@ -408,35 +421,7 @@ h6 .mixed-text-part {
 
   --color-color-1: var(--color-1);
 
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-
-    to {
-      transform: translateX(calc(-100% - var(--gap)));
-    }
-  }
-
-  @keyframes marquee-vertical {
-    from {
-      transform: translateY(0);
-    }
-
-    to {
-      transform: translateY(calc(-100% - var(--gap)));
-    }
-  }
-
-  @keyframes rainbow {
-    0% {
-      background-position: 0%;
-    }
-
-    100% {
-      background-position: 200%;
-    }
-  }
+  /* marquee和rainbow动画已在上方统一定义 */
 }
 
 /* ========== 颜色变量 ========== */
@@ -522,111 +507,7 @@ h6 .mixed-text-part {
   --moz-font-smoothing: grayscale;
 }
 
-/* 按钮主题适配：默认按钮在浅色模式下为黑色背景白色文字，深色模式下为白色背景黑色文字 */
-[data-slot="button"][variant="default"],
-[data-slot="button"].variant-default {
-  background-color: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-[data-slot="button"][variant="default"]:hover,
-[data-slot="button"].variant-default:hover {
-  background-color: #1A1A1A !important;
-  color: #FFFFFF !important;
-}
-
-.dark [data-slot="button"][variant="default"],
-.dark [data-slot="button"].variant-default {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-}
-
-.dark [data-slot="button"][variant="default"]:hover,
-.dark [data-slot="button"].variant-default:hover {
-  background-color: #F5F5F5 !important;
-  color: #000000 !important;
-}
-
-/* 按钮主题适配：secondary按钮在浅色模式下为灰色背景黑色文字，深色模式下为白色背景黑色文字 */
-[data-slot="button"][variant="secondary"],
-[data-slot="button"].variant-secondary {
-  background-color: #F5F5F5 !important;
-  color: #000000 !important;
-}
-
-[data-slot="button"][variant="secondary"]:hover,
-[data-slot="button"].variant-secondary:hover {
-  background-color: #E5E5E5 !important;
-  color: #000000 !important;
-}
-
-.dark [data-slot="button"][variant="secondary"],
-.dark [data-slot="button"].variant-secondary {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-}
-
-.dark [data-slot="button"][variant="secondary"]:hover,
-.dark [data-slot="button"].variant-secondary:hover {
-  background-color: #F5F5F5 !important;
-  color: #000000 !important;
-}
-
-/* 按钮主题适配：outline按钮在浅色模式下为白色背景黑色文字，深色模式下为黑色背景白色文字 */
-[data-slot="button"][variant="outline"],
-[data-slot="button"].variant-outline {
-  background-color: #FFFFFF !important;
-  color: #000000 !important;
-}
-
-[data-slot="button"][variant="outline"]:hover,
-[data-slot="button"].variant-outline:hover {
-  background-color: #F5F5F5 !important;
-  color: #000000 !important;
-}
-
-.dark [data-slot="button"][variant="outline"],
-.dark [data-slot="button"].variant-outline {
-  background-color: #000000 !important;
-  color: #FFFFFF !important;
-}
-
-.dark [data-slot="button"][variant="outline"]:hover,
-.dark [data-slot="button"].variant-outline:hover {
-  background-color: #1A1A1A !important;
-  color: #FFFFFF !important;
-}
-
-/* 特殊处理带图标按钮的背景色 */
-[data-slot="button"][variant="outline"] svg,
-.dark [data-slot="button"][variant="outline"] svg {
-  color: inherit !important;
-}
-
-/* destructive 按钮样式 */
-[data-slot="button"][variant="destructive"],
-[data-slot="button"].variant-destructive {
-  background-color: var(--destructive) !important;
-  color: #FFFFFF !important;
-}
-
-[data-slot="button"][variant="destructive"]:hover,
-[data-slot="button"].variant-destructive:hover {
-  background-color: color-mix(in srgb, var(--destructive) 90%, black) !important;
-  color: #FFFFFF !important;
-}
-
-.dark [data-slot="button"][variant="destructive"],
-.dark [data-slot="button"].variant-destructive {
-  background-color: var(--destructive) !important;
-  color: #FFFFFF !important;
-}
-
-.dark [data-slot="button"][variant="destructive"]:hover,
-.dark [data-slot="button"].variant-destructive:hover {
-  background-color: color-mix(in srgb, var(--destructive) 90%, black) !important;
-  color: #FFFFFF !important;
-}
+/* 按钮样式已移至组件中，移除重复的全局样式定义 */
 
 .dark {
   --background: #161618;
@@ -1397,21 +1278,6 @@ h6,
 .go3958317564 line,
 .go3958317564 polygon,
 .go3958317564 polyline,
-/* 通用toast图标选择器 */
-[data-hot-toast],
-[data-hot-toast] *,
-[data-hot-toast] svg,
-[data-hot-toast] path,
-[data-hot-toast] circle,
-[data-hot-toast] rect,
-[data-hot-toast] line,
-[data-hot-toast] polygon,
-[data-hot-toast] polyline {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -moz-user-select: none !important;
-  -ms-user-select: none !important;
-}
 
 /* 确保输入框和文本区域可以正常选择 */
 input,
@@ -1517,15 +1383,6 @@ table th:focus {
   -webkit-caret-color: transparent !important;
 }
 
-/* 禁用加载组件中的光标 */
-.loading-container *,
-.loading-spinner *,
-[data-loading] *,
-.spinner *,
-.animate-spin * {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
 
 /* 禁用卡片和容器中的光标 */
 .card,
@@ -1564,17 +1421,6 @@ main:not([contenteditable="true"]) {
   -webkit-caret-color: transparent !important;
 }
 
-/* 禁用所有可能的容器元素的子元素 */
-.card *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-[data-slot="card"] *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-.card-content *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-.card-body *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-main *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-section *:not(input):not(textarea):not(select):not([contenteditable="true"]),
-article *:not(input):not(textarea):not(select):not([contenteditable="true"]) {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
 
 /* 禁用焦点状态的光标 */
 *:focus:not(input):not(textarea):not(select):not([contenteditable="true"]) {
@@ -1611,20 +1457,7 @@ input:focus {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* Rainbow button animation */
-@keyframes rainbow {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
+/* Rainbow button animation - 已在上方统一定义 */
 
 /* ========== 侧边栏样式 ========== */
 /* 修正sonner提示框深色模式下主内容颜色 */
@@ -2214,13 +2047,7 @@ body.eye-care.dark .text-muted-foreground,
   transition: none !important;
 }
 
-/* tabs 选中状态增强可见性 */
-/* Tabs component now handles all styling, removing global overrides */
 
-/* Calendar: 强制禁用 outside 与 aria-disabled 的点击 */
-/* Calendar component now handles all styling, removing global overrides */
-
-/* 过渡效果优化 */
 .transition-colors {
   transition-duration: 1ms !important;
 }
@@ -2362,7 +2189,7 @@ body.eye-care.dark .text-muted-foreground,
   width: 100% !important;
   max-width: 100% !important;
   position: relative;
-  z-index: 100;
+  z-index: 10;
 }
 
 .chart-container {
@@ -2376,18 +2203,18 @@ body.eye-care.dark .text-muted-foreground,
 /* 确保图例不被遮挡 - 为每个图表类型单独设置 */
 .trend-chart .echarts-legend {
   position: relative !important;
-  z-index: 999 !important;
+  z-index: 20 !important;
 }
 
 .pie-chart .echarts-legend {
   position: relative !important;
-  z-index: 999 !important;
+  z-index: 20 !important;
 }
 
 /* 确保所有ECharts图例都有足够高的z-index */
 .echarts-for-react .echarts-legend {
   position: relative !important;
-  z-index: 999 !important;
+  z-index: 20 !important;
 }
 
 /* 移动端图表优化 */
@@ -2438,31 +2265,6 @@ body.eye-care.dark .text-muted-foreground,
 
 #toast-container>* {
   pointer-events: auto;
-}
-
-/* 顶部Toast动画效果 */
-@keyframes toast-enter {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes toast-exit {
-  from {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
 }
 
 /* 确保Toast容器样式正确 */
@@ -2553,11 +2355,6 @@ body.eye-care.dark .text-muted-foreground,
   z-index: -1;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
 
 
 /* 通用日历样式 - 使用CSS变量，优先级更高 */

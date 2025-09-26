@@ -143,12 +143,11 @@ export default function CountdownExpandableCard({
                                                         <Button
                                                             variant="outline"
                                                             size="icon"
-                                                            className="h-8 w-8 rounded-full"
+                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                             onClick={() => {
                                                                 onEdit?.(active);
                                                                 setActive(null);
                                                             }}
-                                                            className="bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                         >
                                                             <Edit className="w-4 h-4 text-white" />
                                                         </Button>
@@ -265,12 +264,11 @@ export default function CountdownExpandableCard({
                                                 <TooltipTrigger asChild>
                                                     <motion.button
                                                         layoutId={`button-${prefix}-${countdown.id}-${uniqueId}`}
-                                                        className="h-8 w-8 rounded-full flex items-center justify-center border border-gray-200 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                                                        className="h-8 w-8 rounded-full flex items-center justify-center bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             onEdit?.(countdown);
                                                         }}
-                                                        className="bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                     >
                                                         <Edit className="w-4 h-4 text-white" />
                                                     </motion.button>
