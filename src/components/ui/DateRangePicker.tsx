@@ -147,6 +147,7 @@ export function DateRangePicker({
                             onSelect={handleSelect}
                             numberOfMonths={typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 2}
                             locale={zhCN}
+                            themeColor="#0d9488"
                         />
                     </div>
                 </PopoverContent>

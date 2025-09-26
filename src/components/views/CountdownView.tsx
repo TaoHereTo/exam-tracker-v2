@@ -551,7 +551,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 px-6 rounded-full font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                        className="h-9 px-6 rounded-full font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90 dark:bg-[#db2777] dark:hover:bg-[#db2777]/90 dark:text-white"
                         variant="default"
                     >
                         <Plus className="w-5 h-5 mr-2" />
@@ -603,7 +603,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </p>
                                         <Button
                                             onClick={() => handleOpenForm()}
-                                            className="h-10 px-6 rounded-md font-medium bg-[#15803d] text-white hover:bg-[#15803d]/90 dark:bg-[#15803d] dark:hover:bg-[#15803d]/90 dark:text-white"
+                                            className="h-10 px-6 rounded-md font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90 dark:bg-[#db2777] dark:hover:bg-[#db2777]/90 dark:text-white"
                                             variant="default"
                                         >
                                             <Plus className="w-5 h-5 mr-2" />
@@ -866,7 +866,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 // Close popover after selection
                                                 setDateOpen(false);
                                             }}
-                                            themeColor="#15803d"
+                                            themeColor="#db2777"
                                         />
                                     </PopoverContent>
                                 </Popover>
@@ -961,6 +961,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                 type="submit"
                                 variant="default"
                                 className="w-full sm:w-auto rounded-full"
+                                style={{ backgroundColor: '#db2777' }}
                             >
                                 {editId ? <MixedText text="更新" /> : <MixedText text="添加倒计时" />}
                             </Button>

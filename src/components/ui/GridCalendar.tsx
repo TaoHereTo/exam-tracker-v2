@@ -260,7 +260,7 @@ function CustomCalendar({
                         setCurrentMonthIndex(date.getMonth())
                     }}
                     locale={zhCN}
-                    className={`rounded-md border data-[selected-single=true]:!bg-[${themeColor}] data-[selected-single=true]:!text-white data-[range-start=true]:!bg-[${themeColor}] data-[range-start=true]:!text-white data-[range-end=true]:!bg-[${themeColor}] data-[range-end=true]:!text-white data-[range-middle=true]:!bg-[${themeColor}]/30 data-[range-middle=true]:!text-[${themeColor}]`}
+                    themeColor={themeColor}
                 />
             </div>
         </div>
@@ -279,6 +279,7 @@ function CustomDateRangePicker({
     placeholder?: string
     themeColor?: string
 }) {
+
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -310,7 +311,7 @@ function CustomDateRangePicker({
                     onSelect={onDateRangeChange}
                     numberOfMonths={2}
                     locale={zhCN}
-                    className={`data-[selected-single=true]:!bg-[${themeColor}] data-[selected-single=true]:!text-white data-[range-start=true]:!bg-[${themeColor}] data-[range-start=true]:!text-white data-[range-end=true]:!bg-[${themeColor}] data-[range-end=true]:!text-white data-[range-middle=true]:!bg-[${themeColor}]/30 data-[range-middle=true]:!text-[${themeColor}]`}
+                    themeColor={themeColor}
                 />
             </PopoverContent>
         </Popover>

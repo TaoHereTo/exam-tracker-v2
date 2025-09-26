@@ -19,11 +19,14 @@ function Calendar({
   buttonVariant = "ghost",
   formatters,
   components,
+  themeColor = "#0d9488",
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
+  themeColor?: string
 }) {
   const defaultClassNames = getDefaultClassNames()
+
 
   return (
     <div className="calendar-container">
@@ -157,7 +160,7 @@ function Calendar({
               <ChevronDownIcon className={cn("size-4", className)} {...props} />
             )
           },
-          DayButton: CalendarDayButton,
+          DayButton: (props) => <CalendarDayButton {...props} themeColor={themeColor} />,
           WeekNumber: ({ children, ...props }) => {
             return (
               <td {...props}>
@@ -179,8 +182,9 @@ function CalendarDayButton({
   className,
   day,
   modifiers,
+  themeColor = "#0d9488",
   ...props
-}: React.ComponentProps<typeof DayButton>) {
+}: React.ComponentProps<typeof DayButton> & { themeColor?: string }) {
   const defaultClassNames = getDefaultClassNames()
 
   const ref = React.useRef<HTMLButtonElement>(null)
@@ -194,6 +198,19 @@ function CalendarDayButton({
     }
     prevFocusedRef.current = modifiers.focused;
   }, [modifiers.focused]);
+
+  // 强制设置中间日期的文字颜色
+  React.useLayoutEffect(() => {
+    if (modifiers.range_middle && ref.current) {
+      // 简单直接地设置颜色
+      ref.current.style.color = themeColor;
+    }
+  }, [modifiers.range_middle, themeColor]);
+
+
+
+
+
 
   return (
     <Button
@@ -211,10 +228,31 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "data-[selected-single=true]:bg-[#0d9488] data-[selected-single=true]:text-white data-[selected-single=true]:rounded-lg data-[range-middle=true]:bg-[#0d9488]/30 data-[range-middle=true]:text-[#0d9488] data-[range-start=true]:bg-[#0d9488] data-[range-start=true]:text-white data-[range-end=true]:bg-[#0d9488] data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-lg flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-lg data-[range-end=true]:rounded-r-lg data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-lg data-[range-start=true]:rounded-l-lg [&>span]:text-xs [&>span]:opacity-70",
+        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-lg data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-lg flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-lg data-[range-end=true]:rounded-r-lg data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-lg data-[range-start=true]:rounded-l-lg [&>span]:text-xs [&>span]:opacity-70",
+        // 为中间日期添加特殊的类名
+        modifiers.range_middle && `range-middle-${themeColor.replace('#', '')}`,
         defaultClassNames.day,
         className
       )}
+      data-theme-color={themeColor}
+      style={{
+        ...(modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle && {
+          backgroundColor: themeColor,
+          color: 'white'
+        }),
+        ...(modifiers.range_middle && {
+          backgroundColor: `${themeColor}4D`, // 使用十六进制透明度，相当于0.3的透明度
+          color: themeColor
+        }),
+        ...(modifiers.range_start && {
+          backgroundColor: themeColor,
+          color: 'white'
+        }),
+        ...(modifiers.range_end && {
+          backgroundColor: themeColor,
+          color: 'white'
+        })
+      } as React.CSSProperties}
       {...props}
     />
   )

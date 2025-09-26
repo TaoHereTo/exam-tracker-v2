@@ -322,6 +322,7 @@ export function ExerciseRecordView({
                                         }}
                                         initialFocus={false}
                                         locale={zhCN}
+                                        themeColor="#253985"
                                     />
                                 </PopoverContent>
                             </Popover>

@@ -158,6 +158,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         }}
                         initialFocus={false}
                         locale={zhCN}
+                        themeColor="#347659"
                     />
                 </PopoverContent>
             </Popover>

@@ -851,7 +851,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                     dateRange={dateRange}
                                     onDateRangeChange={handleDateRangeChange}
                                     placeholder="选择开始和结束日期"
-                                    themeColor="#2A4DD0"
+                                    themeColor="#324CC8"
                                 />
                             </FormField>
                             <FormError error={errors.startDate || errors.endDate} />
@@ -965,6 +965,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                 type="submit"
                                 variant="default"
                                 className="w-full sm:w-auto rounded-full"
+                                style={{ backgroundColor: '#324CC8' }}
                             >
                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                             </Button>

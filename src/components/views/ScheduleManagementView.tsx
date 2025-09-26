@@ -773,6 +773,7 @@ export default function ScheduleManagementView({
                                     }}
                                     className="rounded-md border scale-100"
                                     locale={zhCN}
+                                    themeColor="#845EEE"
                                 />
                             </div>
                         </div>
@@ -1153,6 +1154,7 @@ export default function ScheduleManagementView({
                                                                 initialFocus={false}
                                                                 locale={zhCN}
                                                                 className="p-3"
+                                                                themeColor="#845EEE"
                                                             />
                                                         </PopoverContent>
                                                     </Popover>

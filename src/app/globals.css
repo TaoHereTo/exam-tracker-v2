@@ -2510,3 +2510,224 @@ body.eye-care.dark .text-muted-foreground,
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* 日历选中日期样式 - 新记录页面 */
+[data-selected-single="true"][data-theme-color="#347659"] {
+  background-color: #347659 !important;
+  color: white !important;
+}
+
+[data-range-start="true"][data-theme-color="#347659"] {
+  background-color: #347659 !important;
+  color: white !important;
+}
+
+[data-range-end="true"][data-theme-color="#347659"] {
+  background-color: #347659 !important;
+  color: white !important;
+}
+
+[data-range-middle="true"][data-theme-color="#347659"] {
+  background-color: #3476594D !important;
+  /* 使用十六进制透明度 */
+  color: #347659 !important;
+}
+
+/* 更具体的选择器确保中间日期文字颜色正确 */
+button[data-range-middle="true"][data-theme-color="#347659"],
+[data-range-middle="true"][data-theme-color="#347659"] button,
+button[data-range-middle="true"][data-theme-color="#347659"] span,
+button[data-range-middle="true"][data-theme-color="#347659"] * {
+  color: #347659 !important;
+}
+
+button[data-range-middle="true"][data-theme-color="#324CC8"],
+[data-range-middle="true"][data-theme-color="#324CC8"] button,
+button[data-range-middle="true"][data-theme-color="#324CC8"] span,
+button[data-range-middle="true"][data-theme-color="#324CC8"] * {
+  color: #324CC8 !important;
+}
+
+/* 使用更高优先级的选择器 */
+.calendar-container button[data-range-middle="true"][data-theme-color="#324CC8"] {
+  color: #324CC8 !important;
+}
+
+.calendar-container button[data-range-middle="true"][data-theme-color="#324CC8"] * {
+  color: #324CC8 !important;
+}
+
+/* 使用特殊类名的规则 */
+.range-middle-324CC8 {
+  color: #324CC8 !important;
+}
+
+.range-middle-324CC8 * {
+  color: #324CC8 !important;
+}
+
+.range-middle-347659 {
+  color: #347659 !important;
+}
+
+.range-middle-347659 * {
+  color: #347659 !important;
+}
+
+/* 使用最高优先级的选择器 */
+button[data-range-middle="true"][data-theme-color="#324CC8"],
+button[data-range-middle="true"][data-theme-color="#324CC8"] span,
+button[data-range-middle="true"][data-theme-color="#324CC8"] *,
+.range-middle-324CC8,
+.range-middle-324CC8 span,
+.range-middle-324CC8 * {
+  color: #324CC8 !important;
+}
+
+button[data-range-middle="true"][data-theme-color="#347659"],
+button[data-range-middle="true"][data-theme-color="#347659"] span,
+button[data-range-middle="true"][data-theme-color="#347659"] *,
+.range-middle-347659,
+.range-middle-347659 span,
+.range-middle-347659 * {
+  color: #347659 !important;
+}
+
+/* 学习计划页面日历样式 */
+[data-selected-single="true"][data-theme-color="#324CC8"] {
+  background-color: #324CC8 !important;
+  color: white !important;
+}
+
+[data-range-start="true"][data-theme-color="#324CC8"] {
+  background-color: #324CC8 !important;
+  color: white !important;
+}
+
+[data-range-end="true"][data-theme-color="#324CC8"] {
+  background-color: #324CC8 !important;
+  color: white !important;
+}
+
+[data-range-middle="true"][data-theme-color="#324CC8"] {
+  background-color: #324CC84D !important;
+  /* 使用十六进制透明度 */
+  color: #324CC8 !important;
+}
+
+/* 倒计时页面日历样式 */
+[data-selected-single="true"][data-theme-color="#db2777"] {
+  background-color: #db2777 !important;
+  color: white !important;
+}
+
+[data-range-start="true"][data-theme-color="#db2777"] {
+  background-color: #db2777 !important;
+  color: white !important;
+}
+
+[data-range-end="true"][data-theme-color="#db2777"] {
+  background-color: #db2777 !important;
+  color: white !important;
+}
+
+[data-range-middle="true"][data-theme-color="#db2777"] {
+  background-color: #db27774D !important;
+  /* 使用十六进制透明度 */
+  color: #db2777 !important;
+}
+
+/* 更具体的选择器确保倒计时页面中间日期文字颜色正确 */
+button[data-range-middle="true"][data-theme-color="#db2777"],
+[data-range-middle="true"][data-theme-color="#db2777"] button,
+button[data-range-middle="true"][data-theme-color="#db2777"] span,
+button[data-range-middle="true"][data-theme-color="#db2777"] * {
+  color: #db2777 !important;
+}
+
+/* 使用最高优先级的选择器 */
+.calendar-container button[data-range-middle="true"][data-theme-color="#db2777"] {
+  color: #db2777 !important;
+}
+
+.calendar-container button[data-range-middle="true"][data-theme-color="#db2777"] * {
+  color: #db2777 !important;
+}
+
+/* 日程管理页面日历样式 */
+[data-selected-single="true"][data-theme-color="#845EEE"] {
+  background-color: #845EEE !important;
+  color: white !important;
+}
+
+[data-range-start="true"][data-theme-color="#845EEE"] {
+  background-color: #845EEE !important;
+  color: white !important;
+}
+
+[data-range-end="true"][data-theme-color="#845EEE"] {
+  background-color: #845EEE !important;
+  color: white !important;
+}
+
+[data-range-middle="true"][data-theme-color="#845EEE"] {
+  background-color: #845EEE4D !important;
+  /* 使用十六进制透明度 */
+  color: #845EEE !important;
+}
+
+/* 更具体的选择器确保日程管理页面中间日期文字颜色正确 */
+button[data-range-middle="true"][data-theme-color="#845EEE"],
+[data-range-middle="true"][data-theme-color="#845EEE"] button,
+button[data-range-middle="true"][data-theme-color="#845EEE"] span,
+button[data-range-middle="true"][data-theme-color="#845EEE"] * {
+  color: #845EEE !important;
+}
+
+/* 使用最高优先级的选择器 */
+.calendar-container button[data-range-middle="true"][data-theme-color="#845EEE"] {
+  color: #845EEE !important;
+}
+
+.calendar-container button[data-range-middle="true"][data-theme-color="#845EEE"] * {
+  color: #845EEE !important;
+}
+
+/* 知识点录入页面日历样式 */
+[data-selected-single="true"][data-theme-color="#253985"] {
+  background-color: #253985 !important;
+  color: white !important;
+}
+
+[data-range-start="true"][data-theme-color="#253985"] {
+  background-color: #253985 !important;
+  color: white !important;
+}
+
+[data-range-end="true"][data-theme-color="#253985"] {
+  background-color: #253985 !important;
+  color: white !important;
+}
+
+[data-range-middle="true"][data-theme-color="#253985"] {
+  background-color: #2539854D !important;
+  /* 使用十六进制透明度 */
+  color: #253985 !important;
+}
+
+/* 更具体的选择器确保知识点录入页面中间日期文字颜色正确 */
+button[data-range-middle="true"][data-theme-color="#253985"],
+[data-range-middle="true"][data-theme-color="#253985"] button,
+button[data-range-middle="true"][data-theme-color="#253985"] span,
+button[data-range-middle="true"][data-theme-color="#253985"] * {
+  color: #253985 !important;
+}
+
+/* 使用最高优先级的选择器 */
+.calendar-container button[data-range-middle="true"][data-theme-color="#253985"] {
+  color: #253985 !important;
+}
+
+.calendar-container button[data-range-middle="true"][data-theme-color="#253985"] * {
+  color: #253985 !important;
+}
