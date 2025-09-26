@@ -1260,12 +1260,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 />
             )}
             <div
-                className={cn('rich-text-editor border rounded-lg overflow-hidden flex flex-col', isFullscreen ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] max-w-4xl h-[80vh] z-50 bg-white dark:bg-gray-900 shadow-2xl' : '', isDragOver ? 'ring-2 ring-blue-500' : '', className)}
+                className={cn('rich-text-editor border rounded-lg overflow-hidden flex flex-col', isFullscreen ? 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[60vw] max-w-4xl h-[80vh] z-50 bg-[color:var(--modal-background)] shadow-2xl' : '', isDragOver ? 'ring-2 ring-blue-500' : '', className)}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
-                <div className="border-b bg-gray-50 dark:bg-[#161618] p-1 flex flex-wrap gap-0.5">
+                <div className="border-b bg-[color:var(--muted)] p-1 flex flex-wrap gap-0.5">
                     {/* 撤销/重做 */}
                     <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                         <Tooltip>
@@ -1770,7 +1770,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         }
                     }}
                     className={cn(
-                        "bg-white dark:bg-[#303030] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
+                        "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
                         isFullscreen ? "flex-1 min-h-0" :
                             customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
                     )}
@@ -1786,55 +1786,20 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                 <style jsx global>{`
           .rich-text-editor [contenteditable] {
-            caret-color: currentColor !important;
-            outline: none !important;
-            cursor: text !important;
-            padding: 16px !important;
-            margin: 0 !important;
-            overflow-y: auto !important;
-            max-height: 100% !important;
+            outline: none;
+            cursor: text;
+            padding: 16px;
+            margin: 0;
+            overflow-y: auto;
+            max-height: 100%;
           }
           
           .rich-text-editor [contenteditable]:focus {
-            caret-color: currentColor !important;
-            outline: none !important;
+            outline: none;
           }
           
           .rich-text-editor [contenteditable]:focus-visible {
-            outline: none !important;
-          }
-          
-          /* 确保光标在标签内也能显示 */
-          .rich-text-editor [contenteditable] * {
-            caret-color: inherit !important;
-          }
-          
-          .rich-text-editor [contenteditable] b,
-          .rich-text-editor [contenteditable] strong,
-          .rich-text-editor [contenteditable] i,
-          .rich-text-editor [contenteditable] em,
-          .rich-text-editor [contenteditable] u,
-          .rich-text-editor [contenteditable] s,
-          .rich-text-editor [contenteditable] strike {
-            caret-color: currentColor !important;
-          }
-          
-          /* 强制显示光标的关键样式 - 浅色模式 */
-          .rich-text-editor [contenteditable]:focus {
-            caret-color: #000 !important;
-          }
-          
-          .rich-text-editor [contenteditable]:focus * {
-            caret-color: #000 !important;
-          }
-          
-          /* 深色模式下的光标颜色 */
-          .dark .rich-text-editor [contenteditable]:focus {
-            caret-color: #ffffff !important;
-          }
-          
-          .dark .rich-text-editor [contenteditable]:focus * {
-            caret-color: #ffffff !important;
+            outline: none;
           }
           
           .rich-text-editor [contenteditable]:empty:before {

@@ -43,18 +43,13 @@ export const MixedText = memo(function MixedText({
     const hasRedFormatting = /\{red\}[^}]+\{\/red\}/.test(content);
     const hasFormatting = hasBoldFormatting || hasItalicFormatting || hasRedFormatting;
 
-    // 添加字体平滑属性到基础样式
+    // 基础样式 - 字体渲染已在全局CSS中统一处理
     const baseStyle = {
-        ...style,
-        WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale',
-        textRendering: 'optimizeLegibility'
+        ...style
     };
 
     // 特别优化"退出登录"文本
     if (content === "退出登录") {
-        baseStyle.WebkitFontSmoothing = 'antialiased';
-        baseStyle.MozOsxFontSmoothing = 'grayscale';
         baseStyle.fontWeight = '600';
         baseStyle.letterSpacing = '0.02em';
     }
@@ -143,12 +138,9 @@ export const MixedTitle = memo(function MixedTitle({
         6: 'text-sm font-medium'
     };
 
-    // 添加字体平滑属性到标题样式
+    // 标题样式 - 字体渲染已在全局CSS中统一处理
     const titleStyle: React.CSSProperties = {
-        ...style,
-        WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale',
-        textRendering: 'optimizeLegibility'
+        ...style
     };
 
     const renderTitle = () => {
@@ -189,12 +181,9 @@ export const MixedParagraph = memo(function MixedParagraph({
     style,
     onClick
 }: MixedParagraphProps) {
-    // 添加字体平滑属性到段落样式
+    // 段落样式 - 字体渲染已在全局CSS中统一处理
     const paragraphStyle: React.CSSProperties = {
-        ...style,
-        WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale',
-        textRendering: 'optimizeLegibility'
+        ...style
     };
 
     return (

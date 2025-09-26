@@ -26,7 +26,7 @@
   --text-shadow-enhance-strong: 0 0 0.3px currentColor;
 }
 
-/* 全局字体渲染优化 */
+/* 全局字体渲染优化 - 统一应用到所有元素 */
 * {
   font-family: '思源宋体', 'Times New Roman', serif;
   -webkit-font-smoothing: var(--font-smoothing-webkit);
@@ -47,19 +47,8 @@
   }
 }
 
-/* 字体渲染混合样式 - 使用CSS变量统一管理 */
-
-/* 应用到具体元素 */
-.high-dpi {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
-}
-
+/* 特殊字体渲染优化类 - 继承全局设置并增强 */
 .mixed-text-part {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
   text-rendering: var(--text-rendering-precise);
   font-feature-settings: var(--font-features-text);
   font-weight: 400;
@@ -68,11 +57,6 @@
 
 /* 深色模式下的字体渲染优化 */
 .dark .mixed-text-part {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-precise);
-  font-feature-settings: var(--font-features-text);
-  font-weight: 400;
   text-shadow: var(--text-shadow-enhance);
 }
 
@@ -81,14 +65,6 @@
 .mixed-text-part:contains("二"),
 .mixed-text-part:contains("三") {
   text-shadow: var(--text-shadow-enhance-strong);
-}
-
-/* 下拉菜单字体优化 */
-[data-radix-popper-content-wrapper] {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
 }
 
 /* 强制SelectContent宽度与trigger一致 */
@@ -104,46 +80,16 @@
   max-width: 120px !important;
 }
 
-[data-radix-popper-content-wrapper] *,
-.dark [data-radix-popper-content-wrapper],
-.dark [data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
-}
-
 /* 深色模式下拉菜单特殊优化 */
 .dark [data-radix-popper-content-wrapper] * {
   font-weight: 500 !important;
 }
 
-/* 特别优化退出登录按钮文本 */
-.dark [data-radix-popper-content-wrapper] [data-slot="menu-item"]>div>span {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
-  font-weight: 500 !important;
-}
-
 /* 特别优化"退出登录"文本在深色模式下的清晰度 */
 .dark .logout-menu-item .logout-text {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
   font-weight: 600 !important;
   letter-spacing: 0.02em !important;
   color: var(--destructive) !important;
-}
-
-/* 确保深色模式下所有菜单项文本清晰 */
-.dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  font-feature-settings: var(--font-features-basic);
 }
 
 body,
@@ -429,6 +375,12 @@ h6 .mixed-text-part {
   --input: #FFFFFF;
   --input-border: #E0E0E0;
   --ring: oklch(0.708 0 0);
+
+  /* 组件专用背景色 - 统一管理 */
+  --editor-background: var(--input);
+  --textarea-background: var(--input);
+  --modal-background: var(--background);
+  --card-modal-background: var(--card);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -483,6 +435,12 @@ h6 .mixed-text-part {
   --input: #242628;
   --input-border: #313335;
   --ring: oklch(0.556 0 0);
+
+  /* 深色模式组件专用背景色 */
+  --editor-background: var(--input);
+  --textarea-background: var(--input);
+  --modal-background: var(--background);
+  --card-modal-background: var(--card);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -1268,96 +1226,27 @@ textarea,
 }
 
 /* ========== 光标控制 ========== */
-/* 禁用表格和加载组件中的巨大光标 */
-table,
-table td,
-table th,
-.loading-container,
-.loading-spinner,
-[data-loading],
-.spinner,
-.animate-spin {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
+/* 全局光标控制 - 默认禁用，输入元素启用 */
+* {
+  caret-color: transparent;
+  -webkit-caret-color: transparent;
 }
 
-/* 禁用所有非输入元素的光标，但排除输入框容器 */
-div:not([contenteditable="true"]):not(input):not(textarea):not(select):not(.input-container):not(.form-field):not(.form-stack),
-span:not([contenteditable="true"]):not(input):not(textarea):not(select),
-p:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h1:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h2:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h3:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h4:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h5:not([contenteditable="true"]):not(input):not(textarea):not(select),
-h6:not([contenteditable="true"]):not(input):not(textarea):not(select) {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
-
-/* 确保输入框和文本区域保持正常光标 */
+/* 启用输入元素的光标 */
 input,
 textarea,
 select,
 [contenteditable="true"],
 [data-slot="input"],
 [data-slot="textarea"] {
-  caret-color: auto !important;
-  -webkit-caret-color: auto !important;
+  caret-color: currentColor;
+  -webkit-caret-color: currentColor;
 }
-
-/* 表单容器光标控制已移至组件内部 */
 
 /* 禁用表格单元格的焦点状态 */
 table td:focus,
 table th:focus {
-  outline: none !important;
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
-
-/* 禁用卡片和容器中的光标 */
-.card,
-[data-slot="card"],
-.card-content,
-.card-body,
-.card-header,
-.card-footer,
-[data-slot="card-content"],
-[data-slot="card-body"],
-[data-slot="card-header"],
-[data-slot="card-footer"],
-/* 页面容器 */
-main,
-section,
-article,
-aside,
-nav,
-header,
-footer,
-/* 布局容器 */
-.container,
-.wrapper,
-.content,
-.page,
-.view,
-/* 禁用所有可能的容器元素 */
-section:not([contenteditable="true"]),
-article:not([contenteditable="true"]),
-aside:not([contenteditable="true"]),
-nav:not([contenteditable="true"]),
-header:not([contenteditable="true"]),
-footer:not([contenteditable="true"]),
-main:not([contenteditable="true"]) {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
-
-/* 禁用焦点状态的光标 */
-*:focus:not(input):not(textarea):not(select):not([contenteditable="true"]) {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-  outline: none !important;
+  outline: none;
 }
 
 /* 输入框基础样式 - 保留必要的全局样式 */

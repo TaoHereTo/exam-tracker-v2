@@ -20,7 +20,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           data-slot="textarea"
           className={cn(
             "placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:border-blue-500 focus-visible:ring-0 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex field-sizing-content min-h-16 w-full rounded-md border px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-            "bg-white dark:bg-[#303030]",
+            "bg-[color:var(--textarea-background)]",
             "border-[color:var(--input-border)]",
             className
           )}

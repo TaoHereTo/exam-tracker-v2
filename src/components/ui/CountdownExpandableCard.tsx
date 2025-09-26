@@ -98,15 +98,15 @@ export default function CountdownExpandableCard({
                         <motion.div
                             layoutId={`card-${prefix}-${active.id}-${uniqueId}`}
                             ref={ref}
-                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white dark:bg-neutral-900 sm:rounded-3xl overflow-hidden border border-neutral-200 dark:border-neutral-700 shadow-lg"
+                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-[color:var(--card-modal-background)] sm:rounded-3xl overflow-hidden border border-border shadow-lg"
                         >
                             <div>
                                 <div className="flex justify-between items-start p-4">
                                     <div className="">
-                                        <h3 className="font-bold text-neutral-800 dark:text-neutral-100">
+                                        <h3 className="font-bold text-foreground">
                                             {active.name}
                                         </h3>
-                                        <p className="text-neutral-700 dark:text-neutral-300">
+                                        <p className="text-muted-foreground">
                                             {active.description || '暂无描述'}
                                         </p>
                                     </div>
