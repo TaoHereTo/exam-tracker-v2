@@ -529,9 +529,21 @@ h6 .mixed-text-part {
   color: #FFFFFF !important;
 }
 
+[data-slot="button"][variant="default"]:hover,
+[data-slot="button"].variant-default:hover {
+  background-color: #1A1A1A !important;
+  color: #FFFFFF !important;
+}
+
 .dark [data-slot="button"][variant="default"],
 .dark [data-slot="button"].variant-default {
   background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark [data-slot="button"][variant="default"]:hover,
+.dark [data-slot="button"].variant-default:hover {
+  background-color: #F5F5F5 !important;
   color: #000000 !important;
 }
 
@@ -542,9 +554,21 @@ h6 .mixed-text-part {
   color: #000000 !important;
 }
 
+[data-slot="button"][variant="secondary"]:hover,
+[data-slot="button"].variant-secondary:hover {
+  background-color: #E5E5E5 !important;
+  color: #000000 !important;
+}
+
 .dark [data-slot="button"][variant="secondary"],
 .dark [data-slot="button"].variant-secondary {
   background-color: #FFFFFF !important;
+  color: #000000 !important;
+}
+
+.dark [data-slot="button"][variant="secondary"]:hover,
+.dark [data-slot="button"].variant-secondary:hover {
+  background-color: #F5F5F5 !important;
   color: #000000 !important;
 }
 
@@ -555,9 +579,21 @@ h6 .mixed-text-part {
   color: #000000 !important;
 }
 
+[data-slot="button"][variant="outline"]:hover,
+[data-slot="button"].variant-outline:hover {
+  background-color: #F5F5F5 !important;
+  color: #000000 !important;
+}
+
 .dark [data-slot="button"][variant="outline"],
 .dark [data-slot="button"].variant-outline {
   background-color: #000000 !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="outline"]:hover,
+.dark [data-slot="button"].variant-outline:hover {
+  background-color: #1A1A1A !important;
   color: #FFFFFF !important;
 }
 
@@ -574,9 +610,21 @@ h6 .mixed-text-part {
   color: #FFFFFF !important;
 }
 
+[data-slot="button"][variant="destructive"]:hover,
+[data-slot="button"].variant-destructive:hover {
+  background-color: color-mix(in srgb, var(--destructive) 90%, black) !important;
+  color: #FFFFFF !important;
+}
+
 .dark [data-slot="button"][variant="destructive"],
 .dark [data-slot="button"].variant-destructive {
   background-color: var(--destructive) !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-slot="button"][variant="destructive"]:hover,
+.dark [data-slot="button"].variant-destructive:hover {
+  background-color: color-mix(in srgb, var(--destructive) 90%, black) !important;
   color: #FFFFFF !important;
 }
 

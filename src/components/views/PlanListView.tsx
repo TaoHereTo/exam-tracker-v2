@@ -393,24 +393,8 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 text-white shadow-sm rounded-full"
-                        style={{
-                            backgroundColor: '#2A4DD0',
-                            color: 'white',
-                            transition: 'none',
-                            transform: 'none'
-                        }}
+                        className="h-9 text-white shadow-sm rounded-full bg-[#2A4DD0] hover:bg-[#2A4DD0]/90"
                         data-plan-button
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#2A4DD0';
-                            e.currentTarget.style.color = 'white';
-                            e.currentTarget.style.transform = 'none';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#2A4DD0';
-                            e.currentTarget.style.color = 'white';
-                            e.currentTarget.style.transform = 'none';
-                        }}
                     >
                         <Plus className="w-5 h-5 mr-2" />
                         <MixedText text="新建计划" />
@@ -465,11 +449,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                             }}
                                                                             variant="outline"
                                                                             size="icon"
-                                                                            className="h-8 w-8 rounded-full"
-                                                                            style={{
-                                                                                backgroundColor: plan.isPinned ? '#f59e0b' : '#6b7280',
-                                                                                borderColor: plan.isPinned ? '#f59e0b' : '#6b7280'
-                                                                            }}
+                                                                            className={`h-8 w-8 rounded-full ${plan.isPinned
+                                                                                    ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                    : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                }`}
                                                                         >
                                                                             {plan.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
                                                                         </Button>
@@ -484,8 +467,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                             onClick={() => handleOpenForm(plan)}
                                                                             variant="outline"
                                                                             size="icon"
-                                                                            className="h-8 w-8 rounded-full"
-                                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                                         >
                                                                             <Edit className="w-4 h-4 text-white" />
                                                                         </Button>
@@ -623,7 +605,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                         </p>
                                         <Button
                                             onClick={() => handleOpenForm()}
-                                            className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90 dark:bg-[#1d4ed8] dark:hover:bg-[#1d4ed8]/90 dark:text-white"
+                                            className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
                                             variant="default"
                                         >
                                             <Plus className="w-5 h-5 mr-2" />
@@ -659,9 +641,8 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                             onClick={handleBulkEdit}
                                                             variant="outline"
                                                             size="icon"
-                                                            className="h-8 w-8 rounded-full"
+                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                             disabled={selectedPlans.size === 0}
-                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                         >
                                                             <Edit className="w-4 h-4 text-white" />
                                                         </Button>
@@ -748,11 +729,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                                                     }}
                                                                                                     variant="outline"
                                                                                                     size="icon"
-                                                                                                    className="h-6 w-6 rounded-full"
-                                                                                                    style={{
-                                                                                                        backgroundColor: plan.isPinned ? '#f59e0b' : '#6b7280',
-                                                                                                        borderColor: plan.isPinned ? '#f59e0b' : '#6b7280'
-                                                                                                    }}
+                                                                                                    className={`h-6 w-6 rounded-full ${plan.isPinned
+                                                                                                            ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                                            : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                                        }`}
                                                                                                 >
                                                                                                     {plan.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
                                                                                                 </Button>
@@ -964,8 +944,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto rounded-full"
-                                style={{ backgroundColor: '#324CC8' }}
+                                className="w-full sm:w-auto rounded-full bg-[#324CC8] hover:bg-[#324CC8]/90"
                             >
                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                             </Button>

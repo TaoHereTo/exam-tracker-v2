@@ -551,7 +551,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 px-6 rounded-full font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90 dark:bg-[#db2777] dark:hover:bg-[#db2777]/90 dark:text-white"
+                        className="h-9 px-6 rounded-full font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
                         variant="default"
                     >
                         <Plus className="w-5 h-5 mr-2" />
@@ -603,7 +603,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </p>
                                         <Button
                                             onClick={() => handleOpenForm()}
-                                            className="h-10 px-6 rounded-md font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90 dark:bg-[#db2777] dark:hover:bg-[#db2777]/90 dark:text-white"
+                                            className="h-10 px-6 rounded-md font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
                                             variant="default"
                                         >
                                             <Plus className="w-5 h-5 mr-2" />
@@ -639,9 +639,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                             onClick={handleBulkEdit}
                                                             variant="outline"
                                                             size="icon"
-                                                            className="h-8 w-8 rounded-full"
+                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                             disabled={selectedCountdowns.size === 0}
-                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
                                                         >
                                                             <Edit className="w-4 h-4 text-white" />
                                                         </Button>
@@ -726,11 +725,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                                                     }}
                                                                                                     variant="outline"
                                                                                                     size="icon"
-                                                                                                    className="h-6 w-6 rounded-full"
-                                                                                                    style={{
-                                                                                                        backgroundColor: countdown.isPinned ? '#f59e0b' : '#6b7280',
-                                                                                                        borderColor: countdown.isPinned ? '#f59e0b' : '#6b7280'
-                                                                                                    }}
+                                                                                                    className={`h-6 w-6 rounded-full ${countdown.isPinned
+                                                                                                            ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                                            : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                                        }`}
                                                                                                 >
                                                                                                     {countdown.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
                                                                                                 </Button>
@@ -963,8 +961,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto rounded-full"
-                                style={{ backgroundColor: '#db2777' }}
+                                className="w-full sm:w-auto rounded-full bg-[#db2777] hover:bg-[#db2777]/90"
                             >
                                 {editId ? <MixedText text="更新" /> : <MixedText text="添加倒计时" />}
                             </Button>

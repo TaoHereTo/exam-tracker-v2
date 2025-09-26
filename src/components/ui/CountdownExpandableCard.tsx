@@ -148,7 +148,7 @@ export default function CountdownExpandableCard({
                                                                 onEdit?.(active);
                                                                 setActive(null);
                                                             }}
-                                                            style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                                            className="bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                         >
                                                             <Edit className="w-4 h-4 text-white" />
                                                         </Button>
@@ -270,7 +270,7 @@ export default function CountdownExpandableCard({
                                                             e.stopPropagation();
                                                             onEdit?.(countdown);
                                                         }}
-                                                        style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                                        className="bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                                     >
                                                         <Edit className="w-4 h-4 text-white" />
                                                     </motion.button>

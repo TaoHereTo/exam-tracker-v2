@@ -667,11 +667,6 @@ function DateRangePicker({
               disabled && "opacity-50 cursor-not-allowed"
             )}
             disabled={disabled}
-            style={{
-              transition: 'none',
-              transform: 'none',
-              boxShadow: 'none'
-            }}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {dateRange?.from ? (

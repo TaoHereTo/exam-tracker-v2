@@ -528,8 +528,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         disabled={editDisabled}
                                         variant="outline"
                                         size="icon"
-                                        className="h-9 w-9"
-                                        style={{ backgroundColor: '#2C9678', borderColor: '#2C9678' }}
+                                        className="h-9 w-9 bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
                                     >
                                         <Edit className="w-5 h-5 text-white" />
                                     </Button>
