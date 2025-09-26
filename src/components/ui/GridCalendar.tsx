@@ -83,7 +83,7 @@ function YearPicker({
                         className="h-8 text-sm px-2"
                         onClick={() => {
                             onYearSelect(year)
-                            onClose()
+                            // 不自动关闭，让用户可以继续选择
                         }}
                     >
                         {year}
@@ -162,7 +162,7 @@ function CustomCalendar({
 
     const handleYearSelect = (year: number) => {
         setCurrentYear(year)
-        setShowYearPicker(false)
+        // 不自动关闭年份选择器，让用户可以继续选择
     }
 
     const handleMonthSelect = (monthIndex: number) => {
@@ -262,8 +262,9 @@ function CustomCalendar({
                         setCurrentMonthIndex(date.getMonth())
                     }}
                     locale={zhCN}
-                    themeColor={themeColor}
                     page={page}
+                    captionLayout="label"
+                    showCustomHeader={false}
                 />
             </div>
         </div>
@@ -316,8 +317,9 @@ function CustomDateRangePicker({
                     onSelect={onDateRangeChange}
                     numberOfMonths={2}
                     locale={zhCN}
-                    themeColor={themeColor}
                     page={page}
+                    captionLayout="label"
+                    showCustomHeader={false}
                 />
             </PopoverContent>
         </Popover>

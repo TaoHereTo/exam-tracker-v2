@@ -139,7 +139,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                 >
                     <Calendar
                         mode="single"
-                        captionLayout="dropdown"
+                        captionLayout="label"
                         month={currentMonth}
                         onMonthChange={setCurrentMonth}
                         selected={date}
@@ -159,6 +159,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                         initialFocus={false}
                         locale={zhCN}
                         page="new-record"
+                        showCustomHeader={true}
                     />
                 </PopoverContent>
             </Popover>
