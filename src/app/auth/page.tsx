@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar } from '@/components/ui/calendar'
+import { CustomCalendar } from '@/components/ui/GridCalendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TimePicker } from '@/components/ui/TimePicker'
 import { MODULES } from '@/config/exam'
@@ -122,17 +122,7 @@ function AuthPageContent() {
                                                 </div>
                                                 <div>
                                                     <Label className="text-sm">日期</Label>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <button className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-9 bg-white dark:bg-[#303030] mt-1">
-                                                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                                                <span className="text-gray-400 dark:text-gray-500 text-sm">选择日期</span>
-                                                            </button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0" align="start">
-                                                            <Calendar mode="single" captionLayout="dropdown" selected={new Date()} onSelect={() => { }} initialFocus={false} locale={zhCN} />
-                                                        </PopoverContent>
-                                                    </Popover>
+                                                    <CustomCalendar selected={new Date()} onSelect={() => { }} themeColor="#0d9488" />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>

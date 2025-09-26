@@ -17,7 +17,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { generateUUID } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar"; // Use existing calendar component
+import { CustomCalendar } from "@/components/ui/GridCalendar"; // Use new grid calendar component
 import { cn } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
@@ -846,11 +846,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         align="start"
                                         onInteractOutside={() => setDateOpen(false)}
                                     >
-                                        <Calendar
-                                            mode="single"
-                                            captionLayout="dropdown"
-                                            month={currentMonth}
-                                            onMonthChange={setCurrentMonth}
+                                        <CustomCalendar
                                             selected={date}
                                             onSelect={(d) => {
                                                 setDate(d);
@@ -870,9 +866,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 // Close popover after selection
                                                 setDateOpen(false);
                                             }}
-                                            initialFocus={false}
-                                            locale={zhCN}
-                                            className="p-3"
+                                            themeColor="#15803d"
                                         />
                                     </PopoverContent>
                                 </Popover>

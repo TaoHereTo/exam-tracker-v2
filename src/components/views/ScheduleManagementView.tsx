@@ -16,7 +16,7 @@ import { MixedText } from "@/components/ui/MixedText";
 import { Plus, Edit, Trash2, Clock, Target, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { CustomDateRangePicker } from "@/components/ui/GridCalendar";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
 import { format } from "date-fns";
@@ -1091,11 +1091,11 @@ export default function ScheduleManagementView({
                                         {form.type === 'plan' ? (
                                             <div className="space-y-2">
                                                 <FormField label={<MixedText text="计划时间范围" />}>
-                                                    <DateRangePicker
+                                                    <CustomDateRangePicker
                                                         dateRange={dateRange}
                                                         onDateRangeChange={handleDateRangeChange}
                                                         placeholder="选择开始和结束日期"
-                                                        error={!!errors.start || !!errors.end}
+                                                        themeColor="#8b5cf6"
                                                     />
                                                 </FormField>
                                                 <FormError error={errors.start || errors.end} />

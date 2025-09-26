@@ -16,7 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { HoverCard, HoverCardContent, HoverCardTrigger, HoverCardPortal } from "@/components/animate-ui/components/radix/hover-card";
 import { AnimatePresence, motion } from "motion/react";
 
-import { DateRangePicker } from "@/components/ui/DateRangePicker";
+import { CustomDateRangePicker } from "@/components/ui/GridCalendar";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";
@@ -395,19 +395,19 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                         onClick={() => handleOpenForm()}
                         className="h-9 text-white shadow-sm rounded-full"
                         style={{
-                            backgroundColor: '#1d4ed8',
+                            backgroundColor: '#2A4DD0',
                             color: 'white',
                             transition: 'none',
                             transform: 'none'
                         }}
                         data-plan-button
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.backgroundColor = '#2A4DD0';
                             e.currentTarget.style.color = 'white';
                             e.currentTarget.style.transform = 'none';
                         }}
                         onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = '#1d4ed8';
+                            e.currentTarget.style.backgroundColor = '#2A4DD0';
                             e.currentTarget.style.color = 'white';
                             e.currentTarget.style.transform = 'none';
                         }}
@@ -847,11 +847,11 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
 
                         <div className="space-y-2">
                             <FormField label={<MixedText text="计划时间范围" />}>
-                                <DateRangePicker
+                                <CustomDateRangePicker
                                     dateRange={dateRange}
                                     onDateRangeChange={handleDateRangeChange}
                                     placeholder="选择开始和结束日期"
-                                    error={!!errors.startDate || !!errors.endDate}
+                                    themeColor="#2A4DD0"
                                 />
                             </FormField>
                             <FormError error={errors.startDate || errors.endDate} />
