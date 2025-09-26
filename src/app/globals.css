@@ -193,14 +193,7 @@ main,
   overflow-x: hidden !important;
 }
 
-/* 确保卡片组件有足够高的z-index，不被背景遮挡 */
-.card,
-[data-card],
-.border-beam-card,
-.magic-card {
-  position: relative !important;
-  z-index: 50 !important;
-}
+/* 卡片组件 z-index 已移至组件内部定义 */
 
 /* Marquee动画 - 统一定义 */
 @keyframes marquee {
@@ -322,10 +315,7 @@ h6 .mixed-text-part {
     margin: 1rem !important;
   }
 
-  /* 移动端表单优化 */
-  .form-grid-2 {
-    grid-template-columns: 1fr !important;
-  }
+  /* 移动端表单优化 - 移至组件内部 */
 
   /* 移动端按钮组优化 */
   .button-group {
@@ -333,10 +323,7 @@ h6 .mixed-text-part {
     gap: 0.5rem !important;
   }
 
-  /* 移动端卡片间距优化 */
-  .card-container {
-    padding: 0.5rem !important;
-  }
+  /* 移动端卡片间距优化 - 移至组件内部 */
 
   /* 移动端文本大小优化 */
   .text-responsive {
@@ -600,7 +587,7 @@ h6 .mixed-text-part {
   border-color: var(--input-border);
 }
 
-/* ========== 统一的表单/卡片布局工具类 ========== */
+/* ========== 表单布局工具类 ========== */
 @layer utilities {
 
   /* 整体纵向栈 */
@@ -634,6 +621,13 @@ h6 .mixed-text-part {
   /* 操作按钮区域 */
   .form-actions {
     margin-top: 0.5rem;
+  }
+
+  /* 移动端表单优化 */
+  @media (max-width: 640px) {
+    .form-grid-2 {
+      grid-template-columns: 1fr !important;
+    }
   }
 }
 
@@ -1345,35 +1339,7 @@ select,
   -webkit-caret-color: auto !important;
 }
 
-/* 确保表单容器不会影响输入框光标 */
-.form-field,
-.form-stack,
-.input-container,
-[data-slot="form-field"],
-[data-slot="form-stack"] {
-  caret-color: transparent !important;
-  -webkit-caret-color: transparent !important;
-}
-
-/* 但确保这些容器内的输入框保持正常光标 */
-.form-field input,
-.form-field textarea,
-.form-field select,
-.form-stack input,
-.form-stack textarea,
-.form-stack select,
-.input-container input,
-.input-container textarea,
-.input-container select,
-[data-slot="form-field"] input,
-[data-slot="form-field"] textarea,
-[data-slot="form-field"] select,
-[data-slot="form-stack"] input,
-[data-slot="form-stack"] textarea,
-[data-slot="form-stack"] select {
-  caret-color: auto !important;
-  -webkit-caret-color: auto !important;
-}
+/* 表单容器光标控制已移至组件内部 */
 
 /* 禁用表格单元格的焦点状态 */
 table td:focus,
@@ -1382,7 +1348,6 @@ table th:focus {
   caret-color: transparent !important;
   -webkit-caret-color: transparent !important;
 }
-
 
 /* 禁用卡片和容器中的光标 */
 .card,
@@ -1421,7 +1386,6 @@ main:not([contenteditable="true"]) {
   -webkit-caret-color: transparent !important;
 }
 
-
 /* 禁用焦点状态的光标 */
 *:focus:not(input):not(textarea):not(select):not([contenteditable="true"]) {
   caret-color: transparent !important;
@@ -1429,7 +1393,7 @@ main:not([contenteditable="true"]) {
   outline: none !important;
 }
 
-/* 输入框高亮效果 */
+/* 输入框基础样式 - 保留必要的全局样式 */
 .shadow-input {
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
 }
@@ -1438,26 +1402,7 @@ main:not([contenteditable="true"]) {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-/* 输入框悬停和焦点效果 */
-input:hover {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.dark input:hover {
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.4), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
-input:focus {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease-in-out;
-}
-
-.dark input:focus {
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.6), 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
-/* Rainbow button animation - 已在上方统一定义 */
+/* Rainbow button animation - 已移至 RainbowButton 组件 */
 
 /* ========== 侧边栏样式 ========== */
 /* 修正sonner提示框深色模式下主内容颜色 */
@@ -2036,28 +1981,13 @@ body.eye-care.dark .text-muted-foreground,
 /* destructive 按钮样式 */
 /* Button component now handles all styling, removing global overrides */
 
-/* 禁用特定组件的 Hover 效果 */
-[data-plan-button]:hover,
-[data-plan-button]:focus,
-[data-plan-button]:active,
-[data-plan-button]:focus-visible {
-  transform: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-  transition: none !important;
-}
-
+/* 禁用特定组件的 Hover 效果 - 移动到组件内部 */
 
 .transition-colors {
   transition-duration: 1ms !important;
 }
 
-/* 卡片保持优雅的过渡效果 */
-[data-slot="card"],
-.card,
-.shadow-md {
-  transition: none !important;
-}
+/* 卡片过渡效果已移至组件内部定义 */
 
 /* Switch 组件保持原有过渡效果 */
 /* Switch component now handles all styling, removing global overrides */
@@ -2355,8 +2285,6 @@ body.eye-care.dark .text-muted-foreground,
   z-index: -1;
 }
 
-
-
 /* 通用日历样式 - 使用CSS变量，优先级更高 */
 .calendar-container [data-selected-single="true"] {
   background-color: var(--calendar-theme-color) !important;
@@ -2384,4 +2312,8 @@ body.eye-care.dark .text-muted-foreground,
 .calendar-container button[data-range-middle="true"] span,
 .calendar-container button[data-range-middle="true"] * {
   color: var(--calendar-theme-color) !important;
+}
+::view-transition-old(root), ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
 }
