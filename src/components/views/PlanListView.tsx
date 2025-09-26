@@ -851,7 +851,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                     dateRange={dateRange}
                                     onDateRangeChange={handleDateRangeChange}
                                     placeholder="选择开始和结束日期"
-                                    themeColor="#324CC8"
+                                    page="study-plan"
                                 />
                             </FormField>
                             <FormError error={errors.startDate || errors.endDate} />

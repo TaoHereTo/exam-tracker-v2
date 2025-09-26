@@ -20,16 +20,40 @@ function Calendar({
   formatters,
   components,
   themeColor = "#0d9488",
+  page = "default",
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
   themeColor?: string
+  page?: string
 }) {
   const defaultClassNames = getDefaultClassNames()
 
+  // 根据页面自动选择颜色
+  const getPageColor = (page: string) => {
+    const pageColors: Record<string, string> = {
+      'new-record': '#347659',
+      'study-plan': '#324CC8',
+      'countdown': '#db2777',
+      'schedule': '#845EEE',
+      'knowledge': '#253985',
+      'history': '#253985',
+      'default': '#0d9488'
+    };
+    return pageColors[page] || themeColor;
+  };
+
+  const finalThemeColor = getPageColor(page);
+
 
   return (
-    <div className="calendar-container">
+    <div
+      className="calendar-container"
+      style={{
+        '--calendar-theme-color': finalThemeColor,
+        '--calendar-theme-color-light': `${finalThemeColor}4D`
+      } as React.CSSProperties}
+    >
       <DayPicker
         showOutsideDays={showOutsideDays}
         className={cn(
@@ -160,7 +184,7 @@ function Calendar({
               <ChevronDownIcon className={cn("size-4", className)} {...props} />
             )
           },
-          DayButton: (props) => <CalendarDayButton {...props} themeColor={themeColor} />,
+          DayButton: (props) => <CalendarDayButton {...props} themeColor={finalThemeColor} />,
           WeekNumber: ({ children, ...props }) => {
             return (
               <td {...props}>

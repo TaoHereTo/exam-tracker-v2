@@ -866,7 +866,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 // Close popover after selection
                                                 setDateOpen(false);
                                             }}
-                                            themeColor="#db2777"
+                                            page="countdown"
                                         />
                                     </PopoverContent>
                                 </Popover>

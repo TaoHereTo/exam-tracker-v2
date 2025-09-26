@@ -147,11 +147,13 @@ function MonthPicker({
 function CustomCalendar({
     selected,
     onSelect,
-    themeColor = '#65a30d'
+    themeColor = '#65a30d',
+    page
 }: {
     selected?: Date
     onSelect?: (date: Date | undefined) => void
     themeColor?: string
+    page?: string
 }) {
     const [currentYear, setCurrentYear] = useState(selected?.getFullYear() || new Date().getFullYear())
     const [currentMonthIndex, setCurrentMonthIndex] = useState(selected?.getMonth() || new Date().getMonth())
@@ -261,6 +263,7 @@ function CustomCalendar({
                     }}
                     locale={zhCN}
                     themeColor={themeColor}
+                    page={page}
                 />
             </div>
         </div>
@@ -272,12 +275,14 @@ function CustomDateRangePicker({
     dateRange,
     onDateRangeChange,
     placeholder = "选择日期范围",
-    themeColor = '#65a30d'
+    themeColor = '#65a30d',
+    page
 }: {
     dateRange?: DateRange
     onDateRangeChange?: (range: DateRange | undefined) => void
     placeholder?: string
     themeColor?: string
+    page?: string
 }) {
 
     return (
@@ -312,6 +317,7 @@ function CustomDateRangePicker({
                     numberOfMonths={2}
                     locale={zhCN}
                     themeColor={themeColor}
+                    page={page}
                 />
             </PopoverContent>
         </Popover>

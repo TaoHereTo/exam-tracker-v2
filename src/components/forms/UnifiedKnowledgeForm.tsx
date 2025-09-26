@@ -186,7 +186,7 @@ function DateField() {
           onSelect={handleDateSelect}
           initialFocus={false}
           locale={zhCN}
-          themeColor="#253985"
+          page="knowledge"
         />
       </PopoverContent>
     </Popover>
