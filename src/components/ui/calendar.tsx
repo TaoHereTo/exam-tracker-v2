@@ -291,7 +291,7 @@ function Calendar({
           <div className="flex items-center gap-0 h-10">
             <Popover open={showYearPicker} onOpenChange={setShowYearPicker}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center hover:bg-accent hover:text-accent-foreground">
+                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center">
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
@@ -307,7 +307,7 @@ function Calendar({
 
             <Popover open={showMonthPicker} onOpenChange={setShowMonthPicker}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center hover:bg-accent hover:text-accent-foreground">
+                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center">
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
@@ -430,7 +430,7 @@ function Calendar({
           range_middle: cn("rounded-none", defaultClassNames.range_middle),
           range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
           today: cn(
-            "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+            "data-[selected=true]:rounded-none",
             defaultClassNames.today
           ),
           outside: cn(
@@ -522,6 +522,15 @@ function CalendarDayButton({
     }
   }, [modifiers.range_middle, themeColor]);
 
+  // 调试today修饰符
+  React.useLayoutEffect(() => {
+    if (modifiers.today && ref.current) {
+      console.log('Today modifier detected:', modifiers.today);
+      ref.current.style.backgroundColor = '#f1f5f9';
+      ref.current.style.color = '#0f172a';
+    }
+  }, [modifiers.today]);
+
 
 
 
@@ -531,7 +540,7 @@ function CalendarDayButton({
     <Button
       ref={ref}
       variant="ghost"
-      size="icon"
+      size="sm"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={
         modifiers.selected &&
@@ -543,7 +552,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
+        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70 h-8 px-2 py-1",
         // 为中间日期添加特殊的类名
         modifiers.range_middle && `range-middle-${themeColor.replace('#', '')}`,
         defaultClassNames.day,
@@ -566,6 +575,10 @@ function CalendarDayButton({
         ...(modifiers.range_end && {
           backgroundColor: themeColor,
           color: 'white'
+        }),
+        ...(modifiers.today && {
+          backgroundColor: '#f1f5f9',
+          color: '#0f172a'
         })
       } as React.CSSProperties}
       {...props}
@@ -648,7 +661,7 @@ function DateRangePicker({
             id="date"
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal h-10",
+              "w-full justify-start text-left font-normal h-10 dark:bg-[#303030]",
               !dateRange && "text-muted-foreground",
               error && "border-destructive ring-destructive/20",
               disabled && "opacity-50 cursor-not-allowed"
@@ -709,7 +722,7 @@ function DateRangePicker({
               themeColor={themeColor}
               page={page}
               captionLayout="label"
-              showCustomHeader={false}
+              showCustomHeader={true}
             />
           </div>
         </PopoverContent>
