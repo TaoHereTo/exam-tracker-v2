@@ -116,7 +116,7 @@ main,
   overflow-x: hidden !important;
 }
 
-/* 卡片组件 z-index 已移至组件内部定义 */
+/* 卡片样式统一在组件中定义 */
 
 /* Marquee动画 - 统一定义 */
 @keyframes marquee {
@@ -153,9 +153,7 @@ main,
   animation-play-state: paused;
 }
 
-/* 字体类已优化，移除重复定义，使用全局设置 */
-
-/* MixedText 组件样式 - 已统一到上方的工具类 */
+/* 字体样式已统一到全局设置和工具类 */
 
 /* 表格标题字体粗细设置 */
 th {
@@ -188,15 +186,8 @@ h6 .mixed-text-part {
   z-index: 1;
 }
 
-/* ========== 按钮间距系统 ========== */
-/* 按钮间距已统一使用CSS变量系统 */
-
-/* ========== 日历样式修复 ========== */
-/* 使用最高优先级的选择器强制覆盖所有日历样式 */
-
-/* Calendar component now handles all styling, removing global overrides */
-
-/* 其余按钮间距样式已移除，统一使用CSS变量系统 */
+/* ========== 日历和按钮样式 ========== */
+/* 日历和按钮样式已统一到组件内部 */
 
 /* ========== 移动端优化 ========== */
 /* 确保表格在移动端可以水平滚动 */
@@ -231,15 +222,11 @@ h6 .mixed-text-part {
     margin: 1rem !important;
   }
 
-  /* 移动端表单优化 - 移至组件内部 */
-
   /* 移动端按钮组优化 */
   .button-group {
     flex-direction: column !important;
     gap: 0.5rem !important;
   }
-
-  /* 移动端卡片间距优化 - 移至组件内部 */
 
   /* 移动端文本大小优化 */
   .text-responsive {
@@ -254,7 +241,6 @@ h6 .mixed-text-part {
 }
 
 /* ========== 动画优化 ========== */
-/* 移除未使用的shimmer动画，保留必要的动画效果 */
 
 /* ========== 主题配置 ========== */
 @theme inline {
@@ -298,7 +284,9 @@ h6 .mixed-text-part {
 
   --animate-rainbow: rainbow var(--speed, 2s) infinite linear;
 
-  /* 彩虹色变量已在上方定义，这里移除重复 */
+  /* 动画变量定义 */
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 
   @keyframes rainbow {
     0% {
@@ -310,21 +298,12 @@ h6 .mixed-text-part {
     }
   }
 
-  --animate-marquee: marquee var(--duration) infinite linear;
-
-  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
-
-  --color-color-5: var(--color-5);
-
-  --color-color-4: var(--color-4);
-
-  --color-color-3: var(--color-3);
-
-  --color-color-2: var(--color-2);
-
+  /* 彩虹颜色别名 - 保持向后兼容 */
   --color-color-1: var(--color-1);
-
-  /* marquee和rainbow动画已在上方统一定义 */
+  --color-color-2: var(--color-2);
+  --color-color-3: var(--color-3);
+  --color-color-4: var(--color-4);
+  --color-color-5: var(--color-5);
 }
 
 /* ========== 颜色变量 ========== */
@@ -410,10 +389,14 @@ h6 .mixed-text-part {
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
 
+  /* 表单输入样式变量 */
+  --placeholder-color: #9CA3AF;
+  --placeholder-color-dark: #6B7280;
+
   /* 高DPI字体渲染变量 - 已统一到字体渲染系统 */
 }
 
-/* 按钮样式已移至组件中，移除重复的全局样式定义 */
+/* 按钮样式统一在组件中定义 */
 
 .dark {
   --background: #161618;
@@ -461,6 +444,9 @@ h6 .mixed-text-part {
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
+
+  /* 深色模式下的表单输入样式变量 */
+  --placeholder-color: var(--placeholder-color-dark);
 }
 
 /* ========== 基础样式 ========== */
@@ -473,32 +459,15 @@ h6 .mixed-text-part {
     @apply bg-background text-foreground;
   }
 
-  /* 统一所有placeholder颜色 - 浅灰色（浅色模式）和浅灰色（深色模式） */
+  /* 统一所有placeholder颜色 - 使用CSS变量 */
   input::placeholder,
   textarea::placeholder,
-  select::placeholder {
-    color: #9CA3AF !important;
-  }
-
-  .dark input::placeholder,
-  .dark textarea::placeholder,
-  .dark select::placeholder {
-    color: #6B7280 !important;
-  }
-
-  /* 统一所有组件的占位符颜色 - 浅灰色（浅色模式）和浅灰色（深色模式） */
+  select::placeholder,
   [data-radix-select-trigger][data-placeholder] span,
   [data-radix-select-value][data-placeholder] span,
   .time-picker-trigger span,
   [data-slot="button"][variant="outline"] span {
-    color: #9CA3AF !important;
-  }
-
-  .dark [data-radix-select-trigger][data-placeholder] span,
-  .dark [data-radix-select-value][data-placeholder] span,
-  .dark .time-picker-trigger span,
-  .dark [data-slot="button"][variant="outline"] span {
-    color: #6B7280 !important;
+    color: var(--placeholder-color) !important;
   }
 }
 
@@ -606,7 +575,7 @@ html {
   }
 }
 
-/* 移除重复的动画定义，已在keyframes中定义 */
+/* Toast动画样式 */
 
 /* 在主题切换动画期间暂时禁用某些过渡效果 */
 ::view-transition-group(root) * {
@@ -1664,8 +1633,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   padding-right: 1rem !important;
 }
 
-/* 确保侧边栏底部用户信息区域不被遮挡 */
-/* Sidebar component now handles all styling, removing global overrides */
+/* 侧边栏底部用户信息区域样式 */
 
 [data-slot="sidebar-footer"]>div {
   display: flex !important;
@@ -1727,7 +1695,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
 }
 
 /* 侧边栏按钮样式 */
-/* 移除旧版自定义侧边栏样式（.sidebar-parent/.sidebar-child），统一使用 shadcn/ui Sidebar */
+/* 侧边栏样式已统一使用 shadcn/ui Sidebar 组件 */
 
 /* ========== 护眼模式 ========== */
 body.eye-care {
@@ -1786,27 +1754,14 @@ body.eye-care.dark .text-muted-foreground,
   color: #b0a98b !important;
 }
 
-/* ========== Checkbox 动效 ========== */
-/* Checkbox component now handles all styling, removing global overrides */
-
 /* ========== 响应式设计优化 ========== */
 
-/* Dark mode border color for dropdown menus */
-/* DropdownMenu component now handles all styling, removing global overrides */
-
-/* destructive 按钮样式 */
-/* Button component now handles all styling, removing global overrides */
-
-/* 禁用特定组件的 Hover 效果 - 移动到组件内部 */
-
-.transition-colors {
+/* 禁用过渡效果 - 性能优化 */
+.no-transition {
   transition-duration: 1ms !important;
 }
 
-/* 卡片过渡效果已移至组件内部定义 */
-
-/* Switch 组件保持原有过渡效果 */
-/* Switch component now handles all styling, removing global overrides */
+/* 组件特定样式已移至组件内部定义 */
 
 /* 固定页面标题样式 */
 .page-title-sticky {

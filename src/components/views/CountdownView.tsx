@@ -726,8 +726,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                                                     variant="outline"
                                                                                                     size="icon"
                                                                                                     className={`h-6 w-6 rounded-full ${countdown.isPinned
-                                                                                                            ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
-                                                                                                            : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                                        ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                                        : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
                                                                                                         }`}
                                                                                                 >
                                                                                                     {countdown.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
@@ -867,7 +867,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                             }}
                                             page="countdown"
                                             captionLayout="label"
-                                            showCustomHeader={false}
+                                            showCustomHeader={true}
+                                            locale={zhCN}
                                         />
                                     </PopoverContent>
                                 </Popover>
