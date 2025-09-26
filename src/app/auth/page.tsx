@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { CustomCalendar } from '@/components/ui/GridCalendar'
+import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { TimePicker } from '@/components/ui/TimePicker'
 import { MODULES } from '@/config/exam'
@@ -122,7 +122,14 @@ function AuthPageContent() {
                                                 </div>
                                                 <div>
                                                     <Label className="text-sm">日期</Label>
-                                                    <CustomCalendar selected={new Date()} onSelect={() => { }} themeColor="#0d9488" />
+                                                    <Calendar
+                                                        mode="single"
+                                                        selected={new Date()}
+                                                        onSelect={() => { }}
+                                                        page="default"
+                                                        captionLayout="label"
+                                                        showCustomHeader={true}
+                                                    />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-3">
                                                     <div>

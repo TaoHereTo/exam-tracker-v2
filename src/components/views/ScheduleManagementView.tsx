@@ -16,7 +16,7 @@ import { MixedText } from "@/components/ui/MixedText";
 import { Plus, Edit, Trash2, Clock, Target, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Calendar as DatePicker } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CustomDateRangePicker } from "@/components/ui/GridCalendar";
+import { CustomDateRangePicker } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
 import { format } from "date-fns";

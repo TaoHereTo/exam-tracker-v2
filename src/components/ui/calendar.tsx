@@ -7,10 +7,15 @@ import {
   ChevronRightIcon,
 } from "lucide-react"
 import { DayButton, DayPicker, getDefaultClassNames } from "react-day-picker"
+import { format } from "date-fns"
+import { zhCN } from "date-fns/locale"
+import { Calendar as CalendarIcon } from "lucide-react"
+import { DateRange } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { MixedText } from "./MixedText"
 
 // 年份选择器组件
 function YearPicker({
@@ -159,12 +164,14 @@ function Calendar({
   themeColor = "#0d9488",
   page = "default",
   showCustomHeader = true,
+  numberOfMonths,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
   themeColor?: string
   page?: string
   showCustomHeader?: boolean
+  numberOfMonths?: number
 }) {
   const defaultClassNames = getDefaultClassNames()
 
@@ -254,6 +261,12 @@ function Calendar({
 
   const currentDate = new Date(currentYear, currentMonthIndex, 1)
 
+  // 智能月份数量配置 - 根据模式决定
+  const responsiveNumberOfMonths = numberOfMonths ||
+    (props.mode === 'range'
+      ? (typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 2)
+      : 1) // 单日期模式始终显示1个月
+
   return (
     <div
       className="calendar-container"
@@ -340,6 +353,7 @@ function Calendar({
           className
         )}
         captionLayout="label"
+        numberOfMonths={responsiveNumberOfMonths}
         formatters={{
           formatMonthDropdown: (date) =>
             date.toLocaleString("default", { month: "short" }),
@@ -529,7 +543,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-lg data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-lg flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-lg data-[range-end=true]:rounded-r-lg data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-lg data-[range-start=true]:rounded-l-lg [&>span]:text-xs [&>span]:opacity-70",
+        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70",
         // 为中间日期添加特殊的类名
         modifiers.range_middle && `range-middle-${themeColor.replace('#', '')}`,
         defaultClassNames.day,
@@ -559,4 +573,152 @@ function CalendarDayButton({
   )
 }
 
-export { Calendar, CalendarDayButton }
+// 增强的日期范围选择器组件
+function DateRangePicker({
+  dateRange,
+  onDateRangeChange,
+  placeholder = "选择日期范围",
+  className,
+  disabled = false,
+  error = false,
+  themeColor = "#0d9488",
+  page = "default"
+}: {
+  dateRange?: DateRange
+  onDateRangeChange?: (range: DateRange | undefined) => void
+  placeholder?: string
+  className?: string
+  disabled?: boolean
+  error?: boolean
+  themeColor?: string
+  page?: string
+}) {
+  const [open, setOpen] = React.useState(false)
+
+  // 智能月份对齐 - 根据选择的日期自动调整月份显示
+  const [currentMonth, setCurrentMonth] = React.useState<Date | undefined>(() => {
+    if (dateRange?.from) return dateRange.from
+    if (dateRange?.to) return dateRange.to
+    return new Date()
+  })
+
+  const fromTimestamp = dateRange?.from?.getTime();
+  const toTimestamp = dateRange?.to?.getTime();
+
+  React.useEffect(() => {
+    // 当外部日期变化时，对齐月份到起始日期
+    if (dateRange?.from) setCurrentMonth(dateRange.from)
+    else if (dateRange?.to) setCurrentMonth(dateRange.to)
+  }, [dateRange?.from, dateRange?.to, fromTimestamp, toTimestamp])
+
+  const handleSelect = React.useCallback(
+    (range: DateRange | undefined) => {
+      // 更新月份到起始日期以保持正确的视图
+      if (range?.from) setCurrentMonth(range.from)
+      else if (range?.to) setCurrentMonth(range.to)
+      onDateRangeChange?.(range)
+    },
+    [onDateRangeChange]
+  )
+
+  const handleOpenChange = React.useCallback((nextOpen: boolean) => {
+    if (nextOpen) {
+      // 打开时，对齐月份到起始日期
+      if (dateRange?.from) setCurrentMonth(dateRange.from)
+      else if (dateRange?.to) setCurrentMonth(dateRange.to)
+    }
+    setOpen(nextOpen)
+  }, [dateRange?.from, dateRange?.to])
+
+  // 防止弹窗在交互日历元素时关闭
+  const handleCalendarInteraction = (e: React.MouseEvent | React.PointerEvent) => {
+    e.stopPropagation()
+  }
+
+  // 处理月份/年份下拉变化而不关闭弹窗
+  const handleMonthChange = React.useCallback((month: Date) => {
+    setCurrentMonth(month)
+  }, [])
+
+  return (
+    <div className={cn("grid gap-2", className)}>
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <Button
+            id="date"
+            variant="outline"
+            className={cn(
+              "w-full justify-start text-left font-normal h-10",
+              !dateRange && "text-muted-foreground",
+              error && "border-destructive ring-destructive/20",
+              disabled && "opacity-50 cursor-not-allowed"
+            )}
+            disabled={disabled}
+            style={{
+              transition: 'none',
+              transform: 'none',
+              boxShadow: 'none'
+            }}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {dateRange?.from ? (
+              dateRange.to ? (
+                <>
+                  <MixedText text={format(dateRange.from, "yyyy-MM-dd")} />
+                  <MixedText text=" ~ " />
+                  <MixedText text={format(dateRange.to, "yyyy-MM-dd")} />
+                </>
+              ) : (
+                <MixedText text={format(dateRange.from, "yyyy-MM-dd")} />
+              )
+            ) : (
+              <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-auto p-0 text-black dark:text-white"
+          align="start"
+          onPointerDownOutside={(e) => {
+            // 防止在与下拉菜单交互时关闭
+            const target = e.target as HTMLElement
+            if (target.closest('.rdp-dropdown_root') || target.closest('.rdp-dropdown')) {
+              e.preventDefault()
+            }
+          }}
+          onInteractOutside={(e) => {
+            // 防止在与下拉菜单交互时关闭
+            const target = e.target as HTMLElement
+            if (target.closest('.rdp-dropdown_root') || target.closest('.rdp-dropdown')) {
+              e.preventDefault()
+            }
+          }}
+        >
+          <div
+            onClick={handleCalendarInteraction}
+            onPointerDown={handleCalendarInteraction}
+          >
+            <Calendar
+              initialFocus={false}
+              mode="range"
+              month={currentMonth}
+              onMonthChange={handleMonthChange}
+              selected={dateRange}
+              onSelect={handleSelect}
+              locale={zhCN}
+              themeColor={themeColor}
+              page={page}
+              captionLayout="label"
+              showCustomHeader={false}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  )
+}
+
+// 为了向后兼容，导出 CustomDateRangePicker 作为 DateRangePicker 的别名
+const CustomDateRangePicker = DateRangePicker
+
+export { Calendar, CalendarDayButton, DateRangePicker, CustomDateRangePicker }

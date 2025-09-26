@@ -16,7 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { HoverCard, HoverCardContent, HoverCardTrigger, HoverCardPortal } from "@/components/animate-ui/components/radix/hover-card";
 import { AnimatePresence, motion } from "motion/react";
 
-import { CustomDateRangePicker } from "@/components/ui/GridCalendar";
+import { CustomDateRangePicker } from "@/components/ui/calendar";
 import { DateRange } from "react-day-picker";
 import { generateUUID } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";

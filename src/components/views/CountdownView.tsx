@@ -17,7 +17,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { generateUUID } from "@/lib/utils";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CustomCalendar } from "@/components/ui/GridCalendar"; // Use new grid calendar component
+import { Calendar } from "@/components/ui/calendar"; // Use new grid calendar component
 import { cn } from "@/lib/utils";
 import { BorderBeamCard } from "@/components/magicui/border-beam-card";
 import toast from 'react-hot-toast';
@@ -846,7 +846,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         align="start"
                                         onInteractOutside={() => setDateOpen(false)}
                                     >
-                                        <CustomCalendar
+                                        <Calendar
+                                            mode="single"
                                             selected={date}
                                             onSelect={(d) => {
                                                 setDate(d);
@@ -867,6 +868,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 setDateOpen(false);
                                             }}
                                             page="countdown"
+                                            captionLayout="label"
+                                            showCustomHeader={false}
                                         />
                                     </PopoverContent>
                                 </Popover>
