@@ -459,6 +459,14 @@ h6 .mixed-text-part {
     @apply bg-background text-foreground;
   }
 
+  /* 优化输入框焦点效果 */
+  input:focus-visible,
+  textarea:focus-visible,
+  [data-slot="input"]:focus-visible,
+  [data-slot="textarea"]:focus-visible {
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
   /* 统一所有placeholder颜色 - 使用CSS变量 */
   input::placeholder,
   textarea::placeholder,
