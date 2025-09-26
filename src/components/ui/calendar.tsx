@@ -264,15 +264,15 @@ function Calendar({
     >
       {/* 自定义标题栏 - 只在 showCustomHeader 为 true 时显示 */}
       {showCustomHeader && (
-        <div className="flex items-center justify-between px-3 py-2 h-10">
+        <div className="flex items-center justify-between px-3 py-3 h-12">
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 w-10 p-0 flex items-center justify-center"
+            className="h-8 w-8 p-0 flex items-center justify-center rounded-md"
             onClick={() => navigateMonth('prev')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>‹</span>
+            <span className="text-lg leading-none" style={{ transform: 'translateY(-1px)' }}>‹</span>
           </Button>
 
           <div className="flex items-center gap-0 h-10">
@@ -312,11 +312,11 @@ function Calendar({
           <Button
             variant="ghost"
             size="sm"
-            className="h-10 w-10 p-0 flex items-center justify-center"
+            className="h-8 w-8 p-0 flex items-center justify-center rounded-md"
             onClick={() => navigateMonth('next')}
             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
-            <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>›</span>
+            <span className="text-lg leading-none" style={{ transform: 'translateY(-1px)' }}>›</span>
           </Button>
         </div>
       )}
