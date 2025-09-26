@@ -4,104 +4,91 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ========== 字体渲染优化 for 2K/高DPI 显示器 ========== */
-/* 添加字体平滑和抗锯齿优化 */
+/* ========== 字体渲染优化系统 ========== */
+/* 统一的字体渲染变量定义 */
+:root {
+  /* 基础字体渲染设置 */
+  --font-smoothing-webkit: antialiased;
+  --font-smoothing-moz: grayscale;
+  --text-rendering-base: optimizeLegibility;
+  --text-rendering-precise: geometricPrecision;
+
+  /* 字体特性设置 */
+  --font-features-basic: "liga" 1;
+  --font-features-advanced: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
+  --font-features-text: "kern" 1, "liga" 1;
+
+  /* 文本大小调整 */
+  --text-size-adjust: 100%;
+
+  /* 文本阴影增强 */
+  --text-shadow-enhance: 0 0 0.2px currentColor;
+  --text-shadow-enhance-strong: 0 0 0.3px currentColor;
+}
+
+/* 全局字体渲染优化 */
 * {
   font-family: '思源宋体', 'Times New Roman', serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  -webkit-text-size-adjust: 100%;
-  -moz-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
-  text-size-adjust: 100%;
-  font-feature-settings: "liga" 1;
-  /* 启用连字 */
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  -webkit-text-size-adjust: var(--text-size-adjust);
+  -moz-text-size-adjust: var(--text-size-adjust);
+  -ms-text-size-adjust: var(--text-size-adjust);
+  text-size-adjust: var(--text-size-adjust);
+  font-feature-settings: var(--font-features-basic);
 }
 
-/* 针对高DPI屏幕的媒体查询优化 */
+/* 高DPI和2K分辨率优化 */
 @media (-webkit-min-device-pixel-ratio: 1.25),
 (min-resolution: 120dpi) {
-  * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: "liga" 1;
-  }
-
-  /* 高DPI字体优化变量 */
   :root {
-    --font-smoothing: antialiased;
-    --text-rendering: optimizeLegibility;
+    --font-features-basic: var(--font-features-advanced);
   }
 }
 
-/* 针对2K及以上分辨率的优化 */
-@media (min-width: 2048px) {
-  * {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-    font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
-  }
+/* 字体渲染混合样式 - 使用CSS变量统一管理 */
 
-  /* 2K分辨率字体优化变量 */
-  :root {
-    --font-smoothing: antialiased;
-    --text-rendering: optimizeLegibility;
-    --font-feature-settings: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
-  }
-}
-
-/* 高DPI类 */
+/* 应用到具体元素 */
 .high-dpi {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
 }
 
-/* 优化中文字符在100%缩放下的清晰度 */
 .mixed-text-part {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
-  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-precise);
+  font-feature-settings: var(--font-features-text);
   font-weight: 400;
-  /* 添加轻微的文本阴影来增强细线的可见性 */
-  text-shadow: 0 0 0.2px currentColor;
+  text-shadow: var(--text-shadow-enhance);
 }
 
-/* 深色模式下的中文字符优化 */
+/* 深色模式下的字体渲染优化 */
 .dark .mixed-text-part {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: geometricPrecision;
-  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-precise);
+  font-feature-settings: var(--font-features-text);
   font-weight: 400;
-  /* 添加轻微的文本阴影来增强细线的可见性 */
-  text-shadow: 0 0 0.2px currentColor;
+  text-shadow: var(--text-shadow-enhance);
 }
 
 /* 特别优化包含横线的常见中文字符 */
-.mixed-text-part:contains("一"):not(.dark *),
-.mixed-text-part:contains("二"):not(.dark *),
-.mixed-text-part:contains("三"):not(.dark *) {
-  text-shadow: 0 0 0.3px currentColor;
-}
-
-.dark .mixed-text-part:contains("一"),
-.dark .mixed-text-part:contains("二"),
-.dark .mixed-text-part:contains("三") {
-  text-shadow: 0 0 0.3px currentColor;
+.mixed-text-part:contains("一"),
+.mixed-text-part:contains("二"),
+.mixed-text-part:contains("三") {
+  text-shadow: var(--text-shadow-enhance-strong);
 }
 
 /* 下拉菜单字体优化 */
 [data-radix-popper-content-wrapper] {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
 }
 
 /* 强制SelectContent宽度与trigger一致 */
@@ -117,56 +104,46 @@
   max-width: 120px !important;
 }
 
-[data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
-}
-
-.dark [data-radix-popper-content-wrapper] {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+[data-radix-popper-content-wrapper] *,
+.dark [data-radix-popper-content-wrapper],
+.dark [data-radix-popper-content-wrapper] * {
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
 }
 
 /* 深色模式下拉菜单特殊优化 */
 .dark [data-radix-popper-content-wrapper] * {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
   font-weight: 500 !important;
 }
 
 /* 特别优化退出登录按钮文本 */
 .dark [data-radix-popper-content-wrapper] [data-slot="menu-item"]>div>span {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
   font-weight: 500 !important;
 }
 
 /* 特别优化"退出登录"文本在深色模式下的清晰度 */
 .dark .logout-menu-item .logout-text {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
   font-weight: 600 !important;
   letter-spacing: 0.02em !important;
   color: var(--destructive) !important;
-  /* Ensure red color is vibrant */
 }
 
 /* 确保深色模式下所有菜单项文本清晰 */
 .dark [data-radix-popper-content-wrapper] [data-slot="dropdown-menu-item"] {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
+  -webkit-font-smoothing: var(--font-smoothing-webkit);
+  -moz-osx-font-smoothing: var(--font-smoothing-moz);
+  text-rendering: var(--text-rendering-base);
+  font-feature-settings: var(--font-features-basic);
 }
 
 body,
@@ -232,14 +209,7 @@ main,
 
 /* 字体类已优化，移除重复定义，使用全局设置 */
 
-/* MixedText 组件样式 */
-.mixed-text-part {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  font-feature-settings: "liga" 1;
-  font-weight: 400;
-}
+/* MixedText 组件样式 - 已统一到上方的工具类 */
 
 /* 表格标题字体粗细设置 */
 th {
@@ -488,10 +458,7 @@ h6 .mixed-text-part {
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
 
-  /* 高DPI字体渲染变量 */
-  --font-smoothing: antialiased;
-  --text-rendering: optimizeLegibility;
-  --moz-font-smoothing: grayscale;
+  /* 高DPI字体渲染变量 - 已统一到字体渲染系统 */
 }
 
 /* 按钮样式已移至组件中，移除重复的全局样式定义 */
@@ -1439,8 +1406,7 @@ main:not([contenteditable="true"]) {
 }
 
 /* ========== 侧边栏文字动画修复 ========== */
-/* 为侧边栏文字添加平滑过渡动画 */
-[data-slot="sidebar-group-label"] span,
+/* 为侧边栏文字添加平滑过渡动画 - 移除组标签 */
 [data-slot="sidebar-menu-button"] span,
 [data-slot="sidebar-header"] span {
   transition: all 0.2s ease-linear;
@@ -1453,8 +1419,7 @@ main:not([contenteditable="true"]) {
   position: relative;
 }
 
-/* 当侧边栏处于icon模式且收起状态时，平滑隐藏文字 */
-[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] span,
+/* 当侧边栏处于icon模式且收起状态时，平滑隐藏文字 - 移除组标签 */
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-menu-button"] span,
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"] span {
   opacity: 0;
@@ -1463,19 +1428,9 @@ main:not([contenteditable="true"]) {
   pointer-events: none;
 }
 
-/* 确保侧边栏组标签在收起状态时完全隐藏 */
-[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
-  opacity: 0;
-  transform: translateY(-8px);
-  pointer-events: none;
-  transition: all 0.2s ease-linear;
-}
+/* 组标签已全局隐藏，无需收起状态样式 */
 
-/* 增加侧边栏文字大小以提高可读性 */
-[data-slot="sidebar-group-label"] span {
-  font-size: 0.95rem;
-  font-weight: 500;
-}
+/* 组标签文字样式 - 已隐藏，无需设置 */
 
 /* 深色模式下侧边栏头部增强可见性 */
 .dark [data-slot="sidebar-header"] span {
@@ -1484,8 +1439,7 @@ main:not([contenteditable="true"]) {
   color: hsl(var(--sidebar-foreground) / 0.95);
 }
 
-/* 增加侧边栏图标大小 */
-[data-slot="sidebar-group-label"] svg,
+/* 增加侧边栏图标大小 - 只保留菜单按钮图标 */
 [data-slot="sidebar-menu-button"] svg {
   width: 1.25rem;
   height: 1.25rem;
@@ -1636,30 +1590,12 @@ main:not([contenteditable="true"]) {
   width: 100% !important;
 }
 
-/* 组标签样式 - 去掉左边框 */
+/* 组标签样式 - 完全隐藏 */
 [data-slot="sidebar-group-label"] {
-  color: hsl(var(--sidebar-foreground) / 0.7);
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.75rem 0.75rem 0.5rem 0.75rem;
-  margin-top: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  margin-left: 0;
-  width: 100%;
-  border-left: none;
+  display: none !important;
 }
 
-/* 深色模式下组标签增强可见性 */
-.dark [data-slot="sidebar-group-label"] {
-  color: hsl(var(--sidebar-foreground) / 0.8);
-  font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
+/* 深色模式下组标签 - 已隐藏，无需额外样式 */
 
 /* 子项按钮样式 - 去掉缩进 */
 [data-slot="sidebar-menu-button"] {
@@ -1830,11 +1766,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   overflow: hidden;
 }
 
-/* 侧边栏组标签样式 */
-[data-slot="sidebar-group-label"] {
-  padding-left: 1.25rem !important;
-  padding-right: 1rem !important;
-}
+/* 侧边栏组标签样式 - 已隐藏，无需内边距 */
 
 /* 侧边栏头部和底部的内边距 */
 [data-slot="sidebar-header"],
@@ -1891,12 +1823,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   padding-right: 0.5rem !important;
 }
 
-/* 收起状态下的样式 */
-[data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-group-label"] {
-  padding-left: 0.75rem !important;
-  padding-right: 0.75rem !important;
-  text-align: center !important;
-}
+/* 收起状态下的组标签样式 - 已隐藏，无需额外样式 */
 
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-header"],
 [data-slot="sidebar"][data-collapsible="icon"][data-state="collapsed"] [data-slot="sidebar-footer"] {
@@ -2313,7 +2240,9 @@ body.eye-care.dark .text-muted-foreground,
 .calendar-container button[data-range-middle="true"] * {
   color: var(--calendar-theme-color) !important;
 }
-::view-transition-old(root), ::view-transition-new(root) {
-    animation: none;
-    mix-blend-mode: normal;
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
 }
