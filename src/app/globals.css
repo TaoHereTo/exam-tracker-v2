@@ -420,7 +420,7 @@ h6 .mixed-text-part {
   --ring: oklch(0.556 0 0);
 
   /* 深色模式组件专用背景色 */
-  --editor-background: var(--input);
+  --editor-background: #303030;
   --textarea-background: var(--input);
   --modal-background: var(--background);
   --card-modal-background: var(--card);
