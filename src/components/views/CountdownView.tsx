@@ -8,6 +8,7 @@ import { FormError } from "@/components/ui/form-error";
 import { format, differenceInDays, differenceInHours, differenceInMinutes } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { Plus, Edit, Trash2, Clock, CheckCircle, Trash, Pin, PinOff } from "lucide-react";
+import { CircularButton } from "@/components/ui/circular-button";
 import { useState, useEffect, useMemo } from "react";
 import { MixedText } from "@/components/ui/MixedText";
 import { ButtonGroup } from "@/components/ui/ButtonGroup";
@@ -635,15 +636,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                             <div className="flex items-center gap-2">
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <Button
+                                                        <CircularButton
                                                             onClick={handleBulkEdit}
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
+                                                            variant="success"
+                                                            size="default"
                                                             disabled={selectedCountdowns.size === 0}
                                                         >
-                                                            <Edit className="w-4 h-4 text-white" />
-                                                        </Button>
+                                                            <Edit className="w-4 h-4" />
+                                                        </CircularButton>
                                                     </TooltipTrigger>
                                                     <TooltipContent>
                                                         <p><MixedText text="编辑选中项" /></p>
@@ -718,20 +718,16 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                                     <div className="flex gap-1 ml-2 flex-shrink-0">
                                                                                         <Tooltip>
                                                                                             <TooltipTrigger asChild>
-                                                                                                <Button
+                                                                                                <CircularButton
                                                                                                     onClick={(e) => {
                                                                                                         e.stopPropagation();
                                                                                                         handleTogglePin(countdown);
                                                                                                     }}
-                                                                                                    variant="outline"
-                                                                                                    size="icon"
-                                                                                                    className={`h-6 w-6 rounded-full ${countdown.isPinned
-                                                                                                        ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
-                                                                                                        : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
-                                                                                                        }`}
+                                                                                                    variant={countdown.isPinned ? "warning" : "gray"}
+                                                                                                    size="sm"
                                                                                                 >
-                                                                                                    {countdown.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
-                                                                                                </Button>
+                                                                                                    {countdown.isPinned ? <Pin className="w-3 h-3" /> : <PinOff className="w-3 h-3" />}
+                                                                                                </CircularButton>
                                                                                             </TooltipTrigger>
                                                                                             <TooltipContent>
                                                                                                 <p><MixedText text={countdown.isPinned ? "取消置顶" : "置顶"} /></p>

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CircularButton } from "@/components/ui/circular-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -688,14 +689,14 @@ export default function NotesView() {
 
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <Button
-                                            size="icon"
-                                            className="h-8 w-8 rounded-full bg-green-600 hover:bg-green-700"
+                                        <CircularButton
+                                            variant="success"
+                                            size="default"
                                             onClick={handleSaveNote}
                                             disabled={isSaving}
                                         >
-                                            <Save className="h-4 w-4 text-white" />
-                                        </Button>
+                                            <Save className="h-4 w-4" />
+                                        </CircularButton>
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>{isSaving ? "保存中..." : "保存笔记"}</p>
@@ -761,13 +762,13 @@ export default function NotesView() {
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    size="icon"
-                                    className="h-8 w-8 rounded-full bg-blue-600 hover:bg-blue-700"
+                                <CircularButton
+                                    variant="default"
+                                    size="default"
                                     onClick={() => setIsCreating(true)}
                                 >
-                                    <Plus className="h-4 w-4 text-white" />
-                                </Button>
+                                    <Plus className="h-4 w-4" />
+                                </CircularButton>
                             </TooltipTrigger>
                             <TooltipContent>
                                 <p>新建笔记</p>

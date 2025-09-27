@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { CircularButton } from "@/components/ui/circular-button";
 
 type props = {
   className?: string;
@@ -59,15 +60,14 @@ export const AnimatedThemeToggler = ({ className }: props) => {
   };
 
   return (
-    <button
+    <CircularButton
       ref={buttonRef}
       onClick={changeTheme}
-      className={cn(
-        "flex items-center justify-center w-8 h-8 rounded-full border border-input-border shadow-sm bg-background hover:bg-accent transition-colors",
-        className
-      )}
+      variant="theme"
+      size="default"
+      className={cn(className)}
     >
       {theme === "dark" ? <SunDim className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-    </button>
+    </CircularButton>
   );
 };

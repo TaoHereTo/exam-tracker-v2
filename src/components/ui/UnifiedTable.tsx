@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Search, Upload, Trash2, Edit, FileSpreadsheet, ChevronLeftIcon, ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { CircularButton } from "@/components/ui/circular-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { MixedText } from "@/components/ui/MixedText";
 import { SimpleUiverseSpinner } from "@/components/ui/UiverseSpinner";
@@ -523,15 +524,14 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         {showEdit && onEdit && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <CircularButton
                                         onClick={onEdit}
                                         disabled={editDisabled}
-                                        variant="outline"
-                                        size="icon"
-                                        className="h-9 w-9 bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
+                                        variant="success"
+                                        size="lg"
                                     >
-                                        <Edit className="w-5 h-5 text-white" />
-                                    </Button>
+                                        <Edit className="w-5 h-5" />
+                                    </CircularButton>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p><MixedText text="编辑" /></p>
@@ -543,15 +543,14 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                         {showDelete && onDelete && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
+                                    <CircularButton
                                         onClick={onDelete}
                                         disabled={deleteDisabled}
                                         variant="destructive"
-                                        size="icon"
-                                        className="h-9 w-9"
+                                        size="lg"
                                     >
                                         <Trash2 className="w-5 h-5" />
-                                    </Button>
+                                    </CircularButton>
                                 </TooltipTrigger>
                                 <TooltipContent>
                                     <p><MixedText text="批量删除" /></p>

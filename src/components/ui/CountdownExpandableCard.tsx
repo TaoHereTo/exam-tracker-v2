@@ -6,6 +6,7 @@ import { useOutsideClick } from "@/hooks/use-outside-click";
 import { format } from "date-fns";
 import { Clock, Edit, Trash2, Pin, PinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CircularButton } from "@/components/ui/circular-button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
 
 interface ExamCountdown {
@@ -140,17 +141,16 @@ export default function CountdownExpandableCard({
                                                     <motion.div
                                                         layoutId={`button-${prefix}-${active.id}-${uniqueId}`}
                                                     >
-                                                        <Button
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
+                                                        <CircularButton
+                                                            variant="success"
+                                                            size="default"
                                                             onClick={() => {
                                                                 onEdit?.(active);
                                                                 setActive(null);
                                                             }}
                                                         >
-                                                            <Edit className="w-4 h-4 text-white" />
-                                                        </Button>
+                                                            <Edit className="w-4 h-4" />
+                                                        </CircularButton>
                                                     </motion.div>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="z-[1001]">
@@ -159,10 +159,9 @@ export default function CountdownExpandableCard({
                                             </Tooltip>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Button
+                                                    <CircularButton
                                                         variant="destructive"
-                                                        size="icon"
-                                                        className="h-8 w-8 rounded-full"
+                                                        size="default"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             onDelete?.(active.id);
@@ -170,7 +169,7 @@ export default function CountdownExpandableCard({
                                                         }}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
-                                                    </Button>
+                                                    </CircularButton>
                                                 </TooltipTrigger>
                                                 <TooltipContent className="z-[1001]">
                                                     <p>删除倒计时</p>
@@ -262,16 +261,20 @@ export default function CountdownExpandableCard({
                                             </Tooltip>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <motion.button
+                                                    <motion.div
                                                         layoutId={`button-${prefix}-${countdown.id}-${uniqueId}`}
-                                                        className="h-8 w-8 rounded-full flex items-center justify-center bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            onEdit?.(countdown);
-                                                        }}
                                                     >
-                                                        <Edit className="w-4 h-4 text-white" />
-                                                    </motion.button>
+                                                        <CircularButton
+                                                            variant="success"
+                                                            size="default"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                onEdit?.(countdown);
+                                                            }}
+                                                        >
+                                                            <Edit className="w-4 h-4" />
+                                                        </CircularButton>
+                                                    </motion.div>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>编辑倒计时</p>
@@ -279,17 +282,16 @@ export default function CountdownExpandableCard({
                                             </Tooltip>
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <Button
+                                                    <CircularButton
                                                         variant="destructive"
-                                                        size="icon"
-                                                        className="h-8 w-8 rounded-full"
+                                                        size="default"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             onDelete?.(countdown.id);
                                                         }}
                                                     >
                                                         <Trash2 className="w-4 h-4" />
-                                                    </Button>
+                                                    </CircularButton>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
                                                     <p>删除倒计时</p>

@@ -1277,6 +1277,25 @@ table th:focus {
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
+/* 日历按钮无阴影 */
+.calendar-container button,
+.calendar-container [data-slot="button"],
+[data-day] {
+  box-shadow: none !important;
+}
+
+.calendar-container button:hover,
+.calendar-container [data-slot="button"]:hover,
+[data-day]:hover {
+  box-shadow: none !important;
+}
+
+.calendar-container button:active,
+.calendar-container [data-slot="button"]:active,
+[data-day]:active {
+  box-shadow: none !important;
+}
+
 /* Rainbow button animation - 已移至 RainbowButton 组件 */
 
 /* ========== 侧边栏样式 ========== */
