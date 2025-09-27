@@ -337,7 +337,7 @@ h6 .mixed-text-part {
   /* 主题颜色 */
   --background: #F5F4F7;
   --foreground: oklch(0.145 0 0);
-  --card: transparent;
+  --card: #ffffff;
   --card-foreground: oklch(0.145 0 0);
   --popover: #FAFAFA;
   --popover-foreground: oklch(0.145 0 0);
@@ -345,7 +345,7 @@ h6 .mixed-text-part {
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #F5F5F5;
   --secondary-foreground: oklch(0.205 0 0);
-  --muted: #F0F0F0;
+  --muted: #ffffff;
   --muted-foreground: oklch(0.556 0 0);
   --accent: #F5F5F5;
   --accent-foreground: oklch(0.205 0 0);
