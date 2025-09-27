@@ -450,8 +450,8 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                             variant="outline"
                                                                             size="icon"
                                                                             className={`h-8 w-8 rounded-full ${plan.isPinned
-                                                                                    ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
-                                                                                    : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
                                                                                 }`}
                                                                         >
                                                                             {plan.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
@@ -730,8 +730,8 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                                                     variant="outline"
                                                                                                     size="icon"
                                                                                                     className={`h-6 w-6 rounded-full ${plan.isPinned
-                                                                                                            ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
-                                                                                                            : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                                        ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                                        : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
                                                                                                         }`}
                                                                                                 >
                                                                                                     {plan.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
@@ -944,7 +944,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto rounded-full bg-[#324CC8] hover:bg-[#324CC8]/90"
+                                className="w-full sm:w-auto rounded-full bg-[#324CC8] hover:bg-[#324CC8]/90 text-white dark:text-white"
                             >
                                 {editId ? <MixedText text="更新计划" /> : <MixedText text="创建计划" />}
                             </Button>

@@ -1925,7 +1925,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
                             取消
                         </Button>
-                        <Button onClick={handleInsertLink}>
+                        <Button onClick={handleInsertLink} className="bg-[#253985] hover:bg-[#253985]/90 text-white">
                             插入链接
                         </Button>
                     </DialogFooter>

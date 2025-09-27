@@ -561,7 +561,7 @@ html {
 /* ========== Toast Animations ========== */
 @keyframes toast-enter {
   from {
-    transform: translate3d(0, 100%, 0) scale(0.8);
+    transform: translate3d(0, -100%, 0) scale(0.8);
     opacity: 0;
   }
 
@@ -578,7 +578,7 @@ html {
   }
 
   to {
-    transform: translate3d(0, 100%, 0) scale(0.8);
+    transform: translate3d(0, -100%, 0) scale(0.8);
     opacity: 0;
   }
 }

@@ -543,7 +543,7 @@ export function UnifiedSettings({
                 <Button
                   onClick={handleSaveAllSettings}
                   variant="default"
-                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90"
+                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   <MixedText text="保存设置" />
@@ -948,7 +948,7 @@ export function UnifiedSettings({
                 <Button
                   onClick={handleSaveAllSettings}
                   variant="default"
-                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90"
+                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   <MixedText text="保存设置" />

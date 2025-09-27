@@ -352,7 +352,7 @@ export function ScorePredictor({ records }: ScorePredictorProps) {
                                                 }
                                             }}
                                             size="sm"
-                                            className="flex-1 rounded-full bg-[#be185d] hover:bg-[#be185d]/90"
+                                            className="flex-1 rounded-full bg-[#be185d] hover:bg-[#be185d]/90 text-white dark:text-white"
                                         >
                                             <MixedText text="确定" />
                                         </Button>

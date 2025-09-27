@@ -192,6 +192,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'flex-start',
+            flexDirection: 'column' as const, // 确保toast从上往下排列
             pointerEvents: 'none' as const, // 允许点击穿透到下方元素
         };
     };

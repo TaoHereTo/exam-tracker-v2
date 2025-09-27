@@ -962,7 +962,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                             <Button
                                 type="submit"
                                 variant="default"
-                                className="w-full sm:w-auto rounded-full bg-[#db2777] hover:bg-[#db2777]/90"
+                                className="w-full sm:w-auto rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                             >
                                 {editId ? <MixedText text="更新" /> : <MixedText text="添加倒计时" />}
                             </Button>

@@ -447,7 +447,7 @@ export function AISettings() {
                     onClick={handleSaveSettings}
                     disabled={isSaving}
                     variant="default"
-                    className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 flex items-center gap-2"
+                    className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white flex items-center gap-2"
                 >
                     <Save className="w-4 h-4" />
                     {isSaving ? '保存中...' : '保存设置'}
