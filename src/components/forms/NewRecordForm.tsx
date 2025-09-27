@@ -186,140 +186,148 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
 
     return (
         <div className="flex items-start justify-center min-h-screen p-2 sm:p-4 pt-4 sm:pt-6 md:pt-10">
-            <Card className="w-full max-w-md flex flex-col">
-                <CardHeader className="pb-3">
-                    <CardTitle className="text-xl sm:text-2xl">
+            <div className="w-full max-w-md space-y-6">
+                {/* 标题区域 - 移到卡片上方 */}
+                <div className="text-center space-y-2">
+                    <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                         <MixedText text="新增做题记录" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 pb-3">
-                    <BaseForm
-                        className="form-stack"
-                        validationSchema={{
-                            // 顺序即校验顺序：从上到下
-                            module: {
-                                required: true,
-                                custom: (value) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请选择模块';
-                                    return null;
-                                }
-                            },
-                            date: {
-                                required: true,
-                                custom: (value) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请选择做题日期';
-                                    return null;
-                                }
-                            },
-                            total: {
-                                required: true,
-                                custom: (value) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入总题数';
-                                    const num = Number(value);
-                                    if (!Number.isFinite(num) || num <= 0) return '总题数必须大于0';
-                                    return null;
-                                }
-                            },
-                            correct: {
-                                required: true,
-                                custom: (value, allValues?: Record<string, unknown>) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入正确题数';
-                                    const num = Number(value);
-                                    if (!Number.isFinite(num) || num < 0) return '正确数不能为负数';
-                                    const totalRaw = allValues?.total as unknown;
-                                    const hasTotal = !(totalRaw === undefined || totalRaw === null || String(totalRaw).trim() === '');
-                                    if (hasTotal) {
-                                        const totalNum = Number(totalRaw);
-                                        if (Number.isFinite(totalNum) && num > totalNum) return '正确数不能大于总题数';
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                        <MixedText text="记录你的学习成果" />
+                    </p>
+                </div>
+
+                {/* 卡片内容 */}
+                <Card className="flex flex-col">
+                    <CardContent className="pt-4 pb-4">
+                        <BaseForm
+                            className="form-stack"
+                            validationSchema={{
+                                // 顺序即校验顺序：从上到下
+                                module: {
+                                    required: true,
+                                    custom: (value) => {
+                                        if (value === undefined || value === null || String(value).trim() === '') return '请选择模块';
+                                        return null;
                                     }
-                                    return null;
+                                },
+                                date: {
+                                    required: true,
+                                    custom: (value) => {
+                                        if (value === undefined || value === null || String(value).trim() === '') return '请选择做题日期';
+                                        return null;
+                                    }
+                                },
+                                total: {
+                                    required: true,
+                                    custom: (value) => {
+                                        if (value === undefined || value === null || String(value).trim() === '') return '请输入总题数';
+                                        const num = Number(value);
+                                        if (!Number.isFinite(num) || num <= 0) return '总题数必须大于0';
+                                        return null;
+                                    }
+                                },
+                                correct: {
+                                    required: true,
+                                    custom: (value, allValues?: Record<string, unknown>) => {
+                                        if (value === undefined || value === null || String(value).trim() === '') return '请输入正确题数';
+                                        const num = Number(value);
+                                        if (!Number.isFinite(num) || num < 0) return '正确数不能为负数';
+                                        const totalRaw = allValues?.total as unknown;
+                                        const hasTotal = !(totalRaw === undefined || totalRaw === null || String(totalRaw).trim() === '');
+                                        if (hasTotal) {
+                                            const totalNum = Number(totalRaw);
+                                            if (Number.isFinite(totalNum) && num > totalNum) return '正确数不能大于总题数';
+                                        }
+                                        return null;
+                                    }
+                                },
+                                duration: {
+                                    required: true,
+                                    custom: (value) => {
+                                        if (value === undefined || value === null || String(value).trim() === '') return '请输入做题时长';
+                                        return null;
+                                    }
                                 }
-                            },
-                            duration: {
-                                required: true,
-                                custom: (value) => {
-                                    if (value === undefined || value === null || String(value).trim() === '') return '请输入做题时长';
-                                    return null;
-                                }
-                            }
-                        }}
-                        onSubmit={handleSubmit}
-                        initialData={{
-                            module: '',
-                            total: '',
-                            correct: '',
-                            duration: '',
-                            date: format(new Date(), 'yyyy-MM-dd') // 设置默认日期为今天
-                        }}
-                    >
-                        {/* 模块选择 */}
-                        <FormField name="module" className="form-field">
-                            <Label htmlFor="module" className="text-sm">
-                                <MixedText text="选择模块" />
-                            </Label>
-                            <FormSelect
-                                name="module"
-                                placeholder="请选择模块"
-                            >
-                                <SelectItem value="data-analysis">资料分析</SelectItem>
-                                <SelectItem value="politics">政治理论</SelectItem>
-                                <SelectItem value="math">数量关系</SelectItem>
-                                <SelectItem value="verbal">言语理解</SelectItem>
-                                <SelectItem value="common">常识判断</SelectItem>
-                                <SelectItem value="logic">判断推理</SelectItem>
-                            </FormSelect>
-                        </FormField>
-
-                        {/* 日期选择 */}
-                        <FormField name="date" className="form-field">
-                            <Label htmlFor="date" className="text-sm">
-                                <MixedText text="做题日期" />
-                            </Label>
-                            <DateField />
-                        </FormField>
-
-                        {/* 总题数和正确题数 */}
-                        <div className="form-grid-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <FormField name="total" className="form-field">
-                                <Label htmlFor="total" className="text-sm">
-                                    <MixedText text="总题数" />
+                            }}
+                            onSubmit={handleSubmit}
+                            initialData={{
+                                module: '',
+                                total: '',
+                                correct: '',
+                                duration: '',
+                                date: format(new Date(), 'yyyy-MM-dd') // 设置默认日期为今天
+                            }}
+                        >
+                            {/* 模块选择 */}
+                            <FormField name="module" className="form-field">
+                                <Label htmlFor="module" className="text-sm">
+                                    <MixedText text="选择模块" />
                                 </Label>
-                                <FormInput
-                                    name="total"
-                                    type="number"
-                                    placeholder="请输入总题数"
-                                    className="h-10 text-sm"
-                                />
+                                <FormSelect
+                                    name="module"
+                                    placeholder="请选择模块"
+                                >
+                                    <SelectItem value="data-analysis">资料分析</SelectItem>
+                                    <SelectItem value="politics">政治理论</SelectItem>
+                                    <SelectItem value="math">数量关系</SelectItem>
+                                    <SelectItem value="verbal">言语理解</SelectItem>
+                                    <SelectItem value="common">常识判断</SelectItem>
+                                    <SelectItem value="logic">判断推理</SelectItem>
+                                </FormSelect>
                             </FormField>
-                            <FormField name="correct" className="form-field">
-                                <Label htmlFor="correct" className="text-sm">
-                                    <MixedText text="正确题数" />
+
+                            {/* 日期选择 */}
+                            <FormField name="date" className="form-field">
+                                <Label htmlFor="date" className="text-sm">
+                                    <MixedText text="做题日期" />
                                 </Label>
-                                <FormInput
-                                    name="correct"
-                                    type="number"
-                                    placeholder="请输入正确题数"
-                                    className="h-10 text-sm"
-                                />
+                                <DateField />
                             </FormField>
-                        </div>
 
-                        {/* 做题时长 */}
-                        <FormField name="duration" className="form-field">
-                            <Label htmlFor="duration" className="text-sm">
-                                <MixedText text="做题时长" />
-                            </Label>
-                            <DurationField />
-                        </FormField>
+                            {/* 总题数和正确题数 */}
+                            <div className="form-grid-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <FormField name="total" className="form-field">
+                                    <Label htmlFor="total" className="text-sm">
+                                        <MixedText text="总题数" />
+                                    </Label>
+                                    <FormInput
+                                        name="total"
+                                        type="number"
+                                        placeholder="请输入总题数"
+                                        className="h-10 text-sm"
+                                    />
+                                </FormField>
+                                <FormField name="correct" className="form-field">
+                                    <Label htmlFor="correct" className="text-sm">
+                                        <MixedText text="正确题数" />
+                                    </Label>
+                                    <FormInput
+                                        name="correct"
+                                        type="number"
+                                        placeholder="请输入正确题数"
+                                        className="h-10 text-sm"
+                                    />
+                                </FormField>
+                            </div>
 
-                        <div className="form-actions pt-4">
-                            <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full bg-[#047857] hover:bg-[#047857]/90 text-white">
-                                <MixedText text="保存记录" />
-                            </Button>
-                        </div>
-                    </BaseForm>
-                </CardContent>
-            </Card>
+                            {/* 做题时长 */}
+                            <FormField name="duration" className="form-field">
+                                <Label htmlFor="duration" className="text-sm">
+                                    <MixedText text="做题时长" />
+                                </Label>
+                                <DurationField />
+                            </FormField>
+
+                            <div className="form-actions pt-4">
+                                <Button type="submit" variant="default" className="w-full py-2 text-sm h-10 rounded-full bg-[#047857] hover:bg-[#047857]/90 text-white">
+                                    <MixedText text="保存记录" />
+                                </Button>
+                            </div>
+                        </BaseForm>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

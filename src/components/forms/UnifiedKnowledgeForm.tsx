@@ -495,14 +495,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       ) : (
         // When not in dialog, render with Card wrapper as usual
         <Card className="w-full max-w-xl flex flex-col">
-          {!initialData && (
-            <CardHeader className="pb-2">
-              <CardTitle className="text-2xl">
-                <MixedText text={config.title} />
-              </CardTitle>
-            </CardHeader>
-          )}
-          <CardContent className={`${!initialData ? 'pt-0' : 'pt-4'} pb-2`}>
+          <CardContent className="pt-4 pb-4">
             {/* 非对话框模式下的表单 */}
             <BaseForm
               className="form-stack"
