@@ -167,9 +167,6 @@ const TextType = ({
     onSentenceComplete
   ]);
 
-  const shouldHideCursor =
-    hideCursorWhileTyping && (currentCharIndex < textArray[currentTextIndex].length || isDeleting);
-
   return createElement(
     Component,
     {
@@ -183,7 +180,7 @@ const TextType = ({
     showCursor && (
       <span
         ref={cursorRef}
-        className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? 'hidden' : ''} ${cursorClassName}`}
+        className={`ml-1 inline-block opacity-100 ${cursorClassName}`}
       >
         {cursorCharacter}
       </span>

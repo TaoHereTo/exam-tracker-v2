@@ -217,28 +217,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         return cleaned;
     };
 
-    // 强制显示光标的函数
-    const forceShowCursor = () => {
-        if (!editorRef.current) return;
-
-        editorRef.current.focus();
-
-        const selection = window.getSelection();
-        if (selection) {
-            // 如果没有选区，创建一个
-            if (selection.rangeCount === 0) {
-                const range = document.createRange();
-                range.selectNodeContents(editorRef.current);
-                range.collapse(false);
-                selection.addRange(range);
-            }
-
-            // 强制触发光标显示
-            const range = selection.getRangeAt(0);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
-    };
+    // 移除强制光标控制，让浏览器自然处理光标
 
 
     // 保存和恢复选区的辅助函数
@@ -289,43 +268,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         const success = document.execCommand(command, false, value);
 
         if (success) {
-            // 使用更简单的方法：直接确保光标在末尾
-            const ensureCursorAtEnd = () => {
-                if (!editorRef.current) return;
-
-                editorRef.current.focus();
-
-                const selection = window.getSelection();
-                if (selection) {
-                    const range = document.createRange();
-
-                    // 总是将光标放在编辑器末尾
-                    if (editorRef.current.lastChild) {
-                        const lastChild = editorRef.current.lastChild;
-                        if (lastChild.nodeType === Node.TEXT_NODE) {
-                            const textLength = lastChild.textContent?.length || 0;
-                            range.setStart(lastChild, textLength);
-                            range.setEnd(lastChild, textLength);
-                        } else {
-                            range.setStartAfter(lastChild);
-                            range.setEndAfter(lastChild);
-                        }
-                    } else {
-                        range.selectNodeContents(editorRef.current);
-                        range.collapse(false);
-                    }
-
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-            };
-
-            // 立即执行
-            ensureCursorAtEnd();
-
-            // 延迟执行确保DOM更新
-            setTimeout(ensureCursorAtEnd, 0);
-            setTimeout(ensureCursorAtEnd, 10);
+            // 移除强制光标控制，让浏览器自然处理光标位置
 
             // 清理空内容
             setTimeout(() => {
@@ -1677,33 +1620,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         }
                     }}
                     onClick={(e) => {
-                        const target = e.currentTarget;
-                        target.focus();
-
-                        // 确保点击后光标可见
-                        const ensureCursor = () => {
-                            if (!target) return;
-                            const selection = window.getSelection();
-                            if (selection) {
-                                // 如果没有选区，创建一个
-                                if (selection.rangeCount === 0) {
-                                    const range = document.createRange();
-                                    range.selectNodeContents(target);
-                                    range.collapse(false);
-                                    selection.addRange(range);
-                                }
-                                // 强制显示光标
-                                target.focus();
-                            }
-                        };
-
-                        // 立即执行
-                        ensureCursor();
-
-                        // 使用 requestAnimationFrame 确保在下一个渲染周期执行
-                        requestAnimationFrame(() => {
-                            ensureCursor();
-                        });
+                        // 移除强制光标控制，让浏览器自然处理光标
+                        e.currentTarget.focus();
                     }}
                     onMouseDown={(e) => {
                         e.currentTarget.focus();
@@ -1777,7 +1695,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     style={{
                         fontSize: '14px',
                         lineHeight: '1.5',
-                        caretColor: 'currentColor',
                     }}
                     data-placeholder={placeholder}
                     suppressContentEditableWarning={true}

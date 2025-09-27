@@ -1203,22 +1203,7 @@ textarea,
 }
 
 /* ========== 光标控制 ========== */
-/* 全局光标控制 - 默认禁用，输入元素启用 */
-* {
-  caret-color: transparent;
-  -webkit-caret-color: transparent;
-}
-
-/* 启用输入元素的光标 */
-input,
-textarea,
-select,
-[contenteditable="true"],
-[data-slot="input"],
-[data-slot="textarea"] {
-  caret-color: currentColor;
-  -webkit-caret-color: currentColor;
-}
+/* 移除全局光标限制，让所有元素正常显示光标 */
 
 /* 禁用表格单元格的焦点状态 */
 table td:focus,
