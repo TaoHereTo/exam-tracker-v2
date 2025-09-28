@@ -31,6 +31,7 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
+import { LatexRichTextEditor } from "@/components/rich-text-editors/LatexRichTextEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
@@ -410,17 +411,13 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     };
 
     return (
-      <KnowledgeRichTextEditor
-        value={currentValue || ''}
+      <LatexRichTextEditor
+        content={currentValue || ''}
         onChange={(value) => setValue('secondField', value || '')}
-        onImageChange={handleImageChange}
         placeholder={fieldConfig.secondPlaceholder}
         className="w-full"
-        onPendingImagesChange={(pendingImages) => {
-          // Store pending images that need to be uploaded on save
-          pendingImagesRef.current = pendingImages;
-        }}
-        clearPreviewImages={clearPreviewImages}
+        editorMinHeight="200px"
+        editorMaxHeight="400px"
       />
     );
   };

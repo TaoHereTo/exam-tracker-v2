@@ -27,7 +27,7 @@ import {
     Edit3
 } from "lucide-react";
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
-import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { HtmlRenderer } from "@/components/ui/HtmlRenderer";
 import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { notesService, type Note as CloudNote } from "@/lib/notesService";
@@ -809,7 +809,7 @@ export default function NotesView() {
                                 {isPreviewMode ? (
                                     <div className="h-full p-6 border rounded-lg bg-background overflow-auto">
                                         <div className="max-w-none">
-                                            <MarkdownRenderer
+                                            <HtmlRenderer
                                                 content={selectedNote.content}
                                                 className="text-sm leading-relaxed"
                                             />

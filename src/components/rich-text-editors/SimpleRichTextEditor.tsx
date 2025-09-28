@@ -23,7 +23,9 @@ import {
     Upload,
     Maximize2,
     Minimize2,
-    Heading
+    Heading,
+    Sigma,
+    Eye
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,6 +48,42 @@ import {
 } from '@/components/ui/dropdown-with-animation';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/animate-ui/components/radix/hover-card';
+import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
+import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+// 简单的LaTeX Hover Card组件
+const LatexHoverCard: React.FC<{ latex: string; children: React.ReactNode }> = ({ latex, children }) => {
+    const [renderedLatex, setRenderedLatex] = useState<string>('');
+
+    useEffect(() => {
+        try {
+            const rendered = katex.renderToString(latex, {
+                throwOnError: false,
+                displayMode: false
+            });
+            setRenderedLatex(rendered);
+        } catch (error) {
+            setRenderedLatex(`$${latex}$`);
+        }
+    }, [latex]);
+
+    return (
+        <HoverCard>
+            <HoverCardTrigger asChild>
+                {children}
+            </HoverCardTrigger>
+            <HoverCardContent className="w-auto p-3">
+                <div
+                    className="text-center"
+                    dangerouslySetInnerHTML={{ __html: renderedLatex }}
+                />
+            </HoverCardContent>
+        </HoverCard>
+    );
+};
 
 interface SimpleRichTextEditorProps {
     content: string;
@@ -84,6 +122,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const [showLinkDialog, setShowLinkDialog] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [linkText, setLinkText] = useState('');
+    const [showLatexSelector, setShowLatexSelector] = useState(false);
+    const [previewMode, setPreviewMode] = useState(false);
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -91,7 +131,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             if (content === '') {
                 editorRef.current.innerHTML = '';
             } else {
-                editorRef.current.innerHTML = content;
+                editorRef.current.innerHTML = processLatexContent(content);
             }
         }
     }, [content]);
@@ -147,9 +187,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const html = e.currentTarget.innerHTML;
-
-        // 暂时禁用自动清理，避免干扰正常输入
-        // 只在用户明确需要时手动清理
         onChange(html);
     };
 
@@ -521,6 +558,39 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         });
     };
 
+    // 处理LaTeX公式插入
+    const handleInsertLatex = (latex: string, displayMode: boolean) => {
+        if (!editorRef.current) return;
+
+        // 确保编辑器有焦点
+        editorRef.current.focus();
+
+        // 创建LaTeX文本（带美元符号标记）
+        const latexText = displayMode ? `$$${latex}$$` : `$${latex}$`;
+
+        // 使用execCommand插入文本
+        const success = document.execCommand('insertText', false, latexText);
+
+        if (!success) {
+            // 如果execCommand失败，使用innerHTML方式
+            const currentContent = editorRef.current.innerHTML;
+            const newContent = currentContent + latexText;
+            editorRef.current.innerHTML = newContent;
+        }
+
+        // 更新内容并处理LaTeX hover card
+        const html = editorRef.current.innerHTML;
+        const processedHtml = processLatexContent(html);
+        editorRef.current.innerHTML = processedHtml;
+        onChange(processedHtml);
+    };
+
+    // 简化的LaTeX处理 - 不再包装span，直接返回原始HTML
+    const processLatexContent = (html: string) => {
+        // 直接返回原始HTML，LaTeX渲染由HtmlRenderer处理
+        return html;
+    };
+
     // 在编辑器中插入图片
     const insertImageToEditor = useCallback((imageUrl: string, isResizable: boolean = true) => {
         if (!editorRef.current) return;
@@ -840,6 +910,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             };
         }
     }, [handlePaste]);
+
+    // 移除复杂的hover card逻辑，使用简单的预览模式
 
 
     // 保存当前选区
@@ -1224,7 +1296,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>撤销</p>
+                                <p>撤销 (Ctrl+Z)</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -1261,7 +1333,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>加粗</p>
+                                <p>加粗 (Ctrl+B)</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -1278,7 +1350,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>斜体</p>
+                                <p>斜体 (Ctrl+I)</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -1295,7 +1367,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>下划线</p>
+                                <p>下划线 (Ctrl+U)</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -1545,6 +1617,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                         <Tooltip>
                             <TooltipTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
+                                    <Sigma className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>公式</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
                                 <Button
                                     type="button"
                                     variant="ghost"
@@ -1581,6 +1664,23 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <Button
                                     type="button"
+                                    variant={previewMode ? "default" : "ghost"}
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => setPreviewMode(!previewMode)}
+                                >
+                                    <Eye className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{previewMode ? "关闭预览" : "开启预览"}</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
                                     variant="ghost"
                                     size="sm"
                                     className="h-6 w-6 p-0"
@@ -1596,110 +1696,148 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </div>
                 </div>
 
-                <div
-                    ref={editorRef}
-                    contentEditable
-                    onInput={handleInput}
-                    onFocus={(e) => {
-                        e.currentTarget.focus();
-                    }}
-                    onBlur={() => {
-                        // 在失去焦点时进行清理，避免在编辑过程中干扰
-                        if (editorRef.current) {
-                            const html = editorRef.current.innerHTML;
-                            const textContent = editorRef.current.textContent || '';
-
-                            // 只有在有内容时才进行清理
-                            if (textContent.trim() !== '') {
-                                const cleanedHtml = cleanEmptyContent(html);
-                                if (cleanedHtml !== html) {
-                                    editorRef.current.innerHTML = cleanedHtml;
-                                    onChange(cleanedHtml);
-                                }
-                            }
-                        }
-                    }}
-                    onClick={(e) => {
-                        // 移除强制光标控制，让浏览器自然处理光标
-                        e.currentTarget.focus();
-                    }}
-                    onMouseDown={(e) => {
-                        e.currentTarget.focus();
-                    }}
-                    onMouseUp={() => {
-                        // 在鼠标释放时保存选区（只在有选中文字时）
-                        const selection = window.getSelection();
-                        if (selection && selection.rangeCount > 0) {
-                            const range = selection.getRangeAt(0);
-                            const selectedText = range.toString();
-                            if (selectedText.length > 0) {
-                                saveCurrentSelection();
-                            }
-                        }
-                        // 更新按钮状态
-                        updateButtonStates();
-                    }}
-                    onKeyUp={() => {
-                        // 在键盘释放时保存选区（只在有选中文字时）
-                        const selection = window.getSelection();
-                        if (selection && selection.rangeCount > 0) {
-                            const range = selection.getRangeAt(0);
-                            const selectedText = range.toString();
-                            if (selectedText.length > 0) {
-                                saveCurrentSelection();
-                            }
-                        }
-                        // 更新按钮状态
-                        updateButtonStates();
-                    }}
-                    onKeyDown={(e) => {
-                        // 智能处理删除键
-                        if (e.key === 'Backspace' || e.key === 'Delete') {
-                            // 延迟执行，让浏览器先处理删除操作
-                            setTimeout(() => {
+                {/* 编辑器内容区域 - 支持预览模式 */}
+                <div className={cn(
+                    "flex",
+                    isFullscreen ? "flex-1" : "",
+                    previewMode ? "" : ""
+                )}>
+                    {/* 编辑器区域 */}
+                    <div className={cn(
+                        "flex-1",
+                        previewMode ? "w-1/2 border-r" : "w-full"
+                    )}>
+                        <div
+                            ref={editorRef}
+                            contentEditable
+                            onInput={handleInput}
+                            onFocus={(e) => {
+                                e.currentTarget.focus();
+                            }}
+                            onBlur={() => {
+                                // 在失去焦点时进行清理和LaTeX处理，避免在编辑过程中干扰
                                 if (editorRef.current) {
                                     const html = editorRef.current.innerHTML;
                                     const textContent = editorRef.current.textContent || '';
 
-                                    // 检查是否有空的HTML标签需要清理
-                                    const hasEmptyTags = /<[^>]+><\/[^>]+>/.test(html) ||
-                                        /<[^>]+>\s*<\/[^>]+>/.test(html);
+                                    // 只有在有内容时才进行处理
+                                    if (textContent.trim() !== '') {
+                                        // 先处理LaTeX内容
+                                        const processedHtml = processLatexContent(html);
 
-                                    // 如果内容为空或者有空的HTML标签，进行清理
-                                    if (textContent.trim() === '' || hasEmptyTags) {
-                                        const cleanedHtml = cleanEmptyContent(html);
+                                        // 再清理空内容
+                                        const cleanedHtml = cleanEmptyContent(processedHtml);
+
                                         if (cleanedHtml !== html) {
                                             editorRef.current.innerHTML = cleanedHtml;
                                             onChange(cleanedHtml);
-
-                                            // 确保光标在正确位置
-                                            const selection = window.getSelection();
-                                            if (selection) {
-                                                const range = document.createRange();
-                                                range.selectNodeContents(editorRef.current);
-                                                range.collapse(false);
-                                                selection.removeAllRanges();
-                                                selection.addRange(range);
-                                            }
                                         }
                                     }
                                 }
-                            }, 0);
-                        }
-                    }}
-                    className={cn(
-                        "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
-                        isFullscreen ? "flex-1 min-h-0" :
-                            customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
+                            }}
+                            onClick={(e) => {
+                                // 移除强制光标控制，让浏览器自然处理光标
+                                e.currentTarget.focus();
+                            }}
+                            onMouseDown={(e) => {
+                                e.currentTarget.focus();
+                            }}
+                            onMouseUp={() => {
+                                // 在鼠标释放时保存选区（只在有选中文字时）
+                                const selection = window.getSelection();
+                                if (selection && selection.rangeCount > 0) {
+                                    const range = selection.getRangeAt(0);
+                                    const selectedText = range.toString();
+                                    if (selectedText.length > 0) {
+                                        saveCurrentSelection();
+                                    }
+                                }
+                                // 更新按钮状态
+                                updateButtonStates();
+                            }}
+                            onKeyUp={() => {
+                                // 在键盘释放时保存选区（只在有选中文字时）
+                                const selection = window.getSelection();
+                                if (selection && selection.rangeCount > 0) {
+                                    const range = selection.getRangeAt(0);
+                                    const selectedText = range.toString();
+                                    if (selectedText.length > 0) {
+                                        saveCurrentSelection();
+                                    }
+                                }
+                                // 更新按钮状态
+                                updateButtonStates();
+                            }}
+                            onKeyDown={(e) => {
+                                // 智能处理删除键
+                                if (e.key === 'Backspace' || e.key === 'Delete') {
+                                    // 延迟执行，让浏览器先处理删除操作
+                                    setTimeout(() => {
+                                        if (editorRef.current) {
+                                            const html = editorRef.current.innerHTML;
+                                            const textContent = editorRef.current.textContent || '';
+
+                                            // 检查是否有空的HTML标签需要清理
+                                            const hasEmptyTags = /<[^>]+><\/[^>]+>/.test(html) ||
+                                                /<[^>]+>\s*<\/[^>]+>/.test(html);
+
+                                            // 如果内容为空或者有空的HTML标签，进行清理
+                                            if (textContent.trim() === '' || hasEmptyTags) {
+                                                const cleanedHtml = cleanEmptyContent(html);
+                                                if (cleanedHtml !== html) {
+                                                    editorRef.current.innerHTML = cleanedHtml;
+                                                    onChange(cleanedHtml);
+
+                                                    // 确保光标在正确位置
+                                                    const selection = window.getSelection();
+                                                    if (selection) {
+                                                        const range = document.createRange();
+                                                        range.selectNodeContents(editorRef.current);
+                                                        range.collapse(false);
+                                                        selection.removeAllRanges();
+                                                        selection.addRange(range);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }, 0);
+                                }
+                            }}
+                            className={cn(
+                                "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
+                                isFullscreen ? "h-full" :
+                                    customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
+                            )}
+                            style={{
+                                fontSize: '14px',
+                                lineHeight: '1.5',
+                            }}
+                            data-placeholder={placeholder}
+                            suppressContentEditableWarning={true}
+                            tabIndex={0}
+                        />
+                    </div>
+
+                    {/* 预览区域 */}
+                    {previewMode && (
+                        <div className={cn(
+                            "w-1/2 bg-gray-50 dark:bg-gray-900 overflow-auto",
+                            isFullscreen ? "h-full" : ""
+                        )} style={!isFullscreen ? {
+                            minHeight: customMinHeight && customMaxHeight ? `${customMinHeight}` : '200px',
+                            maxHeight: customMinHeight && customMaxHeight ? `${customMaxHeight}` : '400px'
+                        } : {}}>
+                            <div className="p-4">
+                                <div className="prose prose-sm max-w-none" style={{
+                                    fontSize: '14px',
+                                    lineHeight: '1.5'
+                                }}>
+                                    <HtmlRenderer content={content} />
+                                </div>
+                            </div>
+                        </div>
                     )}
-                    style={{
-                        fontSize: '14px',
-                        lineHeight: '1.5',
-                    }}
-                    data-placeholder={placeholder}
-                    suppressContentEditableWarning={true}
-                    tabIndex={0}
-                />
+                </div>
 
                 <style jsx global>{`
           .rich-text-editor [contenteditable] {
@@ -1753,6 +1891,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             display: block !important;
             border-radius: 4px !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+          }
+
+          .latex-inline-hover, .latex-block-hover {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-radius: 4px;
+            padding: 2px 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+          }
+
+          .latex-inline-hover:hover, .latex-block-hover:hover {
+            background-color: rgba(59, 130, 246, 0.2);
           }
           
           /* 调整大小控制点样式 */
@@ -1931,6 +2081,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* LaTeX公式选择器 */}
+            <LatexFormulaSelector
+                open={showLatexSelector}
+                onOpenChange={setShowLatexSelector}
+                onInsert={handleInsertLatex}
+            />
 
         </TooltipProvider>
     );

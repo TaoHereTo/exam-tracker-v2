@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { AIService } from "@/lib/aiService";
 import { MixedText } from "@/components/ui/MixedText";
-import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
+import { HtmlRenderer } from "@/components/ui/HtmlRenderer";
 import { useLocalStorageString } from "@/hooks/useLocalStorage";
 import {
     Tooltip,
@@ -263,7 +263,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                         </div>
                                     ) : (
                                         <div className="text-sm leading-relaxed">
-                                            <MarkdownRenderer
+                                            <HtmlRenderer
                                                 content={message.content}
                                                 className="text-sm leading-relaxed"
                                             />

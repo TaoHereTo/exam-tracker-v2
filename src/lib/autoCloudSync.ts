@@ -528,11 +528,6 @@ export class AutoCloudSync {
             // Update to success
             if (toastId && notify.updateToSuccess) {
                 notify.updateToSuccess(toastId, '知识点已更新到云端');
-            } else {
-                notify.notify({
-                    type: 'success',
-                    message: '知识点已更新到云端'
-                });
             }
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);

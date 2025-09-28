@@ -16,7 +16,7 @@ const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ de
 import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
-import { MarkdownRenderer } from '@/components/ui/MarkdownRenderer';
+import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
 import { useCloudData } from '@/contexts/CloudDataContext';
 import { cn } from '@/lib/utils';
 
@@ -91,7 +91,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
 
                             return (
                                 <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <MarkdownRenderer content={note || ''} className="mb-0" />
+                                    <HtmlRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -141,7 +141,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <MarkdownRenderer content={note || ''} className="mb-0" />
+                                    <HtmlRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -191,7 +191,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <MarkdownRenderer content={note || ''} className="mb-0" />
+                                    <HtmlRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -253,7 +253,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <MarkdownRenderer content={note || ''} className="mb-0" />
+                                    <HtmlRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
@@ -303,7 +303,7 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                             const note = (row as Record<string, unknown>).note as string;
                             return (
                                 <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <MarkdownRenderer content={note || ''} className="mb-0" />
+                                    <HtmlRenderer content={note || ''} className="mb-0" />
                                 </div>
                             );
                         }
