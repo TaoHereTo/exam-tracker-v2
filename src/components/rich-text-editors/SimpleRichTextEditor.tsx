@@ -1162,7 +1162,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     ];
 
     return (
-        <TooltipProvider>
+        <TooltipProvider delayDuration={300} skipDelayDuration={100}>
             {isFullscreen && (
                 <div
                     className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
@@ -1388,113 +1388,116 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </DropdownMenu>
                 </div>
 
-                {/* 文字颜色 */}
-                <Popover>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onMouseDown={() => {
-                                        // 在鼠标按下时检查并保存选区
-                                        console.log('文字颜色按钮被按下，检查选区');
-                                        const selection = window.getSelection();
-                                        if (selection && selection.rangeCount > 0) {
-                                            const range = selection.getRangeAt(0);
-                                            const selectedText = range.toString();
-                                            if (selectedText.length > 0) {
-                                                console.log('有选中文字，保存选区');
-                                                saveCurrentSelection();
-                                            } else {
-                                                console.log('没有选中文字，不保存选区');
+                {/* 颜色按钮组 */}
+                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                    {/* 文字颜色 */}
+                    <Popover>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onMouseDown={() => {
+                                            // 在鼠标按下时检查并保存选区
+                                            console.log('文字颜色按钮被按下，检查选区');
+                                            const selection = window.getSelection();
+                                            if (selection && selection.rangeCount > 0) {
+                                                const range = selection.getRangeAt(0);
+                                                const selectedText = range.toString();
+                                                if (selectedText.length > 0) {
+                                                    console.log('有选中文字，保存选区');
+                                                    saveCurrentSelection();
+                                                } else {
+                                                    console.log('没有选中文字，不保存选区');
+                                                }
                                             }
-                                        }
-                                    }}
-                                >
-                                    <Type className="w-3 h-3" />
-                                </Button>
-                            </PopoverTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>文字颜色</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                        <div className="space-y-2">
-                            <div className="text-sm font-medium">文字颜色</div>
-                            <div className="grid grid-cols-6 gap-2">
-                                {colors.map((color) => (
-                                    <div
-                                        key={color}
-                                        className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => {
-                                            console.log('文字颜色被选择，颜色:', color);
-                                            setTextColor(color);
                                         }}
-                                    />
-                                ))}
+                                    >
+                                        <Type className="w-3 h-3" />
+                                    </Button>
+                                </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>文字颜色</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                            <div className="space-y-2">
+                                <div className="text-sm font-medium">文字颜色</div>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {colors.map((color) => (
+                                        <div
+                                            key={color}
+                                            className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => {
+                                                console.log('文字颜色被选择，颜色:', color);
+                                                setTextColor(color);
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        </PopoverContent>
+                    </Popover>
 
-                {/* 背景颜色 */}
-                <Popover>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <PopoverTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onMouseDown={() => {
-                                        // 在鼠标按下时检查并保存选区
-                                        console.log('背景颜色按钮被按下，检查选区');
-                                        const selection = window.getSelection();
-                                        if (selection && selection.rangeCount > 0) {
-                                            const range = selection.getRangeAt(0);
-                                            const selectedText = range.toString();
-                                            if (selectedText.length > 0) {
-                                                console.log('有选中文字，保存选区');
-                                                saveCurrentSelection();
-                                            } else {
-                                                console.log('没有选中文字，不保存选区');
+                    {/* 背景颜色 */}
+                    <Popover>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onMouseDown={() => {
+                                            // 在鼠标按下时检查并保存选区
+                                            console.log('背景颜色按钮被按下，检查选区');
+                                            const selection = window.getSelection();
+                                            if (selection && selection.rangeCount > 0) {
+                                                const range = selection.getRangeAt(0);
+                                                const selectedText = range.toString();
+                                                if (selectedText.length > 0) {
+                                                    console.log('有选中文字，保存选区');
+                                                    saveCurrentSelection();
+                                                } else {
+                                                    console.log('没有选中文字，不保存选区');
+                                                }
                                             }
-                                        }
-                                    }}
-                                >
-                                    <Palette className="w-3 h-3" />
-                                </Button>
-                            </PopoverTrigger>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>背景颜色</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                        <div className="space-y-2">
-                            <div className="text-sm font-medium">背景颜色</div>
-                            <div className="grid grid-cols-6 gap-2">
-                                {colors.map((color) => (
-                                    <div
-                                        key={color}
-                                        className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                        style={{ backgroundColor: color }}
-                                        onClick={() => {
-                                            console.log('背景颜色被选择，颜色:', color);
-                                            setBackgroundColor(color);
                                         }}
-                                    />
-                                ))}
+                                    >
+                                        <Palette className="w-3 h-3" />
+                                    </Button>
+                                </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>背景颜色</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                            <div className="space-y-2">
+                                <div className="text-sm font-medium">背景颜色</div>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {colors.map((color) => (
+                                        <div
+                                            key={color}
+                                            className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                            style={{ backgroundColor: color }}
+                                            onClick={() => {
+                                                console.log('背景颜色被选择，颜色:', color);
+                                                setBackgroundColor(color);
+                                            }}
+                                        />
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                        </PopoverContent>
+                    </Popover>
+                </div>
 
                 {/* 插入链接和图片 */}
                 <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
@@ -1597,7 +1600,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             <div
                 className={cn(
                     'rich-text-editor-main rich-text-editor border overflow-hidden flex flex-col',
-                    isFullscreen ? 'fixed top-12 left-1/2 transform -translate-x-1/2 w-[60vw] max-w-4xl h-[calc(80vh-3rem)] max-h-[calc(80vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl rounded-b-lg' : '',
+                    isFullscreen ? 'fixed top-12 left-1/2 -translate-x-1/2 w-[80vw] max-w-6xl h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl rounded-lg' : '',
                     isDragOver ? 'ring-2 ring-blue-500' : '',
                     className
                 )}
@@ -2054,19 +2057,169 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           .rich-text-editor-toolbar.fixed {
             position: fixed !important;
             top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            z-index: 60 !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 80vw !important;
+            max-width: 6xl !important;
+            height: 3rem !important;
+            z-index: 50 !important; /* 降低z-index，让tooltip在更上层 */
             background: var(--modal-background) !important;
             border-radius: 0.5rem 0.5rem 0 0 !important;
             margin-bottom: 0 !important;
-            border-bottom: 1px solid var(--border) !important;
+            border-bottom: none !important;
             border-left: 1px solid var(--border) !important;
             border-right: 1px solid var(--border) !important;
             border-top: 1px solid var(--border) !important;
             justify-content: center !important; /* 按钮水平居中 */
             flex-wrap: nowrap !important; /* 防止换行 */
+            overflow: visible !important; /* 允许tooltip溢出显示 */
+            clip-path: none !important; /* 移除裁剪，允许tooltip完全显示 */
+            contain: none !important; /* 不限制子元素 */
+            isolation: auto !important; /* 不创建新的层叠上下文 */
           }
+          
+          /* 全屏模式下的tooltip和popover设置 - 统一管理 */
+          .rich-text-editor-toolbar.fixed [data-radix-tooltip-content],
+          .rich-text-editor-toolbar.fixed [data-radix-popover-content] {
+            z-index: 9999 !important;
+            position: fixed !important;
+          }
+          
+          /* 全局tooltip设置 - 确保所有tooltip都有最高层级 */
+          [data-radix-tooltip-content] {
+            z-index: 9999 !important;
+          }
+          
+          [data-radix-popover-content] {
+            z-index: 9999 !important;
+          }
+          
+          /* Portal中的tooltip设置 */
+          [data-radix-portal] [data-radix-tooltip-content],
+          [data-radix-portal] [data-radix-popover-content] {
+            z-index: 9999 !important;
+          }
+          
+          /* 全屏模式下的body级别设置 */
+          body:has(.rich-text-editor-toolbar.fixed) [data-radix-tooltip-content],
+          body:has(.rich-text-editor-toolbar.fixed) [data-radix-popover-content] {
+            z-index: 9999 !important;
+            position: fixed !important;
+          }
+          
+          /* 确保工具栏不拦截tooltip */
+          .rich-text-editor-toolbar.fixed {
+            pointer-events: none !important;
+            overflow: visible !important;
+          }
+          
+          .rich-text-editor-toolbar.fixed > * {
+            pointer-events: auto !important;
+          }
+          
+          /* 强制所有tooltip相关元素使用最高层级 */
+          .rich-text-editor-toolbar.fixed * [data-radix-tooltip-content],
+          .rich-text-editor-toolbar.fixed * [data-radix-popover-content] {
+            z-index: 9999 !important;
+            position: fixed !important;
+          }
+          
+          /* 最强制性的tooltip设置 - 覆盖所有可能的样式 */
+          .rich-text-editor-toolbar.fixed [data-radix-tooltip-content] {
+            z-index: 99999 !important;
+            position: fixed !important;
+            background: var(--popover) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          }
+          
+          /* 最强制性的popover设置 */
+          .rich-text-editor-toolbar.fixed [data-radix-popover-content] {
+            z-index: 99999 !important;
+            position: fixed !important;
+            background: var(--popover) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+          }
+          
+          /* 确保tooltip在body级别也有最高优先级 */
+          body [data-radix-tooltip-content] {
+            z-index: 99999 !important;
+          }
+          
+          body [data-radix-popover-content] {
+            z-index: 99999 !important;
+          }
+          
+          /* 终极解决方案 - 确保tooltip完全可见 */
+          .rich-text-editor-toolbar.fixed [data-radix-tooltip-content] {
+            z-index: 999999 !important;
+            position: fixed !important;
+            transform: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            background: var(--popover) !important;
+            color: var(--popover-foreground) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            line-height: 1.4 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            max-width: 200px !important;
+            word-wrap: break-word !important;
+            top: 3.5rem !important; /* 强制显示在工具栏下方 */
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+          }
+          
+          /* 确保tooltip箭头也正确显示 */
+          .rich-text-editor-toolbar.fixed [data-radix-tooltip-content]::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -4px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            width: 0 !important;
+            height: 0 !important;
+            border-left: 4px solid transparent !important;
+            border-right: 4px solid transparent !important;
+            border-bottom: 4px solid var(--popover) !important;
+          }
+          
+          /* 强制tooltip显示在工具栏下方，不被遮挡 */
+          .rich-text-editor-toolbar.fixed [data-radix-tooltip-content] {
+            z-index: 999999 !important; /* 确保tooltip在工具栏之上 */
+            position: fixed !important;
+            background: var(--popover) !important;
+            color: var(--popover-foreground) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 6px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            font-weight: 500 !important;
+            line-height: 1.4 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            max-width: 200px !important;
+            word-wrap: break-word !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+            clip-path: none !important; /* 确保tooltip不被裁剪 */
+            overflow: visible !important; /* 确保tooltip完全可见 */
+          }
+          
+          /* 终极解决方案 - 使用更高层级的容器 */
+          .rich-text-editor-toolbar.fixed {
+            isolation: auto !important; /* 不创建新的层叠上下文，避免限制tooltip */
+          }
+          
           
           /* 全屏模式下工具栏内的所有按钮组居中 */
           .rich-text-editor-toolbar.fixed > div {
@@ -2099,22 +2252,40 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             border-bottom: 1px solid var(--border) !important;
           }
           
+          /* 全屏模式下的主编辑器容器样式 - 完整圆角 */
+          .rich-text-editor-main.fixed {
+            border-radius: 0 0 0.5rem 0.5rem !important;
+            border-top: 1px solid var(--border) !important;
+            border-left: 1px solid var(--border) !important;
+            border-right: 1px solid var(--border) !important;
+            border-bottom: 1px solid var(--border) !important;
+            width: 80vw !important;
+            max-width: 6xl !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+          }
+          
           /* 全屏模式下的高度限制 */
           .rich-text-editor-main.fixed {
-            max-height: calc(80vh - 3rem) !important;
+            height: calc(100vh - 3rem) !important;
+            max-height: calc(100vh - 3rem) !important;
             overflow: hidden !important;
           }
           
           /* 全屏模式下编辑器内容区域高度限制 */
           .rich-text-editor-main.fixed > .flex {
+            height: 100% !important;
             max-height: 100% !important;
             overflow: hidden !important;
           }
           
           /* 全屏模式下编辑器区域高度限制 */
           .rich-text-editor-main.fixed [contenteditable] {
+            height: 100% !important;
+            min-height: calc(100vh - 6rem) !important;
             max-height: 100% !important;
             overflow-y: auto !important;
+            padding: 1rem !important;
           }
           
           /* 图片加载状态样式 */
