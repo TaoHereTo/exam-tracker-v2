@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import {
@@ -11,9 +11,17 @@ import {
     DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/animate-ui/components/radix/radio-group';
 import { Label } from '@/components/ui/label';
-import { Sigma } from 'lucide-react';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Sigma, Search, X } from 'lucide-react';
 
 interface LatexFormulaSelectorProps {
     open: boolean;
@@ -122,82 +130,160 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     onInsert
 }) => {
     const [displayMode, setDisplayMode] = useState<'inline' | 'block'>('inline');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
 
-    const handleFormulaClick = (latex: string) => {
-        onInsert(latex, displayMode === 'block');
-        onOpenChange(false);
+    // 扁平化所有公式数据
+    const allFormulas = useMemo(() => {
+        const formulas: Array<{ name: string; latex: string; preview: string; category: string }> = [];
+        Object.entries(latexTemplates).forEach(([category, formulaList]) => {
+            formulaList.forEach(formula => {
+                formulas.push({
+                    ...formula,
+                    category
+                });
+            });
+        });
+        return formulas;
+    }, []);
+
+    // 根据分类筛选公式
+    const filteredFormulas = useMemo(() => {
+        let filtered = allFormulas;
+
+        // 如果选择了分类，则筛选该分类的公式
+        if (selectedCategory) {
+            filtered = filtered.filter(formula => formula.category === selectedCategory);
+        }
+
+        // 如果有搜索词，则进一步筛选
+        if (searchTerm.trim()) {
+            const searchLower = searchTerm.toLowerCase();
+            filtered = filtered.filter(formula =>
+                formula.name.toLowerCase().includes(searchLower) ||
+                formula.latex.toLowerCase().includes(searchLower)
+            );
+        }
+
+        return filtered;
+    }, [allFormulas, selectedCategory, searchTerm]);
+
+    // 获取所有分类
+    const categories = Object.keys(latexTemplates);
+
+    const handleCategoryChange = (category: string) => {
+        setSelectedCategory(category);
     };
+
 
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
             <DrawerContent className="max-h-[90vh]">
                 <DrawerHeader className="pb-2">
-                    <DrawerTitle className="flex items-center gap-2">
-                        <Sigma className="h-5 w-5" />
-                        LaTeX公式选择器
-                    </DrawerTitle>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                        可以点击下方公式选中后插入，也可以直接在输入框中输入公式（注意使用$包裹）
-                    </p>
-                    <div className="mt-4">
-                        <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-6">
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="inline"
-                                    id="inline"
-                                    className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                />
-                                <Label htmlFor="inline" className="text-sm">行内公式 ($...$)</Label>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Sigma className="h-5 w-5" />
+                            <div>
+                                <DrawerTitle className="inline">LaTeX公式选择器</DrawerTitle>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                    可以点击下方公式选中后插入，也可以直接在输入框中输入公式（注意使用$包裹）
+                                </span>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem
-                                    value="block"
-                                    id="block"
-                                    className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                />
-                                <Label htmlFor="block" className="text-sm">行间公式 ($$...$$)</Label>
-                            </div>
-                        </RadioGroup>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onOpenChange(false)}
+                            className="h-8 w-8"
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
                     </div>
                 </DrawerHeader>
 
                 <div className="flex-1 overflow-auto p-4">
                     <div className="space-y-6">
-                        {Object.entries(latexTemplates).map(([category, formulas]) => (
-                            <div key={category} className="space-y-3">
-                                <h3 className="text-lg font-semibold">{category}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                    {formulas.map((formula, index) => (
-                                        <div
-                                            key={index}
-                                            className="p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
-                                            onClick={() => handleFormulaClick(formula.latex)}
-                                        >
-                                            <div className="text-sm font-medium mb-2">{formula.name}</div>
-                                            <div className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all mb-2">
-                                                {formula.latex}
-                                            </div>
-                                            <div className="text-center bg-gray-100 dark:bg-gray-700 p-2 rounded min-h-[40px] flex items-center justify-center">
-                                                <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
-                                            </div>
+                        {/* 分类选择、搜索和公式模式选择区域 */}
+                        <div className="flex gap-4 items-center">
+                            <div className="flex gap-2 items-center">
+                                <Label className="text-sm font-medium">选择分类:</Label>
+                                <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                                    <SelectTrigger className="w-[200px]">
+                                        <SelectValue placeholder="选择分类" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((category) => (
+                                            <SelectItem key={category} value={category}>
+                                                {category}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="flex gap-2 items-center">
+                                <Label className="text-sm font-medium">搜索:</Label>
+                                <Input
+                                    placeholder="搜索公式..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-[200px]"
+                                />
+                            </div>
+
+                            <div className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <div className="flex gap-2 items-center">
+                                    <Label className="text-sm font-medium">公式模式:</Label>
+                                    <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-4">
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem
+                                                value="inline"
+                                                id="inline"
+                                                className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
+                                            />
+                                            <Label htmlFor="inline" className="text-sm">行内公式</Label>
                                         </div>
-                                    ))}
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem
+                                                value="block"
+                                                id="block"
+                                                className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
+                                            />
+                                            <Label htmlFor="block" className="text-sm">行间公式</Label>
+                                        </div>
+                                    </RadioGroup>
                                 </div>
                             </div>
-                        ))}
+                        </div>
+
+                        {/* 公式展示区域 */}
+                        <div className="space-y-4">
+                            <div className="text-sm text-gray-600 dark:text-gray-400">
+                                {selectedCategory ? `${selectedCategory} 分类共有` : '全部'} {filteredFormulas.length} 个公式
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {filteredFormulas.map((formula, index) => (
+                                    <div
+                                        key={`${formula.category}-${index}`}
+                                        className="p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                                        onClick={() => onInsert(formula.latex, displayMode === 'block')}
+                                    >
+                                        <div className="text-sm font-medium mb-2">{formula.name}</div>
+                                        <div className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all mb-2">
+                                            {formula.latex}
+                                        </div>
+                                        <div className="text-center bg-gray-100 dark:bg-gray-700 p-2 rounded min-h-[40px] flex items-center justify-center">
+                                            <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <DrawerFooter className="pt-2">
-                    <div className="flex justify-center items-center gap-2">
-                        <Button
-                            variant="outline"
-                            onClick={() => onOpenChange(false)}
-                        >
-                            关闭
-                        </Button>
-                    </div>
-                </DrawerFooter>
             </DrawerContent>
         </Drawer>
     );

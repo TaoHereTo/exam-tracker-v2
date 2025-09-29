@@ -1162,7 +1162,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     ];
 
     return (
-        <TooltipProvider delayDuration={300} skipDelayDuration={100}>
+        <TooltipProvider openDelay={300}>
             {isFullscreen && (
                 <div
                     className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
