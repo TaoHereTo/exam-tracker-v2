@@ -1165,7 +1165,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         <TooltipProvider>
             {isFullscreen && (
                 <div
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40"
+                    className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
                     onClick={() => setIsFullscreen(false)}
                 />
             )}
@@ -1173,7 +1173,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             {/* 工具栏 - 独立固定在顶部，胶囊形状 */}
             <div className={cn(
                 "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5",
-                isFullscreen ? "fixed" : ""
+                isFullscreen ? "fixed justify-center" : ""
             )}>
                 {/* 撤销/重做 */}
                 <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
@@ -1553,7 +1553,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 </div>
 
                 {/* 全屏按钮 */}
-                <div className="flex items-center gap-0.5 ml-auto">
+                <div className={cn(
+                    "flex items-center gap-0.5",
+                    isFullscreen ? "" : "ml-auto"
+                )}>
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
@@ -1594,7 +1597,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             <div
                 className={cn(
                     'rich-text-editor-main rich-text-editor border overflow-hidden flex flex-col',
-                    isFullscreen ? 'fixed top-12 left-1/2 transform -translate-x-1/2 w-[60vw] max-w-4xl h-[calc(80vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl rounded-lg' : '',
+                    isFullscreen ? 'fixed top-12 left-1/2 transform -translate-x-1/2 w-[60vw] max-w-4xl h-[calc(80vh-3rem)] max-h-[calc(80vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl rounded-b-lg' : '',
                     isDragOver ? 'ring-2 ring-blue-500' : '',
                     className
                 )}
@@ -1605,12 +1608,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 {/* 编辑器内容区域 - 支持预览模式 */}
                 <div className={cn(
                     "flex",
-                    isFullscreen ? "flex-1" : "",
+                    isFullscreen ? "flex-1 min-h-0" : "",
                     previewMode ? "" : ""
                 )}>
                     {/* 编辑器区域 */}
                     <div className={cn(
-                        "flex-1",
+                        "flex-1 min-h-0",
                         previewMode ? "w-1/2 border-r" : "w-full"
                     )}>
                         <div
@@ -1711,7 +1714,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             }}
                             className={cn(
                                 "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
-                                isFullscreen ? "h-full" :
+                                isFullscreen ? "h-full max-h-full" :
                                     customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
                             )}
                             style={{
@@ -2040,7 +2043,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             margin-bottom: -1px !important; /* 与下方容器无缝连接 */
           }
           
-          /* 全屏模式下的工具栏样式 */
+          /* 非全屏模式下的工具栏 - 胶囊形状 */
+          .rich-text-editor-toolbar:not(.fixed) {
+            border-radius: 0.5rem 0.5rem 0 0 !important;
+            border-bottom: none !important;
+            margin-bottom: -1px !important;
+          }
+          
+          /* 全屏模式下的工具栏样式 - 胶囊形状，按钮居中 */
           .rich-text-editor-toolbar.fixed {
             position: fixed !important;
             top: 0 !important;
@@ -2048,9 +2058,36 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             right: 0 !important;
             z-index: 60 !important;
             background: var(--modal-background) !important;
-            border-radius: 0 !important;
+            border-radius: 0.5rem 0.5rem 0 0 !important;
             margin-bottom: 0 !important;
             border-bottom: 1px solid var(--border) !important;
+            border-left: 1px solid var(--border) !important;
+            border-right: 1px solid var(--border) !important;
+            border-top: 1px solid var(--border) !important;
+            justify-content: center !important; /* 按钮水平居中 */
+            flex-wrap: nowrap !important; /* 防止换行 */
+          }
+          
+          /* 全屏模式下工具栏内的所有按钮组居中 */
+          .rich-text-editor-toolbar.fixed > div {
+            justify-content: center !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+          }
+          
+          /* 全屏模式下移除右侧按钮组的自动边距 */
+          .rich-text-editor-toolbar.fixed .ml-auto {
+            margin-left: 0 !important;
+          }
+          
+          /* 全屏模式下隐藏主题切换按钮 */
+          .rich-text-editor-toolbar.fixed ~ * .theme-toggle-button {
+            display: none !important;
+          }
+          
+          /* 当全屏模式激活时隐藏主题切换按钮 */
+          body:has(.rich-text-editor-toolbar.fixed) .theme-toggle-button {
+            display: none !important;
           }
           
           /* 主编辑器容器样式 - 独立输入框 */
@@ -2060,6 +2097,24 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             border-left: 1px solid var(--border) !important;
             border-right: 1px solid var(--border) !important;
             border-bottom: 1px solid var(--border) !important;
+          }
+          
+          /* 全屏模式下的高度限制 */
+          .rich-text-editor-main.fixed {
+            max-height: calc(80vh - 3rem) !important;
+            overflow: hidden !important;
+          }
+          
+          /* 全屏模式下编辑器内容区域高度限制 */
+          .rich-text-editor-main.fixed > .flex {
+            max-height: 100% !important;
+            overflow: hidden !important;
+          }
+          
+          /* 全屏模式下编辑器区域高度限制 */
+          .rich-text-editor-main.fixed [contenteditable] {
+            max-height: 100% !important;
+            overflow-y: auto !important;
           }
           
           /* 图片加载状态样式 */
