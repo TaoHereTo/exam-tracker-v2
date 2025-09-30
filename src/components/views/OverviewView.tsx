@@ -13,6 +13,7 @@ import {
 import { HelpCircle } from "lucide-react";
 import { Marquee } from "@/components/magicui/marquee";
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from '@/components/ui/simple-tabs';
+import { ThemeColorProvider, PAGE_THEME_COLORS } from "@/contexts/ThemeColorContext";
 import { FlexCenter, FlexCenterBoth } from "@/components/ui/FlexCenter";
 import { CardContainer } from "@/components/ui/CardContainer";
 
@@ -606,184 +607,186 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             {/* 学习分析区域 - 放在屏幕底部 */}
             <div className="w-full mt-16 mb-12">
                 {/* 使用Animate Tabs展示分析卡片 */}
-                <Tabs defaultValue="data-analysis" className="w-full">
-                    <div className="flex justify-center mb-4 sm:mb-8">
-                        <TabsList className="grid w-fit min-w-[200px] grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
+                <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.overview}>
+                    <Tabs defaultValue="data-analysis" className="w-full" themeColor={PAGE_THEME_COLORS.overview}>
+                        <div className="flex justify-center mb-4 sm:mb-8">
+                            <TabsList className="grid w-fit min-w-[200px] grid-cols-3 sm:grid-cols-6 gap-1 sm:gap-2">
+                                {moduleData.map((module) => (
+                                    <TabsTrigger key={module.module} value={module.module} className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center">
+                                        {module.name}
+                                    </TabsTrigger>
+                                ))}
+                            </TabsList>
+                        </div>
+                        <TabsContents className="py-4 sm:py-6 px-2">
                             {moduleData.map((module) => (
-                                <TabsTrigger key={module.module} value={module.module} className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center">
-                                    {module.name}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </div>
-                    <TabsContents className="py-4 sm:py-6 px-2">
-                        {moduleData.map((module) => (
-                            <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
-                                <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
-                                    {/* 原有数据分析卡片 */}
-                                    <Card className="p-3 sm:p-4 bg-white dark:bg-transparent dark:border-[#262626]">
-                                        <div className="space-y-3 sm:space-y-4">
-                                            <h3 className="font-medium text-center text-base sm:text-lg">{module.name}</h3>
+                                <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
+                                    <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
+                                        {/* 原有数据分析卡片 */}
+                                        <Card className="p-3 sm:p-4 bg-white dark:bg-transparent dark:border-[#262626]">
+                                            <div className="space-y-3 sm:space-y-4">
+                                                <h3 className="font-medium text-center text-base sm:text-lg">{module.name}</h3>
 
-                                            {/* 刷题数量 */}
-                                            <div className="p-2 sm:p-3 border rounded-lg">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-medium text-sm sm:text-base">刷题数量</span>
+                                                {/* 刷题数量 */}
+                                                <div className="p-2 sm:p-3 border rounded-lg">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="font-medium text-sm sm:text-base">刷题数量</span>
+                                                        {module.hasWeekData ? (
+                                                            <div className={`flex items-center gap-2 ${module.weekChange > 0 ? 'text-green-600' :
+                                                                module.weekChange < 0 ? 'text-red-600' :
+                                                                    'text-gray-600'
+                                                                }`}>
+                                                                {module.weekChange > 0 ? '↗️' : module.weekChange < 0 ? '↘️' : '➡️'}
+                                                                <span className="text-sm font-medium">
+                                                                    {module.weekChange > 0 ? '增加' : module.weekChange < 0 ? '减少' : '持平'}
+                                                                </span>
+                                                            </div>
+                                                        ) : (
+                                                            <span className="text-sm text-muted-foreground">本周无数据</span>
+                                                        )}
+                                                    </div>
+
                                                     {module.hasWeekData ? (
-                                                        <div className={`flex items-center gap-2 ${module.weekChange > 0 ? 'text-green-600' :
-                                                            module.weekChange < 0 ? 'text-red-600' :
-                                                                'text-gray-600'
-                                                            }`}>
-                                                            {module.weekChange > 0 ? '↗️' : module.weekChange < 0 ? '↘️' : '➡️'}
-                                                            <span className="text-sm font-medium">
-                                                                {module.weekChange > 0 ? '增加' : module.weekChange < 0 ? '减少' : '持平'}
-                                                            </span>
-                                                        </div>
+                                                        <>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">今日刷题</div>
+                                                                    <div className="font-medium">{module.todayTotal}题</div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">本周总计</div>
+                                                                    <div className="font-medium">{module.weekTotal}题</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-2 pt-2 border-t">
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-muted-foreground">与历史平均对比</span>
+                                                                    <span className={`font-medium ${module.weekChange > 0 ? 'text-green-600' :
+                                                                        module.weekChange < 0 ? 'text-red-600' :
+                                                                            'text-gray-600'
+                                                                        }`}>
+                                                                        {module.weekChange > 0 ? '+' : ''}{module.weekChange.toFixed(0)}题
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </>
                                                     ) : (
-                                                        <span className="text-sm text-muted-foreground">本周无数据</span>
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {module.hasHistoricalData ? '有历史数据，本周未录入' : '暂无任何数据'}
+                                                        </div>
                                                     )}
                                                 </div>
 
-                                                {module.hasWeekData ? (
-                                                    <>
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">今日刷题</div>
-                                                                <div className="font-medium">{module.todayTotal}题</div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">本周总计</div>
-                                                                <div className="font-medium">{module.weekTotal}题</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="mt-2 pt-2 border-t">
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-muted-foreground">与历史平均对比</span>
-                                                                <span className={`font-medium ${module.weekChange > 0 ? 'text-green-600' :
-                                                                    module.weekChange < 0 ? 'text-red-600' :
-                                                                        'text-gray-600'
-                                                                    }`}>
-                                                                    {module.weekChange > 0 ? '+' : ''}{module.weekChange.toFixed(0)}题
+                                                {/* 每分钟得分 */}
+                                                <div className="p-2 sm:p-3 border rounded-lg">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="font-medium text-sm sm:text-base">每分钟得分</span>
+                                                        {module.hasTodayData ? (
+                                                            <div className={`flex items-center gap-2 ${module.scoreChange > 0 ? 'text-green-600' :
+                                                                module.scoreChange < 0 ? 'text-red-600' :
+                                                                    'text-gray-600'
+                                                                }`}>
+                                                                {module.scoreChange > 0 ? '↗️' : module.scoreChange < 0 ? '↘️' : '➡️'}
+                                                                <span className="text-sm font-medium">
+                                                                    {module.scoreChange > 0 ? '上升' : module.scoreChange < 0 ? '下降' : '持平'}
                                                                 </span>
                                                             </div>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {module.hasHistoricalData ? '有历史数据，本周未录入' : '暂无任何数据'}
+                                                        ) : (
+                                                            <span className="text-sm text-muted-foreground">今日未录入</span>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            {/* 每分钟得分 */}
-                                            <div className="p-2 sm:p-3 border rounded-lg">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-medium text-sm sm:text-base">每分钟得分</span>
                                                     {module.hasTodayData ? (
-                                                        <div className={`flex items-center gap-2 ${module.scoreChange > 0 ? 'text-green-600' :
-                                                            module.scoreChange < 0 ? 'text-red-600' :
-                                                                'text-gray-600'
-                                                            }`}>
-                                                            {module.scoreChange > 0 ? '↗️' : module.scoreChange < 0 ? '↘️' : '➡️'}
-                                                            <span className="text-sm font-medium">
-                                                                {module.scoreChange > 0 ? '上升' : module.scoreChange < 0 ? '下降' : '持平'}
-                                                            </span>
-                                                        </div>
+                                                        <>
+                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">今日每分钟得分</div>
+                                                                    <div className="font-medium">{module.todayScorePerMinute.toFixed(3)}分/分钟</div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">历史平均每分钟得分</div>
+                                                                    <div className="font-medium">{module.historicalScorePerMinute.toFixed(3)}分/分钟</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-2 pt-2 border-t">
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-muted-foreground">变化幅度</span>
+                                                                    <span className={`font-medium ${module.scoreChange > 0 ? 'text-green-600' :
+                                                                        module.scoreChange < 0 ? 'text-red-600' :
+                                                                            'text-gray-600'
+                                                                        }`}>
+                                                                        {module.scoreChange > 0 ? '+' : ''}{module.scoreChange.toFixed(3)}分/分钟
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </>
                                                     ) : (
-                                                        <span className="text-sm text-muted-foreground">今日未录入</span>
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {module.hasHistoricalData ? '有历史数据，今日未录入' : '暂无任何数据'}
+                                                        </div>
                                                     )}
                                                 </div>
 
-                                                {module.hasTodayData ? (
-                                                    <>
-                                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">今日每分钟得分</div>
-                                                                <div className="font-medium">{module.todayScorePerMinute.toFixed(3)}分/分钟</div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">历史平均每分钟得分</div>
-                                                                <div className="font-medium">{module.historicalScorePerMinute.toFixed(3)}分/分钟</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="mt-2 pt-2 border-t">
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-muted-foreground">变化幅度</span>
-                                                                <span className={`font-medium ${module.scoreChange > 0 ? 'text-green-600' :
-                                                                    module.scoreChange < 0 ? 'text-red-600' :
-                                                                        'text-gray-600'
-                                                                    }`}>
-                                                                    {module.scoreChange > 0 ? '+' : ''}{module.scoreChange.toFixed(3)}分/分钟
+                                                {/* 正确率 */}
+                                                <div className="p-3 border rounded-lg">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="font-medium">正确率</span>
+                                                        {module.hasTodayData ? (
+                                                            <div className={`flex items-center gap-2 ${module.accuracyChange > 0 ? 'text-green-600' :
+                                                                module.accuracyChange < 0 ? 'text-red-600' :
+                                                                    'text-gray-600'
+                                                                }`}>
+                                                                {module.accuracyChange > 0 ? '↗️' : module.accuracyChange < 0 ? '↘️' : '➡️'}
+                                                                <span className="text-sm font-medium">
+                                                                    {module.accuracyChange > 0 ? '上升' : module.accuracyChange < 0 ? '下降' : '持平'}
                                                                 </span>
                                                             </div>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {module.hasHistoricalData ? '有历史数据，今日未录入' : '暂无任何数据'}
+                                                        ) : (
+                                                            <span className="text-sm text-muted-foreground">今日未录入</span>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            {/* 正确率 */}
-                                            <div className="p-3 border rounded-lg">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="font-medium">正确率</span>
                                                     {module.hasTodayData ? (
-                                                        <div className={`flex items-center gap-2 ${module.accuracyChange > 0 ? 'text-green-600' :
-                                                            module.accuracyChange < 0 ? 'text-red-600' :
-                                                                'text-gray-600'
-                                                            }`}>
-                                                            {module.accuracyChange > 0 ? '↗️' : module.accuracyChange < 0 ? '↘️' : '➡️'}
-                                                            <span className="text-sm font-medium">
-                                                                {module.accuracyChange > 0 ? '上升' : module.accuracyChange < 0 ? '下降' : '持平'}
-                                                            </span>
-                                                        </div>
+                                                        <>
+                                                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">今日正确率</div>
+                                                                    <div className="font-medium">{(module.todayAccuracy * 100).toFixed(1)}%</div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-muted-foreground mb-1">历史平均正确率</div>
+                                                                    <div className="font-medium">{(module.historicalAccuracy * 100).toFixed(1)}%</div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-2 pt-2 border-t">
+                                                                <div className="flex justify-between text-sm">
+                                                                    <span className="text-muted-foreground">变化幅度</span>
+                                                                    <span className={`font-medium ${module.accuracyChange > 0 ? 'text-green-600' :
+                                                                        module.accuracyChange < 0 ? 'text-red-600' :
+                                                                            'text-gray-600'
+                                                                        }`}>
+                                                                        {module.accuracyChange > 0 ? '+' : ''}{(module.accuracyChange * 100).toFixed(1)}%
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </>
                                                     ) : (
-                                                        <span className="text-sm text-muted-foreground">今日未录入</span>
+                                                        <div className="text-sm text-muted-foreground">
+                                                            {module.hasHistoricalData ? '有历史数据，今日未录入' : '暂无任何数据'}
+                                                        </div>
                                                     )}
                                                 </div>
-
-                                                {module.hasTodayData ? (
-                                                    <>
-                                                        <div className="grid grid-cols-2 gap-4 text-sm">
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">今日正确率</div>
-                                                                <div className="font-medium">{(module.todayAccuracy * 100).toFixed(1)}%</div>
-                                                            </div>
-                                                            <div>
-                                                                <div className="text-muted-foreground mb-1">历史平均正确率</div>
-                                                                <div className="font-medium">{(module.historicalAccuracy * 100).toFixed(1)}%</div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className="mt-2 pt-2 border-t">
-                                                            <div className="flex justify-between text-sm">
-                                                                <span className="text-muted-foreground">变化幅度</span>
-                                                                <span className={`font-medium ${module.accuracyChange > 0 ? 'text-green-600' :
-                                                                    module.accuracyChange < 0 ? 'text-red-600' :
-                                                                        'text-gray-600'
-                                                                    }`}>
-                                                                    {module.accuracyChange > 0 ? '+' : ''}{(module.accuracyChange * 100).toFixed(1)}%
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </>
-                                                ) : (
-                                                    <div className="text-sm text-muted-foreground">
-                                                        {module.hasHistoricalData ? '有历史数据，今日未录入' : '暂无任何数据'}
-                                                    </div>
-                                                )}
                                             </div>
-                                        </div>
-                                    </Card>
-                                </div>
-                            </TabsContent>
-                        ))}
-                    </TabsContents>
-                </Tabs>
+                                        </Card>
+                                    </div>
+                                </TabsContent>
+                            ))}
+                        </TabsContents>
+                    </Tabs>
+                </ThemeColorProvider>
             </div>
         </div>
     );

@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from '@/components/ui/simple-tabs';
+import { ThemeColorProvider, PAGE_THEME_COLORS } from "@/contexts/ThemeColorContext";
 import { normalizeModuleName, getModuleScore, getModuleColor, UNIFIED_LEGEND_STYLE } from "@/config/exam";
 import { TrendChart } from "@/components/ui/TrendChart";
 import { ModulePieChart } from "@/components/ui/ModulePieChart";
@@ -334,41 +335,43 @@ export const ChartsView = function ChartsView({ records }: ChartsViewProps) {
     }, [records]);
 
     return (
-        <Tabs defaultValue="perMinute" className="w-full">
-            <div className="flex justify-center mb-4 sm:mb-8">
-                <TabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
-                    <TabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="每分钟得分" /></TabsTrigger>
-                    <TabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="正确率" /></TabsTrigger>
-                    <TabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块耗时分布" /></TabsTrigger>
-                    <TabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块能力" /></TabsTrigger>
-                </TabsList>
-            </div>
+        <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.charts}>
+            <Tabs defaultValue="perMinute" className="w-full" themeColor={PAGE_THEME_COLORS.charts}>
+                <div className="flex justify-center mb-4 sm:mb-8">
+                    <TabsList className="grid w-fit min-w-[200px] grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-2">
+                        <TabsTrigger value="perMinute" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="每分钟得分" /></TabsTrigger>
+                        <TabsTrigger value="accuracy" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="正确率" /></TabsTrigger>
+                        <TabsTrigger value="pie" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块耗时分布" /></TabsTrigger>
+                        <TabsTrigger value="radar" className="text-xs sm:text-sm px-2 sm:px-4 py-1 flex items-center justify-center"><MixedText text="模块能力" /></TabsTrigger>
+                    </TabsList>
+                </div>
 
-            <TabsContents className="py-4 sm:py-8">
-                <TabsContent value="perMinute" className="outline-none">
-                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
-                        <TrendChart data={perMinuteData} yMax={2} />
-                    </div>
-                </TabsContent>
+                <TabsContents className="py-4 sm:py-8">
+                    <TabsContent value="perMinute" className="outline-none">
+                        <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
+                            <TrendChart data={perMinuteData} yMax={2} />
+                        </div>
+                    </TabsContent>
 
-                <TabsContent value="accuracy" className="outline-none">
-                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
-                        <TrendChart data={accuracyData} yMax={100} />
-                    </div>
-                </TabsContent>
+                    <TabsContent value="accuracy" className="outline-none">
+                        <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
+                            <TrendChart data={accuracyData} yMax={100} />
+                        </div>
+                    </TabsContent>
 
-                <TabsContent value="pie" className="outline-none">
-                    <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
-                        <ModulePieChart data={pieChartData} />
-                    </div>
-                </TabsContent>
+                    <TabsContent value="pie" className="outline-none">
+                        <div className="w-full h-[300px] sm:h-[450px] md:h-[500px] relative">
+                            <ModulePieChart data={pieChartData} />
+                        </div>
+                    </TabsContent>
 
-                <TabsContent value="radar" className="outline-none">
-                    <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] relative mt-2 sm:mt-4">
-                        <ModuleRadarChart data={records} />
-                    </div>
-                </TabsContent>
-            </TabsContents>
-        </Tabs>
+                    <TabsContent value="radar" className="outline-none">
+                        <div className="w-full h-[250px] sm:h-[350px] md:h-[400px] relative mt-2 sm:mt-4">
+                            <ModuleRadarChart data={records} />
+                        </div>
+                    </TabsContent>
+                </TabsContents>
+            </Tabs>
+        </ThemeColorProvider>
     );
 };

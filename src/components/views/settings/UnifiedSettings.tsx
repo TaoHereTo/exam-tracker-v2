@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/ui/simple-tabs";
+import { ThemeColorProvider, PAGE_THEME_COLORS } from "@/contexts/ThemeColorContext";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
@@ -481,588 +482,590 @@ export function UnifiedSettings({
         width: '100%',
         margin: '0 auto',
       }}>
-        <Tabs defaultValue="appearance" className="w-full">
-          <div className="flex justify-center items-center mb-6 py-2">
-            <TabsList className="items-center h-10">
-              <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
-              <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
-              <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
-            </TabsList>
-          </div>
+        <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.settings}>
+          <Tabs defaultValue="appearance" className="w-full" themeColor={PAGE_THEME_COLORS.settings}>
+            <div className="flex justify-center items-center mb-6 py-2">
+              <TabsList className="items-center h-10">
+                <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
+                <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
+              </TabsList>
+            </div>
 
-          <TabsContents>
-            <TabsContent value="appearance">
-              {/* Appearance Settings */}
-              <div className="space-y-6">
+            <TabsContents>
+              <TabsContent value="appearance">
+                {/* Appearance Settings */}
+                <div className="space-y-6">
 
-                {/* Theme Switch */}
-                <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="深浅色切换" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="切换浅色、深色或跟随系统。" /></p>
+                  {/* Theme Switch */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="深浅色切换" /></h3>
+                      <p className="text-sm text-muted-foreground mt-1"><MixedText text="切换浅色、深色或跟随系统。" /></p>
+                    </div>
+                    <div className="w-auto">
+                      <Select value={theme} onValueChange={setTheme}>
+                        <SelectTrigger className="w-[120px] h-8 sm:h-10 text-sm">
+                          <SelectValue placeholder="选择外观" className="text-sm" />
+                        </SelectTrigger>
+                        <SelectContent className="select-content-fixed-width" position="popper" sideOffset={4}>
+                          <SelectItem value="light" className="text-sm"><MixedText text="浅色模式" /></SelectItem>
+                          <SelectItem value="dark" className="text-sm"><MixedText text="深色模式" /></SelectItem>
+                          <SelectItem value="system" className="text-sm"><MixedText text="跟随系统" /></SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <div className="w-auto">
-                    <Select value={theme} onValueChange={setTheme}>
-                      <SelectTrigger className="w-[120px] h-8 sm:h-10 text-sm">
-                        <SelectValue placeholder="选择外观" className="text-sm" />
-                      </SelectTrigger>
-                      <SelectContent className="select-content-fixed-width" position="popper" sideOffset={4}>
-                        <SelectItem value="light" className="text-sm"><MixedText text="浅色模式" /></SelectItem>
-                        <SelectItem value="dark" className="text-sm"><MixedText text="深色模式" /></SelectItem>
-                        <SelectItem value="system" className="text-sm"><MixedText text="跟随系统" /></SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
 
-                {/* Divider */}
-                <div className="border-t border-gray-200 dark:border-gray-700"></div>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-                {/* Eye Care Mode */}
-                <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="护眼模式" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {theme === 'dark'
-                        ? <MixedText text="护眼模式仅在浅色模式下可用，请先切换到浅色模式。" />
-                        : <MixedText text="开启后页面整体色调更柔和，减少视觉疲劳。" />
-                      }
-                    </p>
-                  </div>
-                  <Switch
-                    checked={eyeCare}
-                    onCheckedChange={setEyeCare}
-                    disabled={theme === 'dark'}
-                    className="mt-0"
-                  />
-                </div>
-              </div>
-
-              {/* Save Settings Button - Bottom right */}
-              <div className="flex justify-end mt-8 mb-6">
-                <Button
-                  onClick={handleSaveAllSettings}
-                  variant="default"
-                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  <MixedText text="保存设置" />
-                </Button>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="data">
-              {/* Data Management */}
-              <div className="space-y-6">
-
-                {/* Backup and Restore */}
-                <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                  <div>
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="备份与恢复" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      将所有数据导出到文件、或从文件恢复。
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={onExport}
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                        >
-                          <Upload className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-xs">
-                        <MixedText text="导出数据" />
-                      </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={onImport}
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                        >
-                          <Download className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-xs">
-                        <MixedText text="导入数据" />
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-                {/* Cloud Data Sync */}
-                <div className="py-4">
-                  <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-4">
-                    <div>
-                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="云端数据同步" /></h3>
+                  {/* Eye Care Mode */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="护眼模式" /></h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        将数据同步到云端，实现多设备数据共享和备份。
+                        {theme === 'dark'
+                          ? <MixedText text="护眼模式仅在浅色模式下可用，请先切换到浅色模式。" />
+                          : <MixedText text="开启后页面整体色调更柔和，减少视觉疲劳。" />
+                        }
                       </p>
                     </div>
-                    <div className="flex gap-1 sm:gap-2">
+                    <Switch
+                      checked={eyeCare}
+                      onCheckedChange={setEyeCare}
+                      disabled={theme === 'dark'}
+                      className="mt-0"
+                    />
+                  </div>
+                </div>
+
+                {/* Save Settings Button - Bottom right */}
+                <div className="flex justify-end mt-8 mb-6">
+                  <Button
+                    onClick={handleSaveAllSettings}
+                    variant="default"
+                    className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    <MixedText text="保存设置" />
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="data">
+                {/* Data Management */}
+                <div className="space-y-6">
+
+                  {/* Backup and Restore */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div>
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="备份与恢复" /></h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        将所有数据导出到文件、或从文件恢复。
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
-                            onClick={handleUploadToCloud}
-                            disabled={isUploading || isDownloading}
+                            onClick={onExport}
                             variant="outline"
-                            size="sm"
-                            className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                            size="icon"
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
                           >
-                            <CloudUploadIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Upload className="w-4 h-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent className="text-xs">
-                          <p><MixedText text="将本地数据上传到云端备份" /></p>
+                          <MixedText text="导出数据" />
                         </TooltipContent>
                       </Tooltip>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
-                            onClick={handleDownloadFromCloud}
-                            disabled={isUploading || isDownloading}
+                            onClick={onImport}
                             variant="outline"
-                            size="sm"
-                            className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                            size="icon"
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
                           >
-                            <CloudDownload className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Download className="w-4 h-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent className="text-xs">
-                          <p><MixedText text="从云端下载数据到本地" /></p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            onClick={handleViewCloudData}
-                            disabled={isUploading || isDownloading}
-                            variant="outline"
-                            size="sm"
-                            className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
-                          >
-                            <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="text-xs">
-                          <p><MixedText text="查看云端存储的数据详情" /></p>
+                          <MixedText text="导入数据" />
                         </TooltipContent>
                       </Tooltip>
                     </div>
                   </div>
 
-                  {/* Upload Progress Bar */}
-                  {isUploading && uploadProgress && (
-                    <div className="mt-4 space-y-2">
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="font-medium"><MixedText text={uploadProgress.currentItem} /></span>
-                        <span>{uploadProgress.current}/{uploadProgress.total}</span>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
+
+                  {/* Cloud Data Sync */}
+                  <div className="py-4">
+                    <div className="flex flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                      <div>
+                        <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="云端数据同步" /></h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          将数据同步到云端，实现多设备数据共享和备份。
+                        </p>
                       </div>
-                      <Progress
-                        value={(uploadProgress.current / uploadProgress.total) * 100}
-                        variant="upload"
-                        showText={true}
-                      />
-                    </div>
-                  )}
-
-                  {/* Download Progress Bar */}
-                  {isDownloading && downloadProgress && (
-                    <div className="mt-4 space-y-2">
-                      <div className="flex justify-between text-xs sm:text-sm">
-                        <span className="font-medium"><MixedText text={downloadProgress.currentItem} /></span>
-                        <span>{downloadProgress.current}/{downloadProgress.total}</span>
+                      <div className="flex gap-1 sm:gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={handleUploadToCloud}
+                              disabled={isUploading || isDownloading}
+                              variant="outline"
+                              size="sm"
+                              className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                            >
+                              <CloudUploadIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            <p><MixedText text="将本地数据上传到云端备份" /></p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={handleDownloadFromCloud}
+                              disabled={isUploading || isDownloading}
+                              variant="outline"
+                              size="sm"
+                              className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                            >
+                              <CloudDownload className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            <p><MixedText text="从云端下载数据到本地" /></p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              onClick={handleViewCloudData}
+                              disabled={isUploading || isDownloading}
+                              variant="outline"
+                              size="sm"
+                              className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                            >
+                              <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            <p><MixedText text="查看云端存储的数据详情" /></p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
-                      <Progress
-                        value={(downloadProgress.current / downloadProgress.total) * 100}
-                        variant="upload"
-                        showText={true}
-                      />
                     </div>
-                  )}
-                </div>
 
-                {/* Divider */}
-                <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-                {/* Clear Local Data */}
-                <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                  <div>
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="清空本地数据" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      仅删除本地浏览器中的数据，不影响云端。包括：刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置。
-                    </p>
-                  </div>
-                  <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
-                    <DialogTrigger asChild>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            className="h-8 sm:h-9 w-8 sm:w-9 p-0"
-                            onClick={() => {
-                              setClearDataDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent className="text-xs">
-                          <p><MixedText text="清空本地数据" /></p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </DialogTrigger>
-                    <DialogContent className="w-11/12 max-w-md p-4 sm:p-6">
-                      <DialogHeader>
-                        <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
-                        <DialogDescription className="text-xs sm:text-sm">
-                          <MixedText text="确定要清空所有本地数据吗？" />
-                          <br />
-                          <br />
-                          <MixedText text="此操作不可撤销，删除后无法恢复。云端数据不受影响。" />
-                        </DialogDescription>
-                      </DialogHeader>
-                      <DialogFooter className="flex-col sm:flex-row gap-2">
-                        <Button
-                          variant="outline"
-                          className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
-                          onClick={() => setClearDataDialogOpen(false)}
-                        >
-                          <MixedText text="取消" />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            if (onClearLocalData) {
-                              onClearLocalData();
-                            }
-                            setClearDataDialogOpen(false);
-                          }}
-                          variant="destructive"
-                          className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
-                        >
-                          确认清空
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-
-                {/* Divider */}
-                <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-                {/* Cloud Image Management */}
-                <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="云端图片管理" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      <MixedText text="管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。" />
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1 sm:gap-2">
-                    <Tooltip key={showImageManager ? 'collapsed' : 'expanded'}>
-                      <TooltipTrigger asChild>
-                        <Button
-                          onClick={() => {
-                            setShowImageManager(!showImageManager);
-                            if (!showImageManager) {
-                              loadCloudImages();
-                            }
-                          }}
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                        >
-                          {showImageManager ? <XCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Package className="w-4 h-4 sm:w-5 sm:h-5" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent className="text-xs">
-                        <p>{showImageManager ? '收起管理' : '展开管理'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </div>
-
-                {/* Image Management Interface */}
-                {showImageManager && (
-                  <div className="mt-3">
-                    {(() => {
-                      // 定义表格列
-                      const imageColumns: DataTableColumn<SupabaseImageInfo>[] = [
-                        {
-                          key: 'thumbnail',
-                          label: '缩略图',
-                          className: 'w-32',
-                          render: (image) => (
-                            <PhotoProvider>
-                              <PhotoView src={image.url}>
-                                <div className="relative w-16 h-12 rounded overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity">
-                                  <Image
-                                    src={image.url}
-                                    alt={image.originalName}
-                                    width={64}
-                                    height={48}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.style.backgroundColor = '#f3f4f6';
-                                      target.style.display = 'flex';
-                                      target.style.alignItems = 'center';
-                                      target.style.justifyContent = 'center';
-                                      target.style.color = '#6b7280';
-                                      target.style.fontSize = '8px';
-                                      target.textContent = '加载失败';
-                                    }}
-                                  />
-                                </div>
-                              </PhotoView>
-                            </PhotoProvider>
-                          )
-                        },
-                        {
-                          key: 'originalName',
-                          label: '文件名',
-                          className: 'min-w-[200px]',
-                          render: (image) => (
-                            <div className="font-medium text-gray-900 dark:text-gray-100 truncate" title={image.originalName}>
-                              {image.originalName}
-                            </div>
-                          )
-                        },
-                        {
-                          key: 'size',
-                          label: '大小',
-                          className: 'w-24',
-                          render: (image) => (
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {formatFileSize(image.size)}
-                            </span>
-                          )
-                        },
-                        {
-                          key: 'uploadedAt',
-                          label: '上传时间',
-                          className: 'w-40',
-                          render: (image) => (
-                            <span className="text-sm text-gray-500 dark:text-gray-400">
-                              {formatUploadTime(image.uploadedAt)}
-                            </span>
-                          )
-                        }
-                      ];
-
-
-                      // 计算分页数据
-                      const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
-                      const startIndex = (currentPage - 1) * itemsPerPage;
-                      const endIndex = startIndex + itemsPerPage;
-                      const paginatedImages = filteredImages.slice(startIndex, endIndex);
-
-                      return (
-                        <UnifiedTable
-                          columns={imageColumns}
-                          data={paginatedImages}
-                          selected={Array.from(selectedImages)}
-                          onSelect={(selected) => setSelectedImages(new Set(selected))}
-                          rowKey={(image) => image.id}
-                          onBatchDelete={handleDeleteSelectedImages}
-                          batchDeleteText={`删除选中的 ${selectedImages.size} 张图片`}
-                          filters={[
-                            {
-                              type: 'search',
-                              placeholder: '搜索图片...',
-                              value: imageSearchTerm,
-                              onChange: setImageSearchTerm
-                            },
-                            {
-                              type: 'select',
-                              placeholder: '排序方式',
-                              value: `${sortKey}_${sortOrder}`,
-                              onChange: (value) => {
-                                const [k, o] = value.split('_');
-                                setSortKey(k as 'time' | 'name');
-                                setSortOrder(o as 'asc' | 'desc');
-                              },
-                              options: [
-                                { value: 'time_desc', label: '时间降序' },
-                                { value: 'time_asc', label: '时间升序' },
-                                { value: 'name_asc', label: '名称升序' },
-                                { value: 'name_desc', label: '名称降序' }
-                              ]
-                            }
-                          ]}
-                          actions={[
-                            {
-                              label: '',
-                              icon: <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />,
-                              onClick: loadCloudImages,
-                              disabled: isLoadingImages,
-                              variant: 'outline',
-                              className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
-                              tooltip: '刷新图片列表'
-                            },
-                            {
-                              label: '',
-                              icon: <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />,
-                              onClick: handleUploadImage,
-                              variant: 'outline',
-                              className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
-                              tooltip: '上传图片'
-                            },
-                            {
-                              label: '',
-                              icon: <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />,
-                              onClick: handleDeleteSelectedImages,
-                              disabled: selectedImages.size === 0,
-                              variant: 'destructive',
-                              className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
-                              tooltip: selectedImages.size > 0 ? `删除选中的 ${selectedImages.size} 张图片` : '请选择要删除的图片'
-                            }
-                          ]}
-                          pagination={{
-                            currentPage,
-                            totalPages,
-                            onPageChange: setCurrentPage,
-                            totalItems: filteredImages.length
-                          }}
-                          className="w-full"
+                    {/* Upload Progress Bar */}
+                    {isUploading && uploadProgress && (
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span className="font-medium"><MixedText text={uploadProgress.currentItem} /></span>
+                          <span>{uploadProgress.current}/{uploadProgress.total}</span>
+                        </div>
+                        <Progress
+                          value={(uploadProgress.current / uploadProgress.total) * 100}
+                          variant="upload"
+                          showText={true}
                         />
-                      );
-                    })()}
+                      </div>
+                    )}
+
+                    {/* Download Progress Bar */}
+                    {isDownloading && downloadProgress && (
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between text-xs sm:text-sm">
+                          <span className="font-medium"><MixedText text={downloadProgress.currentItem} /></span>
+                          <span>{downloadProgress.current}/{downloadProgress.total}</span>
+                        </div>
+                        <Progress
+                          value={(downloadProgress.current / downloadProgress.total) * 100}
+                          variant="upload"
+                          showText={true}
+                        />
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
 
-              {/* Save Settings Button - Bottom right */}
-              <div className="flex justify-end mt-8 mb-6">
-                <Button
-                  onClick={handleSaveAllSettings}
-                  variant="default"
-                  className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  <MixedText text="保存设置" />
-                </Button>
-              </div>
-            </TabsContent>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-            <TabsContent value="ai">
-              <AISettings />
-            </TabsContent>
-          </TabsContents>
+                  {/* Clear Local Data */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div>
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="清空本地数据" /></h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        仅删除本地浏览器中的数据，不影响云端。包括：刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置。
+                      </p>
+                    </div>
+                    <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 sm:h-9 w-8 sm:w-9 p-0"
+                              onClick={() => {
+                                setClearDataDialogOpen(true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="text-xs">
+                            <p><MixedText text="清空本地数据" /></p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </DialogTrigger>
+                      <DialogContent className="w-11/12 max-w-md p-4 sm:p-6">
+                        <DialogHeader>
+                          <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
+                          <DialogDescription className="text-xs sm:text-sm">
+                            <MixedText text="确定要清空所有本地数据吗？" />
+                            <br />
+                            <br />
+                            <MixedText text="此操作不可撤销，删除后无法恢复。云端数据不受影响。" />
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="flex-col sm:flex-row gap-2">
+                          <Button
+                            variant="outline"
+                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                            onClick={() => setClearDataDialogOpen(false)}
+                          >
+                            <MixedText text="取消" />
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              if (onClearLocalData) {
+                                onClearLocalData();
+                              }
+                              setClearDataDialogOpen(false);
+                            }}
+                            variant="destructive"
+                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                          >
+                            确认清空
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
 
-          {/* Upload Confirmation Dialog */}
-          <Dialog open={uploadConfirmDialogOpen} onOpenChange={setUploadConfirmDialogOpen}>
-            <DialogContent className="p-4 sm:p-6">
-              <DialogHeader>
-                <DialogTitle className="text-base sm:text-lg"><MixedText text="确认上传数据到云端？" /></DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm">
-                  此操作将把本地的所有刷题历史、学习计划和知识点数据上传到云端进行备份。如果云端已有数据，可能会被覆盖。
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex flex-row sm:flex-row gap-2">
-                <Button variant="outline"
-                  onClick={() => setUploadConfirmDialogOpen(false)}
-                  className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="取消" />
-                </Button>
-                <Button
-                  onClick={confirmUploadToCloud}
-                  className="bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="确认上传" />
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
 
-          {/* Download Confirmation Dialog */}
-          <Dialog open={downloadConfirmDialogOpen} onOpenChange={setDownloadConfirmDialogOpen}>
-            <DialogContent className="p-4 sm:p-6">
-              <DialogHeader>
-                <DialogTitle className="text-base sm:text-lg"><MixedText text="确认从云端下载数据？" /></DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm">
-                  此操作将从云端下载所有数据到本地，可能会覆盖您当前的本地数据。请确保您已备份重要数据。
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex flex-row sm:flex-row gap-2">
-                <Button variant="outline"
-                  onClick={() => setDownloadConfirmDialogOpen(false)}
-                  className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="取消" />
-                </Button>
-                <Button
-                  onClick={confirmDownloadFromCloud}
-                  className="bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="确认下载" />
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                  {/* Cloud Image Management */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="云端图片管理" /></h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        <MixedText text="管理Supabase存储桶中的图片，支持上传、删除、搜索等功能。" />
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1 sm:gap-2">
+                      <Tooltip key={showImageManager ? 'collapsed' : 'expanded'}>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={() => {
+                              setShowImageManager(!showImageManager);
+                              if (!showImageManager) {
+                                loadCloudImages();
+                              }
+                            }}
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8 sm:h-9 sm:w-9 rounded-full"
+                          >
+                            {showImageManager ? <XCircle className="w-4 h-4 sm:w-5 sm:h-5" /> : <Package className="w-4 h-4 sm:w-5 sm:h-5" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-xs">
+                          <p>{showImageManager ? '收起管理' : '展开管理'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
 
-          {/* Delete Image Confirmation Dialog */}
-          <Dialog open={deleteDialogOpen} onOpenChange={(open) => {
-            setDeleteDialogOpen(open);
-            if (!open) {
-              setImagesToDelete([]);
-            }
-          }}>
-            <DialogContent className="p-4 sm:p-6">
-              <DialogHeader>
-                <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm">
-                  <MixedText text={`确定要删除选中的 ${imagesToDelete.length} 张图片吗？`} />
-                  <br />
-                  <br />
-                  <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                  <br />
-                  <span className="font-medium text-red-600 text-xs sm:text-sm">
-                    {imagesToDelete.map(id => {
-                      const img = cloudImages.find(img => img.id === id);
-                      return img?.originalName || id;
-                    }).join('、')}
-                  </span>
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter className="flex flex-row sm:flex-row gap-2">
-                <Button variant="outline"
-                  onClick={() => {
-                    setDeleteDialogOpen(false);
-                    setImagesToDelete([]);
-                  }}
-                  className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="取消" />
-                </Button>
-                <Button
-                  onClick={confirmDeleteImages}
-                  variant="destructive"
-                  className="shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                >
-                  <MixedText text="确认删除" />
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                  {/* Image Management Interface */}
+                  {showImageManager && (
+                    <div className="mt-3">
+                      {(() => {
+                        // 定义表格列
+                        const imageColumns: DataTableColumn<SupabaseImageInfo>[] = [
+                          {
+                            key: 'thumbnail',
+                            label: '缩略图',
+                            className: 'w-32',
+                            render: (image) => (
+                              <PhotoProvider>
+                                <PhotoView src={image.url}>
+                                  <div className="relative w-16 h-12 rounded overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer hover:opacity-80 transition-opacity">
+                                    <Image
+                                      src={image.url}
+                                      alt={image.originalName}
+                                      width={64}
+                                      height={48}
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.style.backgroundColor = '#f3f4f6';
+                                        target.style.display = 'flex';
+                                        target.style.alignItems = 'center';
+                                        target.style.justifyContent = 'center';
+                                        target.style.color = '#6b7280';
+                                        target.style.fontSize = '8px';
+                                        target.textContent = '加载失败';
+                                      }}
+                                    />
+                                  </div>
+                                </PhotoView>
+                              </PhotoProvider>
+                            )
+                          },
+                          {
+                            key: 'originalName',
+                            label: '文件名',
+                            className: 'min-w-[200px]',
+                            render: (image) => (
+                              <div className="font-medium text-gray-900 dark:text-gray-100 truncate" title={image.originalName}>
+                                {image.originalName}
+                              </div>
+                            )
+                          },
+                          {
+                            key: 'size',
+                            label: '大小',
+                            className: 'w-24',
+                            render: (image) => (
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {formatFileSize(image.size)}
+                              </span>
+                            )
+                          },
+                          {
+                            key: 'uploadedAt',
+                            label: '上传时间',
+                            className: 'w-40',
+                            render: (image) => (
+                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                {formatUploadTime(image.uploadedAt)}
+                              </span>
+                            )
+                          }
+                        ];
 
-          <CloudDataOverview
-            isOpen={showCloudOverview}
-            onClose={() => setShowCloudOverview(false)}
-          />
-        </Tabs>
+
+                        // 计算分页数据
+                        const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+                        const startIndex = (currentPage - 1) * itemsPerPage;
+                        const endIndex = startIndex + itemsPerPage;
+                        const paginatedImages = filteredImages.slice(startIndex, endIndex);
+
+                        return (
+                          <UnifiedTable
+                            columns={imageColumns}
+                            data={paginatedImages}
+                            selected={Array.from(selectedImages)}
+                            onSelect={(selected) => setSelectedImages(new Set(selected))}
+                            rowKey={(image) => image.id}
+                            onBatchDelete={handleDeleteSelectedImages}
+                            batchDeleteText={`删除选中的 ${selectedImages.size} 张图片`}
+                            filters={[
+                              {
+                                type: 'search',
+                                placeholder: '搜索图片...',
+                                value: imageSearchTerm,
+                                onChange: setImageSearchTerm
+                              },
+                              {
+                                type: 'select',
+                                placeholder: '排序方式',
+                                value: `${sortKey}_${sortOrder}`,
+                                onChange: (value) => {
+                                  const [k, o] = value.split('_');
+                                  setSortKey(k as 'time' | 'name');
+                                  setSortOrder(o as 'asc' | 'desc');
+                                },
+                                options: [
+                                  { value: 'time_desc', label: '时间降序' },
+                                  { value: 'time_asc', label: '时间升序' },
+                                  { value: 'name_asc', label: '名称升序' },
+                                  { value: 'name_desc', label: '名称降序' }
+                                ]
+                              }
+                            ]}
+                            actions={[
+                              {
+                                label: '',
+                                icon: <RefreshCw className={`w-4 h-4 sm:w-5 sm:h-5 ${isLoadingImages ? 'animate-spin' : ''}`} />,
+                                onClick: loadCloudImages,
+                                disabled: isLoadingImages,
+                                variant: 'outline',
+                                className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                                tooltip: '刷新图片列表'
+                              },
+                              {
+                                label: '',
+                                icon: <CloudUpload className="w-4 h-4 sm:w-5 sm:h-5" />,
+                                onClick: handleUploadImage,
+                                variant: 'outline',
+                                className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                                tooltip: '上传图片'
+                              },
+                              {
+                                label: '',
+                                icon: <Trash2 className="w-4 h-4 sm:w-5 sm:h-5" />,
+                                onClick: handleDeleteSelectedImages,
+                                disabled: selectedImages.size === 0,
+                                variant: 'destructive',
+                                className: 'h-8 w-8 sm:h-9 sm:w-9 rounded-full',
+                                tooltip: selectedImages.size > 0 ? `删除选中的 ${selectedImages.size} 张图片` : '请选择要删除的图片'
+                              }
+                            ]}
+                            pagination={{
+                              currentPage,
+                              totalPages,
+                              onPageChange: setCurrentPage,
+                              totalItems: filteredImages.length
+                            }}
+                            className="w-full"
+                          />
+                        );
+                      })()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Save Settings Button - Bottom right */}
+                <div className="flex justify-end mt-8 mb-6">
+                  <Button
+                    onClick={handleSaveAllSettings}
+                    variant="default"
+                    className="h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    <MixedText text="保存设置" />
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="ai">
+                <AISettings />
+              </TabsContent>
+            </TabsContents>
+
+            {/* Upload Confirmation Dialog */}
+            <Dialog open={uploadConfirmDialogOpen} onOpenChange={setUploadConfirmDialogOpen}>
+              <DialogContent className="p-4 sm:p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-base sm:text-lg"><MixedText text="确认上传数据到云端？" /></DialogTitle>
+                  <DialogDescription className="text-xs sm:text-sm">
+                    此操作将把本地的所有刷题历史、学习计划和知识点数据上传到云端进行备份。如果云端已有数据，可能会被覆盖。
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="flex flex-row sm:flex-row gap-2">
+                  <Button variant="outline"
+                    onClick={() => setUploadConfirmDialogOpen(false)}
+                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="取消" />
+                  </Button>
+                  <Button
+                    onClick={confirmUploadToCloud}
+                    className="bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="确认上传" />
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Download Confirmation Dialog */}
+            <Dialog open={downloadConfirmDialogOpen} onOpenChange={setDownloadConfirmDialogOpen}>
+              <DialogContent className="p-4 sm:p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-base sm:text-lg"><MixedText text="确认从云端下载数据？" /></DialogTitle>
+                  <DialogDescription className="text-xs sm:text-sm">
+                    此操作将从云端下载所有数据到本地，可能会覆盖您当前的本地数据。请确保您已备份重要数据。
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="flex flex-row sm:flex-row gap-2">
+                  <Button variant="outline"
+                    onClick={() => setDownloadConfirmDialogOpen(false)}
+                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="取消" />
+                  </Button>
+                  <Button
+                    onClick={confirmDownloadFromCloud}
+                    className="bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="确认下载" />
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            {/* Delete Image Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onOpenChange={(open) => {
+              setDeleteDialogOpen(open);
+              if (!open) {
+                setImagesToDelete([]);
+              }
+            }}>
+              <DialogContent className="p-4 sm:p-6">
+                <DialogHeader>
+                  <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
+                  <DialogDescription className="text-xs sm:text-sm">
+                    <MixedText text={`确定要删除选中的 ${imagesToDelete.length} 张图片吗？`} />
+                    <br />
+                    <br />
+                    <MixedText text="此操作不可撤销，删除后无法恢复。" />
+                    <br />
+                    <span className="font-medium text-red-600 text-xs sm:text-sm">
+                      {imagesToDelete.map(id => {
+                        const img = cloudImages.find(img => img.id === id);
+                        return img?.originalName || id;
+                      }).join('、')}
+                    </span>
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter className="flex flex-row sm:flex-row gap-2">
+                  <Button variant="outline"
+                    onClick={() => {
+                      setDeleteDialogOpen(false);
+                      setImagesToDelete([]);
+                    }}
+                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="取消" />
+                  </Button>
+                  <Button
+                    onClick={confirmDeleteImages}
+                    variant="destructive"
+                    className="shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                  >
+                    <MixedText text="确认删除" />
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <CloudDataOverview
+              isOpen={showCloudOverview}
+              onClose={() => setShowCloudOverview(false)}
+            />
+          </Tabs>
+        </ThemeColorProvider>
       </div>
     </TooltipProvider>
   );

@@ -3,10 +3,12 @@
 import React, { useState, createContext, useContext, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { useThemeColor } from '@/contexts/ThemeColorContext';
 
 interface TabsContextType {
     activeValue: string;
     setActiveValue: (value: string) => void;
+    themeColor?: string;
 }
 
 const TabsContext = createContext<TabsContextType | undefined>(undefined);
@@ -23,13 +25,18 @@ interface TabsProps {
     defaultValue: string;
     className?: string;
     children: React.ReactNode;
+    themeColor?: string;
 }
 
-export function Tabs({ defaultValue, className, children }: TabsProps) {
+export function Tabs({ defaultValue, className, children, themeColor }: TabsProps) {
     const [activeValue, setActiveValue] = useState(defaultValue);
+    const { themeColor: contextThemeColor } = useThemeColor();
+
+    // 优先使用传入的themeColor，其次使用上下文中的themeColor
+    const finalThemeColor = themeColor || contextThemeColor;
 
     return (
-        <TabsContext.Provider value={{ activeValue, setActiveValue }}>
+        <TabsContext.Provider value={{ activeValue, setActiveValue, themeColor: finalThemeColor }}>
             <div className={cn('w-full', className)}>
                 {children}
             </div>
@@ -56,7 +63,7 @@ interface TabsListProps {
 }
 
 export function TabsList({ className, children }: TabsListProps) {
-    const { activeValue } = useTabsContext();
+    const { activeValue, themeColor } = useTabsContext();
     const containerRef = useRef<HTMLDivElement>(null);
     const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 });
 
@@ -81,9 +88,12 @@ export function TabsList({ className, children }: TabsListProps) {
             className={cn('relative inline-flex items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md border border-white/20 dark:border-white/20 p-1 text-muted-foreground shadow-lg unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
             style={{ zIndex: 10 }}
         >
-            {/* 高亮背景 */}
+            {/* 高亮背景 - 使用主题颜色 */}
             <motion.div
-                className="absolute inset-y-1 bg-black dark:bg-white backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                style={{
+                    backgroundColor: themeColor || '#2A4DD0',
+                }}
                 initial={false}
                 animate={{
                     left: highlightStyle.left,
@@ -116,7 +126,7 @@ export function TabsTrigger({ value, className, children }: TabsTriggerProps) {
             className={cn(
                 'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
                 isActive
-                    ? 'text-white dark:text-black'
+                    ? 'text-white'
                     : 'text-muted-foreground hover:text-foreground',
                 className
             )}

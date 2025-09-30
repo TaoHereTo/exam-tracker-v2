@@ -25,6 +25,7 @@ import toast from 'react-hot-toast';
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/ui/simple-tabs";
 import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 import { BeautifulPagination } from "@/components/ui/BeautifulPagination";
+import { ThemeColorProvider, PAGE_THEME_COLORS } from "@/contexts/ThemeColorContext";
 
 interface StudyPlan {
     id: string;
@@ -404,394 +405,396 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
             </div>
 
             {/* 使用统一的 Tabs 组件 */}
-            <Tabs defaultValue="active" className="w-full">
-                <div className="flex justify-center mb-8">
-                    <TabsList className="grid w-fit min-w-[200px] grid-cols-2">
-                        <TabsTrigger value="active">
-                            <MixedText text="进行中" />
-                        </TabsTrigger>
-                        <TabsTrigger value="completed">
-                            <MixedText text="已完成" />
-                        </TabsTrigger>
-                    </TabsList>
-                </div>
+            <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.plans}>
+                <Tabs defaultValue="active" className="w-full" themeColor={PAGE_THEME_COLORS.plans}>
+                    <div className="flex justify-center mb-8">
+                        <TabsList className="grid w-fit min-w-[200px] grid-cols-2">
+                            <TabsTrigger value="active">
+                                <MixedText text="进行中" />
+                            </TabsTrigger>
+                            <TabsTrigger value="completed">
+                                <MixedText text="已完成" />
+                            </TabsTrigger>
+                        </TabsList>
+                    </div>
 
-                <TabsContents className="py-6 px-2">
-                    <TabsContent value="active" className="outline-none">
-                        <AnimatePresence mode="popLayout">
-                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
-                                {activePlans.map(plan => (
-                                    <HoverCard key={plan.id}>
-                                        <HoverCardTrigger asChild>
-                                            <motion.div
-                                                layoutId={`active-plan-${plan.id}`}
-                                                layout
-                                            >
-                                                <BorderBeamCard className="w-full rounded-2xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">
-                                                    <div className="p-6 flex flex-col h-full">
-                                                        {/* Header with title and actions */}
-                                                        <div className="flex justify-between items-start mb-6">
-                                                            <div className="flex-1 min-w-0">
-                                                                <h3 className="text-xl font-bold text-black dark:text-white truncate">
-                                                                    {plan.name}
-                                                                </h3>
-                                                                <p className="text-sm text-muted-foreground mt-1">
-                                                                    {plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}
-                                                                </p>
-                                                            </div>
-                                                            {/* Action buttons */}
-                                                            <div className="flex gap-1 ml-2 flex-shrink-0">
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <Button
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleTogglePin(plan);
-                                                                            }}
-                                                                            variant="outline"
-                                                                            size="icon"
-                                                                            className={`h-8 w-8 rounded-full ${plan.isPinned
-                                                                                ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
-                                                                                : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
-                                                                                }`}
-                                                                        >
-                                                                            {plan.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
-                                                                        </Button>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p><MixedText text={plan.isPinned ? "取消置顶" : "置顶"} /></p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <CircularButton
-                                                                            onClick={() => handleOpenForm(plan)}
-                                                                            variant="success"
-                                                                            size="default"
-                                                                        >
-                                                                            <Edit className="w-4 h-4" />
-                                                                        </CircularButton>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p><MixedText text="编辑" /></p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                                <Dialog>
+                    <TabsContents className="py-6 px-2">
+                        <TabsContent value="active" className="outline-none">
+                            <AnimatePresence mode="popLayout">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
+                                    {activePlans.map(plan => (
+                                        <HoverCard key={plan.id}>
+                                            <HoverCardTrigger asChild>
+                                                <motion.div
+                                                    layoutId={`active-plan-${plan.id}`}
+                                                    layout
+                                                >
+                                                    <BorderBeamCard className="w-full rounded-2xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">
+                                                        <div className="p-6 flex flex-col h-full">
+                                                            {/* Header with title and actions */}
+                                                            <div className="flex justify-between items-start mb-6">
+                                                                <div className="flex-1 min-w-0">
+                                                                    <h3 className="text-xl font-bold text-black dark:text-white truncate">
+                                                                        {plan.name}
+                                                                    </h3>
+                                                                    <p className="text-sm text-muted-foreground mt-1">
+                                                                        {plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}
+                                                                    </p>
+                                                                </div>
+                                                                {/* Action buttons */}
+                                                                <div className="flex gap-1 ml-2 flex-shrink-0">
                                                                     <Tooltip>
                                                                         <TooltipTrigger asChild>
-                                                                            <DialogTrigger asChild>
-                                                                                <CircularButton
-                                                                                    variant="destructive"
-                                                                                    size="default"
-                                                                                >
-                                                                                    <Trash2 className="w-4 h-4" />
-                                                                                </CircularButton>
-                                                                            </DialogTrigger>
+                                                                            <Button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    handleTogglePin(plan);
+                                                                                }}
+                                                                                variant="outline"
+                                                                                size="icon"
+                                                                                className={`h-8 w-8 rounded-full ${plan.isPinned
+                                                                                    ? 'bg-[#f59e0b] border-[#f59e0b] hover:bg-[#f59e0b]/90'
+                                                                                    : 'bg-[#6b7280] border-[#6b7280] hover:bg-[#6b7280]/90'
+                                                                                    }`}
+                                                                            >
+                                                                                {plan.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
+                                                                            </Button>
                                                                         </TooltipTrigger>
                                                                         <TooltipContent>
-                                                                            <p><MixedText text="删除" /></p>
+                                                                            <p><MixedText text={plan.isPinned ? "取消置顶" : "置顶"} /></p>
                                                                         </TooltipContent>
                                                                     </Tooltip>
-                                                                    <DialogContent>
-                                                                        <DialogHeader>
-                                                                            <DialogTitle><MixedText text="确认删除" /></DialogTitle>
-                                                                        </DialogHeader>
-                                                                        <DialogDescription>
-                                                                            <MixedText text={`确定要删除学习计划"${plan.name}"吗？`} />
-                                                                            <br />
-                                                                            <br />
-                                                                            <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                                                                        </DialogDescription>
-                                                                        <DialogFooter>
-                                                                            <DialogClose asChild>
-                                                                                <Button variant="outline">
-                                                                                    <MixedText text="取消" />
-                                                                                </Button>
-                                                                            </DialogClose>
-                                                                            <Button
-                                                                                onClick={() => handleDelete(plan.id)}
-                                                                                variant="destructive"
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <CircularButton
+                                                                                onClick={() => handleOpenForm(plan)}
+                                                                                variant="success"
+                                                                                size="default"
                                                                             >
-                                                                                <MixedText text="确认删除" />
-                                                                            </Button>
-                                                                        </DialogFooter>
-                                                                    </DialogContent>
-                                                                </Dialog>
+                                                                                <Edit className="w-4 h-4" />
+                                                                            </CircularButton>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            <p><MixedText text="编辑" /></p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                    <Dialog>
+                                                                        <Tooltip>
+                                                                            <TooltipTrigger asChild>
+                                                                                <DialogTrigger asChild>
+                                                                                    <CircularButton
+                                                                                        variant="destructive"
+                                                                                        size="default"
+                                                                                    >
+                                                                                        <Trash2 className="w-4 h-4" />
+                                                                                    </CircularButton>
+                                                                                </DialogTrigger>
+                                                                            </TooltipTrigger>
+                                                                            <TooltipContent>
+                                                                                <p><MixedText text="删除" /></p>
+                                                                            </TooltipContent>
+                                                                        </Tooltip>
+                                                                        <DialogContent>
+                                                                            <DialogHeader>
+                                                                                <DialogTitle><MixedText text="确认删除" /></DialogTitle>
+                                                                            </DialogHeader>
+                                                                            <DialogDescription>
+                                                                                <MixedText text={`确定要删除学习计划"${plan.name}"吗？`} />
+                                                                                <br />
+                                                                                <br />
+                                                                                <MixedText text="此操作不可撤销，删除后无法恢复。" />
+                                                                            </DialogDescription>
+                                                                            <DialogFooter>
+                                                                                <DialogClose asChild>
+                                                                                    <Button variant="outline">
+                                                                                        <MixedText text="取消" />
+                                                                                    </Button>
+                                                                                </DialogClose>
+                                                                                <Button
+                                                                                    onClick={() => handleDelete(plan.id)}
+                                                                                    variant="destructive"
+                                                                                >
+                                                                                    <MixedText text="确认删除" />
+                                                                                </Button>
+                                                                            </DialogFooter>
+                                                                        </DialogContent>
+                                                                    </Dialog>
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        {/* Plan progress display - main focus */}
-                                                        <div className="flex-1 flex flex-col justify-center my-4">
-                                                            <div className="space-y-4">
+                                                            {/* Plan progress display - main focus */}
+                                                            <div className="flex-1 flex flex-col justify-center my-4">
+                                                                <div className="space-y-4">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <div className="text-sm text-muted-foreground">
+                                                                            <MixedText text={`${plan.startDate} ~ ${plan.endDate}`} />
+                                                                        </div>
+                                                                        <div className="text-sm font-medium">
+                                                                            <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
+                                                                                <MixedText text={getStatusText(plan.status)} />
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="space-y-2">
+                                                                        <div className="flex justify-between text-sm">
+                                                                            <span className="text-muted-foreground">
+                                                                                {plan.type === '正确率' ? <MixedText text="目标正确率" /> : <MixedText text={`目标${plan.type === '题量' ? '题量' : '错题数'}`} />}
+                                                                            </span>
+                                                                            <span className="font-medium">
+                                                                                {plan.type === '正确率' ? <MixedText text={`${plan.target}%`} /> : <MixedText text={`${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <div className="flex justify-between text-sm">
+                                                                            <span className="text-muted-foreground">
+                                                                                <MixedText text="当前进度" />
+                                                                            </span>
+                                                                            <span className="font-medium">
+                                                                                {plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="pt-2">
+                                                                        <Progress
+                                                                            value={getProgressPercentage(plan)}
+                                                                            variant="plan"
+                                                                            showText={true}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Footer with module and description */}
+                                                            <div className="mt-4 pt-4 border-t border-border">
                                                                 <div className="flex items-center justify-between">
-                                                                    <div className="text-sm text-muted-foreground">
-                                                                        <MixedText text={`${plan.startDate} ~ ${plan.endDate}`} />
+                                                                    <div className="text-sm">
+                                                                        <span className="text-muted-foreground"><MixedText text="板块：" /></span>
+                                                                        <span className="font-medium text-black dark:text-white"><MixedText text={normalizeModuleName(plan.module)} /></span>
                                                                     </div>
-                                                                    <div className="text-sm font-medium">
-                                                                        <span style={{ color: plan.status === '已完成' ? '#0284c7' : plan.status === '进行中' ? '#10b981' : '#6b7280' }}>
-                                                                            <MixedText text={getStatusText(plan.status)} />
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="space-y-2">
-                                                                    <div className="flex justify-between text-sm">
-                                                                        <span className="text-muted-foreground">
-                                                                            {plan.type === '正确率' ? <MixedText text="目标正确率" /> : <MixedText text={`目标${plan.type === '题量' ? '题量' : '错题数'}`} />}
-                                                                        </span>
-                                                                        <span className="font-medium">
-                                                                            {plan.type === '正确率' ? <MixedText text={`${plan.target}%`} /> : <MixedText text={`${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
-                                                                        </span>
-                                                                    </div>
-
-                                                                    <div className="flex justify-between text-sm">
-                                                                        <span className="text-muted-foreground">
-                                                                            <MixedText text="当前进度" />
-                                                                        </span>
-                                                                        <span className="font-medium">
-                                                                            {plan.type === '正确率' ? <MixedText text={`${plan.progress}%`} /> : <MixedText text={`${plan.progress}/${plan.target}${plan.type === '题量' ? '题' : plan.type === '错题数' ? '道' : ''}`} />}
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="pt-2">
-                                                                    <Progress
-                                                                        value={getProgressPercentage(plan)}
-                                                                        variant="plan"
-                                                                        showText={true}
-                                                                    />
                                                                 </div>
                                                             </div>
                                                         </div>
+                                                    </BorderBeamCard>
+                                                </motion.div>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent className="w-80">
+                                                <div className="space-y-2">
+                                                    <h4 className="text-sm font-semibold">
+                                                        <MixedText text="计划描述" />
+                                                    </h4>
+                                                    <p className="text-sm text-black dark:text-white">
+                                                        <MixedText text={plan.description || '暂无描述'} />
+                                                    </p>
+                                                </div>
+                                            </HoverCardContent>
+                                        </HoverCard>
+                                    ))}
 
-                                                        {/* Footer with module and description */}
-                                                        <div className="mt-4 pt-4 border-t border-border">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="text-sm">
-                                                                    <span className="text-muted-foreground"><MixedText text="板块：" /></span>
-                                                                    <span className="font-medium text-black dark:text-white"><MixedText text={normalizeModuleName(plan.module)} /></span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </BorderBeamCard>
-                                            </motion.div>
-                                        </HoverCardTrigger>
-                                        <HoverCardContent className="w-80">
-                                            <div className="space-y-2">
-                                                <h4 className="text-sm font-semibold">
-                                                    <MixedText text="计划描述" />
-                                                </h4>
-                                                <p className="text-sm text-black dark:text-white">
-                                                    <MixedText text={plan.description || '暂无描述'} />
-                                                </p>
+                                    {/* 空状态 - 始终渲染，使用CSS控制显示 */}
+                                    <div className="col-span-full" style={{ display: activePlans.length > 0 ? 'none' : 'block' }}>
+                                        <div className="p-12 text-center">
+                                            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                                <Clock className="w-8 h-8 text-muted-foreground" />
                                             </div>
-                                        </HoverCardContent>
-                                    </HoverCard>
-                                ))}
-
-                                {/* 空状态 - 始终渲染，使用CSS控制显示 */}
-                                <div className="col-span-full" style={{ display: activePlans.length > 0 ? 'none' : 'block' }}>
-                                    <div className="p-12 text-center">
-                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                            <Clock className="w-8 h-8 text-muted-foreground" />
+                                            <h3 className="text-2xl font-bold text-foreground mb-3">
+                                                <MixedText text="暂无进行中的计划" />
+                                            </h3>
+                                            <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                                <MixedText text="创建一个新的学习计划开始您的学习之旅" />
+                                            </p>
+                                            <Button
+                                                onClick={() => handleOpenForm()}
+                                                className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
+                                                variant="default"
+                                            >
+                                                <Plus className="w-5 h-5 mr-2" />
+                                                <MixedText text="创建第一个计划" />
+                                            </Button>
                                         </div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3">
-                                            <MixedText text="暂无进行中的计划" />
-                                        </h3>
-                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                            <MixedText text="创建一个新的学习计划开始您的学习之旅" />
-                                        </p>
-                                        <Button
-                                            onClick={() => handleOpenForm()}
-                                            className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
-                                            variant="default"
-                                        >
-                                            <Plus className="w-5 h-5 mr-2" />
-                                            <MixedText text="创建第一个计划" />
-                                        </Button>
                                     </div>
                                 </div>
-                            </div>
-                        </AnimatePresence>
-                    </TabsContent>
+                            </AnimatePresence>
+                        </TabsContent>
 
-                    <TabsContent value="completed" className="outline-none flex flex-col gap-6">
-                        <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
-                            <div className="min-h-[500px]">
-                                {completedPlans.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {/* 批量操作栏 */}
-                                        <div className="flex items-center justify-between px-6 py-3 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
-                                            <div className="flex items-center gap-3">
-                                                <Checkbox
-                                                    checked={selectedPlans.size === paginatedCompletedPlans.length && paginatedCompletedPlans.length > 0}
-                                                    onCheckedChange={handleSelectAll}
-                                                    size="sm"
-                                                />
-                                                <span className="text-sm text-muted-foreground">
-                                                    已选择 {selectedPlans.size} / {paginatedCompletedPlans.length} 项
-                                                </span>
+                        <TabsContent value="completed" className="outline-none flex flex-col gap-6">
+                            <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
+                                <div className="min-h-[500px]">
+                                    {completedPlans.length > 0 ? (
+                                        <div className="space-y-4">
+                                            {/* 批量操作栏 */}
+                                            <div className="flex items-center justify-between px-6 py-3 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
+                                                <div className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        checked={selectedPlans.size === paginatedCompletedPlans.length && paginatedCompletedPlans.length > 0}
+                                                        onCheckedChange={handleSelectAll}
+                                                        size="sm"
+                                                    />
+                                                    <span className="text-sm text-muted-foreground">
+                                                        已选择 {selectedPlans.size} / {paginatedCompletedPlans.length} 项
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                onClick={handleBulkEdit}
+                                                                variant="outline"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
+                                                                disabled={selectedPlans.size === 0}
+                                                            >
+                                                                <Edit className="w-4 h-4 text-white" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="编辑选中项" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <Button
+                                                                onClick={handleBulkDelete}
+                                                                variant="destructive"
+                                                                size="icon"
+                                                                className="h-8 w-8 rounded-full"
+                                                                disabled={selectedPlans.size === 0}
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </Button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <p><MixedText text="删除选中项" /></p>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            onClick={handleBulkEdit}
-                                                            variant="outline"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full bg-[#2C9678] border-[#2C9678] hover:bg-[#2C9678]/90"
-                                                            disabled={selectedPlans.size === 0}
-                                                        >
-                                                            <Edit className="w-4 h-4 text-white" />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p><MixedText text="编辑选中项" /></p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <Button
-                                                            onClick={handleBulkDelete}
-                                                            variant="destructive"
-                                                            size="icon"
-                                                            className="h-8 w-8 rounded-full"
-                                                            disabled={selectedPlans.size === 0}
-                                                        >
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </Button>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>
-                                                        <p><MixedText text="删除选中项" /></p>
-                                                    </TooltipContent>
-                                                </Tooltip>
-                                            </div>
-                                        </div>
 
-                                        {/* 横向长条卡片列表 */}
-                                        <AnimatePresence mode="popLayout">
-                                            <div className="space-y-2">
-                                                {paginatedCompletedPlans.map(plan => {
-                                                    const isSelected = selectedPlans.has(plan.id);
-                                                    return (
-                                                        <HoverCard key={plan.id}>
-                                                            <HoverCardTrigger asChild>
-                                                                <motion.div
-                                                                    layoutId={`completed-plan-${plan.id}`}
-                                                                    layout
-                                                                    className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
-                                                                    onClick={() => handlePlanSelect(plan.id, !isSelected)}
-                                                                >
-                                                                    <div className="px-6 py-3 flex items-center gap-3">
-                                                                        {/* 复选框 */}
-                                                                        <Checkbox
-                                                                            checked={isSelected}
-                                                                            onCheckedChange={(checked) => handlePlanSelect(plan.id, checked as boolean)}
-                                                                            size="sm"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        />
+                                            {/* 横向长条卡片列表 */}
+                                            <AnimatePresence mode="popLayout">
+                                                <div className="space-y-2">
+                                                    {paginatedCompletedPlans.map(plan => {
+                                                        const isSelected = selectedPlans.has(plan.id);
+                                                        return (
+                                                            <HoverCard key={plan.id}>
+                                                                <HoverCardTrigger asChild>
+                                                                    <motion.div
+                                                                        layoutId={`completed-plan-${plan.id}`}
+                                                                        layout
+                                                                        className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
+                                                                        onClick={() => handlePlanSelect(plan.id, !isSelected)}
+                                                                    >
+                                                                        <div className="px-6 py-3 flex items-center gap-3">
+                                                                            {/* 复选框 */}
+                                                                            <Checkbox
+                                                                                checked={isSelected}
+                                                                                onCheckedChange={(checked) => handlePlanSelect(plan.id, checked as boolean)}
+                                                                                size="sm"
+                                                                                onClick={(e) => e.stopPropagation()}
+                                                                            />
 
-                                                                        {/* 计划信息 */}
-                                                                        <div className="flex-1 min-w-0">
-                                                                            <div className="flex items-center gap-4">
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <h3 className="text-base font-bold text-black dark:text-white truncate">
-                                                                                        {plan.name}
-                                                                                    </h3>
-                                                                                    <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
-                                                                                        <span>{plan.startDate} ~ {plan.endDate}</span>
-                                                                                        <span>•</span>
-                                                                                        <span>{normalizeModuleName(plan.module)}</span>
-                                                                                        <span>•</span>
-                                                                                        <span>{plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}</span>
-                                                                                    </div>
-                                                                                </div>
-
-                                                                                {/* 状态显示 */}
+                                                                            {/* 计划信息 */}
+                                                                            <div className="flex-1 min-w-0">
                                                                                 <div className="flex items-center gap-4">
-                                                                                    <div className="flex items-center gap-2">
-                                                                                        <CheckCircle className="w-4 h-4" style={{ color: '#0284c7' }} />
-                                                                                        <span className="text-xs font-medium" style={{ color: '#0284c7' }}>
-                                                                                            {getStatusText(plan.status)}
-                                                                                        </span>
+                                                                                    <div className="flex-1 min-w-0">
+                                                                                        <h3 className="text-base font-bold text-black dark:text-white truncate">
+                                                                                            {plan.name}
+                                                                                        </h3>
+                                                                                        <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
+                                                                                            <span>{plan.startDate} ~ {plan.endDate}</span>
+                                                                                            <span>•</span>
+                                                                                            <span>{normalizeModuleName(plan.module)}</span>
+                                                                                            <span>•</span>
+                                                                                            <span>{plan.type === '题量' ? '题量计划' : plan.type === '正确率' ? '正确率计划' : '错题数计划'}</span>
+                                                                                        </div>
                                                                                     </div>
 
-                                                                                    {/* 操作按钮 */}
-                                                                                    <div className="flex gap-1 ml-2 flex-shrink-0">
-                                                                                        <Tooltip>
-                                                                                            <TooltipTrigger asChild>
-                                                                                                <CircularButton
-                                                                                                    onClick={(e) => {
-                                                                                                        e.stopPropagation();
-                                                                                                        handleTogglePin(plan);
-                                                                                                    }}
-                                                                                                    variant={plan.isPinned ? "warning" : "gray"}
-                                                                                                    size="sm"
-                                                                                                >
-                                                                                                    {plan.isPinned ? <Pin className="w-3 h-3" /> : <PinOff className="w-3 h-3" />}
-                                                                                                </CircularButton>
-                                                                                            </TooltipTrigger>
-                                                                                            <TooltipContent>
-                                                                                                <p><MixedText text={plan.isPinned ? "取消置顶" : "置顶"} /></p>
-                                                                                            </TooltipContent>
-                                                                                        </Tooltip>
+                                                                                    {/* 状态显示 */}
+                                                                                    <div className="flex items-center gap-4">
+                                                                                        <div className="flex items-center gap-2">
+                                                                                            <CheckCircle className="w-4 h-4" style={{ color: '#0284c7' }} />
+                                                                                            <span className="text-xs font-medium" style={{ color: '#0284c7' }}>
+                                                                                                {getStatusText(plan.status)}
+                                                                                            </span>
+                                                                                        </div>
+
+                                                                                        {/* 操作按钮 */}
+                                                                                        <div className="flex gap-1 ml-2 flex-shrink-0">
+                                                                                            <Tooltip>
+                                                                                                <TooltipTrigger asChild>
+                                                                                                    <CircularButton
+                                                                                                        onClick={(e) => {
+                                                                                                            e.stopPropagation();
+                                                                                                            handleTogglePin(plan);
+                                                                                                        }}
+                                                                                                        variant={plan.isPinned ? "warning" : "gray"}
+                                                                                                        size="sm"
+                                                                                                    >
+                                                                                                        {plan.isPinned ? <Pin className="w-3 h-3" /> : <PinOff className="w-3 h-3" />}
+                                                                                                    </CircularButton>
+                                                                                                </TooltipTrigger>
+                                                                                                <TooltipContent>
+                                                                                                    <p><MixedText text={plan.isPinned ? "取消置顶" : "置顶"} /></p>
+                                                                                                </TooltipContent>
+                                                                                            </Tooltip>
+                                                                                        </div>
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
+
                                                                         </div>
-
+                                                                    </motion.div>
+                                                                </HoverCardTrigger>
+                                                                <HoverCardContent className="w-80">
+                                                                    <div className="space-y-2">
+                                                                        <h4 className="text-sm font-semibold">
+                                                                            <MixedText text="计划描述" />
+                                                                        </h4>
+                                                                        <p className="text-sm text-muted-foreground">
+                                                                            <MixedText text={plan.description || '暂无描述'} />
+                                                                        </p>
                                                                     </div>
-                                                                </motion.div>
-                                                            </HoverCardTrigger>
-                                                            <HoverCardContent className="w-80">
-                                                                <div className="space-y-2">
-                                                                    <h4 className="text-sm font-semibold">
-                                                                        <MixedText text="计划描述" />
-                                                                    </h4>
-                                                                    <p className="text-sm text-muted-foreground">
-                                                                        <MixedText text={plan.description || '暂无描述'} />
-                                                                    </p>
-                                                                </div>
-                                                            </HoverCardContent>
-                                                        </HoverCard>
-                                                    )
-                                                })}
-                                            </div>
-                                        </AnimatePresence>
+                                                                </HoverCardContent>
+                                                            </HoverCard>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </AnimatePresence>
 
-                                        {/* 分页组件 */}
-                                        {totalCompletedPages > 1 && (
-                                            <div className="mt-6">
-                                                <BeautifulPagination
-                                                    currentPage={completedPage}
-                                                    totalPages={totalCompletedPages}
-                                                    onPageChange={handleCompletedPageChange}
-                                                    totalItems={completedPlans.length}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
-                                    /* 空状态 */
-                                    <div className="p-12 text-center">
-                                        <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
-                                            <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                                            {/* 分页组件 */}
+                                            {totalCompletedPages > 1 && (
+                                                <div className="mt-6">
+                                                    <BeautifulPagination
+                                                        currentPage={completedPage}
+                                                        totalPages={totalCompletedPages}
+                                                        onPageChange={handleCompletedPageChange}
+                                                        totalItems={completedPlans.length}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3">
-                                            <MixedText text="暂无已完成的计划" />
-                                        </h3>
-                                        <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
-                                            <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
-                                        </p>
-                                    </div>
-                                )
-                                }
+                                    ) : (
+                                        /* 空状态 */
+                                        <div className="p-12 text-center">
+                                            <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-6">
+                                                <CheckCircle className="w-8 h-8 text-muted-foreground" />
+                                            </div>
+                                            <h3 className="text-2xl font-bold text-foreground mb-3">
+                                                <MixedText text="暂无已完成的计划" />
+                                            </h3>
+                                            <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
+                                                <MixedText text="完成计划后，它们将显示在这里，帮助您回顾学习历程" />
+                                            </p>
+                                        </div>
+                                    )
+                                    }
+                                </div >
                             </div >
-                        </div >
-                    </TabsContent >
-                </TabsContents >
-            </Tabs >
+                        </TabsContent >
+                    </TabsContents >
+                </Tabs >
+            </ThemeColorProvider>
 
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {

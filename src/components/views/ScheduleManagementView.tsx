@@ -28,6 +28,7 @@ import type { ExamCountdown, StudyPlan } from "@/types/record";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { Stepper, Step } from "@/components/ui/Stepper";
+import { ThemeColorProvider, PAGE_THEME_COLORS, useThemeColor } from "@/contexts/ThemeColorContext";
 import CustomAgendaView from './CustomAgendaView';
 
 // 设置 moment 中文语言
@@ -86,6 +87,7 @@ function CustomNavigationButton({ onClick, children, className = "" }: { onClick
 const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentView: string; onViewChange: (view: string) => void }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 });
+    const { themeColor } = useThemeColor();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -116,9 +118,12 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
             className="relative inline-flex h-9 items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md border border-white/20 dark:border-white/20 p-1 text-muted-foreground shadow-lg unselectable"
             style={{ zIndex: 10 }}
         >
-            {/* 高亮背景 */}
+            {/* 高亮背景 - 使用主题颜色 */}
             <motion.div
-                className="absolute inset-y-1 bg-black dark:bg-white backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                style={{
+                    backgroundColor: themeColor || PAGE_THEME_COLORS.schedule,
+                }}
                 initial={false}
                 animate={{
                     left: highlightStyle.left,
@@ -137,7 +142,7 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
                     className={cn(
                         'relative inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 leading-none unselectable',
                         currentView === viewItem.value
-                            ? 'text-white dark:text-black'
+                            ? 'text-white'
                             : 'text-muted-foreground hover:text-foreground'
                     )}
                     onClick={() => onViewChange(viewItem.value)}
@@ -691,558 +696,560 @@ export default function ScheduleManagementView({
     };
 
     return (
-        <TooltipProvider openDelay={100} closeDelay={50}>
-            <div className="space-y-6">
-                {/* 工具栏 */}
-                <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
-                    <Button
-                        onClick={() => {
-                            setForm({
-                                title: '',
-                                start: new Date(),
-                                end: new Date(),
-                                type: undefined, // 不预设类型，让用户选择
-                                description: ''
-                            });
-                            setErrors({});
-                            setShowForm(true);
-                        }}
-                        className="h-9 px-6 rounded-full font-medium bg-[#8b5cf6] text-white hover:bg-[#8b5cf6]/90"
-                    >
-                        <Plus className="w-5 h-5 mr-2" />
-                        <MixedText text="添加日程" />
-                    </Button>
-                </div>
-
-                {/* 左右布局 */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    {/* 左侧：日程说明和日历 */}
-                    <div className="lg:col-span-1 space-y-6">
-                        {/* 视图切换tabs，位于左侧卡片上方 */}
-                        <div className="flex justify-center">
-                            <CalendarViewTabs
-                                currentView={showYearView ? 'year' : view}
-                                onViewChange={(viewStr) => {
-                                    if (viewStr === 'year') {
-                                        setShowYearView(true);
-                                    } else {
-                                        setShowYearView(false);
-                                        setView(viewStr as View);
-                                    }
-                                }}
-                            />
-                        </div>
-
-                        {/* 日程类型说明 */}
-                        <div className="text-center">
-                            <h4 className="text-sm font-medium mb-3">
-                                <MixedText text="日程类型说明" />
-                            </h4>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-center gap-2">
-                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }}></div>
-                                    <span className="text-xs">
-                                        <MixedText text="考试倒计时" />
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-center gap-2">
-                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
-                                    <span className="text-xs">
-                                        <MixedText text="学习计划开始" />
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-center gap-2">
-                                    <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }}></div>
-                                    <span className="text-xs">
-                                        <MixedText text="学习计划结束" />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 快速日期选择日历 */}
-                        <div className="text-center">
-                            <div className="flex justify-center schedule-calendar-container">
-                                <DatePicker
-                                    mode="single"
-                                    selected={date}
-                                    onSelect={(selectedDate) => {
-                                        if (selectedDate) {
-                                            setDate(selectedDate);
-                                        }
-                                    }}
-                                    className="rounded-md border scale-100"
-                                    locale={zhCN}
-                                    page="schedule"
-                                />
-                            </div>
-                        </div>
+        <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.schedule}>
+            <TooltipProvider openDelay={100} closeDelay={50}>
+                <div className="space-y-6">
+                    {/* 工具栏 */}
+                    <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
+                        <Button
+                            onClick={() => {
+                                setForm({
+                                    title: '',
+                                    start: new Date(),
+                                    end: new Date(),
+                                    type: undefined, // 不预设类型，让用户选择
+                                    description: ''
+                                });
+                                setErrors({});
+                                setShowForm(true);
+                            }}
+                            className="h-9 px-6 rounded-full font-medium bg-[#8b5cf6] text-white hover:bg-[#8b5cf6]/90"
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            <MixedText text="添加日程" />
+                        </Button>
                     </div>
 
-                    {/* 右侧：大日历视图 */}
-                    <div className="lg:col-span-3">
-                        <div className="h-[600px] relative">
-                            {showYearView ? (
-                                <YearView />
-                            ) : view === 'agenda' ? (
-                                <CustomAgendaView
-                                    events={events.filter(event => {
-                                        // 过滤掉学习计划的持续时间事件（中间日期）
-                                        if (event.type === 'plan' && event.isDuration) {
-                                            return false;
-                                        }
-                                        // 其他事件正常显示
-                                        return true;
-                                    })}
-                                    currentDate={date}
-                                    onEventClick={handleSelectEvent}
-                                />
-                            ) : (
-                                <BigCalendar
-                                    localizer={localizer}
-                                    events={events}
-                                    startAccessor="start"
-                                    endAccessor="end"
-                                    style={{ height: '100%' }}
-                                    view={view}
-                                    onView={setView}
-                                    date={date}
-                                    onNavigate={setDate}
-                                    onSelectSlot={handleSelectSlot}
-                                    onSelectEvent={handleSelectEvent}
-                                    selectable
-                                    eventPropGetter={eventStyleGetter}
-                                    showMultiDayTimes
-                                    step={15}
-                                    timeslots={4}
-                                    popup={false} // 禁用默认的弹出窗口
-                                    popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
-                                    doShowMoreDrillDown={false} // 禁用更多事件的下钻
-                                    className="" // 移除阻止tooltip的类名
-                                    messages={{
-                                        next: '下月',
-                                        previous: '上月',
-                                        today: '今天',
-                                        month: '月',
-                                        week: '周',
-                                        day: '日',
-                                        agenda: '议程',
-                                        date: '日期',
-                                        time: '时间',
-                                        event: '事件',
-                                        noEventsInRange: '此范围内没有事件',
-                                        showMore: (total: number) => `+${total} 更多`,
-                                        allDay: '全天',
-                                        work_week: '工作周'
-                                    }}
-                                    components={{
-                                        event: ({ event }) => (
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div
-                                                        className="w-full h-full cursor-pointer"
-                                                        style={{
-                                                            minHeight: '20px',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center'
-                                                        }}
-                                                    >
-                                                        {/* 完全透明的触发器，但保持完整的点击区域 */}
-                                                        <div
-                                                            className="absolute inset-0 w-full h-full"
-                                                            style={{
-                                                                backgroundColor: 'transparent',
-                                                                zIndex: 2
-                                                            }}
-                                                        />
-                                                    </div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{event.title}</p>
-                                                    {event.description && (
-                                                        <p className="text-sm">{event.description}</p>
-                                                    )}
-                                                    <p className="text-xs">
-                                                        {event.allDay
-                                                            ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
-                                                            : event.type === 'countdown'
-                                                                ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
-                                                                : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
-                                                        }
-                                                    </p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        ),
-                                        // 自定义导航按钮
-                                        toolbar: ({ label, onNavigate }) => {
-                                            const navigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
-                                                onNavigate(action);
-                                            };
-
-                                            return (
-                                                <div className="flex items-center justify-between mb-4">
-                                                    {/* 左侧：导航按钮 */}
-                                                    <div className="flex items-center gap-2">
-                                                        <CustomNavigationButton onClick={() => navigate('PREV')}>
-                                                            <ChevronLeft className="w-4 h-4" />
-                                                        </CustomNavigationButton>
-                                                        <CustomNavigationButton onClick={() => navigate('TODAY')}>
-                                                            <MixedText text="今天" />
-                                                        </CustomNavigationButton>
-                                                        <CustomNavigationButton onClick={() => navigate('NEXT')}>
-                                                            <ChevronRight className="w-4 h-4" />
-                                                        </CustomNavigationButton>
-                                                    </div>
-
-                                                    {/* 中间：当前日期标签 */}
-                                                    <div className="text-lg font-semibold text-foreground">
-                                                        <MixedText text={label} />
-                                                    </div>
-
-                                                    {/* 右侧：空白区域，保持布局平衡 */}
-                                                    <div className="w-32"></div>
-                                                </div>
-                                            );
+                    {/* 左右布局 */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        {/* 左侧：日程说明和日历 */}
+                        <div className="lg:col-span-1 space-y-6">
+                            {/* 视图切换tabs，位于左侧卡片上方 */}
+                            <div className="flex justify-center">
+                                <CalendarViewTabs
+                                    currentView={showYearView ? 'year' : view}
+                                    onViewChange={(viewStr) => {
+                                        if (viewStr === 'year') {
+                                            setShowYearView(true);
+                                        } else {
+                                            setShowYearView(false);
+                                            setView(viewStr as View);
                                         }
                                     }}
                                 />
-                            )}
-                        </div>
-                    </div>
-                </div>
+                            </div>
 
-                {/* 添加/编辑日程对话框 */}
-                <Dialog open={showForm} onOpenChange={setShowForm}>
-                    <DialogContent className="w-11/12 max-w-md sm:max-w-lg">
-                        <DialogHeader>
-                            <DialogTitle className="text-xl">
-                                {editEvent ? (
-                                    <MixedText text="编辑日程" />
-                                ) : (
-                                    <MixedText text="添加日程" />
-                                )}
-                            </DialogTitle>
-                        </DialogHeader>
-                        {editEvent ? (
-                            // 编辑模式：直接显示表单
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            {/* 日程类型说明 */}
+                            <div className="text-center">
+                                <h4 className="text-sm font-medium mb-3">
+                                    <MixedText text="日程类型说明" />
+                                </h4>
                                 <div className="space-y-2">
-                                    <FormField label={<MixedText text="日程标题" />} htmlFor="title" required>
-                                        <Input
-                                            id="title"
-                                            name="title"
-                                            value={form.title || ''}
-                                            onChange={handleFormChange}
-                                            className="h-11"
-                                            placeholder="请输入日程标题"
-                                        />
-                                    </FormField>
-                                    <FormError error={errors.title} />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <FormField label={<MixedText text="日程描述" />} htmlFor="description">
-                                        <Textarea
-                                            id="description"
-                                            name="description"
-                                            value={form.description || ''}
-                                            onChange={handleFormChange}
-                                            rows={3}
-                                            placeholder="可选：添加日程描述"
-                                            className="resize-none"
-                                        />
-                                    </FormField>
-                                </div>
-
-                                <DialogFooter className="flex-col sm:flex-row gap-2">
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        onClick={handleDelete}
-                                        className="w-full sm:w-auto"
-                                    >
-                                        <Trash2 className="w-4 h-4 mr-2" />
-                                        <MixedText text="删除" />
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onClick={handleCloseForm}
-                                        className="w-full sm:w-auto"
-                                    >
-                                        <MixedText text="取消" />
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        className="w-full sm:w-auto"
-                                    >
-                                        <MixedText text="更新" />
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        ) : (
-                            // 新建模式：使用正确的 Stepper 组件
-                            <Stepper
-                                initialStep={1}
-                                onBeforeNext={validateStep}
-                                onFinalStepCompleted={handleFinalStepCompleted}
-                                backButtonText="上一步"
-                                nextButtonText="下一步"
-                            >
-                                {/* 第一步：选择日程类型 */}
-                                <Step>
-                                    <div className="space-y-4">
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                                                <MixedText text="选择日程类型" />
-                                            </h3>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <div
-                                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'countdown'
-                                                    ? 'border-red-500 bg-red-50 dark:bg-red-950 shadow-md'
-                                                    : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
-                                                    }`}
-                                                onClick={() => handleTypeChange('countdown')}
-                                            >
-                                                <div className="flex items-center space-x-3">
-                                                    <div className={`w-4 h-4 rounded transition-all ${form.type === 'countdown' ? 'ring-2 ring-red-500 scale-110' : ''
-                                                        }`} style={{ backgroundColor: '#ef4444' }}></div>
-                                                    <div>
-                                                        <h3 className="font-medium">
-                                                            <MixedText text="考试倒计时" />
-                                                        </h3>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            <MixedText text="设置考试日期和倒计时" />
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div
-                                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'plan'
-                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 shadow-md'
-                                                    : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
-                                                    }`}
-                                                onClick={() => handleTypeChange('plan')}
-                                            >
-                                                <div className="flex items-center space-x-3">
-                                                    <div className={`w-4 h-4 rounded transition-all ${form.type === 'plan' ? 'ring-2 ring-blue-500 scale-110' : ''
-                                                        }`} style={{ backgroundColor: '#3b82f6' }}></div>
-                                                    <div>
-                                                        <h3 className="font-medium">
-                                                            <MixedText text="学习计划" />
-                                                        </h3>
-                                                        <p className="text-sm text-muted-foreground">
-                                                            <MixedText text="创建学习计划和目标" />
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-3 h-3 rounded" style={{ backgroundColor: '#ef4444' }}></div>
+                                        <span className="text-xs">
+                                            <MixedText text="考试倒计时" />
+                                        </span>
                                     </div>
-                                </Step>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-3 h-3 rounded" style={{ backgroundColor: '#3b82f6' }}></div>
+                                        <span className="text-xs">
+                                            <MixedText text="学习计划开始" />
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center justify-center gap-2">
+                                        <div className="w-3 h-3 rounded" style={{ backgroundColor: '#10b981' }}></div>
+                                        <span className="text-xs">
+                                            <MixedText text="学习计划结束" />
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
 
-                                {/* 第二步：填写日程详情 */}
-                                <Step>
-                                    <div className="space-y-4">
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
-                                                <MixedText text="填写日程详情" />
-                                            </h3>
-                                            <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                                <MixedText text="请填写日程的详细信息" />
-                                            </p>
-                                        </div>
+                            {/* 快速日期选择日历 */}
+                            <div className="text-center">
+                                <div className="flex justify-center schedule-calendar-container">
+                                    <DatePicker
+                                        mode="single"
+                                        selected={date}
+                                        onSelect={(selectedDate) => {
+                                            if (selectedDate) {
+                                                setDate(selectedDate);
+                                            }
+                                        }}
+                                        className="rounded-md border scale-100"
+                                        locale={zhCN}
+                                        page="schedule"
+                                    />
+                                </div>
+                            </div>
+                        </div>
 
-                                        {/* 显示已选择的类型 */}
-                                        <div className="flex items-center p-3 bg-accent rounded-lg">
-                                            <div className="flex items-center space-x-2">
+                        {/* 右侧：大日历视图 */}
+                        <div className="lg:col-span-3">
+                            <div className="h-[600px] relative">
+                                {showYearView ? (
+                                    <YearView />
+                                ) : view === 'agenda' ? (
+                                    <CustomAgendaView
+                                        events={events.filter(event => {
+                                            // 过滤掉学习计划的持续时间事件（中间日期）
+                                            if (event.type === 'plan' && event.isDuration) {
+                                                return false;
+                                            }
+                                            // 其他事件正常显示
+                                            return true;
+                                        })}
+                                        currentDate={date}
+                                        onEventClick={handleSelectEvent}
+                                    />
+                                ) : (
+                                    <BigCalendar
+                                        localizer={localizer}
+                                        events={events}
+                                        startAccessor="start"
+                                        endAccessor="end"
+                                        style={{ height: '100%' }}
+                                        view={view}
+                                        onView={setView}
+                                        date={date}
+                                        onNavigate={setDate}
+                                        onSelectSlot={handleSelectSlot}
+                                        onSelectEvent={handleSelectEvent}
+                                        selectable
+                                        eventPropGetter={eventStyleGetter}
+                                        showMultiDayTimes
+                                        step={15}
+                                        timeslots={4}
+                                        popup={false} // 禁用默认的弹出窗口
+                                        popupOffset={{ x: 0, y: 0 }} // 设置弹出窗口偏移为0
+                                        doShowMoreDrillDown={false} // 禁用更多事件的下钻
+                                        className="" // 移除阻止tooltip的类名
+                                        messages={{
+                                            next: '下月',
+                                            previous: '上月',
+                                            today: '今天',
+                                            month: '月',
+                                            week: '周',
+                                            day: '日',
+                                            agenda: '议程',
+                                            date: '日期',
+                                            time: '时间',
+                                            event: '事件',
+                                            noEventsInRange: '此范围内没有事件',
+                                            showMore: (total: number) => `+${total} 更多`,
+                                            allDay: '全天',
+                                            work_week: '工作周'
+                                        }}
+                                        components={{
+                                            event: ({ event }) => (
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div
+                                                            className="w-full h-full cursor-pointer"
+                                                            style={{
+                                                                minHeight: '20px',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center'
+                                                            }}
+                                                        >
+                                                            {/* 完全透明的触发器，但保持完整的点击区域 */}
+                                                            <div
+                                                                className="absolute inset-0 w-full h-full"
+                                                                style={{
+                                                                    backgroundColor: 'transparent',
+                                                                    zIndex: 2
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{event.title}</p>
+                                                        {event.description && (
+                                                            <p className="text-sm">{event.description}</p>
+                                                        )}
+                                                        <p className="text-xs">
+                                                            {event.allDay
+                                                                ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
+                                                                : event.type === 'countdown'
+                                                                    ? format(event.start, 'yyyy-MM-dd', { locale: zhCN })
+                                                                    : `${format(event.start, 'yyyy-MM-dd HH:mm', { locale: zhCN })} - ${format(event.end, 'yyyy-MM-dd HH:mm', { locale: zhCN })}`
+                                                            }
+                                                        </p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            ),
+                                            // 自定义导航按钮
+                                            toolbar: ({ label, onNavigate }) => {
+                                                const navigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+                                                    onNavigate(action);
+                                                };
+
+                                                return (
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        {/* 左侧：导航按钮 */}
+                                                        <div className="flex items-center gap-2">
+                                                            <CustomNavigationButton onClick={() => navigate('PREV')}>
+                                                                <ChevronLeft className="w-4 h-4" />
+                                                            </CustomNavigationButton>
+                                                            <CustomNavigationButton onClick={() => navigate('TODAY')}>
+                                                                <MixedText text="今天" />
+                                                            </CustomNavigationButton>
+                                                            <CustomNavigationButton onClick={() => navigate('NEXT')}>
+                                                                <ChevronRight className="w-4 h-4" />
+                                                            </CustomNavigationButton>
+                                                        </div>
+
+                                                        {/* 中间：当前日期标签 */}
+                                                        <div className="text-lg font-semibold text-foreground">
+                                                            <MixedText text={label} />
+                                                        </div>
+
+                                                        {/* 右侧：空白区域，保持布局平衡 */}
+                                                        <div className="w-32"></div>
+                                                    </div>
+                                                );
+                                            }
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* 添加/编辑日程对话框 */}
+                    <Dialog open={showForm} onOpenChange={setShowForm}>
+                        <DialogContent className="w-11/12 max-w-md sm:max-w-lg">
+                            <DialogHeader>
+                                <DialogTitle className="text-xl">
+                                    {editEvent ? (
+                                        <MixedText text="编辑日程" />
+                                    ) : (
+                                        <MixedText text="添加日程" />
+                                    )}
+                                </DialogTitle>
+                            </DialogHeader>
+                            {editEvent ? (
+                                // 编辑模式：直接显示表单
+                                <form onSubmit={handleSubmit} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <FormField label={<MixedText text="日程标题" />} htmlFor="title" required>
+                                            <Input
+                                                id="title"
+                                                name="title"
+                                                value={form.title || ''}
+                                                onChange={handleFormChange}
+                                                className="h-11"
+                                                placeholder="请输入日程标题"
+                                            />
+                                        </FormField>
+                                        <FormError error={errors.title} />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <FormField label={<MixedText text="日程描述" />} htmlFor="description">
+                                            <Textarea
+                                                id="description"
+                                                name="description"
+                                                value={form.description || ''}
+                                                onChange={handleFormChange}
+                                                rows={3}
+                                                placeholder="可选：添加日程描述"
+                                                className="resize-none"
+                                            />
+                                        </FormField>
+                                    </div>
+
+                                    <DialogFooter className="flex-col sm:flex-row gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={handleDelete}
+                                            className="w-full sm:w-auto"
+                                        >
+                                            <Trash2 className="w-4 h-4 mr-2" />
+                                            <MixedText text="删除" />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={handleCloseForm}
+                                            className="w-full sm:w-auto"
+                                        >
+                                            <MixedText text="取消" />
+                                        </Button>
+                                        <Button
+                                            type="submit"
+                                            className="w-full sm:w-auto"
+                                        >
+                                            <MixedText text="更新" />
+                                        </Button>
+                                    </DialogFooter>
+                                </form>
+                            ) : (
+                                // 新建模式：使用正确的 Stepper 组件
+                                <Stepper
+                                    initialStep={1}
+                                    onBeforeNext={validateStep}
+                                    onFinalStepCompleted={handleFinalStepCompleted}
+                                    backButtonText="上一步"
+                                    nextButtonText="下一步"
+                                >
+                                    {/* 第一步：选择日程类型 */}
+                                    <Step>
+                                        <div className="space-y-4">
+                                            <div className="text-center mb-6">
+                                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                                                    <MixedText text="选择日程类型" />
+                                                </h3>
+                                            </div>
+
+                                            <div className="space-y-3">
                                                 <div
-                                                    className="w-3 h-3 rounded"
-                                                    style={{ backgroundColor: getTypeColor(form.type || 'countdown') }}
-                                                ></div>
-                                                <span className="text-sm font-medium">
-                                                    {form.type === 'countdown' && <MixedText text="考试倒计时" />}
-                                                    {form.type === 'plan' && <MixedText text="学习计划" />}
-                                                </span>
+                                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'countdown'
+                                                        ? 'border-red-500 bg-red-50 dark:bg-red-950 shadow-md'
+                                                        : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
+                                                        }`}
+                                                    onClick={() => handleTypeChange('countdown')}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className={`w-4 h-4 rounded transition-all ${form.type === 'countdown' ? 'ring-2 ring-red-500 scale-110' : ''
+                                                            }`} style={{ backgroundColor: '#ef4444' }}></div>
+                                                        <div>
+                                                            <h3 className="font-medium">
+                                                                <MixedText text="考试倒计时" />
+                                                            </h3>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                <MixedText text="设置考试日期和倒计时" />
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div
+                                                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'plan'
+                                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 shadow-md'
+                                                        : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
+                                                        }`}
+                                                    onClick={() => handleTypeChange('plan')}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className={`w-4 h-4 rounded transition-all ${form.type === 'plan' ? 'ring-2 ring-blue-500 scale-110' : ''
+                                                            }`} style={{ backgroundColor: '#3b82f6' }}></div>
+                                                        <div>
+                                                            <h3 className="font-medium">
+                                                                <MixedText text="学习计划" />
+                                                            </h3>
+                                                            <p className="text-sm text-muted-foreground">
+                                                                <MixedText text="创建学习计划和目标" />
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+                                    </Step>
 
-                                        <div className="space-y-2">
-                                            <FormField label={<MixedText text="日程标题" />} htmlFor="title" required>
-                                                <Input
-                                                    id="title"
-                                                    name="title"
-                                                    value={form.title || ''}
-                                                    onChange={handleFormChange}
-                                                    className="h-11"
-                                                    placeholder="请输入日程标题"
-                                                />
-                                            </FormField>
-                                            <FormError error={errors.title} />
-                                        </div>
+                                    {/* 第二步：填写日程详情 */}
+                                    <Step>
+                                        <div className="space-y-4">
+                                            <div className="text-center mb-6">
+                                                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                                    <MixedText text="填写日程详情" />
+                                                </h3>
+                                                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                                    <MixedText text="请填写日程的详细信息" />
+                                                </p>
+                                            </div>
 
-                                        {/* 根据日程类型显示不同的日期选择器 */}
-                                        {form.type === 'plan' ? (
+                                            {/* 显示已选择的类型 */}
+                                            <div className="flex items-center p-3 bg-accent rounded-lg">
+                                                <div className="flex items-center space-x-2">
+                                                    <div
+                                                        className="w-3 h-3 rounded"
+                                                        style={{ backgroundColor: getTypeColor(form.type || 'countdown') }}
+                                                    ></div>
+                                                    <span className="text-sm font-medium">
+                                                        {form.type === 'countdown' && <MixedText text="考试倒计时" />}
+                                                        {form.type === 'plan' && <MixedText text="学习计划" />}
+                                                    </span>
+                                                </div>
+                                            </div>
+
                                             <div className="space-y-2">
-                                                <FormField label={<MixedText text="计划时间范围" />}>
-                                                    <CustomDateRangePicker
-                                                        dateRange={dateRange}
-                                                        onDateRangeChange={handleDateRangeChange}
-                                                        placeholder="选择开始和结束日期"
-                                                        themeColor="#8b5cf6"
+                                                <FormField label={<MixedText text="日程标题" />} htmlFor="title" required>
+                                                    <Input
+                                                        id="title"
+                                                        name="title"
+                                                        value={form.title || ''}
+                                                        onChange={handleFormChange}
+                                                        className="h-11"
+                                                        placeholder="请输入日程标题"
                                                     />
                                                 </FormField>
-                                                <FormError error={errors.start || errors.end} />
+                                                <FormError error={errors.title} />
                                             </div>
-                                        ) : null}
 
-                                        {/* 考试倒计时特定字段 */}
-                                        {form.type === 'countdown' && (
-                                            <div className="space-y-2">
-                                                <FormField label={<MixedText text="考试日期" />} htmlFor="examDate" required>
-                                                    <Popover open={examDateOpen} onOpenChange={setExamDateOpen}>
-                                                        <PopoverTrigger asChild>
-                                                            <button
-                                                                type="button"
-                                                                className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
-                                                                onClick={() => setExamDateOpen(true)}
-                                                            >
-                                                                <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
-                                                                {examDate ? (
-                                                                    <span>{format(examDate, 'PPP', { locale: zhCN })}</span>
-                                                                ) : (
-                                                                    <span className="text-gray-400 dark:text-gray-500">请选择考试日期</span>
-                                                                )}
-                                                            </button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent
-                                                            className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white"
-                                                            align="start"
-                                                            onInteractOutside={() => setExamDateOpen(false)}
-                                                        >
-                                                            <DatePicker
-                                                                mode="single"
-                                                                captionLayout="dropdown"
-                                                                month={currentMonth}
-                                                                onMonthChange={setCurrentMonth}
-                                                                selected={examDate}
-                                                                onSelect={(d) => {
-                                                                    setExamDate(d);
-                                                                    if (d) {
-                                                                        setForm(prev => ({
-                                                                            ...prev,
-                                                                            start: d,
-                                                                            end: d // 考试倒计时通常是一天
-                                                                        }));
-                                                                    }
-                                                                    if (errors.examDate) {
-                                                                        setErrors(prev => {
-                                                                            const newErrors = { ...prev };
-                                                                            delete newErrors.examDate;
-                                                                            return newErrors;
-                                                                        });
-                                                                    }
-                                                                    setExamDateOpen(false);
-                                                                }}
-                                                                initialFocus={false}
-                                                                locale={zhCN}
-                                                                className="p-3"
-                                                                page="schedule"
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                </FormField>
-                                                <FormError error={errors.examDate} />
-                                            </div>
-                                        )}
-
-                                        {/* 学习计划特定字段 */}
-                                        {form.type === 'plan' && (
-                                            <div className="space-y-4">
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <FormField label={<MixedText text="学习模块" />} htmlFor="module" required>
-                                                            <Select
-                                                                value={form.module || ''}
-                                                                onValueChange={(value) => setForm(prev => ({ ...prev, module: value }))}
-                                                            >
-                                                                <SelectTrigger className="h-11">
-                                                                    <SelectValue placeholder="选择学习模块" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="data-analysis">资料分析</SelectItem>
-                                                                    <SelectItem value="politics">政治理论</SelectItem>
-                                                                    <SelectItem value="math">数量关系</SelectItem>
-                                                                    <SelectItem value="verbal">言语理解</SelectItem>
-                                                                    <SelectItem value="common">常识判断</SelectItem>
-                                                                    <SelectItem value="logic">判断推理</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </FormField>
-                                                        <FormError error={errors.module} />
-                                                    </div>
-
-                                                    <div className="space-y-2">
-                                                        <FormField label={<MixedText text="计划类型" />} htmlFor="planType" required>
-                                                            <Select
-                                                                value={form.planType || ''}
-                                                                onValueChange={(value) => setForm(prev => ({ ...prev, planType: value }))}
-                                                            >
-                                                                <SelectTrigger className="h-11">
-                                                                    <SelectValue placeholder="选择计划类型" />
-                                                                </SelectTrigger>
-                                                                <SelectContent>
-                                                                    <SelectItem value="题量">题量</SelectItem>
-                                                                    <SelectItem value="正确率">正确率</SelectItem>
-                                                                    <SelectItem value="错题数">错题数</SelectItem>
-                                                                </SelectContent>
-                                                            </Select>
-                                                        </FormField>
-                                                        <FormError error={errors.planType} />
-                                                    </div>
-                                                </div>
-
+                                            {/* 根据日程类型显示不同的日期选择器 */}
+                                            {form.type === 'plan' ? (
                                                 <div className="space-y-2">
-                                                    <FormField label={<MixedText text="目标值" />} htmlFor="target" required>
-                                                        <Input
-                                                            id="target"
-                                                            name="target"
-                                                            type="number"
-                                                            value={form.target || ''}
-                                                            onChange={handleFormChange}
-                                                            className="h-11"
-                                                            placeholder="请输入目标值"
+                                                    <FormField label={<MixedText text="计划时间范围" />}>
+                                                        <CustomDateRangePicker
+                                                            dateRange={dateRange}
+                                                            onDateRangeChange={handleDateRangeChange}
+                                                            placeholder="选择开始和结束日期"
+                                                            themeColor="#8b5cf6"
                                                         />
                                                     </FormField>
-                                                    <FormError error={errors.target} />
+                                                    <FormError error={errors.start || errors.end} />
                                                 </div>
-                                            </div>
-                                        )}
+                                            ) : null}
 
-                                        <div className="space-y-2">
-                                            <FormField label={<MixedText text="日程描述" />} htmlFor="description">
-                                                <Textarea
-                                                    id="description"
-                                                    name="description"
-                                                    value={form.description || ''}
-                                                    onChange={handleFormChange}
-                                                    rows={3}
-                                                    placeholder="可选：添加日程描述"
-                                                    className="resize-none"
-                                                />
-                                            </FormField>
+                                            {/* 考试倒计时特定字段 */}
+                                            {form.type === 'countdown' && (
+                                                <div className="space-y-2">
+                                                    <FormField label={<MixedText text="考试日期" />} htmlFor="examDate" required>
+                                                        <Popover open={examDateOpen} onOpenChange={setExamDateOpen}>
+                                                            <PopoverTrigger asChild>
+                                                                <button
+                                                                    type="button"
+                                                                    className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
+                                                                    onClick={() => setExamDateOpen(true)}
+                                                                >
+                                                                    <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                                                                    {examDate ? (
+                                                                        <span>{format(examDate, 'PPP', { locale: zhCN })}</span>
+                                                                    ) : (
+                                                                        <span className="text-gray-400 dark:text-gray-500">请选择考试日期</span>
+                                                                    )}
+                                                                </button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white"
+                                                                align="start"
+                                                                onInteractOutside={() => setExamDateOpen(false)}
+                                                            >
+                                                                <DatePicker
+                                                                    mode="single"
+                                                                    captionLayout="dropdown"
+                                                                    month={currentMonth}
+                                                                    onMonthChange={setCurrentMonth}
+                                                                    selected={examDate}
+                                                                    onSelect={(d) => {
+                                                                        setExamDate(d);
+                                                                        if (d) {
+                                                                            setForm(prev => ({
+                                                                                ...prev,
+                                                                                start: d,
+                                                                                end: d // 考试倒计时通常是一天
+                                                                            }));
+                                                                        }
+                                                                        if (errors.examDate) {
+                                                                            setErrors(prev => {
+                                                                                const newErrors = { ...prev };
+                                                                                delete newErrors.examDate;
+                                                                                return newErrors;
+                                                                            });
+                                                                        }
+                                                                        setExamDateOpen(false);
+                                                                    }}
+                                                                    initialFocus={false}
+                                                                    locale={zhCN}
+                                                                    className="p-3"
+                                                                    page="schedule"
+                                                                />
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                    </FormField>
+                                                    <FormError error={errors.examDate} />
+                                                </div>
+                                            )}
+
+                                            {/* 学习计划特定字段 */}
+                                            {form.type === 'plan' && (
+                                                <div className="space-y-4">
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        <div className="space-y-2">
+                                                            <FormField label={<MixedText text="学习模块" />} htmlFor="module" required>
+                                                                <Select
+                                                                    value={form.module || ''}
+                                                                    onValueChange={(value) => setForm(prev => ({ ...prev, module: value }))}
+                                                                >
+                                                                    <SelectTrigger className="h-11">
+                                                                        <SelectValue placeholder="选择学习模块" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="data-analysis">资料分析</SelectItem>
+                                                                        <SelectItem value="politics">政治理论</SelectItem>
+                                                                        <SelectItem value="math">数量关系</SelectItem>
+                                                                        <SelectItem value="verbal">言语理解</SelectItem>
+                                                                        <SelectItem value="common">常识判断</SelectItem>
+                                                                        <SelectItem value="logic">判断推理</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </FormField>
+                                                            <FormError error={errors.module} />
+                                                        </div>
+
+                                                        <div className="space-y-2">
+                                                            <FormField label={<MixedText text="计划类型" />} htmlFor="planType" required>
+                                                                <Select
+                                                                    value={form.planType || ''}
+                                                                    onValueChange={(value) => setForm(prev => ({ ...prev, planType: value }))}
+                                                                >
+                                                                    <SelectTrigger className="h-11">
+                                                                        <SelectValue placeholder="选择计划类型" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        <SelectItem value="题量">题量</SelectItem>
+                                                                        <SelectItem value="正确率">正确率</SelectItem>
+                                                                        <SelectItem value="错题数">错题数</SelectItem>
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </FormField>
+                                                            <FormError error={errors.planType} />
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-2">
+                                                        <FormField label={<MixedText text="目标值" />} htmlFor="target" required>
+                                                            <Input
+                                                                id="target"
+                                                                name="target"
+                                                                type="number"
+                                                                value={form.target || ''}
+                                                                onChange={handleFormChange}
+                                                                className="h-11"
+                                                                placeholder="请输入目标值"
+                                                            />
+                                                        </FormField>
+                                                        <FormError error={errors.target} />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            <div className="space-y-2">
+                                                <FormField label={<MixedText text="日程描述" />} htmlFor="description">
+                                                    <Textarea
+                                                        id="description"
+                                                        name="description"
+                                                        value={form.description || ''}
+                                                        onChange={handleFormChange}
+                                                        rows={3}
+                                                        placeholder="可选：添加日程描述"
+                                                        className="resize-none"
+                                                    />
+                                                </FormField>
+                                            </div>
                                         </div>
-                                    </div>
-                                </Step>
-                            </Stepper>
-                        )}
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </TooltipProvider >
+                                    </Step>
+                                </Stepper>
+                            )}
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </TooltipProvider >
+        </ThemeColorProvider>
     );
 }
