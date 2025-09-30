@@ -414,7 +414,7 @@ export function AISettings() {
             </div>
 
             {/* 保存按钮 */}
-            <div className="flex justify-end mt-8 mb-6">
+            <div className="flex justify-center mt-8 mb-6">
                 <Button
                     onClick={handleSaveSettings}
                     disabled={isSaving}

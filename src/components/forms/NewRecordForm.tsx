@@ -190,7 +190,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
             <div className="w-full max-w-md space-y-6">
 
                 {/* 卡片内容 */}
-                <Card className="flex flex-col">
+                <Card className="flex flex-col shadow-lg new-record-form-card" style={{ boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}>
                     <CardContent className="pt-4 pb-4">
                         <BaseForm
                             className="form-stack"

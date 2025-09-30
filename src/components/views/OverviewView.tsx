@@ -542,7 +542,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                     )}
                                 </FlexCenterBoth>
                                 <FlexCenterBoth className="py-1 flex-grow">
-                                    <div className="text-lg sm:text-2xl font-bold">
+                                    <div className="text-lg sm:text-2xl font-medium">
                                         <MixedText text={String(item.value)} />
                                     </div>
                                     {item.extra && (
@@ -582,7 +582,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                     )}
                                 </FlexCenterBoth>
                                 <FlexCenterBoth className="py-1 flex-grow">
-                                    <div className="text-lg sm:text-2xl font-bold">
+                                    <div className="text-lg sm:text-2xl font-medium">
                                         <MixedText text={String(item.value)} />
                                     </div>
                                     {item.extra && (

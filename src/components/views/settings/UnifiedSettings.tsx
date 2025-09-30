@@ -541,7 +541,7 @@ export function UnifiedSettings({
                 </div>
 
                 {/* Save Settings Button - Bottom right */}
-                <div className="flex justify-end mt-8 mb-6">
+                <div className="flex justify-center mt-8 mb-6">
                   <Button
                     onClick={handleSaveAllSettings}
                     variant="default"
@@ -946,7 +946,7 @@ export function UnifiedSettings({
                 </div>
 
                 {/* Save Settings Button - Bottom right */}
-                <div className="flex justify-end mt-8 mb-6">
+                <div className="flex justify-center mt-8 mb-6">
                   <Button
                     onClick={handleSaveAllSettings}
                     variant="default"

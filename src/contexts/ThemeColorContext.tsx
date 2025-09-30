@@ -40,9 +40,9 @@ export const PAGE_THEME_COLORS = {
     'schedule': '#8b5cf6',    // 日程管理页面 - 紫色
     'history': '#0d9488',     // 历史记录页面 - 青色
     'knowledge': '#1e3a8a',   // 知识管理页面 - 深蓝色（与保存按钮一致）
-    'overview': '#3b82f6',    // 概览页面 - 蓝色
-    'charts': '#06b6d4',      // 图表页面 - 青色
-    'settings': '#6b7280',    // 设置页面 - 灰色
+    'overview': '#4f46e5',    // 概览页面 - 靛蓝色
+    'charts': '#c026d3',      // 图表页面 - 紫色
+    'settings': '#C93B76',    // 设置页面 - 粉色
 } as const;
 
 export type PageThemeKey = keyof typeof PAGE_THEME_COLORS;
