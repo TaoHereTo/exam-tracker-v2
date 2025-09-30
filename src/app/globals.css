@@ -472,7 +472,116 @@ h6 .mixed-text {
 /* ========== 基础样式 ========== */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+  }
+
+  /* 全局禁用焦点轮廓，只保留输入元素 */
+  * {
+    outline: none !important;
+  }
+
+  /* 全局禁用文本光标，只保留输入元素 */
+  *:not(input):not(textarea):not(select):not([contenteditable="true"]):not(.rich-text-editor):not(.rich-text-editor *):not(.rich-text-editor-main):not(.rich-text-editor-main *):not(.latex-rich-text-editor):not(.latex-rich-text-editor *):not(.knowledge-editor):not(.knowledge-editor *):not(.editor-container):not(.editor-container *):not([data-slot="editor"]):not([data-slot="editor"] *) {
+    caret-color: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
+
+  /* 恢复输入元素的焦点轮廓 */
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  [data-slot="input"],
+  [data-slot="textarea"] {
+    outline: revert !important;
+  }
+
+  /* 禁用非输入元素的文本光标显示 - 更精确的选择器 */
+  button:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [role="button"]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-slot="button"]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-slot="card"]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-slot="sidebar-menu-button"]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  .tab:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  .tabs-trigger:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-tab-value]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-view]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-tabs-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-select-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-dropdown-menu-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-hover-card-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-popover-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-dialog-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-sheet-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-accordion-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-collapsible-trigger]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-toggle]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-switch]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-checkbox]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-radio]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-slider]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-progress]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-separator]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-scroll-area]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-aspect-ratio]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-avatar]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-badge]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-calendar]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-command]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-context-menu]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-menubar]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-navigation-menu]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-select]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-sheet]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-sidebar]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-tabs]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-toast]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-tooltip]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-tree]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-typography]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *),
+  [data-radix-utils]:not([contenteditable="true"]):not(.rich-text-editor *):not(.rich-text-editor-main *):not(.latex-rich-text-editor *):not(.knowledge-editor *):not(.editor-container *):not([data-slot="editor"] *) {
+    caret-color: transparent !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+  }
+
+  /* 确保所有输入元素和文本编辑器保持正常功能 */
+  input,
+  textarea,
+  select,
+  [contenteditable="true"],
+  [data-slot="input"],
+  [data-slot="textarea"],
+  .rich-text-editor,
+  .rich-text-editor *,
+  .rich-text-editor-main,
+  .rich-text-editor-main *,
+  .latex-rich-text-editor,
+  .latex-rich-text-editor *,
+  .knowledge-editor,
+  .knowledge-editor *,
+  .editor-container,
+  .editor-container *,
+  [data-slot="editor"],
+  [data-slot="editor"] *,
+  /* 保护所有可能的编辑器内容区域 */
+  [contenteditable="true"] *,
+  .editor-content,
+  .editor-content *,
+  .editor-textarea,
+  .editor-textarea *,
+  .knowledge-entry-container,
+  .knowledge-entry-container * {
+    caret-color: auto !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
   }
 
   body {
@@ -484,7 +593,112 @@ h6 .mixed-text {
   textarea:focus-visible,
   [data-slot="input"]:focus-visible,
   [data-slot="textarea"]:focus-visible {
+    @apply outline-ring/50;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  /* 禁用非输入元素的焦点轮廓 - 通用规则 */
+  *:not(input):not(textarea):not(select):not([contenteditable="true"]):focus,
+  *:not(input):not(textarea):not(select):not([contenteditable="true"]):focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 特别针对按钮和交互元素的焦点禁用 */
+  button,
+  [role="button"],
+  [data-slot="button"],
+  [data-slot="card"],
+  [data-slot="sidebar-menu-button"],
+  .tab,
+  .tabs-trigger,
+  [data-tab-value],
+  [data-view],
+  [data-radix-tabs-trigger],
+  [data-radix-select-trigger],
+  [data-radix-dropdown-menu-trigger],
+  [data-radix-hover-card-trigger],
+  [data-radix-popover-trigger],
+  [data-radix-dialog-trigger],
+  [data-radix-sheet-trigger],
+  [data-radix-accordion-trigger],
+  [data-radix-collapsible-trigger],
+  [data-radix-toggle],
+  [data-radix-switch],
+  [data-radix-checkbox],
+  [data-radix-radio],
+  [data-radix-slider],
+  [data-radix-progress],
+  [data-radix-separator],
+  [data-radix-scroll-area],
+  [data-radix-aspect-ratio],
+  [data-radix-avatar],
+  [data-radix-badge],
+  [data-radix-calendar],
+  [data-radix-command],
+  [data-radix-context-menu],
+  [data-radix-menubar],
+  [data-radix-navigation-menu],
+  [data-radix-select],
+  [data-radix-sheet],
+  [data-radix-sidebar],
+  [data-radix-tabs],
+  [data-radix-toast],
+  [data-radix-tooltip],
+  [data-radix-tree],
+  [data-radix-typography],
+  [data-radix-utils] {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 禁用所有可能的焦点状态 */
+  button:focus,
+  button:focus-visible,
+  button:focus-within,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  [role="button"]:focus-within,
+  [data-slot="button"]:focus,
+  [data-slot="button"]:focus-visible,
+  [data-slot="button"]:focus-within,
+  [data-slot="card"]:focus,
+  [data-slot="card"]:focus-visible,
+  [data-slot="card"]:focus-within,
+  [data-slot="sidebar-menu-button"]:focus,
+  [data-slot="sidebar-menu-button"]:focus-visible,
+  [data-slot="sidebar-menu-button"]:focus-within,
+  .tab:focus,
+  .tab:focus-visible,
+  .tab:focus-within,
+  .tabs-trigger:focus,
+  .tabs-trigger:focus-visible,
+  .tabs-trigger:focus-within,
+  [data-tab-value]:focus,
+  [data-tab-value]:focus-visible,
+  [data-tab-value]:focus-within,
+  [data-view]:focus,
+  [data-view]:focus-visible,
+  [data-view]:focus-within {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* 确保输入元素保持焦点轮廓 */
+  input:focus,
+  input:focus-visible,
+  textarea:focus,
+  textarea:focus-visible,
+  select:focus,
+  select:focus-visible,
+  [contenteditable="true"]:focus,
+  [contenteditable="true"]:focus-visible,
+  [data-slot="input"]:focus,
+  [data-slot="input"]:focus-visible,
+  [data-slot="textarea"]:focus,
+  [data-slot="textarea"]:focus-visible {
+    outline: 2px solid var(--ring) !important;
+    outline-offset: 2px !important;
   }
 
   /* 统一所有placeholder颜色 - 使用CSS变量 */
