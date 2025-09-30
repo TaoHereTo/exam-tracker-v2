@@ -21,6 +21,19 @@ const useTabsContext = () => {
     return context;
 };
 
+// 辅助函数：将十六进制颜色转换为RGB
+const hexToRgb = (hex: string): string => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+        const r = parseInt(result[1], 16);
+        const g = parseInt(result[2], 16);
+        const b = parseInt(result[3], 16);
+        return `${r}, ${g}, ${b}`;
+    }
+    // 默认返回蓝色
+    return '42, 77, 208';
+};
+
 interface TabsProps {
     defaultValue: string;
     className?: string;
@@ -85,14 +98,23 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md border border-white/20 dark:border-white/20 p-1 text-muted-foreground shadow-lg unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
-            style={{ zIndex: 10 }}
+            className={cn('relative inline-flex items-center justify-center rounded-full backdrop-blur-md border p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
+            style={{
+                zIndex: 10,
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                borderColor: `${themeColor || '#2A4DD0'}40`,
+                backdropFilter: 'blur(12px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(12px) saturate(180%)'
+            }}
         >
-            {/* 高亮背景 - 使用主题颜色 */}
+            {/* 高亮背景 - 使用主题颜色的毛玻璃效果 */}
             <motion.div
-                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                className="absolute inset-y-1 backdrop-blur-sm rounded-full"
                 style={{
-                    backgroundColor: themeColor || '#2A4DD0',
+                    backgroundColor: `rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.8)`,
+                    backdropFilter: 'blur(8px) saturate(150%)',
+                    WebkitBackdropFilter: 'blur(8px) saturate(150%)',
+                    boxShadow: `0 4px 12px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.4), 0 2px 4px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.2)`,
                 }}
                 initial={false}
                 animate={{

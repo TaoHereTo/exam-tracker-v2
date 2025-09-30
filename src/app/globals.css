@@ -2332,3 +2332,177 @@ button:focus-visible,
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* ========== 彩色毛玻璃效果 ========== */
+/* 基础毛玻璃效果 */
+.glass-effect {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 粉色毛玻璃 */
+.glass-pink {
+  background: rgba(255, 192, 203, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 192, 203, 0.3);
+  box-shadow: 0 8px 32px rgba(255, 192, 203, 0.2);
+}
+
+/* 蓝色毛玻璃 */
+.glass-blue {
+  background: rgba(135, 206, 235, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(135, 206, 235, 0.3);
+  box-shadow: 0 8px 32px rgba(135, 206, 235, 0.2);
+}
+
+/* 绿色毛玻璃 */
+.glass-green {
+  background: rgba(144, 238, 144, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(144, 238, 144, 0.3);
+  box-shadow: 0 8px 32px rgba(144, 238, 144, 0.2);
+}
+
+/* 紫色毛玻璃 */
+.glass-purple {
+  background: rgba(221, 160, 221, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(221, 160, 221, 0.3);
+  box-shadow: 0 8px 32px rgba(221, 160, 221, 0.2);
+}
+
+/* 橙色毛玻璃 */
+.glass-orange {
+  background: rgba(255, 165, 0, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(255, 165, 0, 0.2);
+}
+
+/* 红色毛玻璃 */
+.glass-red {
+  background: rgba(255, 99, 71, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 99, 71, 0.3);
+  box-shadow: 0 8px 32px rgba(255, 99, 71, 0.2);
+}
+
+/* 黄色毛玻璃 */
+.glass-yellow {
+  background: rgba(255, 255, 0, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(255, 255, 0, 0.2);
+}
+
+/* 青色毛玻璃 */
+.glass-cyan {
+  background: rgba(0, 255, 255, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+}
+
+/* 深色模式下的彩色毛玻璃效果 */
+.dark .glass-pink {
+  background: rgba(255, 192, 203, 0.1);
+  border: 1px solid rgba(255, 192, 203, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 192, 203, 0.1);
+}
+
+.dark .glass-blue {
+  background: rgba(135, 206, 235, 0.1);
+  border: 1px solid rgba(135, 206, 235, 0.2);
+  box-shadow: 0 8px 32px rgba(135, 206, 235, 0.1);
+}
+
+.dark .glass-green {
+  background: rgba(144, 238, 144, 0.1);
+  border: 1px solid rgba(144, 238, 144, 0.2);
+  box-shadow: 0 8px 32px rgba(144, 238, 144, 0.1);
+}
+
+.dark .glass-purple {
+  background: rgba(221, 160, 221, 0.1);
+  border: 1px solid rgba(221, 160, 221, 0.2);
+  box-shadow: 0 8px 32px rgba(221, 160, 221, 0.1);
+}
+
+.dark .glass-orange {
+  background: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 165, 0, 0.1);
+}
+
+.dark .glass-red {
+  background: rgba(255, 99, 71, 0.1);
+  border: 1px solid rgba(255, 99, 71, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 99, 71, 0.1);
+}
+
+.dark .glass-yellow {
+  background: rgba(255, 255, 0, 0.1);
+  border: 1px solid rgba(255, 255, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(255, 255, 0, 0.1);
+}
+
+.dark .glass-cyan {
+  background: rgba(0, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+}
+
+/* 可调节强度的毛玻璃效果 */
+.glass-light {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+}
+
+.glass-medium {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(16px) saturate(200%);
+  -webkit-backdrop-filter: blur(16px) saturate(200%);
+}
+
+/* 修复tabs内容重叠问题 */
+.tabs-content-container {
+  position: relative;
+  min-height: 600px;
+}
+
+.tabs-content-container [data-tab-content] {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  width: 100% !important;
+  pointer-events: auto !important;
+}
+
+/* 毛玻璃tabs的背景颜色调整 */
+.backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* 毛玻璃tabs的深色模式支持 */
+.dark .backdrop-blur-md {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
