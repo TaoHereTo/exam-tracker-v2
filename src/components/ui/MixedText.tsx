@@ -96,20 +96,15 @@ export const MixedText = memo(function MixedText({
         );
     }
 
-    // 如果是混合文本，分割并分别应用字体
-    const parts = splitMixedText(content);
-
+    // 如果是混合文本，使用统一的字体样式，不分割
+    const fontStyle = generateFontStyle(content, config);
     return (
-        <Component className={cn('mixed-text-container', className)} style={baseStyle} onClick={onClick}>
-            {parts.map((part, index) => (
-                <span
-                    key={index}
-                    className="mixed-text-part"
-                    style={generateMixedTextStyle(part, config)}
-                >
-                    {part.text}
-                </span>
-            ))}
+        <Component
+            className={cn("mixed-text", className)}
+            style={{ ...fontStyle, ...baseStyle }}
+            onClick={onClick}
+        >
+            {content}
         </Component>
     );
 });

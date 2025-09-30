@@ -574,7 +574,7 @@ export default function NotesView() {
                                     {/* 新建笔记按钮 */}
                                     <Button
                                         onClick={() => setIsCreating(true)}
-                                        className="w-full"
+                                        className="w-full bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                         size="sm"
                                     >
                                         <Plus className="h-4 w-4 mr-2" />
@@ -766,6 +766,7 @@ export default function NotesView() {
                                     variant="default"
                                     size="default"
                                     onClick={() => setIsCreating(true)}
+                                    className="bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                 >
                                     <Plus className="h-4 w-4" />
                                 </CircularButton>
@@ -880,7 +881,11 @@ export default function NotesView() {
                             <Button variant="outline" onClick={() => setIsCreating(false)}>
                                 取消
                             </Button>
-                            <Button onClick={handleCreateNote} disabled={isSaving}>
+                            <Button
+                                onClick={handleCreateNote}
+                                disabled={isSaving}
+                                className="bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
+                            >
                                 {isSaving ? "创建中..." : "创建笔记"}
                             </Button>
                         </DialogFooter>
