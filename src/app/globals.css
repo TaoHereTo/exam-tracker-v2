@@ -1243,11 +1243,7 @@ textarea,
 /* ========== 光标控制 ========== */
 /* 移除全局光标限制，让所有元素正常显示光标 */
 
-/* 禁用表格单元格的焦点状态 */
-table td:focus,
-table th:focus {
-  outline: none;
-}
+/* 表格单元格的焦点状态由全局规则处理 */
 
 /* 输入框基础样式 - 保留必要的全局样式 */
 .shadow-input {
@@ -1741,14 +1737,7 @@ button[data-slot="sidebar-menu-button"][data-size="default"]:not([data-slot="sid
   display: block !important;
 }
 
-/* 去除点击/聚焦时的外边框与阴影 */
-[data-slot="sidebar-menu-button"]:focus,
-[data-slot="sidebar-menu-button"]:focus-visible,
-[data-slot="sidebar-menu-button"]:active {
-  outline: none;
-  box-shadow: none;
-  border: none;
-}
+/* 侧边栏菜单按钮的焦点状态由全局规则处理 */
 
 /* 侧边栏间距和布局 */
 [data-slot="sidebar-inner"] {
@@ -2272,26 +2261,70 @@ body.eye-care.dark .text-muted-foreground,
   color: white !important;
 }
 
-/* 修复tabs和按钮中的光标闪烁问题 */
-[data-slot="button"],
-[data-tab-value],
-[data-view],
-button[data-tab-value] {
+/* 全局禁用光标 - 除了文本输入框外 */
+* {
   caret-color: transparent !important;
   -webkit-tap-highlight-color: transparent !important;
 }
 
-/* 禁用按钮和tabs的焦点轮廓 */
+/* 恢复文本输入框的光标显示 */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+textarea,
+[contenteditable="true"],
+[contenteditable="true"] *,
+[data-slot="input"],
+[data-slot="textarea"],
+.content,
+.text-content,
+.editable,
+/* 富文本编辑器相关选择器 */
+.rich-text-editor,
+.rich-text-editor *,
+[data-rich-text-editor],
+[data-rich-text-editor] *,
+.latex-rich-text-editor,
+.latex-rich-text-editor *,
+/* 确保所有可编辑内容都有光标 */
+[contenteditable],
+[contenteditable] *,
+/* 富文本编辑器内部的所有元素 */
+div[contenteditable],
+div[contenteditable] *,
+div[contenteditable="true"],
+div[contenteditable="true"] * {
+  caret-color: auto !important;
+}
+
+/* 非文本输入元素的焦点轮廓由下面的焦点规则处理 */
+
+/* 确保按钮和交互元素在焦点状态下不显示轮廓 */
+button:focus,
+button:focus-visible,
 [data-slot="button"]:focus,
 [data-slot="button"]:focus-visible,
+[data-slot="sidebar-menu-button"]:focus,
+[data-slot="sidebar-menu-button"]:focus-visible,
+[data-sidebar="menu-button"]:focus,
+[data-sidebar="menu-button"]:focus-visible,
 [data-tab-value]:focus,
 [data-tab-value]:focus-visible,
 [data-view]:focus,
 [data-view]:focus-visible,
-button[data-tab-value]:focus,
-button[data-tab-value]:focus-visible {
+.peer\/menu-button:focus,
+.peer\/menu-button:focus-visible,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+[role="tab"]:focus,
+[role="tab"]:focus-visible,
+[role="menuitem"]:focus,
+[role="menuitem"]:focus-visible {
   outline: none !important;
-  caret-color: transparent !important;
 }
 
 ::view-transition-old(root),
