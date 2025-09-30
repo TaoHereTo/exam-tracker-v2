@@ -26,7 +26,7 @@ const circularButtonVariants = cva(
                 gray:
                     "bg-[#6b7280] text-white shadow-sm hover:bg-[#6b7280]/90 dark:hover:bg-[#6b7280]/80",
                 theme:
-                    "border border-input-border bg-background shadow-sm hover:bg-accent hover:text-accent-foreground dark:bg-background dark:border-input-border dark:hover:bg-accent dark:hover:text-accent-foreground",
+                    "border border-input-border bg-white shadow-sm hover:bg-accent hover:text-accent-foreground dark:bg-background dark:border-input-border dark:hover:bg-accent dark:hover:text-accent-foreground",
             },
             size: {
                 sm: "h-6 w-6",

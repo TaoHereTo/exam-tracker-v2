@@ -231,28 +231,26 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                 />
                             </div>
 
-                            <div className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-800">
-                                <div className="flex gap-2 items-center">
-                                    <Label className="text-sm font-medium">公式模式:</Label>
-                                    <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-4">
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem
-                                                value="inline"
-                                                id="inline"
-                                                className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                            />
-                                            <Label htmlFor="inline" className="text-sm">行内公式</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem
-                                                value="block"
-                                                id="block"
-                                                className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                            />
-                                            <Label htmlFor="block" className="text-sm">行间公式</Label>
-                                        </div>
-                                    </RadioGroup>
-                                </div>
+                            <div className="flex gap-2 items-center">
+                                <Label className="text-sm font-medium">公式模式:</Label>
+                                <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-4">
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem
+                                            value="inline"
+                                            id="inline"
+                                            className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
+                                        />
+                                        <Label htmlFor="inline" className="text-sm">行内公式</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <RadioGroupItem
+                                            value="block"
+                                            id="block"
+                                            className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
+                                        />
+                                        <Label htmlFor="block" className="text-sm">行间公式</Label>
+                                    </div>
+                                </RadioGroup>
                             </div>
                         </div>
 
@@ -266,14 +264,14 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                 {filteredFormulas.map((formula, index) => (
                                     <div
                                         key={`${formula.category}-${index}`}
-                                        className="p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                                        className="p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors bg-white dark:bg-transparent"
                                         onClick={() => onInsert(formula.latex, displayMode === 'block')}
                                     >
                                         <div className="text-sm font-medium mb-2">{formula.name}</div>
                                         <div className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all mb-2">
                                             {formula.latex}
                                         </div>
-                                        <div className="text-center bg-gray-100 dark:bg-gray-700 p-2 rounded min-h-[40px] flex items-center justify-center">
+                                        <div className="text-center bg-transparent p-2 rounded min-h-[40px] flex items-center justify-center">
                                             <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
                                         </div>
                                     </div>
