@@ -10,6 +10,7 @@ import { useNotification } from "@/components/magicui/NotificationProvider";
 import { AIService } from "@/lib/aiService";
 import { MixedText } from "@/components/ui/MixedText";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
     Save,
     TestTube,
@@ -28,8 +29,6 @@ export function AISettings() {
     const [geminiApiKey, setGeminiApiKey] = useLocalStorageString('gemini-api-key', '');
     const [deepseekApiKey, setDeepseekApiKey] = useLocalStorageString('deepseek-api-key', '');
     const [selectedModel, setSelectedModel] = useLocalStorageString('ai-model', 'gemini-2.5-flash');
-    const [aiAnalysisEnabled, setAiAnalysisEnabled] = useLocalStorageString('ai-analysis-enabled', 'false');
-    const [autoAnalysisEnabled, setAutoAnalysisEnabled] = useLocalStorageString('auto-analysis-enabled', 'false');
 
     const [selectedApiType, setSelectedApiType] = useState<'gemini' | 'deepseek'>('gemini');
     const [showApiKey, setShowApiKey] = useState(false);
@@ -199,8 +198,6 @@ export function AISettings() {
 
         try {
             // 保存设置到localStorage
-            localStorage.setItem('ai-analysis-enabled', aiAnalysisEnabled);
-            localStorage.setItem('auto-analysis-enabled', autoAnalysisEnabled);
             localStorage.setItem('ai-model', selectedModel);
 
             // 如果API Key还没有保存（连接测试失败的情况），则保存它
@@ -337,7 +334,7 @@ export function AISettings() {
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                                className="ai-settings-no-shadow absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
                                 onClick={() => setShowApiKey(!showApiKey)}
                             >
                                 {showApiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -347,9 +344,9 @@ export function AISettings() {
                             <Button
                                 onClick={selectedApiType === 'gemini' ? handleTestGeminiConnection : handleTestDeepseekConnection}
                                 disabled={isTestingConnection || !(selectedApiType === 'gemini' ? geminiApiKey : deepseekApiKey).trim()}
-                                variant="outline"
+                                variant="ghost"
                                 size="sm"
-                                className="flex items-center gap-2 h-7 text-xs"
+                                className="ai-settings-no-shadow flex items-center gap-2 h-7 text-xs"
                             >
                                 <TestTube className="w-3 h-3" />
                                 测试连接
@@ -362,83 +359,58 @@ export function AISettings() {
                 </div>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-            {/* 启用AI分析 */}
-            <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                <div className="flex-1">
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="启用AI分析" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="开启后可以在成绩概览页面使用AI智能分析功能" /></p>
-                </div>
-                <Switch
-                    checked={aiAnalysisEnabled === 'true'}
-                    onCheckedChange={(checked) => setAiAnalysisEnabled(checked ? 'true' : 'false')}
-                    disabled={!geminiApiKey.trim() && !deepseekApiKey.trim()}
-                    className="mt-0"
-                />
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-            {/* 自动分析 */}
-            <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                <div className="flex-1">
-                    <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="自动分析" /></h3>
-                    <p className="text-sm text-muted-foreground mt-1"><MixedText text="开启后每次录入新数据时自动进行AI分析" /></p>
-                </div>
-                <Switch
-                    checked={autoAnalysisEnabled === 'true'}
-                    onCheckedChange={(checked) => setAutoAnalysisEnabled(checked ? 'true' : 'false')}
-                    disabled={(!geminiApiKey.trim() && !deepseekApiKey.trim()) || aiAnalysisEnabled !== 'true'}
-                    className="mt-0"
-                />
-            </div>
 
             {/* 使用说明 */}
             <div className="py-4">
-                <h3 className="font-semibold text-base sm:text-lg text-foreground mb-3"><MixedText text="使用说明" /></h3>
-                <div className="space-y-3 text-sm text-muted-foreground">
-                    <div>
-                        <p className="font-medium mb-1">
-                            <MixedText text="1. 选择AI模型" />
-                        </p>
-                        <p>
-                            <MixedText text="选择Gemini或DeepSeek模型，不同模型有不同的分析特点" />
-                        </p>
-                    </div>
-                    <div>
-                        <p className="font-medium mb-1">
-                            <MixedText text="2. 获取API Key" />
-                        </p>
-                        <p>
-                            <MixedText text="Gemini: 访问Google AI Studio (https://aistudio.google.com/)" />
-                        </p>
-                        <p>
-                            <MixedText text="DeepSeek: 访问DeepSeek官网 (https://platform.deepseek.com/)" />
-                        </p>
-                    </div>
-                    <div>
-                        <p className="font-medium mb-1">
-                            <MixedText text="3. 配置设置" />
-                        </p>
-                        <p>
-                            <MixedText text="输入API Key后点击对应的测试按钮，连接成功后会自动保存" />
-                        </p>
-                        <p>
-                            <MixedText text="可以只配置一个API Key，也可以同时配置两个" />
-                        </p>
-                    </div>
-                    <div>
-                        <p className="font-medium mb-1">
-                            <MixedText text="4. 使用AI分析" />
-                        </p>
-                        <p>
-                            <MixedText text="在成绩概览页面的模块分析区域，点击AI分析按钮获取智能分析报告" />
-                        </p>
-                    </div>
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="usage-guide">
+                        <AccordionTrigger className="font-semibold text-base sm:text-lg text-foreground hover:no-underline [&]:font-semibold">
+                            <MixedText text="使用说明" />
+                        </AccordionTrigger>
+                        <AccordionContent>
+                            <div className="space-y-3 text-sm text-muted-foreground pt-2">
+                                <div>
+                                    <p className="font-medium mb-1">
+                                        <MixedText text="1. 选择AI模型" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="选择Gemini或DeepSeek模型，不同模型有不同的分析特点" />
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-medium mb-1">
+                                        <MixedText text="2. 获取API Key" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="Gemini: 访问Google AI Studio (https://aistudio.google.com/)" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="DeepSeek: 访问DeepSeek官网 (https://platform.deepseek.com/)" />
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-medium mb-1">
+                                        <MixedText text="3. 配置设置" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="输入API Key后点击对应的测试按钮，连接成功后会自动保存" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="可以只配置一个API Key，也可以同时配置两个" />
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="font-medium mb-1">
+                                        <MixedText text="4. 使用AI分析" />
+                                    </p>
+                                    <p>
+                                        <MixedText text="在成绩概览页面的模块分析区域，点击AI分析按钮获取智能分析报告" />
+                                    </p>
+                                </div>
+                            </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                </Accordion>
             </div>
 
             {/* 保存按钮 */}

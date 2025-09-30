@@ -376,8 +376,14 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       // 调用onAddKnowledge（禁用其内部的toast显示）
       await onAddKnowledge(knowledgeData);
 
-      // 更新 toast 为成功状态
-      updateToSuccess?.(loadingToastId, '知识点保存成功！');
+      // 如果是编辑模式（有initialData），不显示立即成功toast，让调用方处理
+      if (!initialData) {
+        // 更新 toast 为成功状态（仅新增模式）
+        updateToSuccess?.(loadingToastId, '知识点保存成功！');
+      } else {
+        // 编辑模式：关闭loading toast，让调用方的autoUpdateKnowledge处理成功toast
+        toast.dismiss(loadingToastId);
+      }
 
       // 清空待处理图片列表
       pendingImagesRef.current = [];

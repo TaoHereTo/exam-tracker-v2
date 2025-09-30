@@ -224,14 +224,14 @@ export default function CountdownExpandableCard({
                                 layoutId={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 key={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 onClick={() => setActive(countdown)}
-                                className="p-4 flex flex-col hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+                                className="p-4 flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
                                 style={{
                                     display: isActive ? 'none' : 'block'
                                 }}
                             >
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-neutral-800 dark:text-neutral-200 text-left">
+                                        <h3 className="font-medium text-black dark:text-white text-left">
                                             {countdown.name}
                                         </h3>
                                     </div>

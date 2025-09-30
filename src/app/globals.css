@@ -174,6 +174,26 @@ h6 .mixed-text-part {
   font-weight: inherit !important;
 }
 
+/* 确保标题中的 MixedText 容器也继承字体粗细 */
+h1 .mixed-text-container,
+h2 .mixed-text-container,
+h3 .mixed-text-container,
+h4 .mixed-text-container,
+h5 .mixed-text-container,
+h6 .mixed-text-container {
+  font-weight: inherit !important;
+}
+
+/* 确保标题中的 mixed-text 类也继承字体粗细 */
+h1 .mixed-text,
+h2 .mixed-text,
+h3 .mixed-text,
+h4 .mixed-text,
+h5 .mixed-text,
+h6 .mixed-text {
+  font-weight: inherit !important;
+}
+
 /* 修复下拉框位置问题 */
 [data-radix-select-content] {
   z-index: 9999 !important;
@@ -1294,6 +1314,25 @@ table th:focus {
 .calendar-container [data-slot="button"]:active,
 [data-day]:active {
   box-shadow: none !important;
+}
+
+/* AI设置页面按钮无阴影和边框 */
+.ai-settings-no-shadow {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.ai-settings-no-shadow:hover {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.ai-settings-no-shadow:active {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
 }
 
 /* Rainbow button animation - 已移至 RainbowButton 组件 */

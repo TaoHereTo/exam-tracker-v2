@@ -178,7 +178,7 @@ export default function CustomAgendaView({ events, currentDate, onEventClick }: 
 
                                                 {/* 事件描述 */}
                                                 {event.description && (
-                                                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 truncate max-w-md">
+                                                    <div className="mt-1 text-xs text-black dark:text-white truncate max-w-md">
                                                         {event.description}
                                                     </div>
                                                 )}

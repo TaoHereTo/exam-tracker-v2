@@ -679,7 +679,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                 <motion.div
                                                                     layoutId={`completed-countdown-${countdown.id}`}
                                                                     layout
-                                                                    className="w-full rounded-xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors shadow-none"
+                                                                    className="w-full rounded-xl overflow-hidden cursor-pointer bg-white dark:bg-transparent hover:bg-muted/50 transition-colors shadow-none"
                                                                     onClick={() => handleCountdownSelect(countdown.id, !isSelected)}
                                                                 >
                                                                     <div className="px-6 py-3 flex items-center gap-3">
@@ -695,13 +695,13 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="flex items-center gap-4">
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <h3 className="text-base font-bold text-foreground truncate">{countdown.name}</h3>
+                                                                                    <h3 className="text-base font-bold text-black dark:text-white truncate">{countdown.name}</h3>
                                                                                     <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
                                                                                         <span>{countdown.examDate.split('T')[0]}</span>
                                                                                         {countdown.description && (
                                                                                             <>
                                                                                                 <span>•</span>
-                                                                                                <span className="truncate">{countdown.description}</span>
+                                                                                                <span className="truncate text-black dark:text-white">{countdown.description}</span>
                                                                                             </>
                                                                                         )}
                                                                                     </div>

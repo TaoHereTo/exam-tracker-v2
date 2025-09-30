@@ -45,7 +45,8 @@ export const MixedText = memo(function MixedText({
 
     // 基础样式 - 字体渲染已在全局CSS中统一处理
     const baseStyle = {
-        ...style
+        ...style,
+        fontWeight: 'inherit' // 确保继承父元素的字体粗细
     };
 
     // 特别优化"退出登录"文本

@@ -432,7 +432,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                         {/* Header with title and actions */}
                                                         <div className="flex justify-between items-start mb-6">
                                                             <div className="flex-1 min-w-0">
-                                                                <h3 className="text-xl font-bold text-foreground truncate">
+                                                                <h3 className="text-xl font-bold text-black dark:text-white truncate">
                                                                     {plan.name}
                                                                 </h3>
                                                                 <p className="text-sm text-muted-foreground mt-1">
@@ -569,7 +569,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                             <div className="flex items-center justify-between">
                                                                 <div className="text-sm">
                                                                     <span className="text-muted-foreground"><MixedText text="板块：" /></span>
-                                                                    <span className="font-medium"><MixedText text={normalizeModuleName(plan.module)} /></span>
+                                                                    <span className="font-medium text-black dark:text-white"><MixedText text={normalizeModuleName(plan.module)} /></span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -582,7 +582,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                 <h4 className="text-sm font-semibold">
                                                     <MixedText text="计划描述" />
                                                 </h4>
-                                                <p className="text-sm text-muted-foreground">
+                                                <p className="text-sm text-black dark:text-white">
                                                     <MixedText text={plan.description || '暂无描述'} />
                                                 </p>
                                             </div>
@@ -696,7 +696,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="flex items-center gap-4">
                                                                                 <div className="flex-1 min-w-0">
-                                                                                    <h3 className="text-base font-bold text-foreground truncate">
+                                                                                    <h3 className="text-base font-bold text-black dark:text-white truncate">
                                                                                         {plan.name}
                                                                                     </h3>
                                                                                     <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">

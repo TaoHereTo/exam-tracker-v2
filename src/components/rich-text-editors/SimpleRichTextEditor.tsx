@@ -17,7 +17,7 @@ import {
     AlignCenter,
     AlignRight,
     AlignJustify,
-    Palette,
+    Paintbrush,
     Type,
     Image as ImageIcon,
     Upload,
@@ -59,6 +59,7 @@ import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import Image from 'next/image';
 
 // 简单的LaTeX Hover Card组件
 const LatexHoverCard: React.FC<{ latex: string; children: React.ReactNode }> = ({ latex, children }) => {
@@ -684,7 +685,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         };
 
         reader.readAsDataURL(file);
-    }, [deferImageUpload, onImageChange, pendingImages, notify, handlePendingImagesChange]);
+    }, [pendingImages, notify, handlePendingImagesChange]);
 
     // 删除图片
     const handleRemoveImage = useCallback((imageId: string) => {
@@ -1470,7 +1471,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                             }
                                         }}
                                     >
-                                        <Palette className="w-3 h-3" />
+                                        <Paintbrush className="w-3 h-3" />
                                     </Button>
                                 </PopoverTrigger>
                             </TooltipTrigger>
@@ -1770,11 +1771,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                             {images.map((image) => (
                                                 <div key={image.id} className="relative group">
                                                     <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
-                                                        <img
+                                                        <Image
                                                             src={image.url}
                                                             alt={image.name}
-                                                            className="w-full h-full object-cover"
-                                                            loading="lazy"
+                                                            fill
+                                                            className="object-cover"
+                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                                         />
                                                         {/* 透明按钮，无背景遮罩 */}
                                                         <div className="absolute inset-0 flex items-center justify-center">
