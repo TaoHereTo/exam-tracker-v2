@@ -158,28 +158,30 @@ export function Stepper({
             variant="outline"
             onClick={handlePrevious}
             disabled={isFirstStep || isLoading}
-            className="flex items-center gap-2"
+            className="h-9 px-6 py-0 rounded-full font-medium flex items-center justify-center gap-2"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             <ChevronLeft className="w-4 h-4" />
-            {backButtonText}
+            <span style={{ lineHeight: '1', display: 'inline-flex', alignItems: 'center', transform: 'translateY(1px)' }}>{backButtonText}</span>
           </Button>
 
           <Button
             type="button"
             onClick={isLastStep ? handleComplete : handleNext}
             disabled={isLoading}
-            className="flex items-center gap-2 dark:bg-white dark:text-black bg-black text-white hover:bg-gray-800 dark:hover:bg-gray-200"
+            className="h-9 px-6 py-0 rounded-full font-medium bg-[#8b5cf6] text-white hover:bg-[#8b5cf6]/90 flex items-center justify-center gap-2"
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             {isLoading ? (
               <div className="flex items-center gap-2">
                 <UiverseSpinner size={18} />
-                <span>验证中...</span>
+                <span style={{ lineHeight: '1', display: 'inline-flex', alignItems: 'center', transform: 'translateY(1px)' }}>验证中...</span>
               </div>
             ) : isLastStep ? (
-              '完成'
+              <span style={{ lineHeight: '1', display: 'inline-flex', alignItems: 'center', transform: 'translateY(1px)' }}>完成</span>
             ) : (
               <>
-                {nextButtonText}
+                <span style={{ lineHeight: '1', display: 'inline-flex', alignItems: 'center', transform: 'translateY(1px)' }}>{nextButtonText}</span>
                 <ChevronRight className="w-4 h-4" />
               </>
             )}

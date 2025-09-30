@@ -2088,8 +2088,8 @@ body.eye-care.dark .text-muted-foreground,
 /* 动态设置侧边栏宽度变量 */
 :root {
   --sidebar-width: 280px;
-  --toast-bg: hsl(var(--card));
-  --toast-color: hsl(var(--foreground));
+  --toast-bg: #ffffff;
+  --toast-color: #000000;
 }
 
 /* 当侧边栏处于icon模式时 */
@@ -2104,21 +2104,23 @@ body.eye-care.dark .text-muted-foreground,
 
 /* 深色模式下的toast样式 */
 .dark {
-  --toast-bg: rgba(48, 48, 48, 0.6);
+  --toast-bg: #1a1a1a;
   --toast-color: #ffffff;
 }
 
-/* 确保Toast背景色和文字颜色在深色模式下正确 */
+/* 确保Toast背景色和文字颜色正确 */
 [data-slot="toaster"] [data-slot="toast"] {
-  background: hsl(var(--card)) !important;
-  color: hsl(var(--foreground)) !important;
+  background: var(--toast-bg) !important;
+  color: var(--toast-color) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
 .dark [data-slot="toaster"] [data-slot="toast"] {
-  background: rgba(48, 48, 48, 0.6) !important;
-  color: #ffffff !important;
+  background: var(--toast-bg) !important;
+  color: var(--toast-color) !important;
   backdrop-filter: blur(12px) saturate(180%) !important;
   -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
@@ -2127,22 +2129,22 @@ body.eye-care.dark .text-muted-foreground,
 
 [data-slot="toaster"] .notification-message,
 [data-slot="toaster"] [data-slot="toast"] .notification-message {
-  color: hsl(var(--foreground)) !important;
+  color: var(--toast-color) !important;
 }
 
 .dark [data-slot="toaster"] .notification-message,
 .dark [data-slot="toaster"] [data-slot="toast"] .notification-message {
-  color: #ffffff !important;
+  color: var(--toast-color) !important;
 }
 
 [data-slot="toaster"] .notification-description,
 [data-slot="toaster"] [data-slot="toast"] .notification-description {
-  color: hsl(var(--muted-foreground)) !important;
+  color: rgba(0, 0, 0, 0.6) !important;
 }
 
 .dark [data-slot="toaster"] .notification-description,
 .dark [data-slot="toaster"] [data-slot="toast"] .notification-description {
-  color: #d1d5db !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 
 /* 增强深色模式毛玻璃效果 */

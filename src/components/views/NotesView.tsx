@@ -29,6 +29,7 @@ import {
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
 import { HtmlRenderer } from "@/components/ui/HtmlRenderer";
 import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
+import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { notesService, type Note as CloudNote } from "@/lib/notesService";
 import { useAuth } from "@/contexts/AuthContext";
@@ -760,21 +761,13 @@ export default function NotesView() {
                             </DropdownMenu>
                         )}
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <CircularButton
-                                    variant="default"
-                                    size="default"
-                                    onClick={() => setIsCreating(true)}
-                                    className="bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
-                                >
-                                    <Plus className="h-4 w-4" />
-                                </CircularButton>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>新建笔记</p>
-                            </TooltipContent>
-                        </Tooltip>
+                        <Button
+                            onClick={() => setIsCreating(true)}
+                            className="h-9 px-6 rounded-full font-medium bg-[#ea580c] text-white hover:bg-[#ea580c]/90"
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            <MixedText text="新建笔记" />
+                        </Button>
                     </div>
                 </div>
 
@@ -878,13 +871,17 @@ export default function NotesView() {
                         </div>
 
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setIsCreating(false)}>
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsCreating(false)}
+                                className="h-9 px-6 rounded-full font-medium"
+                            >
                                 取消
                             </Button>
                             <Button
                                 onClick={handleCreateNote}
                                 disabled={isSaving}
-                                className="bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
+                                className="h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                             >
                                 {isSaving ? "创建中..." : "创建笔记"}
                             </Button>
