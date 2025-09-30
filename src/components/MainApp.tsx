@@ -108,11 +108,6 @@ const KnowledgeEntryView = lazy(() =>
         default: module.default
     }))
 );
-const NewRecordForm = lazy(() =>
-    import("@/components/forms/NewRecordForm").then(module => ({
-        default: module.NewRecordForm
-    }))
-);
 const SettingsView = lazy(() =>
     import("@/components/views/SettingsView").then(module => ({
         default: module.SettingsView
@@ -452,11 +447,11 @@ export function MainApp() {
 
                             <DropdownMenuGroup>
                                 <DropdownMenuItem onClick={() => setShowProfileDialog(true)}>
-                                    <User className="h-4 w-4 mr-2" />
+                                    <User className="h-4 w-4 mr-1" />
                                     <MixedText text="个人资料" />
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => setActiveTab('settings')}>
-                                    <Settings className="h-4 w-4 mr-2" />
+                                    <Settings className="h-4 w-4 mr-1" />
                                     <MixedText text="程序设置" />
                                 </DropdownMenuItem>
                             </DropdownMenuGroup>
@@ -472,7 +467,7 @@ export function MainApp() {
                                     textRendering: 'optimizeLegibility'
                                 } as React.CSSProperties}
                             >
-                                <LogOut className="h-4 w-4 mr-2 text-red-600" />
+                                <LogOut className="h-4 w-4 mr-1 text-red-600" />
                                 <MixedText
                                     text="退出登录"
                                     className="font-medium logout-text"
@@ -837,6 +832,17 @@ export function MainApp() {
                                                     onSelectIds={setSelectedRecordIds}
                                                     onBatchDelete={handleBatchDelete}
                                                     onUpdateRecord={handleUpdateRecord}
+                                                    onAddRecord={async (newRecord) => {
+                                                        setRecords(prev => [newRecord, ...prev]);
+
+                                                        // 自动保存到云端
+                                                        await AutoCloudSync.autoSaveRecord(newRecord, {
+                                                            notify,
+                                                            notifyLoading,
+                                                            updateToSuccess,
+                                                            updateToError
+                                                        });
+                                                    }}
                                                     historyPage={historyPage}
                                                     setHistoryPage={setHistoryPage}
                                                     totalPages={Math.ceil(filteredRecords.length / pageSize)}
@@ -883,27 +889,6 @@ export function MainApp() {
                                             </Suspense>
                                         )}
 
-                                        {activeTab === 'form' && (
-                                            <Suspense fallback={
-                                                <div className="flex items-center justify-center min-h-[60vh]">
-                                                    <SimpleUiverseSpinner />
-                                                </div>
-                                            }>
-                                                <NewRecordForm
-                                                    onAddRecord={async (newRecord) => {
-                                                        setRecords(prev => [newRecord, ...prev]);
-
-                                                        // 自动保存到云端
-                                                        await AutoCloudSync.autoSaveRecord(newRecord, {
-                                                            notify,
-                                                            notifyLoading,
-                                                            updateToSuccess,
-                                                            updateToError
-                                                        });
-                                                    }}
-                                                />
-                                            </Suspense>
-                                        )}
 
                                         {activeTab === 'plan-list' && (
                                             <Suspense fallback={
@@ -1354,14 +1339,14 @@ export function MainApp() {
                             <DialogFooter className="flex-col sm:flex-row">
                                 <Button
                                     variant="outline"
-                                    className="w-full sm:w-auto rounded-full"
+                                    className="flex items-center justify-center w-full sm:w-auto rounded-full"
                                     onClick={() => setImportDialogOpen(false)}
                                 >
                                     <MixedText text="取消" />
                                 </Button>
                                 <Button
                                     onClick={handleConfirmImport}
-                                    className="w-full sm:w-auto rounded-full"
+                                    className="flex items-center justify-center w-full sm:w-auto rounded-full"
                                 >
                                     <MixedText text="确认导入" />
                                 </Button>
@@ -1382,13 +1367,13 @@ export function MainApp() {
                                 </DialogDescription>
                             </DialogHeader>
                             <DialogFooter>
-                                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-full">
+                                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="flex items-center justify-center rounded-full">
                                     <MixedText text="取消" />
                                 </Button>
                                 <Button
                                     onClick={handleConfirmDelete}
                                     variant="destructive"
-                                    className="rounded-full"
+                                    className="flex items-center justify-center rounded-full"
                                 >
                                     <MixedText text="确认删除" />
                                 </Button>
@@ -1408,12 +1393,12 @@ export function MainApp() {
                             <DialogFooter className="flex-col sm:flex-row">
                                 <Button
                                     variant="outline"
-                                    className="w-full sm:w-auto rounded-full"
+                                    className="flex items-center justify-center w-full sm:w-auto rounded-full"
                                     onClick={() => setSignOutDialogOpen(false)}
                                 >
                                     <MixedText text="取消" />
                                 </Button>
-                                <Button onClick={handleSignOut} variant="destructive" className="w-full sm:w-auto rounded-full">
+                                <Button onClick={handleSignOut} variant="destructive" className="flex items-center justify-center w-full sm:w-auto rounded-full">
                                     <MixedText text="确认退出" />
                                 </Button>
                             </DialogFooter>

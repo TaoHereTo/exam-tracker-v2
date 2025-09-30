@@ -398,8 +398,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                         className="h-9 px-6 rounded-full font-medium text-white shadow-sm bg-[#2A4DD0] hover:bg-[#2A4DD0]/90"
                         data-plan-button
                     >
-                        <Plus className="w-5 h-5 mr-2" />
-                        <MixedText text="新建计划" />
+                        <div className="flex items-center gap-2">
+                            <Plus className="w-5 h-5" />
+                            <MixedText text="新建计划" />
+                        </div>
                     </Button>
                 </ButtonGroup>
             </div>
@@ -609,8 +611,10 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                 className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
                                                 variant="default"
                                             >
-                                                <Plus className="w-5 h-5 mr-2" />
-                                                <MixedText text="创建第一个计划" />
+                                                <div className="flex items-center gap-2">
+                                                    <Plus className="w-5 h-5" />
+                                                    <MixedText text="创建第一个计划" />
+                                                </div>
                                             </Button>
                                         </div>
                                     </div>

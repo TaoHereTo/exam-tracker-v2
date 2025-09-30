@@ -556,8 +556,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         className="h-9 px-6 rounded-full font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
                         variant="default"
                     >
-                        <Plus className="w-5 h-5 mr-2" />
-                        <MixedText text="添加倒计时" />
+                        <div className="flex items-center gap-2">
+                            <Plus className="w-5 h-5" />
+                            <MixedText text="添加倒计时" />
+                        </div>
                     </Button>
                 </ButtonGroup>
             </div>
@@ -609,8 +611,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                 className="h-10 px-6 rounded-md font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
                                                 variant="default"
                                             >
-                                                <Plus className="w-5 h-5 mr-2" />
-                                                <MixedText text="添加倒计时" />
+                                                <div className="flex items-center gap-2">
+                                                    <Plus className="w-5 h-5" />
+                                                    <MixedText text="添加倒计时" />
+                                                </div>
                                             </Button>
                                         </div>
                                     )}

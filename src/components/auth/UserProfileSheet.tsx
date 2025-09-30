@@ -171,14 +171,14 @@ export function UserProfileSheet({ isOpen, onClose, onProfileUpdate }: UserProfi
                                 <InlineLoadingSpinner />
                             ) : (
                                 <>
-                                    <Save className="w-4 h-4 mr-2" />
+                                    <Save className="w-4 h-4 mr-1" />
                                     <MixedText text="保存" />
                                 </>
                             )}
                         </Button>
                         <SheetClose asChild>
                             <Button variant="outline" className="px-6 rounded-full">
-                                <X className="w-4 h-4 mr-2" />
+                                <X className="w-4 h-4 mr-1" />
                                 <MixedText text="关闭" />
                             </Button>
                         </SheetClose>

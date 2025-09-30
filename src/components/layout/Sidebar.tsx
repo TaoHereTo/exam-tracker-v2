@@ -111,13 +111,7 @@ const NAV_DATA = {
             isActive: false,
             items: [
                 {
-                    title: '新的记录',
-                    url: '#',
-                    tab: 'form',
-                    icon: Plus,
-                },
-                {
-                    title: '刷题历史',
+                    title: '刷题记录',
                     url: '#',
                     tab: 'history',
                     icon: History,

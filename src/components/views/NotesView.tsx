@@ -529,7 +529,7 @@ export default function NotesView() {
                         <Sheet>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    <List className="h-4 w-4 mr-2" />
+                                    <List className="h-4 w-4 mr-1" />
                                     笔记列表
                                 </Button>
                             </SheetTrigger>
@@ -577,8 +577,10 @@ export default function NotesView() {
                                         onClick={() => setIsCreating(true)}
                                         className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                     >
-                                        <Plus className="w-5 h-5 mr-2" />
-                                        <MixedText text="新建笔记" />
+                                        <div className="flex items-center gap-2">
+                                            <Plus className="w-5 h-5" />
+                                            <MixedText text="新建笔记" />
+                                        </div>
                                     </Button>
                                 </div>
 
@@ -741,19 +743,19 @@ export default function NotesView() {
                                 </Tooltip>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem onClick={() => handleExportNote(selectedNote, 'json')}>
-                                        <FileText className="h-4 w-4 mr-2" />
+                                        <FileText className="h-4 w-4 mr-1" />
                                         导出为 JSON
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExportNote(selectedNote, 'txt')}>
-                                        <FileText className="h-4 w-4 mr-2" />
+                                        <FileText className="h-4 w-4 mr-1" />
                                         导出为 TXT
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExportNote(selectedNote, 'md')}>
-                                        <FileText className="h-4 w-4 mr-2" />
+                                        <FileText className="h-4 w-4 mr-1" />
                                         导出为 Markdown
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleExportNote(selectedNote, 'pdf')}>
-                                        <FileText className="h-4 w-4 mr-2" />
+                                        <FileText className="h-4 w-4 mr-1" />
                                         导出为 PDF
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -764,8 +766,10 @@ export default function NotesView() {
                             onClick={() => setIsCreating(true)}
                             className="h-9 px-6 rounded-full font-medium bg-[#ea580c] text-white hover:bg-[#ea580c]/90"
                         >
-                            <Plus className="w-5 h-5 mr-2" />
-                            <MixedText text="新建笔记" />
+                            <div className="flex items-center gap-2">
+                                <Plus className="w-5 h-5" />
+                                <MixedText text="新建笔记" />
+                            </div>
                         </Button>
                     </div>
                 </div>

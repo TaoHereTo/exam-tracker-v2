@@ -715,8 +715,10 @@ export default function ScheduleManagementView({
                             }}
                             className="h-9 px-6 rounded-full font-medium bg-[#8b5cf6] text-white hover:bg-[#8b5cf6]/90"
                         >
-                            <Plus className="w-5 h-5 mr-2" />
-                            <MixedText text="添加日程" />
+                            <div className="flex items-center gap-2">
+                                <Plus className="w-5 h-5" />
+                                <MixedText text="添加日程" />
+                            </div>
                         </Button>
                     </div>
 
@@ -968,7 +970,7 @@ export default function ScheduleManagementView({
                                             onClick={handleDelete}
                                             className="w-full sm:w-auto"
                                         >
-                                            <Trash2 className="w-4 h-4 mr-2" />
+                                            <Trash2 className="w-4 h-4 mr-1" />
                                             <MixedText text="删除" />
                                         </Button>
                                         <Button

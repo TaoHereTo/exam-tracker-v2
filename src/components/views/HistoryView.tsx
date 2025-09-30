@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { TimePicker } from '@/components/ui/TimePicker';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarIcon, Edit, Save, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Calendar as CalendarIcon, Edit, Save, X, Plus } from 'lucide-react';
+import { cn, generateUUID } from '@/lib/utils';
 import { zhCN } from 'date-fns/locale';
 import { Label } from '@/components/ui/label';
 import { FormField } from '@/components/ui/FormField';
@@ -28,6 +28,7 @@ interface ExerciseRecordViewProps {
     onSelectIds: (ids: string[]) => void;
     onBatchDelete: () => void;
     onUpdateRecord: (record: RecordItem) => void; // 添加更新记录的回调
+    onAddRecord: (record: RecordItem) => void; // 添加新增记录的回调
     historyPage: number;
     setHistoryPage: (n: number) => void;
     totalPages: number;
@@ -43,6 +44,7 @@ export function ExerciseRecordView({
     onSelectIds,
     onBatchDelete,
     onUpdateRecord,
+    onAddRecord,
     historyPage,
     setHistoryPage,
     totalPages,
@@ -57,6 +59,12 @@ export function ExerciseRecordView({
     const [dateOpen, setDateOpen] = useState(false);
     const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
 
+    // 新增记录状态管理
+    const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
+    const [addDate, setAddDate] = useState<Date>(new Date());
+    const [addDateOpen, setAddDateOpen] = useState(false);
+    const [addCurrentMonth, setAddCurrentMonth] = useState<Date>(new Date());
+
     // 表单状态
     const [formData, setFormData] = useState<Partial<RecordItem>>({
         date: '',
@@ -66,6 +74,16 @@ export function ExerciseRecordView({
         duration: '00:00'
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    // 新增记录表单状态
+    const [addFormData, setAddFormData] = useState<Partial<RecordItem>>({
+        date: format(new Date(), 'yyyy-MM-dd'),
+        module: 'data-analysis',
+        total: 0,
+        correct: 0,
+        duration: '00:00'
+    });
+    const [addErrors, setAddErrors] = useState<Record<string, string>>({});
 
     // 打开编辑Sheet
     const handleEditRecord = () => {
@@ -174,6 +192,87 @@ export function ExerciseRecordView({
         handleCloseEditSheet();
     };
 
+    // 新增记录相关函数
+    const handleAddRecord = () => {
+        setIsAddSheetOpen(true);
+        setAddFormData({
+            date: format(new Date(), 'yyyy-MM-dd'),
+            module: 'data-analysis',
+            total: 0,
+            correct: 0,
+            duration: '00:00'
+        });
+        setAddDate(new Date());
+        setAddErrors({});
+    };
+
+    const handleAddFormChange = (field: keyof RecordItem, value: string | number) => {
+        setAddFormData(prev => ({ ...prev, [field]: value }));
+        // 清除对应字段的错误
+        if (addErrors[field]) {
+            setAddErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
+                return newErrors;
+            });
+        }
+    };
+
+    const handleCloseAddSheet = () => {
+        setIsAddSheetOpen(false);
+        setAddFormData({
+            date: format(new Date(), 'yyyy-MM-dd'),
+            module: 'data-analysis',
+            total: 0,
+            correct: 0,
+            duration: '00:00'
+        });
+        setAddErrors({});
+    };
+
+    const handleSubmitAdd = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const newErrors: Record<string, string> = {};
+
+        if (!addFormData.date) {
+            newErrors.date = '请选择日期';
+        }
+        if (!addFormData.module) {
+            newErrors.module = '请选择模块';
+        }
+        if (!addFormData.total || addFormData.total <= 0) {
+            newErrors.total = '总题数必须大于0';
+        }
+        if (addFormData.correct === undefined || addFormData.correct < 0 || addFormData.correct > addFormData.total!) {
+            newErrors.correct = '正确数不能小于0或大于总题数';
+        }
+        if (!addFormData.duration) {
+            newErrors.duration = '请选择用时';
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setAddErrors(newErrors);
+            return;
+        }
+
+        // 创建新记录
+        const newRecord: RecordItem = {
+            id: generateUUID(),
+            date: addFormData.date!,
+            module: addFormData.module as RecordItem['module'],
+            total: addFormData.total!,
+            correct: addFormData.correct!,
+            duration: addFormData.duration!,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        };
+
+        onAddRecord(newRecord);
+        toast.success('记录添加成功');
+        handleCloseAddSheet();
+    };
+
     // 创建模块筛选器选项
     const moduleFilterOptions = [
         { value: 'all', label: '全部模块' },
@@ -187,6 +286,19 @@ export function ExerciseRecordView({
         // Simplified container to match KnowledgeSummaryView approach
         <div className="pt-2 sm:pt-4 px-1 sm:px-2 md:px-8">
             <div className="w-full">
+                {/* 新增记录按钮 */}
+                <div className="mb-4 flex justify-end">
+                    <Button
+                        onClick={handleAddRecord}
+                        className="flex items-center justify-center bg-[#0d9488] hover:bg-[#0d9488]/90 text-white rounded-full px-6"
+                    >
+                        <div className="flex items-center gap-2">
+                            <Plus className="w-4 h-4" />
+                            <MixedText text="新增记录" />
+                        </div>
+                    </Button>
+                </div>
+
                 <UnifiedTable<RecordItem, string>
                     columns={[
                         {
@@ -401,17 +513,174 @@ export function ExerciseRecordView({
                         <div className="flex flex-col sm:flex-row gap-3 pt-4">
                             <Button
                                 type="submit"
-                                className="flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
+                                className="flex items-center justify-center flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
                             >
-                                <Save className="w-4 h-4 mr-2" />
-                                <MixedText text="保存" />
+                                <div className="flex items-center gap-2">
+                                    <Save className="w-4 h-4" />
+                                    <MixedText text="保存" />
+                                </div>
                             </Button>
                             <SheetClose asChild>
-                                <Button type="button" variant="outline" className="px-6 rounded-full">
-                                    <X className="w-4 h-4 mr-2" />
-                                    <MixedText text="关闭" />
+                                <Button type="button" variant="outline" className="flex items-center justify-center px-6 rounded-full">
+                                    <div className="flex items-center gap-2">
+                                        <X className="w-4 h-4" />
+                                        <MixedText text="关闭" />
+                                    </div>
                                 </Button>
                             </SheetClose>
+                        </div>
+                    </form>
+                </SheetContent>
+            </Sheet>
+
+            {/* 新增记录Sheet */}
+            <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
+                <SheetContent side="right" className="w-[90vw] sm:w-[350px] md:w-[400px] p-4 sm:p-6 overflow-y-auto">
+                    <SheetHeader className="px-0 pb-4">
+                        <SheetTitle className="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                            <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
+                            <MixedText text="新增刷题记录" />
+                        </SheetTitle>
+                        <SheetDescription>
+                            <MixedText text="添加新的刷题记录" />
+                        </SheetDescription>
+                    </SheetHeader>
+
+                    <form onSubmit={handleSubmitAdd} className="flex flex-col gap-4 sm:gap-6 px-0 relative">
+                        {/* 日期选择 */}
+                        <div className="space-y-2">
+                            <Label htmlFor="add-date">
+                                <MixedText text="日期" />
+                            </Label>
+                            <Popover open={addDateOpen} onOpenChange={setAddDateOpen}>
+                                <PopoverTrigger asChild>
+                                    <button
+                                        type="button"
+                                        className="w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]"
+                                        style={{
+                                            transition: 'none',
+                                            transform: 'none',
+                                            boxShadow: 'none'
+                                        }}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
+                                        {addDate ? format(addDate, "PPP", { locale: zhCN }) : <span className="text-gray-400 dark:text-gray-500">选择日期</span>}
+                                    </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                    className="w-auto p-0 z-[60]"
+                                    align="start"
+                                    side="bottom"
+                                    sideOffset={4}
+                                >
+                                    <Calendar
+                                        mode="single"
+                                        captionLayout="dropdown"
+                                        month={addCurrentMonth}
+                                        onMonthChange={setAddCurrentMonth}
+                                        selected={addDate}
+                                        onSelect={(selectedDate) => {
+                                            if (selectedDate) {
+                                                setAddDate(selectedDate);
+                                                handleAddFormChange('date', format(selectedDate, 'yyyy-MM-dd'));
+                                            }
+                                            setAddDateOpen(false);
+                                        }}
+                                        initialFocus={false}
+                                        locale={zhCN}
+                                        page="add-record"
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                            {addErrors.date && <p className="text-sm text-red-500">{addErrors.date}</p>}
+                        </div>
+
+                        {/* 模块选择 */}
+                        <div className="space-y-2">
+                            <Label htmlFor="add-module">
+                                <MixedText text="模块" />
+                            </Label>
+                            <Select
+                                value={addFormData.module}
+                                onValueChange={(value) => handleAddFormChange('module', value)}
+                            >
+                                <SelectTrigger className="h-10">
+                                    <SelectValue placeholder="选择模块" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {MODULES.map((module) => (
+                                        <SelectItem key={module.value} value={module.value}>
+                                            {module.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {addErrors.module && <p className="text-sm text-red-500">{addErrors.module}</p>}
+                        </div>
+
+                        {/* 总题数和正确数 */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="add-total">
+                                    <MixedText text="总题数" />
+                                </Label>
+                                <Input
+                                    id="add-total"
+                                    type="number"
+                                    min="1"
+                                    value={addFormData.total || ''}
+                                    onChange={(e) => handleAddFormChange('total', parseInt(e.target.value) || 0)}
+                                    className="h-10"
+                                />
+                                {addErrors.total && <p className="text-sm text-red-500">{addErrors.total}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="add-correct">
+                                    <MixedText text="正确数" />
+                                </Label>
+                                <Input
+                                    id="add-correct"
+                                    type="number"
+                                    min="0"
+                                    value={addFormData.correct || ''}
+                                    onChange={(e) => handleAddFormChange('correct', parseInt(e.target.value) || 0)}
+                                    className="h-10"
+                                />
+                                {addErrors.correct && <p className="text-sm text-red-500">{addErrors.correct}</p>}
+                            </div>
+                        </div>
+
+                        {/* 用时 */}
+                        <div className="space-y-2">
+                            <Label htmlFor="add-duration">
+                                <MixedText text="用时" />
+                            </Label>
+                            <TimePicker
+                                value={addFormData.duration || '00:00'}
+                                onChange={(value) => handleAddFormChange('duration', value)}
+                                className="h-10"
+                            />
+                            {addErrors.duration && <p className="text-sm text-red-500">{addErrors.duration}</p>}
+                        </div>
+
+                        {/* 按钮组 */}
+                        <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                            <Button
+                                type="submit"
+                                className="flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white relative"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    height: '36px',
+                                    lineHeight: '1'
+                                }}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Plus className="w-4 h-4" />
+                                    <MixedText text="添加记录" />
+                                </div>
+                            </Button>
                         </div>
                     </form>
                 </SheetContent>

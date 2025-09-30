@@ -179,6 +179,7 @@ function Calendar({
   const getPageColor = (page: string) => {
     const pageColors: Record<string, string> = {
       'new-record': '#347659',
+      'add-record': '#0d9488',
       'study-plan': '#324CC8',
       'countdown': '#db2777',
       'schedule': '#845EEE',
