@@ -2272,6 +2272,28 @@ body.eye-care.dark .text-muted-foreground,
   color: white !important;
 }
 
+/* 修复tabs和按钮中的光标闪烁问题 */
+[data-slot="button"],
+[data-tab-value],
+[data-view],
+button[data-tab-value] {
+  caret-color: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* 禁用按钮和tabs的焦点轮廓 */
+[data-slot="button"]:focus,
+[data-slot="button"]:focus-visible,
+[data-tab-value]:focus,
+[data-tab-value]:focus-visible,
+[data-view]:focus,
+[data-view]:focus-visible,
+button[data-tab-value]:focus,
+button[data-tab-value]:focus-visible {
+  outline: none !important;
+  caret-color: transparent !important;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
