@@ -762,7 +762,7 @@ export default function ScheduleManagementView({
 
                         {/* 快速日期选择日历 */}
                         <div className="text-center">
-                            <div className="flex justify-center">
+                            <div className="flex justify-center schedule-calendar-container">
                                 <DatePicker
                                     mode="single"
                                     selected={date}

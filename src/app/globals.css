@@ -2164,6 +2164,16 @@ body.eye-care.dark .text-muted-foreground,
   z-index: -1;
 }
 
+/* 日程管理页面左侧小日历 - 浅色模式纯白色背景 */
+.schedule-calendar-container [data-slot="calendar"] {
+  background-color: white !important;
+}
+
+/* 深色模式下保持原有样式 */
+.dark .schedule-calendar-container [data-slot="calendar"] {
+  background-color: var(--background) !important;
+}
+
 /* 通用日历样式 - 使用CSS变量，优先级更高 */
 .calendar-container [data-selected-single="true"] {
   background-color: var(--calendar-theme-color) !important;

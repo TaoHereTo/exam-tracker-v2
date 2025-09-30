@@ -46,7 +46,7 @@ export function generateFontStyle(text: string, config: FontConfig = defaultFont
         case 'chinese':
             return {
                 fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -54,7 +54,7 @@ export function generateFontStyle(text: string, config: FontConfig = defaultFont
         case 'english':
             return {
                 fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -62,7 +62,7 @@ export function generateFontStyle(text: string, config: FontConfig = defaultFont
         case 'mixed':
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -70,7 +70,7 @@ export function generateFontStyle(text: string, config: FontConfig = defaultFont
         default:
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -124,7 +124,7 @@ export function generateMixedTextStyle(part: { text: string; type: 'chinese' | '
         case 'chinese':
             return {
                 fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -132,7 +132,7 @@ export function generateMixedTextStyle(part: { text: string; type: 'chinese' | '
         case 'english':
             return {
                 fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -140,7 +140,7 @@ export function generateMixedTextStyle(part: { text: string; type: 'chinese' | '
         case 'other':
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
@@ -148,7 +148,7 @@ export function generateMixedTextStyle(part: { text: string; type: 'chinese' | '
         default:
             return {
                 fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 400,
+                fontWeight: 'inherit', // 继承父元素的字体粗细
                 WebkitFontSmoothing: 'antialiased',
                 MozOsxFontSmoothing: 'grayscale',
                 textRendering: 'optimizeLegibility'
