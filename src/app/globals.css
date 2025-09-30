@@ -1288,6 +1288,17 @@ table th:focus {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
+/* 表单卡片阴影样式 */
+.knowledge-form-card,
+.new-record-form-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .knowledge-form-card,
+.dark .new-record-form-card {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
 /* 按钮阴影优化 */
 [data-slot="button"] {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
@@ -2187,11 +2198,13 @@ body.eye-care.dark .text-muted-foreground,
 /* 日程管理页面左侧小日历 - 浅色模式纯白色背景 */
 .schedule-calendar-container [data-slot="calendar"] {
   background-color: white !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 /* 深色模式下保持原有样式 */
 .dark .schedule-calendar-container [data-slot="calendar"] {
   background-color: var(--background) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 /* 通用日历样式 - 使用CSS变量，优先级更高 */

@@ -498,7 +498,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         </div>
       ) : (
         // When not in dialog, render with Card wrapper as usual
-        <Card className="w-full max-w-xl flex flex-col shadow-lg knowledge-form-card" style={{ boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)' }}>
+        <Card className="w-full max-w-xl flex flex-col shadow-lg knowledge-form-card">
           <CardContent className="pt-4 pb-4">
             {/* 非对话框模式下的表单 */}
             <BaseForm
