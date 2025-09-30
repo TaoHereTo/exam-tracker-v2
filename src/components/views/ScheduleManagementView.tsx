@@ -994,19 +994,16 @@ export default function ScheduleManagementView({
                                 <Step>
                                     <div className="space-y-4">
                                         <div className="text-center mb-6">
-                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                                                 <MixedText text="选择日程类型" />
                                             </h3>
-                                            <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                                <MixedText text="请选择您要添加的日程类型" />
-                                            </p>
                                         </div>
 
                                         <div className="space-y-3">
                                             <div
-                                                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'countdown'
+                                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'countdown'
                                                     ? 'border-red-500 bg-red-50 dark:bg-red-950 shadow-md'
-                                                    : 'hover:bg-accent hover:shadow-sm'
+                                                    : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
                                                     }`}
                                                 onClick={() => handleTypeChange('countdown')}
                                             >
@@ -1025,9 +1022,9 @@ export default function ScheduleManagementView({
                                             </div>
 
                                             <div
-                                                className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'plan'
+                                                className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'plan'
                                                     ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 shadow-md'
-                                                    : 'hover:bg-accent hover:shadow-sm'
+                                                    : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
                                                     }`}
                                                 onClick={() => handleTypeChange('plan')}
                                             >

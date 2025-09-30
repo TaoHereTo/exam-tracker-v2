@@ -621,7 +621,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                             <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
                                 <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
                                     {/* 原有数据分析卡片 */}
-                                    <Card className="p-3 sm:p-4 bg-white dark:bg-transparent">
+                                    <Card className="p-3 sm:p-4 bg-white dark:bg-transparent dark:border-[#262626]">
                                         <div className="space-y-3 sm:space-y-4">
                                             <h3 className="font-medium text-center text-base sm:text-lg">{module.name}</h3>
 

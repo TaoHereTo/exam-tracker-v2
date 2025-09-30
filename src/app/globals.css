@@ -2104,7 +2104,7 @@ body.eye-care.dark .text-muted-foreground,
 
 /* 深色模式下的toast样式 */
 .dark {
-  --toast-bg: #1a1a1a;
+  --toast-bg: #262626;
   --toast-color: #ffffff;
 }
 
