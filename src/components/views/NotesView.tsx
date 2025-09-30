@@ -575,11 +575,10 @@ export default function NotesView() {
                                     {/* 新建笔记按钮 */}
                                     <Button
                                         onClick={() => setIsCreating(true)}
-                                        className="w-full bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
-                                        size="sm"
+                                        className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                     >
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        新建笔记
+                                        <Plus className="w-5 h-5 mr-2" />
+                                        <MixedText text="新建笔记" />
                                     </Button>
                                 </div>
 

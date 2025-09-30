@@ -394,7 +394,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
-                        className="h-9 text-white shadow-sm rounded-full bg-[#2A4DD0] hover:bg-[#2A4DD0]/90"
+                        className="h-9 px-6 rounded-full font-medium text-white shadow-sm bg-[#2A4DD0] hover:bg-[#2A4DD0]/90"
                         data-plan-button
                     >
                         <Plus className="w-5 h-5 mr-2" />
