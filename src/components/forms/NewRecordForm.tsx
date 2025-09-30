@@ -186,8 +186,8 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
     }
 
     return (
-        <div className="flex items-start justify-center min-h-screen p-2 sm:p-4 pt-4 sm:pt-6 md:pt-10">
-            <div className="w-full max-w-md space-y-6">
+        <div className="flex items-start justify-center min-h-screen p-responsive">
+            <div className="w-full max-w-md form-stack">
 
                 {/* 卡片内容 */}
                 <Card className="flex flex-col shadow-lg new-record-form-card">

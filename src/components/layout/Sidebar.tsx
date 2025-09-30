@@ -213,7 +213,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                 {/* 应用标题 */}
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <div className="flex items-center justify-center gap-3 px-2 py-4 unselectable">
+                        <div className="flex items-center justify-center button-group p-sidebar unselectable">
                             <Image src="/trace.svg" alt="App Icon" className="size-8" width={32} height={32} />
                             <span className="truncate font-semibold text-lg leading-none">
                                 <MixedText text="行测记录" />

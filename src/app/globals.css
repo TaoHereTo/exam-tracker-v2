@@ -329,30 +329,128 @@ h6 .mixed-text {
 /* ========== 颜色变量 ========== */
 :root {
   --radius: 0.625rem;
-  /* 通用间距刻度（可复用） */
+  /* ========== 统一边距系统 ========== */
+  /* 基础间距刻度 - 基于 4px 网格系统 */
   --space-0: 0px;
+  /* 0px - 无间距 */
   --space-1: 0.25rem;
-  /* 4px */
+  /* 4px - 最小间距 */
   --space-2: 0.5rem;
-  /* 8px */
+  /* 8px - 小间距 */
   --space-3: 0.75rem;
-  /* 12px */
+  /* 12px - 中小间距 */
   --space-4: 1rem;
-  /* 16px */
+  /* 16px - 基础间距 */
   --space-5: 1.25rem;
-  /* 20px */
+  /* 20px - 中等间距 */
   --space-6: 1.5rem;
-  /* 24px */
+  /* 24px - 大间距 */
   --space-8: 2rem;
-  /* 32px */
+  /* 32px - 超大间距 */
+  --space-10: 2.5rem;
+  /* 40px - 特大间距 */
+  --space-12: 3rem;
+  /* 48px - 巨大间距 */
+  --space-16: 4rem;
+  /* 64px - 最大间距 */
 
-  /* 表单/卡片统一间距令牌 */
-  --form-gap: var(--space-4);
-  --form-section-gap: var(--space-5);
-  --form-field-gap: var(--space-2);
-  --form-grid-gap: var(--space-4);
-  --form-card-padding-x: 1.5rem;
-  --form-card-padding-y: 1.25rem;
+  /* ========== 语义化间距变量 ========== */
+
+  /* 组件内部间距 */
+  --spacing-component-inner: var(--space-3);
+  /* 组件内部元素间距 */
+  --spacing-component-outer: var(--space-4);
+  /* 组件外部间距 */
+  --spacing-component-section: var(--space-6);
+  /* 组件区块间距 */
+
+  /* 布局间距 */
+  --spacing-layout-small: var(--space-2);
+  /* 小布局间距 */
+  --spacing-layout-medium: var(--space-4);
+  /* 中等布局间距 */
+  --spacing-layout-large: var(--space-6);
+  /* 大布局间距 */
+  --spacing-layout-xl: var(--space-8);
+  /* 超大布局间距 */
+
+  /* 表单间距 */
+  --spacing-form-field: var(--space-3);
+  /* 表单字段间距 */
+  --spacing-form-group: var(--space-4);
+  /* 表单组间距 */
+  --spacing-form-section: var(--space-6);
+  /* 表单区块间距 */
+  --spacing-form-actions: var(--space-4);
+  /* 表单操作按钮间距 */
+
+  /* 卡片间距 */
+  --spacing-card-padding: var(--space-4);
+  /* 卡片内边距 */
+  --spacing-card-gap: var(--space-4);
+  /* 卡片间距 */
+  --spacing-card-content: var(--space-3);
+  /* 卡片内容间距 */
+
+  /* 按钮间距 */
+  --spacing-button-gap: var(--space-2);
+  /* 按钮组间距 */
+  --spacing-button-padding: var(--space-3);
+  /* 按钮内边距 */
+  --spacing-button-group: var(--space-4);
+  /* 按钮组间距 */
+
+  /* 列表间距 */
+  --spacing-list-item: var(--space-2);
+  /* 列表项间距 */
+  --spacing-list-group: var(--space-4);
+  /* 列表组间距 */
+  --spacing-list-section: var(--space-6);
+  /* 列表区块间距 */
+
+  /* 网格间距 */
+  --spacing-grid-small: var(--space-3);
+  /* 小网格间距 */
+  --spacing-grid-medium: var(--space-4);
+  /* 中等网格间距 */
+  --spacing-grid-large: var(--space-6);
+  /* 大网格间距 */
+
+  /* 页面间距 */
+  --spacing-page-padding: var(--space-4);
+  /* 页面内边距 */
+  --spacing-page-section: var(--space-8);
+  /* 页面区块间距 */
+  --spacing-page-content: var(--space-6);
+  /* 页面内容间距 */
+
+  /* 侧边栏间距 */
+  --spacing-sidebar-padding: var(--space-4);
+  /* 侧边栏内边距 */
+  --spacing-sidebar-item: var(--space-2);
+  /* 侧边栏项目间距 */
+  --spacing-sidebar-group: var(--space-4);
+  /* 侧边栏组间距 */
+
+  /* 响应式间距 */
+  --spacing-responsive-xs: var(--space-2);
+  /* 超小屏幕 */
+  --spacing-responsive-sm: var(--space-3);
+  /* 小屏幕 */
+  --spacing-responsive-md: var(--space-4);
+  /* 中等屏幕 */
+  --spacing-responsive-lg: var(--space-6);
+  /* 大屏幕 */
+  --spacing-responsive-xl: var(--space-8);
+  /* 超大屏幕 */
+
+  /* ========== 兼容性变量（保持向后兼容） ========== */
+  --form-gap: var(--spacing-form-group);
+  --form-section-gap: var(--spacing-form-section);
+  --form-field-gap: var(--spacing-form-field);
+  --form-grid-gap: var(--spacing-grid-medium);
+  --form-card-padding-x: var(--spacing-card-padding);
+  --form-card-padding-y: var(--spacing-card-padding);
 
   /* 主题颜色 */
   --background: #F5F4F7;
@@ -509,40 +607,241 @@ h6 .mixed-text {
   border-color: var(--input-border);
 }
 
-/* ========== 表单布局工具类 ========== */
+/* ========== 统一边距工具类 ========== */
 @layer utilities {
 
-  /* 整体纵向栈 */
+  /* ========== 基础间距工具类 ========== */
+  .gap-component {
+    gap: var(--spacing-component-inner);
+  }
+
+  .gap-layout-sm {
+    gap: var(--spacing-layout-small);
+  }
+
+  .gap-layout-md {
+    gap: var(--spacing-layout-medium);
+  }
+
+  .gap-layout-lg {
+    gap: var(--spacing-layout-large);
+  }
+
+  .gap-layout-xl {
+    gap: var(--spacing-layout-xl);
+  }
+
+  .p-component {
+    padding: var(--spacing-component-outer);
+  }
+
+  .p-card {
+    padding: var(--spacing-card-padding);
+  }
+
+  .p-page {
+    padding: var(--spacing-page-padding);
+  }
+
+  .p-sidebar {
+    padding: var(--spacing-sidebar-padding);
+  }
+
+  .m-component {
+    margin: var(--spacing-component-outer);
+  }
+
+  .m-layout-sm {
+    margin: var(--spacing-layout-small);
+  }
+
+  .m-layout-md {
+    margin: var(--spacing-layout-medium);
+  }
+
+  .m-layout-lg {
+    margin: var(--spacing-layout-large);
+  }
+
+  /* ========== 语义化间距工具类 ========== */
+
+  /* 表单间距 */
   .form-stack {
     display: flex;
     flex-direction: column;
-    gap: var(--form-gap);
+    gap: var(--spacing-form-group);
   }
 
-  /* 分区块（区块之间更大的间距） */
   .form-section {
     display: flex;
     flex-direction: column;
-    gap: var(--form-section-gap);
+    gap: var(--spacing-form-section);
   }
 
-  /* 单个字段（标签与控件的间距） */
   .form-field {
     display: flex;
     flex-direction: column;
-    gap: var(--form-field-gap);
+    gap: var(--spacing-form-field);
   }
 
-  /* 两列网格 */
+  .form-actions {
+    margin-top: var(--spacing-form-actions);
+  }
+
+  /* 卡片间距 */
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-card-content);
+  }
+
+  .card-grid {
+    display: grid;
+    gap: var(--spacing-card-gap);
+  }
+
+  /* 按钮间距 */
+  .button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-button-gap);
+  }
+
+  .button-group-lg {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-button-group);
+  }
+
+  /* 列表间距 */
+  .list-item {
+    margin-bottom: var(--spacing-list-item);
+  }
+
+  .list-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-list-group);
+  }
+
+  .list-section {
+    margin-bottom: var(--spacing-list-section);
+  }
+
+  /* 网格间距 */
+  .grid-sm {
+    display: grid;
+    gap: var(--spacing-grid-small);
+  }
+
+  .grid-md {
+    display: grid;
+    gap: var(--spacing-grid-medium);
+  }
+
+  .grid-lg {
+    display: grid;
+    gap: var(--spacing-grid-large);
+  }
+
+  /* 页面布局 */
+  .page-content {
+    padding: var(--spacing-page-content);
+  }
+
+  .page-section {
+    margin-bottom: var(--spacing-page-section);
+  }
+
+  /* 侧边栏布局 */
+  .sidebar-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sidebar-group);
+  }
+
+  .sidebar-item {
+    margin-bottom: var(--spacing-sidebar-item);
+  }
+
+  /* ========== 响应式间距工具类 ========== */
+  .gap-responsive {
+    gap: var(--spacing-responsive-xs);
+  }
+
+  .p-responsive {
+    padding: var(--spacing-responsive-xs);
+  }
+
+  .m-responsive {
+    margin: var(--spacing-responsive-xs);
+  }
+
+  /* 小屏幕 */
+  @media (min-width: 640px) {
+    .gap-responsive {
+      gap: var(--spacing-responsive-sm);
+    }
+
+    .p-responsive {
+      padding: var(--spacing-responsive-sm);
+    }
+
+    .m-responsive {
+      margin: var(--spacing-responsive-sm);
+    }
+  }
+
+  /* 中等屏幕 */
+  @media (min-width: 768px) {
+    .gap-responsive {
+      gap: var(--spacing-responsive-md);
+    }
+
+    .p-responsive {
+      padding: var(--spacing-responsive-md);
+    }
+
+    .m-responsive {
+      margin: var(--spacing-responsive-md);
+    }
+  }
+
+  /* 大屏幕 */
+  @media (min-width: 1024px) {
+    .gap-responsive {
+      gap: var(--spacing-responsive-lg);
+    }
+
+    .p-responsive {
+      padding: var(--spacing-responsive-lg);
+    }
+
+    .m-responsive {
+      margin: var(--spacing-responsive-lg);
+    }
+  }
+
+  /* 超大屏幕 */
+  @media (min-width: 1280px) {
+    .gap-responsive {
+      gap: var(--spacing-responsive-xl);
+    }
+
+    .p-responsive {
+      padding: var(--spacing-responsive-xl);
+    }
+
+    .m-responsive {
+      margin: var(--spacing-responsive-xl);
+    }
+  }
+
+  /* ========== 兼容性工具类 ========== */
   .form-grid-2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--form-grid-gap);
-  }
-
-  /* 操作按钮区域 */
-  .form-actions {
-    margin-top: 0.5rem;
+    gap: var(--spacing-grid-medium);
   }
 
   /* 移动端表单优化 */

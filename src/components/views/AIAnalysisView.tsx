@@ -242,7 +242,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                     {messages.map((message) => (
                         <div
                             key={message.id}
-                            className={`flex gap-3 ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex button-group ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                             {message.type === 'ai' && (
                                 <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -271,7 +271,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                     )}
                                 </div>
 
-                                <div className="flex items-center gap-2 mt-2">
+                                <div className="flex items-center button-group mt-2">
                                     <span className="text-xs text-muted-foreground">
                                         {message.timestamp.toLocaleTimeString('zh-CN')}
                                     </span>

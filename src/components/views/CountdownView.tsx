@@ -548,15 +548,15 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center gap-4">
+        <div className="form-stack">
+            <div className="flex flex-col sm:flex-row sm:justify-end sm:items-center button-group-lg">
                 <ButtonGroup spacing="sm">
                     <Button
                         onClick={() => handleOpenForm()}
                         className="h-9 px-6 rounded-full font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
                         variant="default"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="button-group">
                             <Plus className="w-5 h-5" />
                             <MixedText text="添加倒计时" />
                         </div>

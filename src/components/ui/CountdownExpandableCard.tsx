@@ -213,7 +213,7 @@ export default function CountdownExpandableCard({
                     </div>
                 ) : null}
             </AnimatePresence>
-            <ul className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ul className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 grid-md">
                 <AnimatePresence mode="popLayout">
                     {countdowns.map((countdown) => {
                         const statusDisplay = getStatusDisplay(countdown.examDate);
@@ -224,7 +224,7 @@ export default function CountdownExpandableCard({
                                 layoutId={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 key={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 onClick={() => setActive(countdown)}
-                                className="p-4 flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+                                className="p-card flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
                                 style={{
                                     display: isActive ? 'none' : 'block'
                                 }}

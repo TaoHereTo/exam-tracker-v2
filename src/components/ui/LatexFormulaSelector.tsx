@@ -181,7 +181,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
             <DrawerContent className="max-h-[90vh]">
                 <DrawerHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
+                        <div className="button-group">
                             <Sigma className="h-5 w-5" />
                             <div>
                                 <DrawerTitle className="inline">LaTeX公式选择器</DrawerTitle>
@@ -201,11 +201,11 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                     </div>
                 </DrawerHeader>
 
-                <div className="flex-1 overflow-auto p-4">
-                    <div className="space-y-6">
+                <div className="flex-1 overflow-auto p-card">
+                    <div className="form-stack">
                         {/* 分类选择、搜索和公式模式选择区域 */}
-                        <div className="flex gap-4 items-center">
-                            <div className="flex gap-2 items-center">
+                        <div className="flex button-group-lg items-center">
+                            <div className="button-group items-center">
                                 <Label className="text-sm font-medium">选择分类:</Label>
                                 <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                                     <SelectTrigger className="w-[200px]">
@@ -221,7 +221,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                 </Select>
                             </div>
 
-                            <div className="flex gap-2 items-center">
+                            <div className="button-group items-center">
                                 <Label className="text-sm font-medium">搜索:</Label>
                                 <Input
                                     placeholder="搜索公式..."
@@ -231,7 +231,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                 />
                             </div>
 
-                            <div className="flex gap-2 items-center">
+                            <div className="button-group items-center">
                                 <Label className="text-sm font-medium">公式模式:</Label>
                                 <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-4">
                                     <div className="flex items-center space-x-2">
@@ -255,16 +255,16 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                         </div>
 
                         {/* 公式展示区域 */}
-                        <div className="space-y-4">
+                        <div className="form-stack">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
                                 {selectedCategory ? `${selectedCategory} 分类共有` : '全部'} {filteredFormulas.length} 个公式
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-sm">
                                 {filteredFormulas.map((formula, index) => (
                                     <div
                                         key={`${formula.category}-${index}`}
-                                        className="p-3 border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors bg-white dark:bg-transparent"
+                                        className="p-component border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors bg-white dark:bg-transparent"
                                         onClick={() => onInsert(formula.latex, displayMode === 'block')}
                                     >
                                         <div className="text-sm font-medium mb-2">{formula.name}</div>

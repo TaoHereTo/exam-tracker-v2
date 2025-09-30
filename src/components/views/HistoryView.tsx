@@ -284,15 +284,15 @@ export function ExerciseRecordView({
 
     return (
         // Simplified container to match KnowledgeSummaryView approach
-        <div className="pt-2 sm:pt-4 px-1 sm:px-2 md:px-8">
+        <div className="p-responsive">
             <div className="w-full">
                 {/* 新增记录按钮 */}
-                <div className="mb-4 flex justify-end">
+                <div className="m-layout-md flex justify-end">
                     <Button
                         onClick={handleAddRecord}
                         className="flex items-center justify-center bg-[#0d9488] hover:bg-[#0d9488]/90 text-white rounded-full px-6"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="button-group">
                             <Plus className="w-4 h-4" />
                             <MixedText text="新增记录" />
                         </div>
@@ -383,7 +383,7 @@ export function ExerciseRecordView({
             <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
                 <SheetContent side="right" className="w-[90vw] sm:w-[350px] md:w-[400px] p-4 sm:p-6 overflow-y-auto">
                     <SheetHeader className="px-0 pb-4">
-                        <SheetTitle className="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                        <SheetTitle className="flex items-center button-group text-lg sm:text-xl font-bold">
                             <Edit className="w-5 h-5 sm:w-6 sm:h-6" />
                             <MixedText text="编辑刷题记录" />
                         </SheetTitle>
@@ -515,14 +515,14 @@ export function ExerciseRecordView({
                                 type="submit"
                                 className="flex items-center justify-center flex-1 rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
                             >
-                                <div className="flex items-center gap-2">
+                                <div className="button-group">
                                     <Save className="w-4 h-4" />
                                     <MixedText text="保存" />
                                 </div>
                             </Button>
                             <SheetClose asChild>
                                 <Button type="button" variant="outline" className="flex items-center justify-center px-6 rounded-full">
-                                    <div className="flex items-center gap-2">
+                                    <div className="button-group">
                                         <X className="w-4 h-4" />
                                         <MixedText text="关闭" />
                                     </div>
@@ -537,7 +537,7 @@ export function ExerciseRecordView({
             <Sheet open={isAddSheetOpen} onOpenChange={setIsAddSheetOpen}>
                 <SheetContent side="right" className="w-[90vw] sm:w-[350px] md:w-[400px] p-4 sm:p-6 overflow-y-auto">
                     <SheetHeader className="px-0 pb-4">
-                        <SheetTitle className="flex items-center gap-2 text-lg sm:text-xl font-bold">
+                        <SheetTitle className="flex items-center button-group text-lg sm:text-xl font-bold">
                             <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
                             <MixedText text="新增刷题记录" />
                         </SheetTitle>
@@ -676,7 +676,7 @@ export function ExerciseRecordView({
                                     lineHeight: '1'
                                 }}
                             >
-                                <div className="flex items-center gap-2">
+                                <div className="button-group">
                                     <Plus className="w-4 h-4" />
                                     <MixedText text="添加记录" />
                                 </div>

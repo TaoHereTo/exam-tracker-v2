@@ -516,7 +516,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
     const dataSummaries = generateDataSummary();
 
     return (
-        <div className="relative w-full flex flex-col items-center justify-start gap-4 sm:gap-6 md:gap-8 pt-4 sm:pt-8 md:pt-12 pb-4 sm:pb-8">
+        <div className="relative w-full flex flex-col items-center justify-start gap-responsive p-responsive">
 
             {/* 第一行 - 前半部分数据，正向滚动 */}
             <Marquee

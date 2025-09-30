@@ -398,7 +398,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                         className="h-9 px-6 rounded-full font-medium text-white shadow-sm bg-[#2A4DD0] hover:bg-[#2A4DD0]/90"
                         data-plan-button
                     >
-                        <div className="flex items-center gap-2">
+                        <div className="button-group">
                             <Plus className="w-5 h-5" />
                             <MixedText text="新建计划" />
                         </div>
@@ -423,7 +423,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                     <TabsContents className="py-6 px-2">
                         <TabsContent value="active" className="outline-none">
                             <AnimatePresence mode="popLayout">
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 max-w-6xl mx-auto w-full items-stretch px-4 pb-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-lg max-w-6xl mx-auto w-full items-stretch p-page">
                                     {activePlans.map(plan => (
                                         <HoverCard key={plan.id}>
                                             <HoverCardTrigger asChild>
@@ -432,7 +432,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                     layout
                                                 >
                                                     <BorderBeamCard className="w-full rounded-2xl overflow-hidden cursor-pointer hover:bg-muted/50 transition-colors">
-                                                        <div className="p-6 flex flex-col h-full">
+                                                        <div className="p-card flex flex-col h-full">
                                                             {/* Header with title and actions */}
                                                             <div className="flex justify-between items-start mb-6">
                                                                 <div className="flex-1 min-w-0">
@@ -611,7 +611,7 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                 className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
                                                 variant="default"
                                             >
-                                                <div className="flex items-center gap-2">
+                                                <div className="button-group">
                                                     <Plus className="w-5 h-5" />
                                                     <MixedText text="创建第一个计划" />
                                                 </div>

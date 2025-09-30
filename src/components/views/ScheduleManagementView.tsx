@@ -118,11 +118,34 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
             className="relative inline-flex h-9 items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md border border-white/20 dark:border-white/20 p-1 text-muted-foreground shadow-lg unselectable"
             style={{ zIndex: 10 }}
         >
-            {/* 高亮背景 - 使用主题颜色 */}
+            {/* 高亮背景 - 优化的毛玻璃效果 */}
             <motion.div
-                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md border border-white/20"
+                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md"
                 style={{
-                    backgroundColor: themeColor || PAGE_THEME_COLORS.schedule,
+                    // 使用更柔和的边框颜色
+                    border: `1px solid ${themeColor || PAGE_THEME_COLORS.schedule}33`,
+                    // 使用更均匀的颜色，减少发白现象
+                    background: `
+                        linear-gradient(135deg, 
+                            ${themeColor || PAGE_THEME_COLORS.schedule}D9 0%, 
+                            ${themeColor || PAGE_THEME_COLORS.schedule}CC 25%,
+                            ${themeColor || PAGE_THEME_COLORS.schedule}D1 50%, 
+                            ${themeColor || PAGE_THEME_COLORS.schedule}CC 75%,
+                            ${themeColor || PAGE_THEME_COLORS.schedule}D9 100%
+                        ),
+                        radial-gradient(circle at center, 
+                            ${themeColor || PAGE_THEME_COLORS.schedule}1A 0%, 
+                            transparent 70%
+                        )
+                    `,
+                    backdropFilter: 'blur(8px) saturate(150%)',
+                    WebkitBackdropFilter: 'blur(8px) saturate(150%)',
+                    // 减少内发光，避免发白
+                    boxShadow: `
+                        0 2px 8px ${themeColor || PAGE_THEME_COLORS.schedule}40,
+                        0 1px 3px ${themeColor || PAGE_THEME_COLORS.schedule}26,
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                    `,
                 }}
                 initial={false}
                 animate={{

@@ -433,7 +433,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       {isInDialog ? (
         // When in dialog, render without Card wrapper to avoid nested card appearance
         <div className="w-full max-w-xl flex flex-col">
-          <div className={`${!initialData ? 'pt-0' : 'pt-4'} pb-4`}>
+          <div className={`${!initialData ? 'pt-0' : 'pt-4'} p-card`}>
             <BaseForm
               className="form-stack"
               validationSchema={getValidationSchema(module, config)}
