@@ -48,7 +48,7 @@ function YearPicker({
         <Button
           variant="ghost"
           size="sm"
-          className="h-10 w-10 p-0 flex items-center justify-center"
+          className="h-10 w-10 p-0 flex items-center justify-center !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => {
             // 切换到上一组年份
             const newIndex = Math.max(0, currentGroupIndex - 1)
@@ -57,7 +57,7 @@ function YearPicker({
             // 不关闭选择器
           }}
           disabled={currentGroupIndex === 0}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: 'none' }}
         >
           <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>‹</span>
         </Button>
@@ -69,7 +69,7 @@ function YearPicker({
         <Button
           variant="ghost"
           size="sm"
-          className="h-10 w-10 p-0 flex items-center justify-center"
+          className="h-10 w-10 p-0 flex items-center justify-center !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => {
             // 切换到下一组年份
             const newIndex = Math.min(yearGroups.length - 1, currentGroupIndex + 1)
@@ -78,7 +78,7 @@ function YearPicker({
             // 不关闭选择器
           }}
           disabled={currentGroupIndex === yearGroups.length - 1}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: 'none' }}
         >
           <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>›</span>
         </Button>
@@ -90,11 +90,12 @@ function YearPicker({
             key={year}
             variant={selectedYear === year ? "default" : "ghost"}
             size="sm"
-            className="h-8 text-sm px-2"
+            className="h-8 text-sm px-2 !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => {
               onYearSelect(year)
               onClose()
             }}
+            style={{ border: 'none', boxShadow: 'none' }}
           >
             {year}
           </Button>
@@ -139,11 +140,12 @@ function MonthPicker({
             key={month.value}
             variant={selectedMonth === month.value ? "default" : "ghost"}
             size="sm"
-            className="h-8 text-sm px-2"
+            className="h-8 text-sm px-2 !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => {
               onMonthSelect(month.value)
               onClose()
             }}
+            style={{ border: 'none', boxShadow: 'none' }}
           >
             {month.label}
           </Button>
@@ -296,7 +298,7 @@ function Calendar({
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-[70]" align="start">
                 <YearPicker
                   selectedYear={currentYear}
                   onYearSelect={handleYearSelect}
@@ -312,7 +314,7 @@ function Calendar({
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0 z-[70]" align="start">
                 <MonthPicker
                   selectedMonth={currentMonthIndex}
                   onMonthSelect={handleMonthSelect}

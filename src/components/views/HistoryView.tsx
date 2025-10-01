@@ -287,7 +287,7 @@ export function ExerciseRecordView({
         <div className="p-responsive">
             <div className="w-full">
                 {/* 新增记录按钮 */}
-                <div className="m-layout-md flex justify-end">
+                <div className="flex justify-end">
                     <Button
                         onClick={handleAddRecord}
                         className="flex items-center justify-center bg-[#0d9488] hover:bg-[#0d9488]/90 text-white rounded-full px-6"
