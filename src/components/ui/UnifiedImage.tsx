@@ -7,7 +7,7 @@ import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
 import { MixedText } from './MixedText';
-import { SupabaseImageSelectorDialog } from './SupabaseImageSelectorDialog';
+import { SupabaseImageSelectorDrawer } from './SupabaseImageSelectorDrawer';
 import { Button } from '@/components/ui/button';
 import { usePasteContext } from '@/contexts/PasteContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
@@ -429,7 +429,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                                     </TooltipProvider>
                                                     {/* 隐藏的云端选择对话框触发器 */}
                                                     <div className="hidden">
-                                                        <SupabaseImageSelectorDialog
+                                                        <SupabaseImageSelectorDrawer
                                                             onImageSelected={handleImageSelected}
                                                             trigger={
                                                                 <Button
@@ -592,7 +592,7 @@ export const UnifiedImage: React.FC<UnifiedImageProps> = ({
                                 </TooltipProvider>
                                 {/* 隐藏的云端选择对话框触发器 */}
                                 <div className="hidden">
-                                    <SupabaseImageSelectorDialog
+                                    <SupabaseImageSelectorDrawer
                                         onImageSelected={handleImageSelected}
                                         trigger={
                                             <Button

@@ -48,7 +48,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-with-animation';
-import { SupabaseImageSelectorDialog } from '@/components/ui/SupabaseImageSelectorDialog';
+import { SupabaseImageSelectorDrawer } from '@/components/ui/SupabaseImageSelectorDrawer';
 import { Cloud, FileImage } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
@@ -767,8 +767,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 const newImage = {
                     id: tempId,
                     url: imageInfo.url,
-                    name: imageInfo.name || 'cloud-image',
-                    file: null // 云端图片没有文件对象
+                    name: imageInfo.originalName || 'cloud-image',
+                    file: undefined // 云端图片没有文件对象
                 };
                 setImages(prev => [...prev, newImage]);
 
@@ -2433,8 +2433,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             </Dialog>
 
 
-            {/* 云端图片选择对话框 */}
-            <SupabaseImageSelectorDialog
+            {/* 云端图片选择抽屉 */}
+            <SupabaseImageSelectorDrawer
                 open={showCloudImageDialog}
                 onOpenChange={setShowCloudImageDialog}
                 onImageSelected={(imageId) => {
