@@ -233,7 +233,7 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
                                 <SidebarMenuButton
                                     tooltip={item.title}
                                     onClick={() => handleCollapsibleClick(item.title)}
-                                    className="unselectable"
+                                    className="unselectable font-medium"
                                 >
                                     {item.icon && <item.icon />}
                                     <span><MixedText text={item.title} /></span>

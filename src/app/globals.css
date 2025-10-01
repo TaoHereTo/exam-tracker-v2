@@ -1465,15 +1465,6 @@ button *,
 .sidebar-menu-item,
 .sidebar-menu-button,
 .sidebar-group-label,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.page-title,
-.title,
-.header,
 /* 日历相关元素 */
 [data-slot="calendar"] button,
 [data-slot="calendar"] button *,
@@ -1510,7 +1501,101 @@ h6,
 .go3958317564 rect,
 .go3958317564 line,
 .go3958317564 polygon,
-.go3958317564 polyline,
+.go3958317564 polyline {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* 标题样式定义 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-title,
+.title,
+.header {
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0.5em 0;
+  color: inherit;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+h5 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+h6 {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* HTML内容中的标题样式 */
+.html-content h1,
+.html-content h2,
+.html-content h3,
+.html-content h4,
+.html-content h5,
+.html-content h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0.5em 0;
+  color: inherit;
+}
+
+.html-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.html-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.html-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.html-content h4 {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.html-content h5 {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.html-content h6 {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
 
 /* 确保输入框和文本区域可以正常选择 */
 input,
@@ -1729,6 +1814,8 @@ textarea,
   color: hsl(var(--sidebar-foreground) / 0.95);
 }
 
+/* 侧边栏字体粗细增强 - 通过Tailwind类实现 */
+
 /* 增加侧边栏图标大小 - 只保留菜单按钮图标 */
 [data-slot="sidebar-menu-button"] svg {
   width: 1.25rem;
@@ -1897,6 +1984,7 @@ textarea,
   box-sizing: border-box;
   margin-left: 0;
   width: calc(100% - 0.5rem);
+  font-weight: 500 !important;
 }
 
 /* 收起状态下按钮居中对齐 */

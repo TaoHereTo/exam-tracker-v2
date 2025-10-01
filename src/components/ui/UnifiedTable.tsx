@@ -456,39 +456,6 @@ export function UnifiedTable<T, K extends string | number = string | number>({
 
                     {/* 右侧按钮组 */}
                     <div className="flex gap-2 shrink-0 flex-wrap">
-                        {/* 自定义操作按钮 */}
-                        {actions.map((action, index) => {
-                            const button = (
-                                <Button
-                                    key={`action-${index}`}
-                                    onClick={action.onClick}
-                                    disabled={action.disabled}
-                                    variant={action.variant || "default"}
-                                    size="sm"
-                                    className={`${action.className} h-9`}
-                                >
-                                    {action.icon}
-                                    {action.label}
-                                </Button>
-                            );
-
-                            // 如果有 tooltip，包装在 Tooltip 中
-                            if (action.tooltip) {
-                                return (
-                                    <Tooltip key={`action-${index}`}>
-                                        <TooltipTrigger asChild>
-                                            {button}
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <p><MixedText text={action.tooltip} /></p>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                );
-                            }
-
-                            return button;
-                        })}
-
                         {/* 新建按钮 */}
                         {showNew && onNew && (
                             <Button
@@ -557,6 +524,39 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 </TooltipContent>
                             </Tooltip>
                         )}
+
+                        {/* 自定义操作按钮 - 放在最右侧 */}
+                        {actions.map((action, index) => {
+                            const button = (
+                                <Button
+                                    key={`action-${index}`}
+                                    onClick={action.onClick}
+                                    disabled={action.disabled}
+                                    variant={action.variant || "default"}
+                                    size="sm"
+                                    className={`${action.className} h-9`}
+                                >
+                                    {action.icon}
+                                    {action.label}
+                                </Button>
+                            );
+
+                            // 如果有 tooltip，包装在 Tooltip 中
+                            if (action.tooltip) {
+                                return (
+                                    <Tooltip key={`action-${index}`}>
+                                        <TooltipTrigger asChild>
+                                            {button}
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p><MixedText text={action.tooltip} /></p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                );
+                            }
+
+                            return button;
+                        })}
 
                     </div>
                 </div>

@@ -57,13 +57,16 @@ export const MixedText = memo(function MixedText({
 
     // 特别优化侧边栏菜单项文本
     const sidebarMenuItems = [
-        "AI分析", "成绩概览", "数据图表", "最佳成绩", "新的记录", "刷题历史",
+        // 主菜单项
+        "数据可视化", "记录管理", "制定计划", "知识点管理", "笔记管理",
+        // 子菜单项
+        "AI分析", "成绩概览", "数据图表", "最佳成绩", "新的记录", "刷题记录",
         "学习计划", "倒计时", "日程管理", "知识点录入", "知识点汇总",
-        "文本摘录", "暂定"
+        "文本摘录", "暂定", "行测记录", "我的笔记"
     ];
 
     if (sidebarMenuItems.includes(content)) {
-        baseStyle.fontWeight = '500';
+        baseStyle.fontWeight = '600';
         baseStyle.letterSpacing = '0.01em';
     }
 

@@ -286,64 +286,56 @@ export function ExerciseRecordView({
         // Simplified container to match KnowledgeSummaryView approach
         <div className="p-responsive">
             <div className="w-full">
-                {/* 新增记录按钮 */}
-                <div className="flex justify-end">
-                    <Button
-                        onClick={handleAddRecord}
-                        className="flex items-center justify-center bg-[#0d9488] hover:bg-[#0d9488]/90 text-white rounded-full px-6"
-                    >
-                        <div className="button-group">
-                            <Plus className="w-4 h-4" />
-                            <MixedText text="新增记录" />
-                        </div>
-                    </Button>
-                </div>
-
                 <UnifiedTable<RecordItem, string>
                     columns={[
                         {
                             key: 'date',
                             label: (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                     <span className="text-xs sm:text-sm">日期</span>
                                 </div>
                             ),
+                            className: 'text-center',
                             render: (row) => <MixedText text={format(new Date(row.date), 'yyyy-MM-dd')} />
                         },
                         {
                             key: 'module',
                             label: (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                     <span className="text-xs sm:text-sm">模块</span>
                                 </div>
                             ),
+                            className: 'text-center',
                             render: (row) => <MixedText text={normalizeModuleName(row.module)} />
                         },
                         {
                             key: 'correct',
                             label: (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                     <span className="text-xs sm:text-sm">正确数</span>
                                 </div>
                             ),
+                            className: 'text-center',
                             render: (row) => <MixedText text={`${row.correct}/${row.total}`} />
                         },
                         {
                             key: 'accuracy',
                             label: (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                     <span className="text-xs sm:text-sm">正确率</span>
                                 </div>
                             ),
+                            className: 'text-center',
                             render: (row) => <MixedText text={`${((row.correct / row.total) * 100).toFixed(1)}%`} />
                         },
                         {
                             key: 'duration',
                             label: (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center justify-center gap-1">
                                     <span className="text-xs sm:text-sm">用时</span>
                                 </div>
                             ),
+                            className: 'text-center',
                             render: (row) => <MixedText text={formatDuration(row.duration)} />
                         }
                     ]}
@@ -376,6 +368,15 @@ export function ExerciseRecordView({
                     onDelete={onBatchDelete}
                     deleteDisabled={selectedRecordIds.length === 0}
                     deleteConfirmText="此操作将删除所选的刷题记录，删除后无法恢复。是否确认？"
+                    actions={[
+                        {
+                            label: "新增记录",
+                            icon: <Plus className="w-4 h-4" />,
+                            onClick: handleAddRecord,
+                            variant: "default",
+                            className: "bg-[#0d9488] hover:bg-[#0d9488]/90 text-white rounded-full px-6"
+                        }
+                    ]}
                 />
             </div>
 
