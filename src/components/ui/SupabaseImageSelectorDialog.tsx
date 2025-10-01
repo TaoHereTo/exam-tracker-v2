@@ -22,13 +22,19 @@ import { useThemeMode } from '@/hooks/useThemeMode';
 interface SupabaseImageSelectorDialogProps {
     onImageSelected: (imageId: string) => void;
     trigger?: React.ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
 }
 
 export const SupabaseImageSelectorDialog: React.FC<SupabaseImageSelectorDialogProps> = ({
     onImageSelected,
-    trigger
+    trigger,
+    open,
+    onOpenChange
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [internalIsOpen, setInternalIsOpen] = useState(false);
+    const isOpen = open !== undefined ? open : internalIsOpen;
+    const setIsOpen = onOpenChange || setInternalIsOpen;
     const [availableImages, setAvailableImages] = useState<SupabaseImageInfo[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLoading, setIsLoading] = useState(false);

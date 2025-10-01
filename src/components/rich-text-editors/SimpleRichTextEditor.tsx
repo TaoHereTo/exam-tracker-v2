@@ -48,6 +48,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-with-animation';
+import { SupabaseImageSelectorDialog } from '@/components/ui/SupabaseImageSelectorDialog';
+import { Cloud, FileImage } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
@@ -134,6 +136,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const [showLatexSelector, setShowLatexSelector] = useState(false);
     const [previewMode, setPreviewMode] = useState(false);
     const [images, setImages] = useState<{ id: string; url: string; name: string; file?: File }[]>([]);
+    const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
     const { notify } = useNotification();
 
     useEffect(() => {
@@ -751,6 +754,55 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             handleFileUpload(file);
         }
     };
+
+    // 处理云端图片选择
+    const handleCloudImageSelect = useCallback(async (imageId: string) => {
+        try {
+            const imageInfo = await supabaseImageManager.getImageInfo(imageId);
+            if (imageInfo) {
+                // 生成临时ID用于本地预览
+                const tempId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+                // 添加到图片列表（本地预览）
+                const newImage = {
+                    id: tempId,
+                    url: imageInfo.url,
+                    name: imageInfo.name || 'cloud-image',
+                    file: null // 云端图片没有文件对象
+                };
+                setImages(prev => [...prev, newImage]);
+
+                // 添加到待上传列表（云端图片不需要上传，但需要记录）
+                const newPendingImage = { localUrl: imageInfo.url, file: null, imageId: imageId };
+                const newPendingImages = [...pendingImages, newPendingImage];
+                pendingImagesRef.current = newPendingImages;
+                setPendingImages(newPendingImages);
+
+                // 保存到 localStorage
+                try {
+                    localStorage.setItem('pendingImages', JSON.stringify(newPendingImages));
+                } catch (e) {
+                    console.log('无法保存到 localStorage:', e);
+                }
+
+                // 通知父组件有待上传的图片
+                handlePendingImagesChange(newPendingImages);
+
+                notify({
+                    type: "success",
+                    message: "图片已添加",
+                    description: "云端图片已添加到预览区域"
+                });
+            }
+        } catch (error) {
+            console.error('选择云端图片失败:', error);
+            notify({
+                type: "error",
+                message: "选择失败",
+                description: "无法选择云端图片"
+            });
+        }
+    }, [pendingImages, notify, handlePendingImagesChange]);
 
     // 处理粘贴图片
     const handlePaste = useCallback(async (e: ClipboardEvent) => {
@@ -1524,27 +1576,46 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </TooltipContent>
                     </Tooltip>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
+                    <DropdownMenu>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        disabled={isUploading}
+                                    >
+                                        {isUploading ? (
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                        ) : (
+                                            <ImageIcon className="w-3 h-3" />
+                                        )}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>插入图片</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <DropdownMenuContent align="start">
+                            <DropdownMenuItem
                                 onClick={() => fileInputRef.current?.click()}
-                                disabled={isUploading}
+                                className="flex items-center gap-2"
                             >
-                                {isUploading ? (
-                                    <Loader2 className="w-3 h-3 animate-spin" />
-                                ) : (
-                                    <ImageIcon className="w-3 h-3" />
-                                )}
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>插入图片</p>
-                        </TooltipContent>
-                    </Tooltip>
+                                <FileImage className="w-4 h-4" />
+                                <span>从本地选择</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => setShowCloudImageDialog(true)}
+                                className="flex items-center gap-2"
+                            >
+                                <Cloud className="w-4 h-4" />
+                                <span>从云端选择</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
                     {/* 隐藏的文件输入 */}
                     <input
@@ -2360,6 +2431,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+
+            {/* 云端图片选择对话框 */}
+            <SupabaseImageSelectorDialog
+                open={showCloudImageDialog}
+                onOpenChange={setShowCloudImageDialog}
+                onImageSelected={(imageId) => {
+                    handleCloudImageSelect(imageId);
+                    setShowCloudImageDialog(false);
+                }}
+                trigger={<div />}
+            />
 
             {/* LaTeX公式选择器 */}
             <LatexFormulaSelector

@@ -1,18 +1,18 @@
 "use client"
 
 import * as React from "react"
-import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { cn } from "@/lib/utils"
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
 
 const DropdownMenuWithAnimation = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof DropdownMenuPrimitive.Root>
+  React.ComponentProps<typeof DropdownMenuPrimitive.DropdownMenu>
 >(function DropdownMenuWithAnimation({ children, ...props }, ref) {
   return (
-    <DropdownMenuPrimitive.Root {...props}>
+    <DropdownMenuPrimitive.DropdownMenu {...props}>
       {children}
-    </DropdownMenuPrimitive.Root>
+    </DropdownMenuPrimitive.DropdownMenu>
   )
 })
 
