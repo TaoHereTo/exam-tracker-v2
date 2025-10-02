@@ -143,6 +143,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const { notify } = useNotification();
 
+
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
             if (content === '') {
@@ -1243,729 +1244,763 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     ];
 
     return (
-        <TooltipProvider openDelay={300}>
+        <>
             {isFullscreen && (
                 <div
                     className="fixed inset-0 bg-black/30 backdrop-blur-md z-40"
-                    onClick={() => setIsFullscreen(false)}
+                    onClick={(e) => {
+                        // 只有点击背景本身才关闭全屏，不影响编辑器内的交互
+                        if (e.target === e.currentTarget) {
+                            setIsFullscreen(false);
+                        }
+                    }}
                 />
             )}
 
-            {/* 融合的编辑器容器 - 工具栏和编辑区域作为一个整体 */}
-            <div
-                ref={containerRef}
-                className={cn(
-                    'rich-text-editor-unified border flex flex-col rounded-lg',
-                    isFullscreen ? 'fixed top-12 left-1/2 -translate-x-1/2 w-[80vw] max-w-6xl h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl overflow-hidden' : 'overflow-visible',
-                    isDragOver ? 'ring-2 ring-blue-500' : '',
-                    stickyToolbar ? 'rich-text-editor-sticky-container' : '',
-                    className
-                )}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-                {/* 工具栏 - 作为编辑器容器的顶部 */}
+            <TooltipProvider openDelay={300}>
+                {/* 融合的编辑器容器 - 工具栏和编辑区域作为一个整体 */}
                 <div
-                    ref={toolbarRef}
+                    ref={containerRef}
                     className={cn(
-                        "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5 border-b bg-muted/30",
-                        isFullscreen ? "justify-center" : "",
-                        stickyToolbar ? "rich-text-editor-toolbar-sticky" : ""
+                        'rich-text-editor-unified border flex flex-col rounded-lg',
+                        isFullscreen ? 'rich-text-editor-fullscreen fixed inset-0 w-full h-full z-[9999] bg-[color:var(--modal-background)] shadow-2xl overflow-visible border-0 rounded-none' : 'overflow-visible',
+                        isDragOver ? 'ring-2 ring-blue-500' : '',
+                        stickyToolbar ? 'rich-text-editor-sticky-container' : '',
+                        className
                     )}
-                    style={stickyToolbar ? {
-                        position: 'sticky',
-                        top: '10px',
-                        zIndex: 1000,
-                        backgroundColor: 'var(--background)',
-                        border: '1px solid var(--border)',
-                        borderRadius: '0.5rem',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                        backdropFilter: 'blur(8px)'
+                    style={isFullscreen ? {
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        width: '100vw',
+                        height: '100vh',
+                        zIndex: 9999,
+                        transform: 'none',
+                        margin: 0,
+                        padding: 0
                     } : undefined}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
                 >
-                    {/* 撤销/重做 */}
-                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => execCommand('undo')}
-                                >
-                                    <Undo className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>撤销 (Ctrl+Z)</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => execCommand('redo')}
-                                >
-                                    <Redo className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>重做</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-
-                    {/* 文本格式 */}
-                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant={activeFormats.has('bold') ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleFormatCommand('bold')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                                >
-                                    <Bold className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>加粗 (Ctrl+B)</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant={activeFormats.has('italic') ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleFormatCommand('italic')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                                >
-                                    <Italic className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>斜体 (Ctrl+I)</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant={activeFormats.has('underline') ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleFormatCommand('underline')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                                >
-                                    <Underline className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>下划线 (Ctrl+U)</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
-                                    size="sm"
-                                    onClick={() => handleFormatCommand('strikeThrough')}
-                                    className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                                >
-                                    <Strikethrough className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>删除线</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-
-                    {/* 标题选择器 */}
-                    <div className="flex items-center gap-0.5 pr-1 mr-1">
-                        <DropdownMenu>
+                    {/* 工具栏 - 作为编辑器容器的顶部 */}
+                    <div
+                        ref={toolbarRef}
+                        className={cn(
+                            "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5 border-b bg-muted/30",
+                            isFullscreen ? "justify-center" : "",
+                            stickyToolbar ? "rich-text-editor-toolbar-sticky" : ""
+                        )}
+                        style={stickyToolbar ? {
+                            position: 'sticky',
+                            top: '10px',
+                            zIndex: 1000,
+                            backgroundColor: 'var(--background)',
+                            border: '1px solid var(--border)',
+                            borderRadius: '0.5rem',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            backdropFilter: 'blur(8px)'
+                        } : undefined}
+                    >
+                        {/* 撤销/重做 */}
+                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                            <Heading className="w-3 h-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => execCommand('undo')}
+                                    >
+                                        <Undo className="w-3 h-3" />
+                                    </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>选择标题级别</p>
+                                    <p>撤销 (Ctrl+Z)</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <DropdownMenuContent className="w-auto min-w-[80px]">
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
-                                    正文
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
-                                    标题 1
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
-                                    标题 2
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
-                                    标题 3
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
-                                    标题 4
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
-                                    标题 5
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
-                                    标题 6
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
 
-                    {/* 列表下拉菜单 */}
-                    <div className="flex items-center gap-0.5 pr-1 mr-1">
-                        <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                            <List className="w-3 h-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => execCommand('redo')}
+                                    >
+                                        <Redo className="w-3 h-3" />
+                                    </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>列表</p>
+                                    <p>重做 (Ctrl+Y)</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => execCommand('insertUnorderedList')}>
-                                    <List className="w-3 h-3 mr-2" />
-                                    无序列表
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('insertOrderedList')}>
-                                    <ListOrdered className="w-3 h-3 mr-2" />
-                                    有序列表
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                        </div>
 
-                    {/* 对齐方式下拉菜单 */}
-                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                        <DropdownMenu>
+                        {/* 文本格式 */}
+                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                            <AlignLeft className="w-3 h-3" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <Button
+                                        type="button"
+                                        variant={activeFormats.has('bold') ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => handleFormatCommand('bold')}
+                                        className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                    >
+                                        <Bold className="w-3 h-3" />
+                                    </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>对齐方式</p>
+                                    <p>加粗 (Ctrl+B)</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
-                                    <AlignLeft className="w-3 h-3 mr-2" />
-                                    左对齐
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
-                                    <AlignCenter className="w-3 h-3 mr-2" />
-                                    居中
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
-                                    <AlignRight className="w-3 h-3 mr-2" />
-                                    右对齐
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('justifyFull')}>
-                                    <AlignJustify className="w-3 h-3 mr-2" />
-                                    两端对齐
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
 
-                    {/* 颜色按钮组 */}
-                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                        {/* 文字颜色 */}
-                        <Popover>
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-6 w-6 p-0"
-                                            onMouseDown={() => {
-                                                // 在鼠标按下时检查并保存选区
-                                                console.log('文字颜色按钮被按下，检查选区');
-                                                const selection = window.getSelection();
-                                                if (selection && selection.rangeCount > 0) {
-                                                    const range = selection.getRangeAt(0);
-                                                    const selectedText = range.toString();
-                                                    if (selectedText.length > 0) {
-                                                        console.log('有选中文字，保存选区');
-                                                        saveCurrentSelection();
-                                                    } else {
-                                                        console.log('没有选中文字，不保存选区');
+                                    <Button
+                                        type="button"
+                                        variant={activeFormats.has('italic') ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => handleFormatCommand('italic')}
+                                        className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                    >
+                                        <Italic className="w-3 h-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>斜体 (Ctrl+I)</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant={activeFormats.has('underline') ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => handleFormatCommand('underline')}
+                                        className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                    >
+                                        <Underline className="w-3 h-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>下划线 (Ctrl+U)</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
+                                        size="sm"
+                                        onClick={() => handleFormatCommand('strikeThrough')}
+                                        className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                    >
+                                        <Strikethrough className="w-3 h-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>删除线</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
+
+                        {/* 标题选择器 */}
+                        <div className="flex items-center gap-0.5 pr-1 mr-1">
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                <Heading className="w-3 h-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>选择标题级别</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent className="w-auto min-w-[80px]">
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
+                                        正文
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
+                                        标题 1
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
+                                        标题 2
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
+                                        标题 3
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
+                                        标题 4
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
+                                        标题 5
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
+                                        标题 6
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+
+                        {/* 列表下拉菜单 */}
+                        <div className="flex items-center gap-0.5 pr-1 mr-1">
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                <List className="w-3 h-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>列表</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent className="w-auto min-w-[100px]">
+                                    <DropdownMenuItem onClick={() => execCommand('insertUnorderedList')}>
+                                        <List className="w-3 h-3 mr-2" />
+                                        无序列表
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('insertOrderedList')}>
+                                        <ListOrdered className="w-3 h-3 mr-2" />
+                                        有序列表
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+
+                        {/* 对齐方式下拉菜单 */}
+                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                                <AlignLeft className="w-3 h-3" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>对齐方式</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent className="w-auto min-w-[100px]">
+                                    <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
+                                        <AlignLeft className="w-3 h-3 mr-2" />
+                                        左对齐
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
+                                        <AlignCenter className="w-3 h-3 mr-2" />
+                                        居中
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
+                                        <AlignRight className="w-3 h-3 mr-2" />
+                                        右对齐
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => execCommand('justifyFull')}>
+                                        <AlignJustify className="w-3 h-3 mr-2" />
+                                        两端对齐
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+
+                        {/* 颜色按钮组 */}
+                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                            {/* 文字颜色 */}
+                            <Popover>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 w-6 p-0"
+                                                onMouseDown={() => {
+                                                    // 在鼠标按下时检查并保存选区
+                                                    console.log('文字颜色按钮被按下，检查选区');
+                                                    const selection = window.getSelection();
+                                                    if (selection && selection.rangeCount > 0) {
+                                                        const range = selection.getRangeAt(0);
+                                                        const selectedText = range.toString();
+                                                        if (selectedText.length > 0) {
+                                                            console.log('有选中文字，保存选区');
+                                                            saveCurrentSelection();
+                                                        } else {
+                                                            console.log('没有选中文字，不保存选区');
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                        >
-                                            <Type className="w-3 h-3" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>文字颜色</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                                <div className="space-y-2">
-                                    <div className="text-sm font-medium">文字颜色</div>
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {colors.map((color) => (
-                                            <div
-                                                key={color}
-                                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                                style={{ backgroundColor: color }}
-                                                onClick={() => {
-                                                    console.log('文字颜色被选择，颜色:', color);
-                                                    setTextColor(color);
                                                 }}
-                                            />
-                                        ))}
+                                            >
+                                                <Type className="w-3 h-3" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>文字颜色</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                                    <div className="space-y-2">
+                                        <div className="text-sm font-medium">文字颜色</div>
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {colors.map((color) => (
+                                                <div
+                                                    key={color}
+                                                    className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                                    style={{ backgroundColor: color }}
+                                                    onClick={() => {
+                                                        console.log('文字颜色被选择，颜色:', color);
+                                                        setTextColor(color);
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
+                                </PopoverContent>
+                            </Popover>
 
-                        {/* 背景颜色 */}
-                        <Popover>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <PopoverTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-6 w-6 p-0"
-                                            onMouseDown={() => {
-                                                // 在鼠标按下时检查并保存选区
-                                                console.log('背景颜色按钮被按下，检查选区');
-                                                const selection = window.getSelection();
-                                                if (selection && selection.rangeCount > 0) {
-                                                    const range = selection.getRangeAt(0);
-                                                    const selectedText = range.toString();
-                                                    if (selectedText.length > 0) {
-                                                        console.log('有选中文字，保存选区');
-                                                        saveCurrentSelection();
-                                                    } else {
-                                                        console.log('没有选中文字，不保存选区');
+                            {/* 背景颜色 */}
+                            <Popover>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 w-6 p-0"
+                                                onMouseDown={() => {
+                                                    // 在鼠标按下时检查并保存选区
+                                                    console.log('背景颜色按钮被按下，检查选区');
+                                                    const selection = window.getSelection();
+                                                    if (selection && selection.rangeCount > 0) {
+                                                        const range = selection.getRangeAt(0);
+                                                        const selectedText = range.toString();
+                                                        if (selectedText.length > 0) {
+                                                            console.log('有选中文字，保存选区');
+                                                            saveCurrentSelection();
+                                                        } else {
+                                                            console.log('没有选中文字，不保存选区');
+                                                        }
                                                     }
-                                                }
-                                            }}
-                                        >
-                                            <Paintbrush className="w-3 h-3" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>背景颜色</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                                <div className="space-y-2">
-                                    <div className="text-sm font-medium">背景颜色</div>
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {colors.map((color) => (
-                                            <div
-                                                key={color}
-                                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                                style={{ backgroundColor: color }}
-                                                onClick={() => {
-                                                    console.log('背景颜色被选择，颜色:', color);
-                                                    setBackgroundColor(color);
                                                 }}
-                                            />
-                                        ))}
+                                            >
+                                                <Paintbrush className="w-3 h-3" />
+                                            </Button>
+                                        </PopoverTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>背景颜色</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                                    <div className="space-y-2">
+                                        <div className="text-sm font-medium">背景颜色</div>
+                                        <div className="grid grid-cols-6 gap-2">
+                                            {colors.map((color) => (
+                                                <div
+                                                    key={color}
+                                                    className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                                    style={{ backgroundColor: color }}
+                                                    onClick={() => {
+                                                        console.log('背景颜色被选择，颜色:', color);
+                                                        setBackgroundColor(color);
+                                                    }}
+                                                />
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </PopoverContent>
-                        </Popover>
-                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        </div>
 
-                    {/* 插入链接和图片 */}
-                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
-                                    <LinkIcon className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入链接</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
-                                    <Sigma className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>公式</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <DropdownMenu>
+                        {/* 插入链接和图片 */}
+                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-6 w-6 p-0"
-                                            disabled={isUploading}
-                                        >
-                                            {isUploading ? (
-                                                <Loader2 className="w-3 h-3 animate-spin" />
-                                            ) : (
-                                                <ImageIcon className="w-3 h-3" />
-                                            )}
-                                        </Button>
-                                    </DropdownMenuTrigger>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
+                                        <LinkIcon className="w-3 h-3" />
+                                    </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>插入图片</p>
+                                    <p>插入链接</p>
                                 </TooltipContent>
                             </Tooltip>
-                            <DropdownMenuContent align="start">
-                                <DropdownMenuItem
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className="flex items-center gap-2"
-                                >
-                                    <FileImage className="w-4 h-4" />
-                                    <span>从本地选择</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                    onClick={() => setShowCloudImageDialog(true)}
-                                    className="flex items-center gap-2"
-                                >
-                                    <Cloud className="w-4 h-4" />
-                                    <span>从云端选择</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
 
-                        {/* 隐藏的文件输入 */}
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileSelect}
-                            style={{ display: 'none' }}
-                        />
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
+                                        <Sigma className="w-3 h-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>公式</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-6 w-6 p-0"
+                                                disabled={isUploading}
+                                            >
+                                                {isUploading ? (
+                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                ) : (
+                                                    <ImageIcon className="w-3 h-3" />
+                                                )}
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>插入图片</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuItem
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <FileImage className="w-4 h-4" />
+                                        <span>从本地选择</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => setShowCloudImageDialog(true)}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Cloud className="w-4 h-4" />
+                                        <span>从云端选择</span>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* 隐藏的文件输入 */}
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+
+                        {/* 全屏按钮 */}
+                        <div className={cn(
+                            "flex items-center gap-0.5",
+                            isFullscreen ? "" : "ml-auto"
+                        )}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant={previewMode ? "default" : "ghost"}
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => setPreviewMode(!previewMode)}
+                                    >
+                                        <Eye className="w-3 h-3" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{previewMode ? "关闭预览" : "开启预览"}</p>
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0"
+                                        onClick={() => setIsFullscreen(!isFullscreen)}
+                                    >
+                                        {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </div>
                     </div>
 
-                    {/* 全屏按钮 */}
+
+                    {/* 编辑器内容区域 - 支持预览模式 */}
                     <div className={cn(
-                        "flex items-center gap-0.5",
-                        isFullscreen ? "" : "ml-auto"
+                        "flex",
+                        isFullscreen ? "flex-1 min-h-0" : "",
+                        previewMode ? "" : ""
                     )}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant={previewMode ? "default" : "ghost"}
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => setPreviewMode(!previewMode)}
-                                >
-                                    <Eye className="w-3 h-3" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{previewMode ? "关闭预览" : "开启预览"}</p>
-                            </TooltipContent>
-                        </Tooltip>
+                        {/* 编辑器区域 */}
+                        <div className={cn(
+                            "flex-1", // 移除 flex flex-col
+                            previewMode ? "w-1/2 border-r" : "w-full",
+                            "overflow-auto" // 只有这里有滚动条
+                        )}
+                            style={isFullscreen ? {
+                                height: '100%',
+                                minHeight: '100%',
+                                maxHeight: '100%',
+                                backgroundColor: 'var(--editor-background)'
+                            } : {
+                                minHeight: customMinHeight || '300px',
+                                maxHeight: customMaxHeight || '600px',
+                                backgroundColor: 'var(--editor-background)'
+                            }}>
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                onInput={handleInput}
+                                onFocus={(e) => {
+                                    e.currentTarget.focus();
+                                }}
+                                onBlur={() => {
+                                    // 在失去焦点时进行清理和LaTeX处理，避免在编辑过程中干扰
+                                    if (editorRef.current) {
+                                        const html = editorRef.current.innerHTML;
+                                        const textContent = editorRef.current.textContent || '';
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0"
-                                    onClick={() => setIsFullscreen(!isFullscreen)}
-                                >
-                                    {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                </div>
+                                        // 只有在有内容时才进行处理
+                                        if (textContent.trim() !== '') {
+                                            // 先处理LaTeX内容
+                                            const processedHtml = processLatexContent(html);
 
+                                            // 再清理空内容
+                                            const cleanedHtml = cleanEmptyContent(processedHtml);
 
-                {/* 编辑器内容区域 - 支持预览模式 */}
-                <div className={cn(
-                    "flex",
-                    isFullscreen ? "flex-1 min-h-0" : "",
-                    previewMode ? "" : ""
-                )}>
-                    {/* 编辑器区域 */}
-                    <div className={cn(
-                        "flex-1", // 移除 flex flex-col
-                        previewMode ? "w-1/2 border-r" : "w-full",
-                        "overflow-auto" // 只有这里有滚动条
-                    )}
-                        style={{
-                            minHeight: customMinHeight || '300px',
-                            maxHeight: customMaxHeight || '600px',
-                            backgroundColor: 'var(--editor-background)' // 确保容器也有背景色
-                        }}>
-                        <div
-                            ref={editorRef}
-                            contentEditable
-                            onInput={handleInput}
-                            onFocus={(e) => {
-                                e.currentTarget.focus();
-                            }}
-                            onBlur={() => {
-                                // 在失去焦点时进行清理和LaTeX处理，避免在编辑过程中干扰
-                                if (editorRef.current) {
-                                    const html = editorRef.current.innerHTML;
-                                    const textContent = editorRef.current.textContent || '';
-
-                                    // 只有在有内容时才进行处理
-                                    if (textContent.trim() !== '') {
-                                        // 先处理LaTeX内容
-                                        const processedHtml = processLatexContent(html);
-
-                                        // 再清理空内容
-                                        const cleanedHtml = cleanEmptyContent(processedHtml);
-
-                                        if (cleanedHtml !== html) {
-                                            editorRef.current.innerHTML = cleanedHtml;
-                                            onChange(cleanedHtml);
+                                            if (cleanedHtml !== html) {
+                                                editorRef.current.innerHTML = cleanedHtml;
+                                                onChange(cleanedHtml);
+                                            }
                                         }
                                     }
-                                }
-                            }}
-                            onClick={(e) => {
-                                // 移除强制光标控制，让浏览器自然处理光标
-                                e.currentTarget.focus();
-                            }}
-                            onMouseDown={(e) => {
-                                e.currentTarget.focus();
-                            }}
-                            onMouseUp={() => {
-                                // 在鼠标释放时保存选区（只在有选中文字时）
-                                const selection = window.getSelection();
-                                if (selection && selection.rangeCount > 0) {
-                                    const range = selection.getRangeAt(0);
-                                    const selectedText = range.toString();
-                                    if (selectedText.length > 0) {
-                                        saveCurrentSelection();
+                                }}
+                                onClick={(e) => {
+                                    // 移除强制光标控制，让浏览器自然处理光标
+                                    e.currentTarget.focus();
+                                }}
+                                onMouseDown={(e) => {
+                                    e.currentTarget.focus();
+                                }}
+                                onMouseUp={() => {
+                                    // 在鼠标释放时保存选区（只在有选中文字时）
+                                    const selection = window.getSelection();
+                                    if (selection && selection.rangeCount > 0) {
+                                        const range = selection.getRangeAt(0);
+                                        const selectedText = range.toString();
+                                        if (selectedText.length > 0) {
+                                            saveCurrentSelection();
+                                        }
                                     }
-                                }
-                                // 更新按钮状态
-                                updateButtonStates();
-                            }}
-                            onKeyUp={() => {
-                                // 在键盘释放时保存选区（只在有选中文字时）
-                                const selection = window.getSelection();
-                                if (selection && selection.rangeCount > 0) {
-                                    const range = selection.getRangeAt(0);
-                                    const selectedText = range.toString();
-                                    if (selectedText.length > 0) {
-                                        saveCurrentSelection();
+                                    // 更新按钮状态
+                                    updateButtonStates();
+                                }}
+                                onKeyUp={() => {
+                                    // 在键盘释放时保存选区（只在有选中文字时）
+                                    const selection = window.getSelection();
+                                    if (selection && selection.rangeCount > 0) {
+                                        const range = selection.getRangeAt(0);
+                                        const selectedText = range.toString();
+                                        if (selectedText.length > 0) {
+                                            saveCurrentSelection();
+                                        }
                                     }
-                                }
-                                // 更新按钮状态
-                                updateButtonStates();
-                            }}
-                            onKeyDown={(e) => {
-                                // 智能处理删除键
-                                if (e.key === 'Backspace' || e.key === 'Delete') {
-                                    // 延迟执行，让浏览器先处理删除操作
-                                    setTimeout(() => {
-                                        if (editorRef.current) {
-                                            const html = editorRef.current.innerHTML;
-                                            const textContent = editorRef.current.textContent || '';
+                                    // 更新按钮状态
+                                    updateButtonStates();
+                                }}
+                                onKeyDown={(e) => {
+                                    // 智能处理删除键
+                                    if (e.key === 'Backspace' || e.key === 'Delete') {
+                                        // 延迟执行，让浏览器先处理删除操作
+                                        setTimeout(() => {
+                                            if (editorRef.current) {
+                                                const html = editorRef.current.innerHTML;
+                                                const textContent = editorRef.current.textContent || '';
 
-                                            // 检查是否有空的HTML标签需要清理
-                                            const hasEmptyTags = /<[^>]+><\/[^>]+>/.test(html) ||
-                                                /<[^>]+>\s*<\/[^>]+>/.test(html);
+                                                // 检查是否有空的HTML标签需要清理
+                                                const hasEmptyTags = /<[^>]+><\/[^>]+>/.test(html) ||
+                                                    /<[^>]+>\s*<\/[^>]+>/.test(html);
 
-                                            // 如果内容为空或者有空的HTML标签，进行清理
-                                            if (textContent.trim() === '' || hasEmptyTags) {
-                                                const cleanedHtml = cleanEmptyContent(html);
-                                                if (cleanedHtml !== html) {
-                                                    editorRef.current.innerHTML = cleanedHtml;
-                                                    onChange(cleanedHtml);
+                                                // 如果内容为空或者有空的HTML标签，进行清理
+                                                if (textContent.trim() === '' || hasEmptyTags) {
+                                                    const cleanedHtml = cleanEmptyContent(html);
+                                                    if (cleanedHtml !== html) {
+                                                        editorRef.current.innerHTML = cleanedHtml;
+                                                        onChange(cleanedHtml);
 
-                                                    // 确保光标在正确位置
-                                                    const selection = window.getSelection();
-                                                    if (selection) {
-                                                        const range = document.createRange();
-                                                        range.selectNodeContents(editorRef.current);
-                                                        range.collapse(false);
-                                                        selection.removeAllRanges();
-                                                        selection.addRange(range);
+                                                        // 确保光标在正确位置
+                                                        const selection = window.getSelection();
+                                                        if (selection) {
+                                                            const range = document.createRange();
+                                                            range.selectNodeContents(editorRef.current);
+                                                            range.collapse(false);
+                                                            selection.removeAllRanges();
+                                                            selection.addRange(range);
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                    }, 0);
-                                }
-                            }}
-                            className={cn(
-                                "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative flex-1 w-full",
-                                isFullscreen ? "h-full max-h-full" : ""
-                            )}
-                            style={{
-                                fontSize: '16px', // 从14px增加到16px
-                                lineHeight: '1.6', // 稍微增加行高
-                                minHeight: customMinHeight || '300px',
-                                padding: '16px',
-                                boxSizing: 'border-box',
-                                backgroundColor: 'var(--editor-background)',
-                                position: 'relative',
-                                width: '100%'
-                            }}
-                            data-placeholder={placeholder}
-                            suppressContentEditableWarning={true}
-                            tabIndex={0}
-                        />
-                    </div>
+                                        }, 0);
+                                    }
+                                }}
+                                className={cn(
+                                    "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative flex-1 w-full",
+                                    isFullscreen ? "h-full max-h-full" : ""
+                                )}
+                                style={isFullscreen ? {
+                                    fontSize: '16px',
+                                    lineHeight: '1.6',
+                                    height: '100%',
+                                    minHeight: '100%',
+                                    padding: '16px',
+                                    boxSizing: 'border-box',
+                                    backgroundColor: 'var(--editor-background)',
+                                    position: 'relative',
+                                    width: '100%'
+                                } : {
+                                    fontSize: '16px',
+                                    lineHeight: '1.6',
+                                    minHeight: customMinHeight || '300px',
+                                    padding: '16px',
+                                    boxSizing: 'border-box',
+                                    backgroundColor: 'var(--editor-background)',
+                                    position: 'relative',
+                                    width: '100%'
+                                }}
+                                data-placeholder={placeholder}
+                                suppressContentEditableWarning={true}
+                                tabIndex={0}
+                            />
+                        </div>
 
-                    {/* 预览区域 */}
-                    {previewMode && (
-                        <div className={cn(
-                            "w-1/2 bg-gray-50 dark:bg-gray-900 overflow-auto",
-                            isFullscreen ? "h-full" : ""
-                        )} style={!isFullscreen ? {
-                            minHeight: customMinHeight && customMaxHeight ? `${customMinHeight}` : '200px',
-                            maxHeight: customMinHeight && customMaxHeight ? `${customMaxHeight}` : '400px'
-                        } : {}}>
-                            <div className="p-4">
-                                <div className="prose prose-sm max-w-none" style={{
-                                    fontSize: '14px',
-                                    lineHeight: '1.5'
-                                }}>
-                                    <HtmlRenderer content={content} />
+                        {/* 预览区域 */}
+                        {previewMode && (
+                            <div className={cn(
+                                "w-1/2 bg-gray-50 dark:bg-gray-900 overflow-auto",
+                                isFullscreen ? "h-full" : ""
+                            )} style={!isFullscreen ? {
+                                minHeight: customMinHeight && customMaxHeight ? `${customMinHeight}` : '200px',
+                                maxHeight: customMinHeight && customMaxHeight ? `${customMaxHeight}` : '400px'
+                            } : {}}>
+                                <div className="p-4">
+                                    <div className="prose prose-sm max-w-none" style={{
+                                        fontSize: '14px',
+                                        lineHeight: '1.5'
+                                    }}>
+                                        <HtmlRenderer content={content} />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        )}
+                    </div>
 
-                {/* 图片预览区域 - 使用 Accordion */}
-                {images.length > 0 && (
-                    <div className="border-t bg-gray-50 dark:bg-gray-900/50">
-                        <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="images" className="border-none">
-                                <AccordionTrigger className="px-4 py-2 hover:no-underline">
-                                    <div className="flex items-center gap-2">
-                                        <ImageIcon className="w-4 h-4" />
-                                        <span className="text-sm font-medium">
-                                            图片预览 ({images.length})
-                                        </span>
-                                    </div>
-                                </AccordionTrigger>
-                                <AccordionContent className="px-4 pb-4">
-                                    <PhotoProvider>
-                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                            {images.map((image) => (
-                                                <div key={image.id} className="relative group">
-                                                    <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
-                                                        <Image
-                                                            src={image.url}
-                                                            alt={image.name}
-                                                            fill
-                                                            className="object-cover"
-                                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                                        />
-                                                        {/* 透明按钮，无背景遮罩 */}
-                                                        <div className="absolute inset-0 flex items-center justify-center">
-                                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <PhotoView src={image.url}>
+                    {/* 图片预览区域 - 使用 Accordion */}
+                    {images.length > 0 && (
+                        <div className="border-t bg-gray-50 dark:bg-gray-900/50">
+                            <Accordion type="single" collapsible className="w-full">
+                                <AccordionItem value="images" className="border-none">
+                                    <AccordionTrigger className="px-4 py-2 hover:no-underline">
+                                        <div className="flex items-center gap-2">
+                                            <ImageIcon className="w-4 h-4" />
+                                            <span className="text-sm font-medium">
+                                                图片预览 ({images.length})
+                                            </span>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent className="px-4 pb-4">
+                                        <PhotoProvider>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                                {images.map((image) => (
+                                                    <div key={image.id} className="relative group">
+                                                        <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
+                                                            <Image
+                                                                src={image.url}
+                                                                alt={image.name}
+                                                                fill
+                                                                className="object-cover"
+                                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                                            />
+                                                            {/* 透明按钮，无背景遮罩 */}
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-2">
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
+                                                                            <PhotoView src={image.url}>
+                                                                                <Button
+                                                                                    size="sm"
+                                                                                    variant="ghost"
+                                                                                    type="button"
+                                                                                    className="h-8 w-8 p-0 bg-transparent hover:bg-transparent text-white hover:text-white shadow-lg"
+                                                                                    onClick={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        e.stopPropagation();
+                                                                                    }}
+                                                                                >
+                                                                                    <Eye className="h-4 w-4" />
+                                                                                </Button>
+                                                                            </PhotoView>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            <p>预览图片</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger asChild>
                                                                             <Button
                                                                                 size="sm"
                                                                                 variant="ghost"
                                                                                 type="button"
-                                                                                className="h-8 w-8 p-0 bg-transparent hover:bg-transparent text-white hover:text-white shadow-lg"
                                                                                 onClick={(e) => {
                                                                                     e.preventDefault();
                                                                                     e.stopPropagation();
+                                                                                    handleRemoveImage(image.id);
                                                                                 }}
+                                                                                className="h-8 w-8 p-0 bg-transparent hover:bg-transparent text-white hover:text-white shadow-lg"
                                                                             >
-                                                                                <Eye className="h-4 w-4" />
+                                                                                <X className="h-4 w-4" />
                                                                             </Button>
-                                                                        </PhotoView>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p>预览图片</p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                                <Tooltip>
-                                                                    <TooltipTrigger asChild>
-                                                                        <Button
-                                                                            size="sm"
-                                                                            variant="ghost"
-                                                                            type="button"
-                                                                            onClick={(e) => {
-                                                                                e.preventDefault();
-                                                                                e.stopPropagation();
-                                                                                handleRemoveImage(image.id);
-                                                                            }}
-                                                                            className="h-8 w-8 p-0 bg-transparent hover:bg-transparent text-white hover:text-white shadow-lg"
-                                                                        >
-                                                                            <X className="h-4 w-4" />
-                                                                        </Button>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        <p>删除图片</p>
-                                                                    </TooltipContent>
-                                                                </Tooltip>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            <p>删除图片</p>
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        <div className="mt-1 text-xs text-gray-600 dark:text-gray-400 truncate">
+                                                            {image.name}
+                                                        </div>
                                                     </div>
-                                                    <div className="mt-1 text-xs text-gray-600 dark:text-gray-400 truncate">
-                                                        {image.name}
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </PhotoProvider>
-                                </AccordionContent>
-                            </AccordionItem>
-                        </Accordion>
-                    </div>
-                )}
+                                                ))}
+                                            </div>
+                                        </PhotoProvider>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            </Accordion>
+                        </div>
+                    )}
 
-                <style jsx global>{`
+                    <style jsx global>{`
           .rich-text-editor [contenteditable] {
             outline: none;
             cursor: text;
@@ -2448,8 +2483,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           
           /* 全屏模式下的高度限制 */
           .rich-text-editor-main.fixed {
-            height: calc(100vh - 3rem) !important;
-            max-height: calc(100vh - 3rem) !important;
+            height: 100% !important;
+            max-height: 100% !important;
             overflow: hidden !important;
           }
           
@@ -2463,10 +2498,32 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           /* 全屏模式下编辑器区域高度限制 */
           .rich-text-editor-main.fixed [contenteditable] {
             height: 100% !important;
-            min-height: calc(100vh - 6rem) !important;
+            min-height: 100% !important;
             max-height: 100% !important;
             overflow-y: auto !important;
             padding: 1rem !important;
+          }
+
+          /* 强制全屏编辑器定位 - 覆盖任何父容器影响 */
+          .rich-text-editor-fullscreen {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            transform: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+          }
+
+          /* 全屏模式下tooltip显示修复 */
+          body:has(.rich-text-editor-fullscreen) [data-slot="tooltip-overlay"] {
+            z-index: 99999 !important;
           }
           
           /* 图片加载状态样式 */
@@ -2492,75 +2549,76 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           }
         `}</style>
 
-                {/* 链接输入对话框 */}
-                <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>插入链接</DialogTitle>
-                            <DialogDescription>
-                                输入链接地址和显示文本。如果选中了文字，将自动作为链接文本。
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="link-text" className="text-right">
-                                    链接文本
-                                </Label>
-                                <Input
-                                    id="link-text"
-                                    value={linkText}
-                                    onChange={(e) => setLinkText(e.target.value)}
-                                    className="col-span-3"
-                                    placeholder="输入链接显示文本"
-                                />
+                    {/* 链接输入对话框 */}
+                    <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>插入链接</DialogTitle>
+                                <DialogDescription>
+                                    输入链接地址和显示文本。如果选中了文字，将自动作为链接文本。
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="link-text" className="text-right">
+                                        链接文本
+                                    </Label>
+                                    <Input
+                                        id="link-text"
+                                        value={linkText}
+                                        onChange={(e) => setLinkText(e.target.value)}
+                                        className="col-span-3"
+                                        placeholder="输入链接显示文本"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="link-url" className="text-right">
+                                        链接地址
+                                    </Label>
+                                    <Input
+                                        id="link-url"
+                                        value={linkUrl}
+                                        onChange={(e) => setLinkUrl(e.target.value)}
+                                        className="col-span-3"
+                                        placeholder="https://example.com"
+                                        type="url"
+                                    />
+                                </div>
                             </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="link-url" className="text-right">
-                                    链接地址
-                                </Label>
-                                <Input
-                                    id="link-url"
-                                    value={linkUrl}
-                                    onChange={(e) => setLinkUrl(e.target.value)}
-                                    className="col-span-3"
-                                    placeholder="https://example.com"
-                                    type="url"
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
-                                取消
-                            </Button>
-                            <Button onClick={handleInsertLink} className="bg-[#253985] hover:bg-[#253985]/90 text-white">
-                                插入链接
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                            <DialogFooter>
+                                <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                                    取消
+                                </Button>
+                                <Button onClick={handleInsertLink} className="bg-[#253985] hover:bg-[#253985]/90 text-white">
+                                    插入链接
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
 
-                {/* 云端图片选择抽屉 */}
-                <SupabaseImageSelectorDrawer
-                    open={showCloudImageDialog}
-                    onOpenChange={setShowCloudImageDialog}
-                    onImageSelected={(imageId) => {
-                        handleCloudImageSelect(imageId);
-                        setShowCloudImageDialog(false);
-                    }}
-                    trigger={<div />}
+                    {/* 云端图片选择抽屉 */}
+                    <SupabaseImageSelectorDrawer
+                        open={showCloudImageDialog}
+                        onOpenChange={setShowCloudImageDialog}
+                        onImageSelected={(imageId) => {
+                            handleCloudImageSelect(imageId);
+                            setShowCloudImageDialog(false);
+                        }}
+                        trigger={<div />}
+                    />
+
+                </div>
+
+                {/* LaTeX公式选择器 */}
+                <LatexFormulaSelector
+                    open={showLatexSelector}
+                    onOpenChange={setShowLatexSelector}
+                    onInsert={handleInsertLatex}
                 />
 
-            </div>
-
-            {/* LaTeX公式选择器 */}
-            <LatexFormulaSelector
-                open={showLatexSelector}
-                onOpenChange={setShowLatexSelector}
-                onInsert={handleInsertLatex}
-            />
-
-        </TooltipProvider>
+            </TooltipProvider>
+        </>
     );
 };
 
