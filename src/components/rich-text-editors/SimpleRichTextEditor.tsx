@@ -123,6 +123,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     onUploadImages,
     stickyToolbar = false
 }) => {
+    // 统一的按钮样式常量
+    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg hover:bg-accent transition-colors duration-150";
+
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
     const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
@@ -1289,7 +1292,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     <div
                         ref={toolbarRef}
                         className={cn(
-                            "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5 border-b bg-muted/30",
+                            "rich-text-editor-toolbar px-4 py-3 flex flex-wrap items-center gap-1 border-b bg-background/80 backdrop-blur-md",
                             isFullscreen ? "justify-center" : "",
                             stickyToolbar ? "rich-text-editor-toolbar-sticky" : ""
                         )}
@@ -1305,17 +1308,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         } : undefined}
                     >
                         {/* 撤销/重做 */}
-                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <div className="flex items-center gap-0.5">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
                                         type="button"
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0"
+                                        className={TOOLBAR_BUTTON_CLASSES}
                                         onClick={() => execCommand('undo')}
                                     >
-                                        <Undo className="w-3 h-3" />
+                                        <Undo className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1329,10 +1332,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         type="button"
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0"
+                                        className={TOOLBAR_BUTTON_CLASSES}
                                         onClick={() => execCommand('redo')}
                                     >
-                                        <Redo className="w-3 h-3" />
+                                        <Redo className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1341,8 +1344,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </Tooltip>
                         </div>
 
+                        {/* 分隔线 */}
+                        <div className="h-6 w-px bg-border/60"></div>
+
                         {/* 文本格式 */}
-                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <div className="flex items-center gap-0.5">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -1350,9 +1356,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         variant={activeFormats.has('bold') ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => handleFormatCommand('bold')}
-                                        className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                        className={cn(
+                                            TOOLBAR_BUTTON_CLASSES,
+                                            activeFormats.has('bold')
+                                                ? "bg-blue-500/20 text-blue-600 dark:bg-blue-400/20 dark:text-blue-400 hover:bg-blue-500/30"
+                                                : ""
+                                        )}
                                     >
-                                        <Bold className="w-3 h-3" />
+                                        <Bold className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1367,9 +1378,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         variant={activeFormats.has('italic') ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => handleFormatCommand('italic')}
-                                        className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                        className={cn(
+                                            TOOLBAR_BUTTON_CLASSES,
+                                            activeFormats.has('italic')
+                                                ? "bg-purple-500/20 text-purple-600 dark:bg-purple-400/20 dark:text-purple-400 hover:bg-purple-500/30"
+                                                : ""
+                                        )}
                                     >
-                                        <Italic className="w-3 h-3" />
+                                        <Italic className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1384,9 +1400,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         variant={activeFormats.has('underline') ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => handleFormatCommand('underline')}
-                                        className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                        className={cn(
+                                            TOOLBAR_BUTTON_CLASSES,
+                                            activeFormats.has('underline')
+                                                ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400 hover:bg-green-500/30"
+                                                : ""
+                                        )}
                                     >
-                                        <Underline className="w-3 h-3" />
+                                        <Underline className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1401,9 +1422,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
                                         size="sm"
                                         onClick={() => handleFormatCommand('strikeThrough')}
-                                        className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                        className={cn(
+                                            TOOLBAR_BUTTON_CLASSES,
+                                            activeFormats.has('strikeThrough')
+                                                ? "bg-red-500/20 text-red-600 dark:bg-red-400/20 dark:text-red-400 hover:bg-red-500/30"
+                                                : ""
+                                        )}
                                     >
-                                        <Strikethrough className="w-3 h-3" />
+                                        <Strikethrough className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1413,13 +1439,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </div>
 
                         {/* 标题选择器 */}
-                        <div className="flex items-center gap-0.5 pr-1 mr-1">
+                        <div className="flex items-center gap-0.5">
                             <DropdownMenu>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <DropdownMenuTrigger asChild>
-                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                <Heading className="w-3 h-3" />
+                                            <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                                <Heading className="w-4 h-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                     </TooltipTrigger>
@@ -1454,13 +1480,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </div>
 
                         {/* 列表下拉菜单 */}
-                        <div className="flex items-center gap-0.5 pr-1 mr-1">
+                        <div className="flex items-center gap-0.5">
                             <DropdownMenu>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <DropdownMenuTrigger asChild>
-                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                <List className="w-3 h-3" />
+                                            <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                                <List className="w-4 h-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                     </TooltipTrigger>
@@ -1482,13 +1508,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </div>
 
                         {/* 对齐方式下拉菜单 */}
-                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        {/* 分隔线 */}
+                        <div className="h-6 w-px bg-border/60"></div>
+
+                        <div className="flex items-center gap-0.5">
                             <DropdownMenu>
                                 <Tooltip>
                                     <TooltipTrigger asChild>
                                         <DropdownMenuTrigger asChild>
-                                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                                <AlignLeft className="w-3 h-3" />
+                                            <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                                <AlignLeft className="w-4 h-4" />
                                             </Button>
                                         </DropdownMenuTrigger>
                                     </TooltipTrigger>
@@ -1518,7 +1547,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </div>
 
                         {/* 颜色按钮组 */}
-                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        {/* 分隔线 */}
+                        <div className="h-6 w-px bg-border/60"></div>
+
+                        <div className="flex items-center gap-0.5">
                             {/* 文字颜色 */}
                             <Popover>
                                 <Tooltip>
@@ -1528,7 +1560,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-6 w-6 p-0"
+                                                className={TOOLBAR_BUTTON_CLASSES}
                                                 onMouseDown={() => {
                                                     // 在鼠标按下时检查并保存选区
                                                     console.log('文字颜色按钮被按下，检查选区');
@@ -1545,7 +1577,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                     }
                                                 }}
                                             >
-                                                <Type className="w-3 h-3" />
+                                                <Type className="w-4 h-4" />
                                             </Button>
                                         </PopoverTrigger>
                                     </TooltipTrigger>
@@ -1582,7 +1614,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-6 w-6 p-0"
+                                                className={TOOLBAR_BUTTON_CLASSES}
                                                 onMouseDown={() => {
                                                     // 在鼠标按下时检查并保存选区
                                                     console.log('背景颜色按钮被按下，检查选区');
@@ -1599,7 +1631,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                     }
                                                 }}
                                             >
-                                                <Paintbrush className="w-3 h-3" />
+                                                <Paintbrush className="w-4 h-4" />
                                             </Button>
                                         </PopoverTrigger>
                                     </TooltipTrigger>
@@ -1629,11 +1661,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </div>
 
                         {/* 插入链接和图片 */}
-                        <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        {/* 分隔线 */}
+                        <div className="h-6 w-px bg-border/60"></div>
+
+                        <div className="flex items-center gap-0.5">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
-                                        <LinkIcon className="w-3 h-3" />
+                                    <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={insertLink}>
+                                        <LinkIcon className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1643,8 +1678,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
-                                        <Sigma className="w-3 h-3" />
+                                    <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={() => setShowLatexSelector(true)}>
+                                        <Sigma className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1660,13 +1695,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 type="button"
                                                 variant="ghost"
                                                 size="sm"
-                                                className="h-6 w-6 p-0"
+                                                className={TOOLBAR_BUTTON_CLASSES}
                                                 disabled={isUploading}
                                             >
                                                 {isUploading ? (
-                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                    <Loader2 className="w-4 h-4 animate-spin" />
                                                 ) : (
-                                                    <ImageIcon className="w-3 h-3" />
+                                                    <ImageIcon className="w-4 h-4" />
                                                 )}
                                             </Button>
                                         </DropdownMenuTrigger>
@@ -1712,12 +1747,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 <TooltipTrigger asChild>
                                     <Button
                                         type="button"
-                                        variant={previewMode ? "default" : "ghost"}
+                                        variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0"
+                                        className={cn(
+                                            TOOLBAR_BUTTON_CLASSES,
+                                            previewMode
+                                                ? "bg-amber-500/20 text-amber-600 dark:bg-amber-400/20 dark:text-amber-400 hover:bg-amber-500/30"
+                                                : ""
+                                        )}
                                         onClick={() => setPreviewMode(!previewMode)}
                                     >
-                                        <Eye className="w-3 h-3" />
+                                        <Eye className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1731,10 +1771,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         type="button"
                                         variant="ghost"
                                         size="sm"
-                                        className="h-6 w-6 p-0"
+                                        className={TOOLBAR_BUTTON_CLASSES}
                                         onClick={() => setIsFullscreen(!isFullscreen)}
                                     >
-                                        {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                                        {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -2524,6 +2564,28 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           /* 全屏模式下tooltip显示修复 */
           body:has(.rich-text-editor-fullscreen) [data-slot="tooltip-overlay"] {
             z-index: 99999 !important;
+          }
+
+          /* 美化工具栏样式 */
+          .rich-text-editor-toolbar {
+            border-bottom: 1px solid hsl(var(--border));
+            background: hsl(var(--background)/0.8);
+            backdrop-filter: blur(12px);
+          }
+
+          /* 按钮样式优化 */
+          .rich-text-editor-toolbar button {
+            border-radius: 0.5rem;
+            transition: all 0.15s ease;
+          }
+
+          .rich-text-editor-toolbar button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          }
+
+          .rich-text-editor-toolbar button:active {
+            transform: translateY(0);
           }
           
           /* 图片加载状态样式 */
