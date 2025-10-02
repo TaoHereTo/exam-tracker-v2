@@ -41,7 +41,7 @@ const KnowledgeEntryView: React.FC<KnowledgeEntryViewProps> = ({ onAddKnowledge,
                     <TabsContents className="py-4 px-2">
                         {MODULES.map(({ value }) => (
                             <TabsContent key={value} value={value} className="outline-none flex flex-col gap-6">
-                                <div className="w-full max-w-xl mx-auto pb-4">
+                                <div className="w-full max-w-5xl mx-auto pb-4">
                                     <ModuleForm
                                         module={value as 'math' | 'logic' | 'data-analysis' | 'common' | 'verbal' | 'politics'}
                                         onAddKnowledge={handleAdd(value)}

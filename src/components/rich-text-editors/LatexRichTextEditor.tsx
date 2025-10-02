@@ -11,6 +11,7 @@ interface LatexRichTextEditorProps {
     className?: string;
     editorMinHeight?: string;
     editorMaxHeight?: string;
+    stickyToolbar?: boolean;
 }
 
 export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
@@ -18,8 +19,9 @@ export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
     onChange,
     placeholder = '开始输入...',
     className = '',
-    editorMinHeight = '200px',
-    editorMaxHeight = '400px'
+    editorMinHeight = '300px',
+    editorMaxHeight = '600px',
+    stickyToolbar = false
 }) => {
     return (
         <div
@@ -27,14 +29,17 @@ export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
             style={{
                 minHeight: editorMinHeight,
                 maxHeight: editorMaxHeight,
-                overflow: 'auto'
+                overflow: 'visible' // 改为visible，不要外层滚动
             }}
         >
             <SimpleRichTextEditor
                 content={content}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="w-full h-full"
+                className="w-full"
+                stickyToolbar={stickyToolbar}
+                customMinHeight={editorMinHeight}
+                customMaxHeight={editorMaxHeight}
             />
         </div>
     );

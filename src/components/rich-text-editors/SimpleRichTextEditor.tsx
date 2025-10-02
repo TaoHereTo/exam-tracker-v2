@@ -106,6 +106,7 @@ interface SimpleRichTextEditorProps {
     customMaxHeight?: string; // 新增：自定义最大高度
     clearPreviewImages?: boolean; // 新增：用于清理预览图片
     onUploadImages?: (uploadFn: () => Promise<string[]>) => void; // 新增：暴露上传函数
+    stickyToolbar?: boolean; // 新增：工具栏是否相对视口固定
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
@@ -119,7 +120,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     customMinHeight,
     customMaxHeight,
     clearPreviewImages = false,
-    onUploadImages
+    onUploadImages,
+    stickyToolbar = false
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
@@ -137,17 +139,34 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const [previewMode, setPreviewMode] = useState(false);
     const [images, setImages] = useState<{ id: string; url: string; name: string; file?: File }[]>([]);
     const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
+    const toolbarRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
     const { notify } = useNotification();
 
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
             if (content === '') {
                 editorRef.current.innerHTML = '';
+                // 确保占位文字显示
+                editorRef.current.setAttribute('data-empty', 'true');
             } else {
                 editorRef.current.innerHTML = processLatexContent(content);
+                editorRef.current.removeAttribute('data-empty');
             }
         }
     }, [content]);
+
+    // 初始化占位文字状态
+    useEffect(() => {
+        if (editorRef.current) {
+            const textContent = editorRef.current.textContent || '';
+            if (textContent.trim() === '') {
+                editorRef.current.setAttribute('data-empty', 'true');
+            } else {
+                editorRef.current.removeAttribute('data-empty');
+            }
+        }
+    }, []);
 
     // 确保图片状态在组件重新渲染时保持
     useEffect(() => {
@@ -200,6 +219,15 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const html = e.currentTarget.innerHTML;
+        const textContent = e.currentTarget.textContent || '';
+
+        // 管理占位文字状态
+        if (textContent.trim() === '') {
+            e.currentTarget.setAttribute('data-empty', 'true');
+        } else {
+            e.currentTarget.removeAttribute('data-empty');
+        }
+
         onChange(html);
     };
 
@@ -1223,463 +1251,480 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 />
             )}
 
-            {/* 工具栏 - 独立固定在顶部，胶囊形状 */}
-            <div className={cn(
-                "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5",
-                isFullscreen ? "fixed justify-center" : ""
-            )}>
-                {/* 撤销/重做 */}
-                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => execCommand('undo')}
-                            >
-                                <Undo className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>撤销 (Ctrl+Z)</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => execCommand('redo')}
-                            >
-                                <Redo className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>重做</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
-
-                {/* 文本格式 */}
-                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant={activeFormats.has('bold') ? "default" : "ghost"}
-                                size="sm"
-                                onClick={() => handleFormatCommand('bold')}
-                                className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                            >
-                                <Bold className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>加粗 (Ctrl+B)</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant={activeFormats.has('italic') ? "default" : "ghost"}
-                                size="sm"
-                                onClick={() => handleFormatCommand('italic')}
-                                className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                            >
-                                <Italic className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>斜体 (Ctrl+I)</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant={activeFormats.has('underline') ? "default" : "ghost"}
-                                size="sm"
-                                onClick={() => handleFormatCommand('underline')}
-                                className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                            >
-                                <Underline className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>下划线 (Ctrl+U)</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
-                                size="sm"
-                                onClick={() => handleFormatCommand('strikeThrough')}
-                                className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
-                            >
-                                <Strikethrough className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>删除线</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
-
-                {/* 标题选择器 */}
-                <div className="flex items-center gap-0.5 pr-1 mr-1">
-                    <DropdownMenu>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                        <Heading className="w-3 h-3" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>选择标题级别</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent className="w-auto min-w-[80px]">
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
-                                正文
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
-                                标题 1
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
-                                标题 2
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
-                                标题 3
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
-                                标题 4
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
-                                标题 5
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
-                                标题 6
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
-                {/* 列表下拉菜单 */}
-                <div className="flex items-center gap-0.5 pr-1 mr-1">
-                    <DropdownMenu>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                        <List className="w-3 h-3" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>列表</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent className="w-auto min-w-[100px]">
-                            <DropdownMenuItem onClick={() => execCommand('insertUnorderedList')}>
-                                <List className="w-3 h-3 mr-2" />
-                                无序列表
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('insertOrderedList')}>
-                                <ListOrdered className="w-3 h-3 mr-2" />
-                                有序列表
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
-                {/* 对齐方式下拉菜单 */}
-                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                    <DropdownMenu>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                        <AlignLeft className="w-3 h-3" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>对齐方式</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent className="w-auto min-w-[100px]">
-                            <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
-                                <AlignLeft className="w-3 h-3 mr-2" />
-                                左对齐
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
-                                <AlignCenter className="w-3 h-3 mr-2" />
-                                居中
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
-                                <AlignRight className="w-3 h-3 mr-2" />
-                                右对齐
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => execCommand('justifyFull')}>
-                                <AlignJustify className="w-3 h-3 mr-2" />
-                                两端对齐
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
-
-                {/* 颜色按钮组 */}
-                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                    {/* 文字颜色 */}
-                    <Popover>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-6 w-6 p-0"
-                                        onMouseDown={() => {
-                                            // 在鼠标按下时检查并保存选区
-                                            console.log('文字颜色按钮被按下，检查选区');
-                                            const selection = window.getSelection();
-                                            if (selection && selection.rangeCount > 0) {
-                                                const range = selection.getRangeAt(0);
-                                                const selectedText = range.toString();
-                                                if (selectedText.length > 0) {
-                                                    console.log('有选中文字，保存选区');
-                                                    saveCurrentSelection();
-                                                } else {
-                                                    console.log('没有选中文字，不保存选区');
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        <Type className="w-3 h-3" />
-                                    </Button>
-                                </PopoverTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>文字颜色</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                            <div className="space-y-2">
-                                <div className="text-sm font-medium">文字颜色</div>
-                                <div className="grid grid-cols-6 gap-2">
-                                    {colors.map((color) => (
-                                        <div
-                                            key={color}
-                                            className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => {
-                                                console.log('文字颜色被选择，颜色:', color);
-                                                setTextColor(color);
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-
-                    {/* 背景颜色 */}
-                    <Popover>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-6 w-6 p-0"
-                                        onMouseDown={() => {
-                                            // 在鼠标按下时检查并保存选区
-                                            console.log('背景颜色按钮被按下，检查选区');
-                                            const selection = window.getSelection();
-                                            if (selection && selection.rangeCount > 0) {
-                                                const range = selection.getRangeAt(0);
-                                                const selectedText = range.toString();
-                                                if (selectedText.length > 0) {
-                                                    console.log('有选中文字，保存选区');
-                                                    saveCurrentSelection();
-                                                } else {
-                                                    console.log('没有选中文字，不保存选区');
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        <Paintbrush className="w-3 h-3" />
-                                    </Button>
-                                </PopoverTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>背景颜色</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
-                            <div className="space-y-2">
-                                <div className="text-sm font-medium">背景颜色</div>
-                                <div className="grid grid-cols-6 gap-2">
-                                    {colors.map((color) => (
-                                        <div
-                                            key={color}
-                                            className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
-                                            style={{ backgroundColor: color }}
-                                            onClick={() => {
-                                                console.log('背景颜色被选择，颜色:', color);
-                                                setBackgroundColor(color);
-                                            }}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
-                </div>
-
-                {/* 插入链接和图片 */}
-                <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
-                                <LinkIcon className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>插入链接</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
-                                <Sigma className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>公式</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <DropdownMenu>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="sm"
-                                        className="h-6 w-6 p-0"
-                                        disabled={isUploading}
-                                    >
-                                        {isUploading ? (
-                                            <Loader2 className="w-3 h-3 animate-spin" />
-                                        ) : (
-                                            <ImageIcon className="w-3 h-3" />
-                                        )}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入图片</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent align="start">
-                            <DropdownMenuItem
-                                onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2"
-                            >
-                                <FileImage className="w-4 h-4" />
-                                <span>从本地选择</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={() => setShowCloudImageDialog(true)}
-                                className="flex items-center gap-2"
-                            >
-                                <Cloud className="w-4 h-4" />
-                                <span>从云端选择</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* 隐藏的文件输入 */}
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        style={{ display: 'none' }}
-                    />
-                </div>
-
-                {/* 全屏按钮 */}
-                <div className={cn(
-                    "flex items-center gap-0.5",
-                    isFullscreen ? "" : "ml-auto"
-                )}>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant={previewMode ? "default" : "ghost"}
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => setPreviewMode(!previewMode)}
-                            >
-                                <Eye className="w-3 h-3" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{previewMode ? "关闭预览" : "开启预览"}</p>
-                        </TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0"
-                                onClick={() => setIsFullscreen(!isFullscreen)}
-                            >
-                                {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
-            </div>
-
-            {/* 主编辑器容器 - 独立于工具栏 */}
+            {/* 融合的编辑器容器 - 工具栏和编辑区域作为一个整体 */}
             <div
+                ref={containerRef}
                 className={cn(
-                    'rich-text-editor-main rich-text-editor border overflow-hidden flex flex-col',
-                    isFullscreen ? 'fixed top-12 left-1/2 -translate-x-1/2 w-[80vw] max-w-6xl h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl rounded-lg' : '',
+                    'rich-text-editor-unified border flex flex-col rounded-lg',
+                    isFullscreen ? 'fixed top-12 left-1/2 -translate-x-1/2 w-[80vw] max-w-6xl h-[calc(100vh-3rem)] max-h-[calc(100vh-3rem)] z-50 bg-[color:var(--modal-background)] shadow-2xl overflow-hidden' : 'overflow-visible',
                     isDragOver ? 'ring-2 ring-blue-500' : '',
+                    stickyToolbar ? 'rich-text-editor-sticky-container' : '',
                     className
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
+                {/* 工具栏 - 作为编辑器容器的顶部 */}
+                <div
+                    ref={toolbarRef}
+                    className={cn(
+                        "rich-text-editor-toolbar p-1 flex flex-wrap gap-0.5 border-b bg-muted/30",
+                        isFullscreen ? "justify-center" : "",
+                        stickyToolbar ? "rich-text-editor-toolbar-sticky" : ""
+                    )}
+                    style={stickyToolbar ? {
+                        position: 'sticky',
+                        top: '10px',
+                        zIndex: 1000,
+                        backgroundColor: 'var(--background)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        backdropFilter: 'blur(8px)'
+                    } : undefined}
+                >
+                    {/* 撤销/重做 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => execCommand('undo')}
+                                >
+                                    <Undo className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>撤销 (Ctrl+Z)</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => execCommand('redo')}
+                                >
+                                    <Redo className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>重做</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {/* 文本格式 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={activeFormats.has('bold') ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleFormatCommand('bold')}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('bold') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                >
+                                    <Bold className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>加粗 (Ctrl+B)</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={activeFormats.has('italic') ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleFormatCommand('italic')}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('italic') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                >
+                                    <Italic className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>斜体 (Ctrl+I)</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={activeFormats.has('underline') ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleFormatCommand('underline')}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('underline') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                >
+                                    <Underline className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>下划线 (Ctrl+U)</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={activeFormats.has('strikeThrough') ? "default" : "ghost"}
+                                    size="sm"
+                                    onClick={() => handleFormatCommand('strikeThrough')}
+                                    className={`h-6 w-6 p-0 ${activeFormats.has('strikeThrough') ? "bg-[#1e40af] dark:bg-[#d97706] text-white hover:bg-[#1e3a8a] dark:hover:bg-[#b45309]" : ""}`}
+                                >
+                                    <Strikethrough className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>删除线</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {/* 标题选择器 */}
+                    <div className="flex items-center gap-0.5 pr-1 mr-1">
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                            <Heading className="w-3 h-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>选择标题级别</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[80px]">
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
+                                    正文
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
+                                    标题 1
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
+                                    标题 2
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
+                                    标题 3
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
+                                    标题 4
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
+                                    标题 5
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
+                                    标题 6
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* 列表下拉菜单 */}
+                    <div className="flex items-center gap-0.5 pr-1 mr-1">
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                            <List className="w-3 h-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>列表</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[100px]">
+                                <DropdownMenuItem onClick={() => execCommand('insertUnorderedList')}>
+                                    <List className="w-3 h-3 mr-2" />
+                                    无序列表
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('insertOrderedList')}>
+                                    <ListOrdered className="w-3 h-3 mr-2" />
+                                    有序列表
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* 对齐方式下拉菜单 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                            <AlignLeft className="w-3 h-3" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>对齐方式</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent className="w-auto min-w-[100px]">
+                                <DropdownMenuItem onClick={() => execCommand('justifyLeft')}>
+                                    <AlignLeft className="w-3 h-3 mr-2" />
+                                    左对齐
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyCenter')}>
+                                    <AlignCenter className="w-3 h-3 mr-2" />
+                                    居中
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyRight')}>
+                                    <AlignRight className="w-3 h-3 mr-2" />
+                                    右对齐
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => execCommand('justifyFull')}>
+                                    <AlignJustify className="w-3 h-3 mr-2" />
+                                    两端对齐
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    {/* 颜色按钮组 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        {/* 文字颜色 */}
+                        <Popover>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0"
+                                            onMouseDown={() => {
+                                                // 在鼠标按下时检查并保存选区
+                                                console.log('文字颜色按钮被按下，检查选区');
+                                                const selection = window.getSelection();
+                                                if (selection && selection.rangeCount > 0) {
+                                                    const range = selection.getRangeAt(0);
+                                                    const selectedText = range.toString();
+                                                    if (selectedText.length > 0) {
+                                                        console.log('有选中文字，保存选区');
+                                                        saveCurrentSelection();
+                                                    } else {
+                                                        console.log('没有选中文字，不保存选区');
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Type className="w-3 h-3" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>文字颜色</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium">文字颜色</div>
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {colors.map((color) => (
+                                            <div
+                                                key={color}
+                                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                                style={{ backgroundColor: color }}
+                                                onClick={() => {
+                                                    console.log('文字颜色被选择，颜色:', color);
+                                                    setTextColor(color);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+
+                        {/* 背景颜色 */}
+                        <Popover>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0"
+                                            onMouseDown={() => {
+                                                // 在鼠标按下时检查并保存选区
+                                                console.log('背景颜色按钮被按下，检查选区');
+                                                const selection = window.getSelection();
+                                                if (selection && selection.rangeCount > 0) {
+                                                    const range = selection.getRangeAt(0);
+                                                    const selectedText = range.toString();
+                                                    if (selectedText.length > 0) {
+                                                        console.log('有选中文字，保存选区');
+                                                        saveCurrentSelection();
+                                                    } else {
+                                                        console.log('没有选中文字，不保存选区');
+                                                    }
+                                                }
+                                            }}
+                                        >
+                                            <Paintbrush className="w-3 h-3" />
+                                        </Button>
+                                    </PopoverTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>背景颜色</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <PopoverContent className="w-48 p-3" align="start" side="bottom" sideOffset={5}>
+                                <div className="space-y-2">
+                                    <div className="text-sm font-medium">背景颜色</div>
+                                    <div className="grid grid-cols-6 gap-2">
+                                        {colors.map((color) => (
+                                            <div
+                                                key={color}
+                                                className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
+                                                style={{ backgroundColor: color }}
+                                                onClick={() => {
+                                                    console.log('背景颜色被选择，颜色:', color);
+                                                    setBackgroundColor(color);
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+
+                    {/* 插入链接和图片 */}
+                    <div className="flex items-center gap-0.5 border-r pr-1 mr-1">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={insertLink}>
+                                    <LinkIcon className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>插入链接</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => setShowLatexSelector(true)}>
+                                    <Sigma className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>公式</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <DropdownMenu>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0"
+                                            disabled={isUploading}
+                                        >
+                                            {isUploading ? (
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                            ) : (
+                                                <ImageIcon className="w-3 h-3" />
+                                            )}
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>插入图片</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent align="start">
+                                <DropdownMenuItem
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-2"
+                                >
+                                    <FileImage className="w-4 h-4" />
+                                    <span>从本地选择</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                    onClick={() => setShowCloudImageDialog(true)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <Cloud className="w-4 h-4" />
+                                    <span>从云端选择</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* 隐藏的文件输入 */}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileSelect}
+                            style={{ display: 'none' }}
+                        />
+                    </div>
+
+                    {/* 全屏按钮 */}
+                    <div className={cn(
+                        "flex items-center gap-0.5",
+                        isFullscreen ? "" : "ml-auto"
+                    )}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={previewMode ? "default" : "ghost"}
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => setPreviewMode(!previewMode)}
+                                >
+                                    <Eye className="w-3 h-3" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{previewMode ? "关闭预览" : "开启预览"}</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0"
+                                    onClick={() => setIsFullscreen(!isFullscreen)}
+                                >
+                                    {isFullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                </div>
+
+
                 {/* 编辑器内容区域 - 支持预览模式 */}
                 <div className={cn(
                     "flex",
@@ -1688,9 +1733,15 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 )}>
                     {/* 编辑器区域 */}
                     <div className={cn(
-                        "flex-1 min-h-0",
-                        previewMode ? "w-1/2 border-r" : "w-full"
-                    )}>
+                        "flex-1", // 移除 flex flex-col
+                        previewMode ? "w-1/2 border-r" : "w-full",
+                        "overflow-auto" // 只有这里有滚动条
+                    )}
+                        style={{
+                            minHeight: customMinHeight || '300px',
+                            maxHeight: customMaxHeight || '600px',
+                            backgroundColor: 'var(--editor-background)' // 确保容器也有背景色
+                        }}>
                         <div
                             ref={editorRef}
                             contentEditable
@@ -1788,13 +1839,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 }
                             }}
                             className={cn(
-                                "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative overflow-auto",
-                                isFullscreen ? "h-full max-h-full" :
-                                    customMinHeight && customMaxHeight ? `min-h-[${customMinHeight}] max-h-[${customMaxHeight}]` : "min-h-[200px] max-h-[400px]"
+                                "bg-[color:var(--editor-background)] focus:outline-none prose prose-sm max-w-none cursor-text relative flex-1 w-full",
+                                isFullscreen ? "h-full max-h-full" : ""
                             )}
                             style={{
-                                fontSize: '14px',
-                                lineHeight: '1.5',
+                                fontSize: '16px', // 从14px增加到16px
+                                lineHeight: '1.6', // 稍微增加行高
+                                minHeight: customMinHeight || '300px',
+                                padding: '16px',
+                                boxSizing: 'border-box',
+                                backgroundColor: 'var(--editor-background)',
+                                position: 'relative',
+                                width: '100%'
                             }}
                             data-placeholder={placeholder}
                             suppressContentEditableWarning={true}
@@ -1915,8 +1971,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             cursor: text;
             padding: 16px;
             margin: 0;
-            overflow-y: auto;
-            max-height: 100%;
+            overflow: visible; /* 不要内部滚动条 */
+            width: 100%;
+            min-height: calc(300px - 32px); /* 减去padding */
+            box-sizing: border-box;
+            display: block;
+            background-color: var(--editor-background) !important;
+            background: var(--editor-background) !important;
+            /* 移除height限制，让内容自然扩展 */
           }
           
           .rich-text-editor [contenteditable]:focus {
@@ -1927,15 +1989,25 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             outline: none;
           }
           
-          .rich-text-editor [contenteditable]:empty:before {
-            content: attr(data-placeholder);
-            color: #9CA3AF;
-            pointer-events: none;
-            position: absolute;
-            top: 16px;
-            left: 16px;
-            line-height: 1.5;
-            font-size: 14px;
+          /* 占位文字样式 - 使用更强的选择器 */
+          [contenteditable]:empty::before,
+          [contenteditable][data-empty="true"]::before {
+            content: attr(data-placeholder) !important;
+            color: #9CA3AF !important;
+            pointer-events: none !important;
+            position: absolute !important;
+            top: 16px !important;
+            left: 16px !important;
+            line-height: 1.6 !important;
+            font-size: 16px !important; /* 与正文字体大小一致 */
+            opacity: 0.7 !important;
+            z-index: 1 !important;
+            display: block !important;
+          }
+          
+          [contenteditable]:not(:empty)::before,
+          [contenteditable]:not([data-empty="true"])::before {
+            display: none !important;
           }
           
           .rich-text-editor [contenteditable] img {
@@ -2103,24 +2175,60 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             margin: 4px 0 !important;
           }
           
-          /* 确保工具栏始终可见 - 独立固定在视口顶部，胶囊形状 */
-          .rich-text-editor-toolbar {
+          /* 融合模式下的工具栏样式 - 作为编辑器容器的顶部 */
+          .rich-text-editor-unified .rich-text-editor-toolbar {
+            position: relative !important;
+            top: auto !important;
+            z-index: 10 !important;
+            background: var(--muted/30) !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background-opacity: 1 !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin-bottom: 0 !important;
+          }
+
+          /* 粘性工具栏样式 - 只在需要时应用固定定位 */
+          .rich-text-editor-toolbar-sticky {
+            /* 默认保持相对定位，通过内联样式控制固定定位 */
+            position: relative !important;
+            z-index: 10 !important;
+            background: var(--muted/30) !important;
+            border: none !important;
+            border-bottom: 1px solid var(--border) !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+          }
+
+          /* 当工具栏真正固定时的样式（通过内联样式应用） */
+          .rich-text-editor-toolbar-sticky[style*="position: fixed"] {
+            border: 1px solid var(--border) !important;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+          }
+
+          /* 粘性容器样式 */
+          .rich-text-editor-sticky-container {
+            position: relative !important;
+          }
+
+          
+          /* 非融合模式下保持原有样式（向后兼容） */
+          .rich-text-editor-toolbar:not(.rich-text-editor-unified .rich-text-editor-toolbar):not(.fixed) {
             position: sticky !important;
             top: 0 !important;
             z-index: 50 !important;
             background: var(--muted) !important;
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
-            background-opacity: 0.95 !important;
             border: 1px solid var(--border) !important;
-            border-bottom: none !important;
-            border-radius: 0.5rem 0.5rem 0 0 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
-            margin-bottom: -1px !important; /* 与下方容器无缝连接 */
-          }
-          
-          /* 非全屏模式下的工具栏 - 胶囊形状 */
-          .rich-text-editor-toolbar:not(.fixed) {
             border-radius: 0.5rem 0.5rem 0 0 !important;
             border-bottom: none !important;
             margin-bottom: -1px !important;
@@ -2383,66 +2491,67 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             transition: opacity 0.3s ease-in-out !important;
           }
         `}</style>
+
+                {/* 链接输入对话框 */}
+                <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>插入链接</DialogTitle>
+                            <DialogDescription>
+                                输入链接地址和显示文本。如果选中了文字，将自动作为链接文本。
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="link-text" className="text-right">
+                                    链接文本
+                                </Label>
+                                <Input
+                                    id="link-text"
+                                    value={linkText}
+                                    onChange={(e) => setLinkText(e.target.value)}
+                                    className="col-span-3"
+                                    placeholder="输入链接显示文本"
+                                />
+                            </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="link-url" className="text-right">
+                                    链接地址
+                                </Label>
+                                <Input
+                                    id="link-url"
+                                    value={linkUrl}
+                                    onChange={(e) => setLinkUrl(e.target.value)}
+                                    className="col-span-3"
+                                    placeholder="https://example.com"
+                                    type="url"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                                取消
+                            </Button>
+                            <Button onClick={handleInsertLink} className="bg-[#253985] hover:bg-[#253985]/90 text-white">
+                                插入链接
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+
+                {/* 云端图片选择抽屉 */}
+                <SupabaseImageSelectorDrawer
+                    open={showCloudImageDialog}
+                    onOpenChange={setShowCloudImageDialog}
+                    onImageSelected={(imageId) => {
+                        handleCloudImageSelect(imageId);
+                        setShowCloudImageDialog(false);
+                    }}
+                    trigger={<div />}
+                />
+
             </div>
-
-            {/* 链接输入对话框 */}
-            <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>插入链接</DialogTitle>
-                        <DialogDescription>
-                            输入链接地址和显示文本。如果选中了文字，将自动作为链接文本。
-                        </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="link-text" className="text-right">
-                                链接文本
-                            </Label>
-                            <Input
-                                id="link-text"
-                                value={linkText}
-                                onChange={(e) => setLinkText(e.target.value)}
-                                className="col-span-3"
-                                placeholder="输入链接显示文本"
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="link-url" className="text-right">
-                                链接地址
-                            </Label>
-                            <Input
-                                id="link-url"
-                                value={linkUrl}
-                                onChange={(e) => setLinkUrl(e.target.value)}
-                                className="col-span-3"
-                                placeholder="https://example.com"
-                                type="url"
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
-                            取消
-                        </Button>
-                        <Button onClick={handleInsertLink} className="bg-[#253985] hover:bg-[#253985]/90 text-white">
-                            插入链接
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-
-            {/* 云端图片选择抽屉 */}
-            <SupabaseImageSelectorDrawer
-                open={showCloudImageDialog}
-                onOpenChange={setShowCloudImageDialog}
-                onImageSelected={(imageId) => {
-                    handleCloudImageSelect(imageId);
-                    setShowCloudImageDialog(false);
-                }}
-                trigger={<div />}
-            />
 
             {/* LaTeX公式选择器 */}
             <LatexFormulaSelector

@@ -417,14 +417,17 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     };
 
     return (
-      <LatexRichTextEditor
-        content={currentValue || ''}
-        onChange={(value) => setValue('secondField', value || '')}
-        placeholder={fieldConfig.secondPlaceholder}
-        className="w-full"
-        editorMinHeight="200px"
-        editorMaxHeight="400px"
-      />
+      <div className="rich-text-editor-wrapper">
+        <LatexRichTextEditor
+          content={currentValue || ''}
+          onChange={(value) => setValue('secondField', value || '')}
+          placeholder={fieldConfig.secondPlaceholder}
+          className="w-full"
+          editorMinHeight="300px"
+          editorMaxHeight="600px"
+          stickyToolbar={true}
+        />
+      </div>
     );
   };
 
@@ -432,7 +435,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     <div className="flex items-start justify-center w-full">
       {isInDialog ? (
         // When in dialog, render without Card wrapper to avoid nested card appearance
-        <div className="w-full max-w-xl flex flex-col">
+        <div className="w-full max-w-4xl flex flex-col">
           <div className={`${!initialData ? 'pt-0' : 'pt-4'} p-card`}>
             <BaseForm
               className="form-stack"
@@ -498,7 +501,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         </div>
       ) : (
         // When not in dialog, render with Card wrapper as usual
-        <Card className="w-full max-w-xl flex flex-col shadow-lg knowledge-form-card">
+        <Card className="w-full max-w-4xl flex flex-col shadow-lg knowledge-form-card">
           <CardContent className="pt-4 pb-4">
             {/* 非对话框模式下的表单 */}
             <BaseForm
