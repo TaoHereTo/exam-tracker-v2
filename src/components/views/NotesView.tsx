@@ -81,6 +81,7 @@ export default function NotesView() {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
     const [showTagEditDialog, setShowTagEditDialog] = useState(false);
+    const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -170,6 +171,12 @@ export default function NotesView() {
         });
         setNewTagName("");
         setNewTagColor("#3b82f6"); // 重置为默认颜色
+    };
+
+    // 关闭标签管理弹窗
+    const closeTagManager = () => {
+        setIsHoverCardOpen(false);
+        setShowColorPicker(false);
     };
 
     // 删除标签
@@ -897,11 +904,11 @@ export default function NotesView() {
                                         <Calendar className="h-3 w-3" />
                                         {formatDate(selectedNote.updatedAt)}
                                     </div>
-                                    <HoverCard>
-                                        <HoverCardTrigger asChild>
-                                            <div className="flex items-center gap-1 cursor-pointer">
-                                                <Tag className="h-3 w-3" />
-                                                <span>
+                                    <Popover open={isHoverCardOpen} onOpenChange={setIsHoverCardOpen}>
+                                        <PopoverTrigger asChild>
+                                            <div className="flex items-center gap-1 cursor-pointer hover:bg-muted/50 rounded-md px-2 py-1 transition-colors group">
+                                                <Tag className="h-3 w-3 group-hover:text-blue-600 transition-colors" />
+                                                <span className="group-hover:text-blue-600 transition-colors">
                                                     {selectedNote.tags.length > 0 ? (
                                                         selectedNote.tags.map(tag => {
                                                             // 确保提取的是字符串
@@ -913,11 +920,26 @@ export default function NotesView() {
                                                         '添加标签'
                                                     )}
                                                 </span>
+                                                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                                             </div>
-                                        </HoverCardTrigger>
-                                        <HoverCardContent className="w-80 p-4">
+                                        </PopoverTrigger>
+                                        <PopoverContent
+                                            className="w-80 p-4"
+                                            align="start"
+                                            side="bottom"
+                                            sideOffset={5}
+                                        >
                                             <div className="space-y-4">
-                                                <div className="text-sm font-medium">标签管理</div>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="text-sm font-medium">标签管理</div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={closeTagManager}
+                                                        className="text-muted-foreground hover:text-foreground transition-colors"
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
 
                                                 {/* 当前标签显示 */}
                                                 <div className="space-y-2">
@@ -1021,8 +1043,8 @@ export default function NotesView() {
                                                     </div>
                                                 </div>
                                             </div>
-                                        </HoverCardContent>
-                                    </HoverCard>
+                                        </PopoverContent>
+                                    </Popover>
                                 </div>
                             </div>
 
