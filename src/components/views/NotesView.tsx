@@ -897,128 +897,132 @@ export default function NotesView() {
                                         <Calendar className="h-3 w-3" />
                                         {formatDate(selectedNote.updatedAt)}
                                     </div>
-                                    {selectedNote.tags.length > 0 && (
-                                        <HoverCard>
-                                            <HoverCardTrigger asChild>
-                                                <div className="flex items-center gap-1 cursor-pointer">
-                                                    <Tag className="h-3 w-3" />
-                                                    <span>
-                                                        {selectedNote.tags.map(tag => {
+                                    <HoverCard>
+                                        <HoverCardTrigger asChild>
+                                            <div className="flex items-center gap-1 cursor-pointer">
+                                                <Tag className="h-3 w-3" />
+                                                <span>
+                                                    {selectedNote.tags.length > 0 ? (
+                                                        selectedNote.tags.map(tag => {
                                                             // 确保提取的是字符串
                                                             return typeof tag === 'string' ? tag : (
                                                                 typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
                                                             );
-                                                        }).join(', ')}
-                                                    </span>
-                                                </div>
-                                            </HoverCardTrigger>
-                                            <HoverCardContent className="w-80 p-4">
-                                                <div className="space-y-4">
-                                                    <div className="text-sm font-medium">标签管理</div>
+                                                        }).join(', ')
+                                                    ) : (
+                                                        '添加标签'
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent className="w-80 p-4">
+                                            <div className="space-y-4">
+                                                <div className="text-sm font-medium">标签管理</div>
 
-                                                    {/* 当前标签显示 */}
+                                                {/* 当前标签显示 */}
+                                                <div className="space-y-2">
+                                                    <div className="text-xs text-muted-foreground">
+                                                        {selectedNote.tags.length > 0 ? '当前标签' : '暂无标签'}
+                                                    </div>
                                                     {selectedNote.tags.length > 0 && (
-                                                        <div className="space-y-2">
-                                                            <div className="text-xs text-muted-foreground">当前标签</div>
-                                                            <div className="flex flex-wrap gap-2">
-                                                                {selectedNote.tags.map((tag, index) => {
-                                                                    const tagName = typeof tag === 'string' ? tag : (
-                                                                        typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
-                                                                    );
-                                                                    const tagColor = typeof tag === 'object' && tag.color ? tag.color : '#3b82f6';
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {selectedNote.tags.map((tag, index) => {
+                                                                const tagName = typeof tag === 'string' ? tag : (
+                                                                    typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
+                                                                );
+                                                                const tagColor = typeof tag === 'object' && tag.color ? tag.color : '#3b82f6';
 
-                                                                    return (
-                                                                        <Badge
-                                                                            key={index}
-                                                                            className="flex items-center gap-1 px-2 py-1 text-xs"
-                                                                            style={{ backgroundColor: tagColor, color: 'white' }}
+                                                                return (
+                                                                    <Badge
+                                                                        key={index}
+                                                                        className="flex items-center gap-1 px-2 py-1 text-xs"
+                                                                        style={{ backgroundColor: tagColor, color: 'white' }}
+                                                                    >
+                                                                        {tagName}
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                const newTags = selectedNote.tags.filter((_, i) => i !== index);
+                                                                                setSelectedNote({
+                                                                                    ...selectedNote,
+                                                                                    tags: newTags
+                                                                                });
+                                                                            }}
+                                                                            className="ml-1 hover:bg-black/20 rounded-full p-0.5"
                                                                         >
-                                                                            {tagName}
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() => {
-                                                                                    const newTags = selectedNote.tags.filter((_, i) => i !== index);
-                                                                                    setSelectedNote({
-                                                                                        ...selectedNote,
-                                                                                        tags: newTags
-                                                                                    });
-                                                                                }}
-                                                                                className="ml-1 hover:bg-black/20 rounded-full p-0.5"
-                                                                            >
-                                                                                <X className="w-3 h-3" />
-                                                                            </button>
-                                                                        </Badge>
-                                                                    );
-                                                                })}
-                                                            </div>
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                    </Badge>
+                                                                );
+                                                            })}
                                                         </div>
                                                     )}
+                                                </div>
 
-                                                    {/* 添加新标签 */}
-                                                    <div className="space-y-2">
-                                                        <div className="text-xs text-muted-foreground">添加新标签</div>
-                                                        <div className="flex gap-2">
-                                                            <div className="relative flex-1">
-                                                                <Input
-                                                                    value={newTagName}
-                                                                    onChange={(e) => setNewTagName(e.target.value)}
-                                                                    placeholder="输入标签名称"
-                                                                    onKeyPress={(e) => e.key === 'Enter' && addTagToSelectedNote()}
-                                                                    className="pr-12 h-8 text-sm"
+                                                {/* 添加新标签 */}
+                                                <div className="space-y-2">
+                                                    <div className="text-xs text-muted-foreground">添加新标签</div>
+                                                    <div className="flex gap-2">
+                                                        <div className="relative flex-1">
+                                                            <Input
+                                                                value={newTagName}
+                                                                onChange={(e) => setNewTagName(e.target.value)}
+                                                                placeholder="输入标签名称"
+                                                                onKeyPress={(e) => e.key === 'Enter' && addTagToSelectedNote()}
+                                                                className="pr-12 h-8 text-sm"
+                                                            />
+                                                            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center" ref={colorPickerRef}>
+                                                                <button
+                                                                    type="button"
+                                                                    className="h-5 w-5 rounded-full border border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                    style={{ backgroundColor: newTagColor }}
+                                                                    title="选择颜色"
+                                                                    onClick={() => {
+                                                                        setShowColorPicker(!showColorPicker);
+                                                                    }}
                                                                 />
-                                                                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center" ref={colorPickerRef}>
-                                                                    <button
-                                                                        type="button"
-                                                                        className="h-5 w-5 rounded-full border border-gray-300 hover:scale-110 transition-transform cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                                        style={{ backgroundColor: newTagColor }}
-                                                                        title="选择颜色"
-                                                                        onClick={() => {
-                                                                            setShowColorPicker(!showColorPicker);
-                                                                        }}
-                                                                    />
-                                                                    {showColorPicker && (
-                                                                        <div className="absolute top-6 right-0 z-[9999] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-                                                                            <div className="space-y-2">
-                                                                                <div className="text-xs font-medium">选择颜色</div>
-                                                                                <div className="flex flex-wrap gap-2">
-                                                                                    {tagColors.map((color) => (
-                                                                                        <div
-                                                                                            key={color}
-                                                                                            className={`w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform cursor-pointer flex-shrink-0 ${newTagColor === color ? 'ring-2 ring-blue-500' : ''
-                                                                                                }`}
-                                                                                            style={{ backgroundColor: color }}
-                                                                                            onClick={() => {
-                                                                                                setNewTagColor(color);
-                                                                                                setShowColorPicker(false);
-                                                                                            }}
-                                                                                            title={color}
-                                                                                        />
-                                                                                    ))}
-                                                                                </div>
+                                                                {showColorPicker && (
+                                                                    <div className="absolute top-6 right-0 z-[9999] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                                                        <div className="space-y-2">
+                                                                            <div className="text-xs font-medium">选择颜色</div>
+                                                                            <div className="flex flex-wrap gap-2">
+                                                                                {tagColors.map((color) => (
+                                                                                    <div
+                                                                                        key={color}
+                                                                                        className={`w-6 h-6 rounded-full border border-gray-300 hover:scale-110 transition-transform cursor-pointer flex-shrink-0 ${newTagColor === color ? 'ring-2 ring-blue-500' : ''
+                                                                                            }`}
+                                                                                        style={{ backgroundColor: color }}
+                                                                                        onClick={() => {
+                                                                                            setNewTagColor(color);
+                                                                                            setShowColorPicker(false);
+                                                                                        }}
+                                                                                        title={color}
+                                                                                    />
+                                                                                ))}
                                                                             </div>
                                                                         </div>
-                                                                    )}
-                                                                </div>
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                                            <Button
-                                                                type="button"
-                                                                onClick={addTagToSelectedNote}
-                                                                disabled={!newTagName.trim()}
-                                                                size="sm"
-                                                                className="h-8 px-3 rounded-full text-white hover:opacity-90 transition-opacity text-xs"
-                                                                style={{
-                                                                    backgroundColor: newTagColor,
-                                                                    borderColor: newTagColor
-                                                                }}
-                                                            >
-                                                                添加
-                                                            </Button>
                                                         </div>
+                                                        <Button
+                                                            type="button"
+                                                            onClick={addTagToSelectedNote}
+                                                            disabled={!newTagName.trim()}
+                                                            size="sm"
+                                                            className="h-8 px-3 rounded-full text-white hover:opacity-90 transition-opacity text-xs"
+                                                            style={{
+                                                                backgroundColor: newTagColor,
+                                                                borderColor: newTagColor
+                                                            }}
+                                                        >
+                                                            添加
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                            </HoverCardContent>
-                                        </HoverCard>
-                                    )}
+                                            </div>
+                                        </HoverCardContent>
+                                    </HoverCard>
                                 </div>
                             </div>
 
