@@ -27,7 +27,9 @@ import {
     Eye,
     Loader2,
     X,
-    RemoveFormatting
+    RemoveFormatting,
+    Eraser,
+    Palette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1325,7 +1327,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 <div
                     ref={toolbarRef}
                     className={cn(
-                        "rich-text-editor-toolbar px-4 py-3 flex flex-wrap items-center gap-1 border-b bg-background/80 backdrop-blur-md",
+                        "rich-text-editor-toolbar px-4 py-1 flex flex-wrap items-center gap-1 border-b bg-background/80 backdrop-blur-md",
                         stickyToolbar ? "rich-text-editor-toolbar-sticky" : ""
                     )}
                     style={stickyToolbar ? {
@@ -1339,6 +1341,29 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         backdropFilter: 'blur(8px)'
                     } : undefined}
                 >
+
+                    {/* 清除格式 - 移到最左侧 */}
+                    <div className="flex items-center gap-0.5">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className={TOOLBAR_BUTTON_CLASSES}
+                                    onClick={clearAllFormatting}
+                                >
+                                    <Eraser className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>清除所有格式</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+
+                    {/* 分隔线 */}
+                    <div className="h-6 w-px bg-border/60 mx-1"></div>
 
                     {/* 文本格式 */}
                     <div className="flex items-center gap-0.5">
@@ -1430,30 +1455,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
-                        {/* 分隔线 */}
-                        <div className="h-6 w-px bg-border/60 mx-1"></div>
-
-                        {/* 清除格式 */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={clearAllFormatting}
-                                >
-                                    <RemoveFormatting className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>清除所有格式</p>
-                            </TooltipContent>
-                        </Tooltip>
                     </div>
 
-                    {/* 标题选择器 */}
+                    {/* 分隔线 */}
+                    <div className="h-6 w-px bg-border/60 mx-1"></div>
+
+                    {/* 布局和结构工具组 - 标题、列表、对齐方式 */}
                     <div className="flex items-center gap-0.5">
+                        {/* 标题选择器 */}
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1491,10 +1500,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
 
-                    {/* 列表下拉菜单 */}
-                    <div className="flex items-center gap-0.5">
+                        {/* 列表下拉菜单 */}
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1519,13 +1526,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
 
-                    {/* 对齐方式下拉菜单 */}
-                    {/* 分隔线 */}
-                    <div className="h-6 w-px bg-border/60"></div>
-
-                    <div className="flex items-center gap-0.5">
+                        {/* 对齐方式下拉菜单 */}
                         <DropdownMenu>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1560,10 +1562,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </DropdownMenu>
                     </div>
 
-                    {/* 颜色按钮组 */}
                     {/* 分隔线 */}
-                    <div className="h-6 w-px bg-border/60"></div>
+                    <div className="h-6 w-px bg-border/60 mx-1"></div>
 
+                    {/* 颜色工具组 */}
                     <div className="flex items-center gap-0.5">
                         {/* 文字颜色 */}
                         <Popover>
@@ -1593,7 +1595,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 // }
                                             }}
                                         >
-                                            <Type className="w-4 h-4" />
+                                            <Palette className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
                                 </TooltipTrigger>
@@ -1680,7 +1682,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                     {/* 插入链接和图片 */}
                     {/* 分隔线 */}
-                    <div className="h-6 w-px bg-border/60"></div>
+                    <div className="h-6 w-px bg-border/60 mx-1"></div>
 
                     <div className="flex items-center gap-0.5">
                         <Tooltip>
