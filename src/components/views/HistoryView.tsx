@@ -188,7 +188,6 @@ export function ExerciseRecordView({
         };
 
         onUpdateRecord(updatedRecord);
-        toast.success('记录更新成功');
         handleCloseEditSheet();
     };
 
@@ -269,7 +268,6 @@ export function ExerciseRecordView({
         };
 
         onAddRecord(newRecord);
-        toast.success('记录添加成功');
         handleCloseAddSheet();
     };
 

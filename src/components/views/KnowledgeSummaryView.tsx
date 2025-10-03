@@ -619,8 +619,14 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 </DialogContent>
             </Dialog>
             {/* 编辑弹窗 */}
-            <Dialog open={editDialogOpen || !!editError} onOpenChange={v => { setEditDialogOpen(v); if (!v) setEditError(""); }}>
-                <DialogContent>
+            <Dialog
+                open={editDialogOpen || !!editError}
+                onOpenChange={v => {
+                    setEditDialogOpen(v);
+                    if (!v) setEditError("");
+                }}
+            >
+                <DialogContent className="max-w-4xl w-full">
                     <DialogHeader>
                         <DialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</DialogTitle>
                         {editError && (
@@ -641,6 +647,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     )}
                 </DialogContent>
             </Dialog>
+
         </div>
     );
 };

@@ -32,6 +32,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
 import { LatexRichTextEditor } from "@/components/rich-text-editors/LatexRichTextEditor";
+import { FullscreenLatexEditor } from "@/components/rich-text-editors/FullscreenLatexEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
@@ -416,16 +417,22 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       }
     };
 
+    // 编辑器高度设置
+    const editorMinHeight = "300px";
+    const editorMaxHeight = "600px";
+
     return (
       <div className="rich-text-editor-wrapper">
-        <LatexRichTextEditor
+        {/* 统一使用独立的全屏编辑器，无论是知识点汇总还是知识点录入 */}
+        <FullscreenLatexEditor
           content={currentValue || ''}
           onChange={(value) => setValue('secondField', value || '')}
           placeholder={fieldConfig.secondPlaceholder}
           className="w-full"
-          editorMinHeight="300px"
-          editorMaxHeight="600px"
+          editorMinHeight={editorMinHeight}
+          editorMaxHeight={editorMaxHeight}
           stickyToolbar={true}
+          isInDialog={isInDialog}
         />
       </div>
     );

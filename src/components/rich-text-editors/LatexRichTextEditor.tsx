@@ -12,6 +12,8 @@ interface LatexRichTextEditorProps {
     editorMinHeight?: string;
     editorMaxHeight?: string;
     stickyToolbar?: boolean;
+    showFullscreenButton?: boolean;
+    onFullscreenToggle?: () => void;
 }
 
 export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
@@ -21,7 +23,9 @@ export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
     className = '',
     editorMinHeight = '300px',
     editorMaxHeight = '600px',
-    stickyToolbar = false
+    stickyToolbar = false,
+    showFullscreenButton = true,
+    onFullscreenToggle
 }) => {
     return (
         <div
@@ -40,6 +44,8 @@ export const LatexRichTextEditor: React.FC<LatexRichTextEditorProps> = ({
                 stickyToolbar={stickyToolbar}
                 customMinHeight={editorMinHeight}
                 customMaxHeight={editorMaxHeight}
+                showFullscreenButton={showFullscreenButton}
+                onFullscreenToggle={onFullscreenToggle}
             />
         </div>
     );

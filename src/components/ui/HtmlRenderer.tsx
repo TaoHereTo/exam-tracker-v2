@@ -93,8 +93,8 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
             className={`html-content ${className}`}
             data-color-mode={isDarkMode ? 'dark' : 'light'}
             style={{
-                fontSize: '14px',
-                lineHeight: '1.5',
+                fontSize: '16px',
+                lineHeight: '1.6',
                 fontFamily: 'inherit'
             }}
         />
