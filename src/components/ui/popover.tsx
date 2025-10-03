@@ -26,7 +26,7 @@ function PopoverContent({ className, children, ...props }: React.ComponentProps<
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
         className={cn(
-          "z-50 w-auto rounded-md border p-4 outline-none",
+          "z-[10001] w-auto rounded-md border p-4 outline-none",
           "bg-white dark:bg-black",
           "border-[color:var(--input-border)]",
           "text-black dark:text-white",

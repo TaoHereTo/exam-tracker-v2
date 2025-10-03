@@ -133,6 +133,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
     const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+    const selectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
@@ -166,6 +167,15 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             }
         }
     }, [content]);
+
+    // 清理定时器
+    useEffect(() => {
+        return () => {
+            if (selectionTimeoutRef.current) {
+                clearTimeout(selectionTimeoutRef.current);
+            }
+        };
+    }, []);
 
     // 初始化占位文字状态
     useEffect(() => {
@@ -349,7 +359,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     };
 
     const execCommand = (command: string, value?: string) => {
-        if (!editorRef.current) return;
+        if (!editorRef.current) {
+            return;
+        }
 
         // 确保编辑器有焦点
         editorRef.current.focus();
@@ -422,7 +434,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     };
 
     const handleFormatCommand = (command: string, value?: string) => {
-        if (!editorRef.current) return;
+        if (!editorRef.current) {
+            return;
+        }
 
         editorRef.current.focus();
 
@@ -949,37 +963,29 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     // 保存当前选区
     const saveCurrentSelection = () => {
-        console.log('=== 保存选区 ===');
-        const selection = window.getSelection();
-        console.log('当前选区对象:', selection);
-        console.log('选区数量:', selection?.rangeCount);
-
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const selectedText = range.toString();
-
-            console.log('选中的文字:', `"${selectedText}"`);
-            console.log('选中文字长度:', selectedText.length);
-            console.log('开始容器:', range.startContainer);
-            console.log('结束容器:', range.endContainer);
-            console.log('开始偏移:', range.startOffset);
-            console.log('结束偏移:', range.endOffset);
-
-            // 只有在真正选中文字时才保存选区
-            if (selectedText.length > 0) {
-                savedSelectionRef.current = {
-                    startContainer: range.startContainer,
-                    startOffset: range.startOffset,
-                    endContainer: range.endContainer,
-                    endOffset: range.endOffset
-                };
-                console.log('✅ 选区已保存（有选中文字）');
-            } else {
-                console.log('❌ 没有选中文字，不保存选区');
-            }
-        } else {
-            console.log('❌ 没有选区可保存');
+        // 清除之前的定时器
+        if (selectionTimeoutRef.current) {
+            clearTimeout(selectionTimeoutRef.current);
         }
+
+        // 设置新的定时器，防抖处理
+        selectionTimeoutRef.current = setTimeout(() => {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const selectedText = range.toString();
+
+                // 只有在真正选中文字时才保存选区
+                if (selectedText.length > 0) {
+                    savedSelectionRef.current = {
+                        startContainer: range.startContainer,
+                        startOffset: range.startOffset,
+                        endContainer: range.endContainer,
+                        endOffset: range.endOffset
+                    };
+                }
+            }
+        }, 100);
     };
 
     // 检测当前选区是否包含特定格式
@@ -1820,12 +1826,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 e.currentTarget.focus();
                             }}
                             onMouseDown={(e) => {
-                                // 阻止事件冒泡，防止全屏模式意外关闭
-                                e.stopPropagation();
+                                // 不阻止事件，让编辑器正常工作
                             }}
                             onClick={(e) => {
-                                // 阻止事件冒泡，防止全屏模式意外关闭
-                                e.stopPropagation();
+                                // 不阻止事件，让编辑器正常工作
                             }}
                             onBlur={() => {
                                 // 在失去焦点时进行清理和LaTeX处理，避免在编辑过程中干扰
@@ -1849,30 +1853,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 }
                             }}
                             onMouseUp={(e) => {
-                                // 阻止事件冒泡，防止全屏模式意外关闭
-                                e.stopPropagation();
-                                // 临时禁用选区保存和按钮状态更新，测试是否解决全屏关闭问题
-                                // const selection = window.getSelection();
-                                // if (selection && selection.rangeCount > 0) {
-                                //     const range = selection.getRangeAt(0);
-                                //     const selectedText = range.toString();
-                                //     if (selectedText.length > 0) {
-                                //         saveCurrentSelection();
-                                //     }
-                                // }
-                                // updateButtonStates();
+                                // 使用防抖的选区保存
+                                saveCurrentSelection();
+                                updateButtonStates();
                             }}
                             onKeyUp={() => {
-                                // 临时禁用键盘事件中的选区保存和按钮状态更新
-                                // const selection = window.getSelection();
-                                // if (selection && selection.rangeCount > 0) {
-                                //     const range = selection.getRangeAt(0);
-                                //     const selectedText = range.toString();
-                                //     if (selectedText.length > 0) {
-                                //         saveCurrentSelection();
-                                //     }
-                                // }
-                                // updateButtonStates();
+                                // 使用防抖的选区保存
+                                saveCurrentSelection();
+                                updateButtonStates();
                             }}
                             onKeyDown={(e) => {
                                 // 智能处理删除键
@@ -2554,6 +2542,34 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           /* 全屏模式下tooltip显示修复 */
           body:has(.rich-text-editor-fullscreen) [data-slot="tooltip-overlay"] {
             z-index: 99999 !important;
+          }
+
+          /* 全屏模式下确保所有交互元素都能正常工作 */
+          [data-fullscreen-container="true"] * {
+            pointer-events: auto !important;
+          }
+
+          [data-fullscreen-container="true"] button,
+          [data-fullscreen-container="true"] input,
+          [data-fullscreen-container="true"] textarea,
+          [data-fullscreen-container="true"] select,
+          [data-fullscreen-container="true"] [contenteditable],
+          [data-fullscreen-container="true"] [tabindex],
+          [data-fullscreen-container="true"] [role="button"] {
+            pointer-events: auto !important;
+            user-select: auto !important;
+            z-index: auto !important;
+          }
+
+          /* 确保工具栏在全屏模式下正常工作 */
+          [data-fullscreen-container="true"] .rich-text-editor-toolbar {
+            pointer-events: auto !important;
+            z-index: 1000 !important;
+          }
+
+          [data-fullscreen-container="true"] .rich-text-editor-toolbar button {
+            pointer-events: auto !important;
+            cursor: pointer !important;
           }
 
           /* 美化工具栏样式 */

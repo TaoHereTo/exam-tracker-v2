@@ -61,7 +61,7 @@ const DropdownMenuSubContent = React.forwardRef<
       <DropdownMenuPrimitive.SubContent
         ref={ref}
         className={cn(
-          "z-50 min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-lg",
+          "z-[10001] min-w-[8rem] overflow-hidden rounded-md border p-1 shadow-lg",
           "bg-white dark:bg-black",
           "border-[color:var(--input-border)]",
           "text-black dark:text-white",
