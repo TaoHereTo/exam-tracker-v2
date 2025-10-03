@@ -24,7 +24,8 @@ import {
     List,
     ChevronDown,
     Eye,
-    Edit3
+    Edit3,
+    X
 } from "lucide-react";
 import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
 import { HtmlRenderer } from "@/components/ui/HtmlRenderer";
@@ -47,12 +48,18 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-with-animation";
+// 标签数据类型
+interface NoteTag {
+    name: string;
+    color: string;
+}
+
 // 笔记数据类型
 interface Note {
     id: string;
     title: string;
     content: string;
-    tags: string[];
+    tags: NoteTag[];
     createdAt: string;
     updatedAt: string;
     isFavorite?: boolean;
@@ -66,7 +73,9 @@ export default function NotesView() {
     const [isCreating, setIsCreating] = useState(false);
     const [newNoteTitle, setNewNoteTitle] = useState("");
     const [newNoteContent, setNewNoteContent] = useState("");
-    const [newNoteTags, setNewNoteTags] = useState("");
+    const [newNoteTags, setNewNoteTags] = useState<NoteTag[]>([]);
+    const [newTagName, setNewTagName] = useState("");
+    const [newTagColor, setNewTagColor] = useState("#3b82f6");
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [noteToDelete, setNoteToDelete] = useState<Note | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -76,16 +85,43 @@ export default function NotesView() {
     const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
     const { user } = useAuth();
 
+    // 预定义的颜色选项
+    const tagColors = [
+        "#3b82f6", // 蓝色
+        "#ef4444", // 红色
+        "#10b981", // 绿色
+        "#f59e0b", // 黄色
+        "#8b5cf6", // 紫色
+        "#06b6d4", // 青色
+        "#f97316", // 橙色
+        "#84cc16", // 青绿色
+        "#ec4899", // 粉色
+        "#6b7280", // 灰色
+    ];
+
     // 获取所有标签
-    const allTags = Array.from(new Set(notes.flatMap(note => note.tags)));
+    const allTags = Array.from(new Set(notes.flatMap(note => note.tags.map(tag => tag.name))));
 
     // 过滤笔记
     const filteredNotes = notes.filter(note => {
         const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             note.content.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesTag = !selectedTag || note.tags.includes(selectedTag);
+        const matchesTag = !selectedTag || note.tags.some(tag => tag.name === selectedTag);
         return matchesSearch && matchesTag;
     });
+
+    // 添加标签
+    const addTag = () => {
+        if (newTagName.trim() && !newNoteTags.some(tag => tag.name === newTagName.trim())) {
+            setNewNoteTags([...newNoteTags, { name: newTagName.trim(), color: newTagColor }]);
+            setNewTagName("");
+        }
+    };
+
+    // 删除标签
+    const removeTag = (tagName: string) => {
+        setNewNoteTags(newNoteTags.filter(tag => tag.name !== tagName));
+    };
 
     // 加载笔记数据
     const loadNotes = async () => {
@@ -103,7 +139,7 @@ export default function NotesView() {
                 id: cloudNote.id,
                 title: cloudNote.title,
                 content: cloudNote.content,
-                tags: cloudNote.tags,
+                tags: cloudNote.tags.map((tag: string) => ({ name: tag, color: "#3b82f6" })), // 默认蓝色
                 createdAt: cloudNote.created_at,
                 updatedAt: cloudNote.updated_at,
                 isFavorite: cloudNote.is_favorite
@@ -163,16 +199,10 @@ export default function NotesView() {
         try {
             setIsSaving(true);
 
-            // 支持中英文逗号分割标签
-            const tags = newNoteTags
-                .split(/[,，]/) // 支持英文逗号和中文逗号
-                .map(tag => tag.trim())
-                .filter(tag => tag);
-
             const cloudNote = await notesService.createNote({
                 title: newNoteTitle,
                 content: newNoteContent,
-                tags: tags,
+                tags: newNoteTags.map(tag => tag.name),
                 is_favorite: false,
                 is_archived: false
             });
@@ -182,7 +212,7 @@ export default function NotesView() {
                 id: cloudNote.id,
                 title: cloudNote.title,
                 content: cloudNote.content,
-                tags: cloudNote.tags,
+                tags: newNoteTags, // 使用带颜色的标签
                 createdAt: cloudNote.created_at,
                 updatedAt: cloudNote.updated_at,
                 isFavorite: cloudNote.is_favorite
@@ -193,7 +223,9 @@ export default function NotesView() {
             setIsCreating(false);
             setNewNoteTitle("");
             setNewNoteContent("");
-            setNewNoteTags("");
+            setNewNoteTags([]);
+            setNewTagName("");
+            setNewTagColor("#3b82f6");
 
             // 更新为成功状态
             if (toastId && updateToSuccess) {
@@ -236,7 +268,7 @@ export default function NotesView() {
             const cloudNote = await notesService.updateNote(selectedNote.id, {
                 title: selectedNote.title,
                 content: selectedNote.content,
-                tags: selectedNote.tags,
+                tags: selectedNote.tags.map(tag => tag.name),
                 is_favorite: selectedNote.isFavorite || false,
                 is_archived: false
             });
@@ -246,7 +278,7 @@ export default function NotesView() {
                 id: cloudNote.id,
                 title: cloudNote.title,
                 content: cloudNote.content,
-                tags: cloudNote.tags,
+                tags: cloudNote.tags.map((tag: string) => ({ name: tag, color: "#3b82f6" })), // 默认蓝色
                 createdAt: cloudNote.created_at,
                 updatedAt: cloudNote.updated_at,
                 isFavorite: cloudNote.is_favorite
@@ -356,12 +388,12 @@ export default function NotesView() {
                 fileExtension = 'json';
                 break;
             case 'txt':
-                content = `标题: ${note.title}\n\n创建时间: ${note.createdAt}\n更新时间: ${note.updatedAt}\n\n标签: ${note.tags.join(', ')}\n\n内容:\n${note.content.replace(/<[^>]*>/g, '')}`;
+                content = `标题: ${note.title}\n\n创建时间: ${note.createdAt}\n更新时间: ${note.updatedAt}\n\n标签: ${note.tags.map(tag => tag.name).join(', ')}\n\n内容:\n${note.content.replace(/<[^>]*>/g, '')}`;
                 mimeType = 'text/plain';
                 fileExtension = 'txt';
                 break;
             case 'md':
-                content = `# ${note.title}\n\n**创建时间:** ${note.createdAt}\n**更新时间:** ${note.updatedAt}\n\n**标签:** ${note.tags.map(tag => `#${tag}`).join(' ')}\n\n---\n\n${note.content.replace(/<[^>]*>/g, '')}`;
+                content = `# ${note.title}\n\n**创建时间:** ${note.createdAt}\n**更新时间:** ${note.updatedAt}\n\n**标签:** ${note.tags.map(tag => `#${tag.name}`).join(' ')}\n\n---\n\n${note.content.replace(/<[^>]*>/g, '')}`;
                 mimeType = 'text/markdown';
                 fileExtension = 'md';
                 break;
@@ -385,7 +417,7 @@ export default function NotesView() {
                         <div class="meta">
                             <p><strong>创建时间:</strong> ${note.createdAt}</p>
                             <p><strong>更新时间:</strong> ${note.updatedAt}</p>
-                            <p><strong>标签:</strong> ${note.tags.join(', ')}</p>
+                            <p><strong>标签:</strong> ${note.tags.map(tag => tag.name).join(', ')}</p>
                         </div>
                         <div class="content">
                             ${note.content.replace(/<[^>]*>/g, '')}
@@ -422,7 +454,7 @@ export default function NotesView() {
                 user_id: user?.id || '',
                 title: note.title,
                 content: note.content,
-                tags: note.tags,
+                tags: note.tags.map(tag => tag.name),
                 is_favorite: note.isFavorite || false,
                 is_archived: false,
                 created_at: note.createdAt,
@@ -611,9 +643,13 @@ export default function NotesView() {
                                                                 </p>
                                                                 {note.tags.length > 0 && (
                                                                     <div className="flex flex-wrap gap-1 mt-2">
-                                                                        {note.tags.map(tag => (
-                                                                            <Badge key={tag} variant="secondary" className="text-xs">
-                                                                                {tag}
+                                                                        {note.tags.map((tag, index) => (
+                                                                            <Badge
+                                                                                key={index}
+                                                                                className="text-xs text-white"
+                                                                                style={{ backgroundColor: tag.color }}
+                                                                            >
+                                                                                {tag.name}
                                                                             </Badge>
                                                                         ))}
                                                                     </div>
@@ -859,16 +895,65 @@ export default function NotesView() {
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="note-tags">标签</Label>
-                                <Input
-                                    id="note-tags"
-                                    value={newNoteTags}
-                                    onChange={(e) => setNewNoteTags(e.target.value)}
-                                    placeholder="输入标签，用逗号分隔，如：学习,重要,复习"
-                                />
+                            <div className="space-y-4">
+                                <Label>标签</Label>
+
+                                {/* 已添加的标签 */}
+                                {newNoteTags.length > 0 && (
+                                    <div className="flex flex-wrap gap-2">
+                                        {newNoteTags.map((tag, index) => (
+                                            <Badge
+                                                key={index}
+                                                className="flex items-center gap-1 px-2 py-1 text-xs"
+                                                style={{ backgroundColor: tag.color, color: 'white' }}
+                                            >
+                                                {tag.name}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeTag(tag.name)}
+                                                    className="ml-1 hover:bg-black/20 rounded-full p-0.5"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* 添加新标签 */}
+                                <div className="flex gap-2">
+                                    <Input
+                                        value={newTagName}
+                                        onChange={(e) => setNewTagName(e.target.value)}
+                                        placeholder="输入标签名称"
+                                        onKeyPress={(e) => e.key === 'Enter' && addTag()}
+                                        className="flex-1"
+                                    />
+                                    <div className="flex gap-1">
+                                        {tagColors.map((color) => (
+                                            <button
+                                                key={color}
+                                                type="button"
+                                                onClick={() => setNewTagColor(color)}
+                                                className={`w-6 h-6 rounded-full border-2 ${newTagColor === color ? 'border-gray-400' : 'border-gray-200'
+                                                    }`}
+                                                style={{ backgroundColor: color }}
+                                                title={color}
+                                            />
+                                        ))}
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        onClick={addTag}
+                                        disabled={!newTagName.trim()}
+                                        size="sm"
+                                        className="px-3"
+                                    >
+                                        添加
+                                    </Button>
+                                </div>
                                 <p className="text-sm text-muted-foreground">
-                                    多个标签请用逗号分隔，支持中英文标签
+                                    输入标签名称，选择颜色，然后点击添加
                                 </p>
                             </div>
                         </div>
