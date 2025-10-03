@@ -130,7 +130,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     onFullscreenToggle
 }) => {
     // 统一的按钮样式常量
-    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg hover:bg-accent transition-colors duration-150";
+    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg hover:bg-transparent hover:shadow-none active:bg-transparent active:shadow-none focus:bg-transparent focus:shadow-none";
 
     const editorRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
