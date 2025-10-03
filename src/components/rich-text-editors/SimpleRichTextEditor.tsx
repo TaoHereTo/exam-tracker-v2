@@ -370,24 +370,44 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         // 确保编辑器有焦点
         editorRef.current.focus();
 
+        // 对于列表命令，确保有选区
+        if (command === 'insertUnorderedList' || command === 'insertOrderedList') {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) {
+                // 如果没有选区，在编辑器末尾创建一个
+                const range = document.createRange();
+                range.selectNodeContents(editorRef.current);
+                range.collapse(false);
+                selection?.removeAllRanges();
+                selection?.addRange(range);
+            }
+        }
+
         // 执行命令
         const success = document.execCommand(command, false, value);
+        console.log(`执行命令: ${command}, 成功: ${success}`);
 
         if (success) {
-            // 移除强制光标控制，让浏览器自然处理光标位置
+            // 立即更新内容
+            const html = editorRef.current.innerHTML;
+            console.log('执行命令后的HTML:', html);
+            onChange(html);
 
-            // 清理空内容
-            setTimeout(() => {
-                if (editorRef.current) {
-                    const html = editorRef.current.innerHTML;
-                    const cleanedHtml = cleanEmptyContent(html);
+            // 对于列表命令，暂时不清理内容，让列表正常显示
+            if (command !== 'insertUnorderedList' && command !== 'insertOrderedList') {
+                // 清理空内容
+                setTimeout(() => {
+                    if (editorRef.current) {
+                        const html = editorRef.current.innerHTML;
+                        const cleanedHtml = cleanEmptyContent(html);
 
-                    if (cleanedHtml !== html) {
-                        editorRef.current.innerHTML = cleanedHtml;
-                        onChange(cleanedHtml);
+                        if (cleanedHtml !== html) {
+                            editorRef.current.innerHTML = cleanedHtml;
+                            onChange(cleanedHtml);
+                        }
                     }
-                }
-            }, 20);
+                }, 20);
+            }
         }
     };
 
@@ -1523,25 +1543,60 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[80px]">
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'div')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'div');
+                                    }}
+                                >
                                     正文
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h1')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h1');
+                                    }}
+                                >
                                     标题 1
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h2')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h2');
+                                    }}
+                                >
                                     标题 2
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h3')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h3');
+                                    }}
+                                >
                                     标题 3
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h4')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h4');
+                                    }}
+                                >
                                     标题 4
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h5')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h5');
+                                    }}
+                                >
                                     标题 5
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => execCommand('formatBlock', 'h6')}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('formatBlock', 'h6');
+                                    }}
+                                >
                                     标题 6
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
@@ -1572,55 +1627,35 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        // 确保编辑器有焦点
+                                        if (editorRef.current) {
+                                            editorRef.current.focus();
                                         }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('insertUnorderedList');
-                                }}>
+                                        // 使用 setTimeout 确保焦点设置后再执行命令
+                                        setTimeout(() => {
+                                            execCommand('insertUnorderedList');
+                                        }, 10);
+                                    }}
+                                >
                                     <List className="w-3 h-3 mr-2" />
                                     无序列表
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        // 确保编辑器有焦点
+                                        if (editorRef.current) {
+                                            editorRef.current.focus();
                                         }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('insertOrderedList');
-                                }}>
+                                        // 使用 setTimeout 确保焦点设置后再执行命令
+                                        setTimeout(() => {
+                                            execCommand('insertOrderedList');
+                                        }, 10);
+                                    }}
+                                >
                                     <ListOrdered className="w-3 h-3 mr-2" />
                                     有序列表
                                 </DropdownMenuItem>
@@ -1652,107 +1687,39 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
-                                        }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('justifyLeft');
-                                }}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('justifyLeft');
+                                    }}
+                                >
                                     <AlignLeft className="w-3 h-3 mr-2" />
                                     左对齐
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
-                                        }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('justifyCenter');
-                                }}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('justifyCenter');
+                                    }}
+                                >
                                     <AlignCenter className="w-3 h-3 mr-2" />
                                     居中
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
-                                        }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('justifyRight');
-                                }}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('justifyRight');
+                                    }}
+                                >
                                     <AlignRight className="w-3 h-3 mr-2" />
                                     右对齐
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => {
-                                    // 确保编辑器有焦点
-                                    if (editorRef.current) {
-                                        editorRef.current.focus();
-                                    }
-                                    
-                                    // 尝试恢复选区，如果失败则使用当前位置
-                                    const restored = restoreSelection(savedSelectionRef.current);
-                                    if (!restored && editorRef.current) {
-                                        // 如果没有选区，在编辑器末尾创建一个
-                                        const selection = window.getSelection();
-                                        if (selection) {
-                                            const range = document.createRange();
-                                            range.selectNodeContents(editorRef.current);
-                                            range.collapse(false);
-                                            selection.removeAllRanges();
-                                            selection.addRange(range);
-                                        }
-                                    }
-                                    
-                                    // 执行命令
-                                    execCommand('justifyFull');
-                                }}>
+                                <DropdownMenuItem
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        execCommand('justifyFull');
+                                    }}
+                                >
                                     <AlignJustify className="w-3 h-3 mr-2" />
                                     两端对齐
                                 </DropdownMenuItem>
@@ -2237,7 +2204,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 )}
 
                 <style jsx global>{`
-          .rich-text-editor [contenteditable] {
+          .rich-text-editor [contenteditable],
+          .rich-text-editor-unified [contenteditable] {
             outline: none;
             cursor: text;
             padding: 16px;
@@ -2252,11 +2220,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             /* 移除height限制，让内容自然扩展 */
           }
           
-          .rich-text-editor [contenteditable]:focus {
+          .rich-text-editor [contenteditable]:focus,
+          .rich-text-editor-unified [contenteditable]:focus {
             outline: none;
           }
           
-          .rich-text-editor [contenteditable]:focus-visible {
+          .rich-text-editor [contenteditable]:focus-visible,
+          .rich-text-editor-unified [contenteditable]:focus-visible {
             outline: none;
           }
           
@@ -2379,21 +2349,24 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           }
           
           /* 强制列表样式 */
-          .rich-text-editor [contenteditable] ul {
+          .rich-text-editor [contenteditable] ul,
+          .rich-text-editor-unified [contenteditable] ul {
             list-style-type: disc !important;
             padding-left: 24px !important;
             margin: 8px 0 !important;
             display: block !important;
           }
           
-          .rich-text-editor [contenteditable] ol {
+          .rich-text-editor [contenteditable] ol,
+          .rich-text-editor-unified [contenteditable] ol {
             list-style-type: decimal !important;
             padding-left: 24px !important;
             margin: 8px 0 !important;
             display: block !important;
           }
           
-          .rich-text-editor [contenteditable] li {
+          .rich-text-editor [contenteditable] li,
+          .rich-text-editor-unified [contenteditable] li {
             margin: 4px 0 !important;
             display: list-item !important;
           }
