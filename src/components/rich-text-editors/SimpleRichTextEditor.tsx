@@ -1740,7 +1740,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>增加缩进 (Tab)</p>
+                                <p>增加缩进</p>
                             </TooltipContent>
                         </Tooltip>
                     </div>
@@ -2777,12 +2777,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
           }
 
           .rich-text-editor-toolbar button:hover {
-            transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
           }
 
           .rich-text-editor-toolbar button:active {
-            transform: translateY(0);
+            /* 移除active状态的transform效果 */
           }
           
           /* 图片加载状态样式 */
