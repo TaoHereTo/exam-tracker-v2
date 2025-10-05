@@ -133,10 +133,15 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             element.style.setProperty('z-index', 'auto', 'important');
                         });
 
-                        // 确保编辑器获得焦点 - 使用重试机制
+                        // 确保编辑器获得焦点 - 使用重试机制，但避免重复聚焦
                         const focusEditor = () => {
                             const editorElement = fullscreenContainer.querySelector('[contenteditable]') as HTMLElement;
                             if (editorElement) {
+                                // 检查是否已经有焦点，避免重复聚焦
+                                if (document.activeElement === editorElement) {
+                                    return true;
+                                }
+
                                 editorElement.focus();
                                 // 确保光标在编辑器末尾
                                 const range = document.createRange();
@@ -150,16 +155,13 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             return false;
                         };
 
-                        // 立即尝试聚焦
-                        if (!focusEditor()) {
-                            // 如果失败，延迟重试
-                            setTimeout(() => {
-                                if (!focusEditor()) {
-                                    // 再次重试
-                                    setTimeout(focusEditor, 100);
-                                }
-                            }, 50);
-                        }
+                        // 延迟聚焦，避免与组件初始化冲突
+                        setTimeout(() => {
+                            if (!focusEditor()) {
+                                // 如果失败，再次重试
+                                setTimeout(focusEditor, 100);
+                            }
+                        }, 200);
                     }
                 }, 100);
             }
@@ -216,10 +218,15 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                                 el.style.setProperty('bottom', '0', 'important');
                                 el.style.setProperty('pointer-events', 'auto', 'important');
 
-                                // 确保编辑器获得焦点 - 使用多个时机尝试
+                                // 确保编辑器获得焦点 - 使用多个时机尝试，但避免重复聚焦
                                 const focusEditor = () => {
                                     const editorElement = el.querySelector('[contenteditable]') as HTMLElement;
                                     if (editorElement) {
+                                        // 检查是否已经有焦点，避免重复聚焦
+                                        if (document.activeElement === editorElement) {
+                                            return true;
+                                        }
+
                                         editorElement.focus();
                                         // 确保光标在编辑器末尾
                                         const range = document.createRange();
@@ -233,25 +240,27 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                                     return false;
                                 };
 
-                                // 立即尝试聚焦
-                                if (!focusEditor()) {
-                                    // 如果失败，使用MutationObserver监听DOM变化
-                                    const observer = new MutationObserver(() => {
-                                        if (focusEditor()) {
+                                // 延迟聚焦，避免与组件初始化冲突
+                                setTimeout(() => {
+                                    if (!focusEditor()) {
+                                        // 如果失败，使用MutationObserver监听DOM变化
+                                        const observer = new MutationObserver(() => {
+                                            if (focusEditor()) {
+                                                observer.disconnect();
+                                            }
+                                        });
+
+                                        observer.observe(el, {
+                                            childList: true,
+                                            subtree: true
+                                        });
+
+                                        // 设置超时，避免无限等待
+                                        setTimeout(() => {
                                             observer.disconnect();
-                                        }
-                                    });
-
-                                    observer.observe(el, {
-                                        childList: true,
-                                        subtree: true
-                                    });
-
-                                    // 设置超时，避免无限等待
-                                    setTimeout(() => {
-                                        observer.disconnect();
-                                    }, 1000);
-                                }
+                                        }, 1000);
+                                    }
+                                }, 200);
                             }
                         }}
                         data-fullscreen-container="true"

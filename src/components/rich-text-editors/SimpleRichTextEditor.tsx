@@ -157,9 +157,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             const selection = window.getSelection();
             if (!selection) return false;
 
+            // 检查保存的选区是否仍然有效
+            const { startContainer, startOffset, endContainer, endOffset } = savedSelectionRef.current;
+
+            // 验证节点是否仍然在DOM中
+            if (!editorRef.current.contains(startContainer) || !editorRef.current.contains(endContainer)) {
+                return false;
+            }
+
             const range = document.createRange();
-            range.setStart(savedSelectionRef.current.startContainer, savedSelectionRef.current.startOffset);
-            range.setEnd(savedSelectionRef.current.endContainer, savedSelectionRef.current.endOffset);
+            range.setStart(startContainer, startOffset);
+            range.setEnd(endContainer, endOffset);
 
             selection.removeAllRanges();
             selection.addRange(range);
@@ -204,10 +212,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             const html = editorRef.current.innerHTML;
             onChange(html);
 
-            // 延迟恢复选区
+            // 延迟恢复选区，使用更长的延迟确保DOM更新完成
             setTimeout(() => {
-                restoreSelection();
-            }, 10);
+                const restored = restoreSelection();
+                if (!restored) {
+                    // 如果恢复失败，尝试重新聚焦编辑器
+                    editorRef.current?.focus();
+                }
+            }, 50);
         }
     };
 
@@ -299,10 +311,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             onChange(html);
         }
 
-        // 延迟恢复选区
+        // 延迟恢复选区，使用更长的延迟确保DOM更新完成
         setTimeout(() => {
-            restoreSelection();
-        }, 10);
+            const restored = restoreSelection();
+            if (!restored) {
+                // 如果恢复失败，尝试重新聚焦编辑器
+                editorRef.current?.focus();
+            }
+        }, 50);
     };
 
     // 设置背景颜色
@@ -341,10 +357,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             onChange(html);
         }
 
-        // 延迟恢复选区
+        // 延迟恢复选区，使用更长的延迟确保DOM更新完成
         setTimeout(() => {
-            restoreSelection();
-        }, 10);
+            const restored = restoreSelection();
+            if (!restored) {
+                // 如果恢复失败，尝试重新聚焦编辑器
+                editorRef.current?.focus();
+            }
+        }, 50);
     };
 
     // 插入链接
