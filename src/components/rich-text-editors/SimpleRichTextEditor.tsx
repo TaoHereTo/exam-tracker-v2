@@ -113,13 +113,66 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const [showLatexSelector, setShowLatexSelector] = useState(false);
     const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
 
-    // Popover和DropdownMenu状态管理
+    // Popover和DropdownMenu状态管理 - 使用统一的状态管理确保互斥
     const [textColorPopoverOpen, setTextColorPopoverOpen] = useState(false);
     const [backgroundColorPopoverOpen, setBackgroundColorPopoverOpen] = useState(false);
     const [headingDropdownOpen, setHeadingDropdownOpen] = useState(false);
     const [listDropdownOpen, setListDropdownOpen] = useState(false);
     const [alignDropdownOpen, setAlignDropdownOpen] = useState(false);
     const [imageDropdownOpen, setImageDropdownOpen] = useState(false);
+
+    // 关闭所有其他菜单的函数
+    const closeAllMenus = useCallback(() => {
+        setTextColorPopoverOpen(false);
+        setBackgroundColorPopoverOpen(false);
+        setHeadingDropdownOpen(false);
+        setListDropdownOpen(false);
+        setAlignDropdownOpen(false);
+        setImageDropdownOpen(false);
+    }, []);
+
+    // 为每个菜单创建互斥的处理函数
+    const handleTextColorPopoverChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setTextColorPopoverOpen(open);
+    }, [closeAllMenus]);
+
+    const handleBackgroundColorPopoverChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setBackgroundColorPopoverOpen(open);
+    }, [closeAllMenus]);
+
+    const handleHeadingDropdownChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setHeadingDropdownOpen(open);
+    }, [closeAllMenus]);
+
+    const handleListDropdownChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setListDropdownOpen(open);
+    }, [closeAllMenus]);
+
+    const handleAlignDropdownChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setAlignDropdownOpen(open);
+    }, [closeAllMenus]);
+
+    const handleImageDropdownChange = useCallback((open: boolean) => {
+        if (open) {
+            closeAllMenus();
+        }
+        setImageDropdownOpen(open);
+    }, [closeAllMenus]);
 
     const { notify } = useNotification();
 
@@ -724,7 +777,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     {/* 布局和结构工具组 */}
                     <div className="flex items-center gap-0.5">
                         {/* 标题选择器 */}
-                        <DropdownMenu open={headingDropdownOpen} onOpenChange={setHeadingDropdownOpen}>
+                        <DropdownMenu open={headingDropdownOpen} onOpenChange={handleHeadingDropdownChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -738,32 +791,32 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[80px]">
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'div'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'div'); closeAllMenus(); }}>
                                     正文
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h1'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h1'); closeAllMenus(); }}>
                                     标题 1
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h2'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h2'); closeAllMenus(); }}>
                                     标题 2
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h3'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h3'); closeAllMenus(); }}>
                                     标题 3
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h4'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h4'); closeAllMenus(); }}>
                                     标题 4
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h5'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h5'); closeAllMenus(); }}>
                                     标题 5
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h6'); setHeadingDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('formatBlock', 'h6'); closeAllMenus(); }}>
                                     标题 6
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
 
                         {/* 列表下拉菜单 */}
-                        <DropdownMenu open={listDropdownOpen} onOpenChange={setListDropdownOpen}>
+                        <DropdownMenu open={listDropdownOpen} onOpenChange={handleListDropdownChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -777,11 +830,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('insertUnorderedList'); setListDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('insertUnorderedList'); closeAllMenus(); }}>
                                     <List className="w-3 h-3 mr-2" />
                                     无序列表
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('insertOrderedList'); setListDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('insertOrderedList'); closeAllMenus(); }}>
                                     <ListOrdered className="w-3 h-3 mr-2" />
                                     有序列表
                                 </DropdownMenuItem>
@@ -789,7 +842,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </DropdownMenu>
 
                         {/* 对齐方式下拉菜单 */}
-                        <DropdownMenu open={alignDropdownOpen} onOpenChange={setAlignDropdownOpen}>
+                        <DropdownMenu open={alignDropdownOpen} onOpenChange={handleAlignDropdownChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -803,19 +856,19 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent className="w-auto min-w-[100px]">
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyLeft'); setAlignDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyLeft'); closeAllMenus(); }}>
                                     <AlignLeft className="w-3 h-3 mr-2" />
                                     左对齐
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyCenter'); setAlignDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyCenter'); closeAllMenus(); }}>
                                     <AlignCenter className="w-3 h-3 mr-2" />
                                     居中
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyRight'); setAlignDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyRight'); closeAllMenus(); }}>
                                     <AlignRight className="w-3 h-3 mr-2" />
                                     右对齐
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyFull'); setAlignDropdownOpen(false); }}>
+                                <DropdownMenuItem onClick={() => { handleFormatCommand('justifyFull'); closeAllMenus(); }}>
                                     <AlignJustify className="w-3 h-3 mr-2" />
                                     两端对齐
                                 </DropdownMenuItem>
@@ -829,7 +882,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     {/* 颜色工具组 */}
                     <div className="flex items-center gap-0.5">
                         {/* 文字颜色 */}
-                        <Popover open={textColorPopoverOpen} onOpenChange={setTextColorPopoverOpen}>
+                        <Popover open={textColorPopoverOpen} onOpenChange={handleTextColorPopoverChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
@@ -853,7 +906,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 style={{ backgroundColor: color }}
                                                 onClick={() => {
                                                     setTextColor(color);
-                                                    setTextColorPopoverOpen(false);
+                                                    closeAllMenus();
                                                 }}
                                             />
                                         ))}
@@ -863,7 +916,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </Popover>
 
                         {/* 背景颜色 */}
-                        <Popover open={backgroundColorPopoverOpen} onOpenChange={setBackgroundColorPopoverOpen}>
+                        <Popover open={backgroundColorPopoverOpen} onOpenChange={handleBackgroundColorPopoverChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
@@ -887,7 +940,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 style={{ backgroundColor: color }}
                                                 onClick={() => {
                                                     setBackgroundColor(color);
-                                                    setBackgroundColorPopoverOpen(false);
+                                                    closeAllMenus();
                                                 }}
                                             />
                                         ))}
@@ -924,7 +977,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
-                        <DropdownMenu open={imageDropdownOpen} onOpenChange={setImageDropdownOpen}>
+                        <DropdownMenu open={imageDropdownOpen} onOpenChange={handleImageDropdownChange}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -938,11 +991,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent align="start">
-                                <DropdownMenuItem onClick={() => { fileInputRef.current?.click(); setImageDropdownOpen(false); }} className="flex items-center gap-2">
+                                <DropdownMenuItem onClick={() => { fileInputRef.current?.click(); closeAllMenus(); }} className="flex items-center gap-2">
                                     <FileImage className="w-4 h-4" />
                                     <span>从本地选择</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { setShowCloudImageDialog(true); setImageDropdownOpen(false); }} className="flex items-center gap-2">
+                                <DropdownMenuItem onClick={() => { setShowCloudImageDialog(true); closeAllMenus(); }} className="flex items-center gap-2">
                                     <Cloud className="w-4 h-4" />
                                     <span>从云端选择</span>
                                 </DropdownMenuItem>
