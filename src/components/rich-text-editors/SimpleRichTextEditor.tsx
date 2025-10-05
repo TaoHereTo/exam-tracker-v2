@@ -112,6 +112,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const [linkText, setLinkText] = useState('');
     const [showLatexSelector, setShowLatexSelector] = useState(false);
     const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
+    const [hasSelectedText, setHasSelectedText] = useState(false);
 
     // Popover和DropdownMenu状态管理 - 使用统一的状态管理确保互斥
     const [textColorPopoverOpen, setTextColorPopoverOpen] = useState(false);
@@ -248,6 +249,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const handleFormatCommand = (command: string, value?: string) => {
         if (!editorRef.current) return;
 
+        // 检查是否有选中的文本
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const selectedText = selection.toString().trim();
+        if (!selectedText) {
+            // 如果没有选中文本，不执行格式化操作
+            return;
+        }
+
         // 保存当前选区
         saveCurrentSelection();
 
@@ -334,14 +345,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
         editorRef.current.focus();
 
-        // 先尝试恢复选区
-        const restored = restoreSelection();
-
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
 
         const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
+        const selectedText = range.toString().trim();
 
         // 只有当选中有文字时才执行颜色设置
         if (!selectedText) return;
@@ -380,14 +388,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
         editorRef.current.focus();
 
-        // 先尝试恢复选区
-        const restored = restoreSelection();
-
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
 
         const range = selection.getRangeAt(0);
-        const selectedText = range.toString();
+        const selectedText = range.toString().trim();
 
         // 只有当选中有文字时才执行颜色设置
         if (!selectedText) return;
@@ -560,6 +565,94 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         setShowCloudImageDialog(false);
     };
 
+    // 处理缩进命令
+    const handleIndentCommand = (command: 'indent') => {
+        if (!editorRef.current) return;
+
+        editorRef.current.focus();
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+
+        // 检查是否在列表项中
+        const listItem = range.startContainer.parentElement?.closest('li');
+        if (listItem) {
+            // 在列表项中，使用标准的缩进命令
+            const success = document.execCommand('indent', false, undefined);
+            if (success) {
+                const html = editorRef.current.innerHTML;
+                onChange(html);
+            }
+        } else {
+            // 不在列表项中，手动添加缩进
+            const indentAmount = 40;
+            const currentMarginLeft = parseInt(range.startContainer.parentElement?.style.marginLeft || '0');
+            const newMarginLeft = currentMarginLeft + indentAmount;
+
+            // 创建或更新包含选中文本的元素
+            let container = range.startContainer.parentElement;
+            if (!container || container === editorRef.current) {
+                // 如果没有合适的容器，创建一个div
+                const div = document.createElement('div');
+                const contents = range.extractContents();
+                div.appendChild(contents);
+                range.insertNode(div);
+                container = div;
+            }
+
+            container.style.marginLeft = `${newMarginLeft}px`;
+
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
+    };
+
+    // 清除所有格式
+    const handleClearFormat = () => {
+        if (!editorRef.current) return;
+
+        editorRef.current.focus();
+
+        // 延迟执行，确保焦点设置完成
+        setTimeout(() => {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+
+            // 只有在选中文本时才执行清除格式操作
+            if (!selectedText || selectedText.trim() === '') {
+                // 如果没有选中文本，不执行任何操作
+                return;
+            }
+
+            // 使用 document.execCommand 来清除格式，这样更可靠
+            const success = document.execCommand('removeFormat', false, undefined);
+
+            if (success) {
+                const html = editorRef.current?.innerHTML;
+                if (html) onChange(html);
+            } else {
+                // 如果 execCommand 失败，使用手动方式
+                const textNode = document.createTextNode(selectedText);
+                range.deleteContents();
+                range.insertNode(textNode);
+
+                // 将光标移到文本后面
+                const newRange = document.createRange();
+                newRange.setStartAfter(textNode);
+                newRange.setEndAfter(textNode);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+
+                const html = editorRef.current?.innerHTML;
+                if (html) onChange(html);
+            }
+        }, 10);
+    };
+
     // 更新按钮状态
     const updateButtonStates = () => {
         const formats = ['bold', 'italic', 'underline', 'strikeThrough'];
@@ -572,6 +665,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         });
 
         setActiveFormats(newActiveFormats);
+
+        // 检查是否有选中的文本
+        const selection = window.getSelection();
+        const hasSelection = !!(selection && selection.rangeCount > 0 && selection.toString().trim() !== '');
+        setHasSelectedText(hasSelection);
     };
 
     // 监听编辑器变化
@@ -638,9 +736,56 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         onChange(cleanedHtml);
     };
 
-    // 处理键盘事件，特别是删除键
+    // 处理键盘事件，特别是删除键和回车键
     const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Backspace' || e.key === 'Delete') {
+        if (e.key === 'Enter') {
+            // 处理回车键，确保正确换行
+            e.preventDefault();
+
+            if (!editorRef.current) return;
+
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const range = selection.getRangeAt(0);
+
+            // 检查是否在列表项中
+            const listItem = range.startContainer.parentElement?.closest('li');
+            if (listItem) {
+                // 在列表项中，创建新的列表项
+                const newListItem = document.createElement('li');
+                newListItem.innerHTML = '<br>';
+                listItem.parentNode?.insertBefore(newListItem, listItem.nextSibling);
+
+                // 将光标移到新列表项
+                const newRange = document.createRange();
+                newRange.setStart(newListItem, 0);
+                newRange.setEnd(newListItem, 0);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            } else {
+                // 不在列表项中，创建新的段落
+                const br = document.createElement('br');
+                range.deleteContents();
+                range.insertNode(br);
+
+                // 在br后面添加一个空的文本节点，确保光标位置正确
+                const textNode = document.createTextNode('');
+                br.parentNode?.insertBefore(textNode, br.nextSibling);
+
+                // 将光标移到br后面
+                const newRange = document.createRange();
+                newRange.setStartAfter(br);
+                newRange.setEndAfter(br);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+
+            // 更新内容
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
             // 延迟清理，让浏览器先处理删除操作
             setTimeout(() => {
                 if (editorRef.current) {
@@ -694,9 +839,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('bold')}
+                                    disabled={!hasSelectedText}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
-                                        activeFormats.has('bold') ? "bg-blue-500/20 text-blue-600 dark:bg-blue-400/20 dark:text-blue-400" : ""
+                                        activeFormats.has('bold') ? "bg-blue-500/20 text-blue-600 dark:bg-blue-400/20 dark:text-blue-400 hover:bg-blue-500/20 hover:text-blue-600 dark:hover:bg-blue-400/20 dark:hover:text-blue-400" : "",
+                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Bold className="w-4 h-4" />
@@ -715,9 +862,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('italic')}
+                                    disabled={!hasSelectedText}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
-                                        activeFormats.has('italic') ? "bg-purple-500/20 text-purple-600 dark:bg-purple-400/20 dark:text-purple-400" : ""
+                                        activeFormats.has('italic') ? "bg-purple-500/20 text-purple-600 dark:bg-purple-400/20 dark:text-purple-400 hover:bg-purple-500/20 hover:text-purple-600 dark:hover:bg-purple-400/20 dark:hover:text-purple-400" : "",
+                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Italic className="w-4 h-4" />
@@ -736,9 +885,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('underline')}
+                                    disabled={!hasSelectedText}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
-                                        activeFormats.has('underline') ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400" : ""
+                                        activeFormats.has('underline') ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400 hover:bg-green-500/20 hover:text-green-600 dark:hover:bg-green-400/20 dark:hover:text-green-400" : "",
+                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Underline className="w-4 h-4" />
@@ -757,9 +908,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('strikeThrough')}
+                                    disabled={!hasSelectedText}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
-                                        activeFormats.has('strikeThrough') ? "bg-red-500/20 text-red-600 dark:bg-red-400/20 dark:text-red-400" : ""
+                                        activeFormats.has('strikeThrough') ? "bg-red-500/20 text-red-600 dark:bg-red-400/20 dark:text-red-400 hover:bg-red-500/20 hover:text-red-600 dark:hover:bg-red-400/20 dark:hover:text-red-400" : "",
+                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Strikethrough className="w-4 h-4" />
@@ -874,6 +1027,25 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
+                        {/* 增加缩进 */}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className={TOOLBAR_BUTTON_CLASSES}
+                                    onMouseDown={() => saveCurrentSelection()}
+                                    onClick={() => handleIndentCommand('indent')}
+                                >
+                                    <Indent className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>增加缩进</p>
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
 
                     {/* 分隔线 */}
@@ -886,7 +1058,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onMouseDown={() => saveCurrentSelection()}>
+                                        <Button type="button" variant="ghost" size="sm" className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")} onMouseDown={() => saveCurrentSelection()} disabled={!hasSelectedText}>
                                             <Palette className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -920,7 +1092,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onMouseDown={() => saveCurrentSelection()}>
+                                        <Button type="button" variant="ghost" size="sm" className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")} onMouseDown={() => saveCurrentSelection()} disabled={!hasSelectedText}>
                                             <Paintbrush className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -948,6 +1120,25 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                 </div>
                             </PopoverContent>
                         </Popover>
+
+                        {/* 清除格式 */}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")}
+                                    onClick={handleClearFormat}
+                                    disabled={!hasSelectedText}
+                                >
+                                    <Eraser className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>清除格式</p>
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
 
                     {/* 分隔线 */}
