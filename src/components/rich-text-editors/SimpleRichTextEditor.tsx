@@ -267,26 +267,37 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const setTextColor = (color: string) => {
         if (!editorRef.current) return;
 
-        // 保存当前选区
-        saveCurrentSelection();
-
         editorRef.current.focus();
+
+        // 先尝试恢复选区
+        const restored = restoreSelection();
+
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
 
         const range = selection.getRangeAt(0);
         const selectedText = range.toString();
 
+        // 只有当选中有文字时才执行颜色设置
         if (!selectedText) return;
 
-        const span = document.createElement('span');
-        span.style.color = color;
-        const contents = range.extractContents();
-        span.appendChild(contents);
-        range.insertNode(span);
+        // 使用 execCommand 来设置颜色，这样更稳定
+        const success = document.execCommand('foreColor', false, color);
 
-        const html = editorRef.current.innerHTML;
-        onChange(html);
+        if (success) {
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        } else {
+            // 如果 execCommand 失败，使用手动方式
+            const span = document.createElement('span');
+            span.style.color = color;
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
 
         // 延迟恢复选区
         setTimeout(() => {
@@ -298,26 +309,37 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const setBackgroundColor = (color: string) => {
         if (!editorRef.current) return;
 
-        // 保存当前选区
-        saveCurrentSelection();
-
         editorRef.current.focus();
+
+        // 先尝试恢复选区
+        const restored = restoreSelection();
+
         const selection = window.getSelection();
         if (!selection || selection.rangeCount === 0) return;
 
         const range = selection.getRangeAt(0);
         const selectedText = range.toString();
 
+        // 只有当选中有文字时才执行颜色设置
         if (!selectedText) return;
 
-        const span = document.createElement('span');
-        span.style.backgroundColor = color;
-        const contents = range.extractContents();
-        span.appendChild(contents);
-        range.insertNode(span);
+        // 使用 execCommand 来设置背景颜色，这样更稳定
+        const success = document.execCommand('backColor', false, color);
 
-        const html = editorRef.current.innerHTML;
-        onChange(html);
+        if (success) {
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        } else {
+            // 如果 execCommand 失败，使用手动方式
+            const span = document.createElement('span');
+            span.style.backgroundColor = color;
+            const contents = range.extractContents();
+            span.appendChild(contents);
+            range.insertNode(span);
+
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
 
         // 延迟恢复选区
         setTimeout(() => {
@@ -509,10 +531,55 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         };
     }, []);
 
+    // 清理空的HTML标签
+    const cleanEmptyTags = (html: string): string => {
+        // 移除空的标签
+        const cleaned = html
+            .replace(/<(\w+)[^>]*>\s*<\/\1>/g, '') // 移除空的标签如 <strong></strong>
+            .replace(/<(\w+)[^>]*>\s*&nbsp;\s*<\/\1>/g, '&nbsp;') // 移除只包含&nbsp;的标签
+            .replace(/<(\w+)[^>]*>\s*<br\s*\/?>\s*<\/\1>/g, '<br>') // 移除只包含<br>的标签
+            .replace(/<span[^>]*>\s*<\/span>/g, '') // 移除空的span标签
+            .replace(/<span[^>]*>\s*&nbsp;\s*<\/span>/g, '&nbsp;') // 移除只包含&nbsp;的span标签
+            .replace(/<span[^>]*>\s*<br\s*\/?>\s*<\/span>/g, '<br>') // 移除只包含<br>的span标签
+            .replace(/<strong[^>]*>\s*<\/strong>/g, '') // 移除空的strong标签
+            .replace(/<em[^>]*>\s*<\/em>/g, '') // 移除空的em标签
+            .replace(/<u[^>]*>\s*<\/u>/g, '') // 移除空的u标签
+            .replace(/<s[^>]*>\s*<\/s>/g, '') // 移除空的s标签
+            .replace(/<(\w+)[^>]*>\s*<(\w+)[^>]*>\s*<\/\2>\s*<\/\1>/g, '') // 移除嵌套的空标签
+            .replace(/<div[^>]*>\s*<\/div>/g, '') // 移除空的div标签
+            .replace(/<p[^>]*>\s*<\/p>/g, '') // 移除空的p标签
+            .replace(/<h[1-6][^>]*>\s*<\/h[1-6]>/g, ''); // 移除空的标题标签
+
+        // 递归清理，直到没有更多空标签
+        if (cleaned !== html) {
+            return cleanEmptyTags(cleaned);
+        }
+
+        return cleaned;
+    };
+
     // 处理编辑器输入
     const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
         const html = (e.target as HTMLDivElement).innerHTML;
-        onChange(html);
+        const cleanedHtml = cleanEmptyTags(html);
+        onChange(cleanedHtml);
+    };
+
+    // 处理键盘事件，特别是删除键
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Backspace' || e.key === 'Delete') {
+            // 延迟清理，让浏览器先处理删除操作
+            setTimeout(() => {
+                if (editorRef.current) {
+                    const html = editorRef.current.innerHTML;
+                    const cleanedHtml = cleanEmptyTags(html);
+                    if (cleanedHtml !== html) {
+                        editorRef.current.innerHTML = cleanedHtml;
+                        onChange(cleanedHtml);
+                    }
+                }
+            }, 10);
+        }
     };
 
     // 处理编辑器点击，确保光标在正确位置
@@ -889,7 +956,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 {/* 编辑器内容区域 */}
                 <div
                     ref={editorRef}
-                    className="rich-text-editor-main p-4 min-h-[200px] max-h-[600px] overflow-y-auto focus:outline-none relative"
+                    className="rich-text-editor-main p-4 min-h-[200px] max-h-[600px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
                     contentEditable
                     suppressContentEditableWarning
                     data-placeholder={placeholder}
@@ -898,6 +965,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         maxHeight: customMaxHeight
                     }}
                     onInput={handleInput}
+                    onKeyDown={handleKeyDown}
                     onClick={handleEditorClick}
                 />
 
