@@ -20,50 +20,108 @@ export const ExpandableCell: React.FC<ExpandableCellProps> = ({
 }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [needsExpansion, setNeedsExpansion] = useState(false);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+    const [collapsedHeight, setCollapsedHeight] = useState<number>(0);
     const contentRef = useRef<HTMLDivElement>(null);
+    const measureRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const checkContentHeight = () => {
-            if (contentRef.current) {
-                const element = contentRef.current;
-                const lineHeight = parseFloat(getComputedStyle(element).lineHeight) || 20; // 默认行高
+        const measureContent = () => {
+            if (measureRef.current && contentRef.current) {
+                // 确保测量元素有正确的宽度
+                const containerWidth = contentRef.current.offsetWidth;
+                measureRef.current.style.width = `${containerWidth}px`;
+
+                // 测量完整内容的高度
+                const fullHeight = measureRef.current.scrollHeight;
+                const lineHeight = parseFloat(getComputedStyle(measureRef.current).lineHeight) || 20;
                 const maxHeight = lineHeight * maxLines;
 
-                // 临时设置为不限制高度来测量实际高度
-                element.style.maxHeight = 'none';
-                element.style.overflow = 'visible';
-                const actualHeight = element.scrollHeight;
+                // 添加一些额外的像素来确保内容完全显示
+                const adjustedFullHeight = fullHeight + 10; // 添加10px缓冲
 
-                // 恢复原始样式
-                element.style.maxHeight = '';
-                element.style.overflow = '';
+                setContentHeight(adjustedFullHeight);
+                setCollapsedHeight(maxHeight);
+                setNeedsExpansion(fullHeight > maxHeight);
 
-                setNeedsExpansion(actualHeight > maxHeight);
+                console.log('高度测量:', {
+                    containerWidth,
+                    fullHeight,
+                    adjustedFullHeight,
+                    maxHeight,
+                    needsExpansion: fullHeight > maxHeight
+                });
             }
         };
 
-        // 延迟检查，确保内容已渲染
-        const timer = setTimeout(checkContentHeight, 100);
-        return () => clearTimeout(timer);
+        // 多次测量确保内容完全渲染
+        const timer1 = setTimeout(measureContent, 100);
+        const timer2 = setTimeout(measureContent, 500);
+        const timer3 = setTimeout(measureContent, 1000);
+
+        return () => {
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+            clearTimeout(timer3);
+        };
     }, [content, maxLines]);
+
+    // 监听窗口大小变化，重新测量
+    useEffect(() => {
+        const handleResize = () => {
+            if (measureRef.current && contentRef.current) {
+                const containerWidth = contentRef.current.offsetWidth;
+                measureRef.current.style.width = `${containerWidth}px`;
+
+                const fullHeight = measureRef.current.scrollHeight;
+                const adjustedFullHeight = fullHeight + 10;
+                setContentHeight(adjustedFullHeight);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const toggleExpanded = () => {
         setIsExpanded(!isExpanded);
+
+        // 展开时重新测量高度，确保内容完全显示
+        if (!isExpanded && measureRef.current) {
+            setTimeout(() => {
+                if (measureRef.current) {
+                    const fullHeight = measureRef.current.scrollHeight;
+                    const adjustedFullHeight = fullHeight + 15; // 增加更多缓冲
+                    setContentHeight(adjustedFullHeight);
+                }
+            }, 50);
+        }
     };
 
     return (
         <div className={cn('relative', className)}>
+            {/* 隐藏的测量元素 */}
+            <div
+                ref={measureRef}
+                className="absolute opacity-0 pointer-events-none text-sm leading-relaxed"
+                style={{
+                    width: '100%',
+                    zIndex: -1,
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    visibility: 'hidden'
+                }}
+            >
+                {content}
+            </div>
+
+            {/* 实际显示的内容 */}
             <div
                 ref={contentRef}
-                className={cn(
-                    'text-sm leading-relaxed transition-all duration-300 ease-in-out',
-                    !isExpanded && needsExpansion && 'overflow-hidden'
-                )}
+                className="text-sm leading-relaxed overflow-hidden transition-all duration-500 ease-in-out"
                 style={{
-                    maxHeight: !isExpanded && needsExpansion ? `${maxLines * 1.5}em` : 'none',
-                    display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: !isExpanded && needsExpansion ? maxLines : 'unset',
+                    maxHeight: isExpanded ? `${contentHeight}px` : `${collapsedHeight}px`,
                 }}
             >
                 {content}
@@ -75,16 +133,16 @@ export const ExpandableCell: React.FC<ExpandableCellProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={toggleExpanded}
-                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground transition-colors duration-300"
                     >
                         {isExpanded ? (
                             <>
-                                <ChevronUp className="w-3 h-3 mr-1" />
+                                <ChevronUp className="w-3 h-3 mr-1 transition-transform duration-300" />
                                 {collapseText}
                             </>
                         ) : (
                             <>
-                                <ChevronDown className="w-3 h-3 mr-1" />
+                                <ChevronDown className="w-3 h-3 mr-1 transition-transform duration-300" />
                                 {expandText}
                             </>
                         )}
