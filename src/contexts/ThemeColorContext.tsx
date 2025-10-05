@@ -39,7 +39,7 @@ export const PAGE_THEME_COLORS = {
     'notes': '#ea580c',       // 笔记页面 - 橙色
     'schedule': '#8b5cf6',    // 日程管理页面 - 紫色
     'history': '#0d9488',     // 历史记录页面 - 青色
-    'knowledge': '#1e3a8a',   // 知识管理页面 - 深蓝色（与保存按钮一致）
+    'knowledge': '#f97316',   // 知识管理页面 - 橙色
     'overview': '#4f46e5',    // 概览页面 - 靛蓝色
     'charts': '#c026d3',      // 图表页面 - 紫色
     'settings': '#C93B76',    // 设置页面 - 粉色

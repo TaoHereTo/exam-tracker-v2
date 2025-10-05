@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -496,18 +495,21 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <RichTextEditorField />
               </FormField>
 
-              <div className="form-actions pt-1">
-                <Button type="submit" variant="default" className="flex items-center justify-center w-full py-2 text-sm h-10 rounded-full bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white">
-                  <MixedText text="保存知识点" />
-                </Button>
+              {/* 保存按钮在右下角 */}
+              <div className="form-actions">
+                <div className="flex justify-end">
+                  <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
+                    <MixedText text="保存知识点" />
+                  </Button>
+                </div>
               </div>
             </BaseForm>
           </div>
         </div>
       ) : (
-        // When not in dialog, render with Card wrapper as usual
-        <Card className="w-full max-w-4xl flex flex-col shadow-lg knowledge-form-card">
-          <CardContent className="pt-4 pb-4">
+        // When not in dialog, render without Card wrapper
+        <div className="w-full max-w-4xl flex flex-col">
+          <div className="pt-4 pb-4">
             {/* 非对话框模式下的表单 */}
             <BaseForm
               className="form-stack"
@@ -563,14 +565,17 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
                 <RichTextEditorField />
               </FormField>
 
-              <div className="form-actions pt-1">
-                <Button type="submit" variant="default" className="flex items-center justify-center w-full py-2 text-sm h-10 rounded-full bg-[#1e3a8a] hover:bg-[#1e3a8a]/90 text-white">
-                  <MixedText text="保存知识点" />
-                </Button>
+              {/* 保存按钮在右下角 */}
+              <div className="form-actions">
+                <div className="flex justify-end">
+                  <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
+                    <MixedText text="保存知识点" />
+                  </Button>
+                </div>
               </div>
             </BaseForm>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
     </div>
   );
