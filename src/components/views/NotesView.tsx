@@ -29,7 +29,7 @@ import {
     X,
     Palette
 } from "lucide-react";
-import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
+import SimpleRichTextEditor from "@/components/rich-text-editors/SimpleRichTextEditor";
 import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
 import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -1049,16 +1049,16 @@ export default function NotesView() {
                             </div>
 
                             <div className="flex-1 min-h-[500px]">
-                                <KnowledgeRichTextEditor
-                                    value={selectedNote.content}
+                                <SimpleRichTextEditor
+                                    content={selectedNote.content}
                                     onChange={(content) => setSelectedNote({
                                         ...selectedNote,
                                         content
                                     })}
                                     placeholder="开始编写你的笔记..."
                                     className="h-full"
-                                    editorMinHeight="500px"
-                                    editorMaxHeight="800px"
+                                    customMinHeight="500px"
+                                    customMaxHeight="800px"
                                 />
                             </div>
                         </>

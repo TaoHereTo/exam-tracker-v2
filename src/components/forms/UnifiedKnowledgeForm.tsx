@@ -30,8 +30,6 @@ import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-import { KnowledgeRichTextEditor } from "@/components/rich-text-editors/KnowledgeRichTextEditor";
-import { LatexRichTextEditor } from "@/components/rich-text-editors/LatexRichTextEditor";
 import { FullscreenLatexEditor } from "@/components/rich-text-editors/FullscreenLatexEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { supabaseImageManager } from '@/lib/supabaseImageManager';

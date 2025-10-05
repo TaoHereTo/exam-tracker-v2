@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { LatexRichTextEditor } from './LatexRichTextEditor';
+import SimpleRichTextEditor from './SimpleRichTextEditor';
 
 // 全局状态管理，防止组件重新渲染导致状态丢失
 const globalFullscreenState = {
@@ -172,7 +172,7 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
 
     // 正常编辑器
     const normalEditor = (
-        <LatexRichTextEditor
+        <SimpleRichTextEditor
             {...props}
             showFullscreenButton={true}
             onFullscreenToggle={toggleFullscreen}
@@ -190,28 +190,31 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                 {/* 全屏编辑器，使用 createPortal 保持 React 上下文 */}
                 {createPortal(
                     <div
-                        className="fixed inset-0 bg-black/80 flex items-center justify-center p-4"
+                        className="fixed inset-0 bg-black/80 flex items-center justify-center"
                         style={{
-                            zIndex: 99999,
+                            zIndex: 100000,
                             position: 'fixed',
                             top: 0,
                             left: 0,
                             right: 0,
                             bottom: 0,
                             display: 'flex',
-                            visibility: 'visible'
+                            visibility: 'visible',
+                            padding: 0,
+                            pointerEvents: 'auto'
                         }}
                         ref={(el) => {
                             if (el) {
                                 el.style.setProperty('display', 'flex', 'important');
                                 el.style.setProperty('visibility', 'visible', 'important');
                                 el.style.setProperty('opacity', '1', 'important');
-                                el.style.setProperty('z-index', '99999', 'important');
+                                el.style.setProperty('z-index', '100000', 'important');
                                 el.style.setProperty('position', 'fixed', 'important');
                                 el.style.setProperty('top', '0', 'important');
                                 el.style.setProperty('left', '0', 'important');
                                 el.style.setProperty('right', '0', 'important');
                                 el.style.setProperty('bottom', '0', 'important');
+                                el.style.setProperty('pointer-events', 'auto', 'important');
 
                                 // 确保编辑器获得焦点 - 使用多个时机尝试
                                 const focusEditor = () => {
@@ -260,40 +263,39 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             }
                         }}
                         onMouseDown={(e) => {
-                            // 阻止背景的mousedown事件影响编辑器
+                            // 只有点击背景时才阻止默认行为
                             if (e.target === e.currentTarget) {
                                 e.preventDefault();
                             }
                         }}
                     >
                         <div
-                            className="w-full max-w-6xl bg-background rounded-lg shadow-2xl overflow-hidden flex flex-col"
+                            className="w-full h-full bg-background overflow-hidden flex flex-col"
                             style={{
-                                height: '90vh',
-                                maxHeight: '90vh'
+                                height: '100vh',
+                                maxHeight: '100vh',
+                                borderRadius: 0,
+                                pointerEvents: 'auto'
                             }}
                             data-fullscreen-editor="true"
                             onClick={(e) => {
-                                // 阻止事件冒泡到背景，但不影响内部功能
-                                e.stopPropagation();
+                                // 不阻止任何点击事件，让二级菜单正常工作
                             }}
                             onMouseDown={(e) => {
-                                // 阻止事件冒泡到背景，但不影响内部功能
-                                e.stopPropagation();
+                                // 不阻止任何mousedown事件，让二级菜单正常工作
                             }}
                         >
-                            <LatexRichTextEditor
+                            <SimpleRichTextEditor
                                 key="fullscreen-editor"
                                 content={props.content}
                                 onChange={props.onChange}
                                 placeholder={props.placeholder || '开始输入...'}
                                 className="flex-1"
-                                editorMinHeight="calc(90vh - 120px)"
-                                editorMaxHeight="calc(90vh - 120px)"
+                                customMinHeight="calc(100vh - 80px)"
+                                customMaxHeight="calc(100vh - 80px)"
                                 stickyToolbar={props.stickyToolbar}
                                 showFullscreenButton={true}
                                 onFullscreenToggle={toggleFullscreen}
-                                autoFocus={true}
                             />
                         </div>
                     </div>,
