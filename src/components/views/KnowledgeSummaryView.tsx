@@ -17,6 +17,7 @@ import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
 import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
+import { ExpandableCell } from '@/components/ui/ExpandableCell';
 import { useCloudData } from '@/contexts/CloudDataContext';
 import { cn } from '@/lib/utils';
 
@@ -140,9 +141,13 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <HtmlRenderer content={note || ''} className="mb-0" />
-                                </div>
+                                <ExpandableCell
+                                    content={<HtmlRenderer content={note || ''} className="mb-0" />}
+                                    maxLines={6}
+                                    className="flex items-center h-full"
+                                    expandText="展开"
+                                    collapseText="收起"
+                                />
                             );
                         }
                     },
@@ -190,9 +195,13 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <HtmlRenderer content={note || ''} className="mb-0" />
-                                </div>
+                                <ExpandableCell
+                                    content={<HtmlRenderer content={note || ''} className="mb-0" />}
+                                    maxLines={6}
+                                    className="flex items-center h-full"
+                                    expandText="展开"
+                                    collapseText="收起"
+                                />
                             );
                         }
                     },
@@ -252,9 +261,13 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <HtmlRenderer content={note || ''} className="mb-0" />
-                                </div>
+                                <ExpandableCell
+                                    content={<HtmlRenderer content={note || ''} className="mb-0" />}
+                                    maxLines={6}
+                                    className="flex items-center h-full"
+                                    expandText="展开"
+                                    collapseText="收起"
+                                />
                             );
                         }
                     },
@@ -302,9 +315,13 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         render: (row: KnowledgeItem) => {
                             const note = (row as Record<string, unknown>).note as string;
                             return (
-                                <div className="text-sm leading-relaxed flex items-center h-full">
-                                    <HtmlRenderer content={note || ''} className="mb-0" />
-                                </div>
+                                <ExpandableCell
+                                    content={<HtmlRenderer content={note || ''} className="mb-0" />}
+                                    maxLines={6}
+                                    className="flex items-center h-full"
+                                    expandText="展开"
+                                    collapseText="收起"
+                                />
                             );
                         }
                     },

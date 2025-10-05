@@ -67,6 +67,10 @@ const latexTemplates = {
         { name: '大于等于', latex: '\\geq', preview: '\\geq' },
         { name: '约等于', latex: '\\approx', preview: '\\approx' },
         { name: '正负', latex: '\\pm', preview: '\\pm' },
+        { name: '度数符号', latex: '°', preview: '°' },
+        { name: '角度', latex: '\\angle', preview: '\\angle' },
+        { name: '直角', latex: '\\perp', preview: '\\perp' },
+        { name: '平行', latex: '\\parallel', preview: '\\parallel' },
     ],
     '集合符号': [
         { name: '属于', latex: '\\in', preview: '\\in' },
@@ -131,7 +135,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
 }) => {
     const [displayMode, setDisplayMode] = useState<'inline' | 'block'>('inline');
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('全部');
 
     // 扁平化所有公式数据
     const allFormulas = useMemo(() => {
@@ -151,8 +155,8 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     const filteredFormulas = useMemo(() => {
         let filtered = allFormulas;
 
-        // 如果选择了分类，则筛选该分类的公式
-        if (selectedCategory) {
+        // 如果选择了分类且不是"全部"，则筛选该分类的公式
+        if (selectedCategory && selectedCategory !== '全部') {
             filtered = filtered.filter(formula => formula.category === selectedCategory);
         }
 
@@ -169,16 +173,17 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     }, [allFormulas, selectedCategory, searchTerm]);
 
     // 获取所有分类
-    const categories = Object.keys(latexTemplates);
+    const categories = ['全部', ...Object.keys(latexTemplates)];
 
     const handleCategoryChange = (category: string) => {
+        console.log('分类选择变化:', category);
         setSelectedCategory(category);
     };
 
 
     return (
         <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className="max-h-[90vh]">
+            <DrawerContent className="max-h-[90vh] overflow-visible">
                 <DrawerHeader className="pb-2">
                     <div className="flex items-center justify-between">
                         <div className="button-group">
@@ -204,14 +209,14 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                 <div className="flex-1 overflow-auto p-card">
                     <div className="form-stack">
                         {/* 分类选择、搜索和公式模式选择区域 */}
-                        <div className="flex button-group-lg items-center">
+                        <div className="flex button-group-lg items-center overflow-visible">
                             <div className="button-group items-center">
                                 <Label className="text-sm font-medium">选择分类:</Label>
                                 <Select value={selectedCategory} onValueChange={handleCategoryChange}>
                                     <SelectTrigger className="w-[200px]">
                                         <SelectValue placeholder="选择分类" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="z-[999999]">
                                         {categories.map((category) => (
                                             <SelectItem key={category} value={category}>
                                                 {category}
@@ -257,7 +262,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                         {/* 公式展示区域 */}
                         <div className="form-stack">
                             <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {selectedCategory ? `${selectedCategory} 分类共有` : '全部'} {filteredFormulas.length} 个公式
+                                {selectedCategory === '全部' ? '全部' : selectedCategory} 分类共有 {filteredFormulas.length} 个公式
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-sm">
