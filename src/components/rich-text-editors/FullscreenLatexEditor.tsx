@@ -52,9 +52,16 @@ interface FullscreenLatexEditorProps {
     editorMaxHeight?: string;
     stickyToolbar?: boolean;
     isInDialog?: boolean; // 新增：标识是否在Dialog中
+    // 新增：预览相关属性
+    previewContent?: string;
+    isPreviewMode?: boolean;
+    onPreviewModeChange?: (isPreviewMode: boolean) => void;
 }
 
 export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (props) => {
+    // 解构props以避免useCallback依赖问题
+    const { onChange, previewContent: externalPreviewContent, onPreviewModeChange } = props;
+
     // 生成稳定的组件ID，避免使用随机数导致的状态丢失
     const componentId = useMemo(() => {
         // 使用组件在DOM中的位置或其他稳定标识符
@@ -62,6 +69,31 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
         return `fullscreen-editor-${timestamp}`;
     }, []); // 空依赖数组确保ID在组件生命周期内保持不变
     const { isFullscreen, openFullscreen, closeFullscreen } = useGlobalFullscreen(componentId);
+
+    // 预览状态管理
+    const [internalPreviewContent, setInternalPreviewContent] = useState(props.content);
+    const [internalIsPreviewMode, setInternalIsPreviewMode] = useState(false);
+
+    // 使用外部传入的状态或内部状态
+    const previewContent = externalPreviewContent !== undefined ? externalPreviewContent : internalPreviewContent;
+    const isPreviewMode = props.isPreviewMode !== undefined ? props.isPreviewMode : internalIsPreviewMode;
+
+    // 预览模式变化处理
+    const handlePreviewModeChange = useCallback((newIsPreviewMode: boolean) => {
+        if (onPreviewModeChange) {
+            onPreviewModeChange(newIsPreviewMode);
+        } else {
+            setInternalIsPreviewMode(newIsPreviewMode);
+        }
+    }, [onPreviewModeChange]);
+
+    // 预览内容变化处理
+    const handleContentChange = useCallback((newContent: string) => {
+        onChange(newContent);
+        if (externalPreviewContent === undefined) {
+            setInternalPreviewContent(newContent);
+        }
+    }, [onChange, externalPreviewContent]);
 
 
     const toggleFullscreen = useCallback((e?: React.MouseEvent) => {
@@ -176,8 +208,15 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
     const normalEditor = (
         <SimpleRichTextEditor
             {...props}
+            onChange={handleContentChange}
             showFullscreenButton={true}
             onFullscreenToggle={toggleFullscreen}
+            // 传递预览相关属性
+            previewContent={previewContent}
+            isPreviewMode={isPreviewMode}
+            onPreviewModeChange={handlePreviewModeChange}
+            // 正常模式下不标识为全屏
+            isInFullscreen={false}
         />
     );
 
@@ -185,119 +224,22 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
 
         return (
             <>
-                {/* 隐藏的正常编辑器，保持状态同步 */}
-                <div style={{ display: 'none' }}>
-                    {normalEditor}
-                </div>
-                {/* 全屏编辑器，使用 createPortal 保持 React 上下文 */}
+                {/* 简化的全屏编辑器 */}
                 {createPortal(
                     <div
                         className="fixed inset-0 bg-black/80 flex items-center justify-center"
-                        style={{
-                            zIndex: 100000,
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            display: 'flex',
-                            visibility: 'visible',
-                            padding: 0,
-                            pointerEvents: 'auto'
-                        }}
-                        ref={(el) => {
-                            if (el) {
-                                el.style.setProperty('display', 'flex', 'important');
-                                el.style.setProperty('visibility', 'visible', 'important');
-                                el.style.setProperty('opacity', '1', 'important');
-                                el.style.setProperty('z-index', '100000', 'important');
-                                el.style.setProperty('position', 'fixed', 'important');
-                                el.style.setProperty('top', '0', 'important');
-                                el.style.setProperty('left', '0', 'important');
-                                el.style.setProperty('right', '0', 'important');
-                                el.style.setProperty('bottom', '0', 'important');
-                                el.style.setProperty('pointer-events', 'auto', 'important');
-
-                                // 确保编辑器获得焦点 - 使用多个时机尝试，但避免重复聚焦
-                                const focusEditor = () => {
-                                    const editorElement = el.querySelector('[contenteditable]') as HTMLElement;
-                                    if (editorElement) {
-                                        // 检查是否已经有焦点，避免重复聚焦
-                                        if (document.activeElement === editorElement) {
-                                            return true;
-                                        }
-
-                                        editorElement.focus();
-                                        // 确保光标在编辑器末尾
-                                        const range = document.createRange();
-                                        const sel = window.getSelection();
-                                        range.selectNodeContents(editorElement);
-                                        range.collapse(false);
-                                        sel?.removeAllRanges();
-                                        sel?.addRange(range);
-                                        return true;
-                                    }
-                                    return false;
-                                };
-
-                                // 延迟聚焦，避免与组件初始化冲突
-                                setTimeout(() => {
-                                    if (!focusEditor()) {
-                                        // 如果失败，使用MutationObserver监听DOM变化
-                                        const observer = new MutationObserver(() => {
-                                            if (focusEditor()) {
-                                                observer.disconnect();
-                                            }
-                                        });
-
-                                        observer.observe(el, {
-                                            childList: true,
-                                            subtree: true
-                                        });
-
-                                        // 设置超时，避免无限等待
-                                        setTimeout(() => {
-                                            observer.disconnect();
-                                        }, 1000);
-                                    }
-                                }, 200);
-                            }
-                        }}
-                        data-fullscreen-container="true"
+                        style={{ zIndex: 100000 }}
                         onClick={(e) => {
-                            // 只有点击背景时才关闭全屏
                             if (e.target === e.currentTarget) {
-                                console.log('Background clicked, closing fullscreen');
                                 closeFullscreen();
                             }
                         }}
-                        onMouseDown={(e) => {
-                            // 只有点击背景时才阻止默认行为
-                            if (e.target === e.currentTarget) {
-                                e.preventDefault();
-                            }
-                        }}
                     >
-                        <div
-                            className="w-full h-full bg-background overflow-hidden flex flex-col"
-                            style={{
-                                height: '100vh',
-                                maxHeight: '100vh',
-                                borderRadius: 0,
-                                pointerEvents: 'auto'
-                            }}
-                            data-fullscreen-editor="true"
-                            onClick={(e) => {
-                                // 不阻止任何点击事件，让二级菜单正常工作
-                            }}
-                            onMouseDown={(e) => {
-                                // 不阻止任何mousedown事件，让二级菜单正常工作
-                            }}
-                        >
+                        <div className="w-full h-full bg-background flex flex-col">
                             <SimpleRichTextEditor
                                 key="fullscreen-editor"
                                 content={props.content}
-                                onChange={props.onChange}
+                                onChange={handleContentChange}
                                 placeholder={props.placeholder || '开始输入...'}
                                 className="flex-1"
                                 customMinHeight="calc(100vh - 80px)"
@@ -305,6 +247,12 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                                 stickyToolbar={props.stickyToolbar}
                                 showFullscreenButton={true}
                                 onFullscreenToggle={toggleFullscreen}
+                                // 传递预览相关属性
+                                previewContent={previewContent}
+                                isPreviewMode={isPreviewMode}
+                                onPreviewModeChange={handlePreviewModeChange}
+                                // 标识这是全屏模式
+                                isInFullscreen={true}
                             />
                         </div>
                     </div>,

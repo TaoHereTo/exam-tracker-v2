@@ -81,6 +81,12 @@ interface SimpleRichTextEditorProps {
     stickyToolbar?: boolean;
     showFullscreenButton?: boolean;
     onFullscreenToggle?: () => void;
+    // 新增：预览相关属性
+    previewContent?: string;
+    isPreviewMode?: boolean;
+    onPreviewModeChange?: (isPreviewMode: boolean) => void;
+    // 新增：标识是否在全屏模式中
+    isInFullscreen?: boolean;
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
@@ -97,10 +103,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     onUploadImages,
     stickyToolbar = false,
     showFullscreenButton = true,
-    onFullscreenToggle
+    onFullscreenToggle,
+    // 新增：预览相关属性
+    previewContent: externalPreviewContent,
+    isPreviewMode: externalIsPreviewMode,
+    onPreviewModeChange,
+    // 新增：标识是否在全屏模式中
+    isInFullscreen = false
 }) => {
-    // 预览内容状态
-    const [previewContent, setPreviewContent] = useState(content);
+    // 预览内容状态 - 优先使用外部传入的预览内容
+    const [internalPreviewContent, setInternalPreviewContent] = useState(content);
+    const previewContent = externalPreviewContent !== undefined ? externalPreviewContent : internalPreviewContent;
 
     const editorRef = useRef<HTMLDivElement>(null);
     const splitEditorRef = useRef<HTMLDivElement>(null);
@@ -121,8 +134,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         showCloudImageDialog: false,
         // 图片列表状态
         imageList: [] as { id: string; url: string; name: string }[],
-        // 预览模式状态
-        isPreviewMode: false,
+        // 预览模式状态 - 优先使用外部传入的预览模式状态
+        isPreviewMode: externalIsPreviewMode !== undefined ? externalIsPreviewMode : false,
         // 合并所有菜单状态
         openMenus: {
             textColor: false,
@@ -135,7 +148,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     });
 
     // 解构状态以便使用
-    const { activeFormats, hasSelectedText, isUploading, pendingImages, showLinkDialog, linkUrl, linkText, showLatexSelector, showCloudImageDialog, imageList, isPreviewMode, openMenus } = editorState;
+    const { activeFormats, hasSelectedText, isUploading, pendingImages, showLinkDialog, linkUrl, linkText, showLatexSelector, showCloudImageDialog, imageList, openMenus } = editorState;
+
+    // 预览模式状态 - 优先使用外部传入的状态
+    const isPreviewMode = externalIsPreviewMode !== undefined ? externalIsPreviewMode : editorState.isPreviewMode;
 
     // 定义哪些操作需要选中文字
     const requiresSelection = (operation: string): boolean => {
@@ -861,19 +877,94 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     // 监听content变化
     useEffect(() => {
-        setPreviewContent(content);
-    }, [content]);
+        if (externalPreviewContent === undefined) {
+            setInternalPreviewContent(content);
+        }
+    }, [content, externalPreviewContent]);
+
+    // 监听外部预览模式状态变化
+    useEffect(() => {
+        if (externalIsPreviewMode !== undefined) {
+            // 当外部状态变化时，同步内部状态
+            setEditorState(prev => ({ ...prev, isPreviewMode: externalIsPreviewMode }));
+        }
+    }, [externalIsPreviewMode]);
+
+    // 保存和恢复光标位置的辅助函数
+    const saveCursorPosition = (element: HTMLElement) => {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            return {
+                startContainer: range.startContainer,
+                startOffset: range.startOffset,
+                endContainer: range.endContainer,
+                endOffset: range.endOffset
+            };
+        }
+        return null;
+    };
+
+    const restoreCursorPosition = (element: HTMLElement, position: {
+        startContainer: Node;
+        startOffset: number;
+        endContainer: Node;
+        endOffset: number;
+    } | null) => {
+        if (!position) return;
+
+        try {
+            const range = document.createRange();
+            range.setStart(position.startContainer, position.startOffset);
+            range.setEnd(position.endContainer, position.endOffset);
+
+            const selection = window.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        } catch (error) {
+            // 如果恢复失败，将光标放到末尾
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            range.collapse(false);
+            const selection = window.getSelection();
+            if (selection) {
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+    };
 
     // 切换预览模式时同步内容
     useEffect(() => {
         if (isPreviewMode && editorRef.current && splitEditorRef.current) {
-            // 切换到分屏模式时，将主编辑器内容同步到分屏编辑器
+            // 切换到分屏模式时，保存主编辑器光标位置
+            const cursorPosition = saveCursorPosition(editorRef.current);
+            // 将主编辑器内容同步到分屏编辑器
             splitEditorRef.current.innerHTML = editorRef.current.innerHTML;
+            // 恢复光标位置
+            if (cursorPosition) {
+                setTimeout(() => restoreCursorPosition(splitEditorRef.current!, cursorPosition), 0);
+            }
         } else if (!isPreviewMode && editorRef.current && splitEditorRef.current) {
-            // 切换到单屏模式时，将分屏编辑器内容同步到主编辑器
+            // 切换到单屏模式时，保存分屏编辑器光标位置
+            const cursorPosition = saveCursorPosition(splitEditorRef.current);
+            // 将分屏编辑器内容同步到主编辑器
             editorRef.current.innerHTML = splitEditorRef.current.innerHTML;
+            // 恢复光标位置
+            if (cursorPosition) {
+                setTimeout(() => restoreCursorPosition(editorRef.current!, cursorPosition), 0);
+            }
         }
     }, [isPreviewMode]);
+
+    // 初始化分屏编辑器内容
+    useEffect(() => {
+        if (isPreviewMode && splitEditorRef.current && !splitEditorRef.current.innerHTML) {
+            splitEditorRef.current.innerHTML = content;
+        }
+    }, [isPreviewMode, content]);
 
     // 监听选区变化
     useEffect(() => {
@@ -885,7 +976,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         return () => {
             document.removeEventListener('selectionchange', handleSelectionChange);
         };
-    }, []);
+    }, [updateButtonStates]);
 
     // 清理空的HTML标签
     const cleanEmptyTags = (html: string): string => {
@@ -976,22 +1067,27 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             onChange(html);
 
             // 更新预览内容
-            setPreviewContent(html);
+            if (externalPreviewContent === undefined) {
+                setInternalPreviewContent(html);
+            }
 
-            // 同步两个编辑器的内容
-            if (isPreviewMode) {
-                // 如果在分屏模式，同步到主编辑器
-                if (editorRef.current && splitEditorRef.current) {
-                    editorRef.current.innerHTML = html;
-                }
-            } else {
-                // 如果在单屏模式，同步到分屏编辑器
-                if (splitEditorRef.current) {
-                    splitEditorRef.current.innerHTML = html;
+            // 同步两个编辑器的内容 - 只在非全屏模式下同步
+            // 全屏模式下不进行内容同步，避免光标位置丢失
+            if (!isInFullscreen) {
+                if (isPreviewMode) {
+                    // 如果在分屏模式，同步到主编辑器
+                    if (editorRef.current && splitEditorRef.current) {
+                        editorRef.current.innerHTML = html;
+                    }
+                } else {
+                    // 如果在单屏模式，同步到分屏编辑器
+                    if (splitEditorRef.current) {
+                        splitEditorRef.current.innerHTML = html;
+                    }
                 }
             }
         }, 100); // 100ms防抖
-    }, [onChange, isPreviewMode]);
+    }, [onChange, isPreviewMode, externalPreviewContent, isInFullscreen]);
 
     // 完全移除键盘事件处理，让浏览器使用默认行为
     // const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -1425,7 +1521,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         TOOLBAR_BUTTON_CLASSES,
                                         isPreviewMode ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400 hover:bg-green-500/20 hover:text-green-600 dark:hover:bg-green-400/20 dark:hover:text-green-400" : ""
                                     )}
-                                    onClick={() => setEditorState(prev => ({ ...prev, isPreviewMode: !prev.isPreviewMode }))}
+                                    onClick={() => {
+                                        const newPreviewMode = !isPreviewMode;
+                                        if (onPreviewModeChange) {
+                                            onPreviewModeChange(newPreviewMode);
+                                        } else {
+                                            setEditorState(prev => ({ ...prev, isPreviewMode: newPreviewMode }));
+                                        }
+                                    }}
                                 >
                                     <Eye className="w-4 h-4" />
                                 </Button>
@@ -1494,7 +1597,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         data-placeholder={placeholder}
                                         onInput={handleInput}
                                         onClick={handleEditorClick}
-                                        dangerouslySetInnerHTML={{ __html: content }}
                                     />
                                 </div>
                             </div>
