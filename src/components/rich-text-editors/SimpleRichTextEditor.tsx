@@ -194,28 +194,52 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         const selection = window.getSelection();
         if (selection && selection.rangeCount > 0) {
             const range = selection.getRangeAt(0);
-            savedSelectionRef.current = {
-                startContainer: range.startContainer,
-                startOffset: range.startOffset,
-                endContainer: range.endContainer,
-                endOffset: range.endOffset
-            };
+            // 检查选区是否在编辑器内
+            if (editorRef.current && editorRef.current.contains(range.startContainer) && editorRef.current.contains(range.endContainer)) {
+                savedSelectionRef.current = {
+                    startContainer: range.startContainer,
+                    startOffset: range.startOffset,
+                    endContainer: range.endContainer,
+                    endOffset: range.endOffset
+                };
+                console.log('选区已保存:', range.toString());
+            } else {
+                console.log('选区不在编辑器内，无法保存');
+                savedSelectionRef.current = null;
+            }
+        } else {
+            console.log('没有选区可保存');
+            savedSelectionRef.current = null;
         }
     };
 
     // 恢复选区
     const restoreSelection = () => {
-        if (!savedSelectionRef.current || !editorRef.current) return false;
+        if (!savedSelectionRef.current || !editorRef.current) {
+            console.log('无法恢复选区：没有保存的选区或编辑器引用');
+            return false;
+        }
 
         try {
             const selection = window.getSelection();
-            if (!selection) return false;
+            if (!selection) {
+                console.log('无法恢复选区：无法获取selection对象');
+                return false;
+            }
 
             // 检查保存的选区是否仍然有效
             const { startContainer, startOffset, endContainer, endOffset } = savedSelectionRef.current;
 
             // 验证节点是否仍然在DOM中
             if (!editorRef.current.contains(startContainer) || !editorRef.current.contains(endContainer)) {
+                console.log('无法恢复选区：节点不在编辑器内');
+                return false;
+            }
+
+            // 验证偏移量是否仍然有效
+            if (startOffset > (startContainer.textContent?.length || 0) ||
+                endOffset > (endContainer.textContent?.length || 0)) {
+                console.log('无法恢复选区：偏移量无效');
                 return false;
             }
 
@@ -225,6 +249,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
             selection.removeAllRanges();
             selection.addRange(range);
+
+            console.log('选区恢复成功:', range.toString());
             return true;
         } catch (error) {
             console.log('恢复选区失败:', error);
@@ -281,7 +307,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 const restored = restoreSelection();
                 if (!restored) {
                     // 如果恢复失败，尝试重新聚焦编辑器
-                    editorRef.current?.focus();
+                    if (editorRef.current) {
+                        editorRef.current.focus();
+                    }
                 }
             }, 50);
         }
@@ -343,86 +371,124 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const setTextColor = (color: string) => {
         if (!editorRef.current) return;
 
+        // 确保编辑器获得焦点
         editorRef.current.focus();
 
+        // 立即执行，不使用延迟
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
+        if (!selection || selection.rangeCount === 0) {
+            return;
+        }
 
         const range = selection.getRangeAt(0);
         const selectedText = range.toString().trim();
 
         // 只有当选中有文字时才执行颜色设置
-        if (!selectedText) return;
-
-        // 使用 execCommand 来设置颜色，这样更稳定
-        const success = document.execCommand('foreColor', false, color);
-
-        if (success) {
-            const html = editorRef.current.innerHTML;
-            onChange(html);
-        } else {
-            // 如果 execCommand 失败，使用手动方式
-            const span = document.createElement('span');
-            span.style.color = color;
-            const contents = range.extractContents();
-            span.appendChild(contents);
-            range.insertNode(span);
-
-            const html = editorRef.current.innerHTML;
-            onChange(html);
+        if (!selectedText) {
+            return;
         }
 
-        // 延迟恢复选区，使用更长的延迟确保DOM更新完成
-        setTimeout(() => {
-            const restored = restoreSelection();
-            if (!restored) {
-                // 如果恢复失败，尝试重新聚焦编辑器
-                editorRef.current?.focus();
+        try {
+            // 使用 surroundContents 方法
+            const span = document.createElement('span');
+            span.style.color = color;
+
+            // 使用 surroundContents 包装选中的内容
+            range.surroundContents(span);
+
+            // 批量更新内容，减少DOM操作
+            const html = editorRef.current!.innerHTML;
+            onChange(html);
+
+            // 清除选区
+            selection.removeAllRanges();
+
+        } catch (error) {
+            // 备用方法：手动创建和插入
+            try {
+                const span = document.createElement('span');
+                span.style.color = color;
+                span.textContent = selectedText;
+
+                // 删除选中的内容
+                range.deleteContents();
+
+                // 插入新的span
+                range.insertNode(span);
+
+                // 批量更新内容
+                const html = editorRef.current!.innerHTML;
+                onChange(html);
+
+                // 清除选区
+                selection.removeAllRanges();
+
+            } catch (backupError) {
+                console.error('颜色设置失败:', backupError);
             }
-        }, 50);
+        }
     };
 
     // 设置背景颜色
     const setBackgroundColor = (color: string) => {
         if (!editorRef.current) return;
 
+        // 确保编辑器获得焦点
         editorRef.current.focus();
 
+        // 立即执行，不使用延迟
         const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
+        if (!selection || selection.rangeCount === 0) {
+            return;
+        }
 
         const range = selection.getRangeAt(0);
         const selectedText = range.toString().trim();
 
         // 只有当选中有文字时才执行颜色设置
-        if (!selectedText) return;
-
-        // 使用 execCommand 来设置背景颜色，这样更稳定
-        const success = document.execCommand('backColor', false, color);
-
-        if (success) {
-            const html = editorRef.current.innerHTML;
-            onChange(html);
-        } else {
-            // 如果 execCommand 失败，使用手动方式
-            const span = document.createElement('span');
-            span.style.backgroundColor = color;
-            const contents = range.extractContents();
-            span.appendChild(contents);
-            range.insertNode(span);
-
-            const html = editorRef.current.innerHTML;
-            onChange(html);
+        if (!selectedText) {
+            return;
         }
 
-        // 延迟恢复选区，使用更长的延迟确保DOM更新完成
-        setTimeout(() => {
-            const restored = restoreSelection();
-            if (!restored) {
-                // 如果恢复失败，尝试重新聚焦编辑器
-                editorRef.current?.focus();
+        try {
+            // 使用 surroundContents 方法
+            const span = document.createElement('span');
+            span.style.backgroundColor = color;
+
+            // 使用 surroundContents 包装选中的内容
+            range.surroundContents(span);
+
+            // 批量更新内容，减少DOM操作
+            const html = editorRef.current!.innerHTML;
+            onChange(html);
+
+            // 清除选区
+            selection.removeAllRanges();
+
+        } catch (error) {
+            // 备用方法：手动创建和插入
+            try {
+                const span = document.createElement('span');
+                span.style.backgroundColor = color;
+                span.textContent = selectedText;
+
+                // 删除选中的内容
+                range.deleteContents();
+
+                // 插入新的span
+                range.insertNode(span);
+
+                // 批量更新内容
+                const html = editorRef.current!.innerHTML;
+                onChange(html);
+
+                // 清除选区
+                selection.removeAllRanges();
+
+            } catch (backupError) {
+                console.error('背景颜色设置失败:', backupError);
             }
-        }, 50);
+        }
     };
 
     // 插入链接
@@ -530,7 +596,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             });
 
             if (editorRef.current) {
-                const html = editorRef.current.innerHTML;
+                const html = editorRef.current!.innerHTML;
                 onChange(html);
             }
 
@@ -581,7 +647,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 在列表项中，使用标准的缩进命令
             const success = document.execCommand('indent', false, undefined);
             if (success) {
-                const html = editorRef.current.innerHTML;
+                const html = editorRef.current!.innerHTML;
                 onChange(html);
             }
         } else {
@@ -789,7 +855,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 延迟清理，让浏览器先处理删除操作
             setTimeout(() => {
                 if (editorRef.current) {
-                    const html = editorRef.current.innerHTML;
+                    const html = editorRef.current!.innerHTML;
                     const cleanedHtml = cleanEmptyTags(html);
                     if (cleanedHtml !== html) {
                         editorRef.current.innerHTML = cleanedHtml;
@@ -1058,7 +1124,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")} onMouseDown={() => saveCurrentSelection()} disabled={!hasSelectedText}>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")}
+                                            onMouseDown={() => {
+                                                // 在鼠标按下时立即保存选区
+                                                saveCurrentSelection();
+                                            }}
+                                            disabled={!hasSelectedText}
+                                        >
                                             <Palette className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -1076,6 +1152,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 key={color}
                                                 className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
                                                 style={{ backgroundColor: color }}
+                                                onMouseDown={(e) => {
+                                                    // 阻止默认行为，防止失去焦点
+                                                    e.preventDefault();
+                                                    // 保存选区
+                                                    saveCurrentSelection();
+                                                }}
                                                 onClick={() => {
                                                     setTextColor(color);
                                                     closeAllMenus();
@@ -1092,7 +1174,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")} onMouseDown={() => saveCurrentSelection()} disabled={!hasSelectedText}>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")}
+                                            onMouseDown={() => {
+                                                // 在鼠标按下时立即保存选区
+                                                saveCurrentSelection();
+                                            }}
+                                            disabled={!hasSelectedText}
+                                        >
                                             <Paintbrush className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -1110,6 +1202,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 key={color}
                                                 className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform cursor-pointer"
                                                 style={{ backgroundColor: color }}
+                                                onMouseDown={(e) => {
+                                                    // 阻止默认行为，防止失去焦点
+                                                    e.preventDefault();
+                                                    // 保存选区
+                                                    saveCurrentSelection();
+                                                }}
                                                 onClick={() => {
                                                     setBackgroundColor(color);
                                                     closeAllMenus();
