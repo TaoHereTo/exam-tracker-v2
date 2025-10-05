@@ -1687,17 +1687,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                 {/* 图片 Accordion */}
                 {imageList.length > 0 && (
-                    <div className="mt-4">
+                    <div className="mt-2">
                         <Accordion type="single" collapsible className="w-full">
-                            <AccordionItem value="images">
-                                <AccordionTrigger className="text-sm font-medium">
+                            <AccordionItem value="images" className="border-none">
+                                <AccordionTrigger className="text-sm font-medium py-1 px-0 hover:no-underline">
                                     图片 ({imageList.length})
                                 </AccordionTrigger>
-                                <AccordionContent>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-                                        {imageList.map((image, index) => (
-                                            <div key={image.id} className="relative group">
-                                                <PhotoProvider>
+                                <AccordionContent className="pt-0 pb-2">
+                                    <PhotoProvider>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-3">
+                                            {imageList.map((image, index) => (
+                                                <div key={image.id} className="relative group">
                                                     <PhotoView src={image.url}>
                                                         <div className="aspect-square rounded-lg overflow-hidden border border-border cursor-pointer hover:border-primary transition-colors">
                                                             <Image
@@ -1709,32 +1709,32 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                             />
                                                         </div>
                                                     </PhotoView>
-                                                </PhotoProvider>
-                                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="destructive"
-                                                        className="h-6 w-6 p-0"
-                                                        onClick={() => {
-                                                            setEditorState(prev => ({
-                                                                ...prev,
-                                                                imageList: prev.imageList.filter((_, i) => i !== index)
-                                                            }));
-                                                            if (onImageChange) {
-                                                                const newImageIds = imageList.filter((_, i) => i !== index).map(img => img.id);
-                                                                onImageChange(newImageIds);
-                                                            }
-                                                        }}
-                                                    >
-                                                        ×
-                                                    </Button>
+                                                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="destructive"
+                                                            className="h-6 w-6 p-0"
+                                                            onClick={() => {
+                                                                setEditorState(prev => ({
+                                                                    ...prev,
+                                                                    imageList: prev.imageList.filter((_, i) => i !== index)
+                                                                }));
+                                                                if (onImageChange) {
+                                                                    const newImageIds = imageList.filter((_, i) => i !== index).map(img => img.id);
+                                                                    onImageChange(newImageIds);
+                                                                }
+                                                            }}
+                                                        >
+                                                            ×
+                                                        </Button>
+                                                    </div>
+                                                    <div className="mt-2 text-xs text-muted-foreground truncate">
+                                                        {image.name}
+                                                    </div>
                                                 </div>
-                                                <div className="mt-2 text-xs text-muted-foreground truncate">
-                                                    {image.name}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    </PhotoProvider>
                                 </AccordionContent>
                             </AccordionItem>
                         </Accordion>

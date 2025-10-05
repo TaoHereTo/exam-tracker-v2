@@ -69,6 +69,9 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
         return `fullscreen-editor-${timestamp}`;
     }, []); // 空依赖数组确保ID在组件生命周期内保持不变
     const { isFullscreen, openFullscreen, closeFullscreen } = useGlobalFullscreen(componentId);
+    const [isAnimating, setIsAnimating] = useState(false);
+    const editorRef = useRef<HTMLDivElement>(null);
+    const [editorPosition, setEditorPosition] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
 
     // 预览状态管理
     const [internalPreviewContent, setInternalPreviewContent] = useState(props.content);
@@ -107,9 +110,25 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
 
         if (isFullscreen) {
             console.log('Closing fullscreen...');
-            closeFullscreen();
+            setIsAnimating(true);
+            // 延迟关闭，让退出动画完成
+            setTimeout(() => {
+                closeFullscreen();
+                setIsAnimating(false);
+            }, 300);
         } else {
             console.log('Opening fullscreen...');
+            // 记录当前编辑器位置
+            if (editorRef.current) {
+                const rect = editorRef.current.getBoundingClientRect();
+                setEditorPosition({
+                    top: rect.top,
+                    left: rect.left,
+                    width: rect.width,
+                    height: rect.height
+                });
+            }
+            setIsAnimating(false);
             openFullscreen();
             // 在Dialog中时，添加额外的调试信息
             if (props.isInDialog) {
@@ -131,7 +150,12 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                 if (event.key === 'Escape') {
                     event.preventDefault();
                     event.stopPropagation();
-                    closeFullscreen();
+                    setIsAnimating(true);
+                    // 延迟关闭，让退出动画完成
+                    setTimeout(() => {
+                        closeFullscreen();
+                        setIsAnimating(false);
+                    }, 300);
                 }
             };
 
@@ -206,18 +230,24 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
 
     // 正常编辑器
     const normalEditor = (
-        <SimpleRichTextEditor
-            {...props}
-            onChange={handleContentChange}
-            showFullscreenButton={true}
-            onFullscreenToggle={toggleFullscreen}
-            // 传递预览相关属性
-            previewContent={previewContent}
-            isPreviewMode={isPreviewMode}
-            onPreviewModeChange={handlePreviewModeChange}
-            // 正常模式下不标识为全屏
-            isInFullscreen={false}
-        />
+        <div
+            ref={editorRef}
+            className={`transition-all duration-300 ${isFullscreen && !isAnimating ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                }`}
+        >
+            <SimpleRichTextEditor
+                {...props}
+                onChange={handleContentChange}
+                showFullscreenButton={true}
+                onFullscreenToggle={toggleFullscreen}
+                // 传递预览相关属性
+                previewContent={previewContent}
+                isPreviewMode={isPreviewMode}
+                onPreviewModeChange={handlePreviewModeChange}
+                // 正常模式下不标识为全屏
+                isInFullscreen={false}
+            />
+        </div>
     );
 
     if (isFullscreen) {
@@ -227,15 +257,23 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                 {/* 简化的全屏编辑器 */}
                 {createPortal(
                     <div
-                        className="fixed inset-0 bg-black/80 flex items-center justify-center"
+                        className={`fixed inset-0 bg-black/80 flex items-center justify-center ${isAnimating
+                            ? 'animate-out fade-out-0 duration-300'
+                            : 'animate-in fade-in-0 duration-300'
+                            }`}
                         style={{ zIndex: 100000 }}
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
-                                closeFullscreen();
+                                setIsAnimating(true);
+                                // 延迟关闭，让退出动画完成
+                                setTimeout(() => {
+                                    closeFullscreen();
+                                    setIsAnimating(false);
+                                }, 300);
                             }
                         }}
                     >
-                        <div className="w-full h-full bg-background flex flex-col">
+                        <div className="w-full h-full bg-background flex flex-col animate-in zoom-in-95 duration-300">
                             <SimpleRichTextEditor
                                 key="fullscreen-editor"
                                 content={props.content}
@@ -258,6 +296,8 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                     </div>,
                     document.body
                 )}
+                {/* 正常编辑器 - 根据动画阶段显示 */}
+                {normalEditor}
             </>
         );
     }

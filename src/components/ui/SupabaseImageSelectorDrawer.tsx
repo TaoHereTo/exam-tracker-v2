@@ -200,7 +200,7 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
             <Drawer open={isOpen} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
                 <DrawerContent className="h-[90vh] flex flex-col" style={{ height: '90vh' }}>
-                    <DrawerHeader className="flex-shrink-0">
+                    <DrawerHeader className="flex-shrink-0 px-4 py-3">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Cloud className="h-5 w-5" />
@@ -212,14 +212,11 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                 </Button>
                             </DrawerClose>
                         </div>
-                        <DrawerDescription>
-                            <MixedText text="选择一张图片插入到编辑器中" />
-                        </DrawerDescription>
                     </DrawerHeader>
 
                     <div className="flex-1 min-h-0 flex flex-col">
                         {/* 搜索和排序 */}
-                        <div className="flex-shrink-0 p-4 border-b">
+                        <div className="flex-shrink-0 px-4 py-3 border-b">
                             <div className="flex flex-col sm:flex-row gap-3">
                                 <div className="flex-1">
                                     <div className="relative">
@@ -240,14 +237,14 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                         <SelectTrigger className="w-32 h-10">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent>
+                                        <SelectContent className="z-[999999]">
                                             <SelectItem value="time-desc">最新</SelectItem>
                                             <SelectItem value="time-asc">最旧</SelectItem>
                                             <SelectItem value="name-asc">名称A-Z</SelectItem>
                                             <SelectItem value="name-desc">名称Z-A</SelectItem>
                                         </SelectContent>
                                     </Select>
-                                    <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-10 px-3">
+                                    <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isLoading} className="h-10 w-10 p-0 rounded-full">
                                         <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                                     </Button>
                                 </div>
@@ -284,7 +281,7 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                 </div>
                             ) : (
                                 /* 图片网格模式 */
-                                <div className="h-full overflow-y-auto p-4" style={{ height: 'calc(90vh - 200px)', overflowY: 'auto' }}>
+                                <div className="h-full overflow-y-auto px-4 py-3" style={{ height: 'calc(90vh - 200px)', overflowY: 'auto' }}>
                                     {isLoading ? (
                                         <div className="flex items-center justify-center h-32">
                                             <SimpleUiverseSpinner />
@@ -299,7 +296,7 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                             </div>
                                         </div>
                                     ) : (
-                                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-4">
+                                        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 pb-4">
                                             {processedImages.map((image) => (
                                                 <div
                                                     key={image.id}
@@ -313,8 +310,8 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                                         <Image
                                                             src={image.url}
                                                             alt={image.originalName}
-                                                            width={120}
-                                                            height={120}
+                                                            width={80}
+                                                            height={80}
                                                             className="object-cover w-full h-full"
                                                             onError={() => {
                                                                 setImageLoadErrors(prev => new Set(prev).add(image.id));
@@ -341,11 +338,11 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                                         </div>
                                                     </div>
 
-                                                    <div className="p-2">
+                                                    <div className="p-1">
                                                         <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate text-center">
                                                             <MixedText text={image.originalName} />
                                                         </div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
+                                                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-0.5">
                                                             {new Date(image.uploadedAt).toLocaleDateString()}
                                                         </div>
                                                     </div>
