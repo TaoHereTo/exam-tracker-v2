@@ -61,6 +61,7 @@ import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 import 'react-photo-view/dist/react-photo-view.css';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import Image from 'next/image';
@@ -98,82 +99,88 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     showFullscreenButton = true,
     onFullscreenToggle
 }) => {
+    // 预览内容状态
+    const [previewContent, setPreviewContent] = useState(content);
+
     const editorRef = useRef<HTMLDivElement>(null);
+    const splitEditorRef = useRef<HTMLDivElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const toolbarRef = useRef<HTMLDivElement>(null);
     const savedSelectionRef = useRef<{ startContainer: Node; startOffset: number; endContainer: Node; endOffset: number } | null>(null);
 
-    // 状态管理
-    const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
-    const [isUploading, setIsUploading] = useState(false);
-    const [pendingImages, setPendingImages] = useState<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
-    const [showLinkDialog, setShowLinkDialog] = useState(false);
-    const [linkUrl, setLinkUrl] = useState('');
-    const [linkText, setLinkText] = useState('');
-    const [showLatexSelector, setShowLatexSelector] = useState(false);
-    const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
-    const [hasSelectedText, setHasSelectedText] = useState(false);
+    // 合并状态管理 - 减少重渲染
+    const [editorState, setEditorState] = useState({
+        activeFormats: new Set<string>(),
+        hasSelectedText: false,
+        isUploading: false,
+        pendingImages: [] as { localUrl: string; file: File | null; imageId: string | null }[],
+        showLinkDialog: false,
+        linkUrl: '',
+        linkText: '',
+        showLatexSelector: false,
+        showCloudImageDialog: false,
+        // 图片列表状态
+        imageList: [] as { id: string; url: string; name: string }[],
+        // 预览模式状态
+        isPreviewMode: false,
+        // 合并所有菜单状态
+        openMenus: {
+            textColor: false,
+            backgroundColor: false,
+            heading: false,
+            list: false,
+            align: false,
+            image: false
+        }
+    });
 
-    // Popover和DropdownMenu状态管理 - 使用统一的状态管理确保互斥
-    const [textColorPopoverOpen, setTextColorPopoverOpen] = useState(false);
-    const [backgroundColorPopoverOpen, setBackgroundColorPopoverOpen] = useState(false);
-    const [headingDropdownOpen, setHeadingDropdownOpen] = useState(false);
-    const [listDropdownOpen, setListDropdownOpen] = useState(false);
-    const [alignDropdownOpen, setAlignDropdownOpen] = useState(false);
-    const [imageDropdownOpen, setImageDropdownOpen] = useState(false);
+    // 解构状态以便使用
+    const { activeFormats, hasSelectedText, isUploading, pendingImages, showLinkDialog, linkUrl, linkText, showLatexSelector, showCloudImageDialog, imageList, isPreviewMode, openMenus } = editorState;
+
+    // 定义哪些操作需要选中文字
+    const requiresSelection = (operation: string): boolean => {
+        const operationsRequiringSelection = [
+            'bold', 'italic', 'underline', 'strikeThrough',
+            'foreColor', 'backColor', 'removeFormat'
+        ];
+        return operationsRequiringSelection.includes(operation);
+    };
+
+    // 检查按钮是否应该被禁用
+    const isButtonDisabled = (operation: string): boolean => {
+        return requiresSelection(operation) && !hasSelectedText;
+    };
 
     // 关闭所有其他菜单的函数
     const closeAllMenus = useCallback(() => {
-        setTextColorPopoverOpen(false);
-        setBackgroundColorPopoverOpen(false);
-        setHeadingDropdownOpen(false);
-        setListDropdownOpen(false);
-        setAlignDropdownOpen(false);
-        setImageDropdownOpen(false);
+        setEditorState(prev => ({
+            ...prev,
+            openMenus: {
+                textColor: false,
+                backgroundColor: false,
+                heading: false,
+                list: false,
+                align: false,
+                image: false
+            }
+        }));
     }, []);
 
-    // 为每个菜单创建互斥的处理函数
-    const handleTextColorPopoverChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setTextColorPopoverOpen(open);
-    }, [closeAllMenus]);
-
-    const handleBackgroundColorPopoverChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setBackgroundColorPopoverOpen(open);
-    }, [closeAllMenus]);
-
-    const handleHeadingDropdownChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setHeadingDropdownOpen(open);
-    }, [closeAllMenus]);
-
-    const handleListDropdownChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setListDropdownOpen(open);
-    }, [closeAllMenus]);
-
-    const handleAlignDropdownChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setAlignDropdownOpen(open);
-    }, [closeAllMenus]);
-
-    const handleImageDropdownChange = useCallback((open: boolean) => {
-        if (open) {
-            closeAllMenus();
-        }
-        setImageDropdownOpen(open);
-    }, [closeAllMenus]);
+    // 统一的菜单处理函数
+    const handleMenuChange = useCallback((menuType: keyof typeof openMenus, open: boolean) => {
+        setEditorState(prev => ({
+            ...prev,
+            openMenus: {
+                textColor: false,
+                backgroundColor: false,
+                heading: false,
+                list: false,
+                align: false,
+                image: false,
+                [menuType]: open
+            }
+        }));
+    }, []);
 
     const { notify } = useNotification();
 
@@ -275,20 +282,19 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const handleFormatCommand = (command: string, value?: string) => {
         if (!editorRef.current) return;
 
-        // 检查是否有选中的文本
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
-
-        const selectedText = selection.toString().trim();
-        if (!selectedText) {
-            // 如果没有选中文本，不执行格式化操作
-            return;
-        }
-
-        // 保存当前选区
-        saveCurrentSelection();
-
         editorRef.current.focus();
+
+        // 检查是否需要选中文字
+        if (requiresSelection(command)) {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const selectedText = selection.toString().trim();
+            if (!selectedText) {
+                // 如果没有选中文本，不执行需要选中的格式化操作
+                return;
+            }
+        }
 
         // 特殊处理列表命令
         if (command === 'insertUnorderedList' || command === 'insertOrderedList') {
@@ -301,17 +307,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         if (success) {
             const html = editorRef.current.innerHTML;
             onChange(html);
-
-            // 延迟恢复选区，使用更长的延迟确保DOM更新完成
-            setTimeout(() => {
-                const restored = restoreSelection();
-                if (!restored) {
-                    // 如果恢复失败，尝试重新聚焦编辑器
-                    if (editorRef.current) {
-                        editorRef.current.focus();
-                    }
-                }
-            }, 50);
         }
     };
 
@@ -503,10 +498,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         const selectedText = range.toString();
 
         if (selectedText) {
-            setLinkText(selectedText);
+            setEditorState(prev => ({ ...prev, linkText: selectedText }));
         }
 
-        setShowLinkDialog(true);
+        setEditorState(prev => ({ ...prev, showLinkDialog: true }));
     };
 
     // 确认插入链接
@@ -537,38 +532,73 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         const html = editorRef.current.innerHTML;
         onChange(html);
 
-        setShowLinkDialog(false);
-        setLinkUrl('');
-        setLinkText('');
+        setEditorState(prev => ({ ...prev, showLinkDialog: false, linkUrl: '', linkText: '' }));
     };
 
     // 插入LaTeX公式
     const handleInsertLatex = (latex: string) => {
         if (!editorRef.current) return;
 
-        editorRef.current.focus();
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
+        console.log('插入LaTeX公式:', latex);
 
-        const range = selection.getRangeAt(0);
+        // 确保编辑器获得焦点
+        editorRef.current.focus();
+
+        // 获取当前选区
+        const selection = window.getSelection();
+        let range: Range;
+
+        if (!selection || selection.rangeCount === 0) {
+            // 如果没有选区，创建一个在编辑器末尾的选区
+            range = document.createRange();
+            range.selectNodeContents(editorRef.current);
+            range.collapse(false); // 折叠到末尾
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+        } else {
+            range = selection.getRangeAt(0);
+
+            // 检查选区是否在编辑器内部
+            if (!editorRef.current.contains(range.commonAncestorContainer)) {
+                // 如果选区不在编辑器内部，将选区移到编辑器末尾
+                range = document.createRange();
+                range.selectNodeContents(editorRef.current);
+                range.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        }
+
+        // 创建LaTeX元素
         const latexElement = document.createElement('span');
         latexElement.className = 'latex-formula';
         latexElement.setAttribute('data-latex', latex);
         latexElement.textContent = `$${latex}$`;
 
+        console.log('创建的LaTeX元素:', latexElement.outerHTML);
+
+        // 插入元素
         range.insertNode(latexElement);
 
+        // 将光标移到插入的元素后面
+        range.setStartAfter(latexElement);
+        range.setEndAfter(latexElement);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+
+        // 更新内容
         const html = editorRef.current.innerHTML;
+        console.log('更新后的编辑器HTML:', html);
         onChange(html);
 
-        setShowLatexSelector(false);
+        setEditorState(prev => ({ ...prev, showLatexSelector: false }));
     };
 
     // 处理图片上传
     const handleImageUpload = async (files: FileList | null) => {
         if (!files || files.length === 0) return;
 
-        setIsUploading(true);
+        setEditorState(prev => ({ ...prev, isUploading: true }));
 
         try {
             const uploadPromises = Array.from(files).map(async (file) => {
@@ -578,26 +608,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
             const uploadedImages = await Promise.all(uploadPromises);
 
-            // 插入图片到编辑器
-            uploadedImages.forEach((image) => {
-                if (!editorRef.current) return;
+            // 将图片添加到列表中，而不是插入到编辑器
+            setEditorState(prev => ({
+                ...prev,
+                imageList: [...prev.imageList, ...uploadedImages]
+            }));
 
-                editorRef.current.focus();
-                const selection = window.getSelection();
-                if (!selection || selection.rangeCount === 0) return;
-
-                const range = selection.getRangeAt(0);
-                const img = document.createElement('img');
-                img.src = image.url;
-                img.alt = image.name;
-                img.className = 'max-w-full h-auto rounded-lg';
-
-                range.insertNode(img);
-            });
-
-            if (editorRef.current) {
-                const html = editorRef.current!.innerHTML;
-                onChange(html);
+            // 通知父组件图片变化
+            if (onImageChange) {
+                const imageIds = [...imageList.map(img => img.id), ...uploadedImages.map(img => img.id)];
+                onImageChange(imageIds);
             }
 
             notify({ message: '图片上传成功', type: 'success' });
@@ -605,30 +625,72 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             console.error('图片上传失败:', error);
             notify({ message: '图片上传失败', type: 'error' });
         } finally {
-            setIsUploading(false);
+            setEditorState(prev => ({ ...prev, isUploading: false }));
         }
     };
 
     // 处理云端图片选择
     const handleCloudImageSelect = (imageId: string) => {
-        if (!editorRef.current) return;
+        const imageUrl = supabaseImageManager.getImageUrl(imageId) || '';
+        const imageName = `Cloud Image ${imageId}`;
 
-        editorRef.current.focus();
-        const selection = window.getSelection();
-        if (!selection || selection.rangeCount === 0) return;
+        // 将图片添加到列表中，而不是插入到编辑器
+        setEditorState(prev => ({
+            ...prev,
+            imageList: [...prev.imageList, { id: imageId, url: imageUrl, name: imageName }]
+        }));
 
-        const range = selection.getRangeAt(0);
-        const img = document.createElement('img');
-        img.src = supabaseImageManager.getImageUrl(imageId) || '';
-        img.alt = 'Cloud Image';
-        img.className = 'max-w-full h-auto rounded-lg';
+        // 通知父组件图片变化
+        if (onImageChange) {
+            const imageIds = [...imageList.map(img => img.id), imageId];
+            onImageChange(imageIds);
+        }
 
-        range.insertNode(img);
+        setEditorState(prev => ({ ...prev, showCloudImageDialog: false }));
+    };
 
-        const html = editorRef.current.innerHTML;
-        onChange(html);
+    // 渲染LaTeX公式 - 简化版本
+    const renderLatexInContent = (html: string): string => {
+        if (!html || html.trim() === '') return '';
 
-        setShowCloudImageDialog(false);
+        // 创建临时DOM元素来解析HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // 查找所有LaTeX公式元素
+        const latexElements = tempDiv.querySelectorAll('.latex-formula');
+
+        // 如果没有任何LaTeX元素，直接返回原始HTML
+        if (latexElements.length === 0) {
+            return html;
+        }
+
+        latexElements.forEach((element) => {
+            const latex = element.getAttribute('data-latex');
+
+            if (latex) {
+                try {
+                    // 使用katex渲染公式
+                    const rendered = katex.renderToString(latex, {
+                        throwOnError: false,
+                        displayMode: false
+                    });
+
+                    // 创建新的div元素来替换原元素
+                    const newElement = document.createElement('div');
+                    newElement.innerHTML = rendered;
+                    newElement.className = 'latex-rendered inline-block';
+
+                    // 替换原元素
+                    element.parentNode?.replaceChild(newElement, element);
+                } catch (error) {
+                    console.error('LaTeX渲染错误:', error);
+                    // 如果渲染失败，保持原始文本
+                }
+            }
+        });
+
+        return tempDiv.innerHTML;
     };
 
     // 处理缩进命令
@@ -651,23 +713,69 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 onChange(html);
             }
         } else {
-            // 不在列表项中，手动添加缩进
+            // 不在列表项中，为当前段落添加缩进
             const indentAmount = 40;
-            const currentMarginLeft = parseInt(range.startContainer.parentElement?.style.marginLeft || '0');
-            const newMarginLeft = currentMarginLeft + indentAmount;
 
-            // 创建或更新包含选中文本的元素
-            let container = range.startContainer.parentElement;
-            if (!container || container === editorRef.current) {
-                // 如果没有合适的容器，创建一个div
-                const div = document.createElement('div');
-                const contents = range.extractContents();
-                div.appendChild(contents);
-                range.insertNode(div);
-                container = div;
+            // 找到包含光标的段落元素
+            let paragraph = range.startContainer;
+
+            // 向上查找段落元素
+            while (paragraph && paragraph !== editorRef.current) {
+                if (paragraph.nodeType === Node.ELEMENT_NODE) {
+                    const element = paragraph as HTMLElement;
+                    if (['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE'].includes(element.tagName)) {
+                        break;
+                    }
+                }
+                paragraph = paragraph.parentNode!;
             }
 
-            container.style.marginLeft = `${newMarginLeft}px`;
+            // 如果没有找到段落，需要创建一个
+            if (!paragraph || paragraph === editorRef.current) {
+                // 检查编辑器是否为空
+                const editorContent = editorRef.current.innerHTML.trim();
+
+                if (!editorContent || editorContent === '<br>' || editorContent === '') {
+                    // 编辑器为空，创建一个带缩进的段落
+                    const p = document.createElement('p');
+                    p.innerHTML = '&nbsp;';
+                    p.style.marginLeft = `${indentAmount}px`;
+                    editorRef.current.innerHTML = '';
+                    editorRef.current.appendChild(p);
+
+                    // 将光标移到段落中
+                    const newRange = document.createRange();
+                    newRange.setStart(p, 0);
+                    newRange.setEnd(p, 0);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                } else {
+                    // 编辑器有内容，将内容包装在段落中
+                    const allContent = editorRef.current.innerHTML;
+                    const p = document.createElement('p');
+                    p.innerHTML = allContent;
+                    p.style.marginLeft = `${indentAmount}px`;
+                    editorRef.current.innerHTML = '';
+                    editorRef.current.appendChild(p);
+
+                    // 将光标移到段落末尾
+                    const newRange = document.createRange();
+                    newRange.setStart(p, p.childNodes.length);
+                    newRange.setEnd(p, p.childNodes.length);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+
+                const html = editorRef.current.innerHTML;
+                onChange(html);
+                return;
+            }
+
+            // 为现有段落添加缩进
+            const element = paragraph as HTMLElement;
+            const currentMarginLeft = parseInt(element.style.marginLeft || '0');
+            const newMarginLeft = currentMarginLeft + indentAmount;
+            element.style.marginLeft = `${newMarginLeft}px`;
 
             const html = editorRef.current.innerHTML;
             onChange(html);
@@ -719,8 +827,8 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }, 10);
     };
 
-    // 更新按钮状态
-    const updateButtonStates = () => {
+    // 防抖的按钮状态更新函数
+    const updateButtonStates = useCallback(() => {
         const formats = ['bold', 'italic', 'underline', 'strikeThrough'];
         const newActiveFormats = new Set<string>();
 
@@ -730,31 +838,42 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             }
         });
 
-        setActiveFormats(newActiveFormats);
-
         // 检查是否有选中的文本
         const selection = window.getSelection();
         const hasSelection = !!(selection && selection.rangeCount > 0 && selection.toString().trim() !== '');
-        setHasSelectedText(hasSelection);
-    };
 
-    // 监听编辑器变化
-    useEffect(() => {
-        if (editorRef.current && editorRef.current.innerHTML !== content) {
-            editorRef.current.innerHTML = content;
-
-            // 如果内容包含列表，重新应用样式
-            const lists = editorRef.current.querySelectorAll('ul, ol');
-            if (lists.length > 0) {
-                lists.forEach(list => {
-                    const htmlList = list as HTMLElement;
-                    htmlList.style.listStyleType = htmlList.tagName === 'UL' ? 'disc' : 'decimal';
-                    htmlList.style.marginLeft = '20px';
-                    htmlList.style.paddingLeft = '0';
-                });
+        // 批量更新状态，减少重渲染
+        setEditorState(prev => {
+            // 只有当状态真正改变时才更新
+            if (prev.activeFormats.size === newActiveFormats.size &&
+                [...prev.activeFormats].every(format => newActiveFormats.has(format)) &&
+                prev.hasSelectedText === hasSelection) {
+                return prev; // 状态没有变化，不触发重渲染
             }
-        }
+
+            return {
+                ...prev,
+                activeFormats: newActiveFormats,
+                hasSelectedText: hasSelection
+            };
+        });
+    }, []);
+
+    // 监听content变化
+    useEffect(() => {
+        setPreviewContent(content);
     }, [content]);
+
+    // 切换预览模式时同步内容
+    useEffect(() => {
+        if (isPreviewMode && editorRef.current && splitEditorRef.current) {
+            // 切换到分屏模式时，将主编辑器内容同步到分屏编辑器
+            splitEditorRef.current.innerHTML = editorRef.current.innerHTML;
+        } else if (!isPreviewMode && editorRef.current && splitEditorRef.current) {
+            // 切换到单屏模式时，将分屏编辑器内容同步到主编辑器
+            editorRef.current.innerHTML = splitEditorRef.current.innerHTML;
+        }
+    }, [isPreviewMode]);
 
     // 监听选区变化
     useEffect(() => {
@@ -782,10 +901,55 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             .replace(/<em[^>]*>\s*<\/em>/g, '') // 移除空的em标签
             .replace(/<u[^>]*>\s*<\/u>/g, '') // 移除空的u标签
             .replace(/<s[^>]*>\s*<\/s>/g, '') // 移除空的s标签
+            .replace(/<b[^>]*>\s*<\/b>/g, '') // 移除空的b标签
+            .replace(/<i[^>]*>\s*<\/i>/g, '') // 移除空的i标签
             .replace(/<(\w+)[^>]*>\s*<(\w+)[^>]*>\s*<\/\2>\s*<\/\1>/g, '') // 移除嵌套的空标签
             .replace(/<div[^>]*>\s*<\/div>/g, '') // 移除空的div标签
             .replace(/<p[^>]*>\s*<\/p>/g, '') // 移除空的p标签
-            .replace(/<h[1-6][^>]*>\s*<\/h[1-6]>/g, ''); // 移除空的标题标签
+            .replace(/<h[1-6][^>]*>\s*<\/h[1-6]>/g, '') // 移除空的标题标签
+            .replace(/<font[^>]*>\s*<\/font>/g, '') // 移除空的font标签
+            .replace(/<mark[^>]*>\s*<\/mark>/g, '') // 移除空的mark标签
+            .replace(/<del[^>]*>\s*<\/del>/g, '') // 移除空的del标签
+            .replace(/<ins[^>]*>\s*<\/ins>/g, '') // 移除空的ins标签
+            .replace(/<sub[^>]*>\s*<\/sub>/g, '') // 移除空的sub标签
+            .replace(/<sup[^>]*>\s*<\/sup>/g, '') // 移除空的sup标签
+            .replace(/<code[^>]*>\s*<\/code>/g, '') // 移除空的code标签
+            .replace(/<kbd[^>]*>\s*<\/kbd>/g, '') // 移除空的kbd标签
+            .replace(/<samp[^>]*>\s*<\/samp>/g, '') // 移除空的samp标签
+            .replace(/<var[^>]*>\s*<\/var>/g, '') // 移除空的var标签
+            .replace(/<cite[^>]*>\s*<\/cite>/g, '') // 移除空的cite标签
+            .replace(/<q[^>]*>\s*<\/q>/g, '') // 移除空的q标签
+            .replace(/<dfn[^>]*>\s*<\/dfn>/g, '') // 移除空的dfn标签
+            .replace(/<abbr[^>]*>\s*<\/abbr>/g, '') // 移除空的abbr标签
+            .replace(/<time[^>]*>\s*<\/time>/g, '') // 移除空的time标签
+            .replace(/<data[^>]*>\s*<\/data>/g, '') // 移除空的data标签
+            .replace(/<output[^>]*>\s*<\/output>/g, '') // 移除空的output标签
+            .replace(/<meter[^>]*>\s*<\/meter>/g, '') // 移除空的meter标签
+            .replace(/<progress[^>]*>\s*<\/progress>/g, '') // 移除空的progress标签
+            .replace(/<ruby[^>]*>\s*<\/ruby>/g, '') // 移除空的ruby标签
+            .replace(/<rt[^>]*>\s*<\/rt>/g, '') // 移除空的rt标签
+            .replace(/<rp[^>]*>\s*<\/rp>/g, '') // 移除空的rp标签
+            .replace(/<bdi[^>]*>\s*<\/bdi>/g, '') // 移除空的bdi标签
+            .replace(/<bdo[^>]*>\s*<\/bdo>/g, '') // 移除空的bdo标签
+            .replace(/<wbr[^>]*>\s*<\/wbr>/g, '') // 移除空的wbr标签
+            .replace(/<details[^>]*>\s*<\/details>/g, '') // 移除空的details标签
+            .replace(/<summary[^>]*>\s*<\/summary>/g, '') // 移除空的summary标签
+            .replace(/<dialog[^>]*>\s*<\/dialog>/g, '') // 移除空的dialog标签
+            .replace(/<menu[^>]*>\s*<\/menu>/g, '') // 移除空的menu标签
+            .replace(/<menuitem[^>]*>\s*<\/menuitem>/g, '') // 移除空的menuitem标签
+            .replace(/<command[^>]*>\s*<\/command>/g, '') // 移除空的command标签
+            .replace(/<keygen[^>]*>\s*<\/keygen>/g, '') // 移除空的keygen标签
+            .replace(/<source[^>]*>\s*<\/source>/g, '') // 移除空的source标签
+            .replace(/<track[^>]*>\s*<\/track>/g, '') // 移除空的track标签
+            .replace(/<embed[^>]*>\s*<\/embed>/g, '') // 移除空的embed标签
+            .replace(/<object[^>]*>\s*<\/object>/g, '') // 移除空的object标签
+            .replace(/<param[^>]*>\s*<\/param>/g, '') // 移除空的param标签
+            .replace(/<area[^>]*>\s*<\/area>/g, '') // 移除空的area标签
+            .replace(/<base[^>]*>\s*<\/base>/g, '') // 移除空的base标签
+            .replace(/<br[^>]*>\s*<br[^>]*>/g, '<br>') // 合并连续的br标签
+            .replace(/<br[^>]*>\s*$/g, '') // 移除末尾的br标签
+            .replace(/^\s*<br[^>]*>/g, '') // 移除开头的br标签
+            .replace(/<br[^>]*>\s*<br[^>]*>\s*<br[^>]*>/g, '<br><br>'); // 限制连续br标签数量
 
         // 递归清理，直到没有更多空标签
         if (cleaned !== html) {
@@ -795,93 +959,49 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         return cleaned;
     };
 
-    // 处理编辑器输入
-    const handleInput = (e: React.FormEvent<HTMLDivElement>) => {
+    // 防抖的输入处理函数
+    const debouncedOnChange = useRef<NodeJS.Timeout | null>(null);
+
+    const handleInput = useCallback((e: React.FormEvent<HTMLDivElement>) => {
         const html = (e.target as HTMLDivElement).innerHTML;
-        const cleanedHtml = cleanEmptyTags(html);
-        onChange(cleanedHtml);
-    };
 
-    // 处理键盘事件，特别是删除键和回车键
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter') {
-            // 处理回车键，确保正确换行
-            e.preventDefault();
+        // 清除之前的防抖定时器
+        if (debouncedOnChange.current) {
+            clearTimeout(debouncedOnChange.current);
+        }
 
-            if (!editorRef.current) return;
-
-            const selection = window.getSelection();
-            if (!selection || selection.rangeCount === 0) return;
-
-            const range = selection.getRangeAt(0);
-
-            // 检查是否在列表项中
-            const listItem = range.startContainer.parentElement?.closest('li');
-            if (listItem) {
-                // 在列表项中，创建新的列表项
-                const newListItem = document.createElement('li');
-                newListItem.innerHTML = '<br>';
-                listItem.parentNode?.insertBefore(newListItem, listItem.nextSibling);
-
-                // 将光标移到新列表项
-                const newRange = document.createRange();
-                newRange.setStart(newListItem, 0);
-                newRange.setEnd(newListItem, 0);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            } else {
-                // 不在列表项中，创建新的段落
-                const br = document.createElement('br');
-                range.deleteContents();
-                range.insertNode(br);
-
-                // 在br后面添加一个空的文本节点，确保光标位置正确
-                const textNode = document.createTextNode('');
-                br.parentNode?.insertBefore(textNode, br.nextSibling);
-
-                // 将光标移到br后面
-                const newRange = document.createRange();
-                newRange.setStartAfter(br);
-                newRange.setEndAfter(br);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
-
-            // 更新内容
-            const html = editorRef.current.innerHTML;
+        // 设置新的防抖定时器
+        debouncedOnChange.current = setTimeout(() => {
+            // 直接传递HTML，不进行清理
             onChange(html);
 
-        } else if (e.key === 'Backspace' || e.key === 'Delete') {
-            // 延迟清理，让浏览器先处理删除操作
-            setTimeout(() => {
-                if (editorRef.current) {
-                    const html = editorRef.current!.innerHTML;
-                    const cleanedHtml = cleanEmptyTags(html);
-                    if (cleanedHtml !== html) {
-                        editorRef.current.innerHTML = cleanedHtml;
-                        onChange(cleanedHtml);
-                    }
+            // 更新预览内容
+            setPreviewContent(html);
+
+            // 同步两个编辑器的内容
+            if (isPreviewMode) {
+                // 如果在分屏模式，同步到主编辑器
+                if (editorRef.current && splitEditorRef.current) {
+                    editorRef.current.innerHTML = html;
                 }
-            }, 10);
-        }
-    };
+            } else {
+                // 如果在单屏模式，同步到分屏编辑器
+                if (splitEditorRef.current) {
+                    splitEditorRef.current.innerHTML = html;
+                }
+            }
+        }, 100); // 100ms防抖
+    }, [onChange, isPreviewMode]);
+
+    // 完全移除键盘事件处理，让浏览器使用默认行为
+    // const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    //     // 不做任何处理
+    // };
 
     // 处理编辑器点击，确保光标在正确位置
     const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (!editorRef.current) return;
-
-        // 确保编辑器获得焦点
-        editorRef.current.focus();
-
-        // 如果点击的是空白区域，将光标移到末尾
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount === 0) {
-            const range = document.createRange();
-            range.selectNodeContents(editorRef.current);
-            range.collapse(false);
-            selection.removeAllRanges();
-            selection.addRange(range);
-        }
+        const currentEditor = e.target as HTMLDivElement;
+        currentEditor.focus();
     };
 
     return (
@@ -905,11 +1025,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('bold')}
-                                    disabled={!hasSelectedText}
+                                    disabled={isButtonDisabled('bold')}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
                                         activeFormats.has('bold') ? "bg-blue-500/20 text-blue-600 dark:bg-blue-400/20 dark:text-blue-400 hover:bg-blue-500/20 hover:text-blue-600 dark:hover:bg-blue-400/20 dark:hover:text-blue-400" : "",
-                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
+                                        isButtonDisabled('bold') ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Bold className="w-4 h-4" />
@@ -928,11 +1048,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('italic')}
-                                    disabled={!hasSelectedText}
+                                    disabled={isButtonDisabled('italic')}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
                                         activeFormats.has('italic') ? "bg-purple-500/20 text-purple-600 dark:bg-purple-400/20 dark:text-purple-400 hover:bg-purple-500/20 hover:text-purple-600 dark:hover:bg-purple-400/20 dark:hover:text-purple-400" : "",
-                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
+                                        isButtonDisabled('italic') ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Italic className="w-4 h-4" />
@@ -951,11 +1071,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('underline')}
-                                    disabled={!hasSelectedText}
+                                    disabled={isButtonDisabled('underline')}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
                                         activeFormats.has('underline') ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400 hover:bg-green-500/20 hover:text-green-600 dark:hover:bg-green-400/20 dark:hover:text-green-400" : "",
-                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
+                                        isButtonDisabled('underline') ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Underline className="w-4 h-4" />
@@ -974,11 +1094,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('strikeThrough')}
-                                    disabled={!hasSelectedText}
+                                    disabled={isButtonDisabled('strikeThrough')}
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
                                         activeFormats.has('strikeThrough') ? "bg-red-500/20 text-red-600 dark:bg-red-400/20 dark:text-red-400 hover:bg-red-500/20 hover:text-red-600 dark:hover:bg-red-400/20 dark:hover:text-red-400" : "",
-                                        !hasSelectedText ? "opacity-50 cursor-not-allowed" : ""
+                                        isButtonDisabled('strikeThrough') ? "opacity-50 cursor-not-allowed" : ""
                                     )}
                                 >
                                     <Strikethrough className="w-4 h-4" />
@@ -996,7 +1116,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     {/* 布局和结构工具组 */}
                     <div className="flex items-center gap-0.5">
                         {/* 标题选择器 */}
-                        <DropdownMenu open={headingDropdownOpen} onOpenChange={handleHeadingDropdownChange}>
+                        <DropdownMenu open={openMenus.heading} onOpenChange={(open) => handleMenuChange('heading', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -1035,7 +1155,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </DropdownMenu>
 
                         {/* 列表下拉菜单 */}
-                        <DropdownMenu open={listDropdownOpen} onOpenChange={handleListDropdownChange}>
+                        <DropdownMenu open={openMenus.list} onOpenChange={(open) => handleMenuChange('list', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -1061,7 +1181,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </DropdownMenu>
 
                         {/* 对齐方式下拉菜单 */}
-                        <DropdownMenu open={alignDropdownOpen} onOpenChange={handleAlignDropdownChange}>
+                        <DropdownMenu open={openMenus.align} onOpenChange={(open) => handleMenuChange('align', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -1120,7 +1240,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     {/* 颜色工具组 */}
                     <div className="flex items-center gap-0.5">
                         {/* 文字颜色 */}
-                        <Popover open={textColorPopoverOpen} onOpenChange={handleTextColorPopoverChange}>
+                        <Popover open={openMenus.textColor} onOpenChange={(open) => handleMenuChange('textColor', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
@@ -1133,7 +1253,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                                 // 在鼠标按下时立即保存选区
                                                 saveCurrentSelection();
                                             }}
-                                            disabled={!hasSelectedText}
+                                            disabled={isButtonDisabled('foreColor')}
                                         >
                                             <Palette className="w-4 h-4" />
                                         </Button>
@@ -1170,7 +1290,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         </Popover>
 
                         {/* 背景颜色 */}
-                        <Popover open={backgroundColorPopoverOpen} onOpenChange={handleBackgroundColorPopoverChange}>
+                        <Popover open={openMenus.backgroundColor} onOpenChange={(open) => handleMenuChange('backgroundColor', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
@@ -1178,12 +1298,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")}
+                                            className={cn(TOOLBAR_BUTTON_CLASSES, isButtonDisabled('backColor') ? "opacity-50 cursor-not-allowed" : "")}
                                             onMouseDown={() => {
                                                 // 在鼠标按下时立即保存选区
                                                 saveCurrentSelection();
                                             }}
-                                            disabled={!hasSelectedText}
+                                            disabled={isButtonDisabled('backColor')}
                                         >
                                             <Paintbrush className="w-4 h-4" />
                                         </Button>
@@ -1226,9 +1346,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     type="button"
                                     variant="ghost"
                                     size="sm"
-                                    className={cn(TOOLBAR_BUTTON_CLASSES, !hasSelectedText ? "opacity-50 cursor-not-allowed" : "")}
+                                    className={cn(TOOLBAR_BUTTON_CLASSES, isButtonDisabled('removeFormat') ? "opacity-50 cursor-not-allowed" : "")}
                                     onClick={handleClearFormat}
-                                    disabled={!hasSelectedText}
+                                    disabled={isButtonDisabled('removeFormat')}
                                 >
                                     <Eraser className="w-4 h-4" />
                                 </Button>
@@ -1257,7 +1377,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={() => setShowLatexSelector(true)}>
+                                <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={() => setEditorState(prev => ({ ...prev, showLatexSelector: true }))}>
                                     <Sigma className="w-4 h-4" />
                                 </Button>
                             </TooltipTrigger>
@@ -1266,7 +1386,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
-                        <DropdownMenu open={imageDropdownOpen} onOpenChange={handleImageDropdownChange}>
+                        <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
@@ -1284,17 +1404,39 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     <FileImage className="w-4 h-4" />
                                     <span>从本地选择</span>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => { setShowCloudImageDialog(true); closeAllMenus(); }} className="flex items-center gap-2">
+                                <DropdownMenuItem onClick={() => { setEditorState(prev => ({ ...prev, showCloudImageDialog: true })); closeAllMenus(); }} className="flex items-center gap-2">
                                     <Cloud className="w-4 h-4" />
                                     <span>从云端选择</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+
                     </div>
 
-                    {/* 全屏按钮 */}
-                    {showFullscreenButton && (
-                        <div className="flex items-center gap-0.5 ml-auto">
+                    {/* 预览模式切换按钮 */}
+                    <div className="flex items-center gap-0.5 ml-auto">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant={isPreviewMode ? "default" : "ghost"}
+                                    size="sm"
+                                    className={cn(
+                                        TOOLBAR_BUTTON_CLASSES,
+                                        isPreviewMode ? "bg-green-500/20 text-green-600 dark:bg-green-400/20 dark:text-green-400 hover:bg-green-500/20 hover:text-green-600 dark:hover:bg-green-400/20 dark:hover:text-green-400" : ""
+                                    )}
+                                    onClick={() => setEditorState(prev => ({ ...prev, isPreviewMode: !prev.isPreviewMode }))}
+                                >
+                                    <Eye className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>{isPreviewMode ? '退出分屏预览' : '分屏预览'}</p>
+                            </TooltipContent>
+                        </Tooltip>
+
+                        {/* 全屏按钮 */}
+                        {showFullscreenButton && (
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <Button
@@ -1311,14 +1453,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     <p>全屏输入</p>
                                 </TooltipContent>
                             </Tooltip>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
 
                 {/* 编辑器内容区域 */}
                 <div
                     ref={editorRef}
-                    className="rich-text-editor-main p-4 min-h-[200px] max-h-[600px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                    className={cn(
+                        "rich-text-editor-main p-4 min-h-[200px] max-h-[600px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]",
+                        isPreviewMode ? "hidden" : ""
+                    )}
                     contentEditable
                     suppressContentEditableWarning
                     data-placeholder={placeholder}
@@ -1327,9 +1472,55 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         maxHeight: customMaxHeight
                     }}
                     onInput={handleInput}
-                    onKeyDown={handleKeyDown}
                     onClick={handleEditorClick}
                 />
+
+                {/* 分屏模式 - 使用同一个编辑器，只是改变布局 */}
+                {isPreviewMode && (
+                    <div className="flex h-full" style={{ minHeight: customMinHeight, maxHeight: customMaxHeight }}>
+                        {/* 左侧编辑器 - 显示隐藏的编辑器 */}
+                        <div className="flex-1 border-r rich-text-editor-split-border">
+                            <div className="h-full flex flex-col">
+                                <div className="px-3 py-2 text-xs font-medium rich-text-editor-split-header border-b">
+                                    编辑
+                                </div>
+                                <div className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]">
+                                    {/* 分屏模式下的编辑器 */}
+                                    <div
+                                        ref={splitEditorRef}
+                                        className="rich-text-editor-main h-full w-full focus:outline-none"
+                                        contentEditable
+                                        suppressContentEditableWarning
+                                        data-placeholder={placeholder}
+                                        onInput={handleInput}
+                                        onClick={handleEditorClick}
+                                        dangerouslySetInnerHTML={{ __html: content }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 右侧预览 */}
+                        <div className="flex-1">
+                            <div className="h-full flex flex-col">
+                                <div className="px-3 py-2 text-xs font-medium rich-text-editor-split-header border-b">
+                                    预览
+                                </div>
+                                <div
+                                    className="rich-text-editor-preview flex-1 p-4 overflow-y-auto relative preview-mode"
+                                >
+                                    {previewContent && previewContent.trim() !== '' ? (
+                                        <HtmlRenderer content={previewContent} className="prose max-w-none" />
+                                    ) : (
+                                        <div className="text-muted-foreground text-sm italic">
+                                            预览内容将在这里显示
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 隐藏的文件输入 */}
                 <input
@@ -1342,7 +1533,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 />
 
                 {/* 链接输入对话框 */}
-                <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+                <Dialog open={showLinkDialog} onOpenChange={(open) => setEditorState(prev => ({ ...prev, showLinkDialog: open }))}>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>插入链接</DialogTitle>
@@ -1357,7 +1548,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     id="link-url"
                                     placeholder="https://example.com"
                                     value={linkUrl}
-                                    onChange={(e) => setLinkUrl(e.target.value)}
+                                    onChange={(e) => setEditorState(prev => ({ ...prev, linkUrl: e.target.value }))}
                                 />
                             </div>
                             <div className="grid gap-2">
@@ -1366,12 +1557,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                     id="link-text"
                                     placeholder="链接文本"
                                     value={linkText}
-                                    onChange={(e) => setLinkText(e.target.value)}
+                                    onChange={(e) => setEditorState(prev => ({ ...prev, linkText: e.target.value }))}
                                 />
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                            <Button variant="outline" onClick={() => setEditorState(prev => ({ ...prev, showLinkDialog: false }))}>
                                 取消
                             </Button>
                             <Button onClick={confirmInsertLink} disabled={!linkUrl}>
@@ -1384,18 +1575,74 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 {/* 云端图片选择抽屉 */}
                 <SupabaseImageSelectorDrawer
                     open={showCloudImageDialog}
-                    onOpenChange={setShowCloudImageDialog}
+                    onOpenChange={(open) => setEditorState(prev => ({ ...prev, showCloudImageDialog: open }))}
                     onImageSelected={(imageId) => {
                         handleCloudImageSelect(imageId);
-                        setShowCloudImageDialog(false);
+                        setEditorState(prev => ({ ...prev, showCloudImageDialog: false }));
                     }}
                     trigger={<div />}
                 />
 
+                {/* 图片 Accordion */}
+                {imageList.length > 0 && (
+                    <div className="mt-4">
+                        <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="images">
+                                <AccordionTrigger className="text-sm font-medium">
+                                    图片 ({imageList.length})
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+                                        {imageList.map((image, index) => (
+                                            <div key={image.id} className="relative group">
+                                                <PhotoProvider>
+                                                    <PhotoView src={image.url}>
+                                                        <div className="aspect-square rounded-lg overflow-hidden border border-border cursor-pointer hover:border-primary transition-colors">
+                                                            <Image
+                                                                src={image.url}
+                                                                alt={image.name}
+                                                                width={200}
+                                                                height={200}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                    </PhotoView>
+                                                </PhotoProvider>
+                                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        className="h-6 w-6 p-0"
+                                                        onClick={() => {
+                                                            setEditorState(prev => ({
+                                                                ...prev,
+                                                                imageList: prev.imageList.filter((_, i) => i !== index)
+                                                            }));
+                                                            if (onImageChange) {
+                                                                const newImageIds = imageList.filter((_, i) => i !== index).map(img => img.id);
+                                                                onImageChange(newImageIds);
+                                                            }
+                                                        }}
+                                                    >
+                                                        ×
+                                                    </Button>
+                                                </div>
+                                                <div className="mt-2 text-xs text-muted-foreground truncate">
+                                                    {image.name}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        </Accordion>
+                    </div>
+                )}
+
                 {/* LaTeX公式选择器 */}
                 <LatexFormulaSelector
                     open={showLatexSelector}
-                    onOpenChange={setShowLatexSelector}
+                    onOpenChange={(open) => setEditorState(prev => ({ ...prev, showLatexSelector: open }))}
                     onInsert={handleInsertLatex}
                 />
 
@@ -1414,6 +1661,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     .rich-text-editor-main:focus::before {
                         display: none;
+                    }
+                    
+                    /* 确保预览模式下不显示placeholder */
+                    .preview-mode .rich-text-editor-main:empty::before {
+                        display: none !important;
                     }
                     
                     /* 强制列表样式显示 */
@@ -1546,6 +1798,191 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         display: block !important;
                         visibility: visible !important;
                         opacity: 1 !important;
+                    }
+                    
+                    /* LaTeX公式样式 */
+                    .latex-formula {
+                        display: inline-block;
+                        background-color: #f8f9fa;
+                        border: 1px solid #e9ecef;
+                        border-radius: 4px;
+                        padding: 2px 6px;
+                        margin: 0 2px;
+                        font-family: 'Courier New', monospace;
+                        font-size: 14px;
+                        color: #495057;
+                    }
+                    
+                    .latex-rendered {
+                        display: inline-block;
+                        margin: 0 2px;
+                        vertical-align: middle;
+                    }
+                    
+                    /* 预览模式下的LaTeX样式 */
+                    .prose .latex-rendered {
+                        display: inline-block;
+                        margin: 0 2px;
+                        vertical-align: middle;
+                    }
+                    
+                    /* 分屏模式样式 */
+                    .rich-text-editor-preview {
+                        background-color: #ffffff;
+                        color: #111827;
+                    }
+                    
+                    .dark .rich-text-editor-preview {
+                        background-color: #1f2937;
+                        color: #f9fafb;
+                    }
+                    
+                    /* 分屏模式下的分隔线 */
+                    .rich-text-editor-split-border {
+                        border-color: #e5e7eb;
+                    }
+                    
+                    .dark .rich-text-editor-split-border {
+                        border-color: #374151;
+                    }
+                    
+                    /* 分屏模式下的标签栏 */
+                    .rich-text-editor-split-header {
+                        background-color: #f8f9fa;
+                        border-color: #e5e7eb;
+                        color: #6b7280;
+                    }
+                    
+                    .dark .rich-text-editor-split-header {
+                        background-color: #374151;
+                        border-color: #4b5563;
+                        color: #9ca3af;
+                    }
+                    
+                    /* 预览模式下的内容样式 */
+                    .rich-text-editor-preview .prose {
+                        color: inherit;
+                    }
+                    
+                    .rich-text-editor-preview .prose h1,
+                    .rich-text-editor-preview .prose h2,
+                    .rich-text-editor-preview .prose h3,
+                    .rich-text-editor-preview .prose h4,
+                    .rich-text-editor-preview .prose h5,
+                    .rich-text-editor-preview .prose h6 {
+                        color: inherit;
+                        font-weight: 600;
+                        margin-top: 1.5em;
+                        margin-bottom: 0.5em;
+                    }
+                    
+                    .rich-text-editor-preview .prose h1 {
+                        font-size: 2em;
+                    }
+                    
+                    .rich-text-editor-preview .prose h2 {
+                        font-size: 1.5em;
+                    }
+                    
+                    .rich-text-editor-preview .prose h3 {
+                        font-size: 1.25em;
+                    }
+                    
+                    .rich-text-editor-preview .prose p {
+                        margin-bottom: 1em;
+                        line-height: 1.6;
+                    }
+                    
+                    .rich-text-editor-preview .prose ul,
+                    .rich-text-editor-preview .prose ol {
+                        margin: 1em 0;
+                        padding-left: 1.5em;
+                    }
+                    
+                    .rich-text-editor-preview .prose li {
+                        margin: 0.25em 0;
+                    }
+                    
+                    .rich-text-editor-preview .prose blockquote {
+                        border-left: 4px solid #e5e7eb;
+                        padding-left: 1em;
+                        margin: 1em 0;
+                        font-style: italic;
+                        color: #6b7280;
+                    }
+                    
+                    .dark .rich-text-editor-preview .prose blockquote {
+                        border-left-color: #4b5563;
+                        color: #9ca3af;
+                    }
+                    
+                    .rich-text-editor-preview .prose a {
+                        color: #3b82f6;
+                        text-decoration: underline;
+                    }
+                    
+                    .dark .rich-text-editor-preview .prose a {
+                        color: #60a5fa;
+                    }
+                    
+                    .rich-text-editor-preview .prose strong {
+                        font-weight: 600;
+                    }
+                    
+                    .rich-text-editor-preview .prose em {
+                        font-style: italic;
+                    }
+                    
+                    .rich-text-editor-preview .prose u {
+                        text-decoration: underline;
+                    }
+                    
+                    .rich-text-editor-preview .prose s {
+                        text-decoration: line-through;
+                    }
+                    
+                    /* LaTeX公式在预览模式下的样式 */
+                    .rich-text-editor-preview .latex-block {
+                        text-align: center;
+                        margin: 1em 0;
+                        padding: 0.5em;
+                        background-color: #f8f9fa;
+                        border-radius: 0.25rem;
+                    }
+                    
+                    .dark .rich-text-editor-preview .latex-block {
+                        background-color: #374151;
+                    }
+                    
+                    .rich-text-editor-preview .latex-inline {
+                        background-color: #f8f9fa;
+                        padding: 0.125em 0.25em;
+                        border-radius: 0.125rem;
+                        font-size: 0.9em;
+                    }
+                    
+                    .dark .rich-text-editor-preview .latex-inline {
+                        background-color: #374151;
+                    }
+                    
+                    /* 移除分屏模式下的焦点边框 */
+                    .rich-text-editor-main:focus {
+                        outline: none !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                    }
+                    
+                    .rich-text-editor-main[contenteditable]:focus {
+                        outline: none !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                    }
+                    
+                    /* 移除所有可能的焦点样式 */
+                    .rich-text-editor-main:focus-visible {
+                        outline: none !important;
+                        border: none !important;
+                        box-shadow: none !important;
                     }
                 `}</style>
             </div>
