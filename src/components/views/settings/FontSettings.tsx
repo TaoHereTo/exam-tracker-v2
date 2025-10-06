@@ -46,7 +46,7 @@ export function FontSettings() {
         console.log('FontSettings: available fonts:', CHINESE_FONTS.map(f => f.value));
         setChineseFont(fontConfig.chineseFont || 'Noto Serif SC');
         setEnglishFont(fontConfig.englishFont || 'Times New Roman');
-    }, [fontConfig]);
+    }, [fontConfig, chineseFont]);
 
     // 组件挂载时确保有默认值
     useEffect(() => {

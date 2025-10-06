@@ -8,7 +8,8 @@ import type {
     PendingImport,
     UserSettings,
     CloudImageInfo,
-    ExportData
+    ExportData,
+    Note
 } from "@/types/record";
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
@@ -23,7 +24,9 @@ export function useImportExport(
     plans?: StudyPlan[],
     setPlans?: (p: StudyPlan[]) => void,
     countdowns?: ExamCountdown[],
-    setCountdowns?: (c: ExamCountdown[]) => void
+    setCountdowns?: (c: ExamCountdown[]) => void,
+    notes?: Note[],
+    setNotes?: (n: Note[]) => void
 ) {
     const { notify } = useNotification();
     const [importDialogOpen, setImportDialogOpen] = useState(false);
@@ -108,6 +111,15 @@ export function useImportExport(
         };
     }
 
+    function formatNote(note: Note): Note {
+        return {
+            ...note,
+            id: note.id || generateUUID(),
+            createdAt: note.createdAt || new Date().toISOString(),
+            updatedAt: note.updatedAt || new Date().toISOString()
+        };
+    }
+
     // 导出数据到 JSON 文件（使用新的统一格式）
     const handleExportData = () => {
         // 获取所有云端图片数据
@@ -118,6 +130,7 @@ export function useImportExport(
         const formattedKnowledge = knowledge.map(formatKnowledge);
         const formattedPlans = (plans || []).map(formatPlan);
         const formattedCountdowns = (countdowns || []).map(formatCountdown);
+        const formattedNotes = (notes || []).map(formatNote);
         const settings = getAllSettings();
 
         const exportData: ExportData = {
@@ -126,6 +139,7 @@ export function useImportExport(
             knowledge: formattedKnowledge,
             plans: formattedPlans,
             countdowns: formattedCountdowns,
+            notes: formattedNotes,
             settings,
             cloudImages,
             metadata: {
@@ -133,6 +147,7 @@ export function useImportExport(
                 totalKnowledge: formattedKnowledge.length,
                 totalPlans: formattedPlans.length,
                 totalCountdowns: formattedCountdowns.length,
+                totalNotes: formattedNotes.length,
                 totalImages: cloudImages.length,
                 appVersion: '7.0.0'
             }
@@ -177,6 +192,7 @@ export function useImportExport(
                     let importedKnowledge: KnowledgeItem[] = [];
                     let importedPlans: StudyPlan[] = [];
                     let importedCountdowns: ExamCountdown[] = [];
+                    let importedNotes: Note[] = [];
                     let importedSettings: UserSettings = {};
                     let importedCloudImages: CloudImageInfo[] = [];
 
@@ -185,6 +201,7 @@ export function useImportExport(
                     importedKnowledge = importedObject.knowledge || importedObject.knowledgeItems || [];
                     importedPlans = importedObject.plans || importedObject.studyPlans || [];
                     importedCountdowns = importedObject.countdowns || importedObject.examCountdowns || [];
+                    importedNotes = importedObject.notes || [];
                     importedSettings = importedObject.settings || {};
                     importedCloudImages = importedObject.cloudImages || [];
 
@@ -205,6 +222,10 @@ export function useImportExport(
                         .filter((c: ExamCountdown | Record<string, unknown>) => c && 'name' in c && 'examDate' in c)
                         .map(formatCountdown);
 
+                    const validatedNotes = importedNotes
+                        .filter((n: Note | Record<string, unknown>) => n && 'title' in n && 'content' in n)
+                        .map(formatNote);
+
                     // 导入云端图片
                     if (importedCloudImages.length > 0) {
                         supabaseImageManager.importImageInfo(importedCloudImages);
@@ -216,6 +237,7 @@ export function useImportExport(
                         knowledge: validatedKnowledge,
                         plans: validatedPlans,
                         countdowns: validatedCountdowns,
+                        notes: validatedNotes,
                         settings: importedSettings,
                         cloudImages: importedCloudImages
                     });
@@ -289,6 +311,16 @@ export function useImportExport(
                 setCountdowns([...newCountdowns, ...(countdowns || [])]);
             }
 
+            // 导入笔记（去重）
+            if (pendingImport.notes && setNotes) {
+                const existingNoteKeys = new Set(notes?.map(n => `${n.title}__${n.content}`) || []);
+                const newNotes = pendingImport.notes.filter(n => {
+                    const key = `${n.title}__${n.content}`;
+                    return !existingNoteKeys.has(key);
+                });
+                setNotes([...newNotes, ...(notes || [])]);
+            }
+
             const newPlansCount = pendingImport.plans && setPlans ?
                 pendingImport.plans.filter(p => {
                     const key = `${p.name}__${p.module}__${p.description || ''}`;
@@ -303,11 +335,18 @@ export function useImportExport(
                     return !existingCountdownKeys.has(key);
                 }).length : 0;
 
+            const newNotesCount = pendingImport.notes && setNotes ?
+                pendingImport.notes.filter(n => {
+                    const key = `${n.title}__${n.content}`;
+                    const existingNoteKeys = new Set(notes?.map(n => `${n.title}__${n.content}`) || []);
+                    return !existingNoteKeys.has(key);
+                }).length : 0;
+
             const stats = {
-                total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0) + (pendingImport.countdowns?.length || 0),
-                added: newRecords.length + newKnowledge.length + newPlansCount + newCountdownsCount,
+                total: pendingImport.records.length + pendingImport.knowledge.length + (pendingImport.plans?.length || 0) + (pendingImport.countdowns?.length || 0) + (pendingImport.notes?.length || 0),
+                added: newRecords.length + newKnowledge.length + newPlansCount + newCountdownsCount + newNotesCount,
                 repeated: (pendingImport.records.length - newRecords.length) + (pendingImport.knowledge.length - newKnowledge.length) +
-                    ((pendingImport.plans?.length || 0) - newPlansCount) + ((pendingImport.countdowns?.length || 0) - newCountdownsCount),
+                    ((pendingImport.plans?.length || 0) - newPlansCount) + ((pendingImport.countdowns?.length || 0) - newCountdownsCount) + ((pendingImport.notes?.length || 0) - newNotesCount),
                 updated: 0,
                 failed: 0
             };

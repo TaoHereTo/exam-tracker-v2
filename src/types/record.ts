@@ -1,5 +1,16 @@
 // 统一的数据格式定义 - 版本 7.0
 
+// 导入笔记类型
+export interface Note {
+    id: string;
+    title: string;
+    content: string;
+    tags: Array<{ name: string; color: string }>;
+    createdAt: string;
+    updatedAt: string;
+    isFavorite?: boolean;
+}
+
 // 刷题历史类型
 export type RecordItem = {
     id: string; // UUID 格式
@@ -87,6 +98,7 @@ export interface ExportData {
     knowledge: KnowledgeItem[];
     plans: StudyPlan[];
     countdowns: ExamCountdown[];
+    notes: Note[]; // 添加笔记数据
     settings: UserSettings;
     cloudImages: CloudImageInfo[];
     metadata: {
@@ -94,6 +106,7 @@ export interface ExportData {
         totalKnowledge: number;
         totalPlans: number;
         totalCountdowns: number;
+        totalNotes: number; // 添加笔记数量统计
         totalImages: number;
         appVersion?: string;
     };
@@ -113,6 +126,7 @@ export type PendingImport = {
     knowledge: KnowledgeItem[];
     plans?: StudyPlan[];
     countdowns?: ExamCountdown[];
+    notes?: Note[];
     settings?: UserSettings;
     cloudImages?: CloudImageInfo[];
     importStats?: ImportStats;

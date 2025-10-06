@@ -947,10 +947,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     }, [clearPreviewImages, onChange, externalPreviewContent]);
 
-    // 初始化编辑器内容 - 只在组件首次渲染时设置
+    // 初始化编辑器内容 - 当content变化时更新编辑器内容
     useEffect(() => {
-        if (editorRef.current && content && !editorRef.current.innerHTML) {
-            editorRef.current.innerHTML = content;
+        if (editorRef.current && content !== undefined) {
+            // 只有当内容确实不同时才更新，避免不必要的重新渲染
+            if (editorRef.current.innerHTML !== content) {
+                editorRef.current.innerHTML = content;
+            }
         }
     }, [content]); // 添加content依赖
 
@@ -1033,8 +1036,11 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     // 初始化分屏编辑器内容
     useEffect(() => {
-        if (isPreviewMode && splitEditorRef.current && !splitEditorRef.current.innerHTML) {
-            splitEditorRef.current.innerHTML = content;
+        if (isPreviewMode && splitEditorRef.current && content !== undefined) {
+            // 只有当内容确实不同时才更新，避免不必要的重新渲染
+            if (splitEditorRef.current.innerHTML !== content) {
+                splitEditorRef.current.innerHTML = content;
+            }
         }
     }, [isPreviewMode, content]);
 

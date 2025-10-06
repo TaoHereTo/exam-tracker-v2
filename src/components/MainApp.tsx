@@ -6,7 +6,7 @@ import { SidebarInset, SidebarTrigger, SidebarProvider, useSidebar, SidebarMenu,
 import { useImportExport } from "@/hooks/useImportExport";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { usePlanProgress } from "@/hooks/usePlanProgress";
-import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings, ExamCountdown } from "@/types/record";
+import type { RecordItem, StudyPlan, KnowledgeItem, PendingImport, UserSettings, ExamCountdown, Note } from "@/types/record";
 import type { CalendarEvent } from "@/components/views/ScheduleManagementView";
 import { calcPlanProgress } from "@/lib/planUtils";
 import NavModeContext from "@/contexts/NavModeContext";
@@ -263,6 +263,7 @@ export function MainApp() {
     const [plans, setPlans] = useLocalStorage<StudyPlan[]>("exam-tracker-plans-v2", []);
     const [records, setRecords] = useLocalStorage<RecordItem[]>("exam-tracker-records-v2", []);
     const [countdowns, setCountdowns] = useLocalStorage<ExamCountdown[]>("exam-tracker-countdowns-v2", []);
+    const [notes, setNotes] = useLocalStorage<Note[]>("exam-tracker-notes-v2", []);
     const [customEvents, setCustomEvents] = useLocalStorage<CalendarEvent[]>("exam-tracker-custom-events-v2", []);
 
     const {
@@ -273,7 +274,7 @@ export function MainApp() {
         setImportDialogOpen,
         pendingImport,
         setPendingImport,
-    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans, setPlans, countdowns, setCountdowns);
+    } = useImportExport(records, setRecords, knowledge, setKnowledge, plans, setPlans, countdowns, setCountdowns, notes, setNotes);
 
     // 刷题历史分页和筛选
     const [historyPage, setHistoryPage] = useState(1);
