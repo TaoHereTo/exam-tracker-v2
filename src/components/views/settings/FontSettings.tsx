@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useFont } from "@/contexts/FontContext";
 import { MixedText } from "@/components/ui/MixedText";
-import { RefreshCw, Type } from "lucide-react";
+import { RefreshCw, Type, Save, ScanEye } from "lucide-react";
 
 // 预定义的中文字体选项
 const CHINESE_FONTS = [
@@ -17,10 +17,6 @@ const CHINESE_FONTS = [
     { value: 'Microsoft YaHei', label: '微软雅黑', icon: 'windows' },
     { value: 'SimSun', label: '宋体', icon: 'windows' },
     { value: 'SimHei', label: '黑体', icon: 'windows' },
-    { value: 'STHeiti', label: '华文黑体', icon: 'apple' },
-    { value: 'serif', label: '衬线字体', icon: 'both' },
-    { value: 'sans-serif', label: '无衬线字体', icon: 'both' },
-    { value: 'monospace', label: '等宽字体', icon: 'both' },
 ];
 
 // 预定义的英文字体选项
@@ -39,15 +35,32 @@ const ENGLISH_FONTS = [
 
 export function FontSettings() {
     const { fontConfig, updateFontConfig, resetFontConfig } = useFont();
-    const [chineseFont, setChineseFont] = useState(fontConfig.chineseFont || 'SimSun');
-    const [englishFont, setEnglishFont] = useState(fontConfig.englishFont || 'Times New Roman');
+    const [chineseFont, setChineseFont] = useState('Noto Serif SC');
+    const [englishFont, setEnglishFont] = useState('Times New Roman');
     const [isPreviewMode, setIsPreviewMode] = useState(false);
 
     // 当字体配置变化时更新本地状态
     useEffect(() => {
-        setChineseFont(fontConfig.chineseFont || 'SimSun');
+        console.log('FontSettings: fontConfig changed', fontConfig);
+        console.log('FontSettings: chineseFont value:', chineseFont);
+        console.log('FontSettings: available fonts:', CHINESE_FONTS.map(f => f.value));
+        setChineseFont(fontConfig.chineseFont || 'Noto Serif SC');
         setEnglishFont(fontConfig.englishFont || 'Times New Roman');
     }, [fontConfig]);
+
+    // 组件挂载时确保有默认值
+    useEffect(() => {
+        console.log('FontSettings: component mounted, chineseFont:', chineseFont);
+        // 确保chineseFont是有效的字体选项
+        const validFont = CHINESE_FONTS.find(f => f.value === chineseFont);
+        if (!validFont) {
+            console.log('FontSettings: chineseFont not valid, setting to Noto Serif SC');
+            setChineseFont('Noto Serif SC');
+        }
+        if (!englishFont) {
+            setEnglishFont('Times New Roman');
+        }
+    }, [chineseFont, englishFont]);
 
     // 应用字体设置
     const handleApplyFonts = () => {
@@ -240,25 +253,28 @@ export function FontSettings() {
                 <Button
                     variant="outline"
                     onClick={handlePreviewFonts}
-                    className="flex items-center gap-2 h-8 sm:h-9 text-sm"
+                    className="flex items-center gap-2 h-9 text-sm rounded-full"
                 >
-                    <RefreshCw className="w-4 h-4" />
+                    <ScanEye className="w-4 h-4" />
                     <MixedText text="预览效果" />
                 </Button>
 
                 <Button
                     variant="outline"
                     onClick={handleResetFonts}
-                    className="flex items-center gap-2 h-8 sm:h-9 text-sm"
+                    className="flex items-center gap-2 h-9 text-sm rounded-full"
                 >
                     <MixedText text="重置默认" />
                 </Button>
 
                 <Button
                     onClick={handleApplyFonts}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 h-8 sm:h-9 text-sm"
+                    className="flex items-center justify-center h-9 w-32 text-sm font-medium shadow-none hover:shadow-none transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                 >
-                    <MixedText text="应用设置" />
+                    <div className="flex items-center gap-2">
+                        <Save className="w-4 h-4" />
+                        <MixedText text="保存设置" />
+                    </div>
                 </Button>
             </div>
 

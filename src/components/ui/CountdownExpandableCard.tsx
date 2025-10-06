@@ -224,7 +224,7 @@ export default function CountdownExpandableCard({
                                 layoutId={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 key={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 onClick={() => setActive(countdown)}
-                                className="p-card flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-sm hover:shadow-md transition-shadow"
+                                className="p-card flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-none hover:shadow-none transition-shadow"
                                 style={{
                                     display: isActive ? 'none' : 'block'
                                 }}

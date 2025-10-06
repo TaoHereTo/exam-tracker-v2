@@ -1686,7 +1686,7 @@ textarea,
 }
 
 [data-slot="button"]:hover {
-  box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: none !important;
 }
 
 [data-slot="button"]:active {
@@ -1699,7 +1699,7 @@ textarea,
 }
 
 .dark [data-slot="button"]:hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: none !important;
 }
 
 .dark [data-slot="button"]:active {

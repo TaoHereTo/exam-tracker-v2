@@ -1034,7 +1034,7 @@ export default function ScheduleManagementView({
                                                 <div
                                                     className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'countdown'
                                                         ? 'border-red-500 bg-red-50 dark:bg-red-950 shadow-md'
-                                                        : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
+                                                        : 'hover:bg-accent hover:shadow-none dark:border-[#262626]'
                                                         }`}
                                                     onClick={() => handleTypeChange('countdown')}
                                                 >
@@ -1055,7 +1055,7 @@ export default function ScheduleManagementView({
                                                 <div
                                                     className={`p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${form.type === 'plan'
                                                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 shadow-md'
-                                                        : 'hover:bg-accent hover:shadow-sm dark:border-[#262626]'
+                                                        : 'hover:bg-accent hover:shadow-none dark:border-[#262626]'
                                                         }`}
                                                     onClick={() => handleTypeChange('plan')}
                                                 >

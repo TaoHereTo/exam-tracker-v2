@@ -22,6 +22,7 @@ import {
     Upload,
     Maximize2,
     Minimize2,
+    Fullscreen,
     Heading,
     Sigma,
     Eye,
@@ -31,7 +32,8 @@ import {
     Eraser,
     Palette,
     Indent,
-    Outdent
+    Outdent,
+    Minus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -214,7 +216,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     ];
 
     // 工具栏按钮样式
-    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg hover:bg-transparent hover:shadow-none active:bg-transparent active:shadow-none focus:bg-transparent focus:shadow-none";
+    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
 
     // 保存当前选区
     const saveCurrentSelection = () => {
@@ -522,6 +524,46 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
 
         setEditorState(prev => ({ ...prev, showLinkDialog: true }));
+    };
+
+    // 插入分割线
+    const insertHorizontalRule = () => {
+        if (!editorRef.current) return;
+
+        editorRef.current.focus();
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) return;
+
+        const range = selection.getRangeAt(0);
+
+        // 创建分割线
+        const hr = document.createElement('hr');
+        hr.style.border = 'none';
+        hr.style.borderTop = '2px solid #e5e7eb';
+        hr.style.margin = '16px 0';
+        hr.style.width = '100%';
+        hr.style.height = '0';
+        hr.style.background = 'none';
+        hr.setAttribute('contenteditable', 'false');
+
+        // 插入分割线
+        range.deleteContents();
+        range.insertNode(hr);
+
+        // 在分割线后创建一个新段落
+        const newParagraph = document.createElement('p');
+        newParagraph.innerHTML = '<br>';
+        hr.parentNode?.insertBefore(newParagraph, hr.nextSibling);
+
+        // 将光标移到新段落中
+        range.selectNodeContents(newParagraph);
+        range.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // 触发内容更新
+        const event = new Event('input', { bubbles: true });
+        editorRef.current.dispatchEvent(event);
     };
 
     // 确认插入链接
@@ -910,7 +952,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         if (editorRef.current && content && !editorRef.current.innerHTML) {
             editorRef.current.innerHTML = content;
         }
-    }, []); // 空依赖数组，只在组件挂载时执行一次
+    }, [content]); // 添加content依赖
 
     // 监听外部预览模式状态变化
     useEffect(() => {
@@ -1120,28 +1162,48 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 setInternalPreviewContent(html);
             }
 
-            // 同步两个编辑器的内容 - 只在非全屏模式下同步
-            // 全屏模式下不进行内容同步，避免光标位置丢失
-            if (!isInFullscreen) {
+            // 同步两个编辑器的内容
+            if (isPreviewMode) {
+                // 如果在分屏模式，同步到主编辑器
+                if (editorRef.current && splitEditorRef.current) {
+                    editorRef.current.innerHTML = html;
+                }
+            } else {
+                // 如果在单屏模式，同步到分屏编辑器
+                if (splitEditorRef.current) {
+                    splitEditorRef.current.innerHTML = html;
+                }
+            }
+        }, 100); // 100ms防抖
+    }, [onChange, isPreviewMode, externalPreviewContent]);
+
+    // 处理键盘事件，特别是撤销操作
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+        // 处理撤销操作 (Ctrl+Z)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+            // 让浏览器处理撤销，但确保内容同步
+            setTimeout(() => {
+                const html = (e.target as HTMLDivElement).innerHTML;
+                onChange(html);
+
+                // 更新预览内容
+                if (externalPreviewContent === undefined) {
+                    setInternalPreviewContent(html);
+                }
+
+                // 同步内容到其他编辑器
                 if (isPreviewMode) {
-                    // 如果在分屏模式，同步到主编辑器
                     if (editorRef.current && splitEditorRef.current) {
                         editorRef.current.innerHTML = html;
                     }
                 } else {
-                    // 如果在单屏模式，同步到分屏编辑器
                     if (splitEditorRef.current) {
                         splitEditorRef.current.innerHTML = html;
                     }
                 }
-            }
-        }, 100); // 100ms防抖
-    }, [onChange, isPreviewMode, externalPreviewContent, isInFullscreen]);
-
-    // 完全移除键盘事件处理，让浏览器使用默认行为
-    // const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    //     // 不做任何处理
-    // };
+            }, 0);
+        }
+    };
 
     // 处理编辑器点击，确保光标在正确位置
     const handleEditorClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -1166,7 +1228,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <Button
                                     type="button"
-                                    variant={activeFormats.has('bold') ? "default" : "ghost"}
+                                    variant="ghost"
                                     size="sm"
                                     onMouseDown={() => saveCurrentSelection()}
                                     onClick={() => handleFormatCommand('bold')}
@@ -1531,6 +1593,17 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={insertHorizontalRule}>
+                                    <Minus className="w-4 h-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>插入分割线</p>
+                            </TooltipContent>
+                        </Tooltip>
+
                         <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
                             <Tooltip>
                                 <TooltipTrigger asChild>
@@ -1564,7 +1637,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <Button
                                     type="button"
-                                    variant={isPreviewMode ? "default" : "ghost"}
+                                    variant="ghost"
                                     size="sm"
                                     className={cn(
                                         TOOLBAR_BUTTON_CLASSES,
@@ -1598,7 +1671,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         className={TOOLBAR_BUTTON_CLASSES}
                                         onClick={onFullscreenToggle}
                                     >
-                                        <Maximize2 className="w-4 h-4" />
+                                        <Fullscreen className="w-4 h-4" />
                                     </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -1624,6 +1697,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         maxHeight: customMaxHeight
                     }}
                     onInput={handleInput}
+                    onKeyDown={handleKeyDown}
                     onClick={handleEditorClick}
                     onMouseDown={(e) => {
                         // 只在Dialog中阻止事件冒泡，全屏模式下允许正常交互
@@ -1651,9 +1725,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         {/* 左侧编辑器 - 显示隐藏的编辑器 */}
                         <div className="flex-1 border-r rich-text-editor-split-border">
                             <div className="h-full flex flex-col">
-                                <div className="px-3 py-2 text-xs font-medium rich-text-editor-split-header border-b">
-                                    编辑
-                                </div>
                                 <div className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]">
                                     {/* 分屏模式下的编辑器 */}
                                     <div
@@ -1663,6 +1734,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                                         suppressContentEditableWarning
                                         data-placeholder={placeholder}
                                         onInput={handleInput}
+                                        onKeyDown={handleKeyDown}
                                         onClick={handleEditorClick}
                                     />
                                 </div>
@@ -1672,9 +1744,6 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         {/* 右侧预览 */}
                         <div className="flex-1">
                             <div className="h-full flex flex-col">
-                                <div className="px-3 py-2 text-xs font-medium rich-text-editor-split-header border-b">
-                                    预览
-                                </div>
                                 <div
                                     className="rich-text-editor-preview flex-1 p-4 overflow-y-auto relative preview-mode"
                                 >
@@ -2189,6 +2258,55 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         outline: none !important;
                         border: none !important;
                         box-shadow: none !important;
+                    }
+                    
+                    /* 分割线样式 */
+                    .rich-text-editor-main hr {
+                        border: none !important;
+                        border-top: 2px solid #e5e7eb !important;
+                        margin: 16px 0 !important;
+                        width: 100% !important;
+                        height: 0 !important;
+                        background: none !important;
+                        display: block !important;
+                    }
+                    
+                    .dark .rich-text-editor-main hr {
+                        border-top-color: #4b5563 !important;
+                    }
+                    
+                    
+                    /* 预览模式下的分割线样式 */
+                    .rich-text-editor-preview hr {
+                        border: none !important;
+                        border-top: 2px solid #e5e7eb !important;
+                        margin: 0 !important;
+                        width: 100% !important;
+                        height: 0 !important;
+                        background: none !important;
+                        display: block !important;
+                        pointer-events: none !important;
+                        user-select: none !important;
+                        -webkit-user-select: none !important;
+                        -moz-user-select: none !important;
+                        -ms-user-select: none !important;
+                    }
+                    
+                    .dark .rich-text-editor-preview hr {
+                        border-top-color: #4b5563 !important;
+                    }
+                    
+                    /* 预览模式下的分割线容器样式 */
+                    .rich-text-editor-preview div[style*="margin: 16px 0"] {
+                        margin: 16px 0 !important;
+                        position: relative !important;
+                        display: block !important;
+                    }
+                    
+                    /* 预览模式下的分割线后段落样式 */
+                    .rich-text-editor-preview div[style*="margin: 16px 0"] + p {
+                        margin: 0 !important;
+                        min-height: 1.2em !important;
                     }
                 `}</style>
             </div>

@@ -547,7 +547,7 @@ export function UnifiedSettings({
                   <Button
                     onClick={handleSaveAllSettings}
                     variant="default"
-                    className="flex items-center justify-center h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
+                    className="flex items-center justify-center h-9 w-32 text-sm font-medium shadow-none hover:shadow-none transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                   >
                     <div className="flex items-center gap-2">
                       <Save className="w-4 h-4" />
@@ -746,7 +746,7 @@ export function UnifiedSettings({
                         <DialogFooter className="flex-col sm:flex-row gap-2">
                           <Button
                             variant="outline"
-                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
                             onClick={() => setClearDataDialogOpen(false)}
                           >
                             <MixedText text="取消" />
@@ -759,7 +759,7 @@ export function UnifiedSettings({
                               setClearDataDialogOpen(false);
                             }}
                             variant="destructive"
-                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
                           >
                             确认清空
                           </Button>
@@ -958,7 +958,7 @@ export function UnifiedSettings({
                   <Button
                     onClick={handleSaveAllSettings}
                     variant="default"
-                    className="flex items-center justify-center h-9 w-32 text-sm font-medium shadow-lg hover:shadow-xl transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
+                    className="flex items-center justify-center h-9 w-32 text-sm font-medium shadow-none hover:shadow-none transition-all duration-200 rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white"
                   >
                     <div className="flex items-center gap-2">
                       <Save className="w-4 h-4" />
@@ -991,7 +991,7 @@ export function UnifiedSettings({
                   </Button>
                   <Button
                     onClick={confirmUploadToCloud}
-                    className="flex items-center justify-center bg-[#10b981] text-white shadow-xs hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                    className="flex items-center justify-center bg-[#10b981] text-white shadow-none hover:bg-[#10b981]/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
                   >
                     <MixedText text="确认上传" />
                   </Button>
@@ -1017,7 +1017,7 @@ export function UnifiedSettings({
                   </Button>
                   <Button
                     onClick={confirmDownloadFromCloud}
-                    className="flex items-center justify-center bg-[#3b82f6] text-white shadow-xs hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                    className="flex items-center justify-center bg-[#3b82f6] text-white shadow-none hover:bg-[#3b82f6]/90 focus-visible:ring-blue-500/20 dark:focus-visible:ring-blue-500/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
                   >
                     <MixedText text="确认下载" />
                   </Button>

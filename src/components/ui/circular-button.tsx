@@ -10,23 +10,23 @@ const circularButtonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 dark:hover:bg-primary/80",
+                    "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-sm dark:hover:bg-primary/80",
                 destructive:
-                    "bg-destructive text-white shadow-sm hover:bg-destructive/90 dark:hover:bg-destructive/80",
+                    "bg-destructive text-white shadow-sm hover:bg-destructive/90 hover:shadow-sm dark:hover:bg-destructive/80",
                 outline:
-                    "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/20",
+                    "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-sm dark:bg-input/30 dark:border-input dark:hover:bg-input/20",
                 secondary:
-                    "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 dark:hover:bg-secondary/80",
+                    "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/90 hover:shadow-sm dark:hover:bg-secondary/80",
                 ghost:
                     "hover:bg-accent hover:text-accent-foreground",
                 success:
-                    "bg-[#2C9678] text-white shadow-sm hover:bg-[#2C9678]/90 dark:hover:bg-[#2C9678]/80",
+                    "bg-[#2C9678] text-white shadow-sm hover:bg-[#2C9678]/90 hover:shadow-sm dark:hover:bg-[#2C9678]/80",
                 warning:
-                    "bg-[#f59e0b] text-white shadow-sm hover:bg-[#f59e0b]/90 dark:hover:bg-[#f59e0b]/80",
+                    "bg-[#f59e0b] text-white shadow-sm hover:bg-[#f59e0b]/90 hover:shadow-sm dark:hover:bg-[#f59e0b]/80",
                 gray:
-                    "bg-[#6b7280] text-white shadow-sm hover:bg-[#6b7280]/90 dark:hover:bg-[#6b7280]/80",
+                    "bg-[#6b7280] text-white shadow-sm hover:bg-[#6b7280]/90 hover:shadow-sm dark:hover:bg-[#6b7280]/80",
                 theme:
-                    "border border-input-border bg-white shadow-sm hover:bg-accent hover:text-accent-foreground dark:bg-background dark:border-input-border dark:hover:bg-accent dark:hover:text-accent-foreground",
+                    "border border-input-border bg-white shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-sm dark:bg-background dark:border-input-border dark:hover:bg-accent dark:hover:text-accent-foreground",
             },
             size: {
                 sm: "h-6 w-6",

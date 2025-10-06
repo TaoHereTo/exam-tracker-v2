@@ -20,7 +20,7 @@ const detectSystemFonts = (): FontConfig => {
     // 检测中文字体
     let chineseFont = 'Noto Serif SC'; // 默认使用Web字体
     const testElement = document.createElement('div');
-    testElement.style.fontFamily = 'PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, serif';
+    testElement.style.fontFamily = 'Noto Serif SC, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, serif';
     testElement.style.position = 'absolute';
     testElement.style.visibility = 'hidden';
     testElement.style.fontSize = '16px';
@@ -30,8 +30,12 @@ const detectSystemFonts = (): FontConfig => {
     const computedStyle = window.getComputedStyle(testElement);
     const fontFamily = computedStyle.fontFamily;
 
+    console.log('Font detection: computed fontFamily:', fontFamily);
+
     // 根据系统字体优先级检测
-    if (fontFamily.includes('PingFang SC')) {
+    if (fontFamily.includes('Noto Serif SC')) {
+        chineseFont = 'Noto Serif SC';
+    } else if (fontFamily.includes('PingFang SC')) {
         chineseFont = 'PingFang SC';
     } else if (fontFamily.includes('Hiragino Sans GB')) {
         chineseFont = 'Hiragino Sans GB';
@@ -40,6 +44,8 @@ const detectSystemFonts = (): FontConfig => {
     } else if (fontFamily.includes('SimSun')) {
         chineseFont = 'SimSun';
     }
+
+    console.log('Font detection: selected chineseFont:', chineseFont);
 
     document.body.removeChild(testElement);
 
