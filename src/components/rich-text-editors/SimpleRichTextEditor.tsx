@@ -882,12 +882,12 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     }, [content, externalPreviewContent]);
 
-    // 初始化编辑器内容
+    // 初始化编辑器内容 - 只在组件首次渲染时设置
     useEffect(() => {
-        if (editorRef.current && content) {
+        if (editorRef.current && content && !editorRef.current.innerHTML) {
             editorRef.current.innerHTML = content;
         }
-    }, [content]);
+    }, []); // 空依赖数组，只在组件挂载时执行一次
 
     // 监听外部预览模式状态变化
     useEffect(() => {
