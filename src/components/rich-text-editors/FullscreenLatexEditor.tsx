@@ -263,7 +263,8 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             ? 'animate-out fade-out-0 duration-300'
                             : 'animate-in fade-in-0 duration-300'
                             }`}
-                        style={{ zIndex: 100000 }}
+                        style={{ zIndex: 100001 }}
+                        data-fullscreen-container="true"
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
                                 setIsAnimating(true);
@@ -275,7 +276,18 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             }
                         }}
                     >
-                        <div className="w-full h-full bg-background flex flex-col animate-in zoom-in-95 duration-300">
+                        <div
+                            className="w-full h-full bg-background flex flex-col animate-in zoom-in-95 duration-300"
+                            data-fullscreen-container="true"
+                            onMouseDown={(e) => {
+                                // 阻止事件冒泡，防止Dialog关闭
+                                e.stopPropagation();
+                            }}
+                            onClick={(e) => {
+                                // 阻止事件冒泡，防止Dialog关闭
+                                e.stopPropagation();
+                            }}
+                        >
                             <SimpleRichTextEditor
                                 key="fullscreen-editor"
                                 content={props.content}

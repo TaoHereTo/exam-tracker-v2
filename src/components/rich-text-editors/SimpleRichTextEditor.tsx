@@ -1004,6 +1004,25 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         };
     }, [updateButtonStates]);
 
+    // 监听全屏状态变化，确保焦点管理
+    useEffect(() => {
+        if (isInFullscreen) {
+            // 全屏模式下，确保编辑器获得焦点
+            setTimeout(() => {
+                if (editorRef.current) {
+                    editorRef.current.focus();
+                    // 确保光标在编辑器末尾
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(editorRef.current);
+                    range.collapse(false);
+                    sel?.removeAllRanges();
+                    sel?.addRange(range);
+                }
+            }, 300);
+        }
+    }, [isInFullscreen]);
+
     // 清理空的HTML标签
     const cleanEmptyTags = (html: string): string => {
         // 移除空的标签
@@ -1602,6 +1621,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     }}
                     onInput={handleInput}
                     onClick={handleEditorClick}
+                    onMouseDown={(e) => {
+                        // 阻止事件冒泡，防止Dialog关闭
+                        e.stopPropagation();
+                    }}
+                    onFocus={(e) => {
+                        // 确保焦点不会丢失
+                        e.stopPropagation();
+                    }}
+                    onBlur={(e) => {
+                        // 防止意外失焦
+                        e.stopPropagation();
+                    }}
                 />
 
                 {/* 分屏模式 - 使用同一个编辑器，只是改变布局 */}
@@ -1876,6 +1907,46 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-radix-dialog-content] [data-radix-dropdown-menu-content] {
                         z-index: 10003 !important;
                         position: fixed !important;
+                        pointer-events: auto !important;
+                    }
+                    
+                    /* 确保全屏编辑器在Dialog中也能正常工作 */
+                    [data-fullscreen-container="true"] {
+                        z-index: 100001 !important;
+                        position: fixed !important;
+                        pointer-events: auto !important;
+                    }
+                    
+                    /* 确保全屏编辑器覆盖Dialog的overlay */
+                    [data-fullscreen-container="true"] > * {
+                        z-index: 100002 !important;
+                        position: relative !important;
+                        pointer-events: auto !important;
+                    }
+                    
+                    /* 确保全屏模式下的编辑器能够正常获得焦点 */
+                    [data-fullscreen-container="true"] .rich-text-editor-main {
+                        pointer-events: auto !important;
+                        user-select: text !important;
+                        -webkit-user-select: text !important;
+                        -moz-user-select: text !important;
+                        -ms-user-select: text !important;
+                    }
+                    
+                    /* 确保全屏模式下的编辑器内容区域能够正常交互 */
+                    [data-fullscreen-container="true"] .rich-text-editor-main:focus {
+                        outline: none !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                    }
+                    
+                    /* 防止Dialog的overlay干扰编辑器焦点 */
+                    [data-radix-dialog-overlay] {
+                        pointer-events: none !important;
+                    }
+                    
+                    /* 确保全屏编辑器容器能够接收所有事件 */
+                    [data-fullscreen-container="true"] {
                         pointer-events: auto !important;
                     }
                     

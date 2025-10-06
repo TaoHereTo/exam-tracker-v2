@@ -28,7 +28,7 @@
 
 /* 全局字体渲染优化 - 统一应用到所有元素 */
 * {
-  font-family: '思源宋体', 'Times New Roman', serif;
+  font-family: var(--chinese-font, '思源宋体'), var(--english-font, 'Times New Roman'), serif;
   -webkit-font-smoothing: var(--font-smoothing-webkit);
   -moz-osx-font-smoothing: var(--font-smoothing-moz);
   text-rendering: var(--text-rendering-base);

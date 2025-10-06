@@ -39,6 +39,7 @@ import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { CloudSyncService } from "@/lib/cloudSyncService";
 import { UnifiedTable, type DataTableColumn } from "@/components/ui/UnifiedTable";
 import { AISettings } from "./AISettings";
+import { FontSettings } from "./FontSettings";
 
 export function UnifiedSettings({
   onExport,
@@ -487,6 +488,7 @@ export function UnifiedSettings({
             <div className="flex justify-center items-center mb-6 py-2">
               <TabsList className="items-center h-10">
                 <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
+                <TabsTrigger value="font" className="flex items-center">字体设置</TabsTrigger>
                 <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
                 <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
               </TabsList>
@@ -553,6 +555,10 @@ export function UnifiedSettings({
                     </div>
                   </Button>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="font">
+                <FontSettings />
               </TabsContent>
 
               <TabsContent value="data">

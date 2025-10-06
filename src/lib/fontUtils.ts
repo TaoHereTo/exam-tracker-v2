@@ -7,12 +7,72 @@ export interface FontConfig {
     fallbackFont: string;
 }
 
-// 默认字体配置 - 优化高DPI显示
-export const defaultFontConfig: FontConfig = {
-    chineseFont: '思源宋体',
-    englishFont: 'Times New Roman',
-    fallbackFont: 'serif'
+// 检测系统默认字体
+const detectSystemFonts = (): FontConfig => {
+    if (typeof window === 'undefined') {
+        return {
+            chineseFont: 'Noto Serif SC',
+            englishFont: 'Times New Roman',
+            fallbackFont: 'serif'
+        };
+    }
+
+    // 检测中文字体
+    let chineseFont = 'Noto Serif SC'; // 默认使用Web字体
+    const testElement = document.createElement('div');
+    testElement.style.fontFamily = 'PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, serif';
+    testElement.style.position = 'absolute';
+    testElement.style.visibility = 'hidden';
+    testElement.style.fontSize = '16px';
+    testElement.textContent = '测试';
+    document.body.appendChild(testElement);
+
+    const computedStyle = window.getComputedStyle(testElement);
+    const fontFamily = computedStyle.fontFamily;
+
+    // 根据系统字体优先级检测
+    if (fontFamily.includes('PingFang SC')) {
+        chineseFont = 'PingFang SC';
+    } else if (fontFamily.includes('Hiragino Sans GB')) {
+        chineseFont = 'Hiragino Sans GB';
+    } else if (fontFamily.includes('Microsoft YaHei')) {
+        chineseFont = 'Microsoft YaHei';
+    } else if (fontFamily.includes('SimSun')) {
+        chineseFont = 'SimSun';
+    }
+
+    document.body.removeChild(testElement);
+
+    // 检测英文字体
+    let englishFont = 'Times New Roman';
+    const testElementEn = document.createElement('div');
+    testElementEn.style.fontFamily = 'Helvetica, Arial, sans-serif';
+    testElementEn.style.position = 'absolute';
+    testElementEn.style.visibility = 'hidden';
+    testElementEn.style.fontSize = '16px';
+    testElementEn.textContent = 'Test';
+    document.body.appendChild(testElementEn);
+
+    const computedStyleEn = window.getComputedStyle(testElementEn);
+    const fontFamilyEn = computedStyleEn.fontFamily;
+
+    if (fontFamilyEn.includes('Helvetica')) {
+        englishFont = 'Helvetica';
+    } else if (fontFamilyEn.includes('Arial')) {
+        englishFont = 'Arial';
+    }
+
+    document.body.removeChild(testElementEn);
+
+    return {
+        chineseFont,
+        englishFont,
+        fallbackFont: 'serif'
+    };
 };
+
+// 默认字体配置 - 检测系统字体
+export const defaultFontConfig: FontConfig = detectSystemFonts();
 
 // 中文字符检测正则表达式
 const CHINESE_CHAR_REGEX = /[\u4e00-\u9fa5]/;
