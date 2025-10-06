@@ -1682,11 +1682,10 @@ textarea,
 /* 按钮阴影优化 */
 [data-slot="button"] {
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s ease-in-out;
 }
 
 [data-slot="button"]:hover {
-  box-shadow: none !important;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 2px 0 rgba(0, 0, 0, 0.1) !important;
 }
 
 [data-slot="button"]:active {
@@ -1699,7 +1698,7 @@ textarea,
 }
 
 .dark [data-slot="button"]:hover {
-  box-shadow: none !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2) !important;
 }
 
 .dark [data-slot="button"]:active {
