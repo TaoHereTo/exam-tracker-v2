@@ -882,6 +882,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     }, [content, externalPreviewContent]);
 
+    // 初始化编辑器内容
+    useEffect(() => {
+        if (editorRef.current && content) {
+            editorRef.current.innerHTML = content;
+        }
+    }, [content]);
+
     // 监听外部预览模式状态变化
     useEffect(() => {
         if (externalIsPreviewMode !== undefined) {
