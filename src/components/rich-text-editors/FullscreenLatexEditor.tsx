@@ -56,6 +56,8 @@ interface FullscreenLatexEditorProps {
     previewContent?: string;
     isPreviewMode?: boolean;
     onPreviewModeChange?: (isPreviewMode: boolean) => void;
+    // 新增：清除预览图片属性
+    clearPreviewImages?: boolean;
 }
 
 export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (props) => {

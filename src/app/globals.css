@@ -381,7 +381,7 @@ h6 .mixed-text {
   /* 表单组间距 */
   --spacing-form-section: var(--space-6);
   /* 表单区块间距 */
-  --spacing-form-actions: var(--space-6);
+  --spacing-form-actions: var(--space-4);
   /* 表单操作按钮间距 */
 
   /* 卡片间距 */

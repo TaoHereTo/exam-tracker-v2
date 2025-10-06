@@ -882,6 +882,25 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     }, [content, externalPreviewContent]);
 
+    // 处理清除预览图片
+    useEffect(() => {
+        if (clearPreviewImages) {
+            // 清除编辑器内容
+            if (editorRef.current) {
+                editorRef.current.innerHTML = '';
+            }
+            if (splitEditorRef.current) {
+                splitEditorRef.current.innerHTML = '';
+            }
+            // 清除预览内容
+            if (externalPreviewContent === undefined) {
+                setInternalPreviewContent('');
+            }
+            // 通知父组件内容已清除
+            onChange('');
+        }
+    }, [clearPreviewImages, onChange, externalPreviewContent]);
+
     // 初始化编辑器内容 - 只在组件首次渲染时设置
     useEffect(() => {
         if (editorRef.current && content && !editorRef.current.innerHTML) {

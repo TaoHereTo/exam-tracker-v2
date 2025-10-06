@@ -368,9 +368,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           })
       };
 
-      // 更新 toast 为云端保存状态
-      toast.loading('正在保存知识点到云端...', { id: loadingToastId });
-
       // 调用onAddKnowledge（禁用其内部的toast显示）
       await onAddKnowledge(knowledgeData);
 
@@ -385,6 +382,9 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
       // 清空待处理图片列表
       pendingImagesRef.current = [];
+
+      // 重置清除预览图片状态
+      setClearPreviewImages(false);
     } catch (error) {
       console.error('保存知识点失败:', error);
       updateToError?.(loadingToastId, '保存知识点失败，请重试');
@@ -430,6 +430,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           editorMaxHeight={editorMaxHeight}
           stickyToolbar={true}
           isInDialog={isInDialog}
+          clearPreviewImages={clearPreviewImages}
         />
       </div>
     );
