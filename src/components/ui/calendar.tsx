@@ -22,12 +22,14 @@ function YearPicker({
   selectedYear,
   onYearSelect,
   isOpen,
-  onClose
+  onClose,
+  themeColor = "#0d9488"
 }: {
   selectedYear: number
   onYearSelect: (year: number) => void
   isOpen: boolean
   onClose: () => void
+  themeColor?: string
 }) {
   const currentYear = new Date().getFullYear()
   const startYear = 1900
@@ -43,59 +45,62 @@ function YearPicker({
   const currentGroupIndex = Math.floor((selectedYear - startYear) / 16)
 
   return (
-    <div className="w-80 p-4">
-      <div className="flex justify-center items-center mb-2 h-10 gap-1">
+    <div className="w-fit p-4">
+      <div className="flex justify-center items-center mb-3 h-8 gap-2">
         <Button
           variant="ghost"
           size="sm"
-          className="h-10 w-10 p-0 flex items-center justify-center !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="h-8 w-8 p-0 !border-0 !shadow-none rounded-md flex items-center justify-center"
           onClick={() => {
-            // 切换到上一组年份
             const newIndex = Math.max(0, currentGroupIndex - 1)
             const newYear = startYear + newIndex * 16
             onYearSelect(newYear)
-            // 不关闭选择器
           }}
           disabled={currentGroupIndex === 0}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: 'none' }}
         >
-          <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>‹</span>
+          <span className="text-sm leading-none">‹</span>
         </Button>
 
-        <span className="text-sm font-medium h-10 flex items-center">
+        <span className="text-sm font-medium px-2 flex items-center">
           {startYear + currentGroupIndex * 16} - {Math.min(startYear + currentGroupIndex * 16 + 15, endYear)}
         </span>
 
         <Button
           variant="ghost"
           size="sm"
-          className="h-10 w-10 p-0 flex items-center justify-center !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="h-8 w-8 p-0 !border-0 !shadow-none rounded-md flex items-center justify-center"
           onClick={() => {
-            // 切换到下一组年份
             const newIndex = Math.min(yearGroups.length - 1, currentGroupIndex + 1)
             const newYear = startYear + newIndex * 16
             onYearSelect(newYear)
-            // 不关闭选择器
           }}
           disabled={currentGroupIndex === yearGroups.length - 1}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', boxShadow: 'none' }}
         >
-          <span className="text-lg leading-none" style={{ transform: 'translateY(-2px)' }}>›</span>
+          <span className="text-sm leading-none">›</span>
         </Button>
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-4 gap-1">
         {yearGroups[currentGroupIndex]?.map((year) => (
           <Button
             key={year}
-            variant={selectedYear === year ? "default" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 text-sm px-2 !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
+            data-selected-single={selectedYear === year}
+            className={cn(
+              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
+            )}
+            data-theme-color={themeColor}
+            style={{
+              ...(selectedYear === year && {
+                backgroundColor: themeColor,
+                color: 'white'
+              })
+            }}
             onClick={() => {
               onYearSelect(year)
               onClose()
             }}
-            style={{ border: 'none', boxShadow: 'none' }}
           >
             {year}
           </Button>
@@ -110,12 +115,14 @@ function MonthPicker({
   selectedMonth,
   onMonthSelect,
   isOpen,
-  onClose
+  onClose,
+  themeColor = "#0d9488"
 }: {
   selectedMonth: number
   onMonthSelect: (month: number) => void
   isOpen: boolean
   onClose: () => void
+  themeColor?: string
 }) {
   const months = [
     { value: 0, label: '1月' },
@@ -133,19 +140,28 @@ function MonthPicker({
   ]
 
   return (
-    <div className="w-80 p-4">
-      <div className="grid grid-cols-3 gap-2">
+    <div className="w-fit p-4">
+      <div className="grid grid-cols-3 gap-1">
         {months.map((month) => (
           <Button
             key={month.value}
-            variant={selectedMonth === month.value ? "default" : "ghost"}
+            variant="ghost"
             size="sm"
-            className="h-8 text-sm px-2 !border-0 !shadow-none hover:bg-gray-100 dark:hover:bg-gray-700"
+            data-selected-single={selectedMonth === month.value}
+            className={cn(
+              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
+            )}
+            data-theme-color={themeColor}
+            style={{
+              ...(selectedMonth === month.value && {
+                backgroundColor: themeColor,
+                color: 'white'
+              })
+            }}
             onClick={() => {
               onMonthSelect(month.value)
               onClose()
             }}
-            style={{ border: 'none', boxShadow: 'none' }}
           >
             {month.label}
           </Button>
@@ -298,12 +314,13 @@ function Calendar({
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[70]" align="start">
+              <PopoverContent className="w-auto p-0 z-[100003]" align="start">
                 <YearPicker
                   selectedYear={currentYear}
                   onYearSelect={handleYearSelect}
                   isOpen={showYearPicker}
                   onClose={() => setShowYearPicker(false)}
+                  themeColor={finalThemeColor}
                 />
               </PopoverContent>
             </Popover>
@@ -314,12 +331,13 @@ function Calendar({
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[70]" align="start">
+              <PopoverContent className="w-auto p-0 z-[100003]" align="start">
                 <MonthPicker
                   selectedMonth={currentMonthIndex}
                   onMonthSelect={handleMonthSelect}
                   isOpen={showMonthPicker}
                   onClose={() => setShowMonthPicker(false)}
+                  themeColor={finalThemeColor}
                 />
               </PopoverContent>
             </Popover>
