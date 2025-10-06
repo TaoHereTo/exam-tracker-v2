@@ -294,7 +294,7 @@ function TooltipOverlay() {
               position: strategy,
               top: 0,
               left: 0,
-              zIndex: 100002, // 提高z-index，确保在全屏模式下显示在前景
+              zIndex: 100004, // 提高z-index，确保在全屏模式下显示在前景
               transform: `translate3d(${x!}px, ${y!}px, 0)`,
             }}
           >

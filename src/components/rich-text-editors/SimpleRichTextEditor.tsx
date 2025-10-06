@@ -87,6 +87,8 @@ interface SimpleRichTextEditorProps {
     onPreviewModeChange?: (isPreviewMode: boolean) => void;
     // 新增：标识是否在全屏模式中
     isInFullscreen?: boolean;
+    // 新增：标识是否在Dialog中
+    isInDialog?: boolean;
 }
 
 const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
@@ -109,7 +111,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     isPreviewMode: externalIsPreviewMode,
     onPreviewModeChange,
     // 新增：标识是否在全屏模式中
-    isInFullscreen = false
+    isInFullscreen = false,
+    // 新增：标识是否在Dialog中
+    isInDialog = false
 }) => {
     // 预览内容状态 - 优先使用外部传入的预览内容
     const [internalPreviewContent, setInternalPreviewContent] = useState(content);
@@ -1622,16 +1626,22 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     onInput={handleInput}
                     onClick={handleEditorClick}
                     onMouseDown={(e) => {
-                        // 阻止事件冒泡，防止Dialog关闭
-                        e.stopPropagation();
+                        // 只在Dialog中阻止事件冒泡，全屏模式下允许正常交互
+                        if (isInDialog && !isInFullscreen) {
+                            e.stopPropagation();
+                        }
                     }}
                     onFocus={(e) => {
-                        // 确保焦点不会丢失
-                        e.stopPropagation();
+                        // 只在Dialog中阻止事件冒泡，全屏模式下允许正常交互
+                        if (isInDialog && !isInFullscreen) {
+                            e.stopPropagation();
+                        }
                     }}
                     onBlur={(e) => {
-                        // 防止意外失焦
-                        e.stopPropagation();
+                        // 只在Dialog中阻止事件冒泡，全屏模式下允许正常交互
+                        if (isInDialog && !isInFullscreen) {
+                            e.stopPropagation();
+                        }
                     }}
                 />
 
@@ -1940,10 +1950,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                         box-shadow: none !important;
                     }
                     
-                    /* 防止Dialog的overlay干扰编辑器焦点 */
-                    [data-radix-dialog-overlay] {
-                        pointer-events: none !important;
-                    }
+                    /* 移除可能干扰Dialog交互的CSS规则 */
                     
                     /* 确保全屏编辑器容器能够接收所有事件 */
                     [data-fullscreen-container="true"] {

@@ -175,7 +175,7 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                         // 确保全屏容器和其子元素都能正常响应事件
                         fullscreenContainer.style.setProperty('pointer-events', 'auto', 'important');
                         fullscreenContainer.style.setProperty('user-select', 'auto', 'important');
-                        fullscreenContainer.style.setProperty('z-index', '99999', 'important');
+                        fullscreenContainer.style.setProperty('z-index', '100003', 'important');
 
                         // 确保所有子元素都能响应事件
                         const allChildElements = fullscreenContainer.querySelectorAll('*') as NodeListOf<HTMLElement>;
@@ -195,20 +195,75 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                         const focusEditor = () => {
                             const editorElement = fullscreenContainer.querySelector('[contenteditable]') as HTMLElement;
                             if (editorElement) {
+                                console.log('Found editor element in fullscreen:', editorElement);
+                                console.log('Editor element styles:', {
+                                    pointerEvents: getComputedStyle(editorElement).pointerEvents,
+                                    userSelect: getComputedStyle(editorElement).userSelect,
+                                    zIndex: getComputedStyle(editorElement).zIndex
+                                });
+
                                 // 检查是否已经有焦点，避免重复聚焦
                                 if (document.activeElement === editorElement) {
+                                    console.log('Editor already has focus');
                                     return true;
                                 }
 
-                                editorElement.focus();
-                                // 确保光标在编辑器末尾
-                                const range = document.createRange();
-                                const sel = window.getSelection();
-                                range.selectNodeContents(editorElement);
-                                range.collapse(false);
-                                sel?.removeAllRanges();
-                                sel?.addRange(range);
+                                // 完全禁用Dialog的焦点管理
+                                const dialogElement = document.querySelector('[role="dialog"]') as HTMLElement;
+                                if (dialogElement) {
+                                    // 移除Dialog的所有焦点相关属性
+                                    dialogElement.removeAttribute('tabindex');
+                                    dialogElement.setAttribute('tabindex', '-1');
+                                    dialogElement.style.setProperty('pointer-events', 'none', 'important');
+                                    dialogElement.style.setProperty('z-index', '1', 'important');
+
+                                    // 禁用Dialog的焦点陷阱
+                                    const dialogContent = dialogElement.querySelector('[data-radix-dialog-content]') as HTMLElement;
+                                    if (dialogContent) {
+                                        dialogContent.removeAttribute('tabindex');
+                                        dialogContent.setAttribute('tabindex', '-1');
+                                        dialogContent.style.setProperty('pointer-events', 'none', 'important');
+                                    }
+
+                                    // 移除Dialog的aria属性，防止屏幕阅读器干扰
+                                    dialogElement.removeAttribute('aria-modal');
+                                    dialogElement.removeAttribute('aria-hidden');
+                                }
+
+                                // 使用更长的延迟确保Dialog完全失去焦点
+                                setTimeout(() => {
+                                    // 强制移除所有其他元素的焦点
+                                    const allFocusableElements = document.querySelectorAll('[tabindex]:not([tabindex="-1"]), input, textarea, button, select, [contenteditable]');
+                                    allFocusableElements.forEach(el => {
+                                        if (el !== editorElement) {
+                                            (el as HTMLElement).blur();
+                                        }
+                                    });
+
+                                    // 强制聚焦编辑器
+                                    editorElement.focus();
+
+                                    // 使用多个requestAnimationFrame确保焦点设置生效
+                                    requestAnimationFrame(() => {
+                                        editorElement.focus();
+                                        requestAnimationFrame(() => {
+                                            editorElement.focus();
+                                            console.log('Focused editor element, active element:', document.activeElement);
+
+                                            // 确保光标在编辑器末尾
+                                            const range = document.createRange();
+                                            const sel = window.getSelection();
+                                            range.selectNodeContents(editorElement);
+                                            range.collapse(false);
+                                            sel?.removeAllRanges();
+                                            sel?.addRange(range);
+                                        });
+                                    });
+                                }, 200); // 增加延迟时间
+
                                 return true;
+                            } else {
+                                console.log('No editor element found in fullscreen container');
                             }
                             return false;
                         };
@@ -220,6 +275,57 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                                 setTimeout(focusEditor, 100);
                             }
                         }, 200);
+
+                        // 添加额外的焦点管理机制
+                        const forceFocusEditor = () => {
+                            const editorElement = fullscreenContainer.querySelector('[contenteditable]') as HTMLElement;
+                            if (editorElement && document.activeElement !== editorElement) {
+                                // 移除所有其他元素的焦点
+                                const allFocusableElements = document.querySelectorAll('[tabindex]:not([tabindex="-1"]), input, textarea, button, select, [contenteditable]');
+                                allFocusableElements.forEach(el => {
+                                    if (el !== editorElement) {
+                                        (el as HTMLElement).blur();
+                                    }
+                                });
+
+                                // 强制聚焦编辑器
+                                editorElement.focus();
+
+                                // 使用多个requestAnimationFrame确保焦点设置生效
+                                requestAnimationFrame(() => {
+                                    editorElement.focus();
+                                    requestAnimationFrame(() => {
+                                        editorElement.focus();
+
+                                        // 确保光标可见
+                                        const range = document.createRange();
+                                        const sel = window.getSelection();
+                                        range.selectNodeContents(editorElement);
+                                        range.collapse(false);
+                                        sel?.removeAllRanges();
+                                        sel?.addRange(range);
+
+                                        console.log('Force focused editor, active element:', document.activeElement);
+                                    });
+                                });
+                            }
+                        };
+
+                        // 监听点击事件，确保编辑器获得焦点
+                        fullscreenContainer.addEventListener('click', (e) => {
+                            const editorElement = fullscreenContainer.querySelector('[contenteditable]') as HTMLElement;
+                            if (editorElement && (e.target === editorElement || editorElement.contains(e.target as Node))) {
+                                forceFocusEditor();
+                            }
+                        });
+
+                        // 监听键盘事件，确保编辑器获得焦点
+                        fullscreenContainer.addEventListener('keydown', (e) => {
+                            const editorElement = fullscreenContainer.querySelector('[contenteditable]') as HTMLElement;
+                            if (editorElement && e.target !== editorElement) {
+                                forceFocusEditor();
+                            }
+                        });
                     }
                 }, 100);
             }
@@ -248,6 +354,8 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                 onPreviewModeChange={handlePreviewModeChange}
                 // 正常模式下不标识为全屏
                 isInFullscreen={false}
+                // 传递Dialog状态
+                isInDialog={props.isInDialog}
             />
         </div>
     );
@@ -263,7 +371,7 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             ? 'animate-out fade-out-0 duration-300'
                             : 'animate-in fade-in-0 duration-300'
                             }`}
-                        style={{ zIndex: 100001 }}
+                        style={{ zIndex: 100003 }}
                         data-fullscreen-container="true"
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
@@ -280,12 +388,16 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                             className="w-full h-full bg-background flex flex-col animate-in zoom-in-95 duration-300"
                             data-fullscreen-container="true"
                             onMouseDown={(e) => {
-                                // 阻止事件冒泡，防止Dialog关闭
-                                e.stopPropagation();
+                                // 只阻止事件冒泡到外层容器，不阻止编辑器内部事件
+                                if (e.target === e.currentTarget) {
+                                    e.stopPropagation();
+                                }
                             }}
                             onClick={(e) => {
-                                // 阻止事件冒泡，防止Dialog关闭
-                                e.stopPropagation();
+                                // 只阻止事件冒泡到外层容器，不阻止编辑器内部事件
+                                if (e.target === e.currentTarget) {
+                                    e.stopPropagation();
+                                }
                             }}
                         >
                             <SimpleRichTextEditor
@@ -305,6 +417,8 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
                                 onPreviewModeChange={handlePreviewModeChange}
                                 // 标识这是全屏模式
                                 isInFullscreen={true}
+                                // 传递Dialog状态
+                                isInDialog={props.isInDialog}
                             />
                         </div>
                     </div>,
