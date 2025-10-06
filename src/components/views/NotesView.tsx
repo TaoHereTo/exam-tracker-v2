@@ -1218,17 +1218,20 @@ export default function NotesView() {
                 <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>确认删除</DialogTitle>
+                            <DialogTitle><MixedText text="确认删除" /></DialogTitle>
                             <DialogDescription>
-                                确定要删除笔记 "{noteToDelete?.title}" 吗？此操作无法撤销。
+                                <MixedText text={`确定要删除笔记 "${noteToDelete?.title}" 吗？`} />
+                                <br />
+                                <br />
+                                <MixedText text="此操作不可撤销，删除后无法恢复。" />
                             </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>
-                                取消
+                            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} className="flex items-center justify-center rounded-full">
+                                <MixedText text="取消" />
                             </Button>
-                            <Button variant="destructive" onClick={confirmDeleteNote}>
-                                删除
+                            <Button variant="destructive" onClick={confirmDeleteNote} className="flex items-center justify-center rounded-full">
+                                <MixedText text="确认删除" />
                             </Button>
                         </DialogFooter>
                     </DialogContent>
@@ -1347,7 +1350,7 @@ export default function NotesView() {
                         </div>
 
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowTagEditDialog(false)}>
+                            <Button variant="outline" onClick={() => setShowTagEditDialog(false)} className="rounded-full">
                                 完成
                             </Button>
                         </DialogFooter>

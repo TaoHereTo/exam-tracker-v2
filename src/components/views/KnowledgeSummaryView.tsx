@@ -626,10 +626,10 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="rounded-full">
+                        <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} className="flex items-center justify-center rounded-full">
                             <MixedText text="取消" />
                         </Button>
-                        <Button variant="destructive" onClick={confirmDelete} className="rounded-full">
+                        <Button variant="destructive" onClick={confirmDelete} className="flex items-center justify-center rounded-full">
                             <MixedText text="确认删除" />
                         </Button>
                     </DialogFooter>

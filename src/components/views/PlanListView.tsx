@@ -508,13 +508,14 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                                                             </DialogDescription>
                                                                             <DialogFooter>
                                                                                 <DialogClose asChild>
-                                                                                    <Button variant="outline">
+                                                                                    <Button variant="outline" className="flex items-center justify-center rounded-full">
                                                                                         <MixedText text="取消" />
                                                                                     </Button>
                                                                                 </DialogClose>
                                                                                 <Button
                                                                                     onClick={() => handleDelete(plan.id)}
                                                                                     variant="destructive"
+                                                                                    className="flex items-center justify-center rounded-full"
                                                                                 >
                                                                                     <MixedText text="确认删除" />
                                                                                 </Button>
@@ -969,14 +970,14 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                     </DialogHeader>
                     <DialogFooter>
                         <DialogClose asChild>
-                            <Button variant="outline" className="rounded-full">
+                            <Button variant="outline" className="flex items-center justify-center rounded-full">
                                 <MixedText text="取消" />
                             </Button>
                         </DialogClose>
                         <Button
                             onClick={confirmDelete}
                             variant="destructive"
-                            className="rounded-full"
+                            className="flex items-center justify-center rounded-full"
                         >
                             <MixedText text="确认删除" />
                         </Button>

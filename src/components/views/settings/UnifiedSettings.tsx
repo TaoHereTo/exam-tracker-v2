@@ -1032,16 +1032,17 @@ export function UnifiedSettings({
                 setImagesToDelete([]);
               }
             }}>
-              <DialogContent className="p-4 sm:p-6">
+              <DialogContent>
                 <DialogHeader>
-                  <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
-                  <DialogDescription className="text-xs sm:text-sm">
+                  <DialogTitle><MixedText text="确认删除" /></DialogTitle>
+                  <DialogDescription>
                     <MixedText text={`确定要删除选中的 ${imagesToDelete.length} 张图片吗？`} />
                     <br />
                     <br />
                     <MixedText text="此操作不可撤销，删除后无法恢复。" />
                     <br />
-                    <span className="font-medium text-red-600 text-xs sm:text-sm">
+                    <br />
+                    <span className="font-medium text-red-600 text-sm">
                       {imagesToDelete.map(id => {
                         const img = cloudImages.find(img => img.id === id);
                         return img?.originalName || id;
@@ -1049,20 +1050,20 @@ export function UnifiedSettings({
                     </span>
                   </DialogDescription>
                 </DialogHeader>
-                <DialogFooter className="flex flex-row sm:flex-row gap-2">
+                <DialogFooter>
                   <Button variant="outline"
                     onClick={() => {
                       setDeleteDialogOpen(false);
                       setImagesToDelete([]);
                     }}
-                    className="flex items-center justify-center h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                    className="flex items-center justify-center rounded-full"
                   >
                     <MixedText text="取消" />
                   </Button>
                   <Button
                     onClick={confirmDeleteImages}
                     variant="destructive"
-                    className="flex items-center justify-center shadow-xs focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                    className="flex items-center justify-center rounded-full"
                   >
                     <MixedText text="确认删除" />
                   </Button>

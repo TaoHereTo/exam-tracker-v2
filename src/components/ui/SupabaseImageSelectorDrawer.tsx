@@ -418,18 +418,22 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                     <DrawerHeader>
                         <DrawerTitle><MixedText text="确认删除" /></DrawerTitle>
                         <DrawerDescription>
-                            <MixedText text={`确定要删除图片 "${imageToDelete?.name}" 吗？此操作无法撤销。`} />
+                            <MixedText text={`确定要删除图片 "${imageToDelete?.name}" 吗？`} />
+                            <br />
+                            <br />
+                            <MixedText text="此操作不可撤销，删除后无法恢复。" />
                         </DrawerDescription>
                     </DrawerHeader>
                     <DrawerFooter>
                         <div className="flex justify-end space-x-2">
-                            <Button variant="outline" onClick={handleDeleteCancel}>
+                            <Button variant="outline" onClick={handleDeleteCancel} className="flex items-center justify-center rounded-full">
                                 <MixedText text="取消" />
                             </Button>
                             <Button
                                 variant="destructive"
                                 onClick={handleDeleteImage}
                                 disabled={isDeleting}
+                                className="flex items-center justify-center rounded-full"
                             >
                                 {isDeleting ? (
                                     <>

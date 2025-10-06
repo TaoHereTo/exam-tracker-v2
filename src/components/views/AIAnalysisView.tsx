@@ -21,6 +21,7 @@ import {
     Loader2,
     Sparkles,
     Send,
+    SendHorizontal,
     MessageSquare,
     Bot,
     User,
@@ -470,7 +471,7 @@ export function AIAnalysisView({ records }: AIAnalysisViewProps) {
                                     {isAnalyzing ? (
                                         <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                                     ) : (
-                                        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        <SendHorizontal className="w-4 h-4 sm:w-5 sm:h-5" />
                                     )}
                                 </button>
                             </TooltipTrigger>

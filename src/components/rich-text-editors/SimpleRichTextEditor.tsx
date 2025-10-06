@@ -878,13 +878,13 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             try {
                 // 创建纯文本节点
                 const textNode = document.createTextNode(selectedText);
-                
+
                 // 删除选中的内容
                 range.deleteContents();
-                
+
                 // 插入纯文本节点
                 range.insertNode(textNode);
-                
+
                 // 将光标移到文本后面
                 const newRange = document.createRange();
                 newRange.setStartAfter(textNode);
@@ -898,22 +898,22 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
             } catch (error) {
                 console.error('清除格式失败:', error);
-                
+
                 // 备用方案：使用更简单的方法
                 try {
                     // 获取选中文本的纯文本内容
                     const textContent = range.toString();
-                    
+
                     // 删除选中内容
                     range.deleteContents();
-                    
+
                     // 插入纯文本
                     range.insertNode(document.createTextNode(textContent));
-                    
+
                     // 更新内容
                     const html = editorRef.current?.innerHTML;
                     if (html) onChange(html);
-                    
+
                 } catch (backupError) {
                     console.error('备用清除格式方法也失败:', backupError);
                 }
@@ -1838,10 +1838,10 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                             </div>
                         </div>
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setEditorState(prev => ({ ...prev, showLinkDialog: false }))}>
+                            <Button variant="outline" onClick={() => setEditorState(prev => ({ ...prev, showLinkDialog: false }))} className="rounded-full">
                                 取消
                             </Button>
-                            <Button onClick={confirmInsertLink} disabled={!linkUrl}>
+                            <Button onClick={confirmInsertLink} disabled={!linkUrl} className="rounded-full">
                                 插入链接
                             </Button>
                         </DialogFooter>
