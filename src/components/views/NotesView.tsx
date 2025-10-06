@@ -711,7 +711,9 @@ export default function NotesView() {
                                                 filteredNotes.map(note => (
                                                     <div
                                                         key={note.id}
-                                                        className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${selectedNote?.id === note.id ? 'bg-muted/50' : ''
+                                                        className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${selectedNote?.id === note.id
+                                                            ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 shadow-sm'
+                                                            : 'hover:border-muted-foreground/20'
                                                             }`}
                                                         onClick={() => {
                                                             setSelectedNote(note);

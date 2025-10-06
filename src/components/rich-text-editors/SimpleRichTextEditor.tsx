@@ -206,9 +206,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
     const { notify } = useNotification();
 
-    // 颜色选项
+    // 检测是否为深色模式
+    const isDarkMode = () => {
+        return document.documentElement.classList.contains('dark') ||
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+    };
+
+    // 颜色选项 - 移除前五个颜色
     const colors = [
-        '#000000', '#374151', '#6B7280', '#9CA3AF', '#D1D5DB',
         '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16',
         '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
         '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
@@ -405,10 +410,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             return;
         }
 
+        // 深色模式下，将黑色文字转换为纯白色
+        let finalColor = color;
+        if (isDarkMode() && color === '#000000') {
+            finalColor = '#FFFFFF';
+        }
+
         try {
             // 使用 surroundContents 方法
             const span = document.createElement('span');
-            span.style.color = color;
+            span.style.color = finalColor;
 
             // 使用 surroundContents 包装选中的内容
             range.surroundContents(span);
@@ -424,7 +435,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 备用方法：手动创建和插入
             try {
                 const span = document.createElement('span');
-                span.style.color = color;
+                span.style.color = finalColor;
                 span.textContent = selectedText;
 
                 // 删除选中的内容
@@ -844,7 +855,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
         }
     };
 
-    // 清除所有格式
+    // 清除所有格式 - 增强版，能够清除所有格式包括标题
     const handleClearFormat = () => {
         if (!editorRef.current) return;
 
@@ -864,18 +875,16 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 return;
             }
 
-            // 使用 document.execCommand 来清除格式，这样更可靠
-            const success = document.execCommand('removeFormat', false, undefined);
-
-            if (success) {
-                const html = editorRef.current?.innerHTML;
-                if (html) onChange(html);
-            } else {
-                // 如果 execCommand 失败，使用手动方式
+            try {
+                // 创建纯文本节点
                 const textNode = document.createTextNode(selectedText);
+                
+                // 删除选中的内容
                 range.deleteContents();
+                
+                // 插入纯文本节点
                 range.insertNode(textNode);
-
+                
                 // 将光标移到文本后面
                 const newRange = document.createRange();
                 newRange.setStartAfter(textNode);
@@ -883,8 +892,31 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 selection.removeAllRanges();
                 selection.addRange(newRange);
 
+                // 更新内容
                 const html = editorRef.current?.innerHTML;
                 if (html) onChange(html);
+
+            } catch (error) {
+                console.error('清除格式失败:', error);
+                
+                // 备用方案：使用更简单的方法
+                try {
+                    // 获取选中文本的纯文本内容
+                    const textContent = range.toString();
+                    
+                    // 删除选中内容
+                    range.deleteContents();
+                    
+                    // 插入纯文本
+                    range.insertNode(document.createTextNode(textContent));
+                    
+                    // 更新内容
+                    const html = editorRef.current?.innerHTML;
+                    if (html) onChange(html);
+                    
+                } catch (backupError) {
+                    console.error('备用清除格式方法也失败:', backupError);
+                }
             }
         }, 10);
     };
@@ -2313,6 +2345,19 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     .rich-text-editor-preview div[style*="margin: 16px 0"] + p {
                         margin: 0 !important;
                         min-height: 1.2em !important;
+                    }
+                    
+                    /* 深色模式下黑色文字自动变白 */
+                    .dark .rich-text-editor-main span[style*="color: rgb(0, 0, 0)"],
+                    .dark .rich-text-editor-main span[style*="color: #000000"],
+                    .dark .rich-text-editor-main span[style*="color: black"] {
+                        color: #FFFFFF !important;
+                    }
+                    
+                    .dark .rich-text-editor-preview span[style*="color: rgb(0, 0, 0)"],
+                    .dark .rich-text-editor-preview span[style*="color: #000000"],
+                    .dark .rich-text-editor-preview span[style*="color: black"] {
+                        color: #FFFFFF !important;
                     }
                 `}</style>
             </div>
