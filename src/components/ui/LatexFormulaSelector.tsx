@@ -306,19 +306,22 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                     {selectedCategory === '全部' ? '全部' : selectedCategory} 分类共有 {filteredFormulas.length} 个公式
                                 </div>
 
-                                <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1">
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                                     {filteredFormulas.map((formula, index) => (
                                         <div
                                             key={`${formula.category}-${index}`}
-                                            className="p-1 hover:bg-gray-50 dark:hover:bg-[#303030] cursor-pointer transition-colors rounded hover:shadow-sm group"
+                                            className="p-2 bg-white dark:bg-black hover:bg-gray-50 dark:hover:bg-[#303030] cursor-pointer transition-colors rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-sm group"
                                             onClick={() => onInsert(formula.latex, displayMode === 'block')}
                                             title={`${formula.name}: ${formula.latex}`}
                                         >
-                                            <div className="text-center bg-gray-50 dark:bg-[#303030] p-1 rounded min-h-[24px] flex items-center justify-center mb-1">
+                                            <div className="text-sm font-medium text-left text-gray-800 dark:text-gray-200 group-hover:text-gray-900 dark:group-hover:text-gray-100 mb-1">
+                                                {formula.name}
+                                            </div>
+                                            <div className="text-center bg-white dark:bg-black group-hover:bg-gray-50 dark:group-hover:bg-[#303030] p-2 rounded min-h-[40px] flex items-center justify-center mb-1 transition-colors duration-150">
                                                 <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
                                             </div>
-                                            <div className="text-xs font-medium truncate text-center text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">
-                                                {formula.name}
+                                            <div className="text-xs text-gray-500 dark:text-gray-400 font-mono text-center break-all">
+                                                {formula.latex}
                                             </div>
                                         </div>
                                     ))}

@@ -685,7 +685,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                     <motion.div
                                                                         layoutId={`completed-countdown-${countdown.id}`}
                                                                         layout
-                                                                        className="w-full rounded-xl overflow-hidden cursor-pointer bg-white dark:bg-transparent dark:border-[#262626] hover:bg-muted/50 transition-colors shadow-none"
+                                                                        className="w-full rounded-xl overflow-hidden cursor-pointer bg-white dark:bg-black dark:border-[#262626] hover:bg-gray-50 dark:hover:bg-[#303030] transition-colors shadow-none"
                                                                         onClick={() => handleCountdownSelect(countdown.id, !isSelected)}
                                                                     >
                                                                         <div className="px-6 py-3 flex items-center gap-3">

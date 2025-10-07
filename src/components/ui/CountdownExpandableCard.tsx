@@ -99,7 +99,7 @@ export default function CountdownExpandableCard({
                         <motion.div
                             layoutId={`card-${prefix}-${active.id}-${uniqueId}`}
                             ref={ref}
-                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-[color:var(--card-modal-background)] sm:rounded-3xl overflow-hidden border border-border shadow-lg"
+                            className="w-full max-w-[500px] h-full md:h-fit md:max-h-[90%] flex flex-col bg-white dark:bg-black sm:rounded-3xl overflow-hidden border border-border shadow-lg"
                         >
                             <div>
                                 <div className="flex justify-between items-start p-4">
@@ -184,9 +184,9 @@ export default function CountdownExpandableCard({
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className="text-neutral-700 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-start gap-4 overflow-auto dark:text-neutral-300 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
+                                        className="text-neutral-700 text-xs md:text-sm lg:text-base h-40 md:h-fit pb-10 flex flex-col items-center gap-4 overflow-auto dark:text-neutral-300 [mask:linear-gradient(to_bottom,white,white,transparent)] [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]"
                                     >
-                                        <div className="space-y-4">
+                                        <div className="space-y-4 flex flex-col items-center">
                                             <div className="flex items-center gap-2">
                                                 <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                                                 <span className="text-sm font-medium text-neutral-800 dark:text-neutral-200">
@@ -200,8 +200,7 @@ export default function CountdownExpandableCard({
                                                 </span>
                                             </div>
                                             <div className="mt-4">
-                                                <h4 className="text-lg font-semibold mb-3 text-neutral-800 dark:text-neutral-200">倒计时信息</h4>
-                                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-700">
+                                                <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg border border-gray-200 dark:border-gray-700 flex flex-col items-center text-center">
                                                     {calculateDetailedCountdown(active.examDate)}
                                                 </div>
                                             </div>
@@ -224,7 +223,7 @@ export default function CountdownExpandableCard({
                                 layoutId={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 key={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 onClick={() => setActive(countdown)}
-                                className="p-card flex flex-col bg-white dark:bg-transparent hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-none hover:shadow-none transition-shadow"
+                                className="p-card flex flex-col bg-white dark:bg-black hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-none hover:shadow-none transition-shadow"
                                 style={{
                                     display: isActive ? 'none' : 'block'
                                 }}
