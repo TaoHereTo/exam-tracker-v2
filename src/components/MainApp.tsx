@@ -1304,6 +1304,7 @@ export function MainApp() {
                                                     navMode={navMode}
                                                     records={records}
                                                     plans={plans}
+                                                    countdowns={countdowns}
                                                     knowledge={knowledge}
                                                     settings={{
                                                         'exam-tracker-nav-mode': navMode,

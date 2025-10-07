@@ -216,13 +216,48 @@ export class CloudSyncService {
         const userId = userData?.user?.id;
         if (!userId) throw new Error('用户未登录');
 
+        // 验证和清理数据
+        const validKnowledgeItems: KnowledgeItem[] = [];
+        const invalidItems: { item: KnowledgeItem; reason: string }[] = [];
+
+        for (const item of knowledgeToUpload) {
+            // 验证必需字段
+            if (!item.id || !item.module) {
+                invalidItems.push({
+                    item,
+                    reason: '缺少必需字段（id或module）'
+                });
+                continue;
+            }
+
+            // 确保type和note字段不为空
+            const validatedItem: KnowledgeItem = {
+                ...item,
+                type: item.type || '未分类',
+                note: item.note || '无内容'
+            };
+
+            validKnowledgeItems.push(validatedItem);
+        }
+
+        console.log(`知识点批量上传：总共${knowledgeToUpload.length}条，有效${validKnowledgeItems.length}条，无效${invalidItems.length}条`);
+
+        if (validKnowledgeItems.length === 0) {
+            const report = knowledgeToUpload.map(knowledge => ({
+                item: knowledge,
+                action: 'failed' as const,
+                reason: '所有知识点数据无效'
+            }));
+            return { uploaded: 0, report };
+        }
+
         // Prepare data for batch upload
-        const uploadData = knowledgeToUpload.map(item => ({
+        const uploadData = validKnowledgeItems.map(item => ({
             id: item.id,
             user_id: userId,
             module: item.module,
-            type: item.type || '',
-            note: item.note || '',
+            type: item.type,
+            note: item.note,
             "subCategory": item.subCategory || '',
             "date": item.date || null,
             "source": item.source || '',
@@ -231,26 +266,47 @@ export class CloudSyncService {
             updated_at: item.updatedAt || new Date().toISOString()
         }));
 
-        // Perform batch upload
-        const { data, error } = await supabase
-            .from('knowledge')
-            .upsert(uploadData, {
-                onConflict: 'id',
-                ignoreDuplicates: false
-            })
-            .select();
+        console.log('准备上传的知识点数据示例:', uploadData.slice(0, 2));
 
-        if (error) {
-            console.error('知识点批量上传失败:', error);
+        try {
+            // Perform batch upload
+            const { data, error } = await supabase
+                .from('knowledge')
+                .upsert(uploadData, {
+                    onConflict: 'id',
+                    ignoreDuplicates: false
+                })
+                .select();
+
+            if (error) {
+                console.error('知识点批量上传失败，详细错误信息:', {
+                    message: error.message,
+                    details: error.details,
+                    hint: error.hint,
+                    code: error.code
+                });
+                throw new Error(`知识点批量上传失败: ${error.message || '未知错误'}`);
+            }
+
+            console.log(`知识点批量上传成功，上传了${data?.length || 0}条数据`);
+
+            const report = [
+                ...validKnowledgeItems.map(knowledge => ({
+                    item: knowledge,
+                    action: 'uploaded' as const
+                })),
+                ...invalidItems.map(({ item, reason }) => ({
+                    item,
+                    action: 'failed' as const,
+                    reason
+                }))
+            ];
+
+            return { uploaded: data?.length || 0, report };
+        } catch (error) {
+            console.error('知识点批量上传异常:', error);
             throw error;
         }
-
-        const report = knowledgeToUpload.map(knowledge => ({
-            item: knowledge,
-            action: 'uploaded' as const
-        }));
-
-        return { uploaded: data?.length || 0, report };
     }
 
     // 上传本地数据到云端 - 优化版本
@@ -342,6 +398,20 @@ export class CloudSyncService {
                 );
             });
 
+            // 调试日志：记录知识点上传信息
+            console.log('知识点上传分析:', {
+                本地知识点总数: localKnowledge.length,
+                云端知识点总数: cloudKnowledge.length,
+                需要上传的知识点数量: knowledgeToUpload.length,
+                需要上传的知识点示例: knowledgeToUpload.slice(0, 3).map(k => ({
+                    id: k.id,
+                    module: k.module,
+                    type: k.type,
+                    note: k.note?.substring(0, 50) + '...',
+                    hasImage: !!k.imagePath
+                }))
+            });
+
             // 批量上传记录
             if (recordsToUpload.length > 0) {
                 onProgress?.({
@@ -430,43 +500,64 @@ export class CloudSyncService {
                     });
 
                     let individualUploaded = 0;
+                    let individualFailed = 0;
+
                     for (const knowledge of knowledgeToUpload) {
                         checkCancelled();
 
                         // 验证知识点数据
-                        if (!knowledge.type || !knowledge.note) {
-                            console.warn('跳过无效的知识点:', {
+                        if (!knowledge.id || !knowledge.module) {
+                            console.warn('跳过无效的知识点（缺少必需字段）:', {
                                 id: knowledge.id,
-                                type: knowledge.type,
-                                note: knowledge.note
+                                module: knowledge.module
                             });
                             report.knowledge.push({
                                 item: knowledge,
                                 action: 'failed',
-                                reason: '知识点数据无效（type或note字段为空）'
+                                reason: '知识点数据无效（缺少id或module字段）'
                             });
+                            individualFailed++;
                             continue;
                         }
 
+                        // 确保type和note字段不为空
+                        const validatedKnowledge = {
+                            ...knowledge,
+                            type: knowledge.type || '未分类',
+                            note: knowledge.note || '无内容'
+                        };
+
                         try {
                             await knowledgeService.addKnowledge({
-                                module: knowledge.module,
-                                type: knowledge.type,
-                                note: knowledge.note,
-                                subCategory: knowledge.subCategory,
-                                date: knowledge.date,
-                                source: knowledge.source,
-                                imagePath: knowledge.imagePath
+                                module: validatedKnowledge.module,
+                                type: validatedKnowledge.type,
+                                note: validatedKnowledge.note,
+                                subCategory: validatedKnowledge.subCategory,
+                                date: validatedKnowledge.date,
+                                source: validatedKnowledge.source,
+                                imagePath: validatedKnowledge.imagePath
                             });
                             individualUploaded++;
                             report.knowledge.push({ item: knowledge, action: 'uploaded' });
+                            console.log(`单个知识点上传成功: ${knowledge.id}`);
                         } catch (individualError) {
-                            console.error('单个知识点上传失败:', individualError);
+                            console.error('单个知识点上传失败:', {
+                                knowledgeId: knowledge.id,
+                                error: individualError
+                            });
 
                             let reason = '未知错误';
                             if (individualError instanceof Error) {
                                 if (individualError.message.includes('not-null constraint') || individualError.message.includes('23502')) {
-                                    reason = '知识点数据无效（type或note字段为空）';
+                                    reason = '知识点数据无效（数据库约束失败）';
+                                } else if (individualError.message.includes('duplicate key') || individualError.message.includes('23505')) {
+                                    reason = '知识点已存在（重复ID）';
+                                } else if (individualError.message.includes('foreign key') || individualError.message.includes('23503')) {
+                                    reason = '知识点数据关联失败';
+                                } else if (individualError.message.includes('permission') || individualError.message.includes('unauthorized')) {
+                                    reason = '权限不足，请重新登录';
+                                } else if (individualError.message.includes('network') || individualError.message.includes('fetch')) {
+                                    reason = '网络连接失败';
                                 } else {
                                     reason = individualError.message;
                                 }
@@ -477,9 +568,12 @@ export class CloudSyncService {
                                 action: 'failed',
                                 reason: reason
                             });
+                            individualFailed++;
                         }
                     }
+
                     uploadedKnowledge = individualUploaded;
+                    console.log(`知识点逐个上传完成：成功${individualUploaded}条，失败${individualFailed}条`);
                 }
             }
 
@@ -684,20 +778,22 @@ export class CloudSyncService {
             throw new Error('用户未登录');
         }
 
-        const [recordsCount, plansCount, knowledgeCount] = await Promise.all([
+        const [recordsCount, plansCount, knowledgeCount, countdownsCount] = await Promise.all([
             this.getRecordsCount(userId),
             this.getPlansCount(userId),
-            this.getKnowledgeCount(userId)
+            this.getKnowledgeCount(userId),
+            this.getCountdownsCount(userId)
         ]);
 
         // 简化设置检查，如果失败就默认为 false
         const hasSettings = await this.hasUserSettings(userId).catch(() => false);
 
         return {
-            records: { count: recordsCount, recent: [] },
-            plans: { count: plansCount, recent: [] },
-            knowledge: { count: knowledgeCount, recent: [] },
-            settings: { hasSettings }
+            records: { count: recordsCount, recent: [], lastUpdated: await this.getLastUpdatedTime('exercise_records', userId) },
+            plans: { count: plansCount, recent: [], lastUpdated: await this.getLastUpdatedTime('plans', userId) },
+            knowledge: { count: knowledgeCount, recent: [], lastUpdated: await this.getLastUpdatedTime('knowledge', userId) },
+            countdowns: { count: countdownsCount, recent: [], lastUpdated: await this.getLastUpdatedTime('exam_countdowns', userId) },
+            settings: { hasSettings, lastUpdated: hasSettings ? await this.getLastUpdatedTime('user_settings', userId) : undefined }
         };
     }
 
@@ -758,6 +854,47 @@ export class CloudSyncService {
         }
     }
 
+    // 获取倒计时数量
+    private static async getCountdownsCount(userId: string): Promise<number> {
+        try {
+            const { count, error } = await supabase
+                .from('exam_countdowns')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId);
+
+            if (error) {
+                console.warn('获取倒计时数量失败:', error);
+                return 0;
+            }
+            return count || 0;
+        } catch (error) {
+            console.warn('获取倒计时数量异常:', error);
+            return 0;
+        }
+    }
+
+    // 获取表最后更新时间
+    private static async getLastUpdatedTime(tableName: string, userId: string): Promise<string | undefined> {
+        try {
+            const { data, error } = await supabase
+                .from(tableName)
+                .select('updated_at')
+                .eq('user_id', userId)
+                .order('updated_at', { ascending: false })
+                .limit(1);
+
+            if (error) {
+                console.warn(`获取${tableName}最后更新时间失败:`, error);
+                return undefined;
+            }
+
+            return data && data.length > 0 ? data[0].updated_at : undefined;
+        } catch (error) {
+            console.warn(`获取${tableName}最后更新时间异常:`, error);
+            return undefined;
+        }
+    }
+
     // 检查是否有用户设置
     private static async hasUserSettings(userId: string): Promise<boolean> {
         try {
@@ -774,6 +911,125 @@ export class CloudSyncService {
         } catch (error) {
             // 如果出现任何异常，返回 false
             return false;
+        }
+    }
+
+    // 删除特定模块的云端数据
+    static async clearSpecificCloudData(
+        dataType: 'records' | 'plans' | 'knowledge' | 'countdowns' | 'settings',
+        onProgress?: (progress: { current: number; total: number; currentItem: string }) => void
+    ): Promise<{
+        success: boolean;
+        message: string;
+        clearedCount: number;
+    }> {
+        try {
+            const { data: userData } = await supabase.auth.getUser();
+            const userId = userData?.user?.id;
+            if (!userId) {
+                return {
+                    success: false,
+                    message: '未登录，无法删除云端数据',
+                    clearedCount: 0
+                };
+            }
+
+            let clearedCount = 0;
+            let tableName = '';
+            let dataName = '';
+
+            // 根据数据类型设置参数
+            switch (dataType) {
+                case 'records':
+                    tableName = 'exercise_records';
+                    dataName = '刷题历史';
+                    const cloudRecords = await recordService.getRecords().catch(() => []);
+                    clearedCount = cloudRecords.length;
+                    break;
+                case 'plans':
+                    tableName = 'plans';
+                    dataName = '学习计划';
+                    const cloudPlans = await planService.getPlans().catch(() => []);
+                    clearedCount = cloudPlans.length;
+                    break;
+                case 'knowledge':
+                    tableName = 'knowledge';
+                    dataName = '知识点';
+                    const cloudKnowledge = await knowledgeService.getKnowledge().catch(() => []);
+                    clearedCount = cloudKnowledge.length;
+                    break;
+                case 'countdowns':
+                    tableName = 'exam_countdowns';
+                    dataName = '考试倒计时';
+                    // 倒计时数据可能没有单独的服务，需要直接查询
+                    const { data: countdowns } = await supabase
+                        .from('exam_countdowns')
+                        .select('*')
+                        .eq('user_id', userId);
+                    clearedCount = countdowns?.length || 0;
+                    break;
+                case 'settings':
+                    tableName = 'user_settings';
+                    dataName = '设置';
+                    const { data: settings } = await supabase
+                        .from('user_settings')
+                        .select('*')
+                        .eq('user_id', userId);
+                    clearedCount = settings?.length || 0;
+                    break;
+                default:
+                    return {
+                        success: false,
+                        message: '不支持的数据类型',
+                        clearedCount: 0
+                    };
+            }
+
+            if (clearedCount === 0) {
+                return {
+                    success: true,
+                    message: `${dataName}没有云端数据需要删除`,
+                    clearedCount: 0
+                };
+            }
+
+            onProgress?.({
+                current: 1,
+                total: 2,
+                currentItem: `正在删除${dataName}...`
+            });
+
+            // 删除数据
+            const { error } = await supabase
+                .from(tableName)
+                .delete()
+                .eq('user_id', userId);
+
+            if (error) {
+                console.error(`删除${dataName}失败:`, error);
+                throw new Error(`删除${dataName}失败: ${error.message}`);
+            }
+
+            onProgress?.({
+                current: 2,
+                total: 2,
+                currentItem: `${dataName}删除完成`
+            });
+
+            return {
+                success: true,
+                message: `成功删除 ${clearedCount} 条${dataName}数据`,
+                clearedCount
+            };
+
+        } catch (error) {
+            console.error(`删除特定模块数据失败:`, error);
+            const errorMessage = error instanceof Error ? error.message : '未知错误';
+            return {
+                success: false,
+                message: `删除失败: ${errorMessage}`,
+                clearedCount: 0
+            };
         }
     }
 

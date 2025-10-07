@@ -8,13 +8,14 @@ export interface NotificationData {
 }
 
 // 云端数据概览类型
-import type { RecordItem, StudyPlan, KnowledgeItem } from './record';
+import type { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from './record';
 
 export interface CloudDataOverview {
-    records: { count: number; recent: RecordItem[] };
-    plans: { count: number; recent: StudyPlan[] };
-    knowledge: { count: number; recent: KnowledgeItem[] };
-    settings: { hasSettings: boolean };
+    records: { count: number; recent: RecordItem[]; lastUpdated?: string };
+    plans: { count: number; recent: StudyPlan[]; lastUpdated?: string };
+    knowledge: { count: number; recent: KnowledgeItem[]; lastUpdated?: string };
+    countdowns: { count: number; recent: ExamCountdown[]; lastUpdated?: string };
+    settings: { hasSettings: boolean; lastUpdated?: string };
 }
 
 // 同步报告项类型

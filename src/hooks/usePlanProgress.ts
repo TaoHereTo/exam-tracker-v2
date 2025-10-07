@@ -77,5 +77,5 @@ export function usePlanProgress(
             lastUpdateRef.current = currentState;
             setPlans(updated);
         }
-    }, [plans, records, calcPlanProgress, setPlans, deepEqual, onPlanCompleted]);
+    }, [plans, records, calcPlanProgress, setPlans, onPlanCompleted]);
 } 

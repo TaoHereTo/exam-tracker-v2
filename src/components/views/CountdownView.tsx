@@ -801,8 +801,9 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {
                     handleDialogClose();
+                } else {
+                    setShowForm(open);
                 }
-                setShowForm(open);
             }}>
                 <DialogContent className="w-11/12 max-w-md sm:max-w-lg h-[73vh] overflow-y-auto">
                     <DialogHeader>

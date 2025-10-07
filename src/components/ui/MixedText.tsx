@@ -5,10 +5,8 @@ import {
     splitMixedText,
     generateMixedTextStyle,
     getTextType,
-    defaultFontConfig,
     renderFormattedText
 } from '@/lib/fontUtils';
-import { useFont } from '@/contexts/FontContext';
 
 interface MixedTextProps {
     text?: string;
@@ -17,7 +15,6 @@ interface MixedTextProps {
     onClick?: (e: React.MouseEvent) => void;
     children?: React.ReactNode;
     as?: React.ElementType;
-    forceConfig?: boolean; // 是否强制使用默认配置
 }
 
 export const MixedText = memo(function MixedText({
@@ -27,10 +24,7 @@ export const MixedText = memo(function MixedText({
     onClick,
     children,
     as: Component = 'span',
-    forceConfig = false
 }: MixedTextProps) {
-    const { fontConfig } = useFont();
-    const config = forceConfig ? defaultFontConfig : fontConfig;
 
     if (!text && !children) return null;
 
@@ -87,7 +81,7 @@ export const MixedText = memo(function MixedText({
 
     // 如果是纯中文或纯英文，直接应用字体样式
     if (textType === 'chinese' || textType === 'english') {
-        const fontStyle = generateFontStyle(content, config);
+        const fontStyle = generateFontStyle(content);
         return (
             <Component
                 className={cn("mixed-text", className)}
@@ -100,7 +94,7 @@ export const MixedText = memo(function MixedText({
     }
 
     // 如果是混合文本，使用统一的字体样式，不分割
-    const fontStyle = generateFontStyle(content, config);
+    const fontStyle = generateFontStyle(content);
     return (
         <Component
             className={cn("mixed-text", className)}

@@ -4,7 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { SwitchStyleProvider } from "@/contexts/SwitchStyleContext";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { FontProvider } from "@/contexts/FontContext";
 import { NotificationProvider } from "@/components/magicui/NotificationProvider";
 import { TooltipProvider } from "@/components/animate-ui/components/animate/tooltip";
 
@@ -35,15 +34,13 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <FontProvider>
-              <SwitchStyleProvider>
-                <NotificationProvider>
-                  <TooltipProvider>
-                    {children}
-                  </TooltipProvider>
-                </NotificationProvider>
-              </SwitchStyleProvider>
-            </FontProvider>
+            <SwitchStyleProvider>
+              <NotificationProvider>
+                <TooltipProvider>
+                  {children}
+                </TooltipProvider>
+              </NotificationProvider>
+            </SwitchStyleProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

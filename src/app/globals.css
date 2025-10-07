@@ -26,9 +26,9 @@
   --text-shadow-enhance-strong: 0 0 0.3px currentColor;
 }
 
-/* 全局字体渲染优化 - 统一应用到所有元素 */
+/* 全局字体渲染优化 - 统一使用思源宋体 */
 * {
-  font-family: var(--chinese-font, '思源宋体'), var(--english-font, 'Times New Roman'), serif;
+  font-family: 'Noto Serif SC', serif;
   -webkit-font-smoothing: var(--font-smoothing-webkit);
   -moz-osx-font-smoothing: var(--font-smoothing-moz);
   text-rendering: var(--text-rendering-base);

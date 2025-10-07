@@ -10,7 +10,7 @@ import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { SyncReportItem } from "@/types/common";
-import { RecordItem, StudyPlan, KnowledgeItem, UserSettings } from "@/types/record";
+import { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown } from "@/types/record";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     Tooltip,
@@ -29,6 +29,7 @@ export function SettingsView({
     records = [],
     plans = [],
     knowledge = [],
+    countdowns = [],
     settings = {}
 }: {
     onExport?: () => void;
@@ -42,6 +43,7 @@ export function SettingsView({
     records?: RecordItem[];
     plans?: StudyPlan[];
     knowledge?: KnowledgeItem[];
+    countdowns?: ExamCountdown[];
     settings?: UserSettings;
 }) {
     // Render the unified settings component
@@ -56,6 +58,7 @@ export function SettingsView({
             records={records}
             plans={plans}
             knowledge={knowledge}
+            countdowns={countdowns}
             settings={settings}
             activeTab={activeTab}
             navMode={navMode}

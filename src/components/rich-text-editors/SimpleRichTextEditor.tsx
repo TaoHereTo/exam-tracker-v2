@@ -977,7 +977,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 通知父组件内容已清除
             onChange('');
         }
-    }, [clearPreviewImages, onChange, externalPreviewContent]);
+    }, [clearPreviewImages, externalPreviewContent]); // 移除 onChange 依赖
 
     // 初始化编辑器内容 - 当content变化时更新编辑器内容
     useEffect(() => {

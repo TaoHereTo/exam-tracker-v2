@@ -30,7 +30,7 @@ import {
 import { MixedText } from "@/components/ui/MixedText";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import type { RecordItem, StudyPlan, KnowledgeItem, UserSettings } from "@/types/record";
+import type { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown } from "@/types/record";
 import type { UploadProgress } from "@/lib/cloudSyncService";
 import type { SyncReportItem } from "@/types/common";
 import { PhotoProvider, PhotoView } from 'react-photo-view';
@@ -39,7 +39,7 @@ import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { CloudSyncService } from "@/lib/cloudSyncService";
 import { UnifiedTable, type DataTableColumn } from "@/components/ui/UnifiedTable";
 import { AISettings } from "./AISettings";
-import { FontSettings } from "./FontSettings";
+import { Type } from "lucide-react";
 
 export function UnifiedSettings({
   onExport,
@@ -51,6 +51,7 @@ export function UnifiedSettings({
   records = [],
   plans = [],
   knowledge = [],
+  countdowns = [],
   settings = {},
   activeTab,
   navMode,
@@ -64,6 +65,7 @@ export function UnifiedSettings({
   records?: RecordItem[];
   plans?: StudyPlan[];
   knowledge?: KnowledgeItem[];
+  countdowns?: ExamCountdown[];
   settings?: UserSettings;
   activeTab?: string;
   navMode?: string;
@@ -74,6 +76,7 @@ export function UnifiedSettings({
 
   // Appearance settings
   const [eyeCare, setEyeCare] = useLocalStorageBoolean('eye-care-enabled', false);
+
 
   // Advanced settings - image management
   const [showImageManager, setShowImageManager] = useState(false);
@@ -124,6 +127,7 @@ export function UnifiedSettings({
       setEyeCare(false);
     }
   }, [theme, eyeCare, setEyeCare]);
+
 
   // Image management functions
   const loadCloudImages = useCallback(async () => {
@@ -426,6 +430,7 @@ export function UnifiedSettings({
     }
   };
 
+
   // Save all settings to cloud
   const handleSaveAllSettings = async () => {
     try {
@@ -488,7 +493,6 @@ export function UnifiedSettings({
             <div className="flex justify-center items-center mb-6 py-2">
               <TabsList className="items-center h-10">
                 <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
-                <TabsTrigger value="font" className="flex items-center">字体设置</TabsTrigger>
                 <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
                 <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
               </TabsList>
@@ -540,6 +544,10 @@ export function UnifiedSettings({
                       className="mt-0"
                     />
                   </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
+
                 </div>
 
                 {/* Save Settings Button - Bottom right */}
@@ -557,9 +565,6 @@ export function UnifiedSettings({
                 </div>
               </TabsContent>
 
-              <TabsContent value="font">
-                <FontSettings />
-              </TabsContent>
 
               <TabsContent value="data">
                 {/* Data Management */}
@@ -602,6 +607,34 @@ export function UnifiedSettings({
                         </TooltipTrigger>
                         <TooltipContent className="text-xs">
                           <MixedText text="导入数据" />
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  {/* 数据概览 */}
+                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
+                    <div>
+                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="数据概览" /></h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        查看云端和本地数据详情。
+                      </p>
+                    </div>
+                    <div className="flex gap-1 sm:gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            onClick={handleViewCloudData}
+                            disabled={isUploading || isDownloading}
+                            variant="outline"
+                            size="sm"
+                            className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
+                          >
+                            <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className="text-xs">
+                          <p><MixedText text="查看数据详情" /></p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -652,22 +685,6 @@ export function UnifiedSettings({
                             <p><MixedText text="从云端下载数据到本地" /></p>
                           </TooltipContent>
                         </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              onClick={handleViewCloudData}
-                              disabled={isUploading || isDownloading}
-                              variant="outline"
-                              size="sm"
-                              className="h-8 sm:h-9 w-8 sm:w-9 rounded-full"
-                            >
-                              <EyeIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="text-xs">
-                            <p><MixedText text="查看云端存储的数据详情" /></p>
-                          </TooltipContent>
-                        </Tooltip>
                       </div>
                     </div>
 
@@ -700,72 +717,6 @@ export function UnifiedSettings({
                         />
                       </div>
                     )}
-                  </div>
-
-                  {/* Divider */}
-                  <div className="border-t border-gray-200 dark:border-gray-700"></div>
-
-                  {/* Clear Local Data */}
-                  <div className="flex flex-row items-start sm:items-center justify-between py-4 gap-3">
-                    <div>
-                      <h3 className="font-semibold text-base sm:text-lg text-foreground"><MixedText text="清空本地数据" /></h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        仅删除本地浏览器中的数据，不影响云端。包括：刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置。
-                      </p>
-                    </div>
-                    <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="h-8 sm:h-9 w-8 sm:w-9 p-0"
-                              onClick={() => {
-                                setClearDataDialogOpen(true);
-                              }}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="text-xs">
-                            <p><MixedText text="清空本地数据" /></p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </DialogTrigger>
-                      <DialogContent className="w-11/12 max-w-md p-4 sm:p-6">
-                        <DialogHeader>
-                          <DialogTitle className="text-base sm:text-lg"><MixedText text="确认删除" /></DialogTitle>
-                          <DialogDescription className="text-xs sm:text-sm">
-                            <MixedText text="确定要清空所有本地数据吗？" />
-                            <br />
-                            <br />
-                            <MixedText text="此操作不可撤销，删除后无法恢复。云端数据不受影响。" />
-                          </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="flex-col sm:flex-row gap-2">
-                          <Button
-                            variant="outline"
-                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
-                            onClick={() => setClearDataDialogOpen(false)}
-                          >
-                            <MixedText text="取消" />
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              if (onClearLocalData) {
-                                onClearLocalData();
-                              }
-                              setClearDataDialogOpen(false);
-                            }}
-                            variant="destructive"
-                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
-                          >
-                            确认清空
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
                   </div>
 
                   {/* Divider */}
@@ -1071,10 +1022,17 @@ export function UnifiedSettings({
               </DialogContent>
             </Dialog>
 
+            {/* 云端数据概览 */}
             <CloudDataOverview
               isOpen={showCloudOverview}
               onClose={() => setShowCloudOverview(false)}
+              localRecords={records}
+              localPlans={plans}
+              localKnowledge={knowledge}
+              localCountdowns={countdowns}
+              onClearLocalData={onClearLocalData}
             />
+
           </Tabs>
         </ThemeColorProvider>
       </div>

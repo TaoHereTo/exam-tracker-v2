@@ -1,84 +1,11 @@
 import React from 'react';
 
-// 字体管理工具
-export interface FontConfig {
-    chineseFont: string;
-    englishFont: string;
-    fallbackFont: string;
-}
-
-// 检测系统默认字体
-const detectSystemFonts = (): FontConfig => {
-    if (typeof window === 'undefined') {
-        return {
-            chineseFont: 'Noto Serif SC',
-            englishFont: 'Times New Roman',
-            fallbackFont: 'serif'
-        };
-    }
-
-    // 检测中文字体
-    let chineseFont = 'Noto Serif SC'; // 默认使用Web字体
-    const testElement = document.createElement('div');
-    testElement.style.fontFamily = 'Noto Serif SC, PingFang SC, Hiragino Sans GB, Microsoft YaHei, SimSun, serif';
-    testElement.style.position = 'absolute';
-    testElement.style.visibility = 'hidden';
-    testElement.style.fontSize = '16px';
-    testElement.textContent = '测试';
-    document.body.appendChild(testElement);
-
-    const computedStyle = window.getComputedStyle(testElement);
-    const fontFamily = computedStyle.fontFamily;
-
-    console.log('Font detection: computed fontFamily:', fontFamily);
-
-    // 根据系统字体优先级检测
-    if (fontFamily.includes('Noto Serif SC')) {
-        chineseFont = 'Noto Serif SC';
-    } else if (fontFamily.includes('PingFang SC')) {
-        chineseFont = 'PingFang SC';
-    } else if (fontFamily.includes('Hiragino Sans GB')) {
-        chineseFont = 'Hiragino Sans GB';
-    } else if (fontFamily.includes('Microsoft YaHei')) {
-        chineseFont = 'Microsoft YaHei';
-    } else if (fontFamily.includes('SimSun')) {
-        chineseFont = 'SimSun';
-    }
-
-    console.log('Font detection: selected chineseFont:', chineseFont);
-
-    document.body.removeChild(testElement);
-
-    // 检测英文字体
-    let englishFont = 'Times New Roman';
-    const testElementEn = document.createElement('div');
-    testElementEn.style.fontFamily = 'Helvetica, Arial, sans-serif';
-    testElementEn.style.position = 'absolute';
-    testElementEn.style.visibility = 'hidden';
-    testElementEn.style.fontSize = '16px';
-    testElementEn.textContent = 'Test';
-    document.body.appendChild(testElementEn);
-
-    const computedStyleEn = window.getComputedStyle(testElementEn);
-    const fontFamilyEn = computedStyleEn.fontFamily;
-
-    if (fontFamilyEn.includes('Helvetica')) {
-        englishFont = 'Helvetica';
-    } else if (fontFamilyEn.includes('Arial')) {
-        englishFont = 'Arial';
-    }
-
-    document.body.removeChild(testElementEn);
-
-    return {
-        chineseFont,
-        englishFont,
-        fallbackFont: 'serif'
-    };
+// 固定的字体配置 - 统一使用思源宋体
+export const FIXED_FONT_CONFIG = {
+    chineseFont: 'Noto Serif SC',
+    englishFont: 'Noto Serif SC',
+    fallbackFont: 'serif'
 };
-
-// 默认字体配置 - 检测系统字体
-export const defaultFontConfig: FontConfig = detectSystemFonts();
 
 // 中文字符检测正则表达式
 const CHINESE_CHAR_REGEX = /[\u4e00-\u9fa5]/;
@@ -104,44 +31,16 @@ export function getTextType(text: string): 'chinese' | 'english' | 'mixed' {
     return 'mixed';
 }
 
-// 生成字体样式 - 添加高DPI优化
-export function generateFontStyle(text: string, config: FontConfig = defaultFontConfig): React.CSSProperties {
-    const textType = getTextType(text);
-
-    switch (textType) {
-        case 'chinese':
-            return {
-                fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        case 'english':
-            return {
-                fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        case 'mixed':
-            return {
-                fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        default:
-            return {
-                fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-    }
+// 生成字体样式 - 统一使用思源宋体
+export function generateFontStyle(text: string): React.CSSProperties {
+    // 统一使用 Noto Serif SC，不再区分中英文
+    return {
+        fontFamily: `'${FIXED_FONT_CONFIG.chineseFont}', ${FIXED_FONT_CONFIG.fallbackFont}`,
+        fontWeight: 'inherit',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
 }
 
 // 生成CSS类名
@@ -184,42 +83,16 @@ export function splitMixedText(text: string): Array<{ text: string; type: 'chine
     return parts;
 }
 
-// 生成混合文本的字体样式 - 添加高DPI优化
-export function generateMixedTextStyle(part: { text: string; type: 'chinese' | 'english' | 'other' }, config: FontConfig = defaultFontConfig): React.CSSProperties {
-    switch (part.type) {
-        case 'chinese':
-            return {
-                fontFamily: `'${config.chineseFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        case 'english':
-            return {
-                fontFamily: `'${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        case 'other':
-            return {
-                fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-        default:
-            return {
-                fontFamily: `'${config.chineseFont}', '${config.englishFont}', ${config.fallbackFont}`,
-                fontWeight: 'inherit', // 继承父元素的字体粗细
-                WebkitFontSmoothing: 'antialiased',
-                MozOsxFontSmoothing: 'grayscale',
-                textRendering: 'optimizeLegibility'
-            };
-    }
+// 生成混合文本的字体样式 - 统一使用思源宋体
+export function generateMixedTextStyle(part: { text: string; type: 'chinese' | 'english' | 'other' }): React.CSSProperties {
+    // 统一使用 Noto Serif SC，不再区分文本类型
+    return {
+        fontFamily: `'${FIXED_FONT_CONFIG.chineseFont}', ${FIXED_FONT_CONFIG.fallbackFont}`,
+        fontWeight: 'inherit',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        textRendering: 'optimizeLegibility'
+    };
 }
 
 // Function to parse and render formatted text - 添加字体平滑优化

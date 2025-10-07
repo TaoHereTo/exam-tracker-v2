@@ -804,8 +804,9 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {
                     handleDialogClose();
+                } else {
+                    setShowForm(open);
                 }
-                setShowForm(open);
             }}>
                 <DialogContent className="w-11/12 max-w-md sm:max-w-lg max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
