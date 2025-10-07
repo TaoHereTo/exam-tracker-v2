@@ -835,10 +835,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         <button
                                             type="button"
                                             className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
-                                            onClick={() => {
-                                                console.log('Button clicked, current dateOpen:', dateOpen);
-                                                setDateOpen(true);
-                                            }}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                             {date ? (
@@ -849,7 +845,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </button>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[var(--z-popover)]"
+                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[var(--z-dialog-popover)]"
                                         align="start"
                                         onInteractOutside={() => setDateOpen(false)}
                                         side="bottom"

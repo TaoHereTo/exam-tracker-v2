@@ -176,7 +176,7 @@ function DateField() {
           {date ? format(date, 'PPP', { locale: zhCN }) : <span className="text-gray-400 dark:text-gray-500">选择日期</span>}
         </button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent className="w-auto p-0 z-[var(--z-dialog-popover)]" align="start">
         <Calendar
           mode="single"
           captionLayout="dropdown"

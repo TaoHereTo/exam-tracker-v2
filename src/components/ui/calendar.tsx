@@ -325,7 +325,7 @@ function Calendar({
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start">
+              <PopoverContent className="w-auto p-0 z-[var(--z-dialog-popover)]" align="start">
                 <YearPicker
                   selectedYear={currentYear}
                   onYearSelect={handleYearSelect}
@@ -353,7 +353,7 @@ function Calendar({
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start">
+              <PopoverContent className="w-auto p-0 z-[var(--z-dialog-popover)]" align="start">
                 <MonthPicker
                   selectedMonth={currentMonthIndex}
                   onMonthSelect={handleMonthSelect}
@@ -728,7 +728,7 @@ function DateRangePicker({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-auto p-0 text-black dark:text-white"
+          className="w-auto p-0 text-black dark:text-white z-[var(--z-dialog-popover)]"
           align="start"
           onPointerDownOutside={(e) => {
             // 防止在与下拉菜单交互时关闭

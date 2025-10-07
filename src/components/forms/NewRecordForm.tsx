@@ -135,7 +135,7 @@ export function NewRecordForm({ onAddRecord }: NewRecordFormProps) {
                     </button>
                 </PopoverTrigger>
                 <PopoverContent
-                    className="w-auto p-0"
+                    className="w-auto p-0 z-[var(--z-dialog-popover)]"
                     align="start"
                 >
                     <Calendar

@@ -116,7 +116,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                     {value ? displayValue : <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>}
                 </div>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-4" align="start">
+            <PopoverContent className="w-80 p-4 z-[var(--z-dialog-popover)]" align="start">
                 <div className="space-y-4" onKeyDown={handleKeyDown}>
                     <div className="text-center">
                         <div className="text-2xl font-mono text-center py-2">
@@ -165,7 +165,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({
                             variant="default"
                             size="sm"
                             onClick={handleConfirm}
-                            className="transition-none transform-none"
+                            className="flex items-center justify-center rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white transition-none transform-none"
                             style={{ boxShadow: 'none' }}
                         >
                             <MixedText text="确认" />

@@ -1151,7 +1151,7 @@ export default function ScheduleManagementView({
                                                                 </button>
                                                             </PopoverTrigger>
                                                             <PopoverContent
-                                                                className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white"
+                                                                className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[var(--z-dialog-popover)]"
                                                                 align="start"
                                                                 onInteractOutside={() => setExamDateOpen(false)}
                                                             >

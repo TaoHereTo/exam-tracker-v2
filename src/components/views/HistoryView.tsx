@@ -413,7 +413,7 @@ export function ExerciseRecordView({
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent
-                                    className="w-auto p-0 z-[60]"
+                                    className="w-auto p-0 z-[var(--z-dialog-popover)]"
                                     align="start"
                                     side="bottom"
                                     sideOffset={4}
@@ -567,7 +567,7 @@ export function ExerciseRecordView({
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent
-                                    className="w-auto p-0 z-[60]"
+                                    className="w-auto p-0 z-[var(--z-dialog-popover)]"
                                     align="start"
                                     side="bottom"
                                     sideOffset={4}

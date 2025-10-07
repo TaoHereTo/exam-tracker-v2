@@ -926,7 +926,7 @@ export default function NotesView() {
                                             </div>
                                         </PopoverTrigger>
                                         <PopoverContent
-                                            className="w-80 p-4"
+                                            className="w-80 p-4 z-[var(--z-popover)]"
                                             align="start"
                                             side="bottom"
                                             sideOffset={5}

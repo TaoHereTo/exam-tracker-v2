@@ -74,7 +74,7 @@ export default function CountdownExpandableCard({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/20 h-full w-full z-[var(--z-overlay)]"
+                        className="fixed inset-0 bg-black/20 h-full w-full z-[var(--z-modal)]"
                         style={{ pointerEvents: 'auto' }}
                     />
                 )}
@@ -228,7 +228,7 @@ export default function CountdownExpandableCard({
                                     display: isActive ? 'none' : 'block'
                                 }}
                             >
-                                <div className="flex justify-between items-start mb-3">
+                                <div className="flex justify-between items-center mb-3">
                                     <div className="flex-1">
                                         <h3 className="font-medium text-black dark:text-white text-left">
                                             {countdown.name}
