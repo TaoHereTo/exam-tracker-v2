@@ -221,7 +221,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     ];
 
     // 工具栏按钮样式
-    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
+    const TOOLBAR_BUTTON_CLASSES = "h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-[#303030] hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
 
     // 保存当前选区
     const saveCurrentSelection = () => {
@@ -1656,7 +1656,18 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
 
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES} onClick={() => setEditorState(prev => ({ ...prev, showLatexSelector: true }))}>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="sm"
+                                    className={TOOLBAR_BUTTON_CLASSES}
+                                    onClick={(e) => {
+                                        console.log('公式按钮被点击', { isInFullscreen, isInDialog });
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setEditorState(prev => ({ ...prev, showLatexSelector: true }));
+                                    }}
+                                >
                                     <Sigma className="w-4 h-4" />
                                 </Button>
                             </TooltipTrigger>
@@ -1999,7 +2010,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的二级菜单能够正常工作 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content] {
-                        z-index: 100035 !important;
+                        z-index: 100040 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2038,14 +2049,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     /* 确保全屏模式下的所有Radix UI组件都能正常工作 */
                     [data-fullscreen-container="true"] [data-radix-portal] {
-                        z-index: 100035 !important;
+                        z-index: 100040 !important;
                     }
                     
                     /* 确保全屏模式下的Popover和DropdownMenu内容能够显示 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content],
                     [data-fullscreen-container="true"] [data-radix-tooltip-content] {
-                        z-index: 100035 !important;
+                        z-index: 100040 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2157,7 +2168,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content],
                     [data-fullscreen-container="true"] [data-radix-tooltip-content],
                     [data-fullscreen-container="true"] [data-radix-portal] {
-                        z-index: 100002 !important;
+                        z-index: 100040 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2169,7 +2180,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的二级菜单不会被隐藏 */
                     [data-fullscreen-container="true"] [data-radix-popover-content][data-state="open"],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content][data-state="open"] {
-                        z-index: 100002 !important;
+                        z-index: 100040 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;

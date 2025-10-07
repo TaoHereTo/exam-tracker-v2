@@ -47,9 +47,11 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
                         try {
                             const rendered = katex.renderToString(latex, {
                                 throwOnError: false,
-                                displayMode: true
+                                displayMode: true,
+                                strict: false,
+                                trust: true
                             });
-                            return `<div class="latex-block" style="text-align: center; margin: 8px 0;">${rendered}</div>`;
+                            return `<div class="latex-block" style="text-align: center; margin: 8px 0; font-family: KaTeX_Main, 'Times New Roman', serif;">${rendered}</div>`;
                         } catch (error) {
                             return `<div class="latex-block" style="text-align: center; margin: 8px 0; color: red;">$${latex}$$</div>`;
                         }
@@ -61,9 +63,11 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
                         try {
                             const rendered = katex.renderToString(latex, {
                                 throwOnError: false,
-                                displayMode: false
+                                displayMode: false,
+                                strict: false,
+                                trust: true
                             });
-                            return `<span class="latex-inline">${rendered}</span>`;
+                            return `<span class="latex-inline" style="font-family: KaTeX_Main, 'Times New Roman', serif;">${rendered}</span>`;
                         } catch (error) {
                             return `<span class="latex-inline" style="color: red;">$${latex}$</span>`;
                         }

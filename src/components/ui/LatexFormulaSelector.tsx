@@ -112,7 +112,9 @@ const LatexPreview: React.FC<{ latex: string; displayMode: boolean }> = ({ latex
         try {
             katex.render(latex, ref.current, {
                 throwOnError: false,
-                displayMode: displayMode
+                displayMode: displayMode,
+                strict: false,
+                trust: true
             });
         } catch (error) {
             console.error('LaTeX渲染错误:', error);
@@ -123,7 +125,11 @@ const LatexPreview: React.FC<{ latex: string; displayMode: boolean }> = ({ latex
     return (
         <div
             ref={ref}
-            className={displayMode ? "block" : "inline-block"}
+            className={`${displayMode ? "block" : "inline-block"} katex-display`}
+            style={{
+                fontFamily: 'KaTeX_Main, "Times New Roman", serif',
+                fontSize: '1em'
+            }}
         />
     );
 };
@@ -133,6 +139,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     onOpenChange,
     onInsert
 }) => {
+    console.log('LatexFormulaSelector 渲染', { open });
     const [displayMode, setDisplayMode] = useState<'inline' | 'block'>('inline');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('全部');
@@ -182,113 +189,148 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
 
 
     return (
-        <Drawer open={open} onOpenChange={onOpenChange}>
-            <DrawerContent className="max-h-[90vh] overflow-visible">
-                <DrawerHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                        <div className="button-group">
-                            <Sigma className="h-5 w-5" />
-                            <div>
-                                <DrawerTitle className="inline">LaTeX公式选择器</DrawerTitle>
-                                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                                    可以点击下方公式选中后插入，也可以直接在输入框中输入公式（注意使用$包裹）
-                                </span>
+        <>
+            <style jsx global>{`
+                .katex-display {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mord {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mrel {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mbin {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mord.neq {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mrel.neq {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mord.notin {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                .katex-display .katex .mrel.notin {
+                    font-family: KaTeX_Main, "Times New Roman", serif !important;
+                }
+                /* 确保所有 KaTeX 元素都使用正确的字体 */
+                .katex-display * {
+                    font-family: inherit !important;
+                }
+            `}</style>
+            <Drawer open={open} onOpenChange={onOpenChange}>
+                <DrawerContent className="max-h-[90vh] overflow-visible">
+                    <DrawerHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                            <div className="button-group">
+                                <Sigma className="h-5 w-5" />
+                                <div>
+                                    <DrawerTitle className="inline">LaTeX公式选择器</DrawerTitle>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                        可以点击下方公式选中后插入，也可以直接在输入框中输入公式（注意使用$包裹）
+                                    </span>
+                                </div>
                             </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onOpenChange(false)}
+                                className="h-8 w-8"
+                            >
+                                <X className="h-4 w-4" />
+                            </Button>
                         </div>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => onOpenChange(false)}
-                            className="h-8 w-8"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-                    </div>
-                </DrawerHeader>
+                    </DrawerHeader>
 
-                <div className="flex-1 overflow-auto p-card">
-                    <div className="form-stack">
-                        {/* 分类选择、搜索和公式模式选择区域 */}
-                        <div className="flex button-group-lg items-center overflow-visible">
-                            <div className="button-group items-center">
-                                <Label className="text-sm font-medium">选择分类:</Label>
-                                <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                                    <SelectTrigger className="w-[200px]">
-                                        <SelectValue placeholder="选择分类" />
-                                    </SelectTrigger>
-                                    <SelectContent className="z-[999999]">
-                                        {categories.map((category) => (
-                                            <SelectItem key={category} value={category}>
-                                                {category}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="button-group items-center">
-                                <Label className="text-sm font-medium">搜索:</Label>
-                                <Input
-                                    placeholder="搜索公式..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-[200px]"
-                                />
-                            </div>
-
-                            <div className="button-group items-center">
-                                <Label className="text-sm font-medium">公式模式:</Label>
-                                <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-4">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem
-                                            value="inline"
-                                            id="inline"
-                                            className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                        />
-                                        <Label htmlFor="inline" className="text-sm">行内公式</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem
-                                            value="block"
-                                            id="block"
-                                            className="border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400"
-                                        />
-                                        <Label htmlFor="block" className="text-sm">行间公式</Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-                        </div>
-
-                        {/* 公式展示区域 */}
+                    <div className="flex-1 overflow-auto p-card">
                         <div className="form-stack">
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                                {selectedCategory === '全部' ? '全部' : selectedCategory} 分类共有 {filteredFormulas.length} 个公式
+                            {/* 分类选择、搜索和公式模式选择区域 */}
+                            <div className="flex flex-wrap gap-4 items-center">
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-sm font-medium">分类:</Label>
+                                    <Select value={selectedCategory} onValueChange={handleCategoryChange}>
+                                        <SelectTrigger className="w-[150px] h-8">
+                                            <SelectValue placeholder="选择分类" />
+                                        </SelectTrigger>
+                                        <SelectContent className="z-[999999]">
+                                            {categories.map((category) => (
+                                                <SelectItem key={category} value={category}>
+                                                    {category}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-sm font-medium">搜索:</Label>
+                                    <Input
+                                        placeholder="搜索公式..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-[150px] h-8"
+                                    />
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <Label className="text-sm font-medium">模式:</Label>
+                                    <RadioGroup value={displayMode} onValueChange={(value) => setDisplayMode(value as 'inline' | 'block')} className="flex gap-3">
+                                        <div className="flex items-center space-x-1">
+                                            <RadioGroupItem
+                                                value="inline"
+                                                id="inline"
+                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400 data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-400"
+                                            />
+                                            <Label htmlFor="inline" className="text-xs">行内</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-1">
+                                            <RadioGroupItem
+                                                value="block"
+                                                id="block"
+                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400 data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-400"
+                                            />
+                                            <Label htmlFor="block" className="text-xs">行间</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 grid-sm">
-                                {filteredFormulas.map((formula, index) => (
-                                    <div
-                                        key={`${formula.category}-${index}`}
-                                        className="p-component border rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors bg-white dark:bg-transparent"
-                                        onClick={() => onInsert(formula.latex, displayMode === 'block')}
-                                    >
-                                        <div className="text-sm font-medium mb-2">{formula.name}</div>
-                                        <div className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all mb-2">
-                                            {formula.latex}
+                            {/* 公式展示区域 */}
+                            <div className="space-y-3">
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                    {selectedCategory === '全部' ? '全部' : selectedCategory} 分类共有 {filteredFormulas.length} 个公式
+                                </div>
+
+                                <div className="grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-1">
+                                    {filteredFormulas.map((formula, index) => (
+                                        <div
+                                            key={`${formula.category}-${index}`}
+                                            className="p-1 hover:bg-gray-50 dark:hover:bg-[#303030] cursor-pointer transition-colors rounded hover:shadow-sm group"
+                                            onClick={() => onInsert(formula.latex, displayMode === 'block')}
+                                            title={`${formula.name}: ${formula.latex}`}
+                                        >
+                                            <div className="text-center bg-gray-50 dark:bg-[#303030] p-1 rounded min-h-[24px] flex items-center justify-center mb-1">
+                                                <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
+                                            </div>
+                                            <div className="text-xs font-medium truncate text-center text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100">
+                                                {formula.name}
+                                            </div>
                                         </div>
-                                        <div className="text-center bg-transparent p-2 rounded min-h-[40px] flex items-center justify-center">
-                                            <LatexPreview latex={formula.preview} displayMode={displayMode === 'block'} />
-                                        </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
+
                         </div>
-
                     </div>
-                </div>
 
-            </DrawerContent>
-        </Drawer>
+                </DrawerContent>
+            </Drawer>
+        </>
     );
 };
 
