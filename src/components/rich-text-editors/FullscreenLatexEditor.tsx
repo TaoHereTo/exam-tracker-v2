@@ -361,72 +361,37 @@ export const FullscreenLatexEditor: React.FC<FullscreenLatexEditorProps> = (prop
     );
 
     if (isFullscreen) {
-
-        return (
-            <>
-                {/* 简化的全屏编辑器 */}
-                {createPortal(
-                    <div
-                        className={`fixed inset-0 bg-black/80 flex items-center justify-center ${isAnimating
-                            ? 'animate-out fade-out-0 duration-300'
-                            : 'animate-in fade-in-0 duration-300'
-                            }`}
-                        style={{ zIndex: 100003 }}
-                        data-fullscreen-container="true"
-                        onClick={(e) => {
-                            if (e.target === e.currentTarget) {
-                                setIsAnimating(true);
-                                // 延迟关闭，让退出动画完成
-                                setTimeout(() => {
-                                    closeFullscreen();
-                                    setIsAnimating(false);
-                                }, 300);
-                            }
-                        }}
-                    >
-                        <div
-                            className="w-full h-full bg-background flex flex-col animate-in zoom-in-95 duration-300"
-                            data-fullscreen-container="true"
-                            onMouseDown={(e) => {
-                                // 只阻止事件冒泡到外层容器，不阻止编辑器内部事件
-                                if (e.target === e.currentTarget) {
-                                    e.stopPropagation();
-                                }
-                            }}
-                            onClick={(e) => {
-                                // 只阻止事件冒泡到外层容器，不阻止编辑器内部事件
-                                if (e.target === e.currentTarget) {
-                                    e.stopPropagation();
-                                }
-                            }}
-                        >
-                            <SimpleRichTextEditor
-                                key="fullscreen-editor"
-                                content={props.content}
-                                onChange={handleContentChange}
-                                placeholder={props.placeholder || '开始输入...'}
-                                className="flex-1"
-                                customMinHeight="calc(100vh - 80px)"
-                                customMaxHeight="calc(100vh - 80px)"
-                                stickyToolbar={props.stickyToolbar}
-                                showFullscreenButton={true}
-                                onFullscreenToggle={toggleFullscreen}
-                                // 传递预览相关属性
-                                previewContent={previewContent}
-                                isPreviewMode={isPreviewMode}
-                                onPreviewModeChange={handlePreviewModeChange}
-                                // 标识这是全屏模式
-                                isInFullscreen={true}
-                                // 传递Dialog状态
-                                isInDialog={props.isInDialog}
-                            />
-                        </div>
-                    </div>,
-                    document.body
-                )}
-                {/* 正常编辑器 - 根据动画阶段显示 */}
-                {normalEditor}
-            </>
+        return createPortal(
+            <div
+                className={`fixed inset-0 bg-background flex flex-col ${isAnimating
+                    ? 'animate-out fade-out-0 duration-300'
+                    : 'animate-in fade-in-0 duration-300'
+                    }`}
+                style={{ zIndex: 100030 }}
+                data-fullscreen-container="true"
+            >
+                <SimpleRichTextEditor
+                    key="fullscreen-editor"
+                    content={props.content}
+                    onChange={handleContentChange}
+                    placeholder={props.placeholder || '开始输入...'}
+                    className="flex-1"
+                    customMinHeight="calc(100vh - 80px)"
+                    customMaxHeight="calc(100vh - 80px)"
+                    stickyToolbar={props.stickyToolbar}
+                    showFullscreenButton={true}
+                    onFullscreenToggle={toggleFullscreen}
+                    // 传递预览相关属性
+                    previewContent={previewContent}
+                    isPreviewMode={isPreviewMode}
+                    onPreviewModeChange={handlePreviewModeChange}
+                    // 标识这是全屏模式
+                    isInFullscreen={true}
+                    // 传递Dialog状态
+                    isInDialog={props.isInDialog}
+                />
+            </div>,
+            document.body
         );
     }
 

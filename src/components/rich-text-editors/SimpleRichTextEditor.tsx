@@ -1965,7 +1965,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的二级菜单能够正常工作 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content] {
-                        z-index: 100002 !important;
+                        z-index: 100035 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -1976,7 +1976,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的工具栏能够正常工作 */
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar {
                         pointer-events: auto !important;
-                        z-index: 100000 !important;
+                        z-index: 100032 !important;
                         position: relative !important;
                     }
                     
@@ -1984,14 +1984,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar button {
                         pointer-events: auto !important;
                         cursor: pointer !important;
-                        z-index: 100000 !important;
+                        z-index: 100032 !important;
                         position: relative !important;
                     }
                     
                     /* 确保全屏模式下的工具栏内所有元素都能点击 */
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar * {
                         pointer-events: auto !important;
-                        z-index: 100000 !important;
+                        z-index: 100032 !important;
                     }
                     
                     /* 确保全屏模式下的Popover和DropdownMenu触发器能够正常工作 */
@@ -1999,19 +1999,19 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-trigger] {
                         pointer-events: auto !important;
                         cursor: pointer !important;
-                        z-index: 100000 !important;
+                        z-index: 100032 !important;
                     }
                     
                     /* 确保全屏模式下的所有Radix UI组件都能正常工作 */
                     [data-fullscreen-container="true"] [data-radix-portal] {
-                        z-index: 100002 !important;
+                        z-index: 100035 !important;
                     }
                     
                     /* 确保全屏模式下的Popover和DropdownMenu内容能够显示 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content],
                     [data-fullscreen-container="true"] [data-radix-tooltip-content] {
-                        z-index: 100002 !important;
+                        z-index: 100035 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2029,14 +2029,44 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     /* 确保全屏编辑器在Dialog中也能正常工作 */
                     [data-fullscreen-container="true"] {
-                        z-index: 100001 !important;
+                        z-index: 100030 !important;
                         position: fixed !important;
                         pointer-events: auto !important;
+                        background: var(--background) !important;
+                    }
+                    
+                    /* 强制覆盖Dialog的Overlay */
+                    [data-fullscreen-container="true"] {
+                        z-index: 100030 !important;
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        bottom: 0 !important;
+                        width: 100vw !important;
+                        height: 100vh !important;
+                        pointer-events: auto !important;
+                        background: var(--background) !important;
+                    }
+                    
+                    /* 确保Dialog的Overlay不会覆盖全屏编辑器 */
+                    [data-radix-dialog-overlay] {
+                        z-index: 100025 !important;
+                    }
+                    
+                    /* 当全屏编辑器打开时，隐藏Dialog的Overlay */
+                    [data-fullscreen-container="true"] ~ [data-radix-dialog-overlay],
+                    [data-fullscreen-container="true"] + [data-radix-dialog-overlay],
+                    body:has([data-fullscreen-container="true"]) [data-radix-dialog-overlay] {
+                        display: none !important;
+                        visibility: hidden !important;
+                        opacity: 0 !important;
+                        pointer-events: none !important;
                     }
                     
                     /* 确保全屏编辑器覆盖Dialog的overlay */
                     [data-fullscreen-container="true"] > * {
-                        z-index: 100002 !important;
+                        z-index: 100031 !important;
                         position: relative !important;
                         pointer-events: auto !important;
                     }

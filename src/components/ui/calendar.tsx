@@ -308,13 +308,24 @@ function Calendar({
           </Button>
 
           <div className="flex items-center gap-0 h-10">
-            <Popover open={showYearPicker} onOpenChange={setShowYearPicker}>
+            <Popover open={showYearPicker} onOpenChange={(open) => {
+              console.log('Year picker onOpenChange:', open);
+              setShowYearPicker(open);
+            }}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="font-medium h-10 px-1 flex items-center justify-center"
+                  onClick={() => {
+                    console.log('Year button clicked, current showYearPicker:', showYearPicker);
+                    setShowYearPicker(true);
+                  }}
+                >
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[100003]" align="start">
+              <PopoverContent className="w-auto p-0 z-[100015]" align="start">
                 <YearPicker
                   selectedYear={currentYear}
                   onYearSelect={handleYearSelect}
@@ -325,13 +336,24 @@ function Calendar({
               </PopoverContent>
             </Popover>
 
-            <Popover open={showMonthPicker} onOpenChange={setShowMonthPicker}>
+            <Popover open={showMonthPicker} onOpenChange={(open) => {
+              console.log('Month picker onOpenChange:', open);
+              setShowMonthPicker(open);
+            }}>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="sm" className="font-medium h-10 px-1 flex items-center justify-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="font-medium h-10 px-1 flex items-center justify-center"
+                  onClick={() => {
+                    console.log('Month button clicked, current showMonthPicker:', showMonthPicker);
+                    setShowMonthPicker(true);
+                  }}
+                >
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[100003]" align="start">
+              <PopoverContent className="w-auto p-0 z-[100015]" align="start">
                 <MonthPicker
                   selectedMonth={currentMonthIndex}
                   onMonthSelect={handleMonthSelect}
@@ -543,10 +565,9 @@ function CalendarDayButton({
     }
   }, [modifiers.range_middle, themeColor]);
 
-  // 调试today修饰符
+  // 设置今天的样式
   React.useLayoutEffect(() => {
     if (modifiers.today && ref.current) {
-      console.log('Today modifier detected:', modifiers.today);
       ref.current.style.backgroundColor = '#f1f5f9';
       ref.current.style.color = '#0f172a';
     }
@@ -562,6 +583,7 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="sm"
+      type="button"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={
         modifiers.selected &&

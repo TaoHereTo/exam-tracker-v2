@@ -642,7 +642,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     setEditDialogOpen(v);
                     if (!v) setEditError("");
                 }}
-                modal={false}
             >
                 <DialogContent className="max-w-4xl w-full">
                     <DialogHeader>

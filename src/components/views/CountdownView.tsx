@@ -801,9 +801,8 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
             <Dialog open={showForm} onOpenChange={(open) => {
                 if (!open) {
                     handleDialogClose();
-                } else {
-                    setShowForm(open);
                 }
+                setShowForm(open);
             }}>
                 <DialogContent className="w-11/12 max-w-md sm:max-w-lg h-[73vh] overflow-y-auto">
                     <DialogHeader>
@@ -828,12 +827,18 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
 
                         <div className="space-y-2">
                             <FormField label={<MixedText text="目标日期" />} htmlFor="examDate" required>
-                                <Popover open={dateOpen} onOpenChange={setDateOpen}>
+                                <Popover open={dateOpen} onOpenChange={(open) => {
+                                    console.log('Popover onOpenChange:', open);
+                                    setDateOpen(open);
+                                }}>
                                     <PopoverTrigger asChild>
                                         <button
                                             type="button"
                                             className="w-full flex items-center justify-start text-left font-normal border bg-white dark:bg-[#303030] px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-11 shadow-xs transition-[color,box-shadow]"
-                                            onClick={() => setDateOpen(true)}
+                                            onClick={() => {
+                                                console.log('Button clicked, current dateOpen:', dateOpen);
+                                                setDateOpen(true);
+                                            }}
                                         >
                                             <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
                                             {date ? (
@@ -844,9 +849,11 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </button>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white"
+                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[100010]"
                                         align="start"
                                         onInteractOutside={() => setDateOpen(false)}
+                                        side="bottom"
+                                        sideOffset={4}
                                     >
                                         <Calendar
                                             mode="single"
@@ -866,8 +873,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                         return newErrors;
                                                     });
                                                 }
-                                                // Close popover after selection
-                                                setDateOpen(false);
+                                                // 延迟关闭popover，确保点击事件完成
+                                                setTimeout(() => {
+                                                    setDateOpen(false);
+                                                }, 100);
                                             }}
                                             page="countdown"
                                             captionLayout="label"
