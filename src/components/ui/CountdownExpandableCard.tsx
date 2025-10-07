@@ -74,14 +74,14 @@ export default function CountdownExpandableCard({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 bg-black/20 h-full w-full z-[999]"
+                        className="fixed inset-0 bg-black/20 h-full w-full z-[var(--z-overlay)]"
                         style={{ pointerEvents: 'auto' }}
                     />
                 )}
             </AnimatePresence>
             <AnimatePresence>
                 {active && typeof active === "object" ? (
-                    <div key={`modal-${active.id}-${uniqueId}`} className="fixed inset-0 grid place-items-center z-[1000]">
+                    <div key={`modal-${active.id}-${uniqueId}`} className="fixed inset-0 grid place-items-center z-[var(--z-modal)]">
                         <motion.button
                             key={`close-button-${active.id}-${uniqueId}`}
                             layout
@@ -132,7 +132,7 @@ export default function CountdownExpandableCard({
                                                         {active.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
                                                     </Button>
                                                 </TooltipTrigger>
-                                                <TooltipContent className="z-[1001]">
+                                                <TooltipContent className="z-[var(--z-tooltip)]">
                                                     <p>{active.isPinned ? '取消置顶' : '置顶'}</p>
                                                 </TooltipContent>
                                             </Tooltip>
@@ -153,7 +153,7 @@ export default function CountdownExpandableCard({
                                                         </CircularButton>
                                                     </motion.div>
                                                 </TooltipTrigger>
-                                                <TooltipContent className="z-[1001]">
+                                                <TooltipContent className="z-[var(--z-tooltip)]">
                                                     <p>编辑倒计时</p>
                                                 </TooltipContent>
                                             </Tooltip>
@@ -171,7 +171,7 @@ export default function CountdownExpandableCard({
                                                         <Trash2 className="w-4 h-4" />
                                                     </CircularButton>
                                                 </TooltipTrigger>
-                                                <TooltipContent className="z-[1001]">
+                                                <TooltipContent className="z-[var(--z-tooltip)]">
                                                     <p>删除倒计时</p>
                                                 </TooltipContent>
                                             </Tooltip>

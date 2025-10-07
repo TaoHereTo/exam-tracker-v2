@@ -1006,7 +1006,7 @@ export default function NotesView() {
                                                                     }}
                                                                 />
                                                                 {showColorPicker && (
-                                                                    <div className="absolute top-6 right-0 z-[9999] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                                                    <div className="absolute top-6 right-0 z-[var(--z-maximum)] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
                                                                         <div className="space-y-2">
                                                                             <div className="text-xs font-medium">选择颜色</div>
                                                                             <div className="flex flex-wrap gap-2">
@@ -1151,7 +1151,7 @@ export default function NotesView() {
                                                 }}
                                             />
                                             {showColorPicker && (
-                                                <div className="absolute top-8 right-0 z-50 w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                                <div className="absolute top-8 right-0 z-[var(--z-modal)] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
                                                     <div className="space-y-2">
                                                         <div className="text-sm font-medium">选择颜色</div>
                                                         <div className="flex flex-wrap gap-2">
@@ -1309,7 +1309,7 @@ export default function NotesView() {
                                                 }}
                                             />
                                             {showColorPicker && (
-                                                <div className="absolute top-8 right-0 z-50 w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+                                                <div className="absolute top-8 right-0 z-[var(--z-modal)] w-48 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
                                                     <div className="space-y-2">
                                                         <div className="text-sm font-medium">选择颜色</div>
                                                         <div className="flex flex-wrap gap-2">

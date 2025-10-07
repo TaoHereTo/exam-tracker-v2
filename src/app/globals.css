@@ -24,6 +24,33 @@
   /* 文本阴影增强 */
   --text-shadow-enhance: 0 0 0.2px currentColor;
   --text-shadow-enhance-strong: 0 0 0.3px currentColor;
+
+  /* ========== 统一的 z-index 层级系统 ========== */
+  /* 基础层级 (1-10) */
+  --z-base: 1;
+  --z-elevated: 2;
+  --z-focused: 10;
+
+  /* 组件层级 (20-50) */
+  --z-dropdown: 20;
+  --z-sticky: 20;
+  --z-tooltip: 30;
+  --z-popover: 40;
+  --z-modal: 50;
+
+  /* 覆盖层级 (100-200) */
+  --z-overlay: 100;
+  --z-dialog: 150;
+  --z-drawer: 200;
+
+  /* 全屏编辑器层级 (1000-1100) */
+  --z-fullscreen-editor: 1000;
+  --z-fullscreen-editor-toolbar: 1001;
+  --z-fullscreen-editor-overlay: 1002;
+
+  /* 最高层级 (9999+) */
+  --z-maximum: 9999;
+  --z-urgent: 10000;
 }
 
 /* 全局字体渲染优化 - 统一使用思源宋体 */
@@ -196,14 +223,14 @@ h6 .mixed-text {
 
 /* 修复下拉框位置问题 */
 [data-radix-select-content] {
-  z-index: 9999 !important;
+  z-index: var(--z-dropdown) !important;
   position: fixed !important;
 }
 
 /* 确保下拉框容器不会裁剪内容 */
 [data-radix-select-trigger] {
   position: relative;
-  z-index: 1;
+  z-index: var(--z-base);
 }
 
 /* ========== 日历和按钮样式 ========== */
@@ -1133,7 +1160,7 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
   background-color: #2196f3;
   -webkit-transition: 0.4s;
   transition: 0.4s;
-  z-index: 0;
+  z-index: var(--z-base);
   overflow: hidden;
 }
 
@@ -1192,7 +1219,7 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
   position: absolute;
   width: 6px;
   height: 6px;
-  z-index: 4;
+  z-index: var(--z-elevated);
 }
 
 #moon-dot-2 {
@@ -1201,7 +1228,7 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
   position: absolute;
   width: 10px;
   height: 10px;
-  z-index: 4;
+  z-index: var(--z-elevated);
 }
 
 #moon-dot-3 {
@@ -1210,7 +1237,7 @@ html:not(:has(::view-transition-group(root))) .knowledge-entry-container .knowle
   position: absolute;
   width: 3px;
   height: 3px;
-  z-index: 4;
+  z-index: var(--z-elevated);
 }
 
 #light-ray-1 {
@@ -2333,7 +2360,7 @@ body.eye-care.dark .text-muted-foreground,
 .page-title-sticky {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: var(--z-sticky);
   background: var(--background);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
@@ -2456,7 +2483,7 @@ body.eye-care.dark .text-muted-foreground,
   width: 100% !important;
   max-width: 100% !important;
   position: relative;
-  z-index: 10;
+  z-index: var(--z-focused);
 }
 
 .chart-container {
@@ -2470,18 +2497,18 @@ body.eye-care.dark .text-muted-foreground,
 /* 确保图例不被遮挡 - 为每个图表类型单独设置 */
 .trend-chart .echarts-legend {
   position: relative !important;
-  z-index: 20 !important;
+  z-index: var(--z-sticky) !important;
 }
 
 .pie-chart .echarts-legend {
   position: relative !important;
-  z-index: 20 !important;
+  z-index: var(--z-sticky) !important;
 }
 
 /* 确保所有ECharts图例都有足够高的z-index */
 .echarts-for-react .echarts-legend {
   position: relative !important;
-  z-index: 20 !important;
+  z-index: var(--z-sticky) !important;
 }
 
 /* 移动端图表优化 */
@@ -2499,7 +2526,7 @@ body.eye-care.dark .text-muted-foreground,
   .echarts-for-react .chart-legend {
     width: 90% !important;
     position: relative;
-    z-index: 999;
+    z-index: var(--z-maximum);
   }
 
   [data-tab-content] .chart-wrapper,

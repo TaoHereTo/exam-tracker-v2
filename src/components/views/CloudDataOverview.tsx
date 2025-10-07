@@ -88,7 +88,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             setData(null);
             setLoadError(null);
         }
-    }, [isOpen]); // 移除loadCloudData依赖，避免无限循环
+    }, [isOpen, loadCloudData]);
 
     const handleClearCloudData = useCallback(async () => {
         setShowClearDialog(false);

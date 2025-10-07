@@ -88,7 +88,7 @@ function YearPicker({
             size="sm"
             data-selected-single={selectedYear === year}
             className={cn(
-              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
+              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-[var(--z-focused)] group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
             )}
             data-theme-color={themeColor}
             style={{
@@ -149,7 +149,7 @@ function MonthPicker({
             size="sm"
             data-selected-single={selectedMonth === month.value}
             className={cn(
-              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
+              "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-[var(--z-focused)] group-data-[focused=true]/day:ring-[3px] h-8 px-2 py-1 !border-0 !shadow-none"
             )}
             data-theme-color={themeColor}
             style={{
@@ -325,7 +325,7 @@ function Calendar({
                   {currentYear}年
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[100015]" align="start">
+              <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start">
                 <YearPicker
                   selectedYear={currentYear}
                   onYearSelect={handleYearSelect}
@@ -353,7 +353,7 @@ function Calendar({
                   {currentMonthIndex + 1}月
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 z-[100015]" align="start">
+              <PopoverContent className="w-auto p-0 z-[var(--z-popover)]" align="start">
                 <MonthPicker
                   selectedMonth={currentMonthIndex}
                   onMonthSelect={handleMonthSelect}
@@ -595,7 +595,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70 h-8 px-2 py-1",
+        "data-[selected-single=true]:text-white data-[selected-single=true]:rounded-md data-[range-start=true]:text-white data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground hover:rounded-md flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-[var(--z-focused)] group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70 h-8 px-2 py-1",
         // 为中间日期添加特殊的类名
         modifiers.range_middle && `range-middle-${themeColor.replace('#', '')}`,
         defaultClassNames.day,

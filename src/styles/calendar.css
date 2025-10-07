@@ -182,7 +182,7 @@
 .rbc-event>div {
     pointer-events: auto !important;
     position: relative !important;
-    z-index: 1 !important;
+    z-index: var(--z-base) !important;
 }
 
 /* 确保事件标签也被隐藏 */

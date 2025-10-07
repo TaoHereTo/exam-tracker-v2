@@ -237,7 +237,7 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                                         <SelectTrigger className="w-32 h-10">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="z-[999999]">
+                                        <SelectContent className="z-[var(--z-urgent)]">
                                             <SelectItem value="time-desc">最新</SelectItem>
                                             <SelectItem value="time-asc">最旧</SelectItem>
                                             <SelectItem value="name-asc">名称A-Z</SelectItem>

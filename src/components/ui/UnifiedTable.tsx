@@ -441,7 +441,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                 )}
                                 {filter.type === 'search' && (
                                     <div className="relative w-36">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 w-5 h-5 z-10 pointer-events-none" />
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 w-5 h-5 z-[var(--z-focused)] pointer-events-none" />
                                         <Input
                                             placeholder={filter.placeholder || "搜索..."}
                                             value={filter.value}

@@ -257,7 +257,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                         <SelectTrigger className="w-[150px] h-8">
                                             <SelectValue placeholder="选择分类" />
                                         </SelectTrigger>
-                                        <SelectContent className="z-[999999]">
+                                        <SelectContent className="z-[var(--z-urgent)]">
                                             {categories.map((category) => (
                                                 <SelectItem key={category} value={category}>
                                                     {category}
@@ -284,7 +284,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                             <RadioGroupItem
                                                 value="inline"
                                                 id="inline"
-                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400 data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-400"
+                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500"
                                             />
                                             <Label htmlFor="inline" className="text-xs">行内</Label>
                                         </div>
@@ -292,7 +292,7 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                             <RadioGroupItem
                                                 value="block"
                                                 id="block"
-                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500 data-[state=checked]:border-blue-600 dark:data-[state=checked]:border-blue-400 data-[state=checked]:bg-blue-600 dark:data-[state=checked]:bg-blue-400"
+                                                className="w-4 h-4 border-2 border-gray-400 dark:border-gray-500"
                                             />
                                             <Label htmlFor="block" className="text-xs">行间</Label>
                                         </div>

@@ -91,9 +91,9 @@ export function Stepper({
   const isFirstStep = currentStep === 1
 
   return (
-    <div className="w-full relative z-10">
+    <div className="w-full relative z-[var(--z-focused)]">
       {/* Step indicators */}
-      <div className="flex justify-center mb-8 relative z-20">
+      <div className="flex justify-center mb-8 relative z-[var(--z-sticky)]">
         <div className="flex items-center space-x-4">
           {steps.map((_, index) => {
             const stepNumber = index + 1
@@ -145,14 +145,14 @@ export function Stepper({
         isCompleted={isCompleted}
         currentStep={currentStep}
         direction={direction}
-        className="mb-8 relative z-10"
+        className="mb-8 relative z-[var(--z-focused)]"
       >
         {steps[currentStep - 1]}
       </StepContentWrapper>
 
       {/* Navigation buttons */}
       {!isCompleted && (
-        <div className="flex justify-between relative z-20">
+        <div className="flex justify-between relative z-[var(--z-sticky)]">
           <Button
             type="button"
             variant="outline"

@@ -849,7 +849,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                         </button>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[100010]"
+                                        className="w-auto p-0 bg-white dark:bg-black text-black dark:text-white z-[var(--z-popover)]"
                                         align="start"
                                         onInteractOutside={() => setDateOpen(false)}
                                         side="bottom"

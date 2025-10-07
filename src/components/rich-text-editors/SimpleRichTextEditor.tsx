@@ -1011,7 +1011,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
             // 通知父组件内容已清除
             onChange('');
         }
-    }, [clearPreviewImages, externalPreviewContent]); // 移除 onChange 依赖
+    }, [clearPreviewImages, externalPreviewContent, onChange]);
 
     // 初始化编辑器内容 - 当content变化时更新编辑器内容
     useEffect(() => {
@@ -1291,7 +1291,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     ref={toolbarRef}
                     className={cn(
                         "rich-text-editor-toolbar px-4 py-1 flex flex-wrap items-center gap-1 border-b bg-background/80 backdrop-blur-md",
-                        stickyToolbar ? "sticky top-0 z-50" : ""
+                        stickyToolbar ? "sticky top-0 z-[var(--z-sticky)]" : ""
                     )}
                 >
                     {/* 文本格式 */}
@@ -2010,7 +2010,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的二级菜单能够正常工作 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content] {
-                        z-index: 100040 !important;
+                        z-index: var(--z-fullscreen-editor-overlay) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2021,7 +2021,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的工具栏能够正常工作 */
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar {
                         pointer-events: auto !important;
-                        z-index: 100032 !important;
+                        z-index: var(--z-fullscreen-editor-toolbar) !important;
                         position: relative !important;
                     }
                     
@@ -2029,14 +2029,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar button {
                         pointer-events: auto !important;
                         cursor: pointer !important;
-                        z-index: 100032 !important;
+                        z-index: var(--z-fullscreen-editor-toolbar) !important;
                         position: relative !important;
                     }
                     
                     /* 确保全屏模式下的工具栏内所有元素都能点击 */
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar * {
                         pointer-events: auto !important;
-                        z-index: 100032 !important;
+                        z-index: var(--z-fullscreen-editor-toolbar) !important;
                     }
                     
                     /* 确保全屏模式下的Popover和DropdownMenu触发器能够正常工作 */
@@ -2044,19 +2044,19 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-trigger] {
                         pointer-events: auto !important;
                         cursor: pointer !important;
-                        z-index: 100032 !important;
+                        z-index: var(--z-fullscreen-editor-toolbar) !important;
                     }
                     
                     /* 确保全屏模式下的所有Radix UI组件都能正常工作 */
                     [data-fullscreen-container="true"] [data-radix-portal] {
-                        z-index: 100040 !important;
+                        z-index: var(--z-fullscreen-editor-overlay) !important;
                     }
                     
                     /* 确保全屏模式下的Popover和DropdownMenu内容能够显示 */
                     [data-fullscreen-container="true"] [data-radix-popover-content],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content],
                     [data-fullscreen-container="true"] [data-radix-tooltip-content] {
-                        z-index: 100040 !important;
+                        z-index: var(--z-fullscreen-editor-overlay) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2067,14 +2067,14 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保Dialog中的二级菜单能够正常工作 */
                     [data-radix-dialog-content] [data-radix-popover-content],
                     [data-radix-dialog-content] [data-radix-dropdown-menu-content] {
-                        z-index: 10003 !important;
+                        z-index: var(--z-dialog) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                     }
                     
                     /* 确保全屏编辑器在Dialog中也能正常工作 */
                     [data-fullscreen-container="true"] {
-                        z-index: 100030 !important;
+                        z-index: var(--z-fullscreen-editor) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         background: var(--background) !important;
@@ -2082,7 +2082,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     /* 强制覆盖Dialog的Overlay */
                     [data-fullscreen-container="true"] {
-                        z-index: 100030 !important;
+                        z-index: var(--z-fullscreen-editor) !important;
                         position: fixed !important;
                         top: 0 !important;
                         left: 0 !important;
@@ -2096,7 +2096,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     /* 确保Dialog的Overlay不会覆盖全屏编辑器 */
                     [data-radix-dialog-overlay] {
-                        z-index: 100025 !important;
+                        z-index: var(--z-overlay) !important;
                     }
                     
                     /* 当全屏编辑器打开时，隐藏Dialog的Overlay */
@@ -2111,7 +2111,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     
                     /* 确保全屏编辑器覆盖Dialog的overlay */
                     [data-fullscreen-container="true"] > * {
-                        z-index: 100031 !important;
+                        z-index: var(--z-fullscreen-editor) !important;
                         position: relative !important;
                         pointer-events: auto !important;
                     }
@@ -2159,7 +2159,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] .rich-text-editor-toolbar [data-radix-dropdown-menu-trigger] {
                         pointer-events: auto !important;
                         cursor: pointer !important;
-                        z-index: 100000 !important;
+                        z-index: var(--z-urgent) !important;
                         position: relative !important;
                     }
                     
@@ -2168,7 +2168,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content],
                     [data-fullscreen-container="true"] [data-radix-tooltip-content],
                     [data-fullscreen-container="true"] [data-radix-portal] {
-                        z-index: 100040 !important;
+                        z-index: var(--z-fullscreen-editor-overlay) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;
@@ -2180,7 +2180,7 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                     /* 确保全屏模式下的二级菜单不会被隐藏 */
                     [data-fullscreen-container="true"] [data-radix-popover-content][data-state="open"],
                     [data-fullscreen-container="true"] [data-radix-dropdown-menu-content][data-state="open"] {
-                        z-index: 100040 !important;
+                        z-index: var(--z-fullscreen-editor-overlay) !important;
                         position: fixed !important;
                         pointer-events: auto !important;
                         display: block !important;

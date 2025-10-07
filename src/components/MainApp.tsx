@@ -421,7 +421,7 @@ export function MainApp() {
                             align="end"
                             sideOffset={8}
                             alignOffset={15}
-                            className="w-[--radix-popper-anchor-width] shadow-xl bg-white dark:bg-[#262626] border border-gray-200 dark:border-gray-700 rounded-lg z-[9999]"
+                            className="w-[--radix-popper-anchor-width] shadow-xl bg-white dark:bg-[#262626] border border-gray-200 dark:border-gray-700 rounded-lg z-[var(--z-maximum)]"
                             style={{
                                 WebkitFontSmoothing: 'antialiased',
                                 MozOsxFontSmoothing: 'grayscale',
@@ -793,7 +793,7 @@ export function MainApp() {
                                     </header>
 
                                     {/* 主题切换按钮 - 固定在右上角 */}
-                                    <div className="fixed top-3 right-4 z-50 theme-toggle-button">
+                                    <div className="fixed top-3 right-4 z-[var(--z-modal)] theme-toggle-button">
                                         <AnimatedThemeToggler className="w-8 h-8" />
                                     </div>
 
