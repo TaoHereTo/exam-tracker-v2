@@ -1668,6 +1668,60 @@ textarea,
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
+/* ========== 富文本编辑器列表样式 ========== */
+/* 确保富文本编辑器中的列表正确显示 */
+[contenteditable="true"] ul,
+[contenteditable="true"] ol,
+.rich-text-editor ul,
+.rich-text-editor ol,
+.latex-rich-text-editor ul,
+.latex-rich-text-editor ol {
+  margin: 8px 0;
+  padding-left: 20px;
+  list-style-position: outside;
+}
+
+[contenteditable="true"] ul {
+  list-style-type: disc;
+}
+
+[contenteditable="true"] ol {
+  list-style-type: decimal;
+}
+
+[contenteditable="true"] li,
+.rich-text-editor li,
+.latex-rich-text-editor li {
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+/* 确保列表在深色模式下也能正确显示 */
+.dark [contenteditable="true"] ul,
+.dark [contenteditable="true"] ol,
+.dark .rich-text-editor ul,
+.dark .rich-text-editor ol,
+.dark .latex-rich-text-editor ul,
+.dark .latex-rich-text-editor ol {
+  color: inherit;
+}
+
+/* 嵌套列表样式 */
+[contenteditable="true"] ul ul,
+[contenteditable="true"] ol ol,
+[contenteditable="true"] ul ol,
+[contenteditable="true"] ol ul {
+  margin: 4px 0;
+}
+
+[contenteditable="true"] ul ul {
+  list-style-type: circle;
+}
+
+[contenteditable="true"] ul ul ul {
+  list-style-type: square;
+}
+
 /* 表单卡片阴影样式 */
 .knowledge-form-card,
 .new-record-form-card {

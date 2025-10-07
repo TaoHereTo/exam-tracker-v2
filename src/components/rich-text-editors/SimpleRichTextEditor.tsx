@@ -341,13 +341,71 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
     const handleListCommand = (command: string) => {
         if (!editorRef.current) return;
 
+        console.log('执行列表命令:', command);
         editorRef.current.focus();
 
-        // 使用简单的 document.execCommand
+        // 先尝试使用 document.execCommand
         const success = document.execCommand(command, false, undefined);
 
         if (success) {
+            console.log('execCommand 成功');
+            // 确保列表样式正确显示
+            const lists = editorRef.current.querySelectorAll('ul, ol');
+            lists.forEach(list => {
+                const htmlList = list as HTMLElement;
+                htmlList.style.listStyleType = htmlList.tagName === 'UL' ? 'disc' : 'decimal';
+                htmlList.style.marginLeft = '20px';
+                htmlList.style.paddingLeft = '0';
+                htmlList.style.marginTop = '8px';
+                htmlList.style.marginBottom = '8px';
+            });
+
             const html = editorRef.current.innerHTML;
+            onChange(html);
+        } else {
+            console.log('execCommand 失败，使用备用方法');
+            // 如果 execCommand 失败，使用手动方法
+            const listType = command === 'insertUnorderedList' ? 'ul' : 'ol';
+
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) {
+                // 没有选区，创建默认列表
+                const list = document.createElement(listType);
+                const listItem = document.createElement('li');
+                listItem.textContent = '列表项';
+                list.appendChild(listItem);
+
+                // 清空编辑器并插入列表
+                editorRef.current.innerHTML = '';
+                editorRef.current.appendChild(list);
+
+                // 设置光标位置
+                const newRange = document.createRange();
+                newRange.setStart(listItem, 0);
+                newRange.setEnd(listItem, 0);
+                selection?.removeAllRanges();
+                selection?.addRange(newRange);
+            } else {
+                // 有选区，从选区创建列表
+                const range = selection.getRangeAt(0);
+                const selectedText = range.toString().trim();
+
+                const list = document.createElement(listType);
+                const listItem = document.createElement('li');
+                listItem.textContent = selectedText || '列表项';
+                list.appendChild(listItem);
+
+                // 删除选区内容并插入列表
+                range.deleteContents();
+                range.insertNode(list);
+
+                // 设置光标位置
+                const newRange = document.createRange();
+                newRange.setStart(listItem, 0);
+                newRange.setEnd(listItem, 0);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
 
             // 确保列表样式正确显示
             const lists = editorRef.current.querySelectorAll('ul, ol');
@@ -356,33 +414,9 @@ const SimpleRichTextEditor: React.FC<SimpleRichTextEditorProps> = ({
                 htmlList.style.listStyleType = htmlList.tagName === 'UL' ? 'disc' : 'decimal';
                 htmlList.style.marginLeft = '20px';
                 htmlList.style.paddingLeft = '0';
+                htmlList.style.marginTop = '8px';
+                htmlList.style.marginBottom = '8px';
             });
-
-            onChange(html);
-        } else {
-            // 如果 execCommand 失败，使用手动方法
-            const listType = command === 'insertUnorderedList' ? 'ul' : 'ol';
-
-            // 获取当前编辑器的所有文本
-            const allText = editorRef.current.textContent || '';
-
-            // 清空编辑器并插入列表
-            editorRef.current.innerHTML = '';
-            const list = document.createElement(listType);
-            const listItem = document.createElement('li');
-            listItem.textContent = allText.trim() || '列表项';
-            list.appendChild(listItem);
-            editorRef.current.appendChild(list);
-
-            // 设置光标位置
-            const selection = window.getSelection();
-            if (selection) {
-                const newRange = document.createRange();
-                newRange.setStart(listItem, 0);
-                newRange.setEnd(listItem, 0);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-            }
 
             const html = editorRef.current.innerHTML;
             onChange(html);
