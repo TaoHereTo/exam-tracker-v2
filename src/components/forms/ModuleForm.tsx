@@ -8,6 +8,8 @@ interface ModuleFormProps {
     onAddKnowledge: (knowledge: Partial<KnowledgeItem>) => void;
     initialData?: Partial<KnowledgeItem>;
     isInDialog?: boolean;
+    onFullscreenModeChange?: (isFullscreen: boolean) => void;
+    externalIsFullscreen?: boolean;
 }
 
 export default function ModuleForm({ module, isInDialog, ...props }: ModuleFormProps) {

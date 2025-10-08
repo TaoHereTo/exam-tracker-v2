@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from "@/components/ui/drawer";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { UnifiedTable, DataTableColumn, TableFilter } from "@/components/ui/UnifiedTable";
 import { SimpleLoadingSpinner } from "@/components/ui/LoadingSpinner";
@@ -13,6 +14,8 @@ import { lazy, Suspense } from 'react';
 // 动态导入统一表单组件
 const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
+// 不再需要单独的全屏编辑器，UnifiedEditor已经包含了全屏功能
+
 import { Edit, Trash2, X, Info } from 'lucide-react';
 import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
@@ -20,6 +23,7 @@ import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
 import { ExpandableCell } from '@/components/ui/ExpandableCell';
 import { useCloudData } from '@/contexts/CloudDataContext';
 import { cn } from '@/lib/utils';
+import { getZIndex } from '@/lib/zIndexConfig';
 
 interface KnowledgeSummaryViewProps {
     knowledge: KnowledgeItem[];
@@ -347,6 +351,30 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [editItem, setEditItem] = useState<KnowledgeItem | null>(null);
     const [editError, setEditError] = useState("");
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [isFullscreenMode, setIsFullscreenMode] = useState(false);
+    const [fullscreenDialogOpen, setFullscreenDialogOpen] = useState(false);
+
+    // 调试全屏模式变化
+    useEffect(() => {
+        console.log('KnowledgeSummaryView: isFullscreenMode changed to:', isFullscreenMode);
+    }, [isFullscreenMode]);
+
+    // 处理全屏模式变化
+    const handleFullscreenModeChange = (isFullscreen: boolean) => {
+        console.log('handleFullscreenModeChange called with:', isFullscreen);
+        setIsFullscreenMode(isFullscreen);
+        if (isFullscreen) {
+            // 关闭抽屉，打开全屏Dialog
+            console.log('Switching to fullscreen dialog');
+            setEditDialogOpen(false);
+            setFullscreenDialogOpen(true);
+        } else {
+            // 关闭全屏Dialog，重新打开抽屉
+            console.log('Switching back to drawer');
+            setFullscreenDialogOpen(false);
+            setEditDialogOpen(true);
+        }
+    };
 
     // 当模块改变时，重置子分类选择
     useEffect(() => {
@@ -635,33 +663,82 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-            {/* 编辑弹窗 */}
-            <Dialog
+            {/* 编辑抽屉 */}
+            <Drawer
                 open={editDialogOpen || !!editError}
                 onOpenChange={v => {
+                    // 如果全屏模式开启，不关闭Drawer
+                    if (!v && isFullscreenMode) {
+                        return;
+                    }
                     setEditDialogOpen(v);
-                    if (!v) setEditError("");
+                    if (!v) {
+                        setEditError("");
+                        setIsFullscreenMode(false); // 重置全屏模式状态
+                    }
                 }}
             >
-                <DialogContent className="max-w-4xl w-full">
-                    <DialogHeader>
-                        <DialogTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</DialogTitle>
+                <DrawerContent className="h-[95vh]">
+                    <DrawerHeader className="relative">
+                        <DrawerTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</DrawerTitle>
                         {editError && (
-                            <DialogDescription className="text-red-500"><MixedText text={editError} /></DialogDescription>
+                            <DrawerDescription className="text-red-500"><MixedText text={editError} /></DrawerDescription>
                         )}
-                    </DialogHeader>
+                        {!isFullscreenMode && (
+                            <DrawerClose asChild>
+                                <Button variant="ghost" size="icon" className="absolute right-4 top-4">
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </DrawerClose>
+                        )}
+                    </DrawerHeader>
                     {editItem && !editError && (
-                        <div className="py-2">
+                        <div className="py-2 px-4 overflow-y-auto flex-1">
                             <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
                                 <ModuleForm
                                     module={editItem.module}
                                     onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
                                     initialData={editItem}
                                     isInDialog={true}
+                                    onFullscreenModeChange={handleFullscreenModeChange}
+                                    externalIsFullscreen={false}
                                 />
                             </Suspense>
                         </div>
                     )}
+                </DrawerContent>
+            </Drawer>
+
+            {/* 全屏编辑Dialog */}
+            <Dialog open={fullscreenDialogOpen} onOpenChange={setFullscreenDialogOpen}>
+                <DialogContent
+                    className="max-w-none w-screen h-screen max-h-screen p-0 m-0"
+                    style={{
+                        zIndex: getZIndex('URGENT'),
+                    }}
+                >
+                    <div className="flex flex-col h-screen">
+                        <DialogHeader className="p-4 border-b">
+                            <DialogTitle>编辑知识点 - 全屏模式</DialogTitle>
+                            <DialogDescription>
+                                点击编辑器中的退出全屏按钮或按ESC键退出全屏模式
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex-1 overflow-hidden">
+                            {editItem && (
+                                <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
+                                    <ModuleForm
+                                        module={editItem.module}
+                                        onAddKnowledge={data => handleEditSave({ ...editItem, ...data })}
+                                        initialData={editItem}
+                                        isInDialog={true}
+                                        onFullscreenModeChange={handleFullscreenModeChange}
+                                        externalIsFullscreen={true}
+                                    />
+                                </Suspense>
+                            )}
+                        </div>
+                    </div>
                 </DialogContent>
             </Dialog>
 

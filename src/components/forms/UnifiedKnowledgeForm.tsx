@@ -29,7 +29,7 @@ import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-import { FullscreenLatexEditor } from "@/components/rich-text-editors/FullscreenLatexEditor";
+import UnifiedEditor from "@/components/rich-text-editors/UnifiedEditor";
 import { UnifiedImage } from "@/components/ui/UnifiedImage";
 import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
@@ -54,6 +54,8 @@ interface UnifiedKnowledgeFormProps {
   onAddKnowledge: (knowledge: Partial<KnowledgeItem> | Record<string, unknown>) => void;
   initialData?: Partial<KnowledgeItem> | Record<string, unknown>;
   isInDialog?: boolean;
+  onFullscreenModeChange?: (isFullscreen: boolean) => void;
+  externalIsFullscreen?: boolean;
 }
 
 // 根据模块获取配置
@@ -197,7 +199,9 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   module,
   onAddKnowledge,
   initialData,
-  isInDialog = false
+  isInDialog = false,
+  onFullscreenModeChange,
+  externalIsFullscreen
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
   const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
@@ -421,16 +425,16 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     return (
       <div className="rich-text-editor-wrapper">
         {/* 统一使用独立的全屏编辑器，无论是知识点汇总还是知识点录入 */}
-        <FullscreenLatexEditor
+        <UnifiedEditor
           content={currentValue || ''}
           onChange={(value) => setValue('secondField', value || '')}
           placeholder={fieldConfig.secondPlaceholder}
           className="w-full"
-          editorMinHeight={editorMinHeight}
-          editorMaxHeight={editorMaxHeight}
-          stickyToolbar={true}
+          customMinHeight={editorMinHeight}
+          customMaxHeight={editorMaxHeight}
           isInDialog={isInDialog}
-          clearPreviewImages={clearPreviewImages}
+          onFullscreenToggle={onFullscreenModeChange}
+          disableInternalFullscreen={isInDialog}
         />
       </div>
     );

@@ -54,6 +54,8 @@
   --z-fullscreen-editor-toolbar: 1001;
   --z-fullscreen-editor-overlay: 1002;
   --z-fullscreen-editor-menu: 1003;
+  --z-fullscreen-editor-in-dialog: 1004;
+  --z-fullscreen-editor-in-drawer: 1005;
 
   /* 最高层级 (9999+) */
   --z-maximum: 9999;
@@ -2979,4 +2981,105 @@ button:focus-visible,
 /* 毛玻璃tabs的深色模式支持 */
 .dark .backdrop-blur-md {
   background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ========== 全屏编辑器在Drawer中的特殊处理 ========== */
+.fullscreen-editor-container {
+  /* 确保全屏编辑器在所有情况下都能正确显示 */
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: var(--z-fullscreen-editor-in-drawer) !important;
+  background-color: var(--background) !important;
+
+  /* 确保可访问性 */
+  &[aria-hidden="true"] {
+    display: none !important;
+  }
+
+  /* 确保所有子元素都能正常交互 */
+  * {
+    pointer-events: auto !important;
+  }
+
+  /* 工具栏特殊处理 */
+  .toolbar,
+  [role="toolbar"] {
+    z-index: calc(var(--z-fullscreen-editor-in-drawer) + 1) !important;
+    position: relative !important;
+  }
+
+  /* 下拉菜单特殊处理 */
+  [data-radix-popper-content-wrapper],
+  [data-radix-dropdown-menu-content] {
+    z-index: calc(var(--z-fullscreen-editor-in-drawer) + 2) !important;
+  }
+
+  /* 按钮特殊处理 */
+  button {
+    z-index: calc(var(--z-fullscreen-editor-in-drawer) + 1) !important;
+    position: relative !important;
+  }
+
+  /* 编辑器内容区域 */
+  [contenteditable] {
+    z-index: var(--z-fullscreen-editor-in-drawer) !important;
+    position: relative !important;
+  }
+}
+
+/* 当全屏编辑器打开时，隐藏drawer的overlay */
+body:has(.fullscreen-editor-container) [data-vaul-drawer]:not(.fullscreen-editor-container) {
+  display: none !important;
+}
+
+/* 确保全屏编辑器容器可见 */
+.fullscreen-editor-container {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: var(--z-fullscreen-editor-in-drawer) !important;
+  background-color: var(--background) !important;
+  pointer-events: auto !important;
+}
+
+/* 强制显示全屏编辑器，覆盖任何可能的隐藏规则 */
+.fullscreen-editor-container[data-fullscreen-container="true"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 1005 !important;
+  background-color: var(--background) !important;
+  pointer-events: auto !important;
+}
+
+/* 确保全屏编辑器内的所有交互元素都能正常工作 */
+.fullscreen-editor-container button:focus,
+.fullscreen-editor-container [contenteditable]:focus {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* 确保全屏编辑器中的按钮能正常工作 */
+.fullscreen-editor-container button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 1006 !important;
+}
+
+.fullscreen-editor-container [contenteditable] {
+  pointer-events: auto !important;
+  z-index: 1005 !important;
 }

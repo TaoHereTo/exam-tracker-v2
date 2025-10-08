@@ -16,19 +16,22 @@ import { MixedText } from './MixedText';
 import { InlineLoadingSpinner } from './LoadingSpinner';
 import { SimpleUiverseSpinner } from './UiverseSpinner';
 import { useThemeMode } from '@/hooks/useThemeMode';
+import { getZIndex } from '@/lib/zIndexConfig';
 
 interface SupabaseImageSelectorDrawerProps {
     onImageSelected: (imageId: string) => void;
     trigger?: React.ReactNode;
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
+    isInFullscreen?: boolean;
 }
 
 export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerProps> = ({
     onImageSelected,
     trigger,
     open,
-    onOpenChange
+    onOpenChange,
+    isInFullscreen = false
 }) => {
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isOpen = open !== undefined ? open : internalIsOpen;
@@ -199,7 +202,13 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
         <>
             <Drawer open={isOpen} onOpenChange={handleOpenChange}>
                 {trigger && <DrawerTrigger asChild>{trigger}</DrawerTrigger>}
-                <DrawerContent className="h-[90vh] flex flex-col" style={{ height: '90vh' }}>
+                <DrawerContent
+                    className="h-[90vh] flex flex-col"
+                    style={{
+                        height: '90vh',
+                        zIndex: isInFullscreen ? getZIndex('URGENT') + 1 : getZIndex('FULLSCREEN_EDITOR_MENU'),
+                    }}
+                >
                     <DrawerHeader className="flex-shrink-0 px-4 py-3">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -414,7 +423,11 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                     setImageToDelete(null);
                 }
             }}>
-                <DrawerContent>
+                <DrawerContent
+                    style={{
+                        zIndex: isInFullscreen ? getZIndex('URGENT') + 1 : getZIndex('FULLSCREEN_EDITOR_MENU'),
+                    }}
+                >
                     <DrawerHeader>
                         <DrawerTitle><MixedText text="确认删除" /></DrawerTitle>
                         <DrawerDescription>

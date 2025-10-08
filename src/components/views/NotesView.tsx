@@ -29,7 +29,7 @@ import {
     X,
     Palette
 } from "lucide-react";
-import SimpleRichTextEditor from "@/components/rich-text-editors/SimpleRichTextEditor";
+import UnifiedEditor from "@/components/rich-text-editors/UnifiedEditor";
 import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
 import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -1051,7 +1051,7 @@ export default function NotesView() {
                             </div>
 
                             <div className="flex-1 min-h-[500px]">
-                                <SimpleRichTextEditor
+                                <UnifiedEditor
                                     content={selectedNote.content}
                                     onChange={(content) => setSelectedNote({
                                         ...selectedNote,

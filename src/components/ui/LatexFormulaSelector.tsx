@@ -22,11 +22,13 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Sigma, Search, X } from 'lucide-react';
+import { getZIndex } from '@/lib/zIndexConfig';
 
 interface LatexFormulaSelectorProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onInsert: (latex: string, displayMode: boolean) => void;
+    isInFullscreen?: boolean;
 }
 
 // 常用LaTeX公式模板
@@ -137,12 +139,15 @@ const LatexPreview: React.FC<{ latex: string; displayMode: boolean }> = ({ latex
 export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     open,
     onOpenChange,
-    onInsert
+    onInsert,
+    isInFullscreen = false
 }) => {
-    console.log('LatexFormulaSelector 渲染', { open });
+    // LatexFormulaSelector 渲染
     const [displayMode, setDisplayMode] = useState<'inline' | 'block'>('inline');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>('全部');
+
+    // 调试信息已移除
 
     // 扁平化所有公式数据
     const allFormulas = useMemo(() => {
@@ -224,7 +229,12 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                 }
             `}</style>
             <Drawer open={open} onOpenChange={onOpenChange}>
-                <DrawerContent className="max-h-[90vh] overflow-visible">
+                <DrawerContent
+                    className="max-h-[90vh] overflow-visible"
+                    style={{
+                        zIndex: isInFullscreen ? getZIndex('URGENT') + 1 : getZIndex('FULLSCREEN_EDITOR_MENU'),
+                    }}
+                >
                     <DrawerHeader className="pb-2">
                         <div className="flex items-center justify-between">
                             <div className="button-group">
@@ -257,7 +267,12 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
                                         <SelectTrigger className="w-[150px] h-8">
                                             <SelectValue placeholder="选择分类" />
                                         </SelectTrigger>
-                                        <SelectContent className="z-[var(--z-urgent)]">
+                                        <SelectContent
+                                            className="z-[var(--z-urgent)]"
+                                            style={{
+                                                zIndex: getZIndex('URGENT'),
+                                            }}
+                                        >
                                             {categories.map((category) => (
                                                 <SelectItem key={category} value={category}>
                                                     {category}
