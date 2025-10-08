@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Check, RefreshCw, Trash2, Cloud, AlertCircle, Eye, X } from 'lucide-react';
+import { CloudImageViewer } from './CloudImageViewer';
 import { supabaseImageManager, type SupabaseImageInfo } from '@/lib/supabaseImageManager';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import Image from 'next/image';
@@ -46,23 +47,10 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
     const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
     const [imageToDelete, setImageToDelete] = useState<{ id: string; name: string } | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [isPreviewing, setIsPreviewing] = useState(false);
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
     const { isDarkMode } = useThemeMode();
 
-    // 预览图片
-    const handlePreviewImage = (imageUrl: string) => {
-        setPreviewImage(imageUrl);
-        setIsPreviewing(true);
-    };
-
-    // 关闭预览
-    const closePreview = () => {
-        setPreviewImage(null);
-        setIsPreviewing(false);
-    };
 
     // 加载可用图片
     const loadAvailableImages = useCallback(async () => {
@@ -79,15 +67,40 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
 
     // 处理图片选择
     const handleImageSelect = (imageId: string) => {
+        console.log('SupabaseImageSelectorDrawer: handleImageSelect called with imageId:', imageId);
         setSelectedImage(imageId);
+        console.log('SupabaseImageSelectorDrawer: selectedImage set to:', imageId);
+
+        // 立即选择图片，不需要用户点击确认
+        try {
+            console.log('SupabaseImageSelectorDrawer: calling onImageSelected immediately with:', imageId);
+            onImageSelected(imageId);
+            console.log('SupabaseImageSelectorDrawer: onImageSelected called successfully');
+            setIsOpen(false);
+            setSelectedImage(null);
+        } catch (error) {
+            console.error('SupabaseImageSelectorDrawer: Error calling onImageSelected:', error);
+        }
     };
 
     // 确认选择图片
     const handleConfirmSelection = () => {
+        console.log('SupabaseImageSelectorDrawer: handleConfirmSelection called');
+        console.log('SupabaseImageSelectorDrawer: selectedImage:', selectedImage);
+        console.log('SupabaseImageSelectorDrawer: onImageSelected type:', typeof onImageSelected);
+
         if (selectedImage) {
-            onImageSelected(selectedImage);
-            setIsOpen(false);
-            setSelectedImage(null);
+            try {
+                console.log('SupabaseImageSelectorDrawer: calling onImageSelected with:', selectedImage);
+                onImageSelected(selectedImage);
+                console.log('SupabaseImageSelectorDrawer: onImageSelected called successfully');
+                setIsOpen(false);
+                setSelectedImage(null);
+            } catch (error) {
+                console.error('SupabaseImageSelectorDrawer: Error calling onImageSelected:', error);
+            }
+        } else {
+            console.log('SupabaseImageSelectorDrawer: no image selected');
         }
     };
 
@@ -152,8 +165,6 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
         setImageLoadErrors(new Set());
         setDeleteConfirmOpen(false);
         setImageToDelete(null);
-        setIsPreviewing(false);
-        setPreviewImage(null);
     };
 
     // 处理打开
@@ -260,139 +271,98 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                             </div>
                         </div>
 
-
-                        {/* 主内容区域 - 图片网格或预览 */}
+                        {/* 主内容区域 - 图片网格 */}
                         <div className="flex-1 overflow-hidden">
-                            {isPreviewing && previewImage ? (
-                                /* 预览模式 */
-                                <div className="h-full flex flex-col">
-                                    {/* 预览头部 */}
-                                    <div className="flex-shrink-0 flex items-center justify-between p-4 border-b">
-                                        <div className="flex items-center gap-2">
-                                            <Eye className="h-5 w-5" />
-                                            <span className="font-medium"><MixedText text="图片预览" /></span>
-                                        </div>
-                                        <Button variant="ghost" size="sm" onClick={closePreview}>
-                                            <X className="h-4 w-4" />
-                                        </Button>
+                            <div className="h-full overflow-y-auto px-4 py-3" style={{ height: 'calc(90vh - 200px)', overflowY: 'auto' }}>
+                                {isLoading ? (
+                                    <div className="flex items-center justify-center h-32">
+                                        <SimpleUiverseSpinner />
                                     </div>
-
-                                    {/* 预览内容 */}
-                                    <div className="flex-1 flex items-center justify-center p-4 min-h-0">
-                                        <Image
-                                            src={previewImage}
-                                            alt="预览图片"
-                                            width={800}
-                                            height={600}
-                                            className="max-w-full max-h-full object-contain"
-                                        />
+                                ) : processedImages.length === 0 ? (
+                                    <div className="flex items-center justify-center h-32">
+                                        <div className="text-center">
+                                            <Cloud className="h-8 w-8 mx-auto mb-2 text-gray-400" />
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                <MixedText text={searchTerm ? '没有找到匹配的图片' : '云端暂无图片'} />
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                /* 图片网格模式 */
-                                <div className="h-full overflow-y-auto px-4 py-3" style={{ height: 'calc(90vh - 200px)', overflowY: 'auto' }}>
-                                    {isLoading ? (
-                                        <div className="flex items-center justify-center h-32">
-                                            <SimpleUiverseSpinner />
-                                        </div>
-                                    ) : processedImages.length === 0 ? (
-                                        <div className="flex items-center justify-center h-32">
-                                            <div className="text-center">
-                                                <Cloud className="h-8 w-8 mx-auto mb-2 text-gray-400" />
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                    <MixedText text={searchTerm ? '没有找到匹配的图片' : '云端暂无图片'} />
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 pb-4">
-                                            {processedImages.map((image) => (
-                                                <div
-                                                    key={image.id}
-                                                    className={`group relative cursor-pointer transition-all duration-200 ${selectedImage === image.id
-                                                        ? 'ring-2 ring-blue-500 ring-offset-2'
-                                                        : ''
-                                                        }`}
-                                                    onClick={() => handleImageSelect(image.id)}
-                                                >
-                                                    <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden relative group/image">
-                                                        <Image
-                                                            src={image.url}
-                                                            alt={image.originalName}
-                                                            width={80}
-                                                            height={80}
-                                                            className="object-cover w-full h-full"
-                                                            onError={() => {
-                                                                setImageLoadErrors(prev => new Set(prev).add(image.id));
-                                                            }}
-                                                        />
+                                ) : (
+                                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 pb-4">
+                                        {processedImages.map((image) => (
+                                            <div
+                                                key={image.id}
+                                                className={`group relative cursor-pointer transition-all duration-200 ${selectedImage === image.id
+                                                    ? 'ring-2 ring-blue-500 ring-offset-2'
+                                                    : ''
+                                                    }`}
+                                                onClick={() => handleImageSelect(image.id)}
+                                            >
+                                                <div className="aspect-square bg-gray-100 dark:bg-[#171717] rounded flex items-center justify-center mb-2 overflow-hidden relative group/image">
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={image.originalName}
+                                                        width={80}
+                                                        height={80}
+                                                        className="object-cover w-full h-full"
+                                                        onError={() => {
+                                                            setImageLoadErrors(prev => new Set(prev).add(image.id));
+                                                        }}
+                                                    />
 
-                                                        {/* 预览按钮 */}
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
-                                                            <Button
-                                                                type="button"
-                                                                size="sm"
-                                                                className={`h-6 px-2 text-xs ${isDarkMode
-                                                                    ? 'bg-white text-black hover:bg-gray-100'
-                                                                    : 'bg-black text-white hover:bg-gray-800'
-                                                                    }`}
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation(); // 阻止事件冒泡，避免触发图片选择
-                                                                    handlePreviewImage(image.url);
-                                                                }}
-                                                            >
-                                                                <Eye className="h-3 w-3 mr-1" />
-                                                                <MixedText text="预览" />
-                                                            </Button>
+                                                    {/* 预览按钮 - 暂时禁用以避免无限加载 */}
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/image:opacity-100 transition-opacity">
+                                                        <div className="bg-black/50 text-white px-2 py-1 rounded text-xs">
+                                                            点击选择
                                                         </div>
-                                                    </div>
-
-                                                    <div className="p-1">
-                                                        <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate text-center">
-                                                            <MixedText text={image.originalName} />
-                                                        </div>
-                                                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-0.5">
-                                                            {new Date(image.uploadedAt).toLocaleDateString()}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* 选择指示器 */}
-                                                    {selectedImage === image.id && (
-                                                        <div className="absolute top-1 right-1 bg-blue-500 text-white rounded-full p-0.5">
-                                                            <Check className="h-2 w-2" />
-                                                        </div>
-                                                    )}
-
-                                                    {/* 删除按钮 */}
-                                                    <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <TooltipProvider>
-                                                            <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <Button
-                                                                        type="button"
-                                                                        size="sm"
-                                                                        variant="destructive"
-                                                                        className="h-4 w-4 p-0"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            handleDeleteConfirm(image);
-                                                                        }}
-                                                                    >
-                                                                        <Trash2 className="h-2 w-2" />
-                                                                    </Button>
-                                                                </TooltipTrigger>
-                                                                <TooltipContent>
-                                                                    <p><MixedText text="删除图片" /></p>
-                                                                </TooltipContent>
-                                                            </Tooltip>
-                                                        </TooltipProvider>
                                                     </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+
+                                                <div className="p-1">
+                                                    <div className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate text-center">
+                                                        <MixedText text={image.originalName} />
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-0.5">
+                                                        {new Date(image.uploadedAt).toLocaleDateString()}
+                                                    </div>
+                                                </div>
+
+                                                {/* 选择指示器 */}
+                                                {selectedImage === image.id && (
+                                                    <div className="absolute top-1 right-1 bg-blue-500 text-white rounded-full p-0.5">
+                                                        <Check className="h-2 w-2" />
+                                                    </div>
+                                                )}
+
+                                                {/* 删除按钮 */}
+                                                <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <TooltipProvider>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <Button
+                                                                    type="button"
+                                                                    size="sm"
+                                                                    variant="destructive"
+                                                                    className="h-6 w-6 p-0 rounded-full"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteConfirm(image);
+                                                                    }}
+                                                                >
+                                                                    <Trash2 className="h-3 w-3" />
+                                                                </Button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p><MixedText text="删除图片" /></p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -400,13 +370,14 @@ export const SupabaseImageSelectorDrawer: React.FC<SupabaseImageSelectorDrawerPr
                     <DrawerFooter className="flex-shrink-0">
                         <div className="flex justify-end space-x-2">
                             <DrawerClose asChild>
-                                <Button variant="outline">
+                                <Button variant="outline" className="flex items-center justify-center rounded-full">
                                     <MixedText text="取消" />
                                 </Button>
                             </DrawerClose>
                             <Button
                                 onClick={handleConfirmSelection}
                                 disabled={!selectedImage}
+                                className="flex items-center justify-center rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white"
                             >
                                 <MixedText text="确认选择" />
                             </Button>

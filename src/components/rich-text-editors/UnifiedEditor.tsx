@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,25 +25,19 @@ import {
     AlignCenter,
     AlignRight,
     AlignJustify,
-    Type,
+    Palette,
     Paintbrush,
     Link as LinkIcon,
-    Image as ImageIcon,
     Sigma,
     Fullscreen,
     Minimize2,
     Heading,
-    X,
     Columns2,
-    Upload,
-    Cloud,
-    HardDrive
+    Eraser
 } from 'lucide-react';
 import { getZIndex } from '@/lib/zIndexConfig';
 import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
-import { SupabaseImageSelectorDrawer } from '@/components/ui/SupabaseImageSelectorDrawer';
 import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
-import Image from 'next/image';
 
 interface UnifiedEditorProps {
     content: string;
@@ -172,12 +165,12 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [hasSelectedText, setHasSelectedText] = useState(false);
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
     const [showLatexSelector, setShowLatexSelector] = useState(false);
-    const [showCloudImageDialog, setShowCloudImageDialog] = useState(false);
     const [showLinkDialog, setShowLinkDialog] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [linkText, setLinkText] = useState('');
     const [isSplitPreview, setIsSplitPreview] = useState(false);
-    const [attachedImage, setAttachedImage] = useState<{ src: string; alt: string; type: 'local' | 'cloud' } | null>(null);
+
+
 
     // 检查当前选中的格式
     const checkActiveFormats = useCallback(() => {
@@ -371,45 +364,51 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setShowLatexSelector(false);
     }, [onChange]);
 
-    // 处理图片选择
-    const handleImageSelect = useCallback((imageId: string) => {
-        // 检查是否已经有图片，如果有则替换
-        const imageSrc = `/api/image/${imageId}`;
-        setAttachedImage({
-            src: imageSrc,
-            alt: '图片',
-            type: 'cloud'
-        });
-        setShowCloudImageDialog(false);
-    }, []);
+    // 清除所有格式
+    const handleClearFormat = useCallback(() => {
+        if (!editorRef.current) return;
 
-    // 处理本地图片选择
-    const handleLocalImageSelect = useCallback(() => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = (e) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const imageSrc = e.target?.result as string;
-                    setAttachedImage({
-                        src: imageSrc,
-                        alt: '图片',
-                        type: 'local'
-                    });
-                };
-                reader.readAsDataURL(file);
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+
+            // 如果选中了文本，只清除选中文本的格式
+            if (!selection.isCollapsed) {
+                try {
+                    // 获取选中内容的纯文本
+                    const textContent = selection.toString();
+
+                    // 删除选中的内容
+                    range.deleteContents();
+
+                    // 插入纯文本（无格式）
+                    const textNode = document.createTextNode(textContent);
+                    range.insertNode(textNode);
+
+                    // 清除选择
+                    selection.removeAllRanges();
+                } catch (error) {
+                    console.error('清除格式失败:', error);
+                }
+            } else {
+                // 如果没有选中文本，清除整个编辑器的格式
+                const textContent = editorRef.current.textContent || '';
+                editorRef.current.innerHTML = textContent;
             }
-        };
-        input.click();
-    }, []);
+        } else {
+            // 如果没有选择，清除整个编辑器的格式
+            const textContent = editorRef.current.textContent || '';
+            editorRef.current.innerHTML = textContent;
+        }
 
-    // 删除图片
-    const handleRemoveImage = useCallback(() => {
-        setAttachedImage(null);
-    }, []);
+        // 更新内容并刷新格式状态
+        const html = editorRef.current.innerHTML;
+        onChange(html);
+        checkActiveFormats();
+    }, [onChange, checkActiveFormats]);
+
+
+
 
     // 监听选择变化
     useEffect(() => {
@@ -468,7 +467,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         )}
             style={actualIsFullscreen ? { zIndex: getZIndex('URGENT') + 1 } : undefined}>
             {/* 工具栏 */}
-            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-black sticky top-0 z-10">
                 <div className="flex items-center gap-1">
                     {/* 基础格式化按钮 */}
                     <Tooltip>
@@ -546,6 +545,25 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
                             style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
                             <p>删除线</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    {/* 清除格式按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={handleClearFormat}
+                                disabled={!hasSelectedText && !editorRef.current?.textContent}
+                            >
+                                <Eraser className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>清除格式</p>
                         </TooltipContent>
                     </Tooltip>
 
@@ -678,7 +696,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <TooltipTrigger asChild>
                                 <PopoverTrigger asChild>
                                     <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                        <Type className="w-4 h-4" />
+                                        <Palette className="w-4 h-4" />
                                     </Button>
                                 </PopoverTrigger>
                             </TooltipTrigger>
@@ -781,61 +799,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         </TooltipContent>
                     </Tooltip>
 
-                    {/* 图片选择器 */}
-                    <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <DropdownMenuTrigger asChild>
-                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                        <ImageIcon className="w-4 h-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            </TooltipTrigger>
-                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
-                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
-                                <p>插入图片</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <DropdownMenuContent
-                            className="w-auto min-w-[120px]"
-                            style={{
-                                zIndex: getMenuZIndex(),
-                            }}
-                        >
-                            <DropdownMenuItem
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (attachedImage) {
-                                        // 如果已有图片，替换现有图片
-                                        setShowCloudImageDialog(true);
-                                    } else {
-                                        setShowCloudImageDialog(true);
-                                    }
-                                    handleMenuChange('image', false);
-                                }}
-                            >
-                                <Cloud className="w-3 h-3 mr-2" />
-                                {attachedImage ? '替换云端图片' : '从云端选择'}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    if (attachedImage) {
-                                        // 如果已有图片，替换现有图片
-                                        handleLocalImageSelect();
-                                    } else {
-                                        handleLocalImageSelect();
-                                    }
-                                    handleMenuChange('image', false);
-                                }}
-                            >
-                                <HardDrive className="w-3 h-3 mr-2" />
-                                {attachedImage ? '替换本地图片' : '从本地选择'}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
 
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -853,6 +816,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <p>插入公式</p>
                         </TooltipContent>
                     </Tooltip>
+
 
                 </div>
 
@@ -910,45 +874,42 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 }}>
                     {/* 左侧编辑器 */}
                     <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
-                        <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            编辑
+                        <div className="flex-1 flex flex-col">
+                            <div
+                                ref={editorRef}
+                                className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                                contentEditable
+                                suppressContentEditableWarning
+                                data-placeholder={placeholder}
+                                onInput={handleInput}
+                                onKeyDown={handleKeyDown}
+                                onClick={handleEditorClick}
+                            />
                         </div>
-                        <div
-                            ref={editorRef}
-                            className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                            contentEditable
-                            suppressContentEditableWarning
-                            data-placeholder={placeholder}
-                            onInput={handleInput}
-                            onKeyDown={handleKeyDown}
-                            onClick={handleEditorClick}
-                        />
                     </div>
                     {/* 右侧预览 */}
                     <div className="flex-1 flex flex-col">
-                        <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            预览
-                        </div>
                         <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
                             <HtmlRenderer content={content} />
                         </div>
                     </div>
                 </div>
             ) : (
-                <div
-                    ref={editorRef}
-                    className="p-4 min-h-[300px] max-h-[800px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                    contentEditable
-                    suppressContentEditableWarning
-                    data-placeholder={placeholder}
-                    style={{
-                        minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
-                        maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
-                    }}
-                    onInput={handleInput}
-                    onKeyDown={handleKeyDown}
-                    onClick={handleEditorClick}
-                />
+                <div className="flex flex-col" style={{
+                    minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
+                    maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
+                }}>
+                    <div
+                        ref={editorRef}
+                        className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                        contentEditable
+                        suppressContentEditableWarning
+                        data-placeholder={placeholder}
+                        onInput={handleInput}
+                        onKeyDown={handleKeyDown}
+                        onClick={handleEditorClick}
+                    />
+                </div>
             )}
 
             {/* LaTeX公式选择器 */}
@@ -959,14 +920,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 isInFullscreen={actualIsFullscreen}
             />
 
-            {/* 云端图片选择抽屉 */}
-            <SupabaseImageSelectorDrawer
-                open={showCloudImageDialog}
-                onOpenChange={(open) => setShowCloudImageDialog(open)}
-                onImageSelected={handleImageSelect}
-                trigger={<div />}
-                isInFullscreen={actualIsFullscreen}
-            />
 
             {/* 链接输入对话框 */}
             <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
@@ -1014,44 +967,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 </DialogContent>
             </Dialog>
 
-            {/* 图片附件区域 */}
-            {attachedImage && (
-                <div className="mt-4">
-                    <Accordion type="single" collapsible defaultValue="image">
-                        <AccordionItem value="image">
-                            <AccordionTrigger className="text-sm font-medium">
-                                <div className="flex items-center gap-2">
-                                    <ImageIcon className="w-4 h-4" />
-                                    附加图片
-                                </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                                <div className="relative group">
-                                    <div className="w-full max-w-md mx-auto rounded-lg shadow-sm border overflow-hidden" style={{ maxHeight: '300px' }}>
-                                        <Image
-                                            src={attachedImage.src}
-                                            alt={attachedImage.alt}
-                                            width={400}
-                                            height={300}
-                                            className="w-full h-auto object-contain"
-                                            style={{ maxHeight: '300px' }}
-                                        />
-                                    </div>
-                                    <Button
-                                        type="button"
-                                        variant="destructive"
-                                        size="sm"
-                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                                        onClick={handleRemoveImage}
-                                    >
-                                        <X className="w-4 h-4" />
-                                    </Button>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                </div>
-            )}
 
             {/* 样式 */}
             <style jsx>{`

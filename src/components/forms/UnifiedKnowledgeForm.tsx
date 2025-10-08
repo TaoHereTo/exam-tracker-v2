@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -206,6 +206,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const config = useMemo(() => getModuleConfig(module), [module]);
   const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
   const [clearPreviewImages, setClearPreviewImages] = useState(false);
+
   const { notifyLoading, updateToSuccess, updateToError } = useNotification();
 
   // 获取模块特定的字段配置
@@ -319,39 +320,38 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     const config = getModuleConfig(module);
 
     // 立即显示 loading toast
-    const loadingToastId = notifyLoading?.('正在保存知识点...') || '';
+    const loadingToastId = notifyLoading?.('正在保存到云端...');
+    console.log('UnifiedKnowledgeForm: loadingToastId:', loadingToastId);
 
     // 立即触发清空预览图片
     setClearPreviewImages(true);
 
     try {
-      // 上传待处理的图片到云端
+      // 处理图片信息
       let imagePath = '';
+
       if (pendingImagesRef.current.length > 0) {
-        // 上传所有待处理的图片
+        // 处理待上传的图片（保持原有逻辑）
         const uploadedImageIds: string[] = [];
 
         for (const pendingImage of pendingImagesRef.current) {
           if (pendingImage.file) {
-            // 上传文件到云端
             try {
               const imageInfo = await supabaseImageManager.uploadImage(pendingImage.file);
               uploadedImageIds.push(imageInfo.id);
             } catch (uploadError) {
               console.error('图片上传失败:', uploadError);
-              updateToError?.(loadingToastId, '图片上传失败，请重试');
-              return; // 如果上传失败，停止保存操作
+              updateToError?.(loadingToastId || '', '图片上传失败，请重试');
+              return;
             }
           } else if (pendingImage.imageId) {
-            // 如果是已有的云端图片，直接使用其ID
             uploadedImageIds.push(pendingImage.imageId);
           }
         }
 
-        // 使用第一个上传的图片ID作为imagePath（保持与现有逻辑一致）
         imagePath = uploadedImageIds.length > 0 ? uploadedImageIds[0] : '';
       } else if (data.imagePath && typeof data.imagePath === 'string') {
-        // 如果没有待处理的图片但有imagePath，保持原值
+        // 保持原有的 imagePath
         imagePath = data.imagePath;
       }
 
@@ -378,10 +378,17 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       // 如果是编辑模式（有initialData），不显示立即成功toast，让调用方处理
       if (!initialData) {
         // 更新 toast 为成功状态（仅新增模式）
-        updateToSuccess?.(loadingToastId, '知识点保存成功！');
+        if (loadingToastId) {
+          updateToSuccess?.(loadingToastId, '知识点已成功保存到云端！');
+        } else {
+          // 如果没有loading toast，直接显示成功toast
+          toast.success('知识点已成功保存到云端！');
+        }
       } else {
         // 编辑模式：关闭loading toast，让调用方的autoUpdateKnowledge处理成功toast
-        toast.dismiss(loadingToastId);
+        if (loadingToastId) {
+          toast.dismiss(loadingToastId);
+        }
       }
 
       // 清空待处理图片列表
@@ -391,7 +398,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       setClearPreviewImages(false);
     } catch (error) {
       console.error('保存知识点失败:', error);
-      updateToError?.(loadingToastId, '保存知识点失败，请重试');
+      updateToError?.(loadingToastId || '', '保存知识点失败，请重试');
     }
   };
 
@@ -404,19 +411,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     const currentValue = getValue('secondField') as string;
     const currentImagePath = getValue('imagePath') as string;
 
-    // Handle image changes from RichTextEditor
-    const handleImageChange = (imageIds: string[]) => {
-      // Store pending images that need to be uploaded on save
-      // For now, we'll store the image IDs from the editor
-      // In a more advanced implementation, we might want to handle multiple images
-      if (imageIds.length > 0) {
-        // We don't immediately upload - we just store the IDs for later processing
-        // The actual upload will happen in handleSubmit
-        setValue('imagePath', imageIds[0]);
-      } else {
-        setValue('imagePath', '');
-      }
-    };
 
     // 编辑器高度设置
     const editorMinHeight = "400px";
