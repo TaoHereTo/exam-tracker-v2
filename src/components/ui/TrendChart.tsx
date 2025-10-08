@@ -82,7 +82,7 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
 
     const option = useMemo(() => {
         // 根据主题动态设置颜色
-        const backgroundColor = isDarkMode ? '#161618' : '#F5F4F7';
+        const backgroundColor = 'transparent';
         const textColor = isDarkMode ? '#e5e5e5' : '#333';
         // 图例文字在深色模式下使用黑色以提高可读性
         const legendTextColor = isDarkMode ? '#333' : '#333';

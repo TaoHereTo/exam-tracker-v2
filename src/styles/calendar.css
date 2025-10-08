@@ -4,7 +4,7 @@
 }
 
 .rbc-header {
-    background-color: var(--background);
+    background-color: transparent;
     color: var(--foreground);
     border-bottom: 1px solid var(--border);
     font-weight: 600;
@@ -230,7 +230,7 @@
 }
 
 .rbc-toolbar button {
-    background-color: var(--background);
+    background-color: transparent;
     color: var(--foreground);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -386,18 +386,18 @@
 /* 深色模式适配 */
 @media (prefers-color-scheme: dark) {
     .rbc-calendar {
-        background-color: var(--background);
+        background-color: transparent;
         color: var(--foreground);
     }
 
     .rbc-month-view {
-        background-color: var(--background);
+        background-color: transparent;
         border: none !important;
         /* 去掉外边框 */
     }
 
     .rbc-date-cell {
-        background-color: var(--background);
+        background-color: transparent;
     }
 
     .rbc-off-range-bg {

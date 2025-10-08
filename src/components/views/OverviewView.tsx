@@ -597,9 +597,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                 ))}
             </Marquee>
 
-            {/* 添加渐变遮罩，就像官网例子一样 */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent"></div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-transparent"></div>
+            {/* 暂时移除渐变遮罩，让卡片直接显示在透明背景上 */}
 
             {/* 添加间距，让tabs显示在屏幕底部 */}
             <div className="h-16"></div>
