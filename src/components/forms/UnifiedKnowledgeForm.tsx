@@ -433,6 +433,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
           customMinHeight={editorMinHeight}
           customMaxHeight={editorMaxHeight}
           isInDialog={isInDialog}
+          externalIsFullscreen={externalIsFullscreen}
         />
       </div>
     );

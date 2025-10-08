@@ -357,7 +357,9 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     // 调试全屏模式变化
     useEffect(() => {
         console.log('KnowledgeSummaryView: isFullscreenMode changed to:', isFullscreenMode);
-    }, [isFullscreenMode]);
+        console.log('KnowledgeSummaryView: fullscreenDialogOpen:', fullscreenDialogOpen);
+        console.log('KnowledgeSummaryView: editDialogOpen:', editDialogOpen);
+    }, [isFullscreenMode, fullscreenDialogOpen, editDialogOpen]);
 
     // 处理全屏模式变化
     const handleFullscreenModeChange = (isFullscreen: boolean) => {
@@ -728,7 +730,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                                 点击编辑器中的退出全屏按钮或按ESC键退出全屏模式
                             </DialogDescription>
                         </DialogHeader>
-                        <div className="flex-1 overflow-hidden">
+                        <div className="flex-1 overflow-visible">
                             {editItem && (
                                 <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
                                     <ModuleForm

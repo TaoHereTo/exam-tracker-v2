@@ -52,6 +52,7 @@ interface UnifiedEditorProps {
     customMinHeight?: string;
     customMaxHeight?: string;
     isInDialog?: boolean;
+    externalIsFullscreen?: boolean;
 }
 
 const TOOLBAR_BUTTON_CLASSES = "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive select-none gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-[#303030] hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
@@ -78,10 +79,55 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     className,
     customMinHeight = '300px',
     customMaxHeight = '800px',
-    isInDialog = false
+    isInDialog = false,
+    externalIsFullscreen = false
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // 计算实际的全屏状态
+    const actualIsFullscreen = isFullscreen || externalIsFullscreen;
+
+    // 调试信息（简化）
+    if (actualIsFullscreen) {
+        console.log('UnifiedEditor: Fullscreen mode active, tooltip z-index set to 50000');
+    } else if (isInDialog) {
+        console.log('UnifiedEditor: Dialog mode active, tooltip z-index set to 1000');
+    }
+
+    // 修复 tooltip 显示问题
+    useEffect(() => {
+        const fixTooltips = () => {
+            const tooltips = document.querySelectorAll('[data-slot="tooltip-content"]');
+            if (tooltips.length > 0) {
+                tooltips.forEach((tooltip) => {
+                    if (actualIsFullscreen) {
+                        // 全屏模式：确保 tooltip 有足够高的 z-index
+                        (tooltip as HTMLElement).style.setProperty('z-index', '50000', 'important');
+                        if (tooltip.parentElement) {
+                            (tooltip.parentElement as HTMLElement).style.setProperty('z-index', '50001', 'important');
+                        }
+                    } else if (isInDialog) {
+                        // 非全屏 Dialog 模式：确保 tooltip 有足够高的 z-index
+                        (tooltip as HTMLElement).style.setProperty('z-index', '1000', 'important');
+                        if (tooltip.parentElement) {
+                            (tooltip.parentElement as HTMLElement).style.setProperty('z-index', '1001', 'important');
+                        }
+                    }
+                });
+            }
+        };
+
+        // 立即执行一次
+        fixTooltips();
+
+        // 设置定时器持续检查
+        const interval = setInterval(fixTooltips, 100);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [actualIsFullscreen, isInDialog]);
     const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
     const [hasSelectedText, setHasSelectedText] = useState(false);
     const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
@@ -225,8 +271,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 处理全屏切换
     const handleFullscreenToggle = useCallback(() => {
-        setIsFullscreen(!isFullscreen);
-    }, [isFullscreen]);
+        setIsFullscreen(!actualIsFullscreen);
+    }, [actualIsFullscreen]);
 
     // 处理链接插入
     const handleLinkInsert = useCallback(() => {
@@ -365,7 +411,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 处理ESC键关闭全屏
     useEffect(() => {
-        if (isFullscreen) {
+        if (actualIsFullscreen) {
             const handleKeyDown = (event: KeyboardEvent) => {
                 if (event.key === 'Escape') {
                     event.preventDefault();
@@ -379,7 +425,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 document.removeEventListener('keydown', handleKeyDown, { capture: true });
             };
         }
-    }, [isFullscreen]);
+    }, [actualIsFullscreen]);
 
     // 更新编辑器内容
     useEffect(() => {
@@ -390,7 +436,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 计算z-index
     const getMenuZIndex = () => {
-        if (isFullscreen) {
+        if (actualIsFullscreen) {
             return getZIndex('URGENT') + 1;
         }
         if (isInDialog) {
@@ -400,517 +446,537 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     };
 
     return (
-        <TooltipProvider>
-            <div className={cn(
-                "unified-editor-wrapper",
-                isFullscreen && "fixed inset-0 z-50 bg-background",
-                className
-            )}>
-                {/* 工具栏 */}
-                <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
-                    <div className="flex items-center gap-1">
-                        {/* 基础格式化按钮 */}
+        <div className={cn(
+            "unified-editor-wrapper",
+            actualIsFullscreen && "fixed inset-0 bg-background",
+            className
+        )}
+            style={actualIsFullscreen ? { zIndex: getZIndex('URGENT') + 1 } : undefined}>
+            {/* 工具栏 */}
+            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+                <div className="flex items-center gap-1">
+                    {/* 基础格式化按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => {
+                                    console.log('Bold button clicked, actualIsFullscreen:', actualIsFullscreen);
+                                    handleFormatCommand('bold');
+                                }}
+                                disabled={!hasSelectedText}
+                            >
+                                <Bold className={`w-4 h-4 ${activeFormats.bold ? 'text-blue-600' : ''}`} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                            className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}
+                            onMouseEnter={() => console.log('Tooltip mouse enter, className:', actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[400]" : undefined)}
+                        >
+                            <p>加粗</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => handleFormatCommand('italic')}
+                                disabled={!hasSelectedText}
+                            >
+                                <Italic className={`w-4 h-4 ${activeFormats.italic ? 'text-blue-600' : ''}`} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>斜体</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => handleFormatCommand('underline')}
+                                disabled={!hasSelectedText}
+                            >
+                                <Underline className={`w-4 h-4 ${activeFormats.underline ? 'text-blue-600' : ''}`} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>下划线</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => handleFormatCommand('strikeThrough')}
+                                disabled={!hasSelectedText}
+                            >
+                                <Strikethrough className={`w-4 h-4 ${activeFormats.strikeThrough ? 'text-blue-600' : ''}`} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>删除线</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    {/* 分隔线 */}
+                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+
+                    {/* 标题级别选择器 */}
+                    <DropdownMenu open={openMenus.heading} onOpenChange={(open) => handleMenuChange('heading', open)}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => handleFormatCommand('bold')}
-                                    disabled={!hasSelectedText}
-                                >
-                                    <Bold className={`w-4 h-4 ${activeFormats.bold ? 'text-blue-600' : ''}`} />
-                                </Button>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Heading className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            <TooltipContent>
-                                <p>加粗</p>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>标题级别</p>
                             </TooltipContent>
                         </Tooltip>
+                        <DropdownMenuContent
+                            className="w-auto min-w-[80px]"
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'div'); handleMenuChange('heading', false); }}>
+                                正文
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h1'); handleMenuChange('heading', false); }}>
+                                标题 1
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h2'); handleMenuChange('heading', false); }}>
+                                标题 2
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h3'); handleMenuChange('heading', false); }}>
+                                标题 3
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h4'); handleMenuChange('heading', false); }}>
+                                标题 4
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h5'); handleMenuChange('heading', false); }}>
+                                标题 5
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h6'); handleMenuChange('heading', false); }}>
+                                标题 6
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
+                    {/* 列表选择器 */}
+                    <DropdownMenu open={openMenus.list} onOpenChange={(open) => handleMenuChange('list', open)}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => handleFormatCommand('italic')}
-                                    disabled={!hasSelectedText}
-                                >
-                                    <Italic className={`w-4 h-4 ${activeFormats.italic ? 'text-blue-600' : ''}`} />
-                                </Button>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <List className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            <TooltipContent>
-                                <p>斜体</p>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>列表</p>
                             </TooltipContent>
                         </Tooltip>
+                        <DropdownMenuContent
+                            className="w-auto min-w-[100px]"
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('insertUnorderedList'); handleMenuChange('list', false); }}>
+                                <List className="w-3 h-3 mr-2" />
+                                无序列表
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('insertOrderedList'); handleMenuChange('list', false); }}>
+                                <ListOrdered className="w-3 h-3 mr-2" />
+                                有序列表
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
+                    {/* 对齐方式选择器 */}
+                    <DropdownMenu open={openMenus.align} onOpenChange={(open) => handleMenuChange('align', open)}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => handleFormatCommand('underline')}
-                                    disabled={!hasSelectedText}
-                                >
-                                    <Underline className={`w-4 h-4 ${activeFormats.underline ? 'text-blue-600' : ''}`} />
-                                </Button>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <AlignLeft className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            <TooltipContent>
-                                <p>下划线</p>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>对齐方式</p>
                             </TooltipContent>
                         </Tooltip>
+                        <DropdownMenuContent
+                            className="w-auto min-w-[100px]"
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyLeft'); handleMenuChange('align', false); }}>
+                                <AlignLeft className="w-3 h-3 mr-2" />
+                                左对齐
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyCenter'); handleMenuChange('align', false); }}>
+                                <AlignCenter className="w-3 h-3 mr-2" />
+                                居中对齐
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyRight'); handleMenuChange('align', false); }}>
+                                <AlignRight className="w-3 h-3 mr-2" />
+                                右对齐
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyFull'); handleMenuChange('align', false); }}>
+                                <AlignJustify className="w-3 h-3 mr-2" />
+                                两端对齐
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
+                    {/* 分隔线 */}
+                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+
+                    {/* 文字颜色选择器 */}
+                    <Popover open={openMenus.textColor} onOpenChange={(open) => handleMenuChange('textColor', open)}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => handleFormatCommand('strikeThrough')}
-                                    disabled={!hasSelectedText}
-                                >
-                                    <Strikethrough className={`w-4 h-4 ${activeFormats.strikeThrough ? 'text-blue-600' : ''}`} />
-                                </Button>
+                                <PopoverTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Type className="w-4 h-4" />
+                                    </Button>
+                                </PopoverTrigger>
                             </TooltipTrigger>
-                            <TooltipContent>
-                                <p>删除线</p>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>文字颜色</p>
                             </TooltipContent>
                         </Tooltip>
-
-                        {/* 分隔线 */}
-                        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-
-                        {/* 标题级别选择器 */}
-                        <DropdownMenu open={openMenus.heading} onOpenChange={(open) => handleMenuChange('heading', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <Heading className="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>标题级别</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent
-                                className="w-auto min-w-[80px]"
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
-                            >
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'div'); handleMenuChange('heading', false); }}>
-                                    正文
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h1'); handleMenuChange('heading', false); }}>
-                                    标题 1
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h2'); handleMenuChange('heading', false); }}>
-                                    标题 2
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h3'); handleMenuChange('heading', false); }}>
-                                    标题 3
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h4'); handleMenuChange('heading', false); }}>
-                                    标题 4
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h5'); handleMenuChange('heading', false); }}>
-                                    标题 5
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('formatBlock', 'h6'); handleMenuChange('heading', false); }}>
-                                    标题 6
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* 列表选择器 */}
-                        <DropdownMenu open={openMenus.list} onOpenChange={(open) => handleMenuChange('list', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <List className="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>列表</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent
-                                className="w-auto min-w-[100px]"
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
-                            >
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('insertUnorderedList'); handleMenuChange('list', false); }}>
-                                    <List className="w-3 h-3 mr-2" />
-                                    无序列表
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('insertOrderedList'); handleMenuChange('list', false); }}>
-                                    <ListOrdered className="w-3 h-3 mr-2" />
-                                    有序列表
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* 对齐方式选择器 */}
-                        <DropdownMenu open={openMenus.align} onOpenChange={(open) => handleMenuChange('align', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <AlignLeft className="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>对齐方式</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent
-                                className="w-auto min-w-[100px]"
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
-                            >
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyLeft'); handleMenuChange('align', false); }}>
-                                    <AlignLeft className="w-3 h-3 mr-2" />
-                                    左对齐
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyCenter'); handleMenuChange('align', false); }}>
-                                    <AlignCenter className="w-3 h-3 mr-2" />
-                                    居中对齐
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyRight'); handleMenuChange('align', false); }}>
-                                    <AlignRight className="w-3 h-3 mr-2" />
-                                    右对齐
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFormatCommand('justifyFull'); handleMenuChange('align', false); }}>
-                                    <AlignJustify className="w-3 h-3 mr-2" />
-                                    两端对齐
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* 分隔线 */}
-                        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-
-                        {/* 文字颜色选择器 */}
-                        <Popover open={openMenus.textColor} onOpenChange={(open) => handleMenuChange('textColor', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <Type className="w-4 h-4" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>文字颜色</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <PopoverContent
-                                className="w-48 p-3"
-                                align="start"
-                                side="bottom"
-                                sideOffset={5}
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
-                            >
-                                <div className="space-y-2">
-                                    <div className="text-sm font-medium">文字颜色</div>
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {colorOptions.map((color) => (
-                                            <button
-                                                key={color.value}
-                                                className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
-                                                style={{ backgroundColor: color.value }}
-                                                onClick={() => {
-                                                    handleColorChange(color.value, 'text');
-                                                    handleMenuChange('textColor', false);
-                                                }}
-                                                title={color.name}
-                                            />
-                                        ))}
-                                    </div>
+                        <PopoverContent
+                            className="w-48 p-3"
+                            align="start"
+                            side="bottom"
+                            sideOffset={5}
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <div className="space-y-2">
+                                <div className="text-sm font-medium">文字颜色</div>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {colorOptions.map((color) => (
+                                        <button
+                                            key={color.value}
+                                            className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
+                                            style={{ backgroundColor: color.value }}
+                                            onClick={() => {
+                                                handleColorChange(color.value, 'text');
+                                                handleMenuChange('textColor', false);
+                                            }}
+                                            title={color.name}
+                                        />
+                                    ))}
                                 </div>
-                            </PopoverContent>
-                        </Popover>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
 
-                        {/* 背景颜色选择器 */}
-                        <Popover open={openMenus.backgroundColor} onOpenChange={(open) => handleMenuChange('backgroundColor', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <Paintbrush className="w-4 h-4" />
-                                        </Button>
-                                    </PopoverTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>背景颜色</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <PopoverContent
-                                className="w-48 p-3"
-                                align="start"
-                                side="bottom"
-                                sideOffset={5}
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
-                            >
-                                <div className="space-y-2">
-                                    <div className="text-sm font-medium">背景颜色</div>
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {colorOptions.map((color) => (
-                                            <button
-                                                key={color.value}
-                                                className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
-                                                style={{ backgroundColor: color.value }}
-                                                onClick={() => {
-                                                    handleColorChange(color.value, 'background');
-                                                    handleMenuChange('backgroundColor', false);
-                                                }}
-                                                title={color.name}
-                                            />
-                                        ))}
-                                    </div>
+                    {/* 背景颜色选择器 */}
+                    <Popover open={openMenus.backgroundColor} onOpenChange={(open) => handleMenuChange('backgroundColor', open)}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <PopoverTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Paintbrush className="w-4 h-4" />
+                                    </Button>
+                                </PopoverTrigger>
+                            </TooltipTrigger>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>背景颜色</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <PopoverContent
+                            className="w-48 p-3"
+                            align="start"
+                            side="bottom"
+                            sideOffset={5}
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <div className="space-y-2">
+                                <div className="text-sm font-medium">背景颜色</div>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {colorOptions.map((color) => (
+                                        <button
+                                            key={color.value}
+                                            className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600 hover:scale-110 transition-transform"
+                                            style={{ backgroundColor: color.value }}
+                                            onClick={() => {
+                                                handleColorChange(color.value, 'background');
+                                                handleMenuChange('backgroundColor', false);
+                                            }}
+                                            title={color.name}
+                                        />
+                                    ))}
                                 </div>
-                            </PopoverContent>
-                        </Popover>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
 
-                        {/* 分隔线 */}
-                        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+                    {/* 分隔线 */}
+                    <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
 
-                        {/* 其他功能按钮 */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => setShowLinkDialog(true)}
-                                >
-                                    <LinkIcon className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入链接</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* 图片选择器 */}
-                        <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
-                                            <ImageIcon className="w-4 h-4" />
-                                        </Button>
-                                    </DropdownMenuTrigger>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>插入图片</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <DropdownMenuContent
-                                className="w-auto min-w-[120px]"
-                                style={{
-                                    zIndex: getMenuZIndex(),
-                                }}
+                    {/* 其他功能按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => setShowLinkDialog(true)}
                             >
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowCloudImageDialog(true); handleMenuChange('image', false); }}>
-                                    <Cloud className="w-3 h-3 mr-2" />
-                                    从云端选择
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLocalImageSelect(); handleMenuChange('image', false); }}>
-                                    <HardDrive className="w-3 h-3 mr-2" />
-                                    从本地选择
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                <LinkIcon className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>插入链接</p>
+                        </TooltipContent>
+                    </Tooltip>
 
+                    {/* 图片选择器 */}
+                    <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => setShowLatexSelector(true)}
-                                >
-                                    <Sigma className="w-4 h-4" />
-                                </Button>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <ImageIcon className="w-4 h-4" />
+                                    </Button>
+                                </DropdownMenuTrigger>
                             </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入公式</p>
+                            <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                                style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                                <p>插入图片</p>
                             </TooltipContent>
                         </Tooltip>
+                        <DropdownMenuContent
+                            className="w-auto min-w-[120px]"
+                            style={{
+                                zIndex: getMenuZIndex(),
+                            }}
+                        >
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowCloudImageDialog(true); handleMenuChange('image', false); }}>
+                                <Cloud className="w-3 h-3 mr-2" />
+                                从云端选择
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLocalImageSelect(); handleMenuChange('image', false); }}>
+                                <HardDrive className="w-3 h-3 mr-2" />
+                                从本地选择
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                    </div>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={() => setShowLatexSelector(true)}
+                            >
+                                <Sigma className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>插入公式</p>
+                        </TooltipContent>
+                    </Tooltip>
 
-                    {/* 右侧按钮组 */}
-                    <div className="flex items-center gap-1">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={cn(
-                                        TOOLBAR_BUTTON_CLASSES,
-                                        isSplitPreview && "bg-gray-200 dark:bg-gray-700"
-                                    )}
-                                    onClick={handleSplitPreviewToggle}
-                                >
-                                    <Columns2 className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>分屏预览</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        {/* 全屏按钮 */}
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={handleFullscreenToggle}
-                                >
-                                    {isFullscreen ? (
-                                        <Minimize2 className="w-4 h-4" />
-                                    ) : (
-                                        <Fullscreen className="w-4 h-4" />
-                                    )}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{isFullscreen ? '退出全屏' : '全屏输入'}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
                 </div>
 
-                {/* 编辑器内容区域 */}
-                {isSplitPreview ? (
-                    <div className="flex flex-row h-full" style={{
-                        minHeight: isFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
-                        maxHeight: isFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
-                    }}>
-                        {/* 左侧编辑器 */}
-                        <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
-                            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                编辑
-                            </div>
-                            <div
-                                ref={editorRef}
-                                className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                                contentEditable
-                                suppressContentEditableWarning
-                                data-placeholder={placeholder}
-                                onInput={handleInput}
-                                onKeyDown={handleKeyDown}
-                                onClick={handleEditorClick}
-                            />
+                {/* 右侧按钮组 */}
+                <div className="flex items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={cn(
+                                    TOOLBAR_BUTTON_CLASSES,
+                                    isSplitPreview && "bg-gray-200 dark:bg-gray-700"
+                                )}
+                                onClick={handleSplitPreviewToggle}
+                            >
+                                <Columns2 className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>分屏预览</p>
+                        </TooltipContent>
+                    </Tooltip>
+
+                    {/* 全屏按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={handleFullscreenToggle}
+                            >
+                                {actualIsFullscreen ? (
+                                    <Minimize2 className="w-4 h-4" />
+                                ) : (
+                                    <Fullscreen className="w-4 h-4" />
+                                )}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>{actualIsFullscreen ? '退出全屏' : '全屏输入'}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </div>
+
+            {/* 编辑器内容区域 */}
+            {isSplitPreview ? (
+                <div className="flex flex-row h-full" style={{
+                    minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
+                    maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
+                }}>
+                    {/* 左侧编辑器 */}
+                    <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
+                        <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                            编辑
                         </div>
-                        {/* 右侧预览 */}
-                        <div className="flex-1 flex flex-col">
-                            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                预览
-                            </div>
-                            <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
-                                <HtmlRenderer content={content} />
-                            </div>
+                        <div
+                            ref={editorRef}
+                            className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                            contentEditable
+                            suppressContentEditableWarning
+                            data-placeholder={placeholder}
+                            onInput={handleInput}
+                            onKeyDown={handleKeyDown}
+                            onClick={handleEditorClick}
+                        />
+                    </div>
+                    {/* 右侧预览 */}
+                    <div className="flex-1 flex flex-col">
+                        <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                            预览
+                        </div>
+                        <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
+                            <HtmlRenderer content={content} />
                         </div>
                     </div>
-                ) : (
-                    <div
-                        ref={editorRef}
-                        className="p-4 min-h-[300px] max-h-[800px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                        contentEditable
-                        suppressContentEditableWarning
-                        data-placeholder={placeholder}
-                        style={{
-                            minHeight: isFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
-                            maxHeight: isFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
-                        }}
-                        onInput={handleInput}
-                        onKeyDown={handleKeyDown}
-                        onClick={handleEditorClick}
-                    />
-                )}
-
-                {/* LaTeX公式选择器 */}
-                <LatexFormulaSelector
-                    open={showLatexSelector}
-                    onOpenChange={(open) => setShowLatexSelector(open)}
-                    onInsert={handleLatexInsert}
-                    isInFullscreen={isFullscreen}
+                </div>
+            ) : (
+                <div
+                    ref={editorRef}
+                    className="p-4 min-h-[300px] max-h-[800px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                    contentEditable
+                    suppressContentEditableWarning
+                    data-placeholder={placeholder}
+                    style={{
+                        minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
+                        maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
+                    }}
+                    onInput={handleInput}
+                    onKeyDown={handleKeyDown}
+                    onClick={handleEditorClick}
                 />
+            )}
 
-                {/* 云端图片选择抽屉 */}
-                <SupabaseImageSelectorDrawer
-                    open={showCloudImageDialog}
-                    onOpenChange={(open) => setShowCloudImageDialog(open)}
-                    onImageSelected={handleImageSelect}
-                    trigger={<div />}
-                    isInFullscreen={isFullscreen}
-                />
+            {/* LaTeX公式选择器 */}
+            <LatexFormulaSelector
+                open={showLatexSelector}
+                onOpenChange={(open) => setShowLatexSelector(open)}
+                onInsert={handleLatexInsert}
+                isInFullscreen={actualIsFullscreen}
+            />
 
-                {/* 链接输入对话框 */}
-                <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
-                    <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                            <DialogTitle>插入链接</DialogTitle>
-                            <DialogDescription>
-                                请输入链接地址和显示文本
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="linkUrl" className="text-right">
-                                    链接地址
-                                </Label>
-                                <Input
-                                    id="linkUrl"
-                                    value={linkUrl}
-                                    onChange={(e) => setLinkUrl(e.target.value)}
-                                    className="col-span-3"
-                                    placeholder="https://example.com"
-                                />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="linkText" className="text-right">
-                                    显示文本
-                                </Label>
-                                <Input
-                                    id="linkText"
-                                    value={linkText}
-                                    onChange={(e) => setLinkText(e.target.value)}
-                                    className="col-span-3"
-                                    placeholder="链接文本"
-                                />
-                            </div>
+            {/* 云端图片选择抽屉 */}
+            <SupabaseImageSelectorDrawer
+                open={showCloudImageDialog}
+                onOpenChange={(open) => setShowCloudImageDialog(open)}
+                onImageSelected={handleImageSelect}
+                trigger={<div />}
+                isInFullscreen={actualIsFullscreen}
+            />
+
+            {/* 链接输入对话框 */}
+            <Dialog open={showLinkDialog} onOpenChange={setShowLinkDialog}>
+                <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                        <DialogTitle>插入链接</DialogTitle>
+                        <DialogDescription>
+                            请输入链接地址和显示文本
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="linkUrl" className="text-right">
+                                链接地址
+                            </Label>
+                            <Input
+                                id="linkUrl"
+                                value={linkUrl}
+                                onChange={(e) => setLinkUrl(e.target.value)}
+                                className="col-span-3"
+                                placeholder="https://example.com"
+                            />
                         </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
-                                取消
-                            </Button>
-                            <Button onClick={handleLinkInsert} disabled={!linkUrl}>
-                                插入链接
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="linkText" className="text-right">
+                                显示文本
+                            </Label>
+                            <Input
+                                id="linkText"
+                                value={linkText}
+                                onChange={(e) => setLinkText(e.target.value)}
+                                className="col-span-3"
+                                placeholder="链接文本"
+                            />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                            取消
+                        </Button>
+                        <Button onClick={handleLinkInsert} disabled={!linkUrl}>
+                            插入链接
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
-                {/* 样式 */}
-                <style jsx>{`
+            {/* 样式 */}
+            <style jsx>{`
                     .unified-editor-wrapper [contenteditable]:empty::before {
                         content: attr(data-placeholder);
                         color: #9CA3AF;
@@ -942,8 +1008,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         background-color: #374151;
                     }
                 `}</style>
-            </div>
-        </TooltipProvider>
+        </div>
     );
 };
 
