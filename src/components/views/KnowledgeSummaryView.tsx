@@ -361,16 +361,13 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
 
     // 处理全屏模式变化
     const handleFullscreenModeChange = (isFullscreen: boolean) => {
-        console.log('handleFullscreenModeChange called with:', isFullscreen);
         setIsFullscreenMode(isFullscreen);
         if (isFullscreen) {
             // 关闭抽屉，打开全屏Dialog
-            console.log('Switching to fullscreen dialog');
             setEditDialogOpen(false);
             setFullscreenDialogOpen(true);
         } else {
             // 关闭全屏Dialog，重新打开抽屉
-            console.log('Switching back to drawer');
             setFullscreenDialogOpen(false);
             setEditDialogOpen(true);
         }
@@ -678,7 +675,14 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                     }
                 }}
             >
-                <DrawerContent className="h-[95vh]">
+                <DrawerContent
+                    className="h-screen max-h-screen"
+                    style={{
+                        top: 0,
+                        height: '100vh',
+                        maxHeight: '100vh'
+                    }}
+                >
                     <DrawerHeader className="relative">
                         <DrawerTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</DrawerTitle>
                         {editError && (

@@ -96,7 +96,7 @@ function TooltipProvider({
   id,
   openDelay = 700,
   closeDelay = 300,
-  transition = { type: 'spring', stiffness: 300, damping: 35 },
+  transition = { type: 'spring', stiffness: 300, damping: 40, mass: 0.8 },
 }: TooltipProviderProps) {
   const globalId = React.useId();
   const [currentTooltip, setCurrentTooltip] =
@@ -322,18 +322,24 @@ function TooltipOverlay() {
                       ? { opacity: 1, scale: 1, x: 0, y: 0 }
                       : {
                         opacity: 0,
-                        scale: 0,
-                        ...initialFromSide(rendered.data.side),
+                        scale: 0.95,
+                        x: 0,
+                        y: 0,
                       }
                   }
                   exit={{
                     opacity: 0,
-                    scale: 0,
-                    ...initialFromSide(rendered.data.side),
+                    scale: 0.95,
+                    x: 0,
+                    y: 0,
                   }}
                   onAnimationComplete={() => {
-                    if (!rendered.open)
-                      setRendered({ data: null, open: false });
+                    if (!rendered.open) {
+                      // 延迟一点时间再清理状态，避免动画结束时立即重新渲染
+                      setTimeout(() => {
+                        setRendered({ data: null, open: false });
+                      }, 50);
+                    }
                   }}
                   transition={transition}
                   {...rendered.data.contentProps}

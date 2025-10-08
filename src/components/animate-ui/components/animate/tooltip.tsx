@@ -51,7 +51,7 @@ function TooltipContent({
       )}
       {...props}
     >
-      <motion.div className="overflow-hidden px-3 py-1.5 text-xs text-balance unselectable">
+      <motion.div className="overflow-hidden px-3 py-1.5 text-xs text-balance unselectable flex items-center justify-center">
         <motion.div layout={layout}>{children}</motion.div>
       </motion.div>
       <TooltipArrowPrimitive

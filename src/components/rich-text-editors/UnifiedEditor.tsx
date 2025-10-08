@@ -30,11 +30,11 @@ import {
     Link as LinkIcon,
     Image as ImageIcon,
     Sigma,
-    Eye,
     Fullscreen,
     Minimize2,
     Heading,
-    X
+    X,
+    Columns2
 } from 'lucide-react';
 import { getZIndex } from '@/lib/zIndexConfig';
 import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
@@ -49,11 +49,6 @@ interface UnifiedEditorProps {
     customMinHeight?: string;
     customMaxHeight?: string;
     isInDialog?: boolean;
-    previewContent?: string;
-    isPreviewMode?: boolean;
-    onPreviewModeChange?: (isPreviewMode: boolean) => void;
-    onFullscreenToggle?: (isFullscreen: boolean) => void;
-    disableInternalFullscreen?: boolean; // 禁用内部全屏模式，只使用外部回调
 }
 
 const TOOLBAR_BUTTON_CLASSES = "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive select-none gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-[#303030] hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
@@ -80,12 +75,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     className,
     customMinHeight = '200px',
     customMaxHeight = '600px',
-    isInDialog = false,
-    previewContent,
-    isPreviewMode = false,
-    onPreviewModeChange,
-    onFullscreenToggle,
-    disableInternalFullscreen = false
+    isInDialog = false
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -97,6 +87,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [showLinkDialog, setShowLinkDialog] = useState(false);
     const [linkUrl, setLinkUrl] = useState('');
     const [linkText, setLinkText] = useState('');
+    const [isSplitPreview, setIsSplitPreview] = useState(false);
 
     // 检查当前选中的格式
     const checkActiveFormats = useCallback(() => {
@@ -222,32 +213,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setOpenMenus(prev => ({ ...prev, [menu]: open }));
     }, []);
 
-    // 处理预览模式切换
-    const handlePreviewToggle = useCallback(() => {
-        if (onPreviewModeChange) {
-            onPreviewModeChange(!isPreviewMode);
-        }
-    }, [isPreviewMode, onPreviewModeChange]);
+
+    // 处理分屏预览切换
+    const handleSplitPreviewToggle = useCallback(() => {
+        const newSplitPreview = !isSplitPreview;
+        setIsSplitPreview(newSplitPreview);
+    }, [isSplitPreview]);
 
     // 处理全屏切换
     const handleFullscreenToggle = useCallback(() => {
-        if (disableInternalFullscreen) {
-            // 如果禁用内部全屏，直接调用外部回调
-            console.log('UnifiedEditor: disableInternalFullscreen is true, calling external callback');
-            onFullscreenToggle?.(true);
-            return;
-        }
-
-        const newFullscreenState = !isFullscreen;
-        console.log('UnifiedEditor: handleFullscreenToggle called, new state:', newFullscreenState);
-        setIsFullscreen(newFullscreenState);
-        if (onFullscreenToggle) {
-            console.log('UnifiedEditor: calling onFullscreenToggle with:', newFullscreenState);
-            onFullscreenToggle(newFullscreenState);
-        } else {
-            console.log('UnifiedEditor: onFullscreenToggle is not provided');
-        }
-    }, [isFullscreen, onFullscreenToggle, disableInternalFullscreen]);
+        setIsFullscreen(!isFullscreen);
+    }, [isFullscreen]);
 
     // 处理链接插入
     const handleLinkInsert = useCallback(() => {
@@ -385,7 +361,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         <TooltipProvider>
             <div className={cn(
                 "unified-editor-wrapper",
-                !disableInternalFullscreen && isFullscreen && "fixed inset-0 z-50 bg-background",
+                isFullscreen && "fixed inset-0 z-50 bg-background",
                 className
             )}>
                 {/* 工具栏 */}
@@ -397,7 +373,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => handleFormatCommand('bold')}
                                     disabled={!hasSelectedText}
@@ -415,7 +390,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => handleFormatCommand('italic')}
                                     disabled={!hasSelectedText}
@@ -433,7 +407,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => handleFormatCommand('underline')}
                                     disabled={!hasSelectedText}
@@ -451,7 +424,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => handleFormatCommand('strikeThrough')}
                                     disabled={!hasSelectedText}
@@ -472,7 +444,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
                                             <Heading className="w-4 h-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -516,7 +488,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
                                             <List className="w-4 h-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -550,7 +522,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
                                             <AlignLeft className="w-4 h-4" />
                                         </Button>
                                     </DropdownMenuTrigger>
@@ -592,7 +564,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
                                             <Type className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -635,7 +607,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <PopoverTrigger asChild>
-                                        <Button type="button" variant="ghost" size="sm" className={TOOLBAR_BUTTON_CLASSES}>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
                                             <Paintbrush className="w-4 h-4" />
                                         </Button>
                                     </PopoverTrigger>
@@ -682,7 +654,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => setShowLinkDialog(true)}
                                 >
@@ -699,7 +670,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => setShowCloudImageDialog(true)}
                                 >
@@ -716,7 +686,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={() => setShowLatexSelector(true)}
                                 >
@@ -733,15 +702,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={handlePreviewToggle}
+                                    className={cn(
+                                        TOOLBAR_BUTTON_CLASSES,
+                                        isSplitPreview && "bg-gray-200 dark:bg-gray-700"
+                                    )}
+                                    onClick={handleSplitPreviewToggle}
                                 >
-                                    <Eye className="w-4 h-4" />
+                                    <Columns2 className="w-4 h-4" />
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                                <p>预览模式</p>
+                                <p>分屏预览</p>
                             </TooltipContent>
                         </Tooltip>
 
@@ -751,7 +722,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 <Button
                                     type="button"
                                     variant="ghost"
-                                    size="sm"
                                     className={TOOLBAR_BUTTON_CLASSES}
                                     onClick={handleFullscreenToggle}
                                 >
@@ -770,9 +740,36 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 </div>
 
                 {/* 编辑器内容区域 */}
-                {isPreviewMode ? (
-                    <div className="p-4 min-h-[200px] max-h-[600px] overflow-y-auto bg-white dark:bg-[#303030]">
-                        <HtmlRenderer content={previewContent || content} />
+                {isSplitPreview ? (
+                    <div className="flex flex-row h-full" style={{
+                        minHeight: isFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
+                        maxHeight: isFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
+                    }}>
+                        {/* 左侧编辑器 */}
+                        <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
+                            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                编辑
+                            </div>
+                            <div
+                                ref={editorRef}
+                                className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                                contentEditable
+                                suppressContentEditableWarning
+                                data-placeholder={placeholder}
+                                onInput={handleInput}
+                                onKeyDown={handleKeyDown}
+                                onClick={handleEditorClick}
+                            />
+                        </div>
+                        {/* 右侧预览 */}
+                        <div className="flex-1 flex flex-col">
+                            <div className="p-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                预览
+                            </div>
+                            <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
+                                <HtmlRenderer content={content} />
+                            </div>
+                        </div>
                     </div>
                 ) : (
                     <div
