@@ -46,16 +46,31 @@ function TooltipContent({
   return (
     <TooltipContentPrimitive
       className={cn(
-        'z-[var(--z-tooltip)] w-fit bg-primary text-primary-foreground rounded-md unselectable',
+        'z-50 w-fit bg-primary text-primary-foreground rounded-md',
         className,
       )}
       {...props}
     >
-      <motion.div className="overflow-hidden px-3 py-1.5 text-xs text-balance unselectable flex items-center justify-center">
-        <motion.div layout={layout}>{children}</motion.div>
+      <motion.div
+        className="overflow-hidden px-3 py-1.5 text-xs text-balance flex items-center justify-center"
+        style={{
+          transition: 'none !important',
+          transform: 'translateZ(0)',
+          willChange: 'transform, opacity'
+        }}
+      >
+        <motion.div
+          layout={layout}
+          style={{
+            transition: 'none !important',
+            transform: 'translateZ(0)'
+          }}
+        >
+          {children}
+        </motion.div>
       </motion.div>
       <TooltipArrowPrimitive
-        className="fill-primary size-3 data-[side='bottom']:translate-y-[1px] data-[side='right']:translate-x-[1px] data-[side='left']:translate-x-[-1px] data-[side='top']:translate-y-[-1px] unselectable"
+        className="fill-primary size-3 data-[side='bottom']:translate-y-[1px] data-[side='right']:translate-x-[1px] data-[side='left']:translate-x-[-1px] data-[side='top']:translate-y-[-1px]"
         tipRadius={2}
       />
     </TooltipContentPrimitive>

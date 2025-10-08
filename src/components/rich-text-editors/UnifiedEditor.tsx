@@ -34,7 +34,10 @@ import {
     Minimize2,
     Heading,
     X,
-    Columns2
+    Columns2,
+    Upload,
+    Cloud,
+    HardDrive
 } from 'lucide-react';
 import { getZIndex } from '@/lib/zIndexConfig';
 import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
@@ -73,8 +76,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     onChange,
     placeholder = '开始输入...',
     className,
-    customMinHeight = '200px',
-    customMaxHeight = '600px',
+    customMinHeight = '300px',
+    customMaxHeight = '800px',
     isInDialog = false
 }) => {
     const editorRef = useRef<HTMLDivElement>(null);
@@ -308,6 +311,45 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setShowCloudImageDialog(false);
     }, [onChange]);
 
+    // 处理本地图片选择
+    const handleLocalImageSelect = useCallback(() => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (!editorRef.current) return;
+
+                    const selection = window.getSelection();
+                    if (selection && selection.rangeCount > 0) {
+                        const range = selection.getRangeAt(0);
+                        const img = document.createElement('img');
+                        img.src = e.target?.result as string;
+                        img.alt = '图片';
+                        img.style.maxWidth = '100%';
+                        img.style.height = 'auto';
+
+                        try {
+                            range.deleteContents();
+                            range.insertNode(img);
+                            selection.removeAllRanges();
+                        } catch (error) {
+                            console.error('图片插入失败:', error);
+                        }
+                    }
+
+                    const html = editorRef.current.innerHTML;
+                    onChange(html);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }, [onChange]);
+
     // 监听选择变化
     useEffect(() => {
         const handleSelectionChange = () => {
@@ -365,7 +407,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 className
             )}>
                 {/* 工具栏 */}
-                <div className="flex flex-wrap items-center gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
+                <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-gray-800 sticky top-0 z-10">
                     <div className="flex items-center gap-1">
                         {/* 基础格式化按钮 */}
                         <Tooltip>
@@ -450,7 +492,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                     </DropdownMenuTrigger>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                    <p>选择标题级别</p>
+                                    <p>标题级别</p>
                                 </TooltipContent>
                             </Tooltip>
                             <DropdownMenuContent
@@ -513,9 +555,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
-
-                        {/* 分隔线 */}
-                        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
 
                         {/* 对齐方式选择器 */}
                         <DropdownMenu open={openMenus.align} onOpenChange={(open) => handleMenuChange('align', open)}>
@@ -665,21 +704,36 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    className={TOOLBAR_BUTTON_CLASSES}
-                                    onClick={() => setShowCloudImageDialog(true)}
-                                >
-                                    <ImageIcon className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>插入图片</p>
-                            </TooltipContent>
-                        </Tooltip>
+                        {/* 图片选择器 */}
+                        <DropdownMenu open={openMenus.image} onOpenChange={(open) => handleMenuChange('image', open)}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button type="button" variant="ghost" className={TOOLBAR_BUTTON_CLASSES}>
+                                            <ImageIcon className="w-4 h-4" />
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>插入图片</p>
+                                </TooltipContent>
+                            </Tooltip>
+                            <DropdownMenuContent
+                                className="w-auto min-w-[120px]"
+                                style={{
+                                    zIndex: getMenuZIndex(),
+                                }}
+                            >
+                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowCloudImageDialog(true); handleMenuChange('image', false); }}>
+                                    <Cloud className="w-3 h-3 mr-2" />
+                                    从云端选择
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLocalImageSelect(); handleMenuChange('image', false); }}>
+                                    <HardDrive className="w-3 h-3 mr-2" />
+                                    从本地选择
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -697,6 +751,10 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                             </TooltipContent>
                         </Tooltip>
 
+                    </div>
+
+                    {/* 右侧按钮组 */}
+                    <div className="flex items-center gap-1">
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <Button
@@ -774,7 +832,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 ) : (
                     <div
                         ref={editorRef}
-                        className="p-4 min-h-[200px] max-h-[600px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                        className="p-4 min-h-[300px] max-h-[800px] overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
                         contentEditable
                         suppressContentEditableWarning
                         data-placeholder={placeholder}

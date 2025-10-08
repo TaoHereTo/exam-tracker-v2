@@ -419,8 +419,8 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     };
 
     // 编辑器高度设置
-    const editorMinHeight = "300px";
-    const editorMaxHeight = "600px";
+    const editorMinHeight = "400px";
+    const editorMaxHeight = "900px";
 
     return (
       <div className="rich-text-editor-wrapper">

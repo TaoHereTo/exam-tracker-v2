@@ -1059,8 +1059,8 @@ export default function NotesView() {
                                     })}
                                     placeholder="开始编写你的笔记..."
                                     className="h-full"
-                                    customMinHeight="500px"
-                                    customMaxHeight="800px"
+                                    customMinHeight="400px"
+                                    customMaxHeight="900px"
                                 />
                             </div>
                         </>
