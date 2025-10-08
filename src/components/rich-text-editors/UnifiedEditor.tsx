@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -43,6 +44,7 @@ import { getZIndex } from '@/lib/zIndexConfig';
 import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
 import { SupabaseImageSelectorDrawer } from '@/components/ui/SupabaseImageSelectorDrawer';
 import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
+import Image from 'next/image';
 
 interface UnifiedEditorProps {
     content: string;
@@ -95,37 +97,75 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         console.log('UnifiedEditor: Dialog mode active, tooltip z-index set to 1000');
     }
 
-    // 修复 tooltip 显示问题
+    // 修复 tooltip 显示问题 - 优化性能版本
     useEffect(() => {
+        const processedTooltips = new WeakSet();
+
+        const fixTooltip = (tooltip: Element) => {
+            // 避免重复处理同一个 tooltip
+            if (processedTooltips.has(tooltip)) return;
+
+            const tooltipElement = tooltip as HTMLElement;
+            const parentElement = tooltip.parentElement as HTMLElement;
+
+            if (actualIsFullscreen) {
+                // 全屏模式：确保 tooltip 有足够高的 z-index
+                tooltipElement.style.setProperty('z-index', '50000', 'important');
+                if (parentElement) {
+                    parentElement.style.setProperty('z-index', '50001', 'important');
+                }
+            } else if (isInDialog) {
+                // 非全屏 Dialog 模式：确保 tooltip 有足够高的 z-index
+                tooltipElement.style.setProperty('z-index', '1000', 'important');
+                if (parentElement) {
+                    parentElement.style.setProperty('z-index', '1001', 'important');
+                }
+            }
+
+            processedTooltips.add(tooltip);
+        };
+
         const fixTooltips = () => {
             const tooltips = document.querySelectorAll('[data-slot="tooltip-content"]');
-            if (tooltips.length > 0) {
-                tooltips.forEach((tooltip) => {
-                    if (actualIsFullscreen) {
-                        // 全屏模式：确保 tooltip 有足够高的 z-index
-                        (tooltip as HTMLElement).style.setProperty('z-index', '50000', 'important');
-                        if (tooltip.parentElement) {
-                            (tooltip.parentElement as HTMLElement).style.setProperty('z-index', '50001', 'important');
-                        }
-                    } else if (isInDialog) {
-                        // 非全屏 Dialog 模式：确保 tooltip 有足够高的 z-index
-                        (tooltip as HTMLElement).style.setProperty('z-index', '1000', 'important');
-                        if (tooltip.parentElement) {
-                            (tooltip.parentElement as HTMLElement).style.setProperty('z-index', '1001', 'important');
-                        }
-                    }
-                });
-            }
+            tooltips.forEach(fixTooltip);
         };
 
         // 立即执行一次
         fixTooltips();
 
-        // 设置定时器持续检查
-        const interval = setInterval(fixTooltips, 100);
+        // 使用 MutationObserver 监听 DOM 变化，只在 tooltip 出现时修复
+        const observer = new MutationObserver((mutations) => {
+            let hasNewTooltips = false;
+
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            const element = node as Element;
+                            if (element.hasAttribute('data-slot') && element.getAttribute('data-slot') === 'tooltip-content') {
+                                hasNewTooltips = true;
+                                fixTooltip(element);
+                            }
+                            // 检查子元素
+                            const childTooltips = element.querySelectorAll('[data-slot="tooltip-content"]');
+                            if (childTooltips.length > 0) {
+                                hasNewTooltips = true;
+                                childTooltips.forEach(fixTooltip);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        // 开始观察
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
 
         return () => {
-            clearInterval(interval);
+            observer.disconnect();
         };
     }, [actualIsFullscreen, isInDialog]);
     const [activeFormats, setActiveFormats] = useState<Record<string, boolean>>({});
@@ -137,6 +177,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [linkUrl, setLinkUrl] = useState('');
     const [linkText, setLinkText] = useState('');
     const [isSplitPreview, setIsSplitPreview] = useState(false);
+    const [attachedImage, setAttachedImage] = useState<{ src: string; alt: string; type: 'local' | 'cloud' } | null>(null);
 
     // 检查当前选中的格式
     const checkActiveFormats = useCallback(() => {
@@ -332,30 +373,15 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 处理图片选择
     const handleImageSelect = useCallback((imageId: string) => {
-        if (!editorRef.current) return;
-
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            const img = document.createElement('img');
-            img.src = `/api/image/${imageId}`;
-            img.alt = '图片';
-            img.style.maxWidth = '100%';
-            img.style.height = 'auto';
-
-            try {
-                range.deleteContents();
-                range.insertNode(img);
-                selection.removeAllRanges();
-            } catch (error) {
-                console.error('图片插入失败:', error);
-            }
-        }
-
-        const html = editorRef.current.innerHTML;
-        onChange(html);
+        // 检查是否已经有图片，如果有则替换
+        const imageSrc = `/api/image/${imageId}`;
+        setAttachedImage({
+            src: imageSrc,
+            alt: '图片',
+            type: 'cloud'
+        });
         setShowCloudImageDialog(false);
-    }, [onChange]);
+    }, []);
 
     // 处理本地图片选择
     const handleLocalImageSelect = useCallback(() => {
@@ -367,34 +393,23 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    if (!editorRef.current) return;
-
-                    const selection = window.getSelection();
-                    if (selection && selection.rangeCount > 0) {
-                        const range = selection.getRangeAt(0);
-                        const img = document.createElement('img');
-                        img.src = e.target?.result as string;
-                        img.alt = '图片';
-                        img.style.maxWidth = '100%';
-                        img.style.height = 'auto';
-
-                        try {
-                            range.deleteContents();
-                            range.insertNode(img);
-                            selection.removeAllRanges();
-                        } catch (error) {
-                            console.error('图片插入失败:', error);
-                        }
-                    }
-
-                    const html = editorRef.current.innerHTML;
-                    onChange(html);
+                    const imageSrc = e.target?.result as string;
+                    setAttachedImage({
+                        src: imageSrc,
+                        alt: '图片',
+                        type: 'local'
+                    });
                 };
                 reader.readAsDataURL(file);
             }
         };
         input.click();
-    }, [onChange]);
+    }, []);
+
+    // 删除图片
+    const handleRemoveImage = useCallback(() => {
+        setAttachedImage(null);
+    }, []);
 
     // 监听选择变化
     useEffect(() => {
@@ -787,13 +802,37 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 zIndex: getMenuZIndex(),
                             }}
                         >
-                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowCloudImageDialog(true); handleMenuChange('image', false); }}>
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (attachedImage) {
+                                        // 如果已有图片，替换现有图片
+                                        setShowCloudImageDialog(true);
+                                    } else {
+                                        setShowCloudImageDialog(true);
+                                    }
+                                    handleMenuChange('image', false);
+                                }}
+                            >
                                 <Cloud className="w-3 h-3 mr-2" />
-                                从云端选择
+                                {attachedImage ? '替换云端图片' : '从云端选择'}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleLocalImageSelect(); handleMenuChange('image', false); }}>
+                            <DropdownMenuItem
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    if (attachedImage) {
+                                        // 如果已有图片，替换现有图片
+                                        handleLocalImageSelect();
+                                    } else {
+                                        handleLocalImageSelect();
+                                    }
+                                    handleMenuChange('image', false);
+                                }}
+                            >
                                 <HardDrive className="w-3 h-3 mr-2" />
-                                从本地选择
+                                {attachedImage ? '替换本地图片' : '从本地选择'}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -974,6 +1013,45 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* 图片附件区域 */}
+            {attachedImage && (
+                <div className="mt-4">
+                    <Accordion type="single" collapsible defaultValue="image">
+                        <AccordionItem value="image">
+                            <AccordionTrigger className="text-sm font-medium">
+                                <div className="flex items-center gap-2">
+                                    <ImageIcon className="w-4 h-4" />
+                                    附加图片
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="relative group">
+                                    <div className="w-full max-w-md mx-auto rounded-lg shadow-sm border overflow-hidden" style={{ maxHeight: '300px' }}>
+                                        <Image
+                                            src={attachedImage.src}
+                                            alt={attachedImage.alt}
+                                            width={400}
+                                            height={300}
+                                            className="w-full h-auto object-contain"
+                                            style={{ maxHeight: '300px' }}
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="sm"
+                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                                        onClick={handleRemoveImage}
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </Button>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                </div>
+            )}
 
             {/* 样式 */}
             <style jsx>{`

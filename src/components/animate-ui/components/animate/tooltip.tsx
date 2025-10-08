@@ -54,7 +54,6 @@ function TooltipContent({
       <motion.div
         className="overflow-hidden px-3 py-1.5 text-xs text-balance flex items-center justify-center"
         style={{
-          transition: 'none !important',
           transform: 'translateZ(0)',
           willChange: 'transform, opacity'
         }}
@@ -62,7 +61,6 @@ function TooltipContent({
         <motion.div
           layout={layout}
           style={{
-            transition: 'none !important',
             transform: 'translateZ(0)'
           }}
         >
