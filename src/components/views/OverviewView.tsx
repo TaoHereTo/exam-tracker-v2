@@ -516,7 +516,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
     const dataSummaries = generateDataSummary();
 
     return (
-        <div className="relative w-full flex flex-col items-center justify-start gap-responsive p-responsive">
+        <div className="relative w-full flex flex-col items-center justify-start gap-responsive p-responsive bg-transparent">
 
             {/* 第一行 - 前半部分数据，正向滚动 */}
             <Marquee
@@ -525,7 +525,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                 repeat={2}
             >
                 {firstRow.map((item, idx) => (
-                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] p-0 flex-shrink-0 bg-white dark:bg-transparent hover:bg-muted/50 transition-colors cursor-pointer" key={`row1-${item.title}-${idx}`}>
+                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] p-0 flex-shrink-0 bg-transparent hover:bg-muted/50 transition-colors cursor-pointer" key={`row1-${item.title}-${idx}`}>
                         <FlexCenterBoth className="h-full">
                             <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                 <FlexCenterBoth>
@@ -565,7 +565,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                 reverse={true}
             >
                 {secondRow.map((item, idx) => (
-                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] p-0 flex-shrink-0 bg-white dark:bg-transparent hover:bg-muted/50 transition-colors cursor-pointer" key={`row2-${item.title}-${idx}`}>
+                    <Card className="min-w-[120px] w-[120px] sm:min-w-[140px] sm:w-[140px] md:min-w-[220px] md:w-[220px] h-[80px] sm:h-[100px] md:h-[120px] p-0 flex-shrink-0 bg-transparent hover:bg-muted/50 transition-colors cursor-pointer" key={`row2-${item.title}-${idx}`}>
                         <FlexCenterBoth className="h-full">
                             <div className="flex flex-col items-center text-center w-full px-3 sm:px-6">
                                 <FlexCenterBoth>
@@ -598,14 +598,14 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
             </Marquee>
 
             {/* 添加渐变遮罩，就像官网例子一样 */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-background"></div>
-            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-background"></div>
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-transparent"></div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-transparent"></div>
 
             {/* 添加间距，让tabs显示在屏幕底部 */}
             <div className="h-16"></div>
 
             {/* 学习分析区域 - 放在屏幕底部 */}
-            <div className="w-full mt-16 mb-12">
+            <div className="w-full mt-16 mb-12 bg-transparent">
                 {/* 使用Animate Tabs展示分析卡片 */}
                 <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.overview}>
                     <Tabs defaultValue="data-analysis" className="w-full" themeColor={PAGE_THEME_COLORS.overview}>
@@ -623,7 +623,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                 <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
                                     <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">
                                         {/* 原有数据分析卡片 */}
-                                        <Card className="p-3 sm:p-4 bg-white dark:bg-transparent dark:border-[#262626]">
+                                        <Card className="p-3 sm:p-4 bg-transparent dark:border-[#262626]">
                                             <div className="space-y-3 sm:space-y-4">
                                                 <h3 className="font-medium text-center text-base sm:text-lg">{module.name}</h3>
 

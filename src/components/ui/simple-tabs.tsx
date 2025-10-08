@@ -101,7 +101,7 @@ export function TabsList({ className, children }: TabsListProps) {
             className={cn('relative inline-flex items-center justify-center rounded-full backdrop-blur-md border p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
             style={{
                 zIndex: 10,
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backgroundColor: 'transparent',
                 borderColor: `${themeColor || '#2A4DD0'}40`,
                 backdropFilter: 'blur(12px) saturate(180%)',
                 WebkitBackdropFilter: 'blur(12px) saturate(180%)'

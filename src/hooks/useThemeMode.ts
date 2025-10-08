@@ -16,15 +16,13 @@ export function useThemeMode() {
     const getBackgroundStyle = () => {
         if (!mounted) {
             // 服务端渲染时返回默认样式
-            return {
-                background: '#F5F4F7'
-            };
+            return {};
         }
 
         return {
             background: isDarkMode
                 ? '#161618'
-                : '#F5F4F7'
+                : undefined // 让CSS渐变生效
         };
     };
 
