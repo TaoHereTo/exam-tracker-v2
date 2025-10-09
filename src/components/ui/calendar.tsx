@@ -700,18 +700,22 @@ function DateRangePicker({
     <div className={cn("grid gap-2", className)}>
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
-          <Button
-            id="date"
-            variant="outline"
+          <button
+            type="button"
             className={cn(
-              "w-full justify-start text-left font-normal h-10 dark:bg-[#303030]",
+              "w-full flex items-center justify-start text-left font-normal border px-3 py-2 text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer rounded-md h-10 bg-white dark:bg-[#303030]",
               !dateRange && "text-muted-foreground",
               error && "border-destructive ring-destructive/20",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             disabled={disabled}
+            style={{
+              transition: 'none',
+              transform: 'none',
+              boxShadow: 'none'
+            }}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 h-4 w-4 text-muted-foreground" />
             {dateRange?.from ? (
               dateRange.to ? (
                 <>
@@ -725,7 +729,7 @@ function DateRangePicker({
             ) : (
               <span className="text-gray-400 dark:text-gray-500">{placeholder}</span>
             )}
-          </Button>
+          </button>
         </PopoverTrigger>
         <PopoverContent
           className="w-auto p-0 text-black dark:text-white z-[var(--z-dialog-popover)]"

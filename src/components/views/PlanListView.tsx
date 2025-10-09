@@ -91,7 +91,8 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
     };
 
     const handleDialogClose = () => {
-        // 只重置表单状态，不直接设置showForm，让Dialog自己处理关闭
+        // 重置表单状态并关闭对话框
+        setShowForm(false);
         setEditId(null);
         setForm({});
         setErrors({});
