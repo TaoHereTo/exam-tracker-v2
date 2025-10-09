@@ -173,6 +173,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [charCount, setCharCount] = useState(0);
     const [selectedWordCount, setSelectedWordCount] = useState(0);
     const [selectedCharCount, setSelectedCharCount] = useState(0);
+    const [isInsertingLink, setIsInsertingLink] = useState(false);
+    const [savedCursorRange, setSavedCursorRange] = useState<Range | null>(null);
 
 
 
@@ -359,111 +361,223 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setIsFullscreen(!actualIsFullscreen);
     }, [actualIsFullscreen]);
 
+    // 保存光标位置
+    const saveCursorPosition = useCallback(() => {
+        if (!editorRef.current) return;
+
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            if (editorRef.current.contains(range.startContainer)) {
+                setSavedCursorRange(range.cloneRange());
+                console.log('保存了光标位置');
+            }
+        }
+    }, []);
+
     // 处理链接插入
     const handleLinkInsert = useCallback(() => {
         if (!linkUrl) return;
-
         if (!editorRef.current) return;
+
+        console.log('开始插入链接，当前选择:', window.getSelection());
+        console.log('保存的光标位置:', savedCursorRange);
 
         // 确保编辑器获得焦点
         editorRef.current.focus();
 
-        const selection = window.getSelection();
+        // 等待焦点稳定
+        requestAnimationFrame(() => {
+            const selection = window.getSelection();
 
-        try {
-            console.log('开始插入链接，当前选择:', selection);
-            console.log('选择范围数量:', selection?.rangeCount);
-            console.log('选择是否折叠:', selection?.isCollapsed);
+            try {
+                // 设置标志，防止useEffect覆盖内容
+                setIsInsertingLink(true);
 
-            // 创建链接元素
-            const link = document.createElement('a');
-            link.href = linkUrl;
-            link.textContent = linkText || linkUrl;
-            link.target = '_blank';
-            link.rel = 'noopener noreferrer';
-            link.className = 'text-blue-600 underline hover:text-blue-800';
+                console.log('开始插入链接，当前选择:', selection);
+                console.log('选择范围数量:', selection?.rangeCount);
+                console.log('选择是否折叠:', selection?.isCollapsed);
 
-            console.log('创建的链接元素:', link);
-            console.log('链接href:', link.href);
-            console.log('链接文本:', link.textContent);
+                // 检查是否有选中的文本
+                let selectedText = '';
+                if (selection && selection.rangeCount > 0) {
+                    selectedText = selection.toString().trim();
+                    console.log('选中的文本:', selectedText);
+                }
 
-            // 使用手动方法确保在正确位置插入
-            if (selection && selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                console.log('当前范围:', range);
+                // 创建链接元素
+                const link = document.createElement('a');
+                link.href = linkUrl;
+                // 如果有选中的文本，使用选中的文本作为链接文本
+                link.textContent = selectedText || linkText || linkUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'text-blue-600 underline hover:text-blue-800';
 
-                if (!selection.isCollapsed) {
-                    // 有选中文本，将选中文本转换为链接
-                    console.log('有选中文本，替换为链接');
-                    range.deleteContents();
-                    range.insertNode(link);
+                console.log('创建的链接元素:', link);
+                console.log('链接href:', link.href);
+                console.log('链接文本:', link.textContent);
 
-                    // 将光标移到链接后面
-                    range.setStartAfter(link);
-                    range.setEndAfter(link);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                // 尝试获取有效的选择范围
+                let workingRange: Range | null = null;
+
+                // 首先尝试使用保存的光标位置
+                if (savedCursorRange && editorRef.current && editorRef.current.contains(savedCursorRange.startContainer)) {
+                    workingRange = savedCursorRange;
+                    console.log('使用保存的光标位置');
+                } else if (selection && selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    console.log('当前范围:', range);
+                    console.log('范围容器:', range.startContainer);
+                    console.log('范围是否在编辑器内:', editorRef.current?.contains(range.startContainer));
+
+                    // 检查范围是否在编辑器内
+                    if (editorRef.current && editorRef.current.contains(range.startContainer)) {
+                        workingRange = range;
+                        console.log('使用当前范围');
+                    } else {
+                        console.log('当前范围不在编辑器内，尝试重新获取');
+                        // 尝试在编辑器内容中找到一个合适的位置
+                        const textNodes = [];
+                        if (editorRef.current) {
+                            const walker = document.createTreeWalker(
+                                editorRef.current,
+                                NodeFilter.SHOW_TEXT
+                            );
+
+                            let node;
+                            while (node = walker.nextNode()) {
+                                if (node.textContent && node.textContent.trim()) {
+                                    textNodes.push(node);
+                                }
+                            }
+
+                            if (textNodes.length > 0) {
+                                // 如果有选中的文本，尝试找到包含该文本的节点
+                                if (selectedText) {
+                                    const matchingNode = textNodes.find(node =>
+                                        node.textContent?.includes(selectedText)
+                                    );
+                                    if (matchingNode) {
+                                        const textContent = matchingNode.textContent || '';
+                                        const startIndex = textContent.indexOf(selectedText);
+                                        const endIndex = startIndex + selectedText.length;
+
+                                        const newRange = document.createRange();
+                                        newRange.setStart(matchingNode, startIndex);
+                                        newRange.setEnd(matchingNode, endIndex);
+                                        workingRange = newRange;
+                                        console.log('找到包含选中文本的节点');
+                                    }
+                                }
+
+                                // 如果没有找到匹配的节点，尝试找到更合适的位置
+                                if (!workingRange) {
+                                    // 尝试找到编辑器中最接近光标位置的文本节点
+                                    // 这里我们使用一个更智能的方法：找到最中间的文本节点
+                                    const middleIndex = Math.floor(textNodes.length / 2);
+                                    const targetNode = textNodes[middleIndex];
+
+                                    if (targetNode) {
+                                        const newRange = document.createRange();
+                                        // 尝试在文本节点的中间位置插入
+                                        const textLength = targetNode.textContent?.length || 0;
+                                        const insertPosition = Math.floor(textLength / 2);
+                                        newRange.setStart(targetNode, insertPosition);
+                                        newRange.setEnd(targetNode, insertPosition);
+                                        workingRange = newRange;
+                                        console.log('使用中间文本节点的中间位置');
+                                    } else {
+                                        // 如果还是没有找到，使用最后一个文本节点的末尾
+                                        const lastTextNode = textNodes[textNodes.length - 1];
+                                        const newRange = document.createRange();
+                                        newRange.setStart(lastTextNode, lastTextNode.textContent?.length || 0);
+                                        newRange.setEnd(lastTextNode, lastTextNode.textContent?.length || 0);
+                                        workingRange = newRange;
+                                        console.log('使用最后一个文本节点的末尾');
+                                    }
+                                }
+                            } else {
+                                // 如果没有文本节点，在编辑器末尾插入
+                                if (editorRef.current) {
+                                    const newRange = document.createRange();
+                                    newRange.selectNodeContents(editorRef.current);
+                                    newRange.collapse(false);
+                                    workingRange = newRange;
+                                    console.log('没有文本节点，在编辑器末尾插入');
+                                }
+                            }
+                        }
+                    }
                 } else {
-                    // 没有选中文本，在光标位置插入链接
-                    console.log('没有选中文本，在光标位置插入链接');
+                    console.log('没有选择，使用备用方案');
+                    // 使用备用方案：在编辑器末尾插入
+                    if (editorRef.current) {
+                        const newRange = document.createRange();
+                        newRange.selectNodeContents(editorRef.current);
+                        newRange.collapse(false);
+                        workingRange = newRange;
+                    }
+                }
 
-                    // 使用insertNode方法在光标位置插入
-                    try {
-                        range.insertNode(link);
-                        console.log('insertNode成功');
-                    } catch (error) {
-                        console.log('insertNode失败，使用备用方法:', error);
-                        // 备用方法：在光标位置插入文本节点，然后替换
-                        const textNode = document.createTextNode(link.textContent || '');
-                        range.insertNode(textNode);
-                        textNode.parentNode?.replaceChild(link, textNode);
+                // 执行链接插入
+                if (workingRange) {
+                    if (selectedText && workingRange.toString().trim() === selectedText) {
+                        // 有选中文本，替换选中文本
+                        console.log('替换选中文本为链接');
+                        workingRange.deleteContents();
+                        workingRange.insertNode(link);
+                    } else {
+                        // 没有选中文本或选中文本不匹配，在光标位置插入
+                        console.log('在光标位置插入链接');
+                        workingRange.insertNode(link);
                     }
 
                     // 将光标移到链接后面
-                    range.setStartAfter(link);
-                    range.setEndAfter(link);
-                    selection.removeAllRanges();
-                    selection.addRange(range);
+                    const newRange = document.createRange();
+                    newRange.setStartAfter(link);
+                    newRange.setEndAfter(link);
+                    selection?.removeAllRanges();
+                    selection?.addRange(newRange);
 
-                    console.log('插入后是否包含链接:', editorRef.current.innerHTML.includes('<a'));
+                    // 确保链接可以点击
+                    link.style.pointerEvents = 'auto';
+                    link.style.cursor = 'pointer';
+
+                    // 添加点击事件处理
+                    link.addEventListener('click', (e) => {
+                        console.log('链接被点击:', link.href);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        window.open(link.href, '_blank', 'noopener,noreferrer');
+                    });
+
+                    console.log('链接插入成功');
                 }
-            } else {
-                // 如果没有选择，在编辑器末尾插入链接
-                console.log('没有选择，在编辑器末尾插入链接');
-                editorRef.current.appendChild(link);
+
+                // 更新内容并刷新状态
+                const html = editorRef.current?.innerHTML || '';
+                console.log('插入链接后的HTML:', html);
+                onChange(html);
+                checkActiveFormats();
+                checkSelectedText();
+
+            } catch (error) {
+                console.error('链接插入失败:', error);
+            } finally {
+                // 重置标志
+                setTimeout(() => {
+                    setIsInsertingLink(false);
+                }, 100);
             }
 
-            console.log('链接插入完成，检查编辑器内容');
-            console.log('编辑器是否包含链接:', editorRef.current.innerHTML.includes('<a'));
-
-            // 更新内容并刷新状态
-            const html = editorRef.current.innerHTML;
-            console.log('插入链接后的HTML:', html);
-            console.log('编辑器内容长度:', html.length);
-            console.log('是否包含链接:', html.includes('<a'));
-
-            onChange(html);
-            console.log('onChange已调用，新内容:', html);
-
-            // 延迟检查，确保内容更新
-            setTimeout(() => {
-                console.log('延迟检查 - 编辑器HTML:', editorRef.current?.innerHTML);
-                console.log('延迟检查 - 编辑器文本内容:', editorRef.current?.textContent);
-            }, 100);
-
-            checkActiveFormats();
-            checkSelectedText();
-
-            console.log('链接插入成功:', linkUrl, linkText);
-        } catch (error) {
-            console.error('链接插入失败:', error);
-        }
-
-        // 关闭对话框并重置状态
-        setShowLinkDialog(false);
-        setLinkUrl('');
-        setLinkText('');
-    }, [linkUrl, linkText, onChange, checkActiveFormats, checkSelectedText]);
+            // 关闭对话框并重置状态
+            setShowLinkDialog(false);
+            setLinkUrl('');
+            setLinkText('');
+            setSavedCursorRange(null);
+        });
+    }, [linkUrl, linkText, onChange, checkActiveFormats, checkSelectedText, savedCursorRange]);
 
     // 处理LaTeX插入
     const handleLatexInsert = useCallback((latex: string, displayMode: boolean) => {
@@ -607,7 +721,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 更新编辑器内容
     useEffect(() => {
-        if (editorRef.current && editorRef.current.innerHTML !== content) {
+        if (editorRef.current && editorRef.current.innerHTML !== content && !isInsertingLink) {
             console.log('useEffect更新编辑器内容:', content);
             editorRef.current.innerHTML = content;
             // 更新字数统计
@@ -615,7 +729,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             setWordCount(counts.wordCount);
             setCharCount(counts.charCount);
         }
-    }, [content, calculateWordCount]);
+    }, [content, calculateWordCount, isInsertingLink]);
 
     // 计算z-index
     const getMenuZIndex = () => {
@@ -957,7 +1071,10 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 type="button"
                                 variant="ghost"
                                 className={TOOLBAR_BUTTON_CLASSES}
-                                onClick={() => setShowLinkDialog(true)}
+                                onClick={() => {
+                                    saveCursorPosition();
+                                    setShowLinkDialog(true);
+                                }}
                             >
                                 <LinkIcon className="w-4 h-4" />
                             </Button>
