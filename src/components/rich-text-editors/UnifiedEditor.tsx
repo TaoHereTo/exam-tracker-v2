@@ -169,6 +169,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [linkUrl, setLinkUrl] = useState('');
     const [linkText, setLinkText] = useState('');
     const [isSplitPreview, setIsSplitPreview] = useState(false);
+    const [wordCount, setWordCount] = useState(0);
+    const [charCount, setCharCount] = useState(0);
 
 
 
@@ -193,13 +195,41 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setHasSelectedText(!!hasText);
     }, []);
 
+    // 计算字数统计
+    const calculateWordCount = useCallback((html: string) => {
+        // 创建一个临时div来解析HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // 获取纯文本内容
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+        // 计算字符数（包括空格）
+        const charCount = textContent.length;
+
+        // 计算字数（中文字符、英文单词、标点符号都算作字数）
+        const chineseChars = textContent.match(/[\u4e00-\u9fff]/g) || [];
+        const punctuationMarks = textContent.match(/[^\u4e00-\u9fff\s\w]/g) || [];
+        const englishWords = textContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(word => word.length > 0);
+
+        const wordCount = chineseChars.length + englishWords.length + punctuationMarks.length;
+
+        return { wordCount, charCount };
+    }, []);
+
     // 处理输入事件
     const handleInput = useCallback(() => {
         if (!editorRef.current) return;
-        onChange(editorRef.current.innerHTML);
+        const html = editorRef.current.innerHTML;
+        onChange(html);
         checkActiveFormats();
         checkSelectedText();
-    }, [onChange, checkActiveFormats, checkSelectedText]);
+
+        // 更新字数统计
+        const counts = calculateWordCount(html);
+        setWordCount(counts.wordCount);
+        setCharCount(counts.charCount);
+    }, [onChange, checkActiveFormats, checkSelectedText, calculateWordCount]);
 
     // 处理列表命令
     const handleListCommand = useCallback((command: string) => {
@@ -445,8 +475,12 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
             editorRef.current.innerHTML = content;
+            // 更新字数统计
+            const counts = calculateWordCount(content);
+            setWordCount(counts.wordCount);
+            setCharCount(counts.charCount);
         }
-    }, [content]);
+    }, [content, calculateWordCount]);
 
     // 计算z-index
     const getMenuZIndex = () => {
@@ -867,38 +901,35 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             </div>
 
             {/* 编辑器内容区域 */}
-            {isSplitPreview ? (
-                <div className="flex flex-row h-full" style={{
-                    minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
-                    maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
-                }}>
-                    {/* 左侧编辑器 */}
-                    <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col" style={{
+                minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
+                maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
+            }}>
+                {isSplitPreview ? (
+                    <div className="flex flex-row flex-1">
+                        {/* 左侧编辑器 */}
+                        <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
+                            <div className="flex-1 flex flex-col">
+                                <div
+                                    ref={editorRef}
+                                    className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    data-placeholder={placeholder}
+                                    onInput={handleInput}
+                                    onKeyDown={handleKeyDown}
+                                    onClick={handleEditorClick}
+                                />
+                            </div>
+                        </div>
+                        {/* 右侧预览 */}
                         <div className="flex-1 flex flex-col">
-                            <div
-                                ref={editorRef}
-                                className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                                contentEditable
-                                suppressContentEditableWarning
-                                data-placeholder={placeholder}
-                                onInput={handleInput}
-                                onKeyDown={handleKeyDown}
-                                onClick={handleEditorClick}
-                            />
+                            <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
+                                <HtmlRenderer content={content} />
+                            </div>
                         </div>
                     </div>
-                    {/* 右侧预览 */}
-                    <div className="flex-1 flex flex-col">
-                        <div className="flex-1 p-4 overflow-y-auto bg-white dark:bg-[#303030]">
-                            <HtmlRenderer content={content} />
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="flex flex-col" style={{
-                    minHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMinHeight,
-                    maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
-                }}>
+                ) : (
                     <div
                         ref={editorRef}
                         className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
@@ -909,8 +940,16 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         onKeyDown={handleKeyDown}
                         onClick={handleEditorClick}
                     />
+                )}
+
+                {/* 字数统计显示区域 */}
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-4">
+                        <span>字数: {wordCount}</span>
+                        <span>字符: {charCount}</span>
+                    </div>
                 </div>
-            )}
+            </div>
 
             {/* LaTeX公式选择器 */}
             <LatexFormulaSelector
