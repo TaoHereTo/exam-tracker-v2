@@ -217,7 +217,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
                     <div className="space-y-2">
-                        <h4 className="text-sm font-semibold">
+                        <h4 className="text-sm font-semibold m-0">
                             {knowledge.length > 0 ? "各模块知识点统计" : "各模块刷题记录统计"}
                         </h4>
                         <div className="grid grid-cols-2 gap-2">
@@ -245,7 +245,7 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                 <thead>
                     <tr>
                         {selectable && (
-                            <th className={`border-b px-4 py-3 text-center w-[7%] min-w-[48px] bg-[#EEEDED] dark:bg-[#303030] ${checkboxColClassName}`}>
+                            <th className={`border-b px-4 py-3 text-center w-[7%] min-w-[48px] bg-[#f5f5f5] dark:bg-[#303030] ${checkboxColClassName}`}>
                                 <div className="flex items-center justify-center h-full">
                                     <Checkbox
                                         size="sm"
@@ -262,11 +262,11 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                             </th>
                         )}
                         {columns.map(col => (
-                            <th key={col.key} className={`border-b px-4 py-3 font-medium text-left bg-[#EEEDED] dark:bg-[#303030] ${col.className || ''}`}>
+                            <th key={col.key} className={`border-b px-4 py-3 font-medium text-left bg-[#f5f5f5] dark:bg-[#303030] ${col.className || ''}`}>
                                 {typeof col.label === 'string' ? <MixedText text={col.label} /> : col.label}
                             </th>
                         ))}
-                        {renderActions && <th className="border-b px-4 py-3 text-left w-20 bg-[#EEEDED] dark:bg-[#303030]"><MixedText text="操作" /></th>}
+                        {renderActions && <th className="border-b px-4 py-3 text-left w-20 bg-[#f5f5f5] dark:bg-[#303030]"><MixedText text="操作" /></th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -314,8 +314,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                         <tr
                                             onClick={handleRowClick}
                                             className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors ${isSelected
-                                                ? 'bg-[#EEEDED] dark:bg-[#303030]'
-                                                : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
+                                                ? 'bg-[#f5f5f5] dark:bg-[#303030]'
+                                                : 'hover:bg-[#f5f5f5] dark:hover:bg-[#303030]'
                                                 }`}
                                             data-state={isSelected ? "selected" : undefined}
                                         >
@@ -367,8 +367,8 @@ export function UnifiedTable<T, K extends string | number = string | number>({
                                     key={String(key)}
                                     onClick={handleRowClick}
                                     className={`${enableRowClick ? 'cursor-pointer' : ''} transition-colors ${isSelected
-                                        ? 'bg-[#EEEDED] dark:bg-[#303030]'
-                                        : 'hover:bg-[#EEEDED] dark:hover:bg-[#303030]'
+                                        ? 'bg-[#f5f5f5] dark:bg-[#303030]'
+                                        : 'hover:bg-[#f5f5f5] dark:hover:bg-[#303030]'
                                         }`}
                                     data-state={isSelected ? "selected" : undefined}
                                 >

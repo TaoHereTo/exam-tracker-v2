@@ -607,16 +607,6 @@ export default function PlanListView({ plans, onCreate, onUpdate, onDelete, onBa
                                             <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
                                                 <MixedText text="创建一个新的学习计划开始您的学习之旅" />
                                             </p>
-                                            <Button
-                                                onClick={() => handleOpenForm()}
-                                                className="h-10 px-6 rounded-md font-medium bg-[#1d4ed8] text-white hover:bg-[#1d4ed8]/90"
-                                                variant="default"
-                                            >
-                                                <div className="button-group">
-                                                    <Plus className="w-5 h-5" />
-                                                    <MixedText text="创建第一个计划" />
-                                                </div>
-                                            </Button>
                                         </div>
                                     </div>
                                 </div>

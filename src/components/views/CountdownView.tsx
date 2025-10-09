@@ -606,16 +606,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                             <p className="text-muted-foreground mb-6 max-w-md mx-auto text-lg">
                                                 <MixedText text="点击上方的按钮，添加第一个倒计时" />
                                             </p>
-                                            <Button
-                                                onClick={() => handleOpenForm()}
-                                                className="h-10 px-6 rounded-md font-medium bg-[#db2777] text-white hover:bg-[#db2777]/90"
-                                                variant="default"
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Plus className="w-5 h-5" />
-                                                    <MixedText text="添加倒计时" />
-                                                </div>
-                                            </Button>
                                         </div>
                                     )}
                                 </div>

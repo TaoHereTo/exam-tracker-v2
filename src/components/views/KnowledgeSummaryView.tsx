@@ -678,14 +678,9 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                 }}
             >
                 <DrawerContent
-                    className="h-screen max-h-screen"
-                    style={{
-                        top: 0,
-                        height: '100vh',
-                        maxHeight: '100vh'
-                    }}
+                    className="max-h-[90vh] flex flex-col"
                 >
-                    <DrawerHeader className="relative">
+                    <DrawerHeader className="relative flex-shrink-0">
                         <DrawerTitle>{editError ? <MixedText text="错误" /> : <MixedText text="编辑知识点" />}</DrawerTitle>
                         {editError && (
                             <DrawerDescription className="text-red-500"><MixedText text={editError} /></DrawerDescription>
@@ -699,7 +694,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         )}
                     </DrawerHeader>
                     {editItem && !editError && (
-                        <div className="py-2 px-4 overflow-y-auto flex-1">
+                        <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
                             <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
                                 <ModuleForm
                                     module={editItem.module}

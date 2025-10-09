@@ -9,12 +9,12 @@ import { cn } from '@/lib/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const checkboxVariants = cva(
-  'peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 focus-visible:ring-offset-2 [&[data-state=checked],&[data-state=indeterminate]]:bg-primary [&[data-state=checked],&[data-state=indeterminate]]:text-primary-foreground',
+  'peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 focus-visible:ring-offset-2',
   {
     variants: {
       variant: {
-        default: 'bg-background border',
-        accent: 'bg-input',
+        default: 'bg-background border border-gray-300 dark:border-gray-600',
+        accent: 'bg-input border border-gray-300 dark:border-gray-600',
       },
       size: {
         default: 'size-5 rounded-sm',
@@ -54,7 +54,7 @@ function Checkbox({
 }: CheckboxProps) {
   return (
     <CheckboxPrimitive
-      className={cn(checkboxVariants({ variant, size, className }))}
+      className={cn(checkboxVariants({ variant, size }))}
       {...props}
     >
       {children}

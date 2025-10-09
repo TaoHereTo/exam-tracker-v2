@@ -112,7 +112,7 @@ export function BeautifulPagination({
                 </HoverCardTrigger>
                 <HoverCardContent className="w-80">
                     <div className="space-y-2">
-                        <h4 className="text-sm font-semibold">
+                        <h4 className="text-sm font-semibold m-0">
                             {knowledge.length > 0 ? "各模块知识点统计" : "各模块刷题记录统计"}
                         </h4>
                         <div className="grid grid-cols-2 gap-2">
