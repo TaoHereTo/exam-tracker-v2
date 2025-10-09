@@ -778,11 +778,12 @@ export class CloudSyncService {
             throw new Error('用户未登录');
         }
 
-        const [recordsCount, plansCount, knowledgeCount, countdownsCount] = await Promise.all([
+        const [recordsCount, plansCount, knowledgeCount, countdownsCount, notesCount] = await Promise.all([
             this.getRecordsCount(userId),
             this.getPlansCount(userId),
             this.getKnowledgeCount(userId),
-            this.getCountdownsCount(userId)
+            this.getCountdownsCount(userId),
+            this.getNotesCount(userId)
         ]);
 
         // 简化设置检查，如果失败就默认为 false
@@ -793,6 +794,7 @@ export class CloudSyncService {
             plans: { count: plansCount, recent: [], lastUpdated: await this.getLastUpdatedTime('plans', userId) },
             knowledge: { count: knowledgeCount, recent: [], lastUpdated: await this.getLastUpdatedTime('knowledge', userId) },
             countdowns: { count: countdownsCount, recent: [], lastUpdated: await this.getLastUpdatedTime('exam_countdowns', userId) },
+            notes: { count: notesCount, recent: [], lastUpdated: await this.getLastUpdatedTime('notes', userId) },
             settings: { hasSettings, lastUpdated: hasSettings ? await this.getLastUpdatedTime('user_settings', userId) : undefined }
         };
     }
@@ -869,6 +871,26 @@ export class CloudSyncService {
             return count || 0;
         } catch (error) {
             console.warn('获取倒计时数量异常:', error);
+            return 0;
+        }
+    }
+
+    // 获取笔记数量
+    private static async getNotesCount(userId: string): Promise<number> {
+        try {
+            const { count, error } = await supabase
+                .from('notes')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', userId)
+                .eq('is_archived', false);
+
+            if (error) {
+                console.warn('获取笔记数量失败:', error);
+                return 0;
+            }
+            return count || 0;
+        } catch (error) {
+            console.warn('获取笔记数量异常:', error);
             return 0;
         }
     }

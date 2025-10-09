@@ -1030,6 +1030,8 @@ export function UnifiedSettings({
               localPlans={plans}
               localKnowledge={knowledge}
               localCountdowns={countdowns}
+              localNotes={[]} // 暂时传递空数组，因为设置页面没有管理本地笔记数据
+              localSettings={settings}
               onClearLocalData={onClearLocalData}
             />
 

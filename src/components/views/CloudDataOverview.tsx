@@ -7,18 +7,20 @@ import {
     DrawerDescription,
 } from '@/components/ui/drawer';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { CloudSyncService } from '@/lib/cloudSyncService';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { Trash2, AlertTriangle, Cloud, HardDrive } from 'lucide-react';
+import { Trash2, AlertTriangle, Cloud, HardDrive, FileText } from 'lucide-react';
 import { CircularButton } from '@/components/ui/circular-button';
 import { CloudDataOverview as CloudDataOverviewType, ProgressCallback } from '@/types/common';
 import { MixedText } from '@/components/ui/MixedText';
 import { useToast } from '@/hooks/useToast';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/simple-tabs';
-import type { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from '@/types/record';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
+import type { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown, Note } from '@/types/record';
 
 interface CloudDataOverviewProps {
     isOpen: boolean;
@@ -27,19 +29,18 @@ interface CloudDataOverviewProps {
     localPlans?: StudyPlan[];
     localKnowledge?: KnowledgeItem[];
     localCountdowns?: ExamCountdown[];
+    localNotes?: Note[];
+    localSettings?: Record<string, unknown> | null; // 本地设置数据
     onClearLocalData?: () => void;
 }
 
-export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPlans = [], localKnowledge = [], localCountdowns = [], onClearLocalData }: CloudDataOverviewProps) {
+export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPlans = [], localKnowledge = [], localCountdowns = [], localNotes = [], localSettings = null, onClearLocalData }: CloudDataOverviewProps) {
     const [data, setData] = useState<CloudDataOverviewType | null>(null);
     const [clearing, setClearing] = useState(false);
     const [clearProgress, setClearProgress] = useState<ProgressCallback | null>(null);
     const [showClearDialog, setShowClearDialog] = useState(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [deletingModule, setDeletingModule] = useState<string | null>(null);
-    const [deleteProgress, setDeleteProgress] = useState<ProgressCallback | null>(null);
-    const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null);
     const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
     const { notify } = useNotification();
     const { showError } = useToast();
@@ -60,7 +61,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
         ]);
     };
 
-    const loadCloudData = async () => {
+    const loadCloudData = useCallback(async () => {
         if (isLoadingRef.current) return;
         isLoadingRef.current = true;
         setIsLoading(true);
@@ -92,7 +93,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             isLoadingRef.current = false;
             setIsLoading(false);
         }
-    };
+    }, [showError]);
 
     useEffect(() => {
         if (isOpen) {
@@ -103,8 +104,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             isLoadingRef.current = false;
             setIsLoading(false);
         }
-        // 仅依赖 isOpen，避免因回调 identity 变化触发重复加载
-    }, [isOpen]);
+    }, [isOpen, loadCloudData]);
 
     const handleClearCloudData = useCallback(async () => {
         setShowClearDialog(false);
@@ -141,57 +141,23 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
         }
     }, [notify, loadCloudData]);
 
-    const handleDeleteModuleData = useCallback(async (dataType: 'records' | 'plans' | 'knowledge' | 'countdowns' | 'settings') => {
-        setShowDeleteDialog(null);
-        setDeletingModule(dataType);
-        setDeleteProgress(null);
-        try {
-            const result = await CloudSyncService.clearSpecificCloudData(dataType, (progress: ProgressCallback) => {
-                setDeleteProgress(progress);
-            });
-
-            if (result.success) {
-                notify({
-                    message: "删除成功",
-                    description: result.message,
-                    type: "success"
-                });
-                await loadCloudData();
-            } else {
-                notify({
-                    message: "删除失败",
-                    description: result.message,
-                    type: "error"
-                });
-            }
-        } catch (error) {
-            notify({
-                message: "删除失败",
-                description: error instanceof Error ? error.message : "未知错误",
-                type: "error"
-            });
-        } finally {
-            setDeletingModule(null);
-            setDeleteProgress(null);
-        }
-    }, [notify, loadCloudData]);
 
     const formatDateTime = useCallback((dateString: string) => {
         return new Date(dateString).toLocaleString('zh-CN');
     }, []);
 
     const totalDataCount = useMemo(() => data ?
-        data.records.count + data.plans.count + data.knowledge.count + data.countdowns.count + (data.settings.hasSettings ? 1 : 0) : 0, [data]);
+        data.records.count + data.plans.count + data.knowledge.count + data.countdowns.count + data.notes.count + (data.settings.hasSettings ? 1 : 0) : 0, [data]);
 
-    // 本地数据统计
+    // 本地数据统计（笔记数据完全存储在云端，不计入本地统计）
     const localDataCount = useMemo(() =>
-        localRecords.length + localPlans.length + localKnowledge.length + localCountdowns.length,
-        [localRecords, localPlans, localKnowledge, localCountdowns]
+        localRecords.length + localPlans.length + localKnowledge.length + localCountdowns.length + (localSettings ? 1 : 0),
+        [localRecords, localPlans, localKnowledge, localCountdowns, localSettings]
     );
 
     // 数据项类型定义
     type DataItem = {
-        id: 'records' | 'plans' | 'knowledge' | 'countdowns' | 'settings';
+        id: 'records' | 'plans' | 'knowledge' | 'countdowns' | 'notes' | 'settings';
         name: string;
         count: number;
         lastUpdated: string | null | undefined;
@@ -237,6 +203,15 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             color: 'text-orange-600',
             bgColor: 'bg-orange-50',
             borderColor: 'border-orange-200'
+        },
+        {
+            id: 'notes',
+            name: '笔记',
+            count: data.notes.count,
+            lastUpdated: data.notes.lastUpdated,
+            color: 'text-indigo-600',
+            bgColor: 'bg-indigo-50',
+            borderColor: 'border-indigo-200'
         },
         {
             id: 'settings',
@@ -290,24 +265,40 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             color: 'text-orange-600',
             bgColor: 'bg-orange-50',
             borderColor: 'border-orange-200'
+        },
+        {
+            id: 'notes',
+            name: '笔记',
+            count: 0, // 笔记数据完全存储在云端，本地没有存储
+            lastUpdated: undefined, // 本地没有笔记数据
+            color: 'text-indigo-600',
+            bgColor: 'bg-indigo-50',
+            borderColor: 'border-indigo-200'
+        },
+        {
+            id: 'settings',
+            name: '设置',
+            count: localSettings ? 1 : 0,
+            lastUpdated: localSettings ? new Date().toISOString() : undefined,
+            color: 'text-gray-600',
+            bgColor: 'bg-gray-50',
+            borderColor: 'border-gray-200'
         }
-    ], [localRecords, localPlans, localKnowledge, localCountdowns]);
+    ], [localRecords, localPlans, localKnowledge, localCountdowns, localSettings]);
 
     return (
         <Drawer open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
             <DrawerContent className="max-h-[80vh] p-0 flex flex-col">
-                <DrawerHeader className="p-4 sm:p-6 flex-shrink-0">
-                    <DrawerTitle className="text-base sm:text-lg"><MixedText text="数据概览" /></DrawerTitle>
-                    <DrawerDescription className="text-xs sm:text-sm">
-                        查看云端和本地数据统计
-                    </DrawerDescription>
+                <DrawerHeader className="sr-only">
+                    <VisuallyHidden>
+                        <DrawerTitle>云端数据概览</DrawerTitle>
+                    </VisuallyHidden>
                 </DrawerHeader>
-
-                <div className="px-3 sm:px-4 pb-3 sm:pb-4 flex-1 overflow-y-auto">
+                <div className="px-3 sm:px-4 pt-3 sm:pt-4 pb-3 sm:pb-4 flex-1 overflow-y-auto">
 
                     <Tabs defaultValue="cloud" className="w-full">
-                        <div className="flex justify-center items-center mb-4">
-                            <TabsList className="items-center h-10">
+                        <div className="flex justify-center items-center mb-4 relative z-10">
+                            <TabsList className="items-center h-10 relative z-10">
                                 <TabsTrigger value="cloud" className="flex items-center gap-2">
                                     <Cloud className="w-4 h-4" />
                                     <MixedText text="云端数据" />
@@ -329,14 +320,21 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                     <p className="text-xs text-muted-foreground text-center">
                                         <MixedText text="如果长时间无响应，可能是网络问题" />
                                     </p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={loadCloudData}
-                                        className="mt-2"
-                                    >
-                                        <MixedText text="重试" />
-                                    </Button>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={loadCloudData}
+                                                className="mt-2"
+                                            >
+                                                <MixedText text="重试" />
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <MixedText text="重新加载云端数据" />
+                                        </TooltipContent>
+                                    </Tooltip>
                                 </div>
                             ) : loadError ? (
                                 <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-4">
@@ -357,34 +355,60 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                             )}
                                         </div>
                                         <div className="flex gap-2">
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={loadCloudData}
-                                                className="text-xs"
-                                            >
-                                                <MixedText text="重试" />
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                onClick={() => window.location.reload()}
-                                                className="text-xs"
-                                            >
-                                                <MixedText text="刷新页面" />
-                                            </Button>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={loadCloudData}
+                                                        className="text-xs"
+                                                    >
+                                                        <MixedText text="重试" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <MixedText text="重新加载云端数据" />
+                                                </TooltipContent>
+                                            </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => window.location.reload()}
+                                                        className="text-xs"
+                                                    >
+                                                        <MixedText text="刷新页面" />
+                                                    </Button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <MixedText text="刷新整个页面" />
+                                                </TooltipContent>
+                                            </Tooltip>
                                         </div>
                                     </div>
                                 </div>
                             ) : data ? (
                                 <>
                                     {/* 数据统计表格 */}
-                                    <div className="bg-white rounded-lg border border-border/50 overflow-hidden">
+                                    <div className="bg-white rounded-lg border border-border/50 overflow-hidden max-w-4xl mx-auto">
+                                        {/* 云端数据统计信息 */}
+                                        <div className="px-4 py-3 bg-green-50 dark:bg-green-900/20 border-b border-green-200 dark:border-green-800">
+                                            <div className="flex items-center gap-2">
+                                                <Cloud className="w-4 h-4 text-green-600" />
+                                                <span className="font-medium text-green-900 dark:text-green-100 text-sm">
+                                                    <MixedText text="云端数据统计" />
+                                                </span>
+                                                <span className="text-sm text-green-700 dark:text-green-300">
+                                                    <MixedText text={`共 ${totalDataCount} 项数据`} />
+                                                </span>
+                                            </div>
+                                        </div>
                                         <div className="overflow-x-auto">
                                             <table className="w-full">
                                                 <thead className="bg-muted/20">
                                                     <tr>
-                                                        <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
+                                                        <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                                                             <MixedText text="数据类型" />
                                                         </th>
                                                         <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
@@ -393,25 +417,23 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                                         <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                                                             <MixedText text="最后更新时间" />
                                                         </th>
-                                                        <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
-                                                            <MixedText text="操作" />
-                                                        </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-border/30">
                                                     {cloudDataItems.map((item) => (
                                                         <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                                                            <td className="px-4 py-4">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className={`w-4 h-4 rounded-full ${item.color.replace('text-', 'bg-')}`} />
-                                                                    <span className="font-medium text-sm">
-                                                                        <MixedText text={item.name} />
-                                                                    </span>
-                                                                </div>
+                                                            <td className="px-4 py-4 text-center">
+                                                                <span className="font-medium text-sm">
+                                                                    <MixedText text={item.name || '数据'} />
+                                                                </span>
                                                             </td>
                                                             <td className="px-4 py-4 text-center">
                                                                 <span className={`font-bold text-lg ${item.color}`}>
-                                                                    <MixedText text={item.count.toString()} />
+                                                                    {item.id === 'settings' ? (
+                                                                        <MixedText text={item.count > 0 ? "已保存" : "未保存"} />
+                                                                    ) : (
+                                                                        <MixedText text={item.count.toString()} />
+                                                                    )}
                                                                 </span>
                                                             </td>
                                                             <td className="px-4 py-4 text-center text-sm text-muted-foreground">
@@ -419,103 +441,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                                                     <MixedText text={formatDateTime(item.lastUpdated)} />
                                                                 ) : (
                                                                     <MixedText text="无数据" />
-                                                                )}
-                                                            </td>
-                                                            <td className="px-4 py-4 text-center">
-                                                                {item.count > 0 ? (
-                                                                    <>
-                                                                        <div className="flex justify-center">
-                                                                            <CircularButton
-                                                                                variant="destructive"
-                                                                                size="default"
-                                                                                disabled={deletingModule === item.id}
-                                                                                onClick={() => setShowDeleteDialog(item.id)}
-                                                                            >
-                                                                                <Trash2 className="w-4 h-4" />
-                                                                            </CircularButton>
-                                                                        </div>
-                                                                        <Dialog open={showDeleteDialog === item.id || deletingModule === item.id} onOpenChange={(open) => {
-                                                                            // 仅在关闭时清理，避免切换时重复触发
-                                                                            if (!open && !deletingModule) {
-                                                                                setShowDeleteDialog(null);
-                                                                            }
-                                                                        }}>
-                                                                            <DialogContent className="p-4 sm:p-6">
-                                                                                <DialogHeader>
-                                                                                    <DialogTitle className="text-base sm:text-lg flex items-center gap-2">
-                                                                                        <AlertTriangle className="w-5 h-5 text-destructive" />
-                                                                                        {deletingModule === item.id ? (
-                                                                                            <MixedText text={`正在删除${item.name}`} />
-                                                                                        ) : (
-                                                                                            <MixedText text={`确认删除${item.name}`} />
-                                                                                        )}
-                                                                                    </DialogTitle>
-                                                                                    {deletingModule === item.id ? (
-                                                                                        <div className="space-y-3 sm:space-y-4">
-                                                                                            <p className="text-xs sm:text-sm">
-                                                                                                <MixedText text={`正在删除${item.name}，请稍候...`} />
-                                                                                            </p>
-                                                                                            {deleteProgress && (
-                                                                                                <div className="space-y-2">
-                                                                                                    <div className="flex justify-between text-xs text-gray-600">
-                                                                                                        <span><MixedText text="删除进度" /></span>
-                                                                                                        <span><MixedText text={`${deleteProgress.current}/${deleteProgress.total}`} /></span>
-                                                                                                    </div>
-                                                                                                    <Progress
-                                                                                                        value={(deleteProgress.current / deleteProgress.total) * 100}
-                                                                                                        variant="danger"
-                                                                                                        showText={true}
-                                                                                                        className="h-2 sm:h-3"
-                                                                                                    />
-                                                                                                    <p className="text-xs sm:text-sm text-gray-600">
-                                                                                                        {deleteProgress.currentItem}
-                                                                                                    </p>
-                                                                                                </div>
-                                                                                            )}
-                                                                                        </div>
-                                                                                    ) : (
-                                                                                        <div className="text-xs sm:text-sm space-y-2">
-                                                                                            <p>
-                                                                                                <MixedText text={`确定要删除所有${item.name}数据吗？`} />
-                                                                                            </p>
-                                                                                            <p className="text-muted-foreground">
-                                                                                                <MixedText text={`将删除 ${item.count} 条${item.name}数据`} />
-                                                                                            </p>
-                                                                                            <p className="text-destructive font-medium">
-                                                                                                <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                                                                                            </p>
-                                                                                        </div>
-                                                                                    )}
-                                                                                </DialogHeader>
-                                                                                <DialogFooter className="flex-col sm:flex-row gap-2">
-                                                                                    {!deletingModule && (
-                                                                                        <>
-                                                                                            <Button
-                                                                                                variant="outline"
-                                                                                                className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                                                                                                onClick={() => setShowDeleteDialog(null)}
-                                                                                            >
-                                                                                                <MixedText text="取消" />
-                                                                                            </Button>
-                                                                                            <Button
-                                                                                                onClick={() => handleDeleteModuleData(item.id)}
-                                                                                                variant="destructive"
-                                                                                                className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                                                                                            >
-                                                                                                <MixedText text="确认删除" />
-                                                                                            </Button>
-                                                                                        </>
-                                                                                    )}
-                                                                                </DialogFooter>
-                                                                            </DialogContent>
-                                                                        </Dialog>
-                                                                    </>
-                                                                ) : (
-                                                                    <div className="flex justify-center">
-                                                                        <span className="text-xs text-muted-foreground">
-                                                                            <MixedText text="无数据" />
-                                                                        </span>
-                                                                    </div>
                                                                 )}
                                                             </td>
                                                         </tr>
@@ -527,99 +452,99 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
 
                                     {/* 清空所有云端数据 */}
                                     {totalDataCount > 0 && (
-                                        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
-                                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                                                <div>
+                                        <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4 max-w-4xl mx-auto">
+                                            <div className="flex items-center justify-between gap-3">
+                                                <div className="flex-1">
                                                     <h4 className="font-medium text-destructive text-sm sm:text-base flex items-center gap-2">
                                                         <AlertTriangle className="w-4 h-4" />
-                                                        <MixedText text="危险操作" />
+                                                        <MixedText text="清空云端数据" />
                                                     </h4>
                                                     <p className="text-xs sm:text-sm text-destructive/80 mt-1">
-                                                        云端共有 <MixedText text={totalDataCount.toString()} /> 项数据
+                                                        <MixedText text="仅删除云端服务器中的数据，不影响本地" />
                                                     </p>
                                                 </div>
-                                                <Dialog open={showClearDialog || clearing} onOpenChange={setShowClearDialog}>
-                                                    <DialogTrigger asChild>
-                                                        <Button
-                                                            disabled={clearing}
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                                                        >
-                                                            <Trash2 className="w-4 h-4 mr-2" />
-                                                            <MixedText text="清空所有数据" />
-                                                        </Button>
-                                                    </DialogTrigger>
-                                                    <DialogContent className="p-4 sm:p-6">
-                                                        <DialogHeader>
-                                                            <DialogTitle className="text-base sm:text-lg flex items-center gap-2">
-                                                                <AlertTriangle className="w-5 h-5 text-destructive" />
-                                                                {clearing ? <MixedText text="正在清空云端数据" /> : <MixedText text="确认清空所有数据" />}
-                                                            </DialogTitle>
-                                                            {clearing ? (
-                                                                <div className="space-y-3 sm:space-y-4">
-                                                                    <p className="text-xs sm:text-sm"><MixedText text="正在清空云端数据，请稍候..." /></p>
-                                                                    {clearProgress && (
-                                                                        <div className="space-y-2">
-                                                                            <div className="flex justify-between text-xs text-gray-600">
-                                                                                <span><MixedText text="清空进度" /></span>
-                                                                                <span><MixedText text={`${clearProgress.current}/${clearProgress.total}`} /></span>
-                                                                            </div>
-                                                                            <Progress
-                                                                                value={(clearProgress.current / clearProgress.total) * 100}
-                                                                                variant="danger"
-                                                                                showText={true}
-                                                                                className="h-2 sm:h-3"
-                                                                            />
-                                                                            <p className="text-xs sm:text-sm text-gray-600">
-                                                                                {clearProgress.currentItem}
-                                                                            </p>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            ) : (
-                                                                <div className="text-xs sm:text-sm space-y-2">
-                                                                    <p>
-                                                                        <MixedText text="确定要清空所有云端数据吗？" />
-                                                                    </p>
-                                                                    <p className="text-muted-foreground">
-                                                                        <MixedText text="此操作将删除以下数据：" />
-                                                                    </p>
-                                                                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                                                                        <li><MixedText text={`${data.records.count} 条刷题历史`} /></li>
-                                                                        <li><MixedText text={`${data.plans.count} 个学习计划`} /></li>
-                                                                        <li><MixedText text={`${data.knowledge.count} 条知识点`} /></li>
-                                                                        <li><MixedText text={`${data.countdowns.count} 个考试倒计时`} /></li>
-                                                                        <li><MixedText text="应用设置" /></li>
-                                                                    </ul>
-                                                                    <p className="text-destructive font-medium">
-                                                                        <MixedText text="此操作不可撤销，删除后无法恢复。" />
-                                                                    </p>
-                                                                </div>
-                                                            )}
-                                                        </DialogHeader>
-                                                        <DialogFooter className="flex-col sm:flex-row gap-2">
-                                                            {!clearing && (
-                                                                <>
-                                                                    <Button
-                                                                        variant="outline"
-                                                                        className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                                                                        onClick={() => setShowClearDialog(false)}
-                                                                    >
-                                                                        <MixedText text="取消" />
-                                                                    </Button>
-                                                                    <Button
-                                                                        onClick={handleClearCloudData}
+                                                <div className="flex justify-center">
+                                                    <Dialog open={showClearDialog || clearing} onOpenChange={setShowClearDialog}>
+                                                        <Tooltip>
+                                                            <TooltipTrigger asChild>
+                                                                <DialogTrigger asChild>
+                                                                    <CircularButton
                                                                         variant="destructive"
-                                                                        className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                                                                        size="default"
+                                                                        disabled={clearing}
                                                                     >
-                                                                        <MixedText text="确认清空" />
-                                                                    </Button>
-                                                                </>
-                                                            )}
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                </Dialog>
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </CircularButton>
+                                                                </DialogTrigger>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                <p>清空所有云端数据</p>
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                        <DialogContent className="p-4 sm:p-6" style={{ zIndex: 9999 }}>
+                                                            <DialogHeader>
+                                                                <DialogTitle className="text-base sm:text-lg flex items-center gap-2">
+                                                                    <AlertTriangle className="w-5 h-5 text-destructive" />
+                                                                    {clearing ? <MixedText text="正在清空云端数据" /> : <MixedText text="确认清空云端数据" />}
+                                                                </DialogTitle>
+                                                                {clearing ? (
+                                                                    <div className="space-y-3 sm:space-y-4">
+                                                                        <p className="text-xs sm:text-sm"><MixedText text="正在清空云端数据，请稍候..." /></p>
+                                                                        {clearProgress && (
+                                                                            <div className="space-y-2">
+                                                                                <div className="flex justify-between text-xs text-gray-600">
+                                                                                    <span><MixedText text="清空进度" /></span>
+                                                                                    <span><MixedText text={`${clearProgress.current}/${clearProgress.total}`} /></span>
+                                                                                </div>
+                                                                                <Progress
+                                                                                    value={(clearProgress.current / clearProgress.total) * 100}
+                                                                                    variant="danger"
+                                                                                    showText={true}
+                                                                                    className="h-2 sm:h-3"
+                                                                                />
+                                                                                <p className="text-xs sm:text-sm text-gray-600">
+                                                                                    {clearProgress.currentItem}
+                                                                                </p>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-xs sm:text-sm space-y-2">
+                                                                        <p>
+                                                                            <MixedText text="确定要清空所有云端数据吗？" />
+                                                                        </p>
+                                                                        <p className="text-muted-foreground">
+                                                                            <MixedText text="此操作将删除云端服务器中的：刷题历史、知识点、学习计划、考试倒计时和应用设置。" />
+                                                                        </p>
+                                                                        <p className="text-destructive font-medium">
+                                                                            <MixedText text="此操作不可撤销，删除后无法恢复。本地数据不受影响。" />
+                                                                        </p>
+                                                                    </div>
+                                                                )}
+                                                            </DialogHeader>
+                                                            <DialogFooter className="flex-col sm:flex-row gap-2">
+                                                                {!clearing && (
+                                                                    <>
+                                                                        <Button
+                                                                            variant="outline"
+                                                                            className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                                                                            onClick={() => setShowClearDialog(false)}
+                                                                        >
+                                                                            <MixedText text="取消" />
+                                                                        </Button>
+                                                                        <Button
+                                                                            onClick={handleClearCloudData}
+                                                                            variant="destructive"
+                                                                            className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
+                                                                        >
+                                                                            <MixedText text="确认清空" />
+                                                                        </Button>
+                                                                    </>
+                                                                )}
+                                                            </DialogFooter>
+                                                        </DialogContent>
+                                                    </Dialog>
+                                                </div>
                                             </div>
                                         </div>
                                     )}
@@ -633,12 +558,24 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
 
                         <TabsContent value="local" className="space-y-3 sm:space-y-4" staticLayout>
                             {/* 本地数据统计表格 */}
-                            <div className="bg-white rounded-lg border border-border/50 overflow-hidden">
+                            <div className="bg-white rounded-lg border border-border/50 overflow-hidden max-w-4xl mx-auto">
+                                {/* 本地数据统计信息 */}
+                                <div className="px-4 py-3 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+                                    <div className="flex items-center gap-2">
+                                        <HardDrive className="w-4 h-4 text-blue-600" />
+                                        <span className="font-medium text-blue-900 dark:text-blue-100 text-sm">
+                                            <MixedText text="本地数据统计" />
+                                        </span>
+                                        <span className="text-sm text-blue-700 dark:text-blue-300">
+                                            <MixedText text={`共 ${localDataCount} 项数据`} />
+                                        </span>
+                                    </div>
+                                </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full">
                                         <thead className="bg-muted/20">
                                             <tr>
-                                                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
+                                                <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
                                                     <MixedText text="数据类型" />
                                                 </th>
                                                 <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">
@@ -652,17 +589,20 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                         <tbody className="divide-y divide-border/30">
                                             {localDataItems.map((item) => (
                                                 <tr key={item.id} className="hover:bg-muted/20 transition-colors">
-                                                    <td className="px-4 py-4">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`w-4 h-4 rounded-full ${item.color.replace('text-', 'bg-')}`} />
-                                                            <span className="font-medium text-sm">
-                                                                <MixedText text={item.name} />
-                                                            </span>
-                                                        </div>
+                                                    <td className="px-4 py-4 text-center">
+                                                        <span className="font-medium text-sm">
+                                                            <MixedText text={item.name || '数据'} />
+                                                        </span>
                                                     </td>
                                                     <td className="px-4 py-4 text-center">
                                                         <span className={`font-bold text-lg ${item.color}`}>
-                                                            <MixedText text={item.count.toString()} />
+                                                            {item.id === 'settings' ? (
+                                                                <MixedText text={item.count > 0 ? "已保存" : "未保存"} />
+                                                            ) : item.id === 'notes' ? (
+                                                                <MixedText text="云端存储" />
+                                                            ) : (
+                                                                <MixedText text={item.count.toString()} />
+                                                            )}
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-4 text-center text-sm text-muted-foreground">
@@ -679,26 +619,11 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                 </div>
                             </div>
 
-                            {/* 本地数据统计信息 */}
-                            {localDataCount > 0 && (
-                                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <HardDrive className="w-4 h-4 text-blue-600" />
-                                        <span className="font-medium text-blue-900 dark:text-blue-100 text-sm">
-                                            <MixedText text="本地数据统计" />
-                                        </span>
-                                    </div>
-                                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                                        <MixedText text={`本地共有 ${localDataCount} 项数据`} />
-                                    </p>
-                                </div>
-                            )}
-
                             {/* 清空本地数据按钮 */}
                             {localDataCount > 0 && (
-                                <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4">
-                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                                        <div>
+                                <div className="bg-destructive/5 border border-destructive/20 rounded-lg p-4 max-w-4xl mx-auto">
+                                    <div className="flex items-center justify-between gap-3">
+                                        <div className="flex-1">
                                             <h4 className="font-medium text-destructive text-sm sm:text-base flex items-center gap-2">
                                                 <AlertTriangle className="w-4 h-4" />
                                                 <MixedText text="清空本地数据" />
@@ -707,53 +632,60 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                                 <MixedText text="仅删除本地浏览器中的数据，不影响云端" />
                                             </p>
                                         </div>
-                                        <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
-                                            <DialogTrigger asChild>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    className="h-8 sm:h-9 text-xs sm:text-sm rounded-full"
-                                                >
-                                                    <Trash2 className="w-4 h-4 mr-2" />
-                                                    <MixedText text="清空本地数据" />
-                                                </Button>
-                                            </DialogTrigger>
-                                            <DialogContent className="w-11/12 max-w-md p-4 sm:p-6">
-                                                <DialogHeader>
-                                                    <DialogTitle className="text-base sm:text-lg"><MixedText text="确认清空本地数据" /></DialogTitle>
-                                                    <DialogDescription className="text-xs sm:text-sm">
-                                                        <MixedText text="确定要清空所有本地数据吗？" />
-                                                        <br />
-                                                        <br />
-                                                        <MixedText text="此操作将删除本地浏览器中的：刷题历史、知识点、学习计划、考试倒计时、自定义事件、AI设置和应用设置。" />
-                                                        <br />
-                                                        <br />
-                                                        <MixedText text="此操作不可撤销，删除后无法恢复。云端数据不受影响。" />
-                                                    </DialogDescription>
-                                                </DialogHeader>
-                                                <DialogFooter className="flex-col sm:flex-row gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
-                                                        onClick={() => setClearDataDialogOpen(false)}
-                                                    >
-                                                        <MixedText text="取消" />
-                                                    </Button>
-                                                    <Button
-                                                        onClick={() => {
-                                                            if (onClearLocalData) {
-                                                                onClearLocalData();
-                                                            }
-                                                            setClearDataDialogOpen(false);
-                                                        }}
-                                                        variant="destructive"
-                                                        className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
-                                                    >
-                                                        确认清空
-                                                    </Button>
-                                                </DialogFooter>
-                                            </DialogContent>
-                                        </Dialog>
+                                        <div className="flex justify-center">
+                                            <Dialog open={clearDataDialogOpen} onOpenChange={setClearDataDialogOpen}>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <DialogTrigger asChild>
+                                                            <CircularButton
+                                                                variant="destructive"
+                                                                size="default"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </CircularButton>
+                                                        </DialogTrigger>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>清空所有本地数据</p>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                                <DialogContent className="w-11/12 max-w-md p-4 sm:p-6" style={{ zIndex: 9999 }}>
+                                                    <DialogHeader>
+                                                        <DialogTitle className="text-base sm:text-lg"><MixedText text="确认清空本地数据" /></DialogTitle>
+                                                        <DialogDescription className="text-xs sm:text-sm">
+                                                            <MixedText text="确定要清空所有本地数据吗？" />
+                                                            <br />
+                                                            <br />
+                                                            <MixedText text="此操作将删除本地浏览器中的：刷题历史、知识点、学习计划、考试倒计时和应用设置。" />
+                                                            <br />
+                                                            <br />
+                                                            <MixedText text="此操作不可撤销，删除后无法恢复。云端数据不受影响。" />
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <DialogFooter className="flex-col sm:flex-row gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
+                                                            onClick={() => setClearDataDialogOpen(false)}
+                                                        >
+                                                            <MixedText text="取消" />
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => {
+                                                                if (onClearLocalData) {
+                                                                    onClearLocalData();
+                                                                }
+                                                                setClearDataDialogOpen(false);
+                                                            }}
+                                                            variant="destructive"
+                                                            className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9 rounded-full"
+                                                        >
+                                                            确认清空
+                                                        </Button>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -767,6 +699,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                     </Tabs>
                 </div>
             </DrawerContent>
-        </Drawer >
+        </Drawer>
     );
 }
