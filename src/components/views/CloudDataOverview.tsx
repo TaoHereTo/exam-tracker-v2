@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     Drawer,
     DrawerContent,
@@ -17,7 +17,7 @@ import { CircularButton } from '@/components/ui/circular-button';
 import { CloudDataOverview as CloudDataOverviewType, ProgressCallback } from '@/types/common';
 import { MixedText } from '@/components/ui/MixedText';
 import { useToast } from '@/hooks/useToast';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/simple-tabs';
 import type { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown } from '@/types/record';
 
 interface CloudDataOverviewProps {
@@ -43,43 +43,56 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
     const [clearDataDialogOpen, setClearDataDialogOpen] = useState(false);
     const { notify } = useNotification();
     const { showError } = useToast();
+    const isLoadingRef = useRef(false);
 
-    const loadCloudData = useCallback(async () => {
-        if (isLoading) {
-            return;
+    // 如果数据已返回但仍处于加载态，进行兜底修正，避免意外卡住加载
+    useEffect(() => {
+        if (data && isLoading) {
+            setIsLoading(false);
         }
+    }, [data, isLoading]);
 
+    // 为请求添加超时保护，避免无限加载
+    const withTimeout = async <T,>(promise: Promise<T>, ms: number = 10000): Promise<T> => {
+        return await Promise.race<T>([
+            promise,
+            new Promise<T>((_, reject) => setTimeout(() => reject(new Error('请求超时，请稍后重试')), ms))
+        ]);
+    };
+
+    const loadCloudData = async () => {
+        if (isLoadingRef.current) return;
+        isLoadingRef.current = true;
         setIsLoading(true);
         setLoadError(null);
 
         try {
-            // 添加最小loading时间，确保用户能看到loading状态
             const [overview] = await Promise.all([
-                CloudSyncService.getCloudDataOverview(),
-                new Promise(resolve => setTimeout(resolve, 500)) // 最小500ms loading时间
+                withTimeout(CloudSyncService.getCloudDataOverview(), 12000),
+                new Promise(resolve => setTimeout(resolve, 500))
             ]);
-
             setData(overview);
         } catch (error) {
             console.error('CloudDataOverview: Error loading cloud data:', error);
             let errorMessage = "未知错误";
-
             if (error instanceof Error) {
                 if (error.message.includes('Failed to fetch')) {
                     errorMessage = "网络连接失败，请检查网络连接后重试";
+                } else if (error.message.includes('超时')) {
+                    errorMessage = "请求超时，请检查网络或稍后重试";
                 } else if (error.message.includes('用户未登录')) {
                     errorMessage = "用户未登录，请先登录";
                 } else {
                     errorMessage = error.message;
                 }
             }
-
             setLoadError(errorMessage);
             showError(`获取云端数据失败: ${errorMessage}`);
         } finally {
+            isLoadingRef.current = false;
             setIsLoading(false);
         }
-    }, [isLoading, showError]);
+    };
 
     useEffect(() => {
         if (isOpen) {
@@ -87,8 +100,11 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
         } else {
             setData(null);
             setLoadError(null);
+            isLoadingRef.current = false;
+            setIsLoading(false);
         }
-    }, [isOpen, loadCloudData]);
+        // 仅依赖 isOpen，避免因回调 identity 变化触发重复加载
+    }, [isOpen]);
 
     const handleClearCloudData = useCallback(async () => {
         setShowClearDialog(false);
@@ -278,7 +294,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
     ], [localRecords, localPlans, localKnowledge, localCountdowns]);
 
     return (
-        <Drawer open={isOpen} onOpenChange={onClose}>
+        <Drawer open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
             <DrawerContent className="max-h-[80vh] p-0 flex flex-col">
                 <DrawerHeader className="p-4 sm:p-6 flex-shrink-0">
                     <DrawerTitle className="text-base sm:text-lg"><MixedText text="数据概览" /></DrawerTitle>
@@ -288,16 +304,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                 </DrawerHeader>
 
                 <div className="px-3 sm:px-4 pb-3 sm:pb-4 flex-1 overflow-y-auto">
-                    {/* 测试内容 */}
-                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                            测试：Drawer内容区域正常显示
-                        </p>
-                        <p className="text-xs text-blue-600 mt-1">
-                            云端数据: {data ? '已加载' : '未加载'} |
-                            本地数据: 记录{localRecords.length}条, 计划{localPlans.length}条, 知识点{localKnowledge.length}条, 倒计时{localCountdowns.length}条
-                        </p>
-                    </div>
 
                     <Tabs defaultValue="cloud" className="w-full">
                         <div className="flex justify-center items-center mb-4">
@@ -313,7 +319,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                             </TabsList>
                         </div>
 
-                        <TabsContent value="cloud" className="space-y-3 sm:space-y-4">
+                        <TabsContent value="cloud" className="space-y-3 sm:space-y-4" staticLayout>
                             {isLoading ? (
                                 <div className="flex flex-col items-center justify-center py-6 sm:py-8 space-y-3">
                                     <div className="flex items-center">
@@ -429,6 +435,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                                                                             </CircularButton>
                                                                         </div>
                                                                         <Dialog open={showDeleteDialog === item.id || deletingModule === item.id} onOpenChange={(open) => {
+                                                                            // 仅在关闭时清理，避免切换时重复触发
                                                                             if (!open && !deletingModule) {
                                                                                 setShowDeleteDialog(null);
                                                                             }
@@ -624,7 +631,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                             )}
                         </TabsContent>
 
-                        <TabsContent value="local" className="space-y-3 sm:space-y-4">
+                        <TabsContent value="local" className="space-y-3 sm:space-y-4" staticLayout>
                             {/* 本地数据统计表格 */}
                             <div className="bg-white rounded-lg border border-border/50 overflow-hidden">
                                 <div className="overflow-x-auto">

@@ -183,11 +183,20 @@ interface TabsContentProps {
     value: string;
     className?: string;
     children: React.ReactNode;
+    staticLayout?: boolean;
 }
 
-export function TabsContent({ value, className, children }: TabsContentProps) {
+export function TabsContent({ value, className, children, staticLayout = false }: TabsContentProps) {
     const { activeValue } = useTabsContext();
     const isActive = activeValue === value;
+
+    if (staticLayout) {
+        return (
+            <div className={cn('mt-2', className)} style={{ display: isActive ? 'block' : 'none' }}>
+                {children}
+            </div>
+        );
+    }
 
     return (
         <motion.div
