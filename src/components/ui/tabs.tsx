@@ -28,6 +28,7 @@ const TabsList = React.forwardRef<
             )}
             style={{
                 '--tabs-theme-color': finalThemeColor,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08), 0 0 12px rgba(0,0,0,0.06)'
             } as React.CSSProperties}
             {...props}
         />

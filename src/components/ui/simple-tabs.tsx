@@ -98,13 +98,13 @@ export function TabsList({ className, children }: TabsListProps) {
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex items-center justify-center rounded-full backdrop-blur-md border p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
+            className={cn('relative inline-flex items-center justify-center rounded-full backdrop-blur-md p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
             style={{
                 zIndex: 10,
                 backgroundColor: 'transparent',
-                borderColor: `${themeColor || '#2A4DD0'}40`,
                 backdropFilter: 'blur(12px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(12px) saturate(180%)'
+                WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08), 0 0 12px rgba(0,0,0,0.06)'
             }}
         >
             {/* 高亮背景 - 优化的毛玻璃效果 */}

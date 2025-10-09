@@ -115,12 +115,15 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
     return (
         <div
             ref={containerRef}
-            className="relative inline-flex h-9 items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md border border-white/20 dark:border-white/20 p-1 text-muted-foreground shadow-lg unselectable"
-            style={{ zIndex: 10 }}
+            className="relative inline-flex h-9 items-center justify-center rounded-full bg-[color:var(--card)] backdrop-blur-md p-1 text-muted-foreground unselectable"
+            style={{
+                zIndex: 10,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08), 0 0 12px rgba(0,0,0,0.06)'
+            }}
         >
             {/* 高亮背景 - 优化的毛玻璃效果 */}
             <motion.div
-                className="absolute inset-y-1 backdrop-blur-sm rounded-full shadow-md"
+                className="absolute inset-y-1 backdrop-blur-sm rounded-full"
                 style={{
                     // 使用更柔和的边框颜色
                     border: `1px solid ${themeColor || PAGE_THEME_COLORS.schedule}33`,
@@ -140,12 +143,8 @@ const CalendarViewTabs = React.memo(({ currentView, onViewChange }: { currentVie
                     `,
                     backdropFilter: 'blur(8px) saturate(150%)',
                     WebkitBackdropFilter: 'blur(8px) saturate(150%)',
-                    // 减少内发光，避免发白
-                    boxShadow: `
-                        0 2px 8px ${themeColor || PAGE_THEME_COLORS.schedule}40,
-                        0 1px 3px ${themeColor || PAGE_THEME_COLORS.schedule}26,
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1)
-                    `,
+                    // 内层仅保留轻微内阴影，避免与外层叠加造成不均衡
+                    boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.08)'
                 }}
                 initial={false}
                 animate={{
