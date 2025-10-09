@@ -1073,6 +1073,12 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 className={TOOLBAR_BUTTON_CLASSES}
                                 onClick={() => {
                                     saveCursorPosition();
+                                    // 获取选中的文字并设置到显示文字输入框
+                                    const selection = window.getSelection();
+                                    const selectedText = selection ? selection.toString().trim() : '';
+                                    if (selectedText) {
+                                        setLinkText(selectedText);
+                                    }
                                     setShowLinkDialog(true);
                                 }}
                             >
