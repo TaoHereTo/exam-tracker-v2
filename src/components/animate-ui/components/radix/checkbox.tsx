@@ -29,7 +29,7 @@ const checkboxVariants = cva(
   },
 );
 
-const checkboxIndicatorVariants = cva('', {
+const checkboxIndicatorVariants = cva('text-black dark:text-white', {
   variants: {
     size: {
       default: 'size-3.5',

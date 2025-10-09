@@ -45,22 +45,16 @@ function Checkbox({
         required={required}
         name={name}
         value={value}
+        className={cn(
+          "peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 focus-visible:ring-offset-2",
+          props.className
+        )}
         asChild
       >
         <motion.button
           data-slot="checkbox"
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
-          className={cn(
-            "peer shrink-0 flex items-center justify-center outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 disabled:cursor-not-allowed disabled:opacity-50 transition-colors duration-500 focus-visible:ring-offset-2",
-            "bg-background border border-gray-300 dark:border-gray-600",
-            "size-5 rounded-sm",
-            "data-[state=checked]:bg-[#2563eb] data-[state=checked]:text-white data-[state=checked]:border-[#2563eb]",
-            "data-[state=indeterminate]:bg-[#2563eb] data-[state=indeterminate]:text-white data-[state=indeterminate]:border-[#2563eb]",
-            "dark:data-[state=checked]:bg-[#3b82f6] dark:data-[state=checked]:border-[#3b82f6]",
-            "dark:data-[state=indeterminate]:bg-[#3b82f6] dark:data-[state=indeterminate]:border-[#3b82f6]",
-            props.className
-          )}
           {...props}
         />
       </CheckboxPrimitive.Root>

@@ -201,52 +201,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         checkSelectedText();
     }, [onChange, checkActiveFormats, checkSelectedText]);
 
-    // 处理键盘事件
-    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-        if (e.ctrlKey || e.metaKey) {
-            switch (e.key) {
-                case 'b':
-                    e.preventDefault();
-                    handleFormatCommand('bold');
-                    break;
-                case 'i':
-                    e.preventDefault();
-                    handleFormatCommand('italic');
-                    break;
-                case 'u':
-                    e.preventDefault();
-                    handleFormatCommand('underline');
-                    break;
-            }
-        }
-    }, []);
-
-    // 处理点击事件
-    const handleEditorClick = useCallback(() => {
-        checkActiveFormats();
-        checkSelectedText();
-    }, [checkActiveFormats, checkSelectedText]);
-
-    // 处理格式化命令
-    const handleFormatCommand = useCallback((command: string, value?: string) => {
-        if (!editorRef.current) return;
-
-        editorRef.current.focus();
-
-        if (command === 'insertUnorderedList' || command === 'insertOrderedList') {
-            handleListCommand(command);
-            return;
-        }
-
-        const success = document.execCommand(command, false, value);
-        if (success) {
-            const html = editorRef.current.innerHTML;
-            onChange(html);
-        }
-
-        checkActiveFormats();
-    }, [onChange, checkActiveFormats]);
-
     // 处理列表命令
     const handleListCommand = useCallback((command: string) => {
         if (!editorRef.current) return;
@@ -270,7 +224,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 list.appendChild(li);
                 range.insertNode(list);
             } catch (error) {
-                console.error('列表创建失败:', error);
+                console.error('Error creating list:', error);
             }
         }
 
@@ -278,6 +232,52 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         onChange(html);
         checkActiveFormats();
     }, [onChange, checkActiveFormats]);
+
+    // 处理格式化命令
+    const handleFormatCommand = useCallback((command: string, value?: string) => {
+        if (!editorRef.current) return;
+
+        editorRef.current.focus();
+
+        if (command === 'insertUnorderedList' || command === 'insertOrderedList') {
+            handleListCommand(command);
+            return;
+        }
+
+        const success = document.execCommand(command, false, value);
+        if (success) {
+            const html = editorRef.current.innerHTML;
+            onChange(html);
+        }
+
+        checkActiveFormats();
+    }, [onChange, checkActiveFormats, handleListCommand]);
+
+    // 处理键盘事件
+    const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+            switch (e.key) {
+                case 'b':
+                    e.preventDefault();
+                    handleFormatCommand('bold');
+                    break;
+                case 'i':
+                    e.preventDefault();
+                    handleFormatCommand('italic');
+                    break;
+                case 'u':
+                    e.preventDefault();
+                    handleFormatCommand('underline');
+                    break;
+            }
+        }
+    }, [handleFormatCommand]);
+
+    // 处理点击事件
+    const handleEditorClick = useCallback(() => {
+        checkActiveFormats();
+        checkSelectedText();
+    }, [checkActiveFormats, checkSelectedText]);
 
     // 处理颜色变化
     const handleColorChange = useCallback((color: string, type: 'text' | 'background') => {
