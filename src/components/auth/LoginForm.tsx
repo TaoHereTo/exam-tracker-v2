@@ -162,7 +162,7 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                         variant="ghost"
                         size="sm"
                         onClick={onSwitchToForgotPassword}
-                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0 h-auto rounded-full unselectable"
+                        className="text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 p-0 h-auto rounded-full unselectable ai-settings-no-shadow focus-visible:ring-0 focus-visible:border-transparent"
                     >
                         <MixedText text="忘记密码？" />
                     </Button>
@@ -185,7 +185,9 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     type="button"
                     variant="outline"
                     onClick={onSwitchToSignUp}
-                    className="group/btn shadow-input relative flex h-10 w-full items-center justify-center space-x-2 rounded-full bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] unselectable"
+                    className="group/btn relative flex h-10 w-full items-center justify-center space-x-2 rounded-full px-4 font-medium unselectable
+                    text-neutral-800 dark:text-neutral-100
+                    transition-colors hover:bg-background/90 dark:hover:bg-input/20"
                 >
                     <span className="text-sm text-neutral-700 dark:text-neutral-300">
                         <MixedText text="注册账号" />

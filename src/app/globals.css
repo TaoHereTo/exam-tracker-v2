@@ -677,6 +677,12 @@ h6 .mixed-text {
   [data-slot="button"][variant="outline"] span {
     color: var(--placeholder-color) !important;
   }
+
+  /* 密码输入的字体与字距优化，避免圆点间距过大 */
+  input[type="password"] {
+    font-family: var(--font-geist-sans), system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif !important;
+    letter-spacing: 0 !important;
+  }
 }
 
 /* ========== 边框颜色工具类 ========== */

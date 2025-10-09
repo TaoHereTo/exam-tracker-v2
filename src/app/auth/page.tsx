@@ -83,7 +83,7 @@ function AuthPageContent() {
     const switchToForgotPassword = () => setCurrentView('forgot-password')
 
     return (
-        <div className="min-h-screen flex flex-col lg:flex-row relative" style={getBackgroundStyle()}>
+        <div className="min-h-screen flex flex-col lg:flex-row relative bg-background light-mode-gradient" style={getBackgroundStyle()}>
             {/* 顶部右侧应用图标和主题切换器 */}
             <div className="absolute right-4 top-4 z-[50] inline-flex items-center gap-3">
                 <Link href="/" className="inline-flex items-center gap-3">

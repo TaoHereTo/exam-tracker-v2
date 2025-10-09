@@ -750,7 +750,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         )}
             style={actualIsFullscreen ? { zIndex: getZIndex('URGENT') + 1 } : undefined}>
             {/* 工具栏 */}
-            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-black sticky top-0 z-10">
+            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-black sticky top-0 z-10 rounded-t-lg">
                 <div className="flex items-center gap-1">
                     {/* 基础格式化按钮 */}
                     <Tooltip>
@@ -1201,7 +1201,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 )}
 
                 {/* 字数统计显示区域 */}
-                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
                     <div className="flex items-center gap-4">
                         {hasSelectedText ? (
                             <>
