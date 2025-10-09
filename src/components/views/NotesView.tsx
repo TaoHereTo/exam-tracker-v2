@@ -84,6 +84,7 @@ export default function NotesView() {
     const [isHoverCardOpen, setIsHoverCardOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isSheetOpen, setIsSheetOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const colorPickerRef = useRef<HTMLDivElement>(null);
     const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
@@ -279,10 +280,19 @@ export default function NotesView() {
         try {
             setIsSaving(true);
 
+            // 如果有未添加的标签，自动添加
+            const finalTags = [...newNoteTags];
+            if (newTagName.trim()) {
+                finalTags.push({
+                    name: newTagName.trim(),
+                    color: newTagColor
+                });
+            }
+
             const cloudNote = await notesService.createNote({
                 title: newNoteTitle,
                 content: newNoteContent,
-                tags: newNoteTags.map(tag => tag.name),
+                tags: finalTags.map(tag => tag.name),
                 is_favorite: false,
                 is_archived: false
             });
@@ -292,7 +302,7 @@ export default function NotesView() {
                 id: cloudNote.id,
                 title: cloudNote.title,
                 content: cloudNote.content,
-                tags: newNoteTags, // 使用带颜色的标签
+                tags: finalTags, // 使用带颜色的标签（包括自动添加的标签）
                 createdAt: cloudNote.created_at,
                 updatedAt: cloudNote.updated_at,
                 isFavorite: cloudNote.is_favorite
@@ -640,7 +650,7 @@ export default function NotesView() {
                 {/* 顶部操作栏 */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
-                        <Sheet>
+                        <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="sm">
                                     <List className="h-4 w-4 mr-1" />
@@ -688,7 +698,10 @@ export default function NotesView() {
 
                                     {/* 新建笔记按钮 */}
                                     <Button
-                                        onClick={() => setIsCreating(true)}
+                                        onClick={() => {
+                                            setIsCreating(true);
+                                            setIsSheetOpen(false); // 关闭Sheet
+                                        }}
                                         className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                     >
                                         <div className="flex items-center gap-2">

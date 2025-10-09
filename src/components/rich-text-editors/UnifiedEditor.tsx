@@ -171,6 +171,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [isSplitPreview, setIsSplitPreview] = useState(false);
     const [wordCount, setWordCount] = useState(0);
     const [charCount, setCharCount] = useState(0);
+    const [selectedWordCount, setSelectedWordCount] = useState(0);
+    const [selectedCharCount, setSelectedCharCount] = useState(0);
 
 
 
@@ -188,11 +190,30 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setActiveFormats(formats);
     }, []);
 
-    // 检查是否有选中文本
+    // 检查是否有选中文本并计算选中文本的字数
     const checkSelectedText = useCallback(() => {
         const selection = window.getSelection();
-        const hasText = selection && selection.toString().length > 0;
+        const selectedText = selection ? selection.toString() : '';
+        const hasText = selectedText.length > 0;
         setHasSelectedText(!!hasText);
+
+        if (hasText) {
+            // 计算选中文本的字数统计
+            const charCount = selectedText.length;
+
+            // 计算字数（中文字符、英文单词、标点符号都算作字数）
+            const chineseChars = selectedText.match(/[\u4e00-\u9fff]/g) || [];
+            const punctuationMarks = selectedText.match(/[^\u4e00-\u9fff\s\w]/g) || [];
+            const englishWords = selectedText.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(word => word.length > 0);
+
+            const wordCount = chineseChars.length + englishWords.length + punctuationMarks.length;
+
+            setSelectedWordCount(wordCount);
+            setSelectedCharCount(charCount);
+        } else {
+            setSelectedWordCount(0);
+            setSelectedCharCount(0);
+        }
     }, []);
 
     // 计算字数统计
@@ -344,30 +365,105 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
         if (!editorRef.current) return;
 
+        // 确保编辑器获得焦点
+        editorRef.current.focus();
+
         const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
+
+        try {
+            console.log('开始插入链接，当前选择:', selection);
+            console.log('选择范围数量:', selection?.rangeCount);
+            console.log('选择是否折叠:', selection?.isCollapsed);
+
+            // 创建链接元素
             const link = document.createElement('a');
             link.href = linkUrl;
             link.textContent = linkText || linkUrl;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
+            link.className = 'text-blue-600 underline hover:text-blue-800';
 
-            try {
-                range.deleteContents();
-                range.insertNode(link);
-                selection.removeAllRanges();
-            } catch (error) {
-                console.error('链接插入失败:', error);
+            console.log('创建的链接元素:', link);
+            console.log('链接href:', link.href);
+            console.log('链接文本:', link.textContent);
+
+            // 使用手动方法确保在正确位置插入
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                console.log('当前范围:', range);
+
+                if (!selection.isCollapsed) {
+                    // 有选中文本，将选中文本转换为链接
+                    console.log('有选中文本，替换为链接');
+                    range.deleteContents();
+                    range.insertNode(link);
+
+                    // 将光标移到链接后面
+                    range.setStartAfter(link);
+                    range.setEndAfter(link);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                } else {
+                    // 没有选中文本，在光标位置插入链接
+                    console.log('没有选中文本，在光标位置插入链接');
+
+                    // 使用insertNode方法在光标位置插入
+                    try {
+                        range.insertNode(link);
+                        console.log('insertNode成功');
+                    } catch (error) {
+                        console.log('insertNode失败，使用备用方法:', error);
+                        // 备用方法：在光标位置插入文本节点，然后替换
+                        const textNode = document.createTextNode(link.textContent || '');
+                        range.insertNode(textNode);
+                        textNode.parentNode?.replaceChild(link, textNode);
+                    }
+
+                    // 将光标移到链接后面
+                    range.setStartAfter(link);
+                    range.setEndAfter(link);
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+
+                    console.log('插入后是否包含链接:', editorRef.current.innerHTML.includes('<a'));
+                }
+            } else {
+                // 如果没有选择，在编辑器末尾插入链接
+                console.log('没有选择，在编辑器末尾插入链接');
+                editorRef.current.appendChild(link);
             }
+
+            console.log('链接插入完成，检查编辑器内容');
+            console.log('编辑器是否包含链接:', editorRef.current.innerHTML.includes('<a'));
+
+            // 更新内容并刷新状态
+            const html = editorRef.current.innerHTML;
+            console.log('插入链接后的HTML:', html);
+            console.log('编辑器内容长度:', html.length);
+            console.log('是否包含链接:', html.includes('<a'));
+
+            onChange(html);
+            console.log('onChange已调用，新内容:', html);
+
+            // 延迟检查，确保内容更新
+            setTimeout(() => {
+                console.log('延迟检查 - 编辑器HTML:', editorRef.current?.innerHTML);
+                console.log('延迟检查 - 编辑器文本内容:', editorRef.current?.textContent);
+            }, 100);
+
+            checkActiveFormats();
+            checkSelectedText();
+
+            console.log('链接插入成功:', linkUrl, linkText);
+        } catch (error) {
+            console.error('链接插入失败:', error);
         }
 
-        const html = editorRef.current.innerHTML;
-        onChange(html);
+        // 关闭对话框并重置状态
         setShowLinkDialog(false);
         setLinkUrl('');
         setLinkText('');
-    }, [linkUrl, linkText, onChange]);
+    }, [linkUrl, linkText, onChange, checkActiveFormats, checkSelectedText]);
 
     // 处理LaTeX插入
     const handleLatexInsert = useCallback((latex: string, displayMode: boolean) => {
@@ -398,44 +494,82 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const handleClearFormat = useCallback(() => {
         if (!editorRef.current) return;
 
+        // 确保编辑器获得焦点
+        editorRef.current.focus();
+
         const selection = window.getSelection();
-        if (selection && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
 
-            // 如果选中了文本，只清除选中文本的格式
-            if (!selection.isCollapsed) {
-                try {
-                    // 获取选中内容的纯文本
-                    const textContent = selection.toString();
+        // 如果选中了文本，清除选中文本的格式
+        if (selection && !selection.isCollapsed) {
+            try {
+                // 首先尝试使用原生命令清除内联格式
+                document.execCommand('removeFormat', false);
 
-                    // 删除选中的内容
-                    range.deleteContents();
+                // 然后手动处理标题级别等块级格式
+                const range = selection.getRangeAt(0);
+                const container = range.commonAncestorContainer;
 
-                    // 插入纯文本（无格式）
-                    const textNode = document.createTextNode(textContent);
-                    range.insertNode(textNode);
+                // 查找并处理包含选中文本的标题元素
+                let element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container as Element;
 
-                    // 清除选择
-                    selection.removeAllRanges();
-                } catch (error) {
-                    console.error('清除格式失败:', error);
+                // 向上查找标题元素
+                while (element && element !== editorRef.current) {
+                    if (element.tagName && element.tagName.match(/^H[1-6]$/)) {
+                        // 找到标题元素，将其转换为普通段落
+                        const textContent = element.textContent || '';
+                        const newDiv = document.createElement('div');
+                        newDiv.textContent = textContent;
+                        element.parentNode?.replaceChild(newDiv, element);
+                        break;
+                    }
+                    element = element.parentElement;
                 }
-            } else {
-                // 如果没有选中文本，清除整个编辑器的格式
-                const textContent = editorRef.current.textContent || '';
-                editorRef.current.innerHTML = textContent;
+
+                // 更新内容
+                const html = editorRef.current.innerHTML;
+                onChange(html);
+                checkActiveFormats();
+                checkSelectedText();
+            } catch (error) {
+                console.error('清除格式失败:', error);
             }
         } else {
-            // 如果没有选择，清除整个编辑器的格式
-            const textContent = editorRef.current.textContent || '';
-            editorRef.current.innerHTML = textContent;
-        }
+            // 如果没有选中文本，清除整个编辑器的格式
+            try {
+                // 选中整个编辑器内容
+                const range = document.createRange();
+                range.selectNodeContents(editorRef.current);
+                if (selection) {
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
 
-        // 更新内容并刷新格式状态
-        const html = editorRef.current.innerHTML;
-        onChange(html);
-        checkActiveFormats();
-    }, [onChange, checkActiveFormats]);
+                // 使用removeFormat命令清除内联格式
+                document.execCommand('removeFormat', false);
+
+                // 手动处理所有标题元素
+                const headings = editorRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
+                headings.forEach(heading => {
+                    const textContent = heading.textContent || '';
+                    const newDiv = document.createElement('div');
+                    newDiv.textContent = textContent;
+                    heading.parentNode?.replaceChild(newDiv, heading);
+                });
+
+                // 清除选择
+                if (selection) {
+                    selection.removeAllRanges();
+                }
+
+                const html = editorRef.current.innerHTML;
+                onChange(html);
+                checkActiveFormats();
+                checkSelectedText();
+            } catch (error) {
+                console.error('清除格式失败:', error);
+            }
+        }
+    }, [onChange, checkActiveFormats, checkSelectedText]);
 
 
 
@@ -474,6 +608,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     // 更新编辑器内容
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content) {
+            console.log('useEffect更新编辑器内容:', content);
             editorRef.current.innerHTML = content;
             // 更新字数统计
             const counts = calculateWordCount(content);
@@ -590,7 +725,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                 variant="ghost"
                                 className={TOOLBAR_BUTTON_CLASSES}
                                 onClick={handleClearFormat}
-                                disabled={!hasSelectedText && !editorRef.current?.textContent}
+                                disabled={!hasSelectedText && !editorRef.current?.innerHTML?.trim()}
                             >
                                 <Eraser className="w-4 h-4" />
                             </Button>
@@ -945,8 +1080,21 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 {/* 字数统计显示区域 */}
                 <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-4">
-                        <span>字数: {wordCount}</span>
-                        <span>字符: {charCount}</span>
+                        {hasSelectedText ? (
+                            <>
+                                <span className="text-blue-600 dark:text-blue-400">
+                                    选中: {selectedWordCount}字 / {selectedCharCount}字符
+                                </span>
+                                <span className="text-gray-400">|</span>
+                                <span>字数: {wordCount}</span>
+                                <span>字符: {charCount}</span>
+                            </>
+                        ) : (
+                            <>
+                                <span>字数: {wordCount}</span>
+                                <span>字符: {charCount}</span>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
@@ -996,10 +1144,18 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setShowLinkDialog(false)}>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowLinkDialog(false)}
+                            className="h-9 px-6 rounded-full font-medium"
+                        >
                             取消
                         </Button>
-                        <Button onClick={handleLinkInsert} disabled={!linkUrl}>
+                        <Button
+                            onClick={handleLinkInsert}
+                            disabled={!linkUrl}
+                            className="h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
+                        >
                             插入链接
                         </Button>
                     </DialogFooter>
@@ -1038,6 +1194,25 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     
                     .dark .latex-inline, .dark .latex-display {
                         background-color: #374151;
+                    }
+                    
+                    /* 链接样式 */
+                    .unified-editor-wrapper a {
+                        color: #2563eb !important;
+                        text-decoration: underline !important;
+                        cursor: pointer;
+                    }
+                    
+                    .unified-editor-wrapper a:hover {
+                        color: #1d4ed8 !important;
+                    }
+                    
+                    .dark .unified-editor-wrapper a {
+                        color: #60a5fa !important;
+                    }
+                    
+                    .dark .unified-editor-wrapper a:hover {
+                        color: #93c5fd !important;
                     }
                 `}</style>
         </div>
