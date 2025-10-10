@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/animate-ui/components/radix/checkbox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -175,8 +176,50 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [selectedCharCount, setSelectedCharCount] = useState(0);
     const [isInsertingLink, setIsInsertingLink] = useState(false);
     const [savedCursorRange, setSavedCursorRange] = useState<Range | null>(null);
+    const [includePunctuation, setIncludePunctuation] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('editor-include-punctuation');
+            return saved ? JSON.parse(saved) : true; // 默认包含标点符号
+        }
+        return true;
+    });
+    const [showCountSettings, setShowCountSettings] = useState(false);
 
+    // 计算字数统计
+    const calculateWordCount = useCallback((html: string) => {
+        // 创建一个临时div来解析HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
 
+        // 获取纯文本内容
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+
+        // 计算字符数（包括空格）
+        const charCount = textContent.length;
+
+        // 计算字数
+        const chineseChars = textContent.match(/[\u4e00-\u9fff]/g) || [];
+        const punctuationMarks = textContent.match(/[^\u4e00-\u9fff\s\w]/g) || [];
+        const englishWords = textContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(word => word.length > 0);
+
+        // 根据设置决定是否包含标点符号
+        const wordCount = chineseChars.length + englishWords.length + (includePunctuation ? punctuationMarks.length : 0);
+
+        return { wordCount, charCount };
+    }, [includePunctuation]);
+
+    // 处理标点符号设置变更
+    const handlePunctuationSettingChange = useCallback((include: boolean) => {
+        setIncludePunctuation(include);
+        localStorage.setItem('editor-include-punctuation', JSON.stringify(include));
+        // 重新计算字数统计
+        if (editorRef.current) {
+            const html = editorRef.current.innerHTML;
+            const counts = calculateWordCount(html);
+            setWordCount(counts.wordCount);
+            setCharCount(counts.charCount);
+        }
+    }, [calculateWordCount]);
 
     // 检查当前选中的格式
     const checkActiveFormats = useCallback(() => {
@@ -216,28 +259,6 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             setSelectedWordCount(0);
             setSelectedCharCount(0);
         }
-    }, []);
-
-    // 计算字数统计
-    const calculateWordCount = useCallback((html: string) => {
-        // 创建一个临时div来解析HTML
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = html;
-
-        // 获取纯文本内容
-        const textContent = tempDiv.textContent || tempDiv.innerText || '';
-
-        // 计算字符数（包括空格）
-        const charCount = textContent.length;
-
-        // 计算字数（中文字符、英文单词、标点符号都算作字数）
-        const chineseChars = textContent.match(/[\u4e00-\u9fff]/g) || [];
-        const punctuationMarks = textContent.match(/[^\u4e00-\u9fff\s\w]/g) || [];
-        const englishWords = textContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(word => word.length > 0);
-
-        const wordCount = chineseChars.length + englishWords.length + punctuationMarks.length;
-
-        return { wordCount, charCount };
     }, []);
 
     // 处理输入事件
@@ -1209,14 +1230,76 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                     选中: {selectedWordCount}字 / {selectedCharCount}字符
                                 </span>
                                 <span className="text-gray-400">|</span>
-                                <span>字数: {wordCount}</span>
-                                <span>字符: {charCount}</span>
+                                <Popover open={showCountSettings} onOpenChange={setShowCountSettings}>
+                                    <PopoverTrigger asChild>
+                                        <div className="flex items-center gap-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                            <span>字数: {wordCount}</span>
+                                            <span>字符: {charCount}</span>
+                                        </div>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-80 p-3" align="end">
+                                        <div className="space-y-2">
+                                            <div className="font-medium text-sm leading-none">字数统计设置</div>
+                                            <div className="flex items-center space-x-2">
+                                                <Checkbox
+                                                    id="include-punctuation"
+                                                    checked={includePunctuation}
+                                                    onCheckedChange={(checked: boolean) =>
+                                                        handlePunctuationSettingChange(checked)
+                                                    }
+                                                />
+                                                <Label
+                                                    htmlFor="include-punctuation"
+                                                    className="text-sm font-normal cursor-pointer"
+                                                >
+                                                    将标点符号算作字数
+                                                </Label>
+                                            </div>
+                                            <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                {includePunctuation
+                                                    ? "当前设置：标点符号计入字数统计"
+                                                    : "当前设置：标点符号不计入字数统计"
+                                                }
+                                            </div>
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
                             </>
                         ) : (
-                            <>
-                                <span>字数: {wordCount}</span>
-                                <span>字符: {charCount}</span>
-                            </>
+                            <Popover open={showCountSettings} onOpenChange={setShowCountSettings}>
+                                <PopoverTrigger asChild>
+                                    <div className="flex items-center gap-2 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                        <span>字数: {wordCount}</span>
+                                        <span>字符: {charCount}</span>
+                                    </div>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-80 p-3" align="end">
+                                    <div className="space-y-2">
+                                        <div className="font-medium text-sm leading-none">字数统计设置</div>
+                                        <div className="flex items-center space-x-2">
+                                            <Checkbox
+                                                id="include-punctuation"
+                                                checked={includePunctuation}
+                                                onCheckedChange={(checked: boolean) =>
+                                                    handlePunctuationSettingChange(checked)
+                                                }
+                                            />
+                                            <Label
+                                                htmlFor="include-punctuation"
+                                                className="text-sm font-normal cursor-pointer"
+                                            >
+                                                将标点符号算作字数
+                                            </Label>
+                                        </div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                            {includePunctuation
+                                                ? "当前设置：标点符号计入字数统计"
+                                                : "当前设置：标点符号不计入字数统计"
+                                            }
+                                        </div>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
                         )}
                     </div>
                 </div>
