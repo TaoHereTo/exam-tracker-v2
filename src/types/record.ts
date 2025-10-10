@@ -62,22 +62,10 @@ export type KnowledgeItem = {
     subCategory?: '图形推理' | '定义判断' | '类比推理' | '逻辑判断' | '经济常识' | '法律常识' | '科技常识' | '人文常识' | '地理国情' | '逻辑填空' | '片段阅读' | '成语积累';
     date?: string | null; // YYYY-MM-DD 格式
     source?: string;
-    imagePath?: string; // 云端图片ID
     createdAt?: string; // ISO 8601 格式
     updatedAt?: string; // ISO 8601 格式
 };
 
-// 云端图片信息类型
-export interface CloudImageInfo {
-    id: string; // UUID 格式
-    fileName: string;
-    originalName: string;
-    size: number;
-    type: string;
-    url: string;
-    uploadedAt: string; // ISO 8601 格式
-    bucket: string;
-}
 
 // 用户设置类型
 export interface UserSettings {
@@ -100,14 +88,12 @@ export interface ExportData {
     countdowns: ExamCountdown[];
     notes: Note[]; // 添加笔记数据
     settings: UserSettings;
-    cloudImages: CloudImageInfo[];
     metadata: {
         totalRecords: number;
         totalKnowledge: number;
         totalPlans: number;
         totalCountdowns: number;
         totalNotes: number; // 添加笔记数量统计
-        totalImages: number;
         appVersion?: string;
     };
 }
@@ -128,6 +114,5 @@ export type PendingImport = {
     countdowns?: ExamCountdown[];
     notes?: Note[];
     settings?: UserSettings;
-    cloudImages?: CloudImageInfo[];
     importStats?: ImportStats;
 };

@@ -28,43 +28,26 @@ export const PasteProvider: React.FC<PasteProviderProps> = ({ children }) => {
     const globalListenerAdded = useRef(false);
 
     const handleGlobalPaste = useCallback(async (e: ClipboardEvent) => {
-        // 检查是否在UnifiedImage组件区域内
-        const target = e.target as HTMLElement;
-        const isInUnifiedImage = target?.closest('[data-unified-image="true"]');
-
-        // 调试信息已移除
-
-        if (isInUnifiedImage) {
-            // 直接处理粘贴事件
-            const currentUnifiedImage = target?.closest('[data-unified-image="true"]');
-            if (currentUnifiedImage) {
-                const componentId = currentUnifiedImage.getAttribute('data-component-id');
-                if (componentId && pasteHandlers.current.has(componentId)) {
-                    await pasteHandlers.current.get(componentId)!(e);
-                }
-            }
+        // 检查是否有激活的处理器
+        if (activeHandlerId.current && pasteHandlers.current.has(activeHandlerId.current)) {
+            await pasteHandlers.current.get(activeHandlerId.current)!(e);
         } else {
-            // 如果不在UnifiedImage组件内，检查是否有激活的处理器
-            if (activeHandlerId.current && pasteHandlers.current.has(activeHandlerId.current)) {
-                await pasteHandlers.current.get(activeHandlerId.current)!(e);
-            } else {
-                // 如果没有激活的处理器，尝试找到当前可见的UnifiedImage组件
-                const visibleUnifiedImages = document.querySelectorAll('[data-unified-image="true"]');
+            // 如果没有激活的处理器，尝试找到当前可见的组件
+            const visibleComponents = document.querySelectorAll('[data-paste-handler="true"]');
 
-                // 找到第一个可见的组件
-                for (const element of visibleUnifiedImages) {
-                    const rect = element.getBoundingClientRect();
-                    const isVisible = rect.width > 0 && rect.height > 0 &&
-                        rect.top >= 0 && rect.left >= 0 &&
-                        rect.bottom <= window.innerHeight &&
-                        rect.right <= window.innerWidth;
+            // 找到第一个可见的组件
+            for (const element of visibleComponents) {
+                const rect = element.getBoundingClientRect();
+                const isVisible = rect.width > 0 && rect.height > 0 &&
+                    rect.top >= 0 && rect.left >= 0 &&
+                    rect.bottom <= window.innerHeight &&
+                    rect.right <= window.innerWidth;
 
-                    if (isVisible) {
-                        const componentId = element.getAttribute('data-component-id');
-                        if (componentId && pasteHandlers.current.has(componentId)) {
-                            await pasteHandlers.current.get(componentId)!(e);
-                            return;
-                        }
+                if (isVisible) {
+                    const componentId = element.getAttribute('data-component-id');
+                    if (componentId && pasteHandlers.current.has(componentId)) {
+                        await pasteHandlers.current.get(componentId)!(e);
+                        return;
                     }
                 }
             }

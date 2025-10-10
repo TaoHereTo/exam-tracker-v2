@@ -7,13 +7,11 @@ import type {
     ExamCountdown,
     PendingImport,
     UserSettings,
-    CloudImageInfo,
     ExportData,
     Note
 } from "@/types/record";
 import { format } from 'date-fns';
 import { normalizeModuleName } from "@/config/exam";
-import { supabaseImageManager } from "@/lib/supabaseImageManager";
 import { generateUUID } from "@/lib/utils";
 
 export function useImportExport(
@@ -122,8 +120,6 @@ export function useImportExport(
 
     // 导出数据到 JSON 文件（使用新的统一格式）
     const handleExportData = () => {
-        // 获取所有云端图片数据
-        const cloudImages: CloudImageInfo[] = supabaseImageManager.getAllLocalImageInfo();
 
         // 格式化所有数据
         const formattedRecords = records.map(formatRecord);
@@ -141,14 +137,12 @@ export function useImportExport(
             countdowns: formattedCountdowns,
             notes: formattedNotes,
             settings,
-            cloudImages,
             metadata: {
                 totalRecords: formattedRecords.length,
                 totalKnowledge: formattedKnowledge.length,
                 totalPlans: formattedPlans.length,
                 totalCountdowns: formattedCountdowns.length,
                 totalNotes: formattedNotes.length,
-                totalImages: cloudImages.length,
                 appVersion: '7.0.0'
             }
         };
@@ -168,7 +162,7 @@ export function useImportExport(
         notify({
             type: "success",
             message: "导出成功",
-            description: `已导出 ${formattedRecords.length} 条记录、${formattedKnowledge.length} 条知识点、${formattedPlans.length} 个计划、${formattedCountdowns.length} 个倒计时、${cloudImages.length} 张图片。`
+            description: `已导出 ${formattedRecords.length} 条记录、${formattedKnowledge.length} 条知识点、${formattedPlans.length} 个计划、${formattedCountdowns.length} 个倒计时。`
         });
     };
 
@@ -194,7 +188,6 @@ export function useImportExport(
                     let importedCountdowns: ExamCountdown[] = [];
                     let importedNotes: Note[] = [];
                     let importedSettings: UserSettings = {};
-                    let importedCloudImages: CloudImageInfo[] = [];
 
                     // 优先读取常用键名；若无则尝试兼容键
                     importedRecords = importedObject.records || importedObject.data || [];
@@ -203,7 +196,6 @@ export function useImportExport(
                     importedCountdowns = importedObject.countdowns || importedObject.examCountdowns || [];
                     importedNotes = importedObject.notes || [];
                     importedSettings = importedObject.settings || {};
-                    importedCloudImages = importedObject.cloudImages || [];
 
                     // 数据验证和格式化
                     const validatedRecords = importedRecords
@@ -226,10 +218,6 @@ export function useImportExport(
                         .filter((n: Note | Record<string, unknown>) => n && 'title' in n && 'content' in n)
                         .map(formatNote);
 
-                    // 导入云端图片
-                    if (importedCloudImages.length > 0) {
-                        supabaseImageManager.importImageInfo(importedCloudImages);
-                    }
 
                     // 设置待导入数据
                     setPendingImport({
@@ -239,7 +227,6 @@ export function useImportExport(
                         countdowns: validatedCountdowns,
                         notes: validatedNotes,
                         settings: importedSettings,
-                        cloudImages: importedCloudImages
                     });
 
                     setImportDialogOpen(true);
@@ -278,12 +265,12 @@ export function useImportExport(
             // 导入知识点（去重）- 改进的去重逻辑
             // 创建现有知识点的内容键集合
             const existingKnowledgeContentKeys = new Set(knowledge.map(k =>
-                `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`
+                `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}`
             ));
 
             const newKnowledge = pendingImport.knowledge.filter(k => {
                 // 为导入的知识点创建内容键
-                const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}__${k.imagePath || ''}`;
+                const contentKey = `${k.module}__${k.type || ''}__${k.note || ''}__${k.subCategory || ''}__${k.date || ''}__${k.source || ''}`;
                 return !existingKnowledgeContentKeys.has(contentKey);
             });
 

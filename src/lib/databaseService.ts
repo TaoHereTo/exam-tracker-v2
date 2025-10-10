@@ -621,7 +621,6 @@ export const knowledgeService = {
                 subCategory: item.subCategory || '',
                 date: item.date || '',
                 source: item.source || '',
-                imagePath: item.imagePath || '',
                 created_at: item.created_at,
                 updated_at: item.updated_at
             })) || [];
@@ -683,7 +682,6 @@ export const knowledgeService = {
         if ('subCategory' in knowledge) knowledgeData.subCategory = knowledge.subCategory;
         if ('date' in knowledge) knowledgeData.date = knowledge.date;
         if ('source' in knowledge) knowledgeData.source = knowledge.source;
-        if ('imagePath' in knowledge) knowledgeData.imagePath = knowledge.imagePath;
 
         const { data, error } = await supabase
             .from('knowledge')
@@ -747,7 +745,6 @@ export const knowledgeService = {
                 if ('subCategory' in updates) knowledgeData.subCategory = updates.subCategory;
                 if ('date' in updates) knowledgeData.date = updates.date;
                 if ('source' in updates) knowledgeData.source = updates.source;
-                if ('imagePath' in updates) knowledgeData.imagePath = updates.imagePath;
 
                 const { data, error } = await supabase
                     .from('knowledge')

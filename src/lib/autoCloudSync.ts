@@ -257,9 +257,6 @@ export class AutoCloudSync {
             if ('source' in knowledgeRecord && knowledgeRecord.source) {
                 knowledgeData.source = cleanValue(knowledgeRecord.source);
             }
-            if ('imagePath' in knowledgeRecord && knowledgeRecord.imagePath) {
-                knowledgeData.imagePath = cleanValue(knowledgeRecord.imagePath);
-            }
 
             await knowledgeService.addKnowledge(knowledgeData);
 
@@ -518,9 +515,6 @@ export class AutoCloudSync {
             }
             if ('source' in knowledgeRecord && knowledgeRecord.source) {
                 knowledgeData.source = cleanValue(knowledgeRecord.source);
-            }
-            if ('imagePath' in knowledgeRecord && knowledgeRecord.imagePath) {
-                knowledgeData.imagePath = cleanValue(knowledgeRecord.imagePath);
             }
 
             await knowledgeService.updateKnowledge(knowledge.id, knowledgeData);

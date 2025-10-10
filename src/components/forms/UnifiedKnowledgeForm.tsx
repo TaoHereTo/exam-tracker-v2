@@ -30,8 +30,6 @@ import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 import UnifiedEditor from "@/components/rich-text-editors/UnifiedEditor";
-import { UnifiedImage } from "@/components/ui/UnifiedImage";
-import { supabaseImageManager } from '@/lib/supabaseImageManager';
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -204,8 +202,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   externalIsFullscreen
 }) => {
   const config = useMemo(() => getModuleConfig(module), [module]);
-  const pendingImagesRef = useRef<{ localUrl: string; file: File | null; imageId: string | null }[]>([]);
-  const [clearPreviewImages, setClearPreviewImages] = useState(false);
 
   const { notifyLoading, updateToSuccess, updateToError } = useNotification();
 
@@ -240,7 +236,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
       if ('note' in initialData) data.secondField = String(initialData.note || '');
       if ('subCategory' in initialData) data.subCategory = String(initialData.subCategory || '');
       if ('date' in initialData) data.date = String(initialData.date || '');
-      if ('imagePath' in initialData) data.imagePath = String(initialData.imagePath || '');
     }
 
     // 设置默认值
@@ -323,43 +318,12 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     const loadingToastId = notifyLoading?.('正在保存到云端...');
     console.log('UnifiedKnowledgeForm: loadingToastId:', loadingToastId);
 
-    // 立即触发清空预览图片
-    setClearPreviewImages(true);
-
     try {
-      // 处理图片信息
-      let imagePath = '';
-
-      if (pendingImagesRef.current.length > 0) {
-        // 处理待上传的图片（保持原有逻辑）
-        const uploadedImageIds: string[] = [];
-
-        for (const pendingImage of pendingImagesRef.current) {
-          if (pendingImage.file) {
-            try {
-              const imageInfo = await supabaseImageManager.uploadImage(pendingImage.file);
-              uploadedImageIds.push(imageInfo.id);
-            } catch (uploadError) {
-              console.error('图片上传失败:', uploadError);
-              updateToError?.(loadingToastId || '', '图片上传失败，请重试');
-              return;
-            }
-          } else if (pendingImage.imageId) {
-            uploadedImageIds.push(pendingImage.imageId);
-          }
-        }
-
-        imagePath = uploadedImageIds.length > 0 ? uploadedImageIds[0] : '';
-      } else if (data.imagePath && typeof data.imagePath === 'string') {
-        // 保持原有的 imagePath
-        imagePath = data.imagePath;
-      }
 
       const knowledgeData: Partial<KnowledgeItem> = {
         module: module as 'math' | 'data-analysis' | 'logic' | 'common' | 'politics' | 'verbal',
         subCategory: config.hasSubCategory ? String(data.subCategory || '') as KnowledgeItem['subCategory'] : undefined,
         date: config.hasDateField ? String(data.date || '') : undefined,
-        imagePath: imagePath, // 使用处理后的图片路径
         // 根据模块类型设置字段
         ...(module === 'politics'
           ? {
@@ -391,11 +355,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
         }
       }
 
-      // 清空待处理图片列表
-      pendingImagesRef.current = [];
-
-      // 重置清除预览图片状态
-      setClearPreviewImages(false);
     } catch (error) {
       console.error('保存知识点失败:', error);
       updateToError?.(loadingToastId || '', '保存知识点失败，请重试');
@@ -409,7 +368,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   const RichTextEditorField = () => {
     const { setValue, getValue } = useFormContext();
     const currentValue = getValue('secondField') as string;
-    const currentImagePath = getValue('imagePath') as string;
 
 
     // 编辑器高度设置

@@ -1322,7 +1322,6 @@ export function MainApp() {
                                                 {pendingImport.countdowns && pendingImport.countdowns.length > 0 && <li><MixedText text={`考试倒计时：${pendingImport.countdowns.length} 个`} /></li>}
                                                 {pendingImport.notes && pendingImport.notes.length > 0 && <li><MixedText text={`笔记：${pendingImport.notes.length} 条`} /></li>}
                                                 {pendingImport.settings && <li><MixedText text="设置数据" /></li>}
-                                                {pendingImport.cloudImages && pendingImport.cloudImages.length > 0 && <li><MixedText text={`云端图片：${pendingImport.cloudImages.length} 张`} /></li>}
                                             </ul>
                                             <p className="text-sm text-gray-600 mt-2">
                                                 注意：导入的数据将与现有数据合并，重复的数据将被自动跳过。

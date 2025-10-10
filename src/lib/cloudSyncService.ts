@@ -96,8 +96,7 @@ export class CloudSyncService {
             localKnowledge.note === cloudKnowledge.note &&
             localKnowledge.subCategory === cloudKnowledge.subCategory &&
             localKnowledge.date === cloudKnowledge.date &&
-            localKnowledge.source === cloudKnowledge.source &&
-            localKnowledge.imagePath === cloudKnowledge.imagePath;
+            localKnowledge.source === cloudKnowledge.source;
 
         return isDuplicate;
     }
@@ -113,8 +112,7 @@ export class CloudSyncService {
             localRecord.note !== cloudRecord.note ||
             localRecord.subCategory !== cloudRecord.subCategory ||
             localRecord.date !== cloudRecord.date ||
-            localRecord.source !== cloudRecord.source ||
-            localRecord.imagePath !== cloudRecord.imagePath;
+            localRecord.source !== cloudRecord.source;
     }
 
     // 批量上传记录到云端
@@ -265,7 +263,6 @@ export class CloudSyncService {
             "subCategory": item.subCategory || '',
             "date": item.date || null,
             "source": item.source || '',
-            "imagePath": item.imagePath || null,
             created_at: item.createdAt || new Date().toISOString(),
             updated_at: item.updatedAt || new Date().toISOString()
         }));
@@ -418,7 +415,6 @@ export class CloudSyncService {
                     module: k.module,
                     type: k.type,
                     note: k.note?.substring(0, 50) + '...',
-                    hasImage: !!k.imagePath
                 }))
             });
 
@@ -545,7 +541,6 @@ export class CloudSyncService {
                                 subCategory: validatedKnowledge.subCategory,
                                 date: validatedKnowledge.date,
                                 source: validatedKnowledge.source,
-                                imagePath: validatedKnowledge.imagePath
                             });
                             individualUploaded++;
                             report.knowledge.push({ item: knowledge, action: 'uploaded' });

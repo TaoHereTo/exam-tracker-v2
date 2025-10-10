@@ -17,7 +17,6 @@ const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ de
 // 不再需要单独的全屏编辑器，UnifiedEditor已经包含了全屏功能
 
 import { Edit, Trash2, X, Info } from 'lucide-react';
-import { CloudImageViewer } from '@/components/ui/CloudImageViewer';
 import { MixedText } from '@/components/ui/MixedText';
 import { HtmlRenderer } from '@/components/ui/HtmlRenderer';
 import { ExpandableCell } from '@/components/ui/ExpandableCell';
@@ -72,13 +71,9 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
-                            const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
-                                    {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" />
-                                    )}
                                 </span>
                             );
                         }
@@ -123,13 +118,9 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
-                            const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
-                                    {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" />
-                                    )}
                                 </span>
                             );
                         }
@@ -177,13 +168,9 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
-                            const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
-                                    {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" />
-                                    )}
                                 </span>
                             );
                         }
@@ -222,25 +209,18 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         className: 'w-[12%]',
                         render: (row: KnowledgeItem) => {
                             const value = (row as Record<string, unknown>).date as string;
-                            const imagePath = (row as Record<string, unknown>).imagePath as string;
                             if (!value || typeof value !== 'string') return '';
                             const d = new Date(value);
                             if (!isNaN(d.getTime())) {
                                 return (
                                     <div className="flex items-center justify-between">
                                         <span className="flex-1">{format(d, 'yyyy-MM-dd')}</span>
-                                        {imagePath && (
-                                            <CloudImageViewer imageId={imagePath} size="sm" />
-                                        )}
                                     </div>
                                 );
                             }
                             return (
                                 <div className="flex items-center justify-between">
                                     <span className="flex-1">{value}</span>
-                                    {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" />
-                                    )}
                                 </div>
                             );
                         }
@@ -297,13 +277,9 @@ const getColumns = (module: string, isCloudDataLoading: boolean): DataTableColum
                         className: 'w-[25%]',
                         render: (row: KnowledgeItem) => {
                             const type = (row as Record<string, unknown>).type as string;
-                            const imagePath = (row as Record<string, unknown>).imagePath as string;
                             return (
                                 <span className="flex items-center justify-between w-full">
                                     <MixedText text={type} className="flex-1" />
-                                    {imagePath && (
-                                        <CloudImageViewer imageId={imagePath} size="sm" />
-                                    )}
                                 </span>
                             );
                         }
