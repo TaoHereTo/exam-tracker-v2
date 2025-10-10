@@ -1,12 +1,5 @@
 import React, { memo } from 'react';
 import { cn } from '@/lib/utils';
-import {
-    generateFontStyle,
-    splitMixedText,
-    generateMixedTextStyle,
-    getTextType,
-    renderFormattedText
-} from '@/lib/fontUtils';
 
 interface MixedTextProps {
     text?: string;
@@ -37,39 +30,117 @@ export const MixedText = memo(function MixedText({
     const hasRedFormatting = /\{red\}[^}]+\{\/red\}/.test(content);
     const hasFormatting = hasBoldFormatting || hasItalicFormatting || hasRedFormatting;
 
-    // 基础样式 - 字体渲染已在全局CSS中统一处理
-    const baseStyle = {
-        ...style,
-        fontWeight: 'inherit' // 确保继承父元素的字体粗细
-    };
-
-    // 特别优化"退出登录"文本
-    if (content === "退出登录") {
-        baseStyle.fontWeight = '600';
-        baseStyle.letterSpacing = '0.02em';
-    }
-
-    // 特别优化侧边栏菜单项文本
-    const sidebarMenuItems = [
-        // 主菜单项
-        "数据可视化", "记录管理", "制定计划", "知识点管理", "笔记管理",
-        // 子菜单项
-        "AI分析", "成绩概览", "数据图表", "最佳成绩", "新的记录", "刷题记录",
-        "学习计划", "倒计时", "日程管理", "知识点录入", "知识点汇总",
-        "文本摘录", "暂定", "行测记录", "我的笔记"
-    ];
-
-    if (sidebarMenuItems.includes(content)) {
-        baseStyle.fontWeight = '600';
-        baseStyle.letterSpacing = '0.01em';
-    }
-
     if (hasFormatting) {
-        // Render formatted text
+        // Simple formatted text rendering without font optimization
+        const renderFormattedText = (text: string) => {
+            if (!text || typeof text !== 'string') {
+                return text;
+            }
+
+            const boldRegex = /\*\*([^*]+)\*\*/g;
+            const italicRegex = /\*([^*]+)\*/g;
+            const redRegex = /\{red\}([^{}]+)\{\/red\}/g;
+
+            const parts: { text: string; type: 'normal' | 'bold' | 'italic' | 'red' }[] = [];
+            let lastIndex = 0;
+
+            const allMatches: { index: number; match: string; type: 'bold' | 'italic' | 'red'; content: string }[] = [];
+
+            let match;
+            while ((match = boldRegex.exec(text)) !== null) {
+                allMatches.push({
+                    index: match.index,
+                    match: match[0],
+                    type: 'bold',
+                    content: match[1]
+                });
+            }
+
+            italicRegex.lastIndex = 0;
+            while ((match = italicRegex.exec(text)) !== null) {
+                const isBoldPattern = text.substring(match.index - 1, match.index + match[0].length + 1).includes('**');
+                if (!isBoldPattern) {
+                    allMatches.push({
+                        index: match.index,
+                        match: match[0],
+                        type: 'italic',
+                        content: match[1]
+                    });
+                }
+            }
+
+            redRegex.lastIndex = 0;
+            while ((match = redRegex.exec(text)) !== null) {
+                allMatches.push({
+                    index: match.index,
+                    match: match[0],
+                    type: 'red',
+                    content: match[1]
+                });
+            }
+
+            allMatches.sort((a, b) => a.index - b.index);
+
+            const nonOverlappingMatches = allMatches.filter((current, index) => {
+                if (index === 0) return true;
+                const previous = allMatches[index - 1];
+                return current.index >= previous.index + previous.match.length;
+            });
+
+            for (const { index, match, type, content } of nonOverlappingMatches) {
+                if (index > lastIndex) {
+                    parts.push({
+                        text: text.substring(lastIndex, index),
+                        type: 'normal'
+                    });
+                }
+
+                parts.push({
+                    text: content,
+                    type
+                });
+
+                lastIndex = index + match.length;
+            }
+
+            if (lastIndex < text.length) {
+                parts.push({
+                    text: text.substring(lastIndex),
+                    type: 'normal'
+                });
+            }
+
+            if (parts.length === 0) {
+                return text;
+            }
+
+            return parts.map((part, index) => {
+                switch (part.type) {
+                    case 'bold':
+                        return React.createElement('strong', {
+                            key: index,
+                            className: 'font-bold'
+                        }, part.text);
+                    case 'italic':
+                        return React.createElement('em', {
+                            key: index,
+                            className: 'italic'
+                        }, part.text);
+                    case 'red':
+                        return React.createElement('span', {
+                            key: index,
+                            className: 'text-red-500'
+                        }, part.text);
+                    default:
+                        return React.createElement(React.Fragment, { key: index }, part.text);
+                }
+            });
+        };
+
         return (
             <Component
                 className={cn("mixed-text", className)}
-                style={{ ...baseStyle, fontFamily: 'inherit' }}
+                style={style}
                 onClick={onClick}
             >
                 {renderFormattedText(content)}
@@ -77,28 +148,11 @@ export const MixedText = memo(function MixedText({
         );
     }
 
-    const textType = getTextType(content);
-
-    // 如果是纯中文或纯英文，直接应用字体样式
-    if (textType === 'chinese' || textType === 'english') {
-        const fontStyle = generateFontStyle(content);
-        return (
-            <Component
-                className={cn("mixed-text", className)}
-                style={{ ...fontStyle, ...baseStyle }}
-                onClick={onClick}
-            >
-                {content}
-            </Component>
-        );
-    }
-
-    // 如果是混合文本，使用统一的字体样式，不分割
-    const fontStyle = generateFontStyle(content);
+    // Simple text rendering without font optimization
     return (
         <Component
             className={cn("mixed-text", className)}
-            style={{ ...fontStyle, ...baseStyle }}
+            style={style}
             onClick={onClick}
         >
             {content}
@@ -131,7 +185,6 @@ export const MixedTitle = memo(function MixedTitle({
         6: 'text-sm font-medium'
     };
 
-    // 标题样式 - 字体渲染已在全局CSS中统一处理
     const titleStyle: React.CSSProperties = {
         ...style
     };
@@ -174,7 +227,6 @@ export const MixedParagraph = memo(function MixedParagraph({
     style,
     onClick
 }: MixedParagraphProps) {
-    // 段落样式 - 字体渲染已在全局CSS中统一处理
     const paragraphStyle: React.CSSProperties = {
         ...style
     };
@@ -200,12 +252,8 @@ export const MixedLabel = memo(function MixedLabel({
     style,
     onClick
 }: MixedLabelProps) {
-    // 添加字体平滑属性到标签样式
     const labelStyle: React.CSSProperties = {
-        ...style,
-        WebkitFontSmoothing: 'antialiased',
-        MozOsxFontSmoothing: 'grayscale',
-        textRendering: 'optimizeLegibility'
+        ...style
     };
 
     return (

@@ -2,7 +2,6 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 import { MixedText } from "./MixedText"
-import { generateFontStyle } from "@/lib/fontUtils"
 
 interface TextareaProps extends React.ComponentProps<"textarea"> {
   placeholder?: string
@@ -10,9 +9,6 @@ interface TextareaProps extends React.ComponentProps<"textarea"> {
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   function Textarea({ className, onKeyDown, value, placeholder, ...props }, ref) {
-    // 生成字体样式 - 同时考虑placeholder和value
-    const fontStyle = generateFontStyle(placeholder || String(value || ''));
-
     return (
       <div className="relative">
         <textarea
@@ -30,10 +26,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           }}
           value={value}
           placeholder={placeholder}
-          style={{
-            ...fontStyle,
-            ...props.style
-          }}
           {...props}
         />
       </div>

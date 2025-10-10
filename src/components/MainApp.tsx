@@ -65,7 +65,6 @@ import {
 import { Button, buttonVariants } from "@/components/ui/button";
 import { normalizePageTitle } from "@/config/exam";
 import { clearLocalStorageData } from "@/lib/storageUtils";
-import { useHighDPIFontOptimization } from "@/hooks/useHighDPIFontOptimization";
 import toast from 'react-hot-toast';
 
 // 懒加载组件
@@ -149,8 +148,6 @@ export function MainApp() {
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     const { isDarkMode, mounted, getBackgroundStyle } = useThemeMode();
 
-    // 使用高DPI字体优化hook
-    useHighDPIFontOptimization();
 
     // 移除dock模式，只保留sidebar模式
     const navMode = "sidebar";
@@ -424,9 +421,6 @@ export function MainApp() {
                             alignOffset={15}
                             className="w-[--radix-popper-anchor-width] shadow-xl bg-white dark:bg-[#262626] border border-gray-200 dark:border-gray-700 rounded-lg z-[var(--z-maximum)]"
                             style={{
-                                WebkitFontSmoothing: 'antialiased',
-                                MozOsxFontSmoothing: 'grayscale',
-                                textRendering: 'optimizeLegibility',
                                 zIndex: 9999
                             } as React.CSSProperties}
                         >
@@ -463,22 +457,11 @@ export function MainApp() {
                             <DropdownMenuItem
                                 onClick={handleSignOutClick}
                                 className="text-red-600 focus:text-red-700 logout-menu-item"
-                                style={{
-                                    WebkitFontSmoothing: 'antialiased',
-                                    MozOsxFontSmoothing: 'grayscale',
-                                    textRendering: 'optimizeLegibility'
-                                } as React.CSSProperties}
                             >
                                 <LogOut className="h-4 w-4 mr-1 text-red-600" />
                                 <MixedText
                                     text="退出登录"
                                     className="font-medium logout-text"
-                                    style={{
-                                        WebkitFontSmoothing: 'antialiased',
-                                        MozOsxFontSmoothing: 'grayscale',
-                                        textRendering: 'optimizeLegibility',
-                                        fontWeight: 500
-                                    } as React.CSSProperties}
                                 />
                             </DropdownMenuItem>
                         </DropdownMenuContent>

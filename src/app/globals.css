@@ -4,27 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ========== 字体渲染优化系统 ========== */
-/* 统一的字体渲染变量定义 */
 :root {
-  /* 基础字体渲染设置 */
-  --font-smoothing-webkit: antialiased;
-  --font-smoothing-moz: grayscale;
-  --text-rendering-base: optimizeLegibility;
-  --text-rendering-precise: geometricPrecision;
-
-  /* 字体特性设置 */
-  --font-features-basic: "liga" 1;
-  --font-features-advanced: "kern" 1, "liga" 1, "clig" 1, "calt" 1;
-  --font-features-text: "kern" 1, "liga" 1;
-
-  /* 文本大小调整 */
-  --text-size-adjust: 100%;
-
-  /* 文本阴影增强 */
-  --text-shadow-enhance: 0 0 0.2px currentColor;
-  --text-shadow-enhance-strong: 0 0 0.3px currentColor;
-
   /* ========== 统一的 z-index 层级系统 ========== */
   /* 基础层级 (1-10) */
   --z-base: 1;
@@ -62,45 +42,9 @@
   --z-urgent: 10000;
 }
 
-/* 全局字体渲染优化 - 统一使用思源宋体 */
+/* 全局字体设置 - 使用思源宋体 */
 * {
   font-family: 'Noto Serif SC', serif;
-  -webkit-font-smoothing: var(--font-smoothing-webkit);
-  -moz-osx-font-smoothing: var(--font-smoothing-moz);
-  text-rendering: var(--text-rendering-base);
-  -webkit-text-size-adjust: var(--text-size-adjust);
-  -moz-text-size-adjust: var(--text-size-adjust);
-  -ms-text-size-adjust: var(--text-size-adjust);
-  text-size-adjust: var(--text-size-adjust);
-  font-feature-settings: var(--font-features-basic);
-}
-
-/* 高DPI和2K分辨率优化 */
-@media (-webkit-min-device-pixel-ratio: 1.25),
-(min-resolution: 120dpi) {
-  :root {
-    --font-features-basic: var(--font-features-advanced);
-  }
-}
-
-/* 特殊字体渲染优化类 - 继承全局设置并增强 */
-.mixed-text-part {
-  text-rendering: var(--text-rendering-precise);
-  font-feature-settings: var(--font-features-text);
-  font-weight: 400;
-  text-shadow: var(--text-shadow-enhance);
-}
-
-/* 深色模式下的字体渲染优化 */
-.dark .mixed-text-part {
-  text-shadow: var(--text-shadow-enhance);
-}
-
-/* 特别优化包含横线的常见中文字符 */
-.mixed-text-part:contains("一"),
-.mixed-text-part:contains("二"),
-.mixed-text-part:contains("三") {
-  text-shadow: var(--text-shadow-enhance-strong);
 }
 
 /* 强制SelectContent宽度与trigger一致 */
@@ -116,17 +60,6 @@
   max-width: 120px !important;
 }
 
-/* 深色模式下拉菜单特殊优化 */
-.dark [data-radix-popper-content-wrapper] * {
-  font-weight: 500 !important;
-}
-
-/* 特别优化"退出登录"文本在深色模式下的清晰度 */
-.dark .logout-menu-item .logout-text {
-  font-weight: 600 !important;
-  letter-spacing: 0.02em !important;
-  color: var(--destructive) !important;
-}
 
 body,
 html {
