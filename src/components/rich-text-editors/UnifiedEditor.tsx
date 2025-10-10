@@ -34,7 +34,12 @@ import {
     Minimize2,
     Heading,
     Columns2,
-    Eraser
+    Eraser,
+    Code,
+    Copy,
+    ChevronDown,
+    ChevronUp,
+    RefreshCw
 } from 'lucide-react';
 import { getZIndex } from '@/lib/zIndexConfig';
 import { LatexFormulaSelector } from '@/components/ui/LatexFormulaSelector';
@@ -54,18 +59,24 @@ interface UnifiedEditorProps {
 const TOOLBAR_BUTTON_CLASSES = "inline-flex items-center justify-center whitespace-nowrap text-sm font-medium disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive select-none gap-1.5 has-[>svg]:px-2.5 h-8 w-8 p-0 rounded-lg shadow-none hover:bg-gray-100 dark:hover:bg-[#303030] hover:shadow-none active:bg-gray-200 dark:active:bg-gray-700 active:shadow-none focus:bg-transparent focus:shadow-none";
 
 const colorOptions = [
-    { name: '黑色', value: '#000000' },
     { name: '红色', value: '#ef4444' },
-    { name: '绿色', value: '#22c55e' },
     { name: '蓝色', value: '#3b82f6' },
     { name: '黄色', value: '#eab308' },
     { name: '紫色', value: '#a855f7' },
     { name: '橙色', value: '#f97316' },
     { name: '粉色', value: '#ec4899' },
-    { name: '灰色', value: '#6b7280' },
-    { name: '棕色', value: '#8b5cf6' },
     { name: '青色', value: '#06b6d4' },
-    { name: '白色', value: '#ffffff' }
+    { name: '深红', value: '#dc2626' },
+    { name: '深绿', value: '#16a34a' },
+    { name: '深蓝', value: '#1d4ed8' },
+    { name: '深紫', value: '#7c3aed' },
+    { name: '深粉', value: '#db2777' },
+    { name: '浅红', value: '#f87171' },
+    { name: '浅绿', value: '#4ade80' },
+    { name: '浅蓝', value: '#60a5fa' },
+    { name: '浅黄', value: '#fde047' },
+    { name: '浅紫', value: '#c084fc' },
+    { name: '浅橙', value: '#fb923c' }
 ];
 
 export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
@@ -184,6 +195,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         return true;
     });
     const [showCountSettings, setShowCountSettings] = useState(false);
+    const [showHtmlDebug, setShowHtmlDebug] = useState(false);
+    const [htmlDebugContent, setHtmlDebugContent] = useState('');
 
     // 计算字数统计
     const calculateWordCount = useCallback((html: string) => {
@@ -261,10 +274,123 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         }
     }, []);
 
+    // 自动清理HTML结构
+    const autoCleanHtml = useCallback((html: string) => {
+        if (!html || html.trim() === '') return html;
+
+        // 快速检查是否包含需要清理的结构
+        const needsCleaning = html.includes('<h1><div') ||
+            html.includes('<h2><div') ||
+            html.includes('<h3><div') ||
+            html.includes('<h4><div') ||
+            html.includes('<h5><div') ||
+            html.includes('<h6><div') ||
+            html.includes('border-color: rgb(224, 224, 224)');
+
+        if (!needsCleaning) {
+            return html; // 如果不需要清理，直接返回原HTML
+        }
+
+        console.log('开始清理HTML:', html);
+
+        // 创建一个临时容器来解析和清理HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+
+        // 第一轮：清理嵌套的标题标签
+        const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        headings.forEach(heading => {
+            // 检查标题内部是否包含其他标题标签或div
+            const nestedElements = heading.querySelectorAll('h1, h2, h3, h4, h5, h6, div');
+            if (nestedElements.length > 0) {
+                console.log('发现嵌套标题，清理中...', heading.outerHTML);
+                // 如果包含嵌套元素，将内容提取出来并重新组织
+                const textContent = heading.textContent || '';
+                const newDiv = document.createElement('div');
+                newDiv.textContent = textContent;
+                heading.parentNode?.replaceChild(newDiv, heading);
+            }
+        });
+
+        // 第二轮：清理空的标签
+        const allElements = tempDiv.querySelectorAll('*');
+        allElements.forEach(element => {
+            if (element.textContent?.trim() === '' && element.children.length === 0) {
+                element.remove();
+            }
+        });
+
+        // 第三轮：清理无效的嵌套结构（更全面的选择器）
+        const invalidNested = tempDiv.querySelectorAll('h1 h1, h1 h2, h1 h3, h1 h4, h1 h5, h1 h6, h1 div, h2 h1, h2 h2, h2 h3, h2 h4, h2 h5, h2 h6, h2 div, h3 h1, h3 h2, h3 h3, h3 h4, h3 h5, h3 h6, h3 div, h4 h1, h4 h2, h4 h3, h4 h4, h4 h5, h4 h6, h4 div, h5 h1, h5 h2, h5 h3, h5 h4, h5 h5, h5 h6, h5 div, h6 h1, h6 h2, h6 h3, h6 h4, h6 h5, h6 h6, h6 div');
+        invalidNested.forEach(element => {
+            console.log('发现无效嵌套，清理中...', element.outerHTML);
+            const textContent = element.textContent || '';
+            const newDiv = document.createElement('div');
+            newDiv.textContent = textContent;
+            element.parentNode?.replaceChild(newDiv, element);
+        });
+
+        // 第四轮：清理重复的样式属性
+        const elementsWithStyle = tempDiv.querySelectorAll('[style]');
+        elementsWithStyle.forEach(element => {
+            const style = element.getAttribute('style');
+            if (style && style.includes('border-color') && style.includes('outline-color')) {
+                // 移除这些浏览器自动添加的样式
+                element.removeAttribute('style');
+            }
+        });
+
+        const cleanedHtml = tempDiv.innerHTML;
+        console.log('清理后的HTML:', cleanedHtml);
+
+        return cleanedHtml;
+    }, []);
+
     // 处理输入事件
     const handleInput = useCallback(() => {
         if (!editorRef.current) return;
-        const html = editorRef.current.innerHTML;
+        let html = editorRef.current.innerHTML;
+
+        // 检查是否需要清理HTML结构
+        const cleanedHtml = autoCleanHtml(html);
+
+        // 只有在HTML结构确实有问题时才进行清理
+        if (cleanedHtml !== html && cleanedHtml.length > 0) {
+            console.log('输入事件中自动清理HTML结构');
+            console.log('清理前:', html);
+            console.log('清理后:', cleanedHtml);
+
+            // 保存当前光标位置
+            const selection = window.getSelection();
+            let cursorPosition = null;
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                // 检查光标是否在编辑器内
+                if (editorRef.current.contains(range.startContainer)) {
+                    cursorPosition = range.cloneRange();
+                }
+            }
+
+            // 使用setTimeout来延迟清理，避免干扰正常的输入操作
+            setTimeout(() => {
+                if (editorRef.current) {
+                    editorRef.current.innerHTML = cleanedHtml;
+
+                    // 恢复光标位置
+                    if (cursorPosition && selection) {
+                        try {
+                            selection.removeAllRanges();
+                            selection.addRange(cursorPosition);
+                        } catch (error) {
+                            console.log('无法恢复光标位置:', error);
+                        }
+                    }
+                }
+            }, 0);
+
+            html = cleanedHtml;
+        }
+
         onChange(html);
         checkActiveFormats();
         checkSelectedText();
@@ -273,39 +399,81 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         const counts = calculateWordCount(html);
         setWordCount(counts.wordCount);
         setCharCount(counts.charCount);
-    }, [onChange, checkActiveFormats, checkSelectedText, calculateWordCount]);
+
+        // 更新HTML调试内容
+        setHtmlDebugContent(html);
+    }, [onChange, checkActiveFormats, checkSelectedText, calculateWordCount, autoCleanHtml]);
 
     // 处理列表命令
     const handleListCommand = useCallback((command: string) => {
         if (!editorRef.current) return;
 
-        const listType = command === 'insertUnorderedList' ? 'ul' : 'ol';
-        const selection = window.getSelection();
+        // 确保编辑器获得焦点
+        editorRef.current.focus();
 
-        if (!selection || selection.rangeCount === 0) {
-            const list = document.createElement(listType);
-            const li = document.createElement('li');
-            li.textContent = '列表项';
-            list.appendChild(li);
-            editorRef.current.appendChild(list);
+        // 使用浏览器的原生 execCommand 来处理列表
+        const success = document.execCommand(command, false, undefined);
+
+        if (success) {
+            let html = editorRef.current.innerHTML;
+
+            // 自动清理HTML结构
+            const cleanedHtml = autoCleanHtml(html);
+
+            // 如果HTML被清理了，更新编辑器内容
+            if (cleanedHtml !== html) {
+                editorRef.current.innerHTML = cleanedHtml;
+                html = cleanedHtml;
+                console.log('列表操作后自动清理HTML结构');
+            }
+
+            onChange(html);
+            checkActiveFormats();
         } else {
-            const range = selection.getRangeAt(0);
-            const list = document.createElement(listType);
-            const li = document.createElement('li');
+            // 如果 execCommand 失败，使用备用方案
+            const listType = command === 'insertUnorderedList' ? 'ul' : 'ol';
+            const selection = window.getSelection();
 
-            try {
-                li.appendChild(range.extractContents());
+            if (selection && selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                const list = document.createElement(listType);
+                const li = document.createElement('li');
+
+                // 获取选中的内容或当前行的内容
+                const selectedContent = range.extractContents();
+                if (selectedContent.textContent?.trim() === '') {
+                    li.textContent = '列表项';
+                } else {
+                    li.appendChild(selectedContent);
+                }
+
                 list.appendChild(li);
                 range.insertNode(list);
-            } catch (error) {
-                console.error('Error creating list:', error);
+
+                // 将光标移到列表项内
+                const newRange = document.createRange();
+                newRange.selectNodeContents(li);
+                newRange.collapse(false);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+
+                let html = editorRef.current.innerHTML;
+
+                // 自动清理HTML结构
+                const cleanedHtml = autoCleanHtml(html);
+
+                // 如果HTML被清理了，更新编辑器内容
+                if (cleanedHtml !== html) {
+                    editorRef.current.innerHTML = cleanedHtml;
+                    html = cleanedHtml;
+                    console.log('列表备用方案后自动清理HTML结构');
+                }
+
+                onChange(html);
+                checkActiveFormats();
             }
         }
-
-        const html = editorRef.current.innerHTML;
-        onChange(html);
-        checkActiveFormats();
-    }, [onChange, checkActiveFormats]);
+    }, [onChange, checkActiveFormats, autoCleanHtml]);
 
     // 处理格式化命令
     const handleFormatCommand = useCallback((command: string, value?: string) => {
@@ -320,15 +488,35 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
         const success = document.execCommand(command, false, value);
         if (success) {
-            const html = editorRef.current.innerHTML;
+            let html = editorRef.current.innerHTML;
+
+            // 自动清理HTML结构
+            const cleanedHtml = autoCleanHtml(html);
+
+            // 如果HTML被清理了，更新编辑器内容
+            if (cleanedHtml !== html) {
+                editorRef.current.innerHTML = cleanedHtml;
+                html = cleanedHtml;
+                console.log('格式化后自动清理HTML结构');
+            }
+
             onChange(html);
         }
 
         checkActiveFormats();
-    }, [onChange, checkActiveFormats, handleListCommand]);
+    }, [onChange, checkActiveFormats, handleListCommand, autoCleanHtml]);
 
     // 处理键盘事件
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+        // 处理回车键
+        if (e.key === 'Enter') {
+            console.log('回车键被按下，允许默认行为');
+            // 让浏览器正常处理回车键，不阻止默认行为
+            // 回车键会创建新的段落或换行
+            return;
+        }
+
+        // 处理Ctrl/Cmd组合键
         if (e.ctrlKey || e.metaKey) {
             switch (e.key) {
                 case 'b':
@@ -375,12 +563,71 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const handleSplitPreviewToggle = useCallback(() => {
         const newSplitPreview = !isSplitPreview;
         setIsSplitPreview(newSplitPreview);
+        console.log('分屏预览切换:', newSplitPreview);
     }, [isSplitPreview]);
 
     // 处理全屏切换
     const handleFullscreenToggle = useCallback(() => {
         setIsFullscreen(!actualIsFullscreen);
     }, [actualIsFullscreen]);
+
+    // 处理HTML调试区域切换
+    const handleHtmlDebugToggle = useCallback(() => {
+        setShowHtmlDebug(!showHtmlDebug);
+    }, [showHtmlDebug]);
+
+    // 复制HTML代码到剪贴板
+    const handleCopyHtml = useCallback(async () => {
+        try {
+            await navigator.clipboard.writeText(htmlDebugContent);
+            // 可以添加一个toast提示复制成功
+            console.log('HTML代码已复制到剪贴板');
+        } catch (error) {
+            console.error('复制失败:', error);
+            // 备用方案：使用传统的复制方法
+            const textArea = document.createElement('textarea');
+            textArea.value = htmlDebugContent;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            console.log('HTML代码已复制到剪贴板（备用方案）');
+        }
+    }, [htmlDebugContent]);
+
+    // 清理HTML结构
+    const handleCleanHtml = useCallback(() => {
+        if (!editorRef.current) return;
+
+        try {
+            // 获取当前内容
+            const currentHtml = editorRef.current.innerHTML;
+            console.log('手动清理前的HTML:', currentHtml);
+
+            // 使用自动清理函数
+            const cleanedHtml = autoCleanHtml(currentHtml);
+
+            if (cleanedHtml !== currentHtml) {
+                console.log('手动清理后的HTML:', cleanedHtml);
+
+                // 更新编辑器内容
+                editorRef.current.innerHTML = cleanedHtml;
+                onChange(cleanedHtml);
+                setHtmlDebugContent(cleanedHtml);
+
+                // 重新计算字数统计
+                const counts = calculateWordCount(cleanedHtml);
+                setWordCount(counts.wordCount);
+                setCharCount(counts.charCount);
+
+                console.log('HTML结构已手动清理完成');
+            } else {
+                console.log('HTML结构已经是干净的，无需清理');
+            }
+        } catch (error) {
+            console.error('清理HTML失败:', error);
+        }
+    }, [onChange, calculateWordCount, autoCleanHtml]);
 
     // 保存光标位置
     const saveCursorPosition = useCallback(() => {
@@ -577,7 +824,18 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 }
 
                 // 更新内容并刷新状态
-                const html = editorRef.current?.innerHTML || '';
+                let html = editorRef.current?.innerHTML || '';
+
+                // 自动清理HTML结构
+                const cleanedHtml = autoCleanHtml(html);
+
+                // 如果HTML被清理了，更新编辑器内容
+                if (cleanedHtml !== html && editorRef.current) {
+                    editorRef.current.innerHTML = cleanedHtml;
+                    html = cleanedHtml;
+                    console.log('链接插入后自动清理HTML结构');
+                }
+
                 console.log('插入链接后的HTML:', html);
                 onChange(html);
                 checkActiveFormats();
@@ -598,7 +856,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             setLinkText('');
             setSavedCursorRange(null);
         });
-    }, [linkUrl, linkText, onChange, checkActiveFormats, checkSelectedText, savedCursorRange]);
+    }, [linkUrl, linkText, onChange, checkActiveFormats, checkSelectedText, savedCursorRange, autoCleanHtml]);
 
     // 处理LaTeX插入
     const handleLatexInsert = useCallback((latex: string, displayMode: boolean) => {
@@ -620,10 +878,21 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             }
         }
 
-        const html = editorRef.current.innerHTML;
+        let html = editorRef.current.innerHTML;
+
+        // 自动清理HTML结构
+        const cleanedHtml = autoCleanHtml(html);
+
+        // 如果HTML被清理了，更新编辑器内容
+        if (cleanedHtml !== html) {
+            editorRef.current.innerHTML = cleanedHtml;
+            html = cleanedHtml;
+            console.log('LaTeX插入后自动清理HTML结构');
+        }
+
         onChange(html);
         setShowLatexSelector(false);
-    }, [onChange]);
+    }, [onChange, autoCleanHtml]);
 
     // 清除所有格式
     const handleClearFormat = useCallback(() => {
@@ -661,7 +930,18 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 }
 
                 // 更新内容
-                const html = editorRef.current.innerHTML;
+                let html = editorRef.current.innerHTML;
+
+                // 自动清理HTML结构
+                const cleanedHtml = autoCleanHtml(html);
+
+                // 如果HTML被清理了，更新编辑器内容
+                if (cleanedHtml !== html) {
+                    editorRef.current.innerHTML = cleanedHtml;
+                    html = cleanedHtml;
+                    console.log('清除格式后自动清理HTML结构');
+                }
+
                 onChange(html);
                 checkActiveFormats();
                 checkSelectedText();
@@ -696,7 +976,18 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     selection.removeAllRanges();
                 }
 
-                const html = editorRef.current.innerHTML;
+                let html = editorRef.current.innerHTML;
+
+                // 自动清理HTML结构
+                const cleanedHtml = autoCleanHtml(html);
+
+                // 如果HTML被清理了，更新编辑器内容
+                if (cleanedHtml !== html) {
+                    editorRef.current.innerHTML = cleanedHtml;
+                    html = cleanedHtml;
+                    console.log('清除全部格式后自动清理HTML结构');
+                }
+
                 onChange(html);
                 checkActiveFormats();
                 checkSelectedText();
@@ -704,7 +995,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 console.error('清除格式失败:', error);
             }
         }
-    }, [onChange, checkActiveFormats, checkSelectedText]);
+    }, [onChange, checkActiveFormats, checkSelectedText, autoCleanHtml]);
 
 
 
@@ -744,13 +1035,19 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     useEffect(() => {
         if (editorRef.current && editorRef.current.innerHTML !== content && !isInsertingLink) {
             console.log('useEffect更新编辑器内容:', content);
-            editorRef.current.innerHTML = content;
+
+            // 自动清理外部传入的内容
+            const cleanedContent = autoCleanHtml(content);
+            editorRef.current.innerHTML = cleanedContent;
+
             // 更新字数统计
-            const counts = calculateWordCount(content);
+            const counts = calculateWordCount(cleanedContent);
             setWordCount(counts.wordCount);
             setCharCount(counts.charCount);
+            // 更新HTML调试内容
+            setHtmlDebugContent(cleanedContent);
         }
-    }, [content, calculateWordCount, isInsertingLink]);
+    }, [content, calculateWordCount, isInsertingLink, autoCleanHtml]);
 
     // 计算z-index
     const getMenuZIndex = () => {
@@ -1130,6 +1427,27 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         </TooltipContent>
                     </Tooltip>
 
+                    {/* HTML调试按钮 */}
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={cn(
+                                    TOOLBAR_BUTTON_CLASSES,
+                                    showHtmlDebug && "bg-gray-200 dark:bg-gray-700"
+                                )}
+                                onClick={handleHtmlDebugToggle}
+                            >
+                                <Code className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>HTML调试</p>
+                        </TooltipContent>
+                    </Tooltip>
+
 
                 </div>
 
@@ -1188,18 +1506,16 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     <div className="flex flex-row flex-1">
                         {/* 左侧编辑器 */}
                         <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
-                            <div className="flex-1 flex flex-col">
-                                <div
-                                    ref={editorRef}
-                                    className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
-                                    contentEditable
-                                    suppressContentEditableWarning
-                                    data-placeholder={placeholder}
-                                    onInput={handleInput}
-                                    onKeyDown={handleKeyDown}
-                                    onClick={handleEditorClick}
-                                />
-                            </div>
+                            <div
+                                ref={editorRef}
+                                className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
+                                contentEditable
+                                suppressContentEditableWarning
+                                data-placeholder={placeholder}
+                                onInput={handleInput}
+                                onKeyDown={handleKeyDown}
+                                onClick={handleEditorClick}
+                            />
                         </div>
                         {/* 右侧预览 */}
                         <div className="flex-1 flex flex-col">
@@ -1222,7 +1538,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 )}
 
                 {/* 字数统计显示区域 */}
-                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-4">
                         {hasSelectedText ? (
                             <>
@@ -1303,6 +1619,75 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         )}
                     </div>
                 </div>
+
+                {/* HTML调试区域 */}
+                {showHtmlDebug && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-2">
+                                <Code className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">HTML调试</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 px-2 text-xs"
+                                            onClick={handleCleanHtml}
+                                        >
+                                            <RefreshCw className="w-3 h-3 mr-1" />
+                                            清理
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>清理HTML结构</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 px-2 text-xs"
+                                            onClick={handleCopyHtml}
+                                        >
+                                            <Copy className="w-3 h-3 mr-1" />
+                                            复制
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>复制HTML代码</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-7 px-2"
+                                            onClick={handleHtmlDebugToggle}
+                                        >
+                                            <ChevronUp className="w-4 h-4" />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p>关闭HTML调试</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </div>
+                        </div>
+                        <div className="p-4">
+                            <pre className="text-xs text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-3 rounded border overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
+                                {htmlDebugContent || '<div>暂无内容</div>'}
+                            </pre>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* LaTeX公式选择器 */}
