@@ -759,14 +759,35 @@ export default function NotesView() {
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="right" className="w-96 flex flex-col">
-                                <SheetHeader className="flex-shrink-0">
+                                <SheetHeader className="flex-shrink-0 pb-2">
                                     <SheetTitle>笔记列表</SheetTitle>
                                 </SheetHeader>
 
                                 {/* 固定顶部区域 */}
-                                <div className="flex-shrink-0 mt-4 px-4 space-y-4">
+                                <div className="flex-shrink-0 mt-2 px-4">
+                                    {/* 新建笔记按钮 */}
+                                    <Button
+                                        onClick={() => {
+                                            if (hasUnsavedChanges && selectedNote) {
+                                                checkUnsavedChanges(() => {
+                                                    setIsCreating(true);
+                                                    setIsSheetOpen(false); // 关闭Sheet
+                                                });
+                                            } else {
+                                                setIsCreating(true);
+                                                setIsSheetOpen(false); // 关闭Sheet
+                                            }
+                                        }}
+                                        className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white mb-6"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Plus className="w-5 h-5" />
+                                            <MixedText text="新建笔记" />
+                                        </div>
+                                    </Button>
+
                                     {/* 搜索框 */}
-                                    <div className="relative">
+                                    <div className="relative mb-3">
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                         <Input
                                             placeholder="搜索笔记..."
@@ -798,27 +819,6 @@ export default function NotesView() {
                                             ))}
                                         </div>
                                     )}
-
-                                    {/* 新建笔记按钮 */}
-                                    <Button
-                                        onClick={() => {
-                                            if (hasUnsavedChanges && selectedNote) {
-                                                checkUnsavedChanges(() => {
-                                                    setIsCreating(true);
-                                                    setIsSheetOpen(false); // 关闭Sheet
-                                                });
-                                            } else {
-                                                setIsCreating(true);
-                                                setIsSheetOpen(false); // 关闭Sheet
-                                            }
-                                        }}
-                                        className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Plus className="w-5 h-5" />
-                                            <MixedText text="新建笔记" />
-                                        </div>
-                                    </Button>
                                 </div>
 
                                 {/* 可滚动的笔记列表区域 */}
@@ -834,7 +834,7 @@ export default function NotesView() {
                                                 filteredNotes.map(note => (
                                                     <div
                                                         key={note.id}
-                                                        className={`p-3 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${selectedNote?.id === note.id
+                                                        className={`p-2 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${selectedNote?.id === note.id
                                                             ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 shadow-sm'
                                                             : 'hover:border-muted-foreground/20'
                                                             }`}
@@ -850,12 +850,12 @@ export default function NotesView() {
                                                     >
                                                         <div className="flex items-start justify-between">
                                                             <div className="flex-1 min-w-0">
-                                                                <h3 className="font-medium truncate">{note.title}</h3>
-                                                                <p className="text-sm text-muted-foreground mt-1">
+                                                                <h3 className="font-medium truncate text-sm">{note.title}</h3>
+                                                                <p className="text-xs text-muted-foreground mt-0.5">
                                                                     {formatDate(note.updatedAt)}
                                                                 </p>
                                                                 {note.tags.length > 0 && (
-                                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                                    <div className="flex flex-wrap gap-1 mt-1">
                                                                         {note.tags.map((tag, index) => {
                                                                             // 确保提取的是字符串
                                                                             const tagName = typeof tag === 'string' ? tag : (
@@ -866,7 +866,7 @@ export default function NotesView() {
                                                                             return (
                                                                                 <Badge
                                                                                     key={index}
-                                                                                    className="text-xs text-white"
+                                                                                    className="text-xs text-white px-1.5 py-0.5"
                                                                                     style={{ backgroundColor: tagColor }}
                                                                                 >
                                                                                     {tagName}
@@ -882,7 +882,7 @@ export default function NotesView() {
                                                                         <Button
                                                                             variant="ghost"
                                                                             size="icon"
-                                                                            className="h-6 w-6 rounded-full"
+                                                                            className="h-5 w-5 rounded-full"
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
                                                                                 handleExportNote(note);
@@ -901,7 +901,7 @@ export default function NotesView() {
                                                                         <Button
                                                                             variant="ghost"
                                                                             size="icon"
-                                                                            className="h-6 w-6 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                                            className="h-5 w-5 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
                                                                                 handleDeleteNote(note);
@@ -938,7 +938,7 @@ export default function NotesView() {
                                             disabled={isSaving}
                                             className={`
                                                 relative overflow-hidden transition-all duration-500 ease-in-out
-                                                ${hasUnsavedChanges
+                                                ${hasUnsavedChanges && !isSaving
                                                     ? 'h-8 px-4 rounded-full bg-[#f59e0b] hover:bg-[#f59e0b]/90 text-white shadow-sm'
                                                     : 'h-8 w-8 rounded-full bg-[#2C9678] hover:bg-[#2C9678]/90 text-white shadow-sm'
                                                 }

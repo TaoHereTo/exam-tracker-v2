@@ -321,10 +321,10 @@ function TooltipOverlay() {
                     rendered.open
                       ? { opacity: 1, scale: 1, x: 0, y: 0 }
                       : {
-                          opacity: 0,
-                          scale: 0,
-                          ...initialFromSide(rendered.data.side),
-                        }
+                        opacity: 0,
+                        scale: 0,
+                        ...initialFromSide(rendered.data.side),
+                      }
                   }
                   exit={{
                     opacity: 0,
