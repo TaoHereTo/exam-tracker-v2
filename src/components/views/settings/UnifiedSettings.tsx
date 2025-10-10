@@ -30,7 +30,7 @@ import {
 import { MixedText } from "@/components/ui/MixedText";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
-import type { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown } from "@/types/record";
+import type { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown, Note } from "@/types/record";
 import type { UploadProgress } from "@/lib/cloudSyncService";
 import type { SyncReportItem } from "@/types/common";
 import { PhotoProvider, PhotoView } from 'react-photo-view';
@@ -48,10 +48,13 @@ export function UnifiedSettings({
   setRecords,  // Add setter functions
   setPlans,
   setKnowledge,
+  setCountdowns,
+  setNotes,
   records = [],
   plans = [],
   knowledge = [],
   countdowns = [],
+  notes = [],
   settings = {},
   activeTab,
   navMode,
@@ -62,10 +65,13 @@ export function UnifiedSettings({
   setRecords?: React.Dispatch<React.SetStateAction<RecordItem[]>>;  // Add setter types
   setPlans?: React.Dispatch<React.SetStateAction<StudyPlan[]>>;
   setKnowledge?: React.Dispatch<React.SetStateAction<KnowledgeItem[]>>;
+  setCountdowns?: React.Dispatch<React.SetStateAction<ExamCountdown[]>>;
+  setNotes?: React.Dispatch<React.SetStateAction<Note[]>>;
   records?: RecordItem[];
   plans?: StudyPlan[];
   knowledge?: KnowledgeItem[];
   countdowns?: ExamCountdown[];
+  notes?: Note[];
   settings?: UserSettings;
   activeTab?: string;
   navMode?: string;
@@ -324,6 +330,8 @@ export function UnifiedSettings({
         plans || [],
         knowledge || [],
         settings || {},
+        countdowns || [],
+        notes || [],
         (progress) => {
           setUploadProgress(progress);
         }
@@ -391,6 +399,14 @@ export function UnifiedSettings({
 
         if (setKnowledge && result.report.knowledge) {
           setKnowledge(result.report.knowledge.map(item => item.item));
+        }
+
+        if (setCountdowns && result.report.countdowns) {
+          setCountdowns(result.report.countdowns.map(item => item.item));
+        }
+
+        if (setNotes && result.report.notes) {
+          setNotes(result.report.notes.map(item => item.item));
         }
 
         // Show success notification
@@ -491,10 +507,10 @@ export function UnifiedSettings({
         <ThemeColorProvider defaultColor={PAGE_THEME_COLORS.settings}>
           <Tabs defaultValue="appearance" className="w-full" themeColor={PAGE_THEME_COLORS.settings}>
             <div className="flex justify-center items-center mb-6 py-2">
-              <TabsList className="items-center h-10">
-                <TabsTrigger value="appearance" className="flex items-center">外观设置</TabsTrigger>
-                <TabsTrigger value="data" className="flex items-center">数据管理</TabsTrigger>
-                <TabsTrigger value="ai" className="flex items-center">AI功能</TabsTrigger>
+              <TabsList className="items-center h-10 px-2 py-1">
+                <TabsTrigger value="appearance" className="flex items-center px-6 py-2">外观设置</TabsTrigger>
+                <TabsTrigger value="data" className="flex items-center px-6 py-2">数据管理</TabsTrigger>
+                <TabsTrigger value="ai" className="flex items-center px-6 py-2">AI功能</TabsTrigger>
               </TabsList>
             </div>
 

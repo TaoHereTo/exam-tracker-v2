@@ -10,7 +10,7 @@ import { CloudSyncService, UploadProgress } from "@/lib/cloudSyncService";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { CloudDataOverview } from "@/components/views/CloudDataOverview";
 import { SyncReportItem } from "@/types/common";
-import { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown } from "@/types/record";
+import { RecordItem, StudyPlan, KnowledgeItem, UserSettings, ExamCountdown, Note } from "@/types/record";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     Tooltip,
@@ -23,13 +23,14 @@ import { UnifiedSettings } from "./settings/UnifiedSettings";
 
 export function SettingsView({
     onExport, onImport, onClearLocalData,
-    setRecords, setPlans, setKnowledge,  // Add setter functions
+    setRecords, setPlans, setKnowledge, setCountdowns, setNotes,  // Add setter functions
     activeTab,
     navMode,
     records = [],
     plans = [],
     knowledge = [],
     countdowns = [],
+    notes = [],
     settings = {}
 }: {
     onExport?: () => void;
@@ -38,12 +39,15 @@ export function SettingsView({
     setRecords?: React.Dispatch<React.SetStateAction<RecordItem[]>>;  // Add setter types
     setPlans?: React.Dispatch<React.SetStateAction<StudyPlan[]>>;
     setKnowledge?: React.Dispatch<React.SetStateAction<KnowledgeItem[]>>;
+    setCountdowns?: React.Dispatch<React.SetStateAction<ExamCountdown[]>>;
+    setNotes?: React.Dispatch<React.SetStateAction<Note[]>>;
     activeTab?: string;
     navMode?: string;
     records?: RecordItem[];
     plans?: StudyPlan[];
     knowledge?: KnowledgeItem[];
     countdowns?: ExamCountdown[];
+    notes?: Note[];
     settings?: UserSettings;
 }) {
     // Render the unified settings component
@@ -55,10 +59,13 @@ export function SettingsView({
             setRecords={setRecords}  // Pass setter functions
             setPlans={setPlans}
             setKnowledge={setKnowledge}
+            setCountdowns={setCountdowns}
+            setNotes={setNotes}
             records={records}
             plans={plans}
             knowledge={knowledge}
             countdowns={countdowns}
+            notes={notes}
             settings={settings}
             activeTab={activeTab}
             navMode={navMode}

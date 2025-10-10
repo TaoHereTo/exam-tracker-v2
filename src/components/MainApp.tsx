@@ -1285,11 +1285,14 @@ export function MainApp() {
                                                         setRecords={setRecords}
                                                         setPlans={setPlans}
                                                         setKnowledge={setKnowledge}
+                                                        setCountdowns={setCountdowns}
+                                                        setNotes={setNotes}
                                                         activeTab={activeTab}
                                                         navMode={navMode}
                                                         records={records}
                                                         plans={plans}
                                                         countdowns={countdowns}
+                                                        notes={notes}
                                                         knowledge={knowledge}
                                                         settings={{
                                                             'exam-tracker-nav-mode': navMode,
@@ -1315,7 +1318,11 @@ export function MainApp() {
                                             <ul className="list-disc list-inside space-y-1">
                                                 <li><MixedText text={`刷题历史：${pendingImport.records.length} 条`} /></li>
                                                 <li><MixedText text={`知识点：${pendingImport.knowledge.length} 条`} /></li>
-                                                {pendingImport.plans && <li><MixedText text={`学习计划：${pendingImport.plans.length} 个`} /></li>}
+                                                {pendingImport.plans && pendingImport.plans.length > 0 && <li><MixedText text={`学习计划：${pendingImport.plans.length} 个`} /></li>}
+                                                {pendingImport.countdowns && pendingImport.countdowns.length > 0 && <li><MixedText text={`考试倒计时：${pendingImport.countdowns.length} 个`} /></li>}
+                                                {pendingImport.notes && pendingImport.notes.length > 0 && <li><MixedText text={`笔记：${pendingImport.notes.length} 条`} /></li>}
+                                                {pendingImport.settings && <li><MixedText text="设置数据" /></li>}
+                                                {pendingImport.cloudImages && pendingImport.cloudImages.length > 0 && <li><MixedText text={`云端图片：${pendingImport.cloudImages.length} 张`} /></li>}
                                             </ul>
                                             <p className="text-sm text-gray-600 mt-2">
                                                 注意：导入的数据将与现有数据合并，重复的数据将被自动跳过。
@@ -1333,7 +1340,8 @@ export function MainApp() {
                                     </Button>
                                     <Button
                                         onClick={handleConfirmImport}
-                                        className="flex items-center justify-center w-full sm:w-auto rounded-full"
+                                        variant="default"
+                                        className="flex items-center justify-center w-full sm:w-auto rounded-full bg-[#db2777] hover:bg-[#db2777]/90 text-white dark:text-white shadow-none hover:shadow-none transition-all duration-200"
                                     >
                                         <MixedText text="确认导入" />
                                     </Button>

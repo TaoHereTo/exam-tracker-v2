@@ -1,5 +1,5 @@
-import { recordService, planService, knowledgeService, settingsService } from './databaseService';
-import { RecordItem, StudyPlan, KnowledgeItem } from '../types/record';
+import { recordService, planService, knowledgeService, settingsService, countdownService } from './databaseService';
+import { RecordItem, StudyPlan, KnowledgeItem, ExamCountdown, Note } from '../types/record';
 import { supabase } from '../supabaseClient';
 import { SyncReportItem, CloudDataOverview } from '../types/common';
 import { UserSettings } from '../types/record';
@@ -25,15 +25,19 @@ export interface SyncResult {
     success: boolean;
     message: string;
     details?: {
-        records?: { uploaded: number; downloaded: number; skipped: number };
-        plans?: { uploaded: number; downloaded: number; skipped: number };
-        knowledge?: { uploaded: number; downloaded: number; skipped: number };
+        records?: { uploaded: number; downloaded: number; skipped: number; failed?: number };
+        plans?: { uploaded: number; downloaded: number; skipped: number; failed?: number };
+        knowledge?: { uploaded: number; downloaded: number; skipped: number; failed?: number };
+        countdowns?: { uploaded: number; downloaded: number; skipped: number; failed?: number };
+        notes?: { uploaded: number; downloaded: number; skipped: number; failed?: number };
         settings?: { uploaded: boolean; downloaded: boolean };
     };
     report?: {
         records: SyncReportItem<RecordItem>[];
         plans: SyncReportItem<StudyPlan>[];
         knowledge: SyncReportItem<KnowledgeItem>[];
+        countdowns: SyncReportItem<ExamCountdown>[];
+        notes: SyncReportItem<Note>[];
     };
 }
 
@@ -41,7 +45,7 @@ export interface UploadProgress {
     current: number;
     total: number;
     currentItem: string;
-    stage: 'checking' | 'uploading-records' | 'uploading-plans' | 'uploading-knowledge' | 'uploading-settings' | 'complete';
+    stage: 'checking' | 'uploading-records' | 'uploading-plans' | 'uploading-knowledge' | 'uploading-countdowns' | 'uploading-notes' | 'uploading-settings' | 'complete';
     isPaused?: boolean;
     isCancelled?: boolean;
 }
@@ -315,19 +319,25 @@ export class CloudSyncService {
         localPlans: StudyPlan[],
         localKnowledge: KnowledgeItem[],
         localSettings: UserSettings,
+        localCountdowns?: ExamCountdown[],
+        localNotes?: Note[],
         onProgress?: (progress: UploadProgress) => void,
         abortController?: AbortController
     ): Promise<SyncResult> {
         let uploadedRecords = 0;
         let uploadedPlans = 0;
         let uploadedKnowledge = 0;
+        let uploadedCountdowns = 0;
+        let uploadedNotes = 0;
         let settingsUploaded = false;
 
         // 初始化报告
         const report = {
             records: [] as SyncReportItem<RecordItem>[],
             plans: [] as SyncReportItem<StudyPlan>[],
-            knowledge: [] as SyncReportItem<KnowledgeItem>[]
+            knowledge: [] as SyncReportItem<KnowledgeItem>[],
+            countdowns: [] as SyncReportItem<ExamCountdown>[],
+            notes: [] as SyncReportItem<Note>[]
         };
 
         try {
@@ -341,7 +351,7 @@ export class CloudSyncService {
             // 预先获取云端数据，用于重复检查
             onProgress?.({
                 current: 0,
-                total: 4,
+                total: 6,
                 currentItem: '正在检查云端数据...',
                 stage: 'checking',
                 isPaused: false,
@@ -416,7 +426,7 @@ export class CloudSyncService {
             if (recordsToUpload.length > 0) {
                 onProgress?.({
                     current: 1,
-                    total: 4,
+                    total: 6,
                     currentItem: `正在批量上传 ${recordsToUpload.length} 条记录...`,
                     stage: 'uploading-records',
                     isPaused: false,
@@ -444,7 +454,7 @@ export class CloudSyncService {
             if (plansToUpload.length > 0) {
                 onProgress?.({
                     current: 2,
-                    total: 4,
+                    total: 6,
                     currentItem: `正在批量上传 ${plansToUpload.length} 个计划...`,
                     stage: 'uploading-plans',
                     isPaused: false,
@@ -472,7 +482,7 @@ export class CloudSyncService {
             if (knowledgeToUpload.length > 0) {
                 onProgress?.({
                     current: 3,
-                    total: 4,
+                    total: 6,
                     currentItem: `正在批量上传 ${knowledgeToUpload.length} 条知识点...`,
                     stage: 'uploading-knowledge',
                     isPaused: false,
@@ -492,7 +502,7 @@ export class CloudSyncService {
                     // 如果批量上传失败，尝试逐个上传
                     onProgress?.({
                         current: 3,
-                        total: 4,
+                        total: 6,
                         currentItem: '批量上传失败，尝试逐个上传知识点...',
                         stage: 'uploading-knowledge',
                         isPaused: false,
@@ -579,10 +589,96 @@ export class CloudSyncService {
 
             checkCancelled();
 
+            // 上传倒计时数据
+            if (localCountdowns && localCountdowns.length > 0) {
+                onProgress?.({
+                    current: 4,
+                    total: 6,
+                    currentItem: '正在上传倒计时数据...',
+                    stage: 'uploading-countdowns',
+                    isPaused: false,
+                    isCancelled: false
+                });
+
+                try {
+                    const countdownsToUpload = localCountdowns.filter(countdown => countdown.id);
+                    for (const countdown of countdownsToUpload) {
+                        try {
+                            await countdownService.addCountdown({
+                                name: countdown.name,
+                                examDate: countdown.examDate,
+                                description: countdown.description
+                            });
+                            uploadedCountdowns++;
+                            report.countdowns.push({
+                                item: countdown,
+                                action: 'uploaded',
+                                reason: '成功上传'
+                            });
+                        } catch (error) {
+                            console.error('倒计时上传失败:', error);
+                            report.countdowns.push({
+                                item: countdown,
+                                action: 'failed',
+                                reason: error instanceof Error ? error.message : '上传失败'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('倒计时批量上传失败:', error);
+                }
+            }
+
+            checkCancelled();
+
+            // 上传笔记数据
+            if (localNotes && localNotes.length > 0) {
+                onProgress?.({
+                    current: 5,
+                    total: 6,
+                    currentItem: '正在上传笔记数据...',
+                    stage: 'uploading-notes',
+                    isPaused: false,
+                    isCancelled: false
+                });
+
+                try {
+                    const notesToUpload = localNotes.filter(note => note.id);
+                    for (const note of notesToUpload) {
+                        try {
+                            // TODO: 实现notesService后再启用
+                            // await notesService.addNote({
+                            //     title: note.title,
+                            //     content: note.content,
+                            //     tags: note.tags
+                            // });
+                            throw new Error('笔记服务尚未实现');
+                            uploadedNotes++;
+                            report.notes.push({
+                                item: note,
+                                action: 'uploaded',
+                                reason: '成功上传'
+                            });
+                        } catch (error) {
+                            console.error('笔记上传失败:', error);
+                            report.notes.push({
+                                item: note,
+                                action: 'failed',
+                                reason: error instanceof Error ? error.message : '上传失败'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('笔记批量上传失败:', error);
+                }
+            }
+
+            checkCancelled();
+
             // 上传设置
             onProgress?.({
-                current: 4,
-                total: 4,
+                current: 6,
+                total: 6,
                 currentItem: '正在上传设置...',
                 stage: 'uploading-settings',
                 isPaused: false,
@@ -597,8 +693,8 @@ export class CloudSyncService {
             }
 
             onProgress?.({
-                current: 4,
-                total: 4,
+                current: 6,
+                total: 6,
                 currentItem: '上传完成',
                 stage: 'complete',
                 isPaused: false,
@@ -608,14 +704,18 @@ export class CloudSyncService {
             const skippedRecords = report.records.filter(r => r.action === 'skipped').length;
             const skippedPlans = report.plans.filter(p => p.action === 'skipped').length;
             const skippedKnowledge = report.knowledge.filter(k => k.action === 'skipped').length;
+            const failedCountdowns = report.countdowns.filter(c => c.action === 'failed').length;
+            const failedNotes = report.notes.filter(n => n.action === 'failed').length;
 
             return {
                 success: true,
-                message: `成功上传 ${uploadedRecords} 条记录、${uploadedPlans} 个计划、${uploadedKnowledge} 条知识点。跳过 ${skippedRecords} 条重复记录、${skippedPlans} 个重复计划、${skippedKnowledge} 条重复知识点。`,
+                message: `成功上传 ${uploadedRecords} 条记录、${uploadedPlans} 个计划、${uploadedKnowledge} 条知识点、${uploadedCountdowns} 个倒计时、${uploadedNotes} 条笔记。跳过 ${skippedRecords} 条重复记录、${skippedPlans} 个重复计划、${skippedKnowledge} 条重复知识点。`,
                 details: {
                     records: { uploaded: uploadedRecords, downloaded: 0, skipped: skippedRecords },
                     plans: { uploaded: uploadedPlans, downloaded: 0, skipped: skippedPlans },
                     knowledge: { uploaded: uploadedKnowledge, downloaded: 0, skipped: skippedKnowledge },
+                    countdowns: { uploaded: uploadedCountdowns, downloaded: 0, skipped: 0, failed: failedCountdowns },
+                    notes: { uploaded: uploadedNotes, downloaded: 0, skipped: 0, failed: failedNotes },
                     settings: { uploaded: settingsUploaded, downloaded: false }
                 },
                 report
@@ -654,14 +754,16 @@ export class CloudSyncService {
             let downloadedRecords: RecordItem[] = [];
             let downloadedPlans: StudyPlan[] = [];
             let downloadedKnowledge: KnowledgeItem[] = [];
+            let downloadedCountdowns: ExamCountdown[] = [];
+            let downloadedNotes: Note[] = [];
             let settingsDownloaded: UserSettings | null = null;
 
             // Report initial progress
-            onProgress?.({ current: 0, total: 4, currentItem: "开始下载数据..." });
+            onProgress?.({ current: 0, total: 6, currentItem: "开始下载数据..." });
 
             // 下载刷题历史
             try {
-                onProgress?.({ current: 1, total: 4, currentItem: "正在下载刷题历史..." });
+                onProgress?.({ current: 1, total: 6, currentItem: "正在下载刷题历史..." });
                 downloadedRecords = await recordService.getRecords();
             } catch (error) {
                 console.error('下载记录失败:', error);
@@ -669,7 +771,7 @@ export class CloudSyncService {
 
             // 下载学习计划
             try {
-                onProgress?.({ current: 2, total: 4, currentItem: "正在下载学习计划..." });
+                onProgress?.({ current: 2, total: 6, currentItem: "正在下载学习计划..." });
                 downloadedPlans = await planService.getPlans();
             } catch (error) {
                 console.error('下载计划失败:', error);
@@ -677,36 +779,58 @@ export class CloudSyncService {
 
             // 下载知识点
             try {
-                onProgress?.({ current: 3, total: 4, currentItem: "正在下载知识点..." });
+                onProgress?.({ current: 3, total: 6, currentItem: "正在下载知识点..." });
                 downloadedKnowledge = await knowledgeService.getKnowledge();
             } catch (error) {
                 console.error('下载知识点失败:', error);
             }
 
+            // 下载倒计时
+            try {
+                onProgress?.({ current: 4, total: 6, currentItem: "正在下载倒计时..." });
+                downloadedCountdowns = await countdownService.getCountdowns();
+            } catch (error) {
+                console.error('下载倒计时失败:', error);
+            }
+
+            // 下载笔记
+            try {
+                onProgress?.({ current: 5, total: 6, currentItem: "正在下载笔记..." });
+                // TODO: 实现笔记服务
+                // downloadedNotes = await notesService.getNotes();
+                downloadedNotes = [];
+            } catch (error) {
+                console.error('下载笔记失败:', error);
+            }
+
             // 下载设置
             try {
-                onProgress?.({ current: 4, total: 4, currentItem: "正在下载设置..." });
+                onProgress?.({ current: 6, total: 6, currentItem: "正在下载设置..." });
                 settingsDownloaded = await settingsService.getSettings();
             } catch (error) {
                 console.error('下载设置失败:', error);
             }
 
             // Report completion
-            onProgress?.({ current: 4, total: 4, currentItem: "下载完成" });
+            onProgress?.({ current: 6, total: 6, currentItem: "下载完成" });
 
             return {
                 success: true,
-                message: `成功下载 ${downloadedRecords.length} 条记录、${downloadedPlans.length} 个计划、${downloadedKnowledge.length} 条知识点`,
+                message: `成功下载 ${downloadedRecords.length} 条记录、${downloadedPlans.length} 个计划、${downloadedKnowledge.length} 条知识点、${downloadedCountdowns.length} 个倒计时、${downloadedNotes.length} 条笔记`,
                 details: {
                     records: { uploaded: 0, downloaded: downloadedRecords.length, skipped: 0 },
                     plans: { uploaded: 0, downloaded: downloadedPlans.length, skipped: 0 },
                     knowledge: { uploaded: 0, downloaded: downloadedKnowledge.length, skipped: 0 },
+                    countdowns: { uploaded: 0, downloaded: downloadedCountdowns.length, skipped: 0 },
+                    notes: { uploaded: 0, downloaded: downloadedNotes.length, skipped: 0 },
                     settings: { uploaded: false, downloaded: !!settingsDownloaded }
                 },
                 report: {
                     records: downloadedRecords.map(record => ({ item: record, action: 'uploaded' as const })),
                     plans: downloadedPlans.map(plan => ({ item: plan, action: 'uploaded' as const })),
-                    knowledge: downloadedKnowledge.map(knowledge => ({ item: knowledge, action: 'uploaded' as const }))
+                    knowledge: downloadedKnowledge.map(knowledge => ({ item: knowledge, action: 'uploaded' as const })),
+                    countdowns: downloadedCountdowns.map(countdown => ({ item: countdown, action: 'uploaded' as const })),
+                    notes: downloadedNotes.map(note => ({ item: note, action: 'uploaded' as const }))
                 }
             };
         } catch (error) {
@@ -722,11 +846,13 @@ export class CloudSyncService {
         localRecords: RecordItem[],
         localPlans: StudyPlan[],
         localKnowledge: KnowledgeItem[],
-        localSettings: UserSettings
+        localSettings: UserSettings,
+        localCountdowns?: ExamCountdown[],
+        localNotes?: Note[]
     ): Promise<SyncResult> {
         try {
             // 先上传本地数据
-            const uploadResult = await this.uploadToCloud(localRecords, localPlans, localKnowledge, localSettings);
+            const uploadResult = await this.uploadToCloud(localRecords, localPlans, localKnowledge, localSettings, localCountdowns, localNotes);
 
             // 再下载云端数据
             const downloadResult = await this.downloadFromCloud();
@@ -750,6 +876,18 @@ export class CloudSyncService {
                             uploaded: uploadResult.details?.knowledge?.uploaded || 0,
                             downloaded: downloadResult.details?.knowledge?.downloaded || 0,
                             skipped: uploadResult.details?.knowledge?.skipped || 0
+                        },
+                        countdowns: {
+                            uploaded: uploadResult.details?.countdowns?.uploaded || 0,
+                            downloaded: downloadResult.details?.countdowns?.downloaded || 0,
+                            skipped: uploadResult.details?.countdowns?.skipped || 0,
+                            failed: uploadResult.details?.countdowns?.failed || 0
+                        },
+                        notes: {
+                            uploaded: uploadResult.details?.notes?.uploaded || 0,
+                            downloaded: downloadResult.details?.notes?.downloaded || 0,
+                            skipped: uploadResult.details?.notes?.skipped || 0,
+                            failed: uploadResult.details?.notes?.failed || 0
                         },
                         settings: {
                             uploaded: uploadResult.details?.settings?.uploaded || false,
@@ -1065,6 +1203,8 @@ export class CloudSyncService {
             records: number;
             plans: number;
             knowledge: number;
+            countdowns: number;
+            notes: number;
             settings: boolean;
         };
     }> {
@@ -1075,26 +1215,32 @@ export class CloudSyncService {
                 return {
                     success: false,
                     message: '未登录，无法清空云端数据',
-                    clearedCount: { records: 0, plans: 0, knowledge: 0, settings: false }
+                    clearedCount: { records: 0, plans: 0, knowledge: 0, countdowns: 0, notes: 0, settings: false }
                 };
             }
             let clearedRecords = 0;
             let clearedPlans = 0;
             let clearedKnowledge = 0;
+            let clearedCountdowns = 0;
+            let clearedNotes = 0;
             let clearedSettings = false;
 
             // 获取当前数据数量用于统计
-            const [cloudRecords, cloudPlans, cloudKnowledge] = await Promise.all([
+            const [cloudRecords, cloudPlans, cloudKnowledge, countdownsResult, notesResult] = await Promise.all([
                 recordService.getRecords().catch(() => []),
                 planService.getPlans().catch(() => []),
-                knowledgeService.getKnowledge().catch(() => [])
+                knowledgeService.getKnowledge().catch(() => []),
+                supabase.from('exam_countdowns').select('*').eq('user_id', userId),
+                supabase.from('notes').select('*').eq('user_id', userId)
             ]);
 
             clearedRecords = cloudRecords.length;
             clearedPlans = cloudPlans.length;
             clearedKnowledge = cloudKnowledge.length;
+            clearedCountdowns = countdownsResult.data?.length || 0;
+            clearedNotes = notesResult.data?.length || 0;
 
-            const totalSteps = 4;
+            const totalSteps = 6;
             let currentStep = 0;
 
             // 清空记录
@@ -1133,6 +1279,30 @@ export class CloudSyncService {
                 throw new Error(`清空知识点失败: ${deleteKnowledge.error.message}`);
             }
 
+            // 清空倒计时
+            onProgress?.({
+                current: ++currentStep,
+                total: totalSteps,
+                currentItem: '正在清空倒计时...'
+            });
+            const deleteCountdowns = await supabase.from('exam_countdowns').delete().eq('user_id', userId);
+            if (deleteCountdowns.error) {
+                console.error('清空倒计时失败:', deleteCountdowns.error);
+                throw new Error(`清空倒计时失败: ${deleteCountdowns.error.message}`);
+            }
+
+            // 清空笔记
+            onProgress?.({
+                current: ++currentStep,
+                total: totalSteps,
+                currentItem: '正在清空笔记...'
+            });
+            const deleteNotes = await supabase.from('notes').delete().eq('user_id', userId);
+            if (deleteNotes.error) {
+                console.error('清空笔记失败:', deleteNotes.error);
+                throw new Error(`清空笔记失败: ${deleteNotes.error.message}`);
+            }
+
             // 清空设置
             onProgress?.({
                 current: ++currentStep,
@@ -1160,11 +1330,13 @@ export class CloudSyncService {
 
             return {
                 success: true,
-                message: `成功清空云端数据：${actuallyClearedRecords} 条记录、${actuallyClearedPlans} 个计划、${actuallyClearedKnowledge} 条知识点、设置已清空`,
+                message: `成功清空云端数据：${actuallyClearedRecords} 条记录、${actuallyClearedPlans} 个计划、${actuallyClearedKnowledge} 条知识点、${clearedCountdowns} 个倒计时、${clearedNotes} 条笔记、设置已清空`,
                 clearedCount: {
                     records: actuallyClearedRecords,
                     plans: actuallyClearedPlans,
                     knowledge: actuallyClearedKnowledge,
+                    countdowns: clearedCountdowns,
+                    notes: clearedNotes,
                     settings: clearedSettings
                 }
             };
@@ -1177,6 +1349,8 @@ export class CloudSyncService {
                     records: 0,
                     plans: 0,
                     knowledge: 0,
+                    countdowns: 0,
+                    notes: 0,
                     settings: false
                 }
             };
