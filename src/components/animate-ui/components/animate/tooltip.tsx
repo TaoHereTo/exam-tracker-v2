@@ -49,24 +49,28 @@ function TooltipContent({
         'w-fit bg-primary text-primary-foreground rounded-md',
         className,
       )}
+      style={{
+        // 最简化的字体渲染设置
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        // 移除所有可能导致问题的GPU加速设置
+        transform: 'none',
+        willChange: 'auto',
+        backfaceVisibility: 'visible'
+      }}
       {...props}
     >
-      <motion.div
-        className="overflow-hidden px-3 py-1.5 text-xs text-balance flex items-center justify-center"
+      {/* 最简化的内容结构 - 使用更稳定的居中方式 */}
+      <div
+        className="overflow-hidden px-3 py-1.5 text-xs text-balance"
         style={{
-          transform: 'translateZ(0)',
-          willChange: 'transform, opacity'
+          textAlign: 'center',
+          lineHeight: '1.4',
+          display: 'block'
         }}
       >
-        <motion.div
-          layout={layout}
-          style={{
-            transform: 'translateZ(0)'
-          }}
-        >
-          {children}
-        </motion.div>
-      </motion.div>
+        {children}
+      </div>
       <TooltipArrowPrimitive
         className="fill-primary size-3 data-[side='bottom']:translate-y-[1px] data-[side='right']:translate-x-[1px] data-[side='left']:translate-x-[-1px] data-[side='top']:translate-y-[-1px]"
         tipRadius={2}
