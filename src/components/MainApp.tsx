@@ -472,7 +472,7 @@ export function MainApp() {
     };
 
     // 清空本地数据（不影响云端）
-    const handleClearLocalData = async () => {
+    const handleClearLocalData = useCallback(async () => {
         try {
             // 清空localStorage中的数据
             clearLocalStorageData(['records', 'knowledge', 'plans', 'countdowns', 'events', 'ai', 'settings']);
@@ -497,7 +497,7 @@ export function MainApp() {
                 description: '清空本地数据时发生错误'
             });
         }
-    };
+    }, [setRecords, setKnowledge, setPlans, setCountdowns, setCustomEvents, setSelectedRecordIds, notify]);
 
     const handleBatchDelete = async () => {
         if (selectedRecordIds.length === 0) {

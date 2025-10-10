@@ -51,7 +51,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
         if (data && isLoading) {
             setIsLoading(false);
         }
-    }, [data, isLoading]);
+    }, [data]); // 移除isLoading依赖，避免无限循环
 
     // 为请求添加超时保护，避免无限加载
     const withTimeout = async <T,>(promise: Promise<T>, ms: number = 10000): Promise<T> => {
@@ -101,7 +101,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             isLoadingRef.current = false;
             setIsLoading(false);
         }
-    }, [showError]);
+    }, []); // 移除showError依赖，避免函数重新创建
 
     useEffect(() => {
         if (isOpen) {
@@ -149,7 +149,7 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             setClearing(false);
             setClearProgress(null);
         }
-    }, [notify, loadCloudData]);
+    }, [notify]); // 移除loadCloudData依赖，避免循环依赖
 
 
     const formatDateTime = useCallback((dateString: string) => {
