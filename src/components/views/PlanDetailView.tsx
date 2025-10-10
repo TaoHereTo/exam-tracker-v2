@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MODULES } from '@/config/exam';
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/animate-ui/components/radix/progress";
 import { MixedText } from "@/components/ui/MixedText";
 import { StudyPlan } from "@/types/record";
 

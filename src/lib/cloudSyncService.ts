@@ -232,9 +232,20 @@ export class CloudSyncService {
                 continue;
             }
 
+            // 验证和修复UUID格式
+            let validId = item.id;
+            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+            if (!uuidRegex.test(item.id)) {
+                // 如果不是有效的UUID格式，生成新的UUID
+                const { generateUUID } = await import('./utils');
+                validId = generateUUID();
+                console.warn(`知识点ID格式无效，已生成新UUID: ${item.id} -> ${validId}`);
+            }
+
             // 确保type和note字段不为空
             const validatedItem: KnowledgeItem = {
                 ...item,
+                id: validId,
                 type: item.type || '未分类',
                 note: item.note || '无内容'
             };
@@ -508,8 +519,19 @@ export class CloudSyncService {
                     let individualUploaded = 0;
                     let individualFailed = 0;
 
-                    for (const knowledge of knowledgeToUpload) {
+                    for (let i = 0; i < knowledgeToUpload.length; i++) {
+                        const knowledge = knowledgeToUpload[i];
                         checkCancelled();
+
+                        // 更新进度
+                        onProgress?.({
+                            current: 3,
+                            total: 6,
+                            currentItem: `正在逐个上传知识点 ${i + 1}/${knowledgeToUpload.length}...`,
+                            stage: 'uploading-knowledge',
+                            isPaused: false,
+                            isCancelled: false
+                        });
 
                         // 验证知识点数据
                         if (!knowledge.id || !knowledge.module) {
@@ -526,25 +548,62 @@ export class CloudSyncService {
                             continue;
                         }
 
+                        // 验证和修复UUID格式
+                        let validId = knowledge.id;
+                        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+                        if (!uuidRegex.test(knowledge.id)) {
+                            // 如果不是有效的UUID格式，生成新的UUID
+                            const { generateUUID } = await import('./utils');
+                            validId = generateUUID();
+                            console.warn(`知识点ID格式无效，已生成新UUID: ${knowledge.id} -> ${validId}`);
+                        }
+
                         // 确保type和note字段不为空
                         const validatedKnowledge = {
                             ...knowledge,
+                            id: validId,
                             type: knowledge.type || '未分类',
                             note: knowledge.note || '无内容'
                         };
 
                         try {
-                            await knowledgeService.addKnowledge({
+                            // 使用修复后的ID创建知识点数据
+                            const knowledgeData: Record<string, unknown> = {
                                 module: validatedKnowledge.module,
                                 type: validatedKnowledge.type,
                                 note: validatedKnowledge.note,
                                 subCategory: validatedKnowledge.subCategory,
                                 date: validatedKnowledge.date,
                                 source: validatedKnowledge.source,
-                            });
+                            };
+
+                            // 直接使用Supabase插入，避免使用knowledgeService.addKnowledge（它会生成新ID）
+                            const { data: userData } = await supabase.auth.getUser();
+                            const userId = userData?.user?.id;
+                            if (!userId) throw new Error('用户未登录');
+
+                            const { error: insertError } = await supabase
+                                .from('knowledge')
+                                .insert([{
+                                    id: validId,
+                                    user_id: userId,
+                                    module: validatedKnowledge.module,
+                                    type: validatedKnowledge.type,
+                                    note: validatedKnowledge.note,
+                                    subCategory: validatedKnowledge.subCategory || '',
+                                    date: validatedKnowledge.date || null,
+                                    source: validatedKnowledge.source || '',
+                                    created_at: validatedKnowledge.createdAt || new Date().toISOString(),
+                                    updated_at: validatedKnowledge.updatedAt || new Date().toISOString()
+                                }]);
+
+                            if (insertError) {
+                                throw insertError;
+                            }
+
                             individualUploaded++;
                             report.knowledge.push({ item: knowledge, action: 'uploaded' });
-                            console.log(`单个知识点上传成功: ${knowledge.id}`);
+                            console.log(`单个知识点上传成功: ${validId}`);
                         } catch (individualError) {
                             console.error('单个知识点上传失败:', {
                                 knowledgeId: knowledge.id,
@@ -563,6 +622,8 @@ export class CloudSyncService {
                                     reason = '权限不足，请重新登录';
                                 } else if (individualError.message.includes('network') || individualError.message.includes('fetch')) {
                                     reason = '网络连接失败';
+                                } else if (individualError.message.includes('invalid input syntax for type uuid')) {
+                                    reason = '知识点ID格式无效';
                                 } else {
                                     reason = individualError.message;
                                 }

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/animate-ui/components/radix/progress";
 import { Tabs, TabsList, TabsTrigger, TabsContent, TabsContents } from "@/components/ui/simple-tabs";
 import { ThemeColorProvider, PAGE_THEME_COLORS } from "@/contexts/ThemeColorContext";
 
@@ -163,18 +163,44 @@ export function UnifiedSettings({
           description: result.message
         });
       } else {
-        // Show error notification
+        // Show error notification with more details
+        const errorMessage = result.message || "上传过程中发生未知错误";
         notify({
           type: "error",
           message: "上传失败",
-          description: result.message
+          description: errorMessage
+        });
+
+        // Log detailed error information for debugging
+        console.error("上传失败详情:", {
+          success: result.success,
+          message: result.message,
+          details: result.details
         });
       }
     } catch (error) {
+      console.error("上传过程中发生异常:", error);
+
+      let errorMessage = "未知错误";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // 提供更友好的错误信息
+        if (error.message.includes('invalid input syntax for type uuid')) {
+          errorMessage = "知识点ID格式错误，请尝试重新导入数据";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "网络连接失败，请检查网络连接后重试";
+        } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+          errorMessage = "权限不足，请重新登录";
+        } else if (error.message.includes('timeout')) {
+          errorMessage = "请求超时，请稍后重试";
+        }
+      }
+
       notify({
         type: "error",
         message: "上传失败",
-        description: error instanceof Error ? error.message : "未知错误"
+        description: errorMessage
       });
     } finally {
       // Reset uploading state

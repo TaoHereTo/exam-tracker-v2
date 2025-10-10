@@ -11,7 +11,7 @@ import { VisuallyHidden } from '@/components/ui/visually-hidden';
 import { CloudSyncService } from '@/lib/cloudSyncService';
 import { useNotification } from '@/components/magicui/NotificationProvider';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '@/components/animate-ui/components/radix/progress';
 import { Button } from '@/components/ui/button';
 import { Trash2, AlertTriangle, Cloud, HardDrive, FileText } from 'lucide-react';
 import { CircularButton } from '@/components/ui/circular-button';

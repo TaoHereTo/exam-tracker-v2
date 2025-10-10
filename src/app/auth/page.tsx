@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNotification } from '@/components/magicui/NotificationProvider'
 import { BarChart3, BookOpen, Calendar as CalendarIcon, BookCopy } from 'lucide-react'
 import { Card } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { Progress } from '@/components/animate-ui/components/radix/progress'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -175,7 +175,7 @@ function AuthPageContent() {
                                                             <span className="text-xs font-medium text-[#404040] dark:text-white">{plan.name}</span>
                                                             <span className="text-xs text-[#404040]/60 dark:text-white/60">{plan.progress}/{plan.target}</span>
                                                         </div>
-                                                        <Progress value={(plan.progress / plan.target) * 100} className="h-1.5" />
+                                                        <Progress value={(plan.progress / plan.target) * 100} variant="plan" className="h-1.5" />
                                                         <span className="text-xs text-[#404040]/60 dark:text-white/60">{plan.status}</span>
                                                     </div>
                                                 ))}

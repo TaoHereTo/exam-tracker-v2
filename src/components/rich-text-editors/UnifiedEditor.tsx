@@ -37,6 +37,7 @@ import {
     Eraser,
     Code,
     Copy,
+    Check,
     ChevronDown,
     ChevronUp,
     RefreshCw
@@ -197,6 +198,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const [showCountSettings, setShowCountSettings] = useState(false);
     const [showHtmlDebug, setShowHtmlDebug] = useState(false);
     const [htmlDebugContent, setHtmlDebugContent] = useState('');
+    const [isHtmlCopied, setIsHtmlCopied] = useState(false);
+    const [isHtmlCleaned, setIsHtmlCleaned] = useState(false);
 
     // 计算字数统计
     const calculateWordCount = useCallback((html: string) => {
@@ -580,7 +583,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const handleCopyHtml = useCallback(async () => {
         try {
             await navigator.clipboard.writeText(htmlDebugContent);
-            // 可以添加一个toast提示复制成功
+            setIsHtmlCopied(true);
+            setTimeout(() => setIsHtmlCopied(false), 2000);
             console.log('HTML代码已复制到剪贴板');
         } catch (error) {
             console.error('复制失败:', error);
@@ -591,6 +595,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
+            setIsHtmlCopied(true);
+            setTimeout(() => setIsHtmlCopied(false), 2000);
             console.log('HTML代码已复制到剪贴板（备用方案）');
         }
     }, [htmlDebugContent]);
@@ -619,6 +625,10 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 const counts = calculateWordCount(cleanedHtml);
                 setWordCount(counts.wordCount);
                 setCharCount(counts.charCount);
+
+                // 显示清理成功动效
+                setIsHtmlCleaned(true);
+                setTimeout(() => setIsHtmlCleaned(false), 2000);
 
                 console.log('HTML结构已手动清理完成');
             } else {
@@ -1062,7 +1072,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     return (
         <div className={cn(
-            "unified-editor-wrapper",
+            "unified-editor-wrapper border border-gray-200 dark:border-gray-700 rounded-lg",
             actualIsFullscreen && "fixed inset-0 bg-background",
             className
         )}
@@ -1538,7 +1548,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 )}
 
                 {/* 字数统计显示区域 */}
-                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
                     <div className="flex items-center gap-4">
                         {hasSelectedText ? (
                             <>
@@ -1635,15 +1645,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="h-7 px-2 text-xs"
+                                            className="h-7 w-7 p-0 transition-all duration-300 ease-in-out"
                                             onClick={handleCleanHtml}
                                         >
-                                            <RefreshCw className="w-3 h-3 mr-1" />
-                                            清理
+                                            <div className="relative">
+                                                <RefreshCw className={`w-3 h-3 transition-all duration-300 ${isHtmlCleaned ? 'opacity-0 scale-0 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
+                                                <Check className={`w-3 h-3 text-green-500 absolute top-0 left-0 transition-all duration-300 ${isHtmlCleaned ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-180'}`} />
+                                            </div>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>清理HTML结构</p>
+                                        <p>{isHtmlCleaned ? '已清理' : '清理结构'}</p>
                                     </TooltipContent>
                                 </Tooltip>
                                 <Tooltip>
@@ -1652,15 +1664,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                             type="button"
                                             variant="ghost"
                                             size="sm"
-                                            className="h-7 px-2 text-xs"
+                                            className="h-7 w-7 p-0 transition-all duration-300 ease-in-out"
                                             onClick={handleCopyHtml}
                                         >
-                                            <Copy className="w-3 h-3 mr-1" />
-                                            复制
+                                            <div className="relative">
+                                                <Copy className={`w-3 h-3 transition-all duration-300 ${isHtmlCopied ? 'opacity-0 scale-0 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
+                                                <Check className={`w-3 h-3 text-green-500 absolute top-0 left-0 transition-all duration-300 ${isHtmlCopied ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-180'}`} />
+                                            </div>
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>复制HTML代码</p>
+                                        <p>{isHtmlCopied ? '已复制' : '复制代码'}</p>
                                     </TooltipContent>
                                 </Tooltip>
                                 <Tooltip>
