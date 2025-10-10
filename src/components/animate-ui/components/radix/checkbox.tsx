@@ -13,8 +13,8 @@ const checkboxVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-background border border-gray-300 dark:border-gray-600',
-        accent: 'bg-input border border-gray-300 dark:border-gray-600',
+        default: 'bg-background border border-gray-300 dark:border-gray-600 data-[state=checked]:bg-primary data-[state=checked]:border-primary hover:bg-gray-50 dark:data-[state=checked]:bg-transparent dark:hover:bg-transparent',
+        accent: 'bg-input border border-gray-300 dark:border-gray-600 data-[state=checked]:bg-primary data-[state=checked]:border-primary hover:bg-gray-50 dark:data-[state=checked]:bg-transparent dark:hover:bg-transparent',
       },
       size: {
         default: 'size-5 rounded-sm',
