@@ -576,7 +576,25 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
 
     // 处理HTML调试区域切换
     const handleHtmlDebugToggle = useCallback(() => {
-        setShowHtmlDebug(!showHtmlDebug);
+        if (showHtmlDebug) {
+            // 通过ESC键来隐藏所有Tooltip，避免飞到左上角
+            const escapeEvent = new KeyboardEvent('keydown', {
+                key: 'Escape',
+                code: 'Escape',
+                keyCode: 27,
+                which: 27,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(escapeEvent);
+
+            // 短暂延迟后关闭HTML调试区域
+            setTimeout(() => {
+                setShowHtmlDebug(false);
+            }, 100);
+        } else {
+            setShowHtmlDebug(true);
+        }
     }, [showHtmlDebug]);
 
     // 复制HTML代码到剪贴板
@@ -1690,7 +1708,7 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                         </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>关闭HTML调试</p>
+                                        <p>关闭调试</p>
                                     </TooltipContent>
                                 </Tooltip>
                             </div>

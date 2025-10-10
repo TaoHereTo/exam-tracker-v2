@@ -392,147 +392,149 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
   };
 
   return (
-    <div className="flex items-start justify-center w-full">
-      {isInDialog ? (
-        // When in dialog, render without Card wrapper to avoid nested card appearance
-        <div className="w-full max-w-4xl flex flex-col">
-          <div className={`${!initialData ? 'pt-0' : 'pt-4'} p-card`}>
-            <BaseForm
-              className="form-stack"
-              validationSchema={getValidationSchema(module, config)}
-              onSubmit={handleSubmit}
-              initialData={getInitialData()}
-            >
-              {/* 子分类选择器 */}
-              {config.hasSubCategory && (
-                <FormField name="subCategory" className="form-field">
-                  <Label htmlFor="subCategory">
-                    <MixedText text="选择子分类" />
+    <TooltipProvider>
+      <div className="flex items-start justify-center w-full">
+        {isInDialog ? (
+          // When in dialog, render without Card wrapper to avoid nested card appearance
+          <div className="w-full max-w-4xl flex flex-col">
+            <div className={`${!initialData ? 'pt-0' : 'pt-4'} p-card`}>
+              <BaseForm
+                className="form-stack"
+                validationSchema={getValidationSchema(module, config)}
+                onSubmit={handleSubmit}
+                initialData={getInitialData()}
+              >
+                {/* 子分类选择器 */}
+                {config.hasSubCategory && (
+                  <FormField name="subCategory" className="form-field">
+                    <Label htmlFor="subCategory">
+                      <MixedText text="选择子分类" />
+                    </Label>
+                    <FormSelect
+                      name="subCategory"
+                      placeholder="请选择子分类"
+                    >
+                      {config.subCategories?.map((category: string) => (
+                        <SelectItem key={category} value={category}>
+                          <MixedText text={category} />
+                        </SelectItem>
+                      ))}
+                    </FormSelect>
+                  </FormField>
+                )}
+
+                {/* 日期选择器 */}
+                {config.hasDateField && (
+                  <FormField name="date" className="form-field">
+                    <Label htmlFor="date">
+                      <MixedText text="选择发布日期" />
+                    </Label>
+                    <DateField />
+                  </FormField>
+                )}
+
+                {/* 第一个字段 */}
+                <FormField name="firstField" className="form-field">
+                  <Label htmlFor="firstField">
+                    <MixedText text={fieldConfig.firstLabel} />
                   </Label>
-                  <FormSelect
-                    name="subCategory"
-                    placeholder="请选择子分类"
-                  >
-                    {config.subCategories?.map((category: string) => (
-                      <SelectItem key={category} value={category}>
-                        <MixedText text={category} />
-                      </SelectItem>
-                    ))}
-                  </FormSelect>
+                  <FormInput
+                    name="firstField"
+                    placeholder={fieldConfig.firstPlaceholder}
+                  />
                 </FormField>
-              )}
 
-              {/* 日期选择器 */}
-              {config.hasDateField && (
-                <FormField name="date" className="form-field">
-                  <Label htmlFor="date">
-                    <MixedText text="选择发布日期" />
+                {/* 第二个字段 */}
+                <FormField name="secondField" className="form-field">
+                  <Label htmlFor="secondField">
+                    <MixedText text={fieldConfig.secondLabel} />
                   </Label>
-                  <DateField />
+                  <RichTextEditorField />
                 </FormField>
-              )}
 
-              {/* 第一个字段 */}
-              <FormField name="firstField" className="form-field">
-                <Label htmlFor="firstField">
-                  <MixedText text={fieldConfig.firstLabel} />
-                </Label>
-                <FormInput
-                  name="firstField"
-                  placeholder={fieldConfig.firstPlaceholder}
-                />
-              </FormField>
-
-              {/* 第二个字段 */}
-              <FormField name="secondField" className="form-field">
-                <Label htmlFor="secondField">
-                  <MixedText text={fieldConfig.secondLabel} />
-                </Label>
-                <RichTextEditorField />
-              </FormField>
-
-              {/* 保存按钮在右下角 */}
-              <div className="form-actions">
-                <div className="flex justify-end">
-                  <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
-                    <MixedText text="保存知识点" />
-                  </Button>
+                {/* 保存按钮在右下角 */}
+                <div className="form-actions">
+                  <div className="flex justify-end">
+                    <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
+                      <MixedText text="保存知识点" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </BaseForm>
+              </BaseForm>
+            </div>
           </div>
-        </div>
-      ) : (
-        // When not in dialog, render without Card wrapper
-        <div className="w-full max-w-4xl flex flex-col">
-          <div className="pt-4 pb-4">
-            {/* 非对话框模式下的表单 */}
-            <BaseForm
-              className="form-stack"
-              validationSchema={getValidationSchema(module, config)}
-              onSubmit={handleSubmit}
-              initialData={getInitialData()}
-            >
-              {/* 子分类选择器 */}
-              {config.hasSubCategory && (
-                <FormField name="subCategory" className="form-field">
-                  <Label htmlFor="subCategory">
-                    <MixedText text="选择子分类" />
+        ) : (
+          // When not in dialog, render without Card wrapper
+          <div className="w-full max-w-4xl flex flex-col">
+            <div className="pt-4 pb-4">
+              {/* 非对话框模式下的表单 */}
+              <BaseForm
+                className="form-stack"
+                validationSchema={getValidationSchema(module, config)}
+                onSubmit={handleSubmit}
+                initialData={getInitialData()}
+              >
+                {/* 子分类选择器 */}
+                {config.hasSubCategory && (
+                  <FormField name="subCategory" className="form-field">
+                    <Label htmlFor="subCategory">
+                      <MixedText text="选择子分类" />
+                    </Label>
+                    <FormSelect
+                      name="subCategory"
+                      placeholder="请选择子分类"
+                    >
+                      {config.subCategories?.map((category: string) => (
+                        <SelectItem key={category} value={category}>
+                          <MixedText text={category} />
+                        </SelectItem>
+                      ))}
+                    </FormSelect>
+                  </FormField>
+                )}
+
+                {/* 日期选择器 */}
+                {config.hasDateField && (
+                  <FormField name="date" className="form-field">
+                    <Label htmlFor="date">
+                      <MixedText text="选择发布日期" />
+                    </Label>
+                    <DateField />
+                  </FormField>
+                )}
+
+                {/* 第一个字段 */}
+                <FormField name="firstField" className="form-field">
+                  <Label htmlFor="firstField">
+                    <MixedText text={fieldConfig.firstLabel} />
                   </Label>
-                  <FormSelect
-                    name="subCategory"
-                    placeholder="请选择子分类"
-                  >
-                    {config.subCategories?.map((category: string) => (
-                      <SelectItem key={category} value={category}>
-                        <MixedText text={category} />
-                      </SelectItem>
-                    ))}
-                  </FormSelect>
+                  <FormInput
+                    name="firstField"
+                    placeholder={fieldConfig.firstPlaceholder}
+                  />
                 </FormField>
-              )}
 
-              {/* 日期选择器 */}
-              {config.hasDateField && (
-                <FormField name="date" className="form-field">
-                  <Label htmlFor="date">
-                    <MixedText text="选择发布日期" />
+                {/* 第二个字段 */}
+                <FormField name="secondField" className="form-field">
+                  <Label htmlFor="secondField">
+                    <MixedText text={fieldConfig.secondLabel} />
                   </Label>
-                  <DateField />
+                  <RichTextEditorField />
                 </FormField>
-              )}
 
-              {/* 第一个字段 */}
-              <FormField name="firstField" className="form-field">
-                <Label htmlFor="firstField">
-                  <MixedText text={fieldConfig.firstLabel} />
-                </Label>
-                <FormInput
-                  name="firstField"
-                  placeholder={fieldConfig.firstPlaceholder}
-                />
-              </FormField>
-
-              {/* 第二个字段 */}
-              <FormField name="secondField" className="form-field">
-                <Label htmlFor="secondField">
-                  <MixedText text={fieldConfig.secondLabel} />
-                </Label>
-                <RichTextEditorField />
-              </FormField>
-
-              {/* 保存按钮在右下角 */}
-              <div className="form-actions">
-                <div className="flex justify-end">
-                  <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
-                    <MixedText text="保存知识点" />
-                  </Button>
+                {/* 保存按钮在右下角 */}
+                <div className="form-actions">
+                  <div className="flex justify-end">
+                    <Button type="submit" variant="default" className="flex items-center justify-center py-2 px-6 text-sm h-10 rounded-full bg-[#f97316] hover:bg-[#f97316]/90 text-white">
+                      <MixedText text="保存知识点" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </BaseForm>
+              </BaseForm>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 };
