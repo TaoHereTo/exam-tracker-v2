@@ -34,6 +34,7 @@ import {
 import { useSidebar } from '@/components/animate-ui/components/radix/sidebar';
 import { cn } from "@/lib/utils";
 import { useTheme } from "next-themes";
+import { useUnsavedChanges } from '@/contexts/UnsavedChangesContext';
 
 // 定义 Sidebar 组件的 props 类型
 type SidebarProps = {
@@ -181,6 +182,7 @@ const NAV_DATA = {
 export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
     const { theme } = useTheme();
     const { state } = useSidebar();
+    const { hasUnsavedChanges, checkUnsavedChanges } = useUnsavedChanges();
     // 默认展开所有项目
     const [openItems, setOpenItems] = React.useState<Set<string>>(
         new Set(NAV_DATA.navMain.map(item => item.title))
@@ -191,7 +193,13 @@ export function Sidebar({ activeTab, setActiveTab, userInfo }: SidebarProps) {
 
     // 处理菜单项点击
     const handleMenuClick = (tab: string) => {
-        setActiveTab(tab);
+        if (hasUnsavedChanges && activeTab === 'notes') {
+            checkUnsavedChanges(() => {
+                setActiveTab(tab);
+            });
+        } else {
+            setActiveTab(tab);
+        }
     };
 
     // 处理折叠项点击

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CircularButton } from "@/components/ui/circular-button";
@@ -35,6 +35,7 @@ import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
 import { notesService, type Note as CloudNote } from "@/lib/notesService";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUnsavedChanges } from "@/contexts/UnsavedChangesContext";
 import {
     Dialog,
     DialogContent,
@@ -85,10 +86,14 @@ export default function NotesView() {
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const colorPickerRef = useRef<HTMLDivElement>(null);
+    const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const handleSaveNoteRef = useRef<((silent?: boolean) => Promise<void>) | null>(null);
     const { notify, notifyLoading, updateToSuccess, updateToError } = useNotification();
     const { user } = useAuth();
+    const { hasUnsavedChanges, setHasUnsavedChanges, checkUnsavedChanges, pendingAction, setPendingAction, showUnsavedChangesDialog, setShowUnsavedChangesDialog } = useUnsavedChanges();
 
     // 预定义的颜色选项
     const tagColors = [
@@ -133,9 +138,32 @@ export default function NotesView() {
 
     // 过滤笔记
     const filteredNotes = notes.filter(note => {
-        const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            note.content.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesTag = !selectedTag || note.tags.some(tag => tag.name === selectedTag);
+        const searchLower = searchTerm.toLowerCase();
+
+        // 搜索标题和内容
+        const matchesTitleOrContent = note.title.toLowerCase().includes(searchLower) ||
+            note.content.toLowerCase().includes(searchLower);
+
+        // 搜索标签
+        const matchesTags = note.tags.some(tag => {
+            const tagName = typeof tag === 'string' ? tag : (
+                typeof tag === 'object' && tag !== null ? (
+                    typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
+                ) : String(tag)
+            );
+            return tagName.toLowerCase().includes(searchLower);
+        });
+
+        const matchesSearch = matchesTitleOrContent || matchesTags;
+        const matchesTag = !selectedTag || note.tags.some(tag => {
+            const tagName = typeof tag === 'string' ? tag : (
+                typeof tag === 'object' && tag !== null ? (
+                    typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
+                ) : String(tag)
+            );
+            return tagName === selectedTag;
+        });
+
         return matchesSearch && matchesTag;
     });
 
@@ -186,7 +214,7 @@ export default function NotesView() {
     };
 
     // 加载笔记数据
-    const loadNotes = async () => {
+    const loadNotes = useCallback(async () => {
         if (!user) {
             setIsLoading(false);
             return;
@@ -230,14 +258,74 @@ export default function NotesView() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [user, notify]);
 
     // 组件挂载时加载数据（只在用户变化时重新加载）
     useEffect(() => {
         if (user && notes.length === 0) {
             loadNotes();
         }
-    }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [user, notes.length, loadNotes]);
+
+    // 自动保存功能
+    useEffect(() => {
+        if (selectedNote && hasUnsavedChanges) {
+            // 清除之前的定时器
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+            }
+
+            // 设置新的定时器，3分钟后自动保存
+            autoSaveTimerRef.current = setTimeout(() => {
+                if (hasUnsavedChanges && selectedNote && handleSaveNoteRef.current) {
+                    handleSaveNoteRef.current(true); // 静默保存
+                }
+            }, 3 * 60 * 1000); // 3分钟
+
+            // 清理函数
+            return () => {
+                if (autoSaveTimerRef.current) {
+                    clearTimeout(autoSaveTimerRef.current);
+                }
+            };
+        }
+    }, [selectedNote, hasUnsavedChanges]);
+
+    // 组件卸载时清理定时器
+    useEffect(() => {
+        return () => {
+            if (autoSaveTimerRef.current) {
+                clearTimeout(autoSaveTimerRef.current);
+            }
+        };
+    }, []);
+
+    // 处理未保存更改对话框的确认
+    const handleUnsavedChangesConfirm = async () => {
+        if (pendingAction) {
+            // 先保存当前笔记
+            await handleSaveNote(true); // 静默保存
+            // 然后执行待执行的操作
+            pendingAction();
+            setPendingAction(null);
+        }
+        setShowUnsavedChangesDialog(false);
+    };
+
+    // 处理未保存更改对话框的取消
+    const handleUnsavedChangesCancel = () => {
+        setPendingAction(null);
+        setShowUnsavedChangesDialog(false);
+    };
+
+    // 处理未保存更改对话框的丢弃更改
+    const handleUnsavedChangesDiscard = () => {
+        if (pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+        }
+        setShowUnsavedChangesDialog(false);
+    };
 
     // 点击外部关闭颜色选择器
     useEffect(() => {
@@ -345,12 +433,12 @@ export default function NotesView() {
         }
     };
 
-    // 保存笔记
-    const handleSaveNote = async () => {
+    // 保存笔记（支持静默保存）
+    const handleSaveNote = useCallback(async (silent = false) => {
         if (!selectedNote || !user) return;
 
-        // 显示loading toast
-        const toastId = notifyLoading?.('正在保存笔记...', '请稍候');
+        // 如果不是静默保存，显示loading toast
+        const toastId = !silent ? notifyLoading?.('正在保存笔记...', '请稍候') : null;
 
         try {
             setIsSaving(true);
@@ -381,33 +469,46 @@ export default function NotesView() {
             ));
             setSelectedNote(updatedNote);
 
-            // 更新为成功状态
-            if (toastId && updateToSuccess) {
-                updateToSuccess(toastId, '笔记保存成功', '笔记已成功保存到云端');
-            } else {
-                notify({
-                    type: "success",
-                    message: "笔记保存成功"
-                });
+            // 更新保存状态
+            setLastSaved(new Date());
+            setHasUnsavedChanges(false);
+
+            // 如果不是静默保存，显示成功提示
+            if (!silent) {
+                if (toastId && updateToSuccess) {
+                    updateToSuccess(toastId, '笔记保存成功', '笔记已成功保存到云端');
+                } else {
+                    notify({
+                        type: "success",
+                        message: "笔记保存成功"
+                    });
+                }
             }
         } catch (error) {
             console.error('保存笔记失败:', error);
             const errorMessage = error instanceof Error ? error.message : String(error);
 
-            // 更新为错误状态
-            if (toastId && updateToError) {
-                updateToError(toastId, '保存失败', `保存笔记时出错: ${errorMessage}`);
-            } else {
-                notify({
-                    type: "error",
-                    message: "保存笔记失败",
-                    description: "请检查网络连接或稍后重试"
-                });
+            // 如果不是静默保存，显示错误提示
+            if (!silent) {
+                if (toastId && updateToError) {
+                    updateToError(toastId, '保存失败', `保存笔记时出错: ${errorMessage}`);
+                } else {
+                    notify({
+                        type: "error",
+                        message: "保存笔记失败",
+                        description: "请检查网络连接或稍后重试"
+                    });
+                }
             }
         } finally {
             setIsSaving(false);
         }
-    };
+    }, [selectedNote, user, notifyLoading, updateToSuccess, updateToError, notify, setLastSaved, setHasUnsavedChanges, setNotes]);
+
+    // 更新ref中的函数引用
+    useEffect(() => {
+        handleSaveNoteRef.current = handleSaveNote;
+    }, [handleSaveNote]);
 
     // 删除笔记
     const handleDeleteNote = (note: Note) => {
@@ -657,11 +758,13 @@ export default function NotesView() {
                                     笔记列表
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-80">
-                                <SheetHeader>
+                            <SheetContent side="right" className="w-96 flex flex-col">
+                                <SheetHeader className="flex-shrink-0">
                                     <SheetTitle>笔记列表</SheetTitle>
                                 </SheetHeader>
-                                <div className="mt-4 px-4 space-y-4">
+
+                                {/* 固定顶部区域 */}
+                                <div className="flex-shrink-0 mt-4 px-4 space-y-4">
                                     {/* 搜索框 */}
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -699,8 +802,15 @@ export default function NotesView() {
                                     {/* 新建笔记按钮 */}
                                     <Button
                                         onClick={() => {
-                                            setIsCreating(true);
-                                            setIsSheetOpen(false); // 关闭Sheet
+                                            if (hasUnsavedChanges && selectedNote) {
+                                                checkUnsavedChanges(() => {
+                                                    setIsCreating(true);
+                                                    setIsSheetOpen(false); // 关闭Sheet
+                                                });
+                                            } else {
+                                                setIsCreating(true);
+                                                setIsSheetOpen(false); // 关闭Sheet
+                                            }
                                         }}
                                         className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white"
                                     >
@@ -711,10 +821,10 @@ export default function NotesView() {
                                     </Button>
                                 </div>
 
-                                {/* 笔记列表 */}
-                                <div className="mt-4 flex-1 overflow-hidden px-4">
-                                    <ScrollArea className="h-[calc(100vh-200px)]">
-                                        <div className="space-y-2">
+                                {/* 可滚动的笔记列表区域 */}
+                                <div className="flex-1 overflow-hidden px-4 mt-4">
+                                    <ScrollArea className="h-full">
+                                        <div className="space-y-2 pb-4">
                                             {filteredNotes.length === 0 ? (
                                                 <div className="text-center text-muted-foreground py-8">
                                                     <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
@@ -729,7 +839,13 @@ export default function NotesView() {
                                                             : 'hover:border-muted-foreground/20'
                                                             }`}
                                                         onClick={() => {
-                                                            setSelectedNote(note);
+                                                            if (hasUnsavedChanges && selectedNote) {
+                                                                checkUnsavedChanges(() => {
+                                                                    setSelectedNote(note);
+                                                                });
+                                                            } else {
+                                                                setSelectedNote(note);
+                                                            }
                                                         }}
                                                     >
                                                         <div className="flex items-start justify-between">
@@ -817,17 +933,46 @@ export default function NotesView() {
 
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <CircularButton
-                                            variant="success"
-                                            size="default"
-                                            onClick={handleSaveNote}
+                                        <button
+                                            onClick={() => handleSaveNote(false)}
                                             disabled={isSaving}
+                                            className={`
+                                                relative overflow-hidden transition-all duration-500 ease-in-out
+                                                ${hasUnsavedChanges
+                                                    ? 'h-8 px-4 rounded-full bg-[#f59e0b] hover:bg-[#f59e0b]/90 text-white shadow-sm'
+                                                    : 'h-8 w-8 rounded-full bg-[#2C9678] hover:bg-[#2C9678]/90 text-white shadow-sm'
+                                                }
+                                                disabled:opacity-50 disabled:cursor-not-allowed
+                                                flex items-center justify-center
+                                            `}
                                         >
-                                            <Save className="h-4 w-4" />
-                                        </CircularButton>
+                                            {/* 保存图标 - 始终显示 */}
+                                            <div className={`
+                                                transition-all duration-300 ease-in-out
+                                                ${hasUnsavedChanges ? 'scale-75' : 'scale-100'}
+                                            `}>
+                                                {isSaving ? (
+                                                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                ) : (
+                                                    <Save className="h-4 w-4" />
+                                                )}
+                                            </div>
+
+                                            {/* 未保存状态的内容 */}
+                                            {hasUnsavedChanges && !isSaving && (
+                                                <div className="flex items-center gap-2 ml-2 animate-in slide-in-from-right-2 duration-300">
+                                                    <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                                                    <span className="text-xs font-medium whitespace-nowrap">未保存</span>
+                                                </div>
+                                            )}
+                                        </button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                        <p>{isSaving ? "保存中..." : "保存笔记"}</p>
+                                        <p>
+                                            {isSaving ? "保存中..." :
+                                                hasUnsavedChanges ? "有未保存的更改" :
+                                                    "笔记已保存"}
+                                        </p>
                                     </TooltipContent>
                                 </Tooltip>
                             </>
@@ -889,7 +1034,15 @@ export default function NotesView() {
                         )}
 
                         <Button
-                            onClick={() => setIsCreating(true)}
+                            onClick={() => {
+                                if (hasUnsavedChanges && selectedNote) {
+                                    checkUnsavedChanges(() => {
+                                        setIsCreating(true);
+                                    });
+                                } else {
+                                    setIsCreating(true);
+                                }
+                            }}
                             className="h-9 px-6 rounded-full font-medium bg-[#ea580c] text-white hover:bg-[#ea580c]/90"
                         >
                             <div className="flex items-center gap-2">
@@ -907,10 +1060,13 @@ export default function NotesView() {
                             <div className="mb-4">
                                 <Input
                                     value={selectedNote.title}
-                                    onChange={(e) => setSelectedNote({
-                                        ...selectedNote,
-                                        title: e.target.value
-                                    })}
+                                    onChange={(e) => {
+                                        setSelectedNote({
+                                            ...selectedNote,
+                                            title: e.target.value
+                                        });
+                                        setHasUnsavedChanges(true);
+                                    }}
                                     className="text-lg font-semibold border-none shadow-none focus-visible:ring-0 px-2 py-1"
                                     placeholder="输入笔记标题..."
                                 />
@@ -1066,10 +1222,13 @@ export default function NotesView() {
                             <div className="flex-1 min-h-[500px]">
                                 <UnifiedEditor
                                     content={selectedNote.content}
-                                    onChange={(content) => setSelectedNote({
-                                        ...selectedNote,
-                                        content
-                                    })}
+                                    onChange={(content) => {
+                                        setSelectedNote({
+                                            ...selectedNote,
+                                            content
+                                        });
+                                        setHasUnsavedChanges(true);
+                                    }}
                                     placeholder="开始编写你的笔记..."
                                     className="h-full"
                                     customMinHeight="400px"
@@ -1229,7 +1388,7 @@ export default function NotesView() {
 
                 {/* 删除确认对话框 */}
                 <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-                    <DialogContent>
+                    <DialogContent className="z-[100010]">
                         <DialogHeader>
                             <DialogTitle><MixedText text="确认删除" /></DialogTitle>
                             <DialogDescription>
@@ -1365,6 +1524,40 @@ export default function NotesView() {
                         <DialogFooter>
                             <Button variant="outline" onClick={() => setShowTagEditDialog(false)} className="rounded-full">
                                 完成
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* 未保存更改确认对话框 */}
+                <Dialog open={showUnsavedChangesDialog} onOpenChange={setShowUnsavedChangesDialog}>
+                    <DialogContent className="z-[100020]">
+                        <DialogHeader>
+                            <DialogTitle><MixedText text="未保存的更改" /></DialogTitle>
+                            <DialogDescription>
+                                <MixedText text="当前笔记有未保存的更改，您想要如何处理？" />
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={handleUnsavedChangesCancel}
+                                className="flex items-center justify-center rounded-full"
+                            >
+                                <MixedText text="取消" />
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleUnsavedChangesDiscard}
+                                className="flex items-center justify-center rounded-full"
+                            >
+                                <MixedText text="丢弃更改" />
+                            </Button>
+                            <Button
+                                onClick={handleUnsavedChangesConfirm}
+                                className="flex items-center justify-center rounded-full bg-[#2C9678] hover:bg-[#2C9678]/90 text-white"
+                            >
+                                <MixedText text="保存并继续" />
                             </Button>
                         </DialogFooter>
                     </DialogContent>
