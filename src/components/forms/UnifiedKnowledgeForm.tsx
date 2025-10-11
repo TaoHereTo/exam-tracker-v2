@@ -316,7 +316,6 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
 
     // 立即显示 loading toast
     const loadingToastId = notifyLoading?.('正在保存到云端...');
-    console.log('UnifiedKnowledgeForm: loadingToastId:', loadingToastId);
 
     try {
 

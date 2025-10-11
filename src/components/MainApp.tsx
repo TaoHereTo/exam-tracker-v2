@@ -115,11 +115,7 @@ const SettingsView = lazy(() =>
 );
 
 // 添加倒计时视图的懒加载
-const CountdownView = lazy(() =>
-    import("@/components/views/CountdownView").then(module => ({
-        default: module.default
-    }))
-);
+const CountdownView = lazy(() => import("@/components/views/CountdownView"));
 
 // 添加日程管理视图的懒加载
 const ScheduleManagementView = lazy(() =>
@@ -176,7 +172,6 @@ export function MainApp() {
             const profile = await UserProfileService.ensureUserProfile();
             setUserProfile(profile);
         } catch (error) {
-            console.error('加载用户资料失败:', error);
             // 不设置错误状态，避免影响页面渲染
             setUserProfile(null);
         }
@@ -1074,7 +1069,7 @@ export function MainApp() {
                                                 }>
                                                     <CountdownView
                                                         countdowns={countdowns}
-                                                        onCreate={async (countdown) => {
+                                                        onCreate={async (countdown: ExamCountdown) => {
                                                             const formattedCountdown: ExamCountdown = {
                                                                 ...countdown
                                                             };
@@ -1102,7 +1097,7 @@ export function MainApp() {
                                                                 console.error('MainApp - 创建倒计时失败:', error);
                                                             }
                                                         }}
-                                                        onUpdate={async (countdown) => {
+                                                        onUpdate={async (countdown: ExamCountdown) => {
                                                             const formattedCountdown: ExamCountdown = {
                                                                 ...countdown
                                                             };
@@ -1137,7 +1132,7 @@ export function MainApp() {
                                                                 }
                                                             }
                                                         }}
-                                                        onDelete={async (id) => {
+                                                        onDelete={async (id: string) => {
                                                             // 只进行本地删除，不显示toast
                                                             setCountdowns(prev => prev.filter(c => c.id !== id));
 
@@ -1153,7 +1148,7 @@ export function MainApp() {
                                                                 console.error('MainApp - 删除倒计时失败:', error);
                                                             }
                                                         }}
-                                                        onBatchDelete={async (ids) => {
+                                                        onBatchDelete={async (ids: string[]) => {
                                                             // 先更新本地数据
                                                             setCountdowns(prev => prev.filter(c => !ids.includes(c.id)));
 
@@ -1214,7 +1209,7 @@ export function MainApp() {
                                                                 }
                                                             }
                                                         }}
-                                                        onCountdownComplete={(countdown) => {
+                                                        onCountdownComplete={(countdown: ExamCountdown) => {
                                                             setCompletedCountdown(countdown);
                                                             setCountdownCelebrationOpen(true);
                                                         }}

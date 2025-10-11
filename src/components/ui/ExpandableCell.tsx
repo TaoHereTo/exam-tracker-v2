@@ -43,14 +43,6 @@ export const ExpandableCell: React.FC<ExpandableCellProps> = ({
                 setContentHeight(adjustedFullHeight);
                 setCollapsedHeight(maxHeight);
                 setNeedsExpansion(fullHeight > maxHeight);
-
-                console.log('高度测量:', {
-                    containerWidth,
-                    fullHeight,
-                    adjustedFullHeight,
-                    maxHeight,
-                    needsExpansion: fullHeight > maxHeight
-                });
             }
         };
 

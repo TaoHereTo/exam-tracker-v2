@@ -78,7 +78,6 @@ export function LoginForm({ onSwitchToSignUp, onSwitchToForgotPassword }: LoginF
                     router.push('/')
                 }
             } catch (err) {
-                console.error('Unexpected error during login:', err)
                 // Update to error toast or show error notification
                 if (loadingToastId && updateToError) {
                     updateToError(loadingToastId, '登录失败', '网络错误，请稍后重试')

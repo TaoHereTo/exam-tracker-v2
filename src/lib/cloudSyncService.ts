@@ -253,8 +253,6 @@ export class CloudSyncService {
             validKnowledgeItems.push(validatedItem);
         }
 
-        console.log(`知识点批量上传：总共${knowledgeToUpload.length}条，有效${validKnowledgeItems.length}条，无效${invalidItems.length}条`);
-
         if (validKnowledgeItems.length === 0) {
             const report = knowledgeToUpload.map(knowledge => ({
                 item: knowledge,
@@ -277,8 +275,6 @@ export class CloudSyncService {
             created_at: item.createdAt || new Date().toISOString(),
             updated_at: item.updatedAt || new Date().toISOString()
         }));
-
-        console.log('准备上传的知识点数据示例:', uploadData.slice(0, 2));
 
         try {
             // Perform batch upload

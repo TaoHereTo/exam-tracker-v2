@@ -87,8 +87,6 @@ export function ExerciseRecordView({
 
     // 打开编辑Sheet
     const handleEditRecord = () => {
-        console.log('handleEditRecord called, selectedRecordIds:', selectedRecordIds);
-
         if (selectedRecordIds.length !== 1) {
             toast.error('请选择一个记录进行编辑');
             return;
@@ -96,8 +94,6 @@ export function ExerciseRecordView({
 
         const recordId = selectedRecordIds[0];
         const record = allRecords.find(r => r.id === recordId);
-
-        console.log('Found record:', record);
 
         if (!record) {
             toast.error('未找到要编辑的记录');
@@ -118,7 +114,6 @@ export function ExerciseRecordView({
             setDate(new Date(record.date));
         }
 
-        console.log('Opening edit sheet');
         setIsEditSheetOpen(true);
     };
 

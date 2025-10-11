@@ -90,7 +90,6 @@ class NotesService {
                 console.error('获取笔记失败:', error);
                 // 如果是表不存在的错误，返回空数组
                 if (error.code === '42P01' || error.message?.includes('relation') || error.message?.includes('does not exist')) {
-                    console.log('notes表不存在，返回空数组');
                     return [];
                 }
                 throw error;
@@ -106,7 +105,6 @@ class NotesService {
                 error.message.includes('permission') ||
                 error.message.includes('auth')
             )) {
-                console.log('数据库表不存在或权限问题，返回空数组');
                 return [];
             }
             throw error;

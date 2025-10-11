@@ -819,7 +819,6 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         <div className="space-y-2">
                             <FormField label={<MixedText text="目标日期" />} htmlFor="examDate" required>
                                 <Popover open={dateOpen} onOpenChange={(open) => {
-                                    console.log('Popover onOpenChange:', open);
                                     setDateOpen(open);
                                 }}>
                                     <PopoverTrigger asChild>

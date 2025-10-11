@@ -330,12 +330,6 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
     const [isFullscreenMode, setIsFullscreenMode] = useState(false);
     const [fullscreenDialogOpen, setFullscreenDialogOpen] = useState(false);
 
-    // 调试全屏模式变化
-    useEffect(() => {
-        console.log('KnowledgeSummaryView: isFullscreenMode changed to:', isFullscreenMode);
-        console.log('KnowledgeSummaryView: fullscreenDialogOpen:', fullscreenDialogOpen);
-        console.log('KnowledgeSummaryView: editDialogOpen:', editDialogOpen);
-    }, [isFullscreenMode, fullscreenDialogOpen, editDialogOpen]);
 
     // 处理全屏模式变化
     const handleFullscreenModeChange = (isFullscreen: boolean) => {

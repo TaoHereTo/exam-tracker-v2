@@ -64,11 +64,9 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
     const loadCloudData = useCallback(async () => {
         // 如果正在加载，直接返回，避免重复请求
         if (isLoadingRef.current) {
-            console.log('CloudDataOverview: Already loading, skipping request');
             return;
         }
 
-        console.log('CloudDataOverview: Starting to load cloud data');
         isLoadingRef.current = true;
         setIsLoading(true);
         setLoadError(null);
@@ -78,7 +76,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
                 withTimeout(CloudSyncService.getCloudDataOverview(), 12000),
                 new Promise(resolve => setTimeout(resolve, 500))
             ]);
-            console.log('CloudDataOverview: Successfully loaded cloud data', overview);
             setData(overview);
         } catch (error) {
             console.error('CloudDataOverview: Error loading cloud data:', error);
@@ -97,7 +94,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             setLoadError(errorMessage);
             showError(`获取云端数据失败: ${errorMessage}`);
         } finally {
-            console.log('CloudDataOverview: Finished loading cloud data');
             isLoadingRef.current = false;
             setIsLoading(false);
         }

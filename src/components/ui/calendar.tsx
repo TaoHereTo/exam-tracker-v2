@@ -309,7 +309,6 @@ function Calendar({
 
           <div className="flex items-center gap-0 h-10">
             <Popover open={showYearPicker} onOpenChange={(open) => {
-              console.log('Year picker onOpenChange:', open);
               setShowYearPicker(open);
             }}>
               <PopoverTrigger asChild>
@@ -318,7 +317,6 @@ function Calendar({
                   size="sm"
                   className="font-medium h-10 px-1 flex items-center justify-center"
                   onClick={() => {
-                    console.log('Year button clicked, current showYearPicker:', showYearPicker);
                     setShowYearPicker(true);
                   }}
                 >
@@ -337,7 +335,6 @@ function Calendar({
             </Popover>
 
             <Popover open={showMonthPicker} onOpenChange={(open) => {
-              console.log('Month picker onOpenChange:', open);
               setShowMonthPicker(open);
             }}>
               <PopoverTrigger asChild>
@@ -346,7 +343,6 @@ function Calendar({
                   size="sm"
                   className="font-medium h-10 px-1 flex items-center justify-center"
                   onClick={() => {
-                    console.log('Month button clicked, current showMonthPicker:', showMonthPicker);
                     setShowMonthPicker(true);
                   }}
                 >

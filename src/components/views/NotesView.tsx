@@ -246,7 +246,6 @@ export default function NotesView() {
                 error.message.includes('does not exist') ||
                 error.message.includes('permission')
             )) {
-                console.log('数据库未初始化，显示空状态');
                 setNotes([]);
             } else {
                 notify({
@@ -1319,7 +1318,6 @@ export default function NotesView() {
                                                 title="选择颜色"
                                                 onClick={() => {
                                                     setShowColorPicker(!showColorPicker);
-                                                    console.log('颜色选择器切换:', !showColorPicker);
                                                 }}
                                             />
                                             {showColorPicker && (
@@ -1336,7 +1334,6 @@ export default function NotesView() {
                                                                     onClick={() => {
                                                                         setNewTagColor(color);
                                                                         setShowColorPicker(false);
-                                                                        console.log('颜色选择:', color);
                                                                     }}
                                                                     title={color}
                                                                 />

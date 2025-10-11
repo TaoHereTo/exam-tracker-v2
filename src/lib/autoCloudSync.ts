@@ -335,8 +335,6 @@ export class AutoCloudSync {
 
             // 如果错误是记录不存在，尝试重新创建
             if (errorMessage.includes('学习计划记录不存在') || errorMessage.includes('没有权限访问该记录')) {
-                console.log('记录不存在，尝试重新创建学习计划到云端...');
-
                 try {
                     const savedPlan = await planService.addPlan({
                         name: plan.name,
@@ -421,8 +419,6 @@ export class AutoCloudSync {
 
             // 如果错误是记录不存在，尝试重新创建
             if (errorMessage.includes('倒计时记录不存在') || errorMessage.includes('没有权限访问该记录')) {
-                console.log('记录不存在，尝试重新创建倒计时到云端...');
-
                 try {
                     const savedCountdown = await countdownService.addCountdown({
                         name: countdown.name,

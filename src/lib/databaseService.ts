@@ -31,7 +31,6 @@ export const recordService = {
                 return [];
             }
 
-            console.log('开始查询用户记录，用户ID:', userId);
             const startTime = Date.now();
 
             const { data, error } = await supabase
@@ -42,7 +41,6 @@ export const recordService = {
                 .limit(1000) // 限制查询数量，避免查询过多数据
 
             const endTime = Date.now();
-            console.log(`记录查询完成，耗时: ${endTime - startTime}ms`);
 
             if (error) {
                 console.error('获取记录失败:', error);

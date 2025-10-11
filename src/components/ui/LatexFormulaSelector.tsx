@@ -188,7 +188,6 @@ export const LatexFormulaSelector: React.FC<LatexFormulaSelectorProps> = ({
     const categories = ['全部', ...Object.keys(latexTemplates)];
 
     const handleCategoryChange = (category: string) => {
-        console.log('分类选择变化:', category);
         setSelectedCategory(category);
     };
 
