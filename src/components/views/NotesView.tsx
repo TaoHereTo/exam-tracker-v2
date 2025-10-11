@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/animate-ui/components/animate/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/animate-ui/components/radix/hover-card";
@@ -87,6 +88,8 @@ export default function NotesView() {
     const [isSaving, setIsSaving] = useState(false);
     const [isSheetOpen, setIsSheetOpen] = useState(false);
     const [lastSaved, setLastSaved] = useState<Date | null>(null);
+    const [selectedNoteIds, setSelectedNoteIds] = useState<string[]>([]); // 批量选中的笔记ID
+    const [showBatchDeleteDialog, setShowBatchDeleteDialog] = useState(false); // 批量删除确认对话框
     const fileInputRef = useRef<HTMLInputElement>(null);
     const colorPickerRef = useRef<HTMLDivElement>(null);
     const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -135,6 +138,23 @@ export default function NotesView() {
             })
         )
     ));
+
+    // 创建标签颜色映射
+    const tagColorMap = React.useMemo(() => {
+        const map = new Map<string, string>();
+        notes.forEach(note => {
+            note.tags.forEach(tag => {
+                const tagName = typeof tag === 'string' ? tag : (
+                    typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
+                );
+                const tagColor = typeof tag === 'object' && tag.color ? tag.color : '#3b82f6';
+                if (!map.has(tagName)) {
+                    map.set(tagName, tagColor);
+                }
+            });
+        });
+        return map;
+    }, [notes]);
 
     // 过滤笔记
     const filteredNotes = notes.filter(note => {
@@ -274,12 +294,12 @@ export default function NotesView() {
                 clearTimeout(autoSaveTimerRef.current);
             }
 
-            // 设置新的定时器，3分钟后自动保存
+            // 设置新的定时器，1分钟后自动保存
             autoSaveTimerRef.current = setTimeout(() => {
                 if (hasUnsavedChanges && selectedNote && handleSaveNoteRef.current) {
                     handleSaveNoteRef.current(true); // 静默保存
                 }
-            }, 3 * 60 * 1000); // 3分钟
+            }, 1 * 60 * 1000); // 1分钟
 
             // 清理函数
             return () => {
@@ -718,6 +738,136 @@ export default function NotesView() {
         });
     };
 
+    // 全选/取消全选
+    const handleSelectAll = () => {
+        if (selectedNoteIds.length === filteredNotes.length) {
+            setSelectedNoteIds([]);
+        } else {
+            setSelectedNoteIds(filteredNotes.map(note => note.id));
+        }
+    };
+
+    // 切换单个笔记的选中状态
+    const toggleNoteSelection = (noteId: string) => {
+        setSelectedNoteIds(prev => {
+            if (prev.includes(noteId)) {
+                return prev.filter(id => id !== noteId);
+            } else {
+                return [...prev, noteId];
+            }
+        });
+    };
+
+    // 批量导出笔记
+    const handleBatchExport = () => {
+        if (selectedNoteIds.length === 0) {
+            notify({
+                type: "warning",
+                message: "请先选择要导出的笔记"
+            });
+            return;
+        }
+
+        const selectedNotes = notes.filter(note => selectedNoteIds.includes(note.id));
+
+        // 转换本地笔记格式到云格式
+        const cloudNotes: CloudNote[] = selectedNotes.map(note => ({
+            id: note.id,
+            user_id: user?.id || '',
+            title: note.title,
+            content: note.content,
+            tags: note.tags.map(tag => tag.name),
+            is_favorite: note.isFavorite || false,
+            is_archived: false,
+            created_at: note.createdAt,
+            updated_at: note.updatedAt
+        }));
+
+        const exportData = JSON.stringify(cloudNotes, null, 2);
+        const dataBlob = new Blob([exportData], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `notes-batch-${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+
+        notify({
+            type: "success",
+            message: `成功导出 ${selectedNoteIds.length} 个笔记`
+        });
+
+        // 清空选中
+        setSelectedNoteIds([]);
+    };
+
+    // 批量删除笔记
+    const handleBatchDelete = () => {
+        if (selectedNoteIds.length === 0) {
+            notify({
+                type: "warning",
+                message: "请先选择要删除的笔记"
+            });
+            return;
+        }
+        setShowBatchDeleteDialog(true);
+    };
+
+    // 确认批量删除
+    const confirmBatchDelete = async () => {
+        if (selectedNoteIds.length === 0 || !user) return;
+
+        const notesToDelete = notes.filter(note => selectedNoteIds.includes(note.id));
+
+        // 先更新本地数据
+        setNotes(prev => prev.filter(note => !selectedNoteIds.includes(note.id)));
+
+        // 如果当前选中的笔记在删除列表中，清空选中
+        if (selectedNote && selectedNoteIds.includes(selectedNote.id)) {
+            setSelectedNote(null);
+        }
+
+        setShowBatchDeleteDialog(false);
+        setSelectedNoteIds([]);
+
+        // 显示删除的加载通知
+        let toastId: string | undefined;
+        if (notifyLoading) {
+            toastId = notifyLoading('正在批量删除笔记', `正在删除 ${notesToDelete.length} 个笔记`);
+        }
+
+        try {
+            // 并发删除所有笔记
+            await Promise.all(
+                notesToDelete.map(note => notesService.deleteNote(note.id))
+            );
+
+            // 更新为成功状态
+            if (toastId && updateToSuccess) {
+                updateToSuccess(toastId, '批量删除成功', `已成功删除 ${notesToDelete.length} 个笔记`);
+            } else {
+                notify({
+                    type: "success",
+                    message: `成功删除 ${notesToDelete.length} 个笔记`
+                });
+            }
+        } catch (error) {
+            console.error('批量删除笔记失败:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+
+            // 更新为错误状态
+            if (toastId && updateToError) {
+                updateToError(toastId, '部分删除失败', `云端同步失败: ${errorMessage}`);
+            } else {
+                notify({
+                    type: "error",
+                    message: "批量删除失败",
+                    description: "部分笔记删除失败，请检查网络连接"
+                });
+            }
+        }
+    };
+
     // 如果用户未登录，显示登录提示
     if (!user) {
         return (
@@ -758,169 +908,213 @@ export default function NotesView() {
                                 </Button>
                             </SheetTrigger>
                             <SheetContent side="right" className="w-96 flex flex-col">
-                                <SheetHeader className="flex-shrink-0 pb-2">
-                                    <SheetTitle>笔记列表</SheetTitle>
-                                </SheetHeader>
+                                <TooltipProvider>
+                                    <SheetHeader className="flex-shrink-0 pb-2">
+                                        <SheetTitle>笔记列表</SheetTitle>
+                                    </SheetHeader>
 
-                                {/* 固定顶部区域 */}
-                                <div className="flex-shrink-0 mt-2 px-4">
-                                    {/* 新建笔记按钮 */}
-                                    <Button
-                                        onClick={() => {
-                                            if (hasUnsavedChanges && selectedNote) {
-                                                checkUnsavedChanges(() => {
+                                    {/* 固定顶部区域 */}
+                                    <div className="flex-shrink-0 mt-2 px-4">
+                                        {/* 新建笔记按钮 */}
+                                        <Button
+                                            onClick={() => {
+                                                if (hasUnsavedChanges && selectedNote) {
+                                                    checkUnsavedChanges(() => {
+                                                        setIsCreating(true);
+                                                        setIsSheetOpen(false); // 关闭Sheet
+                                                    });
+                                                } else {
                                                     setIsCreating(true);
                                                     setIsSheetOpen(false); // 关闭Sheet
-                                                });
-                                            } else {
-                                                setIsCreating(true);
-                                                setIsSheetOpen(false); // 关闭Sheet
-                                            }
-                                        }}
-                                        className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white mb-6"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <Plus className="w-5 h-5" />
-                                            <MixedText text="新建笔记" />
-                                        </div>
-                                    </Button>
+                                                }
+                                            }}
+                                            className="w-full h-9 px-6 rounded-full font-medium bg-[#ea580c] hover:bg-[#ea580c]/90 text-white mb-4"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <Plus className="w-5 h-5" />
+                                                <MixedText text="新建笔记" />
+                                            </div>
+                                        </Button>
 
-                                    {/* 搜索框 */}
-                                    <div className="relative mb-3">
-                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                        <Input
-                                            placeholder="搜索笔记..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="pl-10"
-                                        />
+                                        {/* 搜索和筛选区域 */}
+                                        <div className="mb-4 space-y-2">
+                                            {/* 搜索框 */}
+                                            <div className="relative">
+                                                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                                <Input
+                                                    placeholder="搜索笔记..."
+                                                    value={searchTerm}
+                                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                                    className="pl-10"
+                                                />
+                                            </div>
+
+                                            {/* 标签过滤 */}
+                                            {allTags.length > 0 && (
+                                                <div className="flex flex-wrap gap-1">
+                                                    <Badge
+                                                        variant={selectedTag === "" ? "default" : "outline"}
+                                                        className="cursor-pointer"
+                                                        onClick={() => setSelectedTag("")}
+                                                    >
+                                                        全部
+                                                    </Badge>
+                                                    {allTags.map(tag => {
+                                                        const tagColor = tagColorMap.get(tag) || '#3b82f6';
+                                                        const isSelected = selectedTag === tag;
+                                                        return (
+                                                            <Badge
+                                                                key={tag}
+                                                                variant="outline"
+                                                                className="cursor-pointer transition-all"
+                                                                style={isSelected ? {
+                                                                    backgroundColor: tagColor,
+                                                                    color: 'white',
+                                                                    borderColor: tagColor
+                                                                } : {}}
+                                                                onClick={() => setSelectedTag(tag)}
+                                                            >
+                                                                {tag}
+                                                            </Badge>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    {/* 标签过滤 */}
-                                    {allTags.length > 0 && (
-                                        <div className="flex flex-wrap gap-1">
-                                            <Badge
-                                                variant={selectedTag === "" ? "default" : "outline"}
-                                                className="cursor-pointer"
-                                                onClick={() => setSelectedTag("")}
-                                            >
-                                                全部
-                                            </Badge>
-                                            {allTags.map(tag => (
-                                                <Badge
-                                                    key={tag}
-                                                    variant={selectedTag === tag ? "default" : "outline"}
-                                                    className="cursor-pointer"
-                                                    onClick={() => setSelectedTag(tag)}
-                                                >
-                                                    {tag}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* 可滚动的笔记列表区域 */}
-                                <div className="flex-1 overflow-hidden px-4 mt-4">
-                                    <ScrollArea className="h-full">
-                                        <div className="space-y-2 pb-4">
-                                            {filteredNotes.length === 0 ? (
-                                                <div className="text-center text-muted-foreground py-8">
-                                                    <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                                                    <p>没有找到笔记</p>
-                                                </div>
-                                            ) : (
-                                                filteredNotes.map(note => (
-                                                    <div
-                                                        key={note.id}
-                                                        className={`p-2 rounded-lg border cursor-pointer transition-colors hover:bg-muted/50 ${selectedNote?.id === note.id
-                                                            ? 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 shadow-sm'
-                                                            : 'hover:border-muted-foreground/20'
-                                                            }`}
-                                                        onClick={() => {
-                                                            if (hasUnsavedChanges && selectedNote) {
-                                                                checkUnsavedChanges(() => {
-                                                                    setSelectedNote(note);
-                                                                });
-                                                            } else {
-                                                                setSelectedNote(note);
-                                                            }
-                                                        }}
-                                                    >
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex-1 min-w-0">
-                                                                <h3 className="font-medium truncate text-sm">{note.title}</h3>
-                                                                <p className="text-xs text-muted-foreground mt-0.5">
-                                                                    {formatDate(note.updatedAt)}
-                                                                </p>
-                                                                {note.tags.length > 0 && (
-                                                                    <div className="flex flex-wrap gap-1 mt-1">
-                                                                        {note.tags.map((tag, index) => {
-                                                                            // 确保提取的是字符串
-                                                                            const tagName = typeof tag === 'string' ? tag : (
-                                                                                typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
-                                                                            );
-                                                                            const tagColor = typeof tag === 'object' && tag.color ? tag.color : '#3b82f6';
-
-                                                                            return (
-                                                                                <Badge
-                                                                                    key={index}
-                                                                                    className="text-xs text-white px-1.5 py-0.5"
-                                                                                    style={{ backgroundColor: tagColor }}
-                                                                                >
-                                                                                    {tagName}
-                                                                                </Badge>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                )}
+                                    {/* 可滚动的笔记列表区域（包含批量操作） */}
+                                    <div className="flex-1 overflow-hidden pl-4 pr-2">
+                                        <ScrollArea className="h-full pr-2">
+                                            <div className="space-y-2 pb-4 pr-2">
+                                                {/* 批量操作栏 */}
+                                                {filteredNotes.length > 0 && (
+                                                    <div className="mb-2 p-2.5 bg-muted/30 rounded-lg border sticky top-0 z-10 backdrop-blur-sm bg-opacity-95">
+                                                        <div className="flex items-center justify-between">
+                                                            <div className="flex items-center gap-2">
+                                                                <Checkbox
+                                                                    checked={selectedNoteIds.length === filteredNotes.length && filteredNotes.length > 0}
+                                                                    onCheckedChange={handleSelectAll}
+                                                                    className="border-2"
+                                                                />
+                                                                <span className="text-sm font-medium">
+                                                                    {selectedNoteIds.length > 0
+                                                                        ? `已选中 ${selectedNoteIds.length} 项`
+                                                                        : '全选'}
+                                                                </span>
                                                             </div>
-                                                            <div className="flex items-center gap-1 ml-2">
+                                                            <div className="flex items-center gap-1">
                                                                 <Tooltip>
                                                                     <TooltipTrigger asChild>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            className="h-5 w-5 rounded-full"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleExportNote(note);
-                                                                            }}
-                                                                        >
-                                                                            <FileUp className="h-3 w-3" />
-                                                                        </Button>
+                                                                        <span className="inline-block">
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                className="h-7 w-7 hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                                onClick={handleBatchExport}
+                                                                                disabled={selectedNoteIds.length === 0}
+                                                                            >
+                                                                                <FileUp className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </span>
                                                                     </TooltipTrigger>
                                                                     <TooltipContent>
-                                                                        <p>导出笔记</p>
+                                                                        <p>批量导出</p>
                                                                     </TooltipContent>
                                                                 </Tooltip>
-
                                                                 <Tooltip>
                                                                     <TooltipTrigger asChild>
-                                                                        <Button
-                                                                            variant="ghost"
-                                                                            size="icon"
-                                                                            className="h-5 w-5 rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleDeleteNote(note);
-                                                                            }}
-                                                                        >
-                                                                            <Trash2 className="h-3 w-3" />
-                                                                        </Button>
+                                                                        <span className="inline-block">
+                                                                            <Button
+                                                                                variant="ghost"
+                                                                                size="icon"
+                                                                                className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50 disabled:text-muted-foreground disabled:hover:bg-transparent disabled:hover:text-muted-foreground disabled:opacity-50 disabled:cursor-not-allowed"
+                                                                                onClick={handleBatchDelete}
+                                                                                disabled={selectedNoteIds.length === 0}
+                                                                            >
+                                                                                <Trash2 className="h-4 w-4" />
+                                                                            </Button>
+                                                                        </span>
                                                                     </TooltipTrigger>
                                                                     <TooltipContent>
-                                                                        <p>删除笔记</p>
+                                                                        <p>批量删除</p>
                                                                     </TooltipContent>
                                                                 </Tooltip>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                ))
-                                            )}
-                                        </div>
-                                    </ScrollArea>
-                                </div>
+                                                )}
+                                                {filteredNotes.length === 0 ? (
+                                                    <div className="text-center text-muted-foreground py-8">
+                                                        <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                                                        <p>没有找到笔记</p>
+                                                    </div>
+                                                ) : (
+                                                    filteredNotes.map(note => (
+                                                        <div
+                                                            key={note.id}
+                                                            className={`p-3 rounded-lg border transition-colors ${selectedNote?.id === note.id
+                                                                ? 'bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-950/40 dark:to-orange-900/40 border-orange-300 dark:border-orange-700 shadow-sm hover:from-orange-100 hover:to-orange-150 dark:hover:from-orange-950/50 dark:hover:to-orange-900/50'
+                                                                : 'hover:bg-muted/50 hover:border-muted-foreground/20'
+                                                                }`}
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                {/* Checkbox - 垂直居中 */}
+                                                                <div className="flex-shrink-0">
+                                                                    <Checkbox
+                                                                        checked={selectedNoteIds.includes(note.id)}
+                                                                        onCheckedChange={() => toggleNoteSelection(note.id)}
+                                                                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                                                    />
+                                                                </div>
+
+                                                                {/* 笔记内容 */}
+                                                                <div
+                                                                    className="flex-1 min-w-0 cursor-pointer"
+                                                                    onClick={() => {
+                                                                        if (hasUnsavedChanges && selectedNote) {
+                                                                            checkUnsavedChanges(() => {
+                                                                                setSelectedNote(note);
+                                                                            });
+                                                                        } else {
+                                                                            setSelectedNote(note);
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    <div className="font-medium truncate text-[15px] leading-snug mb-0.5">{note.title}</div>
+                                                                    <p className="text-xs text-muted-foreground leading-snug">
+                                                                        {formatDate(note.updatedAt)}
+                                                                    </p>
+                                                                    {note.tags.length > 0 && (
+                                                                        <div className="flex flex-wrap gap-1 mt-1.5">
+                                                                            {note.tags.map((tag, index) => {
+                                                                                // 确保提取的是字符串
+                                                                                const tagName = typeof tag === 'string' ? tag : (
+                                                                                    typeof tag.name === 'string' ? tag.name : String(tag.name || tag)
+                                                                                );
+                                                                                const tagColor = typeof tag === 'object' && tag.color ? tag.color : '#3b82f6';
+
+                                                                                return (
+                                                                                    <Badge
+                                                                                        key={index}
+                                                                                        className="text-xs text-white px-1.5 py-0.5"
+                                                                                        style={{ backgroundColor: tagColor }}
+                                                                                    >
+                                                                                        {tagName}
+                                                                                    </Badge>
+                                                                                );
+                                                                            })}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+                                        </ScrollArea>
+                                    </div>
+                                </TooltipProvider>
                             </SheetContent>
                         </Sheet>
                     </div>
@@ -1077,8 +1271,8 @@ export default function NotesView() {
                                     <Popover open={isHoverCardOpen} onOpenChange={setIsHoverCardOpen}>
                                         <PopoverTrigger asChild>
                                             <div className="flex items-center gap-1 cursor-pointer hover:bg-muted/50 rounded-md px-2 py-1 transition-colors group">
-                                                <Tag className="h-3 w-3 group-hover:text-blue-600 transition-colors" />
-                                                <span className="group-hover:text-blue-600 transition-colors">
+                                                <Tag className="h-3 w-3 group-hover:text-blue-600 transition-colors flex-shrink-0" />
+                                                <span className="group-hover:text-blue-600 transition-colors leading-none flex items-center">
                                                     {selectedNote.tags.length > 0 ? (
                                                         selectedNote.tags.map(tag => {
                                                             // 确保提取的是字符串
@@ -1090,7 +1284,7 @@ export default function NotesView() {
                                                         '添加标签'
                                                     )}
                                                 </span>
-                                                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                                <Edit3 className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                                             </div>
                                         </PopoverTrigger>
                                         <PopoverContent
@@ -1401,6 +1595,29 @@ export default function NotesView() {
                             </Button>
                             <Button variant="destructive" onClick={confirmDeleteNote} className="flex items-center justify-center rounded-full">
                                 <MixedText text="确认删除" />
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* 批量删除确认对话框 */}
+                <Dialog open={showBatchDeleteDialog} onOpenChange={setShowBatchDeleteDialog}>
+                    <DialogContent className="z-[100010]">
+                        <DialogHeader>
+                            <DialogTitle><MixedText text="确认批量删除" /></DialogTitle>
+                            <DialogDescription>
+                                <MixedText text={`确定要删除选中的 ${selectedNoteIds.length} 个笔记吗？`} />
+                                <br />
+                                <br />
+                                <MixedText text="此操作不可撤销，删除后无法恢复。" />
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setShowBatchDeleteDialog(false)} className="flex items-center justify-center rounded-full">
+                                <MixedText text="取消" />
+                            </Button>
+                            <Button variant="destructive" onClick={confirmBatchDelete} className="flex items-center justify-center rounded-full">
+                                <MixedText text="确认批量删除" />
                             </Button>
                         </DialogFooter>
                     </DialogContent>

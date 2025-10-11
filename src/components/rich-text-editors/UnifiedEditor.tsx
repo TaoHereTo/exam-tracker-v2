@@ -870,104 +870,63 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         setShowLatexSelector(false);
     }, [onChange, autoCleanHtml]);
 
-    // 清除所有格式
+    // 清除所有格式 - 仅在选中文本时生效
     const handleClearFormat = useCallback(() => {
         if (!editorRef.current) return;
+
+        const selection = window.getSelection();
+
+        // 只有选中了文本时才清除格式，否则不执行任何操作
+        if (!selection || selection.isCollapsed) {
+            // 没有选中文本，直接返回
+            console.log('清除格式：需要先选中文本');
+            return;
+        }
 
         // 确保编辑器获得焦点
         editorRef.current.focus();
 
-        const selection = window.getSelection();
+        try {
+            // 首先尝试使用原生命令清除内联格式
+            document.execCommand('removeFormat', false);
 
-        // 如果选中了文本，清除选中文本的格式
-        if (selection && !selection.isCollapsed) {
-            try {
-                // 首先尝试使用原生命令清除内联格式
-                document.execCommand('removeFormat', false);
+            // 然后手动处理标题级别等块级格式
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
 
-                // 然后手动处理标题级别等块级格式
-                const range = selection.getRangeAt(0);
-                const container = range.commonAncestorContainer;
+            // 查找并处理包含选中文本的标题元素
+            let element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container as Element;
 
-                // 查找并处理包含选中文本的标题元素
-                let element = container.nodeType === Node.TEXT_NODE ? container.parentElement : container as Element;
-
-                // 向上查找标题元素
-                while (element && element !== editorRef.current) {
-                    if (element.tagName && element.tagName.match(/^H[1-6]$/)) {
-                        // 找到标题元素，将其转换为普通段落
-                        const textContent = element.textContent || '';
-                        const newDiv = document.createElement('div');
-                        newDiv.textContent = textContent;
-                        element.parentNode?.replaceChild(newDiv, element);
-                        break;
-                    }
-                    element = element.parentElement;
-                }
-
-                // 更新内容
-                let html = editorRef.current.innerHTML;
-
-                // 自动清理HTML结构
-                const cleanedHtml = autoCleanHtml(html);
-
-                // 如果HTML被清理了，更新编辑器内容
-                if (cleanedHtml !== html) {
-                    editorRef.current.innerHTML = cleanedHtml;
-                    html = cleanedHtml;
-                }
-
-                onChange(html);
-                checkActiveFormats();
-                checkSelectedText();
-            } catch (error) {
-                console.error('清除格式失败:', error);
-            }
-        } else {
-            // 如果没有选中文本，清除整个编辑器的格式
-            try {
-                // 选中整个编辑器内容
-                const range = document.createRange();
-                range.selectNodeContents(editorRef.current);
-                if (selection) {
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                }
-
-                // 使用removeFormat命令清除内联格式
-                document.execCommand('removeFormat', false);
-
-                // 手动处理所有标题元素
-                const headings = editorRef.current.querySelectorAll('h1, h2, h3, h4, h5, h6');
-                headings.forEach(heading => {
-                    const textContent = heading.textContent || '';
+            // 向上查找标题元素
+            while (element && element !== editorRef.current) {
+                if (element.tagName && element.tagName.match(/^H[1-6]$/)) {
+                    // 找到标题元素，将其转换为普通段落
+                    const textContent = element.textContent || '';
                     const newDiv = document.createElement('div');
                     newDiv.textContent = textContent;
-                    heading.parentNode?.replaceChild(newDiv, heading);
-                });
-
-                // 清除选择
-                if (selection) {
-                    selection.removeAllRanges();
+                    element.parentNode?.replaceChild(newDiv, element);
+                    break;
                 }
-
-                let html = editorRef.current.innerHTML;
-
-                // 自动清理HTML结构
-                const cleanedHtml = autoCleanHtml(html);
-
-                // 如果HTML被清理了，更新编辑器内容
-                if (cleanedHtml !== html) {
-                    editorRef.current.innerHTML = cleanedHtml;
-                    html = cleanedHtml;
-                }
-
-                onChange(html);
-                checkActiveFormats();
-                checkSelectedText();
-            } catch (error) {
-                console.error('清除格式失败:', error);
+                element = element.parentElement;
             }
+
+            // 更新内容
+            let html = editorRef.current.innerHTML;
+
+            // 自动清理HTML结构
+            const cleanedHtml = autoCleanHtml(html);
+
+            // 如果HTML被清理了，更新编辑器内容
+            if (cleanedHtml !== html) {
+                editorRef.current.innerHTML = cleanedHtml;
+                html = cleanedHtml;
+            }
+
+            onChange(html);
+            checkActiveFormats();
+            checkSelectedText();
+        } catch (error) {
+            console.error('清除格式失败:', error);
         }
     }, [onChange, checkActiveFormats, checkSelectedText, autoCleanHtml]);
 
@@ -1040,8 +999,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
             className
         )}
             style={actualIsFullscreen ? { zIndex: getZIndex('URGENT') + 1 } : undefined}>
-            {/* 工具栏 */}
-            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b bg-gray-50 dark:bg-black sticky top-0 z-10 rounded-t-lg">
+            {/* 工具栏 - 毛玻璃效果 */}
+            <div className="flex flex-wrap items-center justify-between gap-1 p-2 border-b backdrop-blur-sm sticky top-0 z-10 rounded-t-lg">
                 <div className="flex items-center gap-1">
                     {/* 基础格式化按钮 */}
                     <Tooltip>
@@ -1508,8 +1467,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     />
                 )}
 
-                {/* 字数统计显示区域 */}
-                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-black border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
+                {/* 字数统计显示区域 - 毛玻璃效果 */}
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-gray-500 dark:text-gray-400 backdrop-blur-sm border-t border-gray-200 dark:border-gray-700 rounded-b-lg">
                     <div className="flex items-center gap-4">
                         {hasSelectedText ? (
                             <>
@@ -1524,7 +1483,13 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                             <span>字符: {charCount}</span>
                                         </div>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-80 p-3" align="end">
+                                    <PopoverContent
+                                        className="w-80 p-3"
+                                        align="end"
+                                        style={{
+                                            zIndex: getMenuZIndex(),
+                                        }}
+                                    >
                                         <div className="space-y-2">
                                             <div className="font-medium text-sm leading-none">字数统计设置</div>
                                             <div className="flex items-center space-x-2">
@@ -1560,7 +1525,13 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                                         <span>字符: {charCount}</span>
                                     </div>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-80 p-3" align="end">
+                                <PopoverContent
+                                    className="w-80 p-3"
+                                    align="end"
+                                    style={{
+                                        zIndex: getMenuZIndex(),
+                                    }}
+                                >
                                     <div className="space-y-2">
                                         <div className="font-medium text-sm leading-none">字数统计设置</div>
                                         <div className="flex items-center space-x-2">
