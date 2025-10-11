@@ -13,6 +13,7 @@ interface BorderBeamCardProps extends React.HTMLAttributes<HTMLDivElement> {
   borderWidth?: number;
   colorFrom?: string;
   colorTo?: string;
+  borderColor?: string; // 单一边框颜色（会同时用于from和to）
 }
 
 export function BorderBeamCard({
@@ -22,10 +23,14 @@ export function BorderBeamCard({
   duration = 15,
   delay = 0,
   borderWidth = 1.5,
-  colorFrom = "#9333ea",
-  colorTo = "#0ea5e9",
+  colorFrom: colorFromProp,
+  colorTo: colorToProp,
+  borderColor,
   ...props
 }: BorderBeamCardProps) {
+  // 如果提供了borderColor，则同时用于from和to
+  const colorFrom = borderColor || colorFromProp || "#9333ea";
+  const colorTo = borderColor || colorToProp || "#0ea5e9";
   return (
     <div
       className={cn(

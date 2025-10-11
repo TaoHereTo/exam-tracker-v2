@@ -79,6 +79,24 @@ export function TabsList({ className, children }: TabsListProps) {
     const { activeValue, themeColor } = useTabsContext();
     const containerRef = useRef<HTMLDivElement>(null);
     const [highlightStyle, setHighlightStyle] = useState({ left: 0, width: 0 });
+    const [isDark, setIsDark] = useState(false);
+
+    useEffect(() => {
+        // 检测深色模式
+        const checkDarkMode = () => {
+            setIsDark(document.documentElement.classList.contains('dark'));
+        };
+        checkDarkMode();
+
+        // 监听主题变化
+        const observer = new MutationObserver(checkDarkMode);
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -88,53 +106,37 @@ export function TabsList({ className, children }: TabsListProps) {
             const containerRect = containerRef.current.getBoundingClientRect();
             const tabRect = activeTab.getBoundingClientRect();
 
-            setHighlightStyle({
-                left: tabRect.left - containerRect.left,
-                width: tabRect.width
-            });
+            // 四舍五入到整数像素，避免亚像素渲染问题
+            const left = Math.round(tabRect.left - containerRect.left);
+            const width = Math.round(tabRect.width);
+
+            setHighlightStyle({ left, width });
         }
     }, [activeValue]);
 
     return (
         <div
             ref={containerRef}
-            className={cn('relative inline-flex items-center justify-center rounded-full backdrop-blur-md p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
+            className={cn('relative inline-flex items-center justify-center rounded-full p-1 text-muted-foreground unselectable', className?.includes('grid') ? 'h-auto' : 'h-9', className)}
             style={{
                 zIndex: 10,
                 backgroundColor: 'transparent',
-                backdropFilter: 'blur(12px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(12px) saturate(180%)',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.12), 0 -2px 8px rgba(0,0,0,0.08), 0 0 12px rgba(0,0,0,0.06)'
+                boxShadow: isDark
+                    ? `0 2px 8px rgba(0,0,0,0.3), 0 -2px 6px rgba(0,0,0,0.2), 0 0 10px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.25)`
+                    : `0 0 10px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.3), 0 0 20px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.15)`,
             }}
         >
-            {/* 高亮背景 - 优化的毛玻璃效果 */}
+            {/* 高亮背景 - 使用 Tween 动画（完全消除抖动） */}
             <motion.div
-                className="absolute inset-y-1 backdrop-blur-sm rounded-full"
+                className="absolute inset-y-1 rounded-full"
                 style={{
-                    // 使用更均匀的颜色，减少发白现象
-                    background: `
-                        linear-gradient(135deg, 
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.85) 0%, 
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.8) 25%,
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.82) 50%, 
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.8) 75%,
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.85) 100%
-                        ),
-                        radial-gradient(circle at center, 
-                            rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.1) 0%, 
-                            transparent 70%
-                        )
-                    `,
-                    backdropFilter: 'blur(8px) saturate(150%)',
-                    WebkitBackdropFilter: 'blur(8px) saturate(150%)',
-                    // 减少内发光，避免发白
+                    backgroundColor: themeColor || '#2A4DD0',
                     boxShadow: `
-                        0 2px 8px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.25),
-                        0 1px 3px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                        0 2px 6px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.35),
+                        0 1px 3px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.25),
+                        0 0 12px rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.3)
                     `,
-                    // 调整边框透明度，让边缘更柔和
-                    border: `1px solid rgba(${hexToRgb(themeColor || '#2A4DD0')}, 0.2)`,
+                    willChange: 'transform',
                 }}
                 initial={false}
                 animate={{
@@ -142,9 +144,10 @@ export function TabsList({ className, children }: TabsListProps) {
                     width: highlightStyle.width,
                 }}
                 transition={{
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 30,
+                    // 使用 tween 动画替代 spring，完全消除抖动
+                    type: "tween",
+                    duration: 0.25,
+                    ease: [0.4, 0.0, 0.2, 1], // cubic-bezier 缓动函数，提供平滑过渡
                 }}
             />
             {children}
