@@ -1657,6 +1657,29 @@ h6 {
   font-weight: 600;
 }
 
+/* ========== 统一文本选中样式 - 蓝色 ========== */
+/* 全局文本选中样式 */
+::selection {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+::-moz-selection {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* 深色模式下的选中样式 */
+.dark ::selection {
+  background-color: #60a5fa !important;
+  color: #000000 !important;
+}
+
+.dark ::-moz-selection {
+  background-color: #60a5fa !important;
+  color: #000000 !important;
+}
+
 /* 确保输入框和文本区域可以正常选择 */
 input,
 textarea,

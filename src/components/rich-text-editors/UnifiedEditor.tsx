@@ -40,7 +40,8 @@ import {
     Check,
     ChevronDown,
     ChevronUp,
-    RefreshCw
+    RefreshCw,
+    Minus
 } from 'lucide-react';
 import { getZIndex } from '@/lib/zIndexConfig';
 import LatexFormulaSelector from '@/components/ui/LatexFormulaSelector';
@@ -939,6 +940,59 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         }
     }, [onChange, checkActiveFormats, checkSelectedText, autoCleanHtml]);
 
+    // 插入分割线
+    const handleInsertDivider = useCallback(() => {
+        if (!editorRef.current) return;
+
+        // 确保编辑器获得焦点
+        editorRef.current.focus();
+
+        try {
+            const selection = window.getSelection();
+            if (!selection || selection.rangeCount === 0) return;
+
+            const range = selection.getRangeAt(0);
+
+            // 创建分割线元素
+            const hr = document.createElement('hr');
+            hr.style.cssText = 'border: none; border-top: 2px solid #e0e0e0; margin: 16px 0;';
+
+            // 插入分割线
+            range.deleteContents();
+            range.insertNode(hr);
+
+            // 在分割线后面添加一个空段落，方便继续输入
+            const newParagraph = document.createElement('div');
+            newParagraph.innerHTML = '<br>';
+            hr.parentNode?.insertBefore(newParagraph, hr.nextSibling);
+
+            // 将光标移到新段落
+            const newRange = document.createRange();
+            newRange.setStart(newParagraph, 0);
+            newRange.setEnd(newParagraph, 0);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+
+            // 更新内容
+            let html = editorRef.current.innerHTML;
+
+            // 自动清理HTML结构
+            const cleanedHtml = autoCleanHtml(html);
+
+            // 如果HTML被清理了，更新编辑器内容
+            if (cleanedHtml !== html) {
+                editorRef.current.innerHTML = cleanedHtml;
+                html = cleanedHtml;
+            }
+
+            onChange(html);
+            checkActiveFormats();
+            checkSelectedText();
+        } catch (error) {
+            console.error('插入分割线失败:', error);
+        }
+    }, [onChange, checkActiveFormats, checkSelectedText, autoCleanHtml]);
+
 
 
 
@@ -1359,6 +1413,22 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                         </TooltipContent>
                     </Tooltip>
 
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                className={TOOLBAR_BUTTON_CLASSES}
+                                onClick={handleInsertDivider}
+                            >
+                                <Minus className="w-4 h-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent className={actualIsFullscreen ? "z-[50000]" : isInDialog ? "z-[1000]" : undefined}
+                            style={actualIsFullscreen ? { zIndex: 50000 } : isInDialog ? { zIndex: 1000 } : undefined}>
+                            <p>插入分割线</p>
+                        </TooltipContent>
+                    </Tooltip>
 
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -1772,6 +1842,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     
                     .dark .unified-editor-wrapper a:hover {
                         color: #93c5fd !important;
+                    }
+                    
+                    /* 分割线样式 */
+                    .unified-editor-wrapper hr {
+                        border: none;
+                        border-top: 2px solid #e0e0e0;
+                        margin: 16px 0;
+                    }
+                    
+                    .dark .unified-editor-wrapper hr {
+                        border-top-color: #404040;
                     }
                 `}</style>
         </div>
