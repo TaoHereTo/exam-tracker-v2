@@ -5,7 +5,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
 import '@wangeditor/editor/dist/css/style.css';
 import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
+import EditorCatalog from './EditorCatalog';
 
 interface WangEditorWrapperProps {
     content: string;
@@ -14,6 +14,7 @@ interface WangEditorWrapperProps {
     className?: string;
     customMinHeight?: string;
     customMaxHeight?: string;
+    showCatalog?: boolean; // 是否显示目录
 }
 
 export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
@@ -22,12 +23,14 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
     placeholder = '开始输入...',
     className,
     customMinHeight = '300px',
-    customMaxHeight = '800px'
+    customMaxHeight = '800px',
+    showCatalog = false
 }) => {
     const [editor, setEditor] = useState<IDomEditor | null>(null);
     const [html, setHtml] = useState(content);
+    const [catalogVisible, setCatalogVisible] = useState<boolean>(true); // 目录是否可见
 
-    // 工具栏配置
+    // 工具栏配置 - 使用官方的菜单分组功能
     const toolbarConfig: Partial<IToolbarConfig> = useMemo(() => ({
         toolbarKeys: [
             'headerSelect',
@@ -41,19 +44,36 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
             '|',
             'fontSize',
             'fontFamily',
+            'lineHeight', // 行高
+            '|',
             'color',
             'bgColor',
             '|',
-            'justifyLeft',
-            'justifyCenter',
-            'justifyRight',
-            'justifyJustify',
+            // 使用官方的菜单分组功能，将对齐按钮放在一个下拉组中
+            {
+                key: 'alignGroup',
+                title: '对齐',
+                iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M768 793.6v102.4H51.2v-102.4h716.8z m204.8-230.4v102.4H51.2v-102.4h921.6z m-204.8-230.4v102.4H51.2v-102.4h716.8zM972.8 102.4v102.4H51.2V102.4h921.6z"></path></svg>',
+                menuKeys: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyJustify']
+            },
+            // 缩进菜单分组
+            {
+                key: 'indentGroup',
+                title: '缩进',
+                iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M0 64h1024v128H0z m384 192h640v128H384z m0 192h640v128H384z m0 192h640v128H384zM0 832h1024v128H0z m0-128V320l256 192z"></path></svg>',
+                menuKeys: ['indent', 'delIndent']
+            },
             '|',
             'insertLink',
-            'insertImage',
+            // 图片菜单分组 - 包含上传和网络图片
+            {
+                key: 'imageGroup',
+                title: '图片',
+                iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M959.877 128l0.123 0.123v767.775l-0.123 0.122H64.102l-0.122-0.122V128.123l0.122-0.123h895.775zM960 64H64C28.795 64 0 92.795 0 128v768c0 35.205 28.795 64 64 64h896c35.205 0 64-28.795 64-64V128c0-35.205-28.795-64-64-64zM832 288.01c0 53.023-42.988 96.01-96.01 96.01s-96.01-42.987-96.01-96.01S682.967 192 735.99 192 832 234.988 832 288.01zM896 832H128V704l224.01-384 256 320h64l224.01-192z"></path></svg>',
+                menuKeys: ['uploadImage', 'insertImage']
+            },
             'insertTable',
             '|',
-            'codeBlock',
             'blockquote',
             'divider',
             '|',
@@ -62,7 +82,7 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
             '|',
             'clearStyle',
             '|',
-            'fullScreen', // wangEditor 自带的全屏功能
+            'fullScreen',
         ],
     }), []);
 
@@ -134,11 +154,24 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
     }, [editor, html]); // html 依赖是必要的，因为编辑器内容变化时需要重新计算
 
     return (
-        <TooltipProvider>
+        <div className={cn("wang-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
+            {/* 目录 - 显示在左侧，可收起 */}
+            {showCatalog && (
+                <EditorCatalog
+                    editor={editor}
+                    className={cn(
+                        "sticky top-4 order-first transition-all duration-300",
+                        catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
+                    )}
+                    isVisible={catalogVisible}
+                    onToggle={() => setCatalogVisible(!catalogVisible)}
+                />
+            )}
+
             <div
                 className={cn(
                     "wang-editor-wrapper border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden",
-                    className
+                    showCatalog ? "flex-1" : "w-full"
                 )}
             >
                 {/* Toolbar 和 Editor 必须直接在同一个父元素下，不能有额外包装 */}
@@ -152,6 +185,7 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                             backgroundColor: 'transparent'
                         }}
                     />
+
                     <Editor
                         defaultConfig={editorConfig}
                         value={html}
@@ -172,7 +206,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         <span>字符: {charCount}</span>
                     </div>
                 </div>
-
 
                 {/* 自定义样式 */}
                 <style jsx global>{`
@@ -286,7 +319,7 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                     }
                 `}</style>
             </div>
-        </TooltipProvider>
+        </div>
     );
 };
 

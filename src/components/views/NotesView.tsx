@@ -1424,6 +1424,7 @@ export default function NotesView() {
                                     }}
                                     placeholder="开始编写你的笔记..."
                                     className="h-full"
+                                    showCatalog={true}
                                     customMinHeight="400px"
                                     customMaxHeight="900px"
                                 />
