@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useEditor, EditorContent } from '@tiptap/react';
+import { useEditor, EditorContent, type Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Image from '@tiptap/extension-image';
@@ -13,7 +13,7 @@ import FontFamily from '@tiptap/extension-font-family';
 import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
 import Highlight from '@tiptap/extension-highlight';
-import { BubbleMenu } from '@tiptap/react';
+// import { BubbleMenu } from '@tiptap/extension-bubble-menu'; // 在Tiptap v3中需要不同的使用方式
 import { cn } from '@/lib/utils';
 import TiptapEditorCatalog from './TiptapEditorCatalog';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,8 @@ import { Separator } from '@/components/ui/separator';
 import {
     Tooltip,
     TooltipContent,
-    TooltipTrigger
+    TooltipTrigger,
+    TooltipProvider
 } from '@/components/animate-ui/components/animate/tooltip';
 import {
     Bold,
@@ -84,7 +85,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         }, 300); // 300ms 防抖延迟
     }, [onChange]);
 
-    // 创建编辑器实例 - 遵循官方最佳实践
+    // 创建编辑器实例 - 遵循官方最佳实践，修复SSR问题
     const editor = useEditor({
         extensions: [
             StarterKit.configure({
@@ -133,7 +134,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                 'aria-multiline': 'true',
             },
         },
-        // 移除 immediatelyRender: false，使用默认值
+        immediatelyRender: false, // 修复SSR问题
     });
 
     // 当 content prop 变化时更新编辑器 - 官方推荐的方式
@@ -195,7 +196,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         return editor.getText().length;
     }, [editor]);
 
-    // 工具栏按钮组件 - 使用更直接的事件处理
+    // 工具栏按钮组件 - 使用更直接的事件处理，集成animate ui tooltip
     const ToolbarButton: React.FC<{
         onClick: () => void;
         isActive?: boolean;
@@ -203,20 +204,26 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         children: React.ReactNode;
         title?: string;
         size?: 'sm' | 'default';
-    }> = ({ onClick, isActive, disabled, children, title, size = 'default' }) => {
+        preventHide?: boolean; // 新增：是否阻止BubbleMenu隐藏
+    }> = ({ onClick, isActive, disabled, children, title, size = 'default', preventHide = false }) => {
         const handleMouseDown = useCallback((e: React.MouseEvent) => {
             e.preventDefault();
             e.stopPropagation();
+
+            // 如果设置了preventHide，阻止事件冒泡
+            if (preventHide) {
+                e.stopPropagation();
+            }
+
             // 使用 mousedown 而不是 click 来避免双击问题
             onClick();
-        }, [onClick]);
+        }, [onClick, preventHide]);
 
-        return (
+        const buttonElement = (
             <button
                 type="button"
                 onMouseDown={handleMouseDown}
                 disabled={disabled}
-                title={title}
                 className={cn(
                     "h-8 w-8 p-0 transition-colors border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center",
                     isActive && "bg-accent text-accent-foreground",
@@ -243,6 +250,22 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                 {children}
             </button>
         );
+
+        // 如果有title，则包装tooltip
+        if (title) {
+            return (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {buttonElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {title}
+                    </TooltipContent>
+                </Tooltip>
+            );
+        }
+
+        return buttonElement;
     };
 
     // 字体选择器组件
@@ -262,28 +285,38 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
         const currentFont = editor?.getAttributes('textStyle').fontFamily || '';
 
+        const triggerElement = (
+            <DropdownMenuTrigger
+                className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center gap-1 transition-colors"
+                style={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+            >
+                <Type className="h-4 w-4" />
+                {fonts.find(f => f.value === currentFont)?.name || '字体'}
+            </DropdownMenuTrigger>
+        );
+
         return (
             <DropdownMenu>
-                <DropdownMenuTrigger
-                    className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center gap-1 transition-colors"
-                    title="选择字体"
-                    style={{
-                        border: 'none',
-                        boxShadow: 'none',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                        backgroundColor: 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                >
-                    <Type className="h-4 w-4" />
-                    {fonts.find(f => f.value === currentFont)?.name || '字体'}
-                </DropdownMenuTrigger>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {triggerElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        选择字体
+                    </TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="start" className="w-48">
                     {fonts.map((font) => (
                         <DropdownMenuItem
@@ -331,27 +364,37 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
         const currentHeading = editor?.getAttributes('heading').level || 'paragraph';
 
+        const triggerElement = (
+            <DropdownMenuTrigger
+                className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center transition-colors"
+                style={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+            >
+                {headings.find(h => h.value === currentHeading.toString())?.name || '正文'}
+            </DropdownMenuTrigger>
+        );
+
         return (
             <DropdownMenu>
-                <DropdownMenuTrigger
-                    className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center transition-colors"
-                    title="选择标题级别"
-                    style={{
-                        border: 'none',
-                        boxShadow: 'none',
-                        outline: 'none',
-                        boxSizing: 'border-box',
-                        backgroundColor: 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                    }}
-                >
-                    {headings.find(h => h.value === currentHeading.toString())?.name || '正文'}
-                </DropdownMenuTrigger>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {triggerElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        选择标题级别
+                    </TooltipContent>
+                </Tooltip>
                 <DropdownMenuContent align="start" className="w-32">
                     {headings.map((heading) => (
                         <DropdownMenuItem
@@ -378,6 +421,226 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>
+        );
+    };
+
+    // 自定义BubbleMenu组件 - 适配Tiptap v3
+    const CustomBubbleMenu: React.FC<{ editor: Editor | null }> = ({ editor }) => {
+        const [isVisible, setIsVisible] = useState(false);
+        const [position, setPosition] = useState({ x: 0, y: 0 });
+        const menuRef = useRef<HTMLDivElement>(null);
+
+        useEffect(() => {
+            if (!editor) return;
+
+            const updateBubbleMenu = () => {
+                const { state } = editor;
+                const { selection } = state;
+                const { $from, $to } = selection;
+
+                // 检查是否有文本选择
+                if (selection.empty || $from.pos === $to.pos) {
+                    setIsVisible(false);
+                    return;
+                }
+
+                // 获取选择范围的位置
+                const start = editor.view.coordsAtPos($from.pos);
+                const end = editor.view.coordsAtPos($to.pos);
+
+                // 计算菜单位置 - 显示在选中文字下方
+                const left = Math.min(start.left, end.left);
+                const top = Math.max(start.bottom, end.bottom) + 10;
+
+                // 获取编辑器容器的位置，确保菜单相对于编辑器定位
+                const editorElement = editor.view.dom.closest('.tiptap-editor-content');
+                if (editorElement) {
+                    const editorRect = editorElement.getBoundingClientRect();
+                    const relativeLeft = left - editorRect.left;
+                    const relativeTop = top - editorRect.top;
+
+                    // 确保菜单不会超出编辑器右边界
+                    const menuWidth = 300;
+                    const adjustedLeft = Math.min(relativeLeft, editorRect.width - menuWidth);
+
+                    setPosition({ x: Math.max(0, adjustedLeft), y: relativeTop });
+                } else {
+                    setPosition({ x: left, y: top });
+                }
+
+                setIsVisible(true);
+            };
+
+            // 监听选择变化
+            editor.on('selectionUpdate', updateBubbleMenu);
+
+            return () => {
+                editor.off('selectionUpdate', updateBubbleMenu);
+            };
+        }, [editor]);
+
+        // 处理点击外部隐藏菜单
+        useEffect(() => {
+            const handleClickOutside = (event: MouseEvent) => {
+                if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                    setIsVisible(false);
+                }
+            };
+
+            if (isVisible) {
+                document.addEventListener('mousedown', handleClickOutside);
+            }
+
+            return () => {
+                document.removeEventListener('mousedown', handleClickOutside);
+            };
+        }, [isVisible]);
+
+        if (!isVisible || !editor) return null;
+
+        return (
+            <div
+                ref={menuRef}
+                className="bubble-menu absolute z-50 flex items-center gap-1 p-2 bg-background border border-border rounded-lg shadow-lg"
+                style={{
+                    left: position.x,
+                    top: position.y,
+                }}
+            >
+                <ToolbarButton
+                    onClick={() => {
+                        safeEditorCommand(() => {
+                            editor.commands.focus();
+                            editor.commands.toggleBold();
+                        });
+                    }}
+                    isActive={editor.isActive('bold')}
+                    title="加粗 (Ctrl+B)"
+                >
+                    <Bold className="h-4 w-4" />
+                </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => {
+                        safeEditorCommand(() => {
+                            editor.commands.focus();
+                            editor.commands.toggleItalic();
+                        });
+                    }}
+                    isActive={editor.isActive('italic')}
+                    title="斜体 (Ctrl+I)"
+                >
+                    <Italic className="h-4 w-4" />
+                </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => {
+                        safeEditorCommand(() => {
+                            editor.commands.focus();
+                            editor.commands.toggleUnderline();
+                        });
+                    }}
+                    isActive={editor.isActive('underline')}
+                    title="下划线 (Ctrl+U)"
+                >
+                    <UnderlineIcon className="h-4 w-4" />
+                </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => {
+                        safeEditorCommand(() => {
+                            editor.commands.focus();
+                            editor.commands.toggleStrike();
+                        });
+                    }}
+                    isActive={editor.isActive('strike')}
+                    title="删除线"
+                >
+                    <Strikethrough className="h-4 w-4" />
+                </ToolbarButton>
+
+                <Separator orientation="vertical" className="h-6" />
+
+                <div className="relative">
+                    <input
+                        type="color"
+                        value={editor.getAttributes('textStyle').color || '#000000'}
+                        onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            editor.chain().focus().setColor(e.target.value).run();
+                        }}
+                        className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute inset-0 z-10"
+                        title="文字颜色"
+                    />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type="button"
+                                className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
+                                style={{
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                    outline: 'none',
+                                    boxSizing: 'border-box',
+                                    backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'hsl(var(--accent) / 0.5)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                            >
+                                <Palette className="h-4 w-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            文字颜色
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+
+                <div className="relative">
+                    <input
+                        type="color"
+                        value={editor.getAttributes('highlight').color || '#ffff00'}
+                        onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            editor.chain().focus().setHighlight({ color: e.target.value }).run();
+                        }}
+                        className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute inset-0 z-10"
+                        title="背景高亮"
+                    />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <button
+                                type="button"
+                                className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
+                                style={{
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                    outline: 'none',
+                                    boxSizing: 'border-box',
+                                    backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'hsl(var(--accent) / 0.5)';
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                            >
+                                <Highlighter className="h-4 w-4" />
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            背景高亮
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
+            </div>
         );
     };
 
@@ -480,26 +743,32 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                             className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
                             title="文字颜色"
                         />
-                        <button
-                            type="button"
-                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                            title="文字颜色"
-                            style={{
-                                border: 'none',
-                                boxShadow: 'none',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                backgroundColor: 'transparent'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                        >
-                            <Palette className="h-4 w-4" />
-                        </button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
+                                    style={{
+                                        border: 'none',
+                                        boxShadow: 'none',
+                                        outline: 'none',
+                                        boxSizing: 'border-box',
+                                        backgroundColor: 'transparent'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                >
+                                    <Palette className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                文字颜色
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                     <div className="relative">
                         <input
@@ -513,26 +782,32 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                             className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
                             title="背景高亮"
                         />
-                        <button
-                            type="button"
-                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                            title="背景高亮"
-                            style={{
-                                border: 'none',
-                                boxShadow: 'none',
-                                outline: 'none',
-                                boxSizing: 'border-box',
-                                backgroundColor: 'transparent'
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                        >
-                            <Highlighter className="h-4 w-4" />
-                        </button>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    type="button"
+                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
+                                    style={{
+                                        border: 'none',
+                                        boxShadow: 'none',
+                                        outline: 'none',
+                                        boxSizing: 'border-box',
+                                        backgroundColor: 'transparent'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = 'transparent';
+                                    }}
+                                >
+                                    <Highlighter className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                背景高亮
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 </div>
 
@@ -664,180 +939,52 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     };
 
     return (
-        <div className={cn("tiptap-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
-            {/* 目录 - 显示在左侧，可收起 */}
-            {showCatalog && (
-                <TiptapEditorCatalog
-                    editor={editor}
-                    className={cn(
-                        "sticky top-4 order-first transition-all duration-300",
-                        catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
-                    )}
-                    isVisible={catalogVisible}
-                    onToggle={() => setCatalogVisible(!catalogVisible)}
-                />
-            )}
-
-            <div
-                className={cn(
-                    "tiptap-editor-wrapper border border-border rounded-lg bg-background",
-                    showCatalog ? "flex-1" : "w-full"
+        <TooltipProvider>
+            <div className={cn("tiptap-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
+                {/* 目录 - 显示在左侧，可收起 */}
+                {showCatalog && (
+                    <TiptapEditorCatalog
+                        editor={editor}
+                        className={cn(
+                            "sticky top-4 order-first transition-all duration-300",
+                            catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
+                        )}
+                        isVisible={catalogVisible}
+                        onToggle={() => setCatalogVisible(!catalogVisible)}
+                    />
                 )}
-            >
-                <Toolbar />
 
                 <div
-                    className="tiptap-editor-content p-4 overflow-y-auto relative"
-                    style={{
-                        minHeight: customMinHeight,
-                        maxHeight: customMaxHeight,
-                    }}
-                >
-                    <EditorContent editor={editor} />
-
-                    {/* BubbleMenu - 官方推荐的精简实现 */}
-                    {editor && (
-                        <BubbleMenu
-                            editor={editor}
-                            tippyOptions={{ duration: 100 }}
-                            className="bubble-menu"
-                        >
-                            <div className="flex items-center gap-1 p-2 bg-background border border-border rounded-lg shadow-lg">
-                                <ToolbarButton
-                                    onClick={() => {
-                                        safeEditorCommand(() => {
-                                            editor.commands.focus();
-                                            editor.commands.toggleBold();
-                                        });
-                                    }}
-                                    isActive={editor.isActive('bold')}
-                                    title="加粗 (Ctrl+B)"
-                                >
-                                    <Bold className="h-4 w-4" />
-                                </ToolbarButton>
-
-                                <ToolbarButton
-                                    onClick={() => {
-                                        safeEditorCommand(() => {
-                                            editor.commands.focus();
-                                            editor.commands.toggleItalic();
-                                        });
-                                    }}
-                                    isActive={editor.isActive('italic')}
-                                    title="斜体 (Ctrl+I)"
-                                >
-                                    <Italic className="h-4 w-4" />
-                                </ToolbarButton>
-
-                                <ToolbarButton
-                                    onClick={() => {
-                                        safeEditorCommand(() => {
-                                            editor.commands.focus();
-                                            editor.commands.toggleUnderline();
-                                        });
-                                    }}
-                                    isActive={editor.isActive('underline')}
-                                    title="下划线 (Ctrl+U)"
-                                >
-                                    <UnderlineIcon className="h-4 w-4" />
-                                </ToolbarButton>
-
-                                <ToolbarButton
-                                    onClick={() => {
-                                        safeEditorCommand(() => {
-                                            editor.commands.focus();
-                                            editor.commands.toggleStrike();
-                                        });
-                                    }}
-                                    isActive={editor.isActive('strike')}
-                                    title="删除线"
-                                >
-                                    <Strikethrough className="h-4 w-4" />
-                                </ToolbarButton>
-
-                                <Separator orientation="vertical" className="h-6" />
-
-                                <div className="relative">
-                                    <input
-                                        type="color"
-                                        value={editor.getAttributes('textStyle').color || '#000000'}
-                                        onChange={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().setColor(e.target.value).run();
-                                        }}
-                                        className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
-                                        title="文字颜色"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                                        title="文字颜色"
-                                        style={{
-                                            border: 'none',
-                                            boxShadow: 'none',
-                                            outline: 'none',
-                                            boxSizing: 'border-box',
-                                            backgroundColor: 'transparent'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'hsl(var(--accent) / 0.5)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                        }}
-                                    >
-                                        <Palette className="h-4 w-4" />
-                                    </button>
-                                </div>
-
-                                <div className="relative">
-                                    <input
-                                        type="color"
-                                        value={editor.getAttributes('highlight').color || '#ffff00'}
-                                        onChange={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().setHighlight({ color: e.target.value }).run();
-                                        }}
-                                        className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
-                                        title="背景高亮"
-                                    />
-                                    <button
-                                        type="button"
-                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                                        title="背景高亮"
-                                        style={{
-                                            border: 'none',
-                                            boxShadow: 'none',
-                                            outline: 'none',
-                                            boxSizing: 'border-box',
-                                            backgroundColor: 'transparent'
-                                        }}
-                                        onMouseEnter={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'hsl(var(--accent) / 0.5)';
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            e.currentTarget.style.backgroundColor = 'transparent';
-                                        }}
-                                    >
-                                        <Highlighter className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-                        </BubbleMenu>
+                    className={cn(
+                        "tiptap-editor-wrapper border border-border rounded-lg bg-background",
+                        showCatalog ? "flex-1" : "w-full"
                     )}
-                </div>
+                >
+                    <Toolbar />
 
-                {/* 字数统计 */}
-                <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
-                    <div className="flex items-center gap-2">
-                        <span>字数: {wordCount}</span>
-                        <span>字符: {charCount}</span>
+                    <div
+                        className="tiptap-editor-content p-4 overflow-y-auto relative"
+                        style={{
+                            minHeight: customMinHeight,
+                            maxHeight: customMaxHeight,
+                        }}
+                    >
+                        <EditorContent editor={editor} />
+
+                        {/* 自定义BubbleMenu - 适配Tiptap v3 */}
+                        <CustomBubbleMenu editor={editor} />
+                    </div>
+
+                    {/* 字数统计 */}
+                    <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
+                        <div className="flex items-center gap-2">
+                            <span>字数: {wordCount}</span>
+                            <span>字符: {charCount}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </TooltipProvider>
     );
 };
 
