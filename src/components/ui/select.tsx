@@ -19,10 +19,20 @@ const SelectTrigger = React.forwardRef<
     <SelectPrimitive.Trigger
         ref={ref}
         className={cn(
-            "flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+            "flex h-10 w-full items-center justify-between rounded-md border px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
             "bg-white dark:bg-[#303030]",
             "border-[color:var(--input-border)]",
-            "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+            // 默认状态：无 ring
+            "shadow-[0_0_0_0px_transparent]",
+            // 过渡动画：只过渡 box-shadow 和 border-color
+            "transition-[box-shadow,border-color] duration-200 ease-in-out",
+            // 浅色模式焦点状态
+            "focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.5)]",
+            "focus-visible:border-blue-500 focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.5)]",
+            // 深色模式焦点效果
+            "dark:focus:border-blue-400 dark:focus:shadow-[0_0_0_3px_rgba(96,165,250,0.5)]",
+            "dark:focus-visible:border-blue-400 dark:focus-visible:shadow-[0_0_0_3px_rgba(96,165,250,0.5)]",
+            // 错误状态
             "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
             className
         )}

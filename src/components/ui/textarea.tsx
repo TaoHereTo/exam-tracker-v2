@@ -15,9 +15,21 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           data-slot="textarea"
           className={cn(
-            "placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:border-ring focus-visible:ring-4 focus-visible:ring-ring/30 focus-visible:ring-offset-0 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive flex field-sizing-content min-h-16 w-full rounded-md border px-3 py-2 text-base shadow-xs transition-[color,box-shadow,border-color] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
+            "placeholder:text-gray-400 dark:placeholder:text-gray-500 flex field-sizing-content min-h-16 w-full rounded-md border px-3 py-2 text-base outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
             "bg-[color:var(--textarea-background)]",
             "border-[color:var(--input-border)]",
+            // 默认状态：无 ring
+            "shadow-[0_0_0_0px_transparent]",
+            // 过渡动画：只过渡 box-shadow 和 border-color
+            "transition-[box-shadow,border-color] duration-200 ease-in-out",
+            // 浅色模式焦点状态
+            "focus:border-blue-500 focus:shadow-[0_0_0_3px_rgba(59,130,246,0.5)]",
+            "focus-visible:border-blue-500 focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.5)]",
+            // 深色模式焦点效果
+            "dark:focus:border-blue-400 dark:focus:shadow-[0_0_0_3px_rgba(96,165,250,0.5)]",
+            "dark:focus-visible:border-blue-400 dark:focus-visible:shadow-[0_0_0_3px_rgba(96,165,250,0.5)]",
+            // 错误状态
+            "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
             className
           )}
           onKeyDown={e => {

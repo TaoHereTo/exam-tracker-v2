@@ -84,8 +84,8 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
         // 根据主题动态设置颜色
         const backgroundColor = 'transparent';
         const textColor = isDarkMode ? '#e5e5e5' : '#333';
-        // 图例文字在深色模式下使用黑色以提高可读性
-        const legendTextColor = isDarkMode ? '#333' : '#333';
+        // 图例文字在深色模式下使用白色
+        const legendTextColor = isDarkMode ? '#ffffff' : '#333';
         const borderColor = isDarkMode ? '#404040' : '#e0e6f1';
         const splitLineColor = isDarkMode ? '#2a2a2a' : '#f5f7fa';
         const tooltipBgColor = isDarkMode ? 'rgba(40,40,40,0.95)' : 'rgba(255,255,255,0.95)';
@@ -136,11 +136,13 @@ export const TrendChart: React.FC<TrendChartProps & { onlyModule?: string }> = (
                 },
                 borderRadius: 6,
                 icon: 'roundRect',
-                backgroundColor: isDarkMode ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.9)',
-                borderColor: isDarkMode ? '#e0e6f1' : '#e0e6f1',
-                borderWidth: 1,
-                shadowColor: 'rgba(51,102,255,0.08)',
-                shadowBlur: 8,
+                // 浅色和深色模式都使用透明背景
+                backgroundColor: 'transparent',
+                // 不需要边框
+                borderColor: 'transparent',
+                borderWidth: 0,
+                shadowColor: 'transparent',
+                shadowBlur: 0,
                 textStyle: {
                     color: legendTextColor,
                     fontSize: 13,

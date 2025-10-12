@@ -440,7 +440,7 @@ h6 .mixed-text {
   --border: #E0E0E0;
   --input: #FFFFFF;
   --input-border: #E0E0E0;
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.6 0.15 250);
 
   /* 组件专用背景色 - 统一管理 */
   --editor-background: var(--input);
@@ -504,7 +504,7 @@ h6 .mixed-text {
   --border: oklch(1 0 0 / 10%);
   --input: #242628;
   --input-border: #313335;
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.75 0.15 250);
 
   /* 深色模式组件专用背景色 */
   --editor-background: #303030;
@@ -592,13 +592,8 @@ h6 .mixed-text {
     background-position: initial;
   }
 
-  /* 优化输入框焦点效果 */
-  input:focus-visible,
-  textarea:focus-visible,
-  [data-slot="input"]:focus-visible,
-  [data-slot="textarea"]:focus-visible {
-    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-  }
+  /* ========== 优化输入框焦点效果 ========== */
+  /* 焦点效果已在组件级别设置，这里保留作为备用 */
 
   /* 统一所有placeholder颜色 - 使用CSS变量 */
   input::placeholder,
@@ -2758,32 +2753,22 @@ body.eye-care.dark .text-muted-foreground,
 /* 标准 tabs 组件主题颜色支持 */
 [data-state="active"] {
   background-color: var(--tabs-theme-color, var(--background)) !important;
-  color: white !important;
+  /* 移除强制白色，让文字颜色根据亮度自动调整 */
 }
 
 /* 确保 tabs 高亮颜色正确应用 */
 .tabs-list [data-state="active"] {
   background-color: var(--tabs-theme-color, var(--background)) !important;
-  color: white !important;
+  /* 选中状态的文字颜色由组件自己控制（foreground） */
 }
 
-/* 为不同主题颜色提供文字对比度优化 */
+/* 为不同主题颜色提供文字对比度优化 - 只在有背景色时添加阴影 */
 .tabs-list [data-state="active"] {
-  color: white !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* 深色模式下确保 tabs 激活状态文字为纯白色 */
-.dark [data-state="active"],
-.dark .tabs-list [data-state="active"],
-.dark [data-tab-value] {
-  color: white !important;
-}
-
-/* 确保 simple-tabs 组件在深色模式下文字为白色 */
-.dark [data-tab-value] {
-  color: white !important;
-}
+/* 深色模式下的 tabs 文字颜色层次（移除 !important 让组件自己控制） */
+/* 未选中状态使用 muted-foreground，选中和悬停使用 foreground */
 
 /* 确保日程管理页面的自定义 tabs 在深色模式下文字为白色 */
 .dark [data-view] {
