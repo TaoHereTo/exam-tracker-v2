@@ -227,10 +227,82 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         position: sticky !important;
                         top: 0 !important;
                         z-index: 10 !important;
+                        padding: 8px 12px !important;
                     }
                     
                     .dark .wang-editor-wrapper .w-e-toolbar {
                         background: rgba(48, 48, 48, 0.3) !important;
+                    }
+                    
+                    /* 工具栏按钮美化 - 保守版本，不影响 tooltip */
+                    .wang-editor-wrapper .w-e-bar-item button {
+                        border-radius: 6px !important;
+                        transition: background-color 0.2s ease, border-color 0.2s ease !important;
+                        border: 1px solid transparent !important;
+                        margin: 0 2px !important;
+                    }
+                    
+                    .wang-editor-wrapper .w-e-bar-item button:hover {
+                        background-color: rgba(0, 0, 0, 0.06) !important;
+                        border-color: rgba(0, 0, 0, 0.1) !important;
+                    }
+                    
+                    .dark .wang-editor-wrapper .w-e-bar-item button:hover {
+                        background-color: rgba(255, 255, 255, 0.1) !important;
+                        border-color: rgba(255, 255, 255, 0.12) !important;
+                    }
+                    
+                    /* 激活状态的按钮 */
+                    .wang-editor-wrapper .w-e-bar-item button.active,
+                    .wang-editor-wrapper .w-e-bar-item button[data-selected="true"] {
+                        background-color: hsl(var(--primary) / 0.1) !important;
+                        border-color: hsl(var(--primary) / 0.3) !important;
+                        color: hsl(var(--primary)) !important;
+                    }
+                    
+                    /* 下拉菜单美化 */
+                    .wang-editor-wrapper .w-e-select-list,
+                    .wang-editor-wrapper .w-e-drop-panel {
+                        border-radius: 8px !important;
+                        border: 1px solid hsl(var(--border)) !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+                    }
+                    
+                    .dark .wang-editor-wrapper .w-e-select-list,
+                    .dark .wang-editor-wrapper .w-e-drop-panel {
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+                    }
+                    
+                    /* 下拉菜单项 */
+                    .wang-editor-wrapper .w-e-select-list ul li,
+                    .wang-editor-wrapper .w-e-drop-panel-item {
+                        border-radius: 4px !important;
+                        margin: 2px 4px !important;
+                        transition: background-color 0.15s ease !important;
+                    }
+                    
+                    .wang-editor-wrapper .w-e-select-list ul li:hover,
+                    .wang-editor-wrapper .w-e-drop-panel-item:hover {
+                        background-color: hsl(var(--accent)) !important;
+                    }
+                    
+                    /* Modal 弹窗优化 */
+                    .wang-editor-wrapper .w-e-modal {
+                        border-radius: 12px !important;
+                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+                    }
+                    
+                    .wang-editor-wrapper .w-e-modal input,
+                    .wang-editor-wrapper .w-e-modal textarea {
+                        border-radius: 6px !important;
+                        transition: border-color 0.2s ease !important;
+                    }
+                    
+                    .wang-editor-wrapper .w-e-modal input:focus,
+                    .wang-editor-wrapper .w-e-modal textarea:focus {
+                        border-color: hsl(var(--primary)) !important;
+                        outline: 2px solid hsl(var(--primary) / 0.2) !important;
+                        outline-offset: 0px !important;
                     }
                     
                     /* 全屏模式样式 */
@@ -243,42 +315,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         backdrop-filter: blur(8px) !important;
                     }
                     
-                    /* 自定义 tooltip 样式 - 匹配项目的 Tooltip 组件 */
-                    .wang-editor-wrapper .w-e-tooltip {
-                        background-color: hsl(var(--popover)) !important;
-                        color: hsl(var(--popover-foreground)) !important;
-                        border: 1px solid hsl(var(--border)) !important;
-                        border-radius: 0.5rem !important;
-                        padding: 0.5rem 0.75rem !important;
-                        font-size: 0.875rem !important;
-                        line-height: 1.25rem !important;
-                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
-                        z-index: 50 !important;
-                        animation: fadeIn 0.15s ease-in-out !important;
-                    }
-                    
-                    .wang-editor-wrapper .w-e-tooltip::before {
-                        border-top-color: hsl(var(--popover)) !important;
-                    }
-                    
-                    /* 暗黑模式下的 tooltip */
-                    .dark .wang-editor-wrapper .w-e-tooltip {
-                        background-color: hsl(var(--popover)) !important;
-                        border-color: hsl(var(--border)) !important;
-                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
-                    }
-                    
-                    @keyframes fadeIn {
-                        from {
-                            opacity: 0;
-                            transform: translateY(-4px);
-                        }
-                        to {
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    
                     /* wangEditor 暗黑模式适配 */
                     .dark .w-e-text-container {
                         background-color: #303030 !important;
@@ -287,23 +323,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                     
                     .dark .w-e-text-placeholder {
                         color: #9CA3AF !important;
-                    }
-                    
-                    .dark .w-e-bar-item button {
-                        color: #e5e5e5 !important;
-                    }
-                    
-                    .dark .w-e-bar-item button:hover {
-                        background-color: rgba(64, 64, 64, 0.5) !important;
-                    }
-                    
-                    /* 亮色模式下的工具栏按钮 hover 效果 */
-                    .wang-editor-wrapper .w-e-bar-item button:hover {
-                        background-color: rgba(0, 0, 0, 0.05) !important;
-                    }
-                    
-                    .dark .wang-editor-wrapper .w-e-bar-item button:hover {
-                        background-color: rgba(255, 255, 255, 0.1) !important;
                     }
                     
                     .dark .w-e-drop-panel {
