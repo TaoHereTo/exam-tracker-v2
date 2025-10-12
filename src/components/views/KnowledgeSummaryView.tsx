@@ -14,8 +14,6 @@ import { lazy, Suspense } from 'react';
 // 动态导入统一表单组件
 const ModuleForm = lazy(() => import("../forms/ModuleForm").then(module => ({ default: module.default })));
 
-// 不再需要单独的全屏编辑器，UnifiedEditor已经包含了全屏功能
-
 import { Edit, Trash2, X, Info } from 'lucide-react';
 import { MixedText } from '@/components/ui/MixedText';
 import { HtmlRenderer } from '@/components/ui/HtmlRenderer';

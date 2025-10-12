@@ -30,7 +30,7 @@ import {
     X,
     Palette
 } from "lucide-react";
-import UnifiedEditor from "@/components/rich-text-editors/UnifiedEditor";
+import WangEditorWrapper from "@/components/rich-text-editors/WangEditorWrapper";
 import { UiverseSpinner } from "@/components/ui/UiverseSpinner";
 import { MixedText } from "@/components/ui/MixedText";
 import { useNotification } from "@/components/magicui/NotificationProvider";
@@ -1413,7 +1413,7 @@ export default function NotesView() {
                             </div>
 
                             <div className="flex-1 min-h-[500px]">
-                                <UnifiedEditor
+                                <WangEditorWrapper
                                     content={selectedNote.content}
                                     onChange={(content) => {
                                         setSelectedNote({

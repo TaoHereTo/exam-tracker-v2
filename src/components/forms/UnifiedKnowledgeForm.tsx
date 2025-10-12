@@ -29,7 +29,7 @@ import { zhCN } from "date-fns/locale";
 import { useThemeMode } from "@/hooks/useThemeMode";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-import UnifiedEditor from "@/components/rich-text-editors/UnifiedEditor";
+import WangEditorWrapper from "@/components/rich-text-editors/WangEditorWrapper";
 
 // 模块配置类型定义
 interface ModuleConfig {
@@ -376,7 +376,7 @@ export const UnifiedKnowledgeForm: React.FC<UnifiedKnowledgeFormProps> = ({
     return (
       <div className="rich-text-editor-wrapper">
         {/* 统一使用独立的全屏编辑器，无论是知识点汇总还是知识点录入 */}
-        <UnifiedEditor
+        <WangEditorWrapper
           content={currentValue || ''}
           onChange={(value) => setValue('secondField', value || '')}
           placeholder={fieldConfig.secondPlaceholder}
