@@ -78,7 +78,6 @@ export function CloudDataOverview({ isOpen, onClose, localRecords = [], localPla
             ]);
             setData(overview);
         } catch (error) {
-            console.error('CloudDataOverview: Error loading cloud data:', error);
             let errorMessage = "未知错误";
             if (error instanceof Error) {
                 if (error.message.includes('Failed to fetch')) {

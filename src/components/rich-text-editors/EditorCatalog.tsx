@@ -3,8 +3,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { IDomEditor } from '@wangeditor/editor';
 import { cn } from '@/lib/utils';
-import { List, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
 
 interface CatalogItem {
     id: string;
@@ -37,7 +38,7 @@ export const EditorCatalog: React.FC<EditorCatalogProps> = ({ editor, className,
                 const text = header.children?.[0]?.text || '';
                 const type = header.type || '';
                 const level = parseInt(type.replace('header', '')) || 1;
-                
+
                 return {
                     id: header.id || '',
                     type,
@@ -97,7 +98,6 @@ export const EditorCatalog: React.FC<EditorCatalogProps> = ({ editor, className,
                     className="h-32 w-10 p-0 rounded-r-lg rounded-l-none border-l-0 flex flex-col items-center justify-center gap-2"
                     onClick={onToggle}
                 >
-                    <List className="h-4 w-4" />
                     <div className="text-xs whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
                         目录
                     </div>
@@ -114,20 +114,25 @@ export const EditorCatalog: React.FC<EditorCatalogProps> = ({ editor, className,
             className
         )}>
             {/* 目录标题栏 */}
-            <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center p-3 border-b border-gray-200 dark:border-gray-700">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 w-6 p-0 mr-2"
+                            onClick={onToggle}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>收起目录</p>
+                    </TooltipContent>
+                </Tooltip>
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    <List className="h-4 w-4" />
                     <span>目录</span>
                 </div>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={onToggle}
-                    title="收起目录"
-                >
-                    <ChevronLeft className="h-4 w-4" />
-                </Button>
             </div>
 
             {/* 目录列表 */}

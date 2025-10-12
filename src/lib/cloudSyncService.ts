@@ -296,7 +296,6 @@ export class CloudSyncService {
                 throw new Error(`知识点批量上传失败: ${error.message || '未知错误'}`);
             }
 
-            console.log(`知识点批量上传成功，上传了${data?.length || 0}条数据`);
 
             const report = [
                 ...validKnowledgeItems.map(knowledge => ({
@@ -412,18 +411,6 @@ export class CloudSyncService {
                 );
             });
 
-            // 调试日志：记录知识点上传信息
-            console.log('知识点上传分析:', {
-                本地知识点总数: localKnowledge.length,
-                云端知识点总数: cloudKnowledge.length,
-                需要上传的知识点数量: knowledgeToUpload.length,
-                需要上传的知识点示例: knowledgeToUpload.slice(0, 3).map(k => ({
-                    id: k.id,
-                    module: k.module,
-                    type: k.type,
-                    note: k.note?.substring(0, 50) + '...',
-                }))
-            });
 
             // 批量上传记录
             if (recordsToUpload.length > 0) {
@@ -599,7 +586,6 @@ export class CloudSyncService {
 
                             individualUploaded++;
                             report.knowledge.push({ item: knowledge, action: 'uploaded' });
-                            console.log(`单个知识点上传成功: ${validId}`);
                         } catch (individualError) {
                             console.error('单个知识点上传失败:', {
                                 knowledgeId: knowledge.id,
@@ -635,7 +621,6 @@ export class CloudSyncService {
                     }
 
                     uploadedKnowledge = individualUploaded;
-                    console.log(`知识点逐个上传完成：成功${individualUploaded}条，失败${individualFailed}条`);
                 }
             }
 

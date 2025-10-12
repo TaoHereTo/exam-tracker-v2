@@ -47,7 +47,6 @@ export const recordService = {
                 throw new Error(`获取记录失败: ${error.message || '未知错误'}`);
             }
 
-            console.log(`成功获取 ${data?.length || 0} 条记录`);
             return data || []
         } catch (error) {
             console.error('记录查询异常:', error);
@@ -159,9 +158,6 @@ export const planService = {
                 return [];
             }
 
-            console.log('开始查询用户计划，用户ID:', userId);
-            const startTime = Date.now();
-
             const { data, error } = await supabase
                 .from('plans')
                 .select('*')
@@ -169,15 +165,11 @@ export const planService = {
                 .order('created_at', { ascending: false })
                 .limit(500) // 限制查询数量
 
-            const endTime = Date.now();
-            console.log(`计划查询完成，耗时: ${endTime - startTime}ms`);
-
             if (error) {
                 console.error('获取计划失败:', error);
                 throw new Error(`获取计划失败: ${error.message || '未知错误'}`);
             }
 
-            console.log(`成功获取 ${data?.length || 0} 个计划`);
             return data || []
         } catch (error) {
             console.error('计划查询异常:', error);
@@ -301,7 +293,6 @@ export const planService = {
                         .eq('user_id', userId);
                 }
 
-                console.log(`已清理 ${recordsToDelete.length} 条重复记录`);
             }
 
             // 执行更新操作
@@ -474,7 +465,6 @@ export const countdownService = {
                         .eq('user_id', userId);
                 }
 
-                console.log(`已清理 ${recordsToDelete.length} 条重复记录`);
             }
 
             // 执行更新操作
@@ -593,18 +583,12 @@ export const knowledgeService = {
         }
 
         try {
-            console.log('开始查询用户知识点，用户ID:', userId);
-            const startTime = Date.now();
-
             const { data, error } = await supabase
                 .from('knowledge')
                 .select('*')
                 .eq('user_id', userId)
                 .order('created_at', { ascending: false })
                 .limit(1000) // 限制查询数量
-
-            const endTime = Date.now();
-            console.log(`知识点查询完成，耗时: ${endTime - startTime}ms`);
 
             if (error) {
                 console.error('获取知识点失败:', error);
@@ -623,7 +607,6 @@ export const knowledgeService = {
                 updated_at: item.updated_at
             })) || [];
 
-            console.log(`成功获取 ${result.length} 个知识点`);
             return result;
         } catch (error) {
             console.error('获取知识点异常:', error);
@@ -909,22 +892,15 @@ export const settingsService = {
         }
 
         try {
-            console.log('开始查询用户设置，用户ID:', userId);
-            const startTime = Date.now();
-
             const { data, error } = await supabase
                 .from('user_settings')
                 .select('*')
                 .eq('user_id', userId)
                 .maybeSingle()
 
-            const endTime = Date.now();
-            console.log(`设置查询完成，耗时: ${endTime - startTime}ms`);
-
             if (error) {
                 // 如果是没有找到记录的错误，返回空对象
                 if (error.code === 'PGRST116') {
-                    console.log('用户设置不存在，返回空对象');
                     return {};
                 }
 
@@ -956,7 +932,6 @@ export const settingsService = {
                 return {};
             }
 
-            console.log('成功获取用户设置');
             return data?.settings || {};
         } catch (error) {
             // 处理网络错误或其他异常

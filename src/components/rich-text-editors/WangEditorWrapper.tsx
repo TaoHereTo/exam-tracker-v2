@@ -34,21 +34,22 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
     const toolbarConfig: Partial<IToolbarConfig> = useMemo(() => ({
         toolbarKeys: [
             'headerSelect',
+            // 格式按钮组 - 包含加粗、斜体、下划线、删除线、文字颜色、背景颜色和清除格式
             'bold',
             'italic',
             'underline',
             'through',
-            '|',
-            'bulletedList',
-            'numberedList',
-            '|',
-            'fontSize',
-            'fontFamily',
-            'lineHeight', // 行高
-            '|',
             'color',
             'bgColor',
+            'clearStyle',
             '|',
+            // 布局按钮组 - 包含列表、对齐和缩进功能
+            {
+                key: 'listGroup',
+                title: '列表',
+                iconSvg: '<svg viewBox="0 0 1024 1024"><path d="M384 64h640v128H384V64z m0 384h640v128H384v-128z m0 384h640v128H384v-128zM0 128a128 128 0 1 1 256 0 128 128 0 0 1-256 0z m0 384a128 128 0 1 1 256 0 128 128 0 0 1-256 0z m0 384a128 128 0 1 1 256 0 128 128 0 0 1-256 0z"></path></svg>',
+                menuKeys: ['bulletedList', 'numberedList']
+            },
             // 使用官方的菜单分组功能，将对齐按钮放在一个下拉组中
             {
                 key: 'alignGroup',
@@ -64,8 +65,12 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                 menuKeys: ['indent', 'delIndent']
             },
             '|',
+            'fontSize',
+            'fontFamily',
+            'lineHeight', // 行高
+            '|',
             'insertLink',
-            // 图片菜单分组 - 包含上传和网络图片
+            // 插入元素按钮组 - 包含图片、表格、分割线和引用
             {
                 key: 'imageGroup',
                 title: '图片',
@@ -73,14 +78,11 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                 menuKeys: ['uploadImage', 'insertImage']
             },
             'insertTable',
-            '|',
-            'blockquote',
             'divider',
+            'blockquote',
             '|',
             'undo',
             'redo',
-            '|',
-            'clearStyle',
             '|',
             'fullScreen',
         ],
@@ -106,6 +108,29 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                     reader.readAsDataURL(file);
                 },
             },
+            // 丰富的颜色配置
+            color: {
+                colors: [
+                    '#000000', '#333333', '#666666', '#999999', '#cccccc', '#ffffff',
+                    '#ff0000', '#ff6600', '#ffcc00', '#00ff00', '#00ccff', '#0066ff',
+                    '#6600ff', '#ff0066', '#ff3366', '#ff6633', '#ffcc33', '#ccff33',
+                    '#33ffcc', '#3366ff', '#6633ff', '#cc33ff', '#ff3399', '#ff6666',
+                    '#ff9966', '#ffcc66', '#ccff66', '#66ffcc', '#6699ff', '#9966ff',
+                    '#cc66ff', '#ff6699', '#ff9999', '#ffcc99', '#ccff99', '#99ffcc',
+                    '#99ccff', '#cc99ff', '#ff99cc'
+                ]
+            },
+            bgColor: {
+                colors: [
+                    '#000000', '#333333', '#666666', '#999999', '#cccccc', '#ffffff',
+                    '#ff0000', '#ff6600', '#ffcc00', '#00ff00', '#00ccff', '#0066ff',
+                    '#6600ff', '#ff0066', '#ff3366', '#ff6633', '#ffcc33', '#ccff33',
+                    '#33ffcc', '#3366ff', '#6633ff', '#cc33ff', '#ff3399', '#ff6666',
+                    '#ff9966', '#ffcc66', '#ccff66', '#66ffcc', '#6699ff', '#9966ff',
+                    '#cc66ff', '#ff6699', '#ff9999', '#ffcc99', '#ccff99', '#99ffcc',
+                    '#99ccff', '#cc99ff', '#ff99cc'
+                ]
+            }
         },
     }), [placeholder]);
 
@@ -126,8 +151,62 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
     // 创建编辑器实例后
     useEffect(() => {
         if (editor) {
-            // 编辑器已创建
+            // 强制修复弹出菜单方向和箭头大小
+            const fixDropdownDirection = () => {
+
+                // 监听所有弹出菜单
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node: Node) => {
+                            if (node.nodeType === 1) { // Element node
+                                // 查找弹出菜单
+                                const element = node as Element;
+                                const dropdowns = element.querySelectorAll ?
+                                    element.querySelectorAll('.w-e-select-list, .w-e-drop-panel, .w-e-panel-container') : [];
+
+                                dropdowns.forEach((dropdown: Element) => {
+                                    if (dropdown) {
+                                        const htmlElement = dropdown as HTMLElement;
+                                        htmlElement.style.top = '100%';
+                                        htmlElement.style.bottom = 'auto';
+                                        htmlElement.style.transform = 'none';
+                                        htmlElement.style.zIndex = '9999';
+                                    }
+                                });
+
+                                // 如果节点本身就是弹出菜单
+                                if (element.classList && (
+                                    element.classList.contains('w-e-select-list') ||
+                                    element.classList.contains('w-e-drop-panel') ||
+                                    element.classList.contains('w-e-panel-container')
+                                )) {
+                                    const htmlElement = element as HTMLElement;
+                                    htmlElement.style.top = '100%';
+                                    htmlElement.style.bottom = 'auto';
+                                    htmlElement.style.transform = 'none';
+                                    htmlElement.style.zIndex = '9999';
+                                }
+                            }
+                        });
+                    });
+
+                });
+
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+
+
+                return () => {
+                    observer.disconnect();
+                };
+            };
+
+            const cleanup = fixDropdownDirection();
+
             return () => {
+                if (cleanup) cleanup();
                 // 组件销毁时销毁编辑器
                 if (editor) {
                     editor.destroy();
@@ -170,7 +249,7 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
 
             <div
                 className={cn(
-                    "wang-editor-wrapper border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden",
+                    "wang-editor-wrapper border border-gray-200 dark:border-gray-700 rounded-lg",
                     showCatalog ? "flex-1" : "w-full"
                 )}
             >
@@ -239,7 +318,41 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         border-radius: 6px !important;
                         transition: background-color 0.2s ease, border-color 0.2s ease !important;
                         border: 1px solid transparent !important;
+                    }
+                    
+                    /* 调整工具栏按钮间距 - 根据官方文档使用正确的选择器 */
+                    .wang-editor-wrapper .w-e-toolbar .w-e-bar-item {
+                        margin: 0 1px !important;
+                    }
+                    
+                    /* 进一步调整工具栏整体间距 */
+                    .wang-editor-wrapper .w-e-toolbar {
+                        gap: 1px !important;
+                    }
+                    
+                    /* 针对分隔符的特殊处理 */
+                    .wang-editor-wrapper .w-e-toolbar .w-e-bar-item-divider {
                         margin: 0 2px !important;
+                    }
+                    
+                    /* 确保按钮组内间距更紧凑 */
+                    .wang-editor-wrapper .w-e-toolbar .w-e-bar-item:not(.w-e-bar-item-divider) {
+                        margin: 0 1px !important;
+                    }
+                    
+                    /* 直接针对工具栏按钮的间距调整 */
+                    .wang-editor-wrapper .w-e-toolbar > div {
+                        margin: 0 1px !important;
+                    }
+                    
+                    /* 更通用的工具栏间距调整 */
+                    .wang-editor-wrapper .w-e-toolbar [class*="w-e-bar-item"] {
+                        margin: 0 1px !important;
+                    }
+                    
+                    /* 针对所有工具栏子元素的间距调整 */
+                    .wang-editor-wrapper .w-e-toolbar > * {
+                        margin: 0 1px !important;
                     }
                     
                     .wang-editor-wrapper .w-e-bar-item button:hover {
@@ -267,6 +380,22 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         border: 1px solid hsl(var(--border)) !important;
                         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
                     }
+                    
+                    /* 确保浮动工具栏不被裁剪 */
+                    .wang-editor-wrapper {
+                        overflow: visible !important;
+                    }
+                    
+                    /* 调整固定工具栏下拉菜单的位置 */
+                    .wang-editor-wrapper .w-e-toolbar .w-e-select-list,
+                    .wang-editor-wrapper .w-e-toolbar .w-e-drop-panel {
+                        top: 100% !important;
+                        margin-top: 2px !important;
+                    }
+                    
+                    
+                    
+                    
                     
                     .dark .wang-editor-wrapper .w-e-select-list,
                     .dark .wang-editor-wrapper .w-e-drop-panel {
