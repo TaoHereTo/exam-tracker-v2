@@ -93,6 +93,15 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
     const editorRef = useRef<HTMLDivElement>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);
 
+    // Ref 回调函数，确保在 DOM 元素创建时立即同步内容
+    const editorRefCallback = useCallback((node: HTMLDivElement | null) => {
+        if (node && content && node.innerHTML !== content) {
+            // 当 ref 被设置时，立即同步内容（不使用 autoCleanHtml，因为 useEffect 会处理清理）
+            node.innerHTML = content;
+        }
+        editorRef.current = node;
+    }, [content]);
+
     // 计算实际的全屏状态
     const actualIsFullscreen = isFullscreen || externalIsFullscreen;
 
@@ -981,6 +990,17 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
         }
     }, [content, calculateWordCount, isInsertingLink, autoCleanHtml]);
 
+    // 当分屏模式切换时，确保编辑器内容同步
+    useEffect(() => {
+        if (editorRef.current && content) {
+            // 当切换分屏模式时，DOM元素会重新创建，需要重新设置内容
+            const cleanedContent = autoCleanHtml(content);
+            if (editorRef.current.innerHTML !== cleanedContent) {
+                editorRef.current.innerHTML = cleanedContent;
+            }
+        }
+    }, [isSplitPreview, content, autoCleanHtml]);
+
     // 计算z-index
     const getMenuZIndex = () => {
         if (actualIsFullscreen) {
@@ -1433,11 +1453,12 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                 maxHeight: actualIsFullscreen ? 'calc(100vh - 80px)' : customMaxHeight
             }}>
                 {isSplitPreview ? (
-                    <div className="flex flex-row flex-1">
+                    <div className="flex flex-row flex-1" key="split-preview">
                         {/* 左侧编辑器 */}
                         <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700">
                             <div
-                                ref={editorRef}
+                                ref={editorRefCallback}
+                                key="split-editor"
                                 className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
                                 contentEditable
                                 suppressContentEditableWarning
@@ -1456,7 +1477,8 @@ export const UnifiedEditor: React.FC<UnifiedEditorProps> = ({
                     </div>
                 ) : (
                     <div
-                        ref={editorRef}
+                        ref={editorRefCallback}
+                        key="single-editor"
                         className="flex-1 p-4 overflow-y-auto focus:outline-none relative bg-white dark:bg-[#303030]"
                         contentEditable
                         suppressContentEditableWarning
