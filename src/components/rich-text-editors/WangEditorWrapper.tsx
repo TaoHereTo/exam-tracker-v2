@@ -5,10 +5,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-react';
 import { IDomEditor, IEditorConfig, IToolbarConfig } from '@wangeditor/editor';
 import '@wangeditor/editor/dist/css/style.css';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Fullscreen, Minimize2, Code, Copy, Check, ChevronUp, RefreshCw } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/animate-ui/components/animate/tooltip';
-import { getZIndex } from '@/lib/zIndexConfig';
 
 interface WangEditorWrapperProps {
     content: string;
@@ -17,8 +14,6 @@ interface WangEditorWrapperProps {
     className?: string;
     customMinHeight?: string;
     customMaxHeight?: string;
-    isInDialog?: boolean;
-    externalIsFullscreen?: boolean;
 }
 
 export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
@@ -27,18 +22,10 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
     placeholder = '开始输入...',
     className,
     customMinHeight = '300px',
-    customMaxHeight = '800px',
-    isInDialog = false,
-    externalIsFullscreen = false
+    customMaxHeight = '800px'
 }) => {
     const [editor, setEditor] = useState<IDomEditor | null>(null);
     const [html, setHtml] = useState(content);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-    const [showHtmlDebug, setShowHtmlDebug] = useState(false);
-    const [isHtmlCopied, setIsHtmlCopied] = useState(false);
-    const [isHtmlCleaned, setIsHtmlCleaned] = useState(false);
-
-    const actualIsFullscreen = isFullscreen || externalIsFullscreen;
 
     // 工具栏配置
     const toolbarConfig: Partial<IToolbarConfig> = useMemo(() => ({
@@ -74,6 +61,8 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
             'redo',
             '|',
             'clearStyle',
+            '|',
+            'fullScreen', // wangEditor 自带的全屏功能
         ],
     }), []);
 
@@ -127,38 +116,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
         }
     }, [editor]);
 
-    // 全屏切换
-    const handleFullscreenToggle = useCallback(() => {
-        setIsFullscreen(!actualIsFullscreen);
-    }, [actualIsFullscreen]);
-
-    // HTML 调试切换
-    const handleHtmlDebugToggle = useCallback(() => {
-        setShowHtmlDebug(!showHtmlDebug);
-    }, [showHtmlDebug]);
-
-    // 复制 HTML
-    const handleCopyHtml = useCallback(async () => {
-        try {
-            await navigator.clipboard.writeText(html);
-            setIsHtmlCopied(true);
-            setTimeout(() => setIsHtmlCopied(false), 2000);
-        } catch (error) {
-            console.error('复制失败:', error);
-        }
-    }, [html]);
-
-    // 清理 HTML
-    const handleCleanHtml = useCallback(() => {
-        if (editor) {
-            // 清理 HTML：移除所有格式
-            const text = editor.getText();
-            editor.clear();
-            editor.insertText(text);
-            setIsHtmlCleaned(true);
-            setTimeout(() => setIsHtmlCleaned(false), 2000);
-        }
-    }, [editor]);
 
     // 计算字数
     const wordCount = useMemo(() => {
@@ -181,13 +138,11 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
             <div
                 className={cn(
                     "wang-editor-wrapper border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden",
-                    actualIsFullscreen && "fixed inset-0 bg-background",
                     className
                 )}
-                style={actualIsFullscreen ? { zIndex: getZIndex('URGENT') + 1 } : undefined}
             >
-                {/* 工具栏容器 */}
-                <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-[#303030]">
+                {/* Toolbar 和 Editor 必须直接在同一个父元素下，不能有额外包装 */}
+                <div className="editor-main-container">
                     <Toolbar
                         editor={editor}
                         defaultConfig={toolbarConfig}
@@ -197,51 +152,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                             backgroundColor: 'transparent'
                         }}
                     />
-
-                    {/* 自定义按钮 */}
-                    <div className="flex items-center justify-end gap-1 px-2 pb-2">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                    onClick={handleHtmlDebugToggle}
-                                >
-                                    <Code className="w-4 h-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>HTML调试</p>
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                    onClick={handleFullscreenToggle}
-                                >
-                                    {actualIsFullscreen ? (
-                                        <Minimize2 className="w-4 h-4" />
-                                    ) : (
-                                        <Fullscreen className="w-4 h-4" />
-                                    )}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>{actualIsFullscreen ? '退出全屏' : '全屏输入'}</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                </div>
-
-                {/* 编辑器容器 */}
-                <div className="editor-container-wrapper">
                     <Editor
                         defaultConfig={editorConfig}
                         value={html}
@@ -249,7 +159,7 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         onChange={handleChange}
                         mode="default"
                         style={{
-                            height: actualIsFullscreen ? 'calc(100vh - 200px)' : customMinHeight,
+                            height: customMinHeight,
                             overflowY: 'hidden'
                         }}
                     />
@@ -263,80 +173,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                     </div>
                 </div>
 
-                {/* HTML 调试区域 */}
-                {showHtmlDebug && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                        <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center gap-2">
-                                <Code className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">HTML调试</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-7 w-7 p-0"
-                                            onClick={handleCleanHtml}
-                                        >
-                                            <div className="relative">
-                                                <RefreshCw className={`w-3 h-3 transition-all duration-300 ${isHtmlCleaned ? 'opacity-0 scale-0 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
-                                                <Check className={`w-3 h-3 text-green-500 absolute top-0 left-0 transition-all duration-300 ${isHtmlCleaned ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-180'}`} />
-                                            </div>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{isHtmlCleaned ? '已清理' : '清理格式'}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-7 w-7 p-0"
-                                            onClick={handleCopyHtml}
-                                        >
-                                            <div className="relative">
-                                                <Copy className={`w-3 h-3 transition-all duration-300 ${isHtmlCopied ? 'opacity-0 scale-0 rotate-180' : 'opacity-100 scale-100 rotate-0'}`} />
-                                                <Check className={`w-3 h-3 text-green-500 absolute top-0 left-0 transition-all duration-300 ${isHtmlCopied ? 'opacity-100 scale-100 rotate-0' : 'opacity-0 scale-0 -rotate-180'}`} />
-                                            </div>
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{isHtmlCopied ? '已复制' : '复制代码'}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            type="button"
-                                            variant="ghost"
-                                            size="sm"
-                                            className="h-7 px-2"
-                                            onClick={handleHtmlDebugToggle}
-                                        >
-                                            <ChevronUp className="w-4 h-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>关闭调试</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            </div>
-                        </div>
-                        <div className="p-4">
-                            <pre className="text-xs text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 p-3 rounded border overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
-                                {html || '<div>暂无内容</div>'}
-                            </pre>
-                        </div>
-                    </div>
-                )}
 
                 {/* 自定义样式 */}
                 <style jsx global>{`
@@ -349,6 +185,67 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         overflow-y: auto !important;
                     }
                     
+                    /* 工具栏毛玻璃效果 */
+                    .wang-editor-wrapper .w-e-toolbar {
+                        background-color: transparent !important;
+                        backdrop-filter: blur(8px) !important;
+                        background: rgba(var(--muted-rgb, 240, 240, 240), 0.3) !important;
+                        border-bottom: 1px solid hsl(var(--border)) !important;
+                        position: sticky !important;
+                        top: 0 !important;
+                        z-index: 10 !important;
+                    }
+                    
+                    .dark .wang-editor-wrapper .w-e-toolbar {
+                        background: rgba(48, 48, 48, 0.3) !important;
+                    }
+                    
+                    /* 全屏模式样式 */
+                    .w-e-full-screen-container {
+                        z-index: 9999 !important;
+                        background-color: hsl(var(--background)) !important;
+                    }
+                    
+                    .w-e-full-screen-container .w-e-toolbar {
+                        backdrop-filter: blur(8px) !important;
+                    }
+                    
+                    /* 自定义 tooltip 样式 - 匹配项目的 Tooltip 组件 */
+                    .wang-editor-wrapper .w-e-tooltip {
+                        background-color: hsl(var(--popover)) !important;
+                        color: hsl(var(--popover-foreground)) !important;
+                        border: 1px solid hsl(var(--border)) !important;
+                        border-radius: 0.5rem !important;
+                        padding: 0.5rem 0.75rem !important;
+                        font-size: 0.875rem !important;
+                        line-height: 1.25rem !important;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+                        z-index: 50 !important;
+                        animation: fadeIn 0.15s ease-in-out !important;
+                    }
+                    
+                    .wang-editor-wrapper .w-e-tooltip::before {
+                        border-top-color: hsl(var(--popover)) !important;
+                    }
+                    
+                    /* 暗黑模式下的 tooltip */
+                    .dark .wang-editor-wrapper .w-e-tooltip {
+                        background-color: hsl(var(--popover)) !important;
+                        border-color: hsl(var(--border)) !important;
+                        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2) !important;
+                    }
+                    
+                    @keyframes fadeIn {
+                        from {
+                            opacity: 0;
+                            transform: translateY(-4px);
+                        }
+                        to {
+                            opacity: 1;
+                            transform: translateY(0);
+                        }
+                    }
+                    
                     /* wangEditor 暗黑模式适配 */
                     .dark .w-e-text-container {
                         background-color: #303030 !important;
@@ -359,17 +256,21 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         color: #9CA3AF !important;
                     }
                     
-                    .dark .w-e-toolbar {
-                        background-color: #303030 !important;
-                        border-color: #404040 !important;
-                    }
-                    
                     .dark .w-e-bar-item button {
                         color: #e5e5e5 !important;
                     }
                     
                     .dark .w-e-bar-item button:hover {
-                        background-color: #404040 !important;
+                        background-color: rgba(64, 64, 64, 0.5) !important;
+                    }
+                    
+                    /* 亮色模式下的工具栏按钮 hover 效果 */
+                    .wang-editor-wrapper .w-e-bar-item button:hover {
+                        background-color: rgba(0, 0, 0, 0.05) !important;
+                    }
+                    
+                    .dark .wang-editor-wrapper .w-e-bar-item button:hover {
+                        background-color: rgba(255, 255, 255, 0.1) !important;
                     }
                     
                     .dark .w-e-drop-panel {
@@ -382,11 +283,6 @@ export const WangEditorWrapper: React.FC<WangEditorWrapperProps> = ({
                         background-color: #303030 !important;
                         border-color: #404040 !important;
                         color: #e5e5e5 !important;
-                    }
-                    
-                    /* 隐藏工具栏边框 */
-                    .w-e-toolbar {
-                        border-bottom: none !important;
                     }
                 `}</style>
             </div>
