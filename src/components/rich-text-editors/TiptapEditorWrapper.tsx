@@ -13,6 +13,68 @@ import FontFamily from '@tiptap/extension-font-family';
 import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
 import Highlight from '@tiptap/extension-highlight';
+import { Mathematics } from '@tiptap/extension-mathematics';
+import 'katex/dist/katex.min.css';
+import katex from 'katex';
+
+// 数学公式样式
+const mathStyles = `
+.tiptap-mathematics-render {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 2px 4px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tiptap-mathematics-render:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.tiptap-mathematics-render--editable {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.tiptap-mathematics-render[data-type="block-math"] {
+    display: block;
+    margin: 16px 0;
+    padding: 12px;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.tiptap-mathematics-render[data-type="inline-math"] {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 2px 6px;
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* KaTeX 样式优化 */
+.katex {
+    font-size: 1em;
+}
+
+.katex-display {
+    margin: 1em 0;
+}
+`;
+
+// 注入样式
+if (typeof document !== 'undefined') {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = mathStyles;
+    document.head.appendChild(styleElement);
+}
 // import { BubbleMenu } from '@tiptap/extension-bubble-menu'; // 在Tiptap v3中需要不同的使用方式
 import { cn } from '@/lib/utils';
 import TiptapEditorCatalog from './TiptapEditorCatalog';
@@ -51,7 +113,10 @@ import {
     Hash,
     ALargeSmall,
     SeparatorHorizontal,
-    TypeOutline
+    TypeOutline,
+    Calculator,
+    Sigma,
+    AArrowUp
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -59,6 +124,21 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-with-animation';
+import {
+    Drawer,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+} from '@/components/ui/drawer';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/animate-ui/components/radix/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { RadioGroup, RadioGroupItem } from '@/components/animate-ui/components/radix/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface TiptapEditorWrapperProps {
     content: string;
@@ -80,6 +160,97 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     showCatalog = false
 }) => {
     const [catalogVisible, setCatalogVisible] = useState<boolean>(true);
+    const [showMathDrawer, setShowMathDrawer] = useState<boolean>(false);
+    const [mathType, setMathType] = useState<'inline' | 'block'>('inline');
+    const [mathLatex, setMathLatex] = useState<string>('');
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [includePunctuation, setIncludePunctuation] = useState<boolean>(true);
+    const [showWordCountOptions, setShowWordCountOptions] = useState<boolean>(false);
+    const [showBubbleMenu, setShowBubbleMenu] = useState<boolean>(true);
+    const [editorContent, setEditorContent] = useState<string>('');
+    const [showColorPalette, setShowColorPalette] = useState<boolean>(false);
+    const [showHighlightPalette, setShowHighlightPalette] = useState<boolean>(false);
+
+    // 常用颜色
+    const commonColors = [
+        { name: '红色', value: '#FF0000' },
+        { name: '绿色', value: '#00FF00' },
+        { name: '蓝色', value: '#0000FF' },
+        { name: '黄色', value: '#FFFF00' },
+        { name: '橙色', value: '#FFA500' },
+        { name: '紫色', value: '#800080' },
+        { name: '粉色', value: '#FFC0CB' },
+        { name: '青色', value: '#00FFFF' },
+        { name: '棕色', value: '#A52A2A' },
+    ];
+
+    const commonHighlightColors = [
+        { name: '黄色高亮', value: '#FFFF00' },
+        { name: '绿色高亮', value: '#90EE90' },
+        { name: '蓝色高亮', value: '#87CEEB' },
+        { name: '粉色高亮', value: '#FFB6C1' },
+        { name: '橙色高亮', value: '#FFE4B5' },
+        { name: '紫色高亮', value: '#DDA0DD' },
+        { name: '青色高亮', value: '#E0FFFF' },
+        { name: '红色高亮', value: '#FFA07A' },
+    ];
+
+    // 数学公式分类
+    const mathCategories = [
+        { id: 'all', name: '全部', icon: '📚' },
+        { id: 'basic', name: '基础数学', icon: '🔢' },
+        { id: 'symbols', name: '符号', icon: '🔣' },
+        { id: 'greek', name: '希腊字母', icon: 'Α' },
+        { id: 'sets', name: '集合', icon: '📊' },
+        { id: 'calculus', name: '微积分', icon: '∫' },
+    ];
+
+    // 常用数学公式模板（按分类组织）
+    const mathTemplates = [
+        // 基础数学
+        { name: '分数', latex: '\\frac{a}{b}', description: '分数 a/b', category: 'basic' },
+        { name: '根号', latex: '\\sqrt{x}', description: '平方根', category: 'basic' },
+        { name: 'n次根号', latex: '\\sqrt[n]{x}', description: 'n次方根', category: 'basic' },
+        { name: '上标', latex: 'x^2', description: 'x的平方', category: 'basic' },
+        { name: '下标', latex: 'x_1', description: 'x下标1', category: 'basic' },
+        { name: '上下标', latex: 'x_1^2', description: 'x下标1上标2', category: 'basic' },
+
+        // 符号
+        { name: '不等于', latex: '\\neq', description: '不等于', category: 'symbols' },
+        { name: '小于等于', latex: '\\leq', description: '小于等于', category: 'symbols' },
+        { name: '大于等于', latex: '\\geq', description: '大于等于', category: 'symbols' },
+        { name: '约等于', latex: '\\approx', description: '约等于', category: 'symbols' },
+        { name: '正负号', latex: '\\pm', description: '正负号', category: 'symbols' },
+        { name: '无穷大', latex: '\\infty', description: '无穷大符号', category: 'symbols' },
+
+        // 希腊字母
+        { name: '阿尔法', latex: '\\alpha', description: '希腊字母α', category: 'greek' },
+        { name: '贝塔', latex: '\\beta', description: '希腊字母β', category: 'greek' },
+        { name: '伽马', latex: '\\gamma', description: '希腊字母γ', category: 'greek' },
+        { name: '德尔塔', latex: '\\delta', description: '希腊字母δ', category: 'greek' },
+        { name: '西塔', latex: '\\theta', description: '希腊字母θ', category: 'greek' },
+        { name: '拉姆达', latex: '\\lambda', description: '希腊字母λ', category: 'greek' },
+        { name: '派', latex: '\\pi', description: '希腊字母π', category: 'greek' },
+        { name: '西格玛', latex: '\\sigma', description: '希腊字母σ', category: 'greek' },
+
+        // 集合
+        { name: '实数集', latex: '\\R', description: '实数集合', category: 'sets' },
+        { name: '自然数集', latex: '\\N', description: '自然数集合', category: 'sets' },
+        { name: '整数集', latex: '\\Z', description: '整数集合', category: 'sets' },
+        { name: '有理数集', latex: '\\Q', description: '有理数集合', category: 'sets' },
+        { name: '复数集', latex: '\\C', description: '复数集合', category: 'sets' },
+        { name: '属于', latex: '\\in', description: '属于符号', category: 'sets' },
+        { name: '不属于', latex: '\\notin', description: '不属于符号', category: 'sets' },
+        { name: '子集', latex: '\\subset', description: '子集符号', category: 'sets' },
+
+        // 微积分
+        { name: '积分', latex: '\\int_{a}^{b} f(x) dx', description: '定积分', category: 'calculus' },
+        { name: '不定积分', latex: '\\int f(x) dx', description: '不定积分', category: 'calculus' },
+        { name: '求和', latex: '\\sum_{i=1}^{n} x_i', description: '求和符号', category: 'calculus' },
+        { name: '极限', latex: '\\lim_{x \\to \\infty} f(x)', description: '极限', category: 'calculus' },
+        { name: '导数', latex: '\\frac{d}{dx}f(x)', description: '导数', category: 'calculus' },
+        { name: '偏导数', latex: '\\frac{\\partial}{\\partial x}f(x,y)', description: '偏导数', category: 'calculus' },
+    ];
 
     // 防抖机制 - 官方推荐的方式
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -130,10 +301,40 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             Highlight.configure({
                 multicolor: true,
             }),
+            Mathematics.configure({
+                inlineOptions: {
+                    onClick: (node, pos) => {
+                        // 点击内联数学公式时编辑
+                        setMathType('inline');
+                        setMathLatex(node.attrs.latex);
+                        setShowMathDrawer(true);
+                    },
+                },
+                blockOptions: {
+                    onClick: (node, pos) => {
+                        // 点击块级数学公式时编辑
+                        setMathType('block');
+                        setMathLatex(node.attrs.latex);
+                        setShowMathDrawer(true);
+                    },
+                },
+                katexOptions: {
+                    throwOnError: false, // 不抛出错误，显示错误信息
+                    macros: {
+                        '\\R': '\\mathbb{R}', // 实数集
+                        '\\N': '\\mathbb{N}', // 自然数集
+                        '\\Z': '\\mathbb{Z}', // 整数集
+                        '\\Q': '\\mathbb{Q}', // 有理数集
+                        '\\C': '\\mathbb{C}', // 复数集
+                    },
+                },
+            }),
         ],
         content,
         onUpdate: ({ editor }) => {
             const html = editor.getHTML();
+            const text = editor.getText();
+            setEditorContent(text);
             debouncedOnChange(html);
         },
         editorProps: {
@@ -152,6 +353,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         if (editor && editor.getHTML() !== content) {
             // 使用 setContent 的第二个参数来避免触发 onUpdate
             editor.commands.setContent(content, { emitUpdate: false });
+            // 同时更新内容状态
+            setEditorContent(editor.getText());
         }
     }, [content, editor]);
 
@@ -161,6 +364,22 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             if (debounceRef.current) {
                 clearTimeout(debounceRef.current);
             }
+        };
+    }, []);
+
+    // 点击外部关闭颜色面板
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            const target = event.target as Element;
+            if (!target.closest('.color-selector-container')) {
+                setShowColorPalette(false);
+                setShowHighlightPalette(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
@@ -194,17 +413,21 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
     // 计算字数
     const wordCount = useMemo(() => {
-        if (!editor) return 0;
-        const text = editor.getText();
-        const chineseChars = text.match(/[\u4e00-\u9fff]/g) || [];
-        const englishWords = text.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
+        if (!editorContent) return 0;
+        const chineseChars = editorContent.match(/[\u4e00-\u9fff]/g) || [];
+        const englishWords = editorContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
         return chineseChars.length + englishWords.length;
-    }, [editor]);
+    }, [editorContent]);
 
     const charCount = useMemo(() => {
-        if (!editor) return 0;
-        return editor.getText().length;
-    }, [editor]);
+        if (!editorContent) return 0;
+        if (includePunctuation) {
+            return editorContent.length;
+        } else {
+            // 排除标点符号和空格
+            return editorContent.replace(/[^\w\u4e00-\u9fff]/g, '').length;
+        }
+    }, [editorContent, includePunctuation]);
 
     // 工具栏按钮组件 - 使用更直接的事件处理，集成animate ui tooltip
     const ToolbarButton: React.FC<{
@@ -319,7 +542,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     e.currentTarget.style.backgroundColor = 'transparent';
                 }}
             >
-                <TypeOutline className="h-4 w-4" />
+                <Type className="h-4 w-4" />
             </DropdownMenuTrigger>
         );
 
@@ -401,7 +624,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     e.currentTarget.style.backgroundColor = 'transparent';
                 }}
             >
-                <ALargeSmall className="h-5 w-5" />
+                <AArrowUp className="h-4 w-4" />
             </DropdownMenuTrigger>
         );
 
@@ -436,7 +659,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                 currentFontSize === size.value && "bg-accent"
                             )}
                         >
-                            <span style={{ fontSize: size.value || 'inherit' }}>
+                            <span>
                                 {size.name}
                             </span>
                         </DropdownMenuItem>
@@ -598,6 +821,31 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         );
     };
 
+    // 数学公式选择器组件
+    const MathSelector: React.FC = () => {
+        const handleOpenMathDrawer = () => {
+            setMathLatex('');
+            setSelectedCategory('all');
+            setShowMathDrawer(true);
+        };
+
+        return (
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <ToolbarButton
+                        onClick={handleOpenMathDrawer}
+                        title="数学公式"
+                    >
+                        <Calculator className="h-4 w-4" />
+                    </ToolbarButton>
+                </TooltipTrigger>
+                <TooltipContent>
+                    数学公式
+                </TooltipContent>
+            </Tooltip>
+        );
+    };
+
     // 标题选择器组件
     const HeadingSelector: React.FC = () => {
         const headings = [
@@ -744,7 +992,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             };
         }, [isVisible]);
 
-        if (!isVisible || !editor) return null;
+        if (!isVisible || !editor || !showBubbleMenu) return null;
 
         return (
             <div
@@ -907,17 +1155,402 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         );
     };
 
+    // 数学公式抽屉组件
+    const MathDrawer: React.FC = () => {
+        const [previewHtml, setPreviewHtml] = useState<string>('');
+
+        // 渲染LaTeX预览
+        const renderPreview = useCallback((latex: string) => {
+            if (!latex.trim()) {
+                setPreviewHtml('');
+                return;
+            }
+
+            try {
+                const html = katex.renderToString(latex, {
+                    throwOnError: false,
+                    displayMode: mathType === 'block',
+                    macros: {
+                        '\\R': '\\mathbb{R}',
+                        '\\N': '\\mathbb{N}',
+                        '\\Z': '\\mathbb{Z}',
+                        '\\Q': '\\mathbb{Q}',
+                        '\\C': '\\mathbb{C}',
+                    },
+                });
+                setPreviewHtml(html);
+            } catch (error) {
+                setPreviewHtml('<span style="color: red;">公式语法错误</span>');
+            }
+        }, [mathType]);
+
+        // 当LaTeX代码变化时更新预览
+        useEffect(() => {
+            renderPreview(mathLatex);
+        }, [mathLatex, renderPreview]);
+
+        // 筛选模板
+        const filteredTemplates = mathTemplates.filter(template =>
+            selectedCategory === 'all' || template.category === selectedCategory
+        );
+
+        const handleInsertMath = () => {
+            if (mathLatex.trim() && editor) {
+                safeEditorCommand(() => {
+                    editor.commands.focus();
+                    if (mathType === 'inline') {
+                        editor.commands.insertInlineMath({ latex: mathLatex.trim() });
+                    } else {
+                        editor.commands.insertBlockMath({ latex: mathLatex.trim() });
+                    }
+                });
+                setShowMathDrawer(false);
+                setMathLatex('');
+            }
+        };
+
+        const handleTemplateClick = (template: string) => {
+            setMathLatex(template);
+        };
+
+        return (
+            <Drawer open={showMathDrawer} onOpenChange={setShowMathDrawer}>
+                <DrawerContent className="max-h-[85vh]">
+                    <DrawerHeader>
+                        <DrawerTitle>
+                            插入{mathType === 'inline' ? '内联' : '块级'}数学公式
+                        </DrawerTitle>
+                        <DrawerDescription>
+                            输入LaTeX公式代码，或从下方选择常用公式模板
+                        </DrawerDescription>
+                    </DrawerHeader>
+
+                    <div className="px-4 space-y-4 flex-1 overflow-y-auto">
+                        <div className="space-y-2">
+                            <Label>公式类型</Label>
+                            <RadioGroup
+                                value={mathType}
+                                onValueChange={(value) => setMathType(value as 'inline' | 'block')}
+                                className="flex gap-4"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="inline" id="inline" />
+                                    <Label htmlFor="inline" className="text-sm font-normal cursor-pointer">
+                                        内联公式
+                                    </Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="block" id="block" />
+                                    <Label htmlFor="block" className="text-sm font-normal cursor-pointer">
+                                        块级公式
+                                    </Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="math-input">LaTeX公式代码</Label>
+                            <Input
+                                id="math-input"
+                                value={mathLatex}
+                                onChange={(e) => setMathLatex(e.target.value)}
+                                placeholder="例如: \\frac{a}{b} 或 x^2 + y^2 = z^2"
+                                className="font-mono"
+                            />
+                        </div>
+
+                        {/* 分类筛选 */}
+                        <div className="space-y-2">
+                            <Label>公式分类</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {mathCategories.map((category) => (
+                                    <Badge
+                                        key={category.id}
+                                        variant={selectedCategory === category.id ? "default" : "outline"}
+                                        className="cursor-pointer hover:bg-accent transition-colors"
+                                        onClick={() => setSelectedCategory(category.id)}
+                                    >
+                                        <span className="mr-1">{category.icon}</span>
+                                        {category.name}
+                                    </Badge>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>常用公式模板</Label>
+                            <div className="grid grid-cols-1 gap-2 max-h-60 overflow-y-auto border rounded-md p-3">
+                                {filteredTemplates.map((template, index) => {
+                                    // 为每个模板渲染预览
+                                    let templatePreview = '';
+                                    try {
+                                        templatePreview = katex.renderToString(template.latex, {
+                                            throwOnError: false,
+                                            displayMode: false,
+                                            macros: {
+                                                '\\R': '\\mathbb{R}',
+                                                '\\N': '\\mathbb{N}',
+                                                '\\Z': '\\mathbb{Z}',
+                                                '\\Q': '\\mathbb{Q}',
+                                                '\\C': '\\mathbb{C}',
+                                            },
+                                        });
+                                    } catch (error) {
+                                        templatePreview = '<span style="color: red;">渲染错误</span>';
+                                    }
+
+                                    return (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleTemplateClick(template.latex)}
+                                            className="text-left p-3 rounded hover:bg-accent transition-colors border flex items-center justify-between"
+                                            title={template.description}
+                                        >
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <div className="font-semibold text-sm">{template.name}</div>
+                                                    <Badge variant="secondary" className="text-xs">
+                                                        {mathCategories.find(cat => cat.id === template.category)?.name}
+                                                    </Badge>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground font-mono mb-2">
+                                                    {template.latex}
+                                                </div>
+                                                <div
+                                                    className="text-sm"
+                                                    dangerouslySetInnerHTML={{ __html: templatePreview }}
+                                                />
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {mathLatex && (
+                            <div className="space-y-2">
+                                <Label>当前公式预览</Label>
+                                <div className="space-y-2">
+                                    <div className="border rounded-md p-3 bg-muted/50 font-mono text-sm">
+                                        {mathLatex}
+                                    </div>
+                                    {previewHtml && (
+                                        <div className="border rounded-md p-3 bg-background">
+                                            <div
+                                                className="text-center"
+                                                dangerouslySetInnerHTML={{ __html: previewHtml }}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <DrawerFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowMathDrawer(false)}
+                        >
+                            取消
+                        </Button>
+                        <Button
+                            onClick={handleInsertMath}
+                            disabled={!mathLatex.trim()}
+                        >
+                            插入公式
+                        </Button>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        );
+    };
+
+    // 颜色选择器组件
+    const ColorSelector: React.FC<{
+        type: 'text' | 'highlight';
+        showPalette: boolean;
+        onTogglePalette: () => void;
+    }> = ({ type, showPalette, onTogglePalette }) => {
+        const colors = type === 'text' ? commonColors : commonHighlightColors;
+        const currentColor = type === 'text'
+            ? editor?.getAttributes('textStyle').color || '#000000'
+            : editor?.getAttributes('highlight').color || '#ffff00';
+
+        const handleColorSelect = (color: string) => {
+            if (!editor) return;
+            if (type === 'text') {
+                editor.chain().focus().setColor(color).run();
+            } else {
+                editor.chain().focus().setHighlight({ color }).run();
+            }
+            onTogglePalette();
+        };
+
+        return (
+            <div className="relative color-selector-container">
+                <input
+                    type="color"
+                    value={currentColor}
+                    onChange={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleColorSelect(e.target.value);
+                    }}
+                    className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute inset-0 z-5"
+                    title={type === 'text' ? '文字颜色' : '背景高亮'}
+                />
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            type="button"
+                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center relative z-10"
+                            style={{
+                                border: 'none',
+                                boxShadow: 'none',
+                                outline: 'none',
+                                boxSizing: 'border-box',
+                                backgroundColor: 'transparent'
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onTogglePalette();
+                            }}
+                        >
+                            {type === 'text' ? <Palette className="h-4 w-4" /> : <Highlighter className="h-4 w-4" />}
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        {type === 'text' ? '文字颜色' : '背景高亮'}
+                    </TooltipContent>
+                </Tooltip>
+
+                {/* 颜色选择面板 */}
+                {showPalette && (
+                    <div className="absolute top-10 left-0 z-50 bg-background border border-border rounded-lg shadow-lg p-3 min-w-[240px]">
+                        <Tabs defaultValue="common" className="w-full">
+                            <TabsList className="grid w-full grid-cols-2 mb-3">
+                                <TabsTrigger value="common" className="text-xs">常用</TabsTrigger>
+                                <TabsTrigger value="custom" className="text-xs">自定义</TabsTrigger>
+                            </TabsList>
+
+                            <TabsContent value="common" className="space-y-2">
+                                <div className="text-xs font-medium text-muted-foreground">
+                                    {type === 'text' ? '常用文字颜色' : '常用高亮颜色'}
+                                </div>
+                                <div className="grid grid-cols-6 gap-1">
+                                    {colors.map((color) => (
+                                        <button
+                                            key={color.value}
+                                            onClick={() => handleColorSelect(color.value)}
+                                            className="w-6 h-6 rounded border border-border hover:scale-110 transition-transform"
+                                            style={{ backgroundColor: color.value }}
+                                            title={color.name}
+                                        />
+                                    ))}
+                                </div>
+                                <div className="text-xs text-muted-foreground text-center">
+                                    点击颜色块快速选择
+                                </div>
+                            </TabsContent>
+
+                            <TabsContent value="custom" className="space-y-2">
+                                <div className="text-xs font-medium text-muted-foreground">
+                                    自定义颜色
+                                </div>
+                                <div className="flex items-center justify-center">
+                                    <input
+                                        type="color"
+                                        value={currentColor}
+                                        onChange={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            handleColorSelect(e.target.value);
+                                        }}
+                                        className="w-16 h-16 border border-border rounded cursor-pointer"
+                                        title={type === 'text' ? '文字颜色' : '背景高亮'}
+                                    />
+                                </div>
+                                <div className="text-xs text-muted-foreground text-center">
+                                    选择任意颜色
+                                </div>
+                            </TabsContent>
+                        </Tabs>
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    // 字数统计配置组件
+    const WordCountConfig: React.FC = () => {
+        return (
+            <Popover open={showWordCountOptions} onOpenChange={setShowWordCountOptions}>
+                <PopoverTrigger asChild>
+                    <div className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 rounded px-2 py-1 transition-colors">
+                        <span>字数: {wordCount}</span>
+                        <span>字符: {charCount}</span>
+                    </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-48" align="end">
+                    <div className="space-y-3">
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="include-punctuation"
+                                checked={includePunctuation}
+                                onCheckedChange={(checked) => setIncludePunctuation(checked as boolean)}
+                            />
+                            <Label
+                                htmlFor="include-punctuation"
+                                className="text-sm font-normal cursor-pointer"
+                            >
+                                包含标点符号
+                            </Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Checkbox
+                                id="show-bubble-menu"
+                                checked={showBubbleMenu}
+                                onCheckedChange={(checked) => setShowBubbleMenu(checked as boolean)}
+                            />
+                            <Label
+                                htmlFor="show-bubble-menu"
+                                className="text-sm font-normal cursor-pointer"
+                            >
+                                显示浮动工具栏
+                            </Label>
+                        </div>
+                    </div>
+                </PopoverContent>
+            </Popover>
+        );
+    };
+
     // 工具栏组件
     const Toolbar: React.FC = () => {
         if (!editor) return null;
 
         return (
-            <div className="flex flex-wrap items-center gap-1 p-3 border-b border-border bg-background/95 backdrop-blur-sm">
+            <div className="flex flex-wrap items-center gap-1 p-3 border-b border-border bg-transparent">
                 {/* 第一组：标题、字体和字号 */}
                 <div className="flex items-center gap-1">
                     <HeadingSelector />
                     <FontFamilySelector />
                     <FontSizeSelector />
+                </div>
+
+                <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                {/* 数学公式 */}
+                <div className="flex items-center gap-1">
+                    <MathSelector />
                 </div>
 
                 <div className="w-px h-6 bg-gray-300 mx-1" />
@@ -990,84 +1623,16 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
                 {/* 颜色 */}
                 <div className="flex items-center gap-1">
-                    <div className="relative">
-                        <input
-                            type="color"
-                            value={editor.getAttributes('textStyle').color || '#000000'}
-                            onChange={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                editor.chain().focus().setColor(e.target.value).run();
-                            }}
-                            className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
-                            title="文字颜色"
-                        />
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button
-                                    type="button"
-                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                                    style={{
-                                        border: 'none',
-                                        boxShadow: 'none',
-                                        outline: 'none',
-                                        boxSizing: 'border-box',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
-                                    }}
-                                >
-                                    <Palette className="h-4 w-4" />
-                                </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                文字颜色
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
-                    <div className="relative">
-                        <input
-                            type="color"
-                            value={editor.getAttributes('highlight').color || '#ffff00'}
-                            onChange={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                editor.chain().focus().setHighlight({ color: e.target.value }).run();
-                            }}
-                            className="w-8 h-8 border border-border rounded cursor-pointer opacity-0 absolute pointer-events-none"
-                            title="背景高亮"
-                        />
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <button
-                                    type="button"
-                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center"
-                                    style={{
-                                        border: 'none',
-                                        boxShadow: 'none',
-                                        outline: 'none',
-                                        boxSizing: 'border-box',
-                                        backgroundColor: 'transparent'
-                                    }}
-                                    onMouseEnter={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.currentTarget.style.backgroundColor = 'transparent';
-                                    }}
-                                >
-                                    <Highlighter className="h-4 w-4" />
-                                </button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                背景高亮
-                            </TooltipContent>
-                        </Tooltip>
-                    </div>
+                    <ColorSelector
+                        type="text"
+                        showPalette={showColorPalette}
+                        onTogglePalette={() => setShowColorPalette(!showColorPalette)}
+                    />
+                    <ColorSelector
+                        type="highlight"
+                        showPalette={showHighlightPalette}
+                        onTogglePalette={() => setShowHighlightPalette(!showHighlightPalette)}
+                    />
                 </div>
 
                 <div className="w-px h-6 bg-gray-300 mx-1" />
@@ -1156,12 +1721,12 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         <CustomBubbleMenu editor={editor} />
                     </div>
 
+                    {/* 数学公式抽屉 */}
+                    <MathDrawer />
+
                     {/* 字数统计 */}
                     <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
-                        <div className="flex items-center gap-2">
-                            <span>字数: {wordCount}</span>
-                            <span>字符: {charCount}</span>
-                        </div>
+                        <WordCountConfig />
                     </div>
                 </div>
             </div>
