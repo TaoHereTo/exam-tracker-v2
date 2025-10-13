@@ -206,16 +206,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
             <Separator orientation="vertical" />
 
-            {/* 第四组：数学公式、列表、引用和对齐方式 */}
+            {/* 第四组：引用、数学公式、列表和对齐方式 */}
             <div className="flex items-center gap-1">
-                <MathSelector />
-                <ListDropdownMenu
-                    editor={editor}
-                    types={['bulletList', 'orderedList', 'taskList']}
-                    hideWhenUnavailable={false}
-                    portal={true}
-                    onOpenChange={(isOpen) => console.log('List dropdown opened:', isOpen)}
-                />
                 <ToolbarButton
                     onClick={() => {
                         if (editor.isActive('blockquote')) {
@@ -234,6 +226,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         <path d="M8 18C8 17.4477 8.44772 17 9 17H16C16.5523 17 17 17.4477 17 18C17 18.5523 16.5523 19 16 19H9C8.44772 19 8 18.5523 8 18Z" fill="currentColor" />
                     </svg>
                 </ToolbarButton>
+                <MathSelector />
+                <ListDropdownMenu
+                    editor={editor}
+                    types={['bulletList', 'orderedList', 'taskList']}
+                    hideWhenUnavailable={false}
+                    portal={true}
+                    onOpenChange={(isOpen) => console.log('List dropdown opened:', isOpen)}
+                />
                 <TextAlignDropdownMenu
                     editor={editor}
                     alignments={['left', 'center', 'right', 'justify']}

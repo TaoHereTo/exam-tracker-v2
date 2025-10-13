@@ -809,9 +809,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         showCatalog ? "flex-1" : "w-full"
                     )}
                 >
-                    {/* 胶囊型工具栏 */}
-                    <div className="flex justify-center">
-                        <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm">
+                    {/* 胶囊型工具栏 - 粘性固定在顶部 */}
+                    <div className="sticky top-4 flex justify-center mb-4" style={{ zIndex: 'var(--z-sticky)' }}>
+                        <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm backdrop-blur-sm">
                             <Toolbar
                                 editor={editor}
                                 onOpenMathDrawer={() => {

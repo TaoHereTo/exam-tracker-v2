@@ -16,8 +16,6 @@ const TEXT_COLORS = [
     { label: '紫色', value: '#a855f7', color: '#a855f7' },
     { label: '粉色', value: '#ec4899', color: '#ec4899' },
     { label: '灰色', value: '#6b7280', color: '#6b7280' },
-    { label: '黑色', value: '#000000', color: '#000000' },
-    { label: '白色', value: '#ffffff', color: '#ffffff' },
 ];
 
 const HIGHLIGHT_COLORS = [
@@ -45,7 +43,7 @@ export function TextStyleColorPanel({
             <div className="space-y-2">
                 <div className="text-sm font-medium">文字颜色</div>
                 <div className="grid grid-cols-6 gap-2">
-                    {TEXT_COLORS.map((color) => (
+                    {TEXT_COLORS.map((color, index) => (
                         <button
                             key={`text-${color.value}`}
                             className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-sm flex items-center justify-center transition-colors bg-transparent hover:bg-accent cursor-pointer"
@@ -58,12 +56,18 @@ export function TextStyleColorPanel({
                             onClick={() => onColorChanged({ type: 'text', label: color.label, value: color.value })}
                             title={color.label}
                         >
-                            <div
-                                className="h-4 w-4 rounded-sm"
-                                style={{
-                                    backgroundColor: color.color,
-                                }}
-                            />
+                            {index === 0 ? (
+                                // 默认颜色显示为圆圈图标
+                                <CircleSlash className="h-4 w-4 text-foreground" />
+                            ) : (
+                                // 其他颜色显示为方块
+                                <div
+                                    className="h-4 w-4 rounded-sm"
+                                    style={{
+                                        backgroundColor: color.color,
+                                    }}
+                                />
+                            )}
                         </button>
                     ))}
                 </div>

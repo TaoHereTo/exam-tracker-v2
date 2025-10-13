@@ -28,7 +28,7 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
             container.innerHTML = content;
 
             // 检查是否有LaTeX公式需要渲染
-            const hasLatex = content.includes('$');
+            const hasLatex = content.includes('$') || content.includes('data-latex');
 
             if (hasLatex) {
                 // 动态导入katex
@@ -40,6 +40,39 @@ export const HtmlRenderer: React.FC<HtmlRendererProps> = ({
 
                     // 直接处理HTML内容中的LaTeX公式，保持换行
                     let html = content;
+
+                    // 处理 Tiptap Mathematics 扩展的 HTML 格式
+                    // 处理块级数学公式 <span data-latex="..." data-type="block-math">
+                    const tiptapBlockRegex = /<span[^>]*data-latex="([^"]*)"[^>]*data-type="block-math"[^>]*>.*?<\/span>/g;
+                    html = html.replace(tiptapBlockRegex, (match, latex) => {
+                        try {
+                            const rendered = katex.renderToString(latex, {
+                                throwOnError: false,
+                                displayMode: true,
+                                strict: false,
+                                trust: true
+                            });
+                            return `<div class="latex-block" style="text-align: center; margin: 8px 0; font-family: KaTeX_Main, 'Times New Roman', serif;">${rendered}</div>`;
+                        } catch (error) {
+                            return `<div class="latex-block" style="text-align: center; margin: 8px 0; color: red;">$${latex}$$</div>`;
+                        }
+                    });
+
+                    // 处理行内数学公式 <span data-latex="..." data-type="inline-math">
+                    const tiptapInlineRegex = /<span[^>]*data-latex="([^"]*)"[^>]*data-type="inline-math"[^>]*>.*?<\/span>/g;
+                    html = html.replace(tiptapInlineRegex, (match, latex) => {
+                        try {
+                            const rendered = katex.renderToString(latex, {
+                                throwOnError: false,
+                                displayMode: false,
+                                strict: false,
+                                trust: true
+                            });
+                            return `<span class="latex-inline" style="font-family: KaTeX_Main, 'Times New Roman', serif;">${rendered}</span>`;
+                        } catch (error) {
+                            return `<span class="latex-inline" style="color: red;">$${latex}$</span>`;
+                        }
+                    });
 
                     // 处理块级公式 $$...$$
                     const blockLatexRegex = /\$\$([^$]+)\$\$/g;
