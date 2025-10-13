@@ -802,28 +802,52 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
                 <div
                     className={cn(
-                        "tiptap-editor-wrapper border border-border rounded-lg bg-background",
+                        "tiptap-editor-container flex flex-col gap-3",
                         showCatalog ? "flex-1" : "w-full"
                     )}
                 >
-                    <Toolbar
-                        editor={editor}
-                        onOpenMathDrawer={() => {
-                            setMathLatex('');
-                            setSelectedCategory('all');
-                            setShowMathDrawer(true);
-                        }}
-                    />
+                    {/* 胶囊型工具栏 */}
+                    <div className="flex justify-center">
+                        <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm">
+                            <Toolbar
+                                editor={editor}
+                                onOpenMathDrawer={() => {
+                                    setMathLatex('');
+                                    setSelectedCategory('all');
+                                    setShowMathDrawer(true);
+                                }}
+                            />
+                        </div>
+                    </div>
 
+                    {/* 带圆角的文本输入区域 */}
                     <div
-                        className="tiptap tiptap-editor-content p-4 overflow-y-auto relative"
-                        style={{
-                            minHeight: customMinHeight,
-                            maxHeight: customMaxHeight,
-                            position: 'relative', // 确保BubbleMenu可以正确定位
-                        }}
+                        className="tiptap-editor-wrapper border border-border rounded-lg bg-background shadow-sm overflow-hidden"
                     >
-                        <EditorContent editor={editor} />
+                        <div
+                            className="tiptap tiptap-editor-content p-4 overflow-y-auto relative rounded-t-lg"
+                            style={{
+                                minHeight: customMinHeight,
+                                maxHeight: customMaxHeight,
+                                position: 'relative', // 确保BubbleMenu可以正确定位
+                            }}
+                        >
+                            <EditorContent editor={editor} />
+                        </div>
+
+                        {/* 字数统计 - 合并到文本输入区域内 */}
+                        <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/30">
+                            <WordCountConfig
+                                wordCount={wordCount}
+                                charCount={charCount}
+                                selectedWordCount={selectedWordCount}
+                                selectedCharCount={selectedCharCount}
+                                includePunctuation={includePunctuation}
+                                setIncludePunctuation={setIncludePunctuation}
+                                showWordCountOptions={showWordCountOptions}
+                                setShowWordCountOptions={setShowWordCountOptions}
+                            />
+                        </div>
                     </div>
 
                     {/* React版本的BubbleMenu */}
@@ -944,19 +968,6 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         setMathLatex={setMathLatex}
                     />
 
-                    {/* 字数统计 */}
-                    <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
-                        <WordCountConfig
-                            wordCount={wordCount}
-                            charCount={charCount}
-                            selectedWordCount={selectedWordCount}
-                            selectedCharCount={selectedCharCount}
-                            includePunctuation={includePunctuation}
-                            setIncludePunctuation={setIncludePunctuation}
-                            showWordCountOptions={showWordCountOptions}
-                            setShowWordCountOptions={setShowWordCountOptions}
-                        />
-                    </div>
                 </div>
             </div>
         </EditorContext.Provider>

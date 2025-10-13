@@ -62,26 +62,26 @@ const getModuleConfig = (module: string): ModuleConfig => {
     'math': {
       title: '录入 - 数量关系',
       typePlaceholder: '例如：数学技巧',
-      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      notePlaceholder: '请输入知识点'
     },
     'data-analysis': {
       title: '录入 - 资料分析',
       typePlaceholder: '例如：速算技巧',
-      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      notePlaceholder: '请输入知识点'
     },
     'logic': {
       title: '录入 - 判断推理',
       hasSubCategory: true,
       subCategories: ['图形推理', '定义判断', '类比推理', '逻辑判断'],
       typePlaceholder: '例如：推理技巧',
-      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      notePlaceholder: '请输入知识点'
     },
     'common': {
       title: '录入 - 常识判断',
       hasSubCategory: true,
       subCategories: ['经济常识', '法律常识', '科技常识', '人文常识', '地理国情'],
       typePlaceholder: '例如：常识技巧',
-      notePlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      notePlaceholder: '请输入知识点'
     },
     'verbal': {
       title: '录入 - 言语理解',
@@ -91,7 +91,7 @@ const getModuleConfig = (module: string): ModuleConfig => {
       firstFieldLabel: '类型',
       secondFieldLabel: '技巧记录',
       firstFieldPlaceholder: '请输入类型...',
-      secondFieldPlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      secondFieldPlaceholder: '请输入知识点'
     },
     'politics': {
       title: '录入 - 政治理论',
@@ -99,14 +99,14 @@ const getModuleConfig = (module: string): ModuleConfig => {
       firstFieldLabel: '文件来源',
       secondFieldLabel: '相关重点',
       firstFieldPlaceholder: '请输入文件来源',
-      secondFieldPlaceholder: '请输入知识点，可以通过拖拽或快捷键上传图片...'
+      secondFieldPlaceholder: '请输入知识点'
     }
   };
 
   return configs[module] || {
     title: '录入 - 知识点',
     typePlaceholder: '例如：技巧类型',
-    notePlaceholder: '请输入具体的技巧或知识点...'
+    notePlaceholder: '请输入知识点'
   };
 };
 

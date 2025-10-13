@@ -98,7 +98,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
 
     return (
-        <div className="flex flex-wrap items-center gap-1 p-3 border-b border-border bg-white dark:bg-transparent relative overflow-visible">
+        <div className="flex flex-wrap items-center gap-1 relative overflow-visible">
             {/* 第一组：撤销重做 */}
             <div className="flex items-center gap-1">
                 <ToolbarButton
