@@ -103,7 +103,7 @@ export const TiptapEditorCatalog: React.FC<TiptapEditorCatalogProps> = ({ editor
                 <Button
                     variant="outline"
                     size="sm"
-                    className="h-32 w-10 p-0 rounded-r-lg rounded-l-none border-l-0 flex flex-col items-center justify-center gap-2"
+                    className="h-32 w-10 p-0 rounded-r-lg rounded-l-none border-l-0 flex flex-col items-center justify-center gap-2 bg-white dark:bg-background"
                     onClick={onToggle}
                 >
                     <div className="text-xs whitespace-nowrap" style={{ writingMode: 'vertical-rl' }}>
@@ -118,7 +118,8 @@ export const TiptapEditorCatalog: React.FC<TiptapEditorCatalogProps> = ({ editor
     // 展开状态 - 显示完整的目录面板
     return (
         <div className={cn(
-            "editor-catalog bg-background border border-border rounded-lg overflow-hidden",
+            "editor-catalog border border-border rounded-lg overflow-hidden",
+            "bg-white dark:bg-background",
             className
         )}>
             {/* 目录标题栏 */}
@@ -129,7 +130,15 @@ export const TiptapEditorCatalog: React.FC<TiptapEditorCatalogProps> = ({ editor
                             variant="ghost"
                             size="sm"
                             className="h-6 w-6 p-0 mr-2"
-                            onClick={onToggle}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onToggle();
+                            }}
+                            onMouseDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                            }}
                         >
                             <ChevronLeft className="h-4 w-4" />
                         </Button>

@@ -15,6 +15,8 @@ import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
 import Highlight from '@tiptap/extension-highlight';
 import { Mathematics } from '@tiptap/extension-mathematics';
+import { TaskList } from '@tiptap/extension-task-list';
+import { TaskItem } from '@tiptap/extension-task-item';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 
@@ -86,9 +88,8 @@ import { Separator } from '@/components/ui/separator';
 import {
     Tooltip,
     TooltipContent,
-    TooltipTrigger,
-    TooltipProvider
-} from '@/components/animate-ui/components/animate/tooltip';
+    TooltipTrigger
+} from '@/components/tiptap-ui-primitive/tooltip';
 import {
     Bold,
     Italic,
@@ -174,6 +175,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     const [includePunctuation, setIncludePunctuation] = useState<boolean>(true);
     const [showWordCountOptions, setShowWordCountOptions] = useState<boolean>(false);
     const [editorContent, setEditorContent] = useState<string>('');
+    const [selectedText, setSelectedText] = useState<string>('');
 
 
     // 防抖机制 - 官方推荐的方式
@@ -225,6 +227,18 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             Highlight.configure({
                 multicolor: true,
             }),
+            TaskList.configure({
+                itemTypeName: 'taskItem',
+                HTMLAttributes: {
+                    class: 'task-list',
+                },
+            }),
+            TaskItem.configure({
+                nested: true,
+                HTMLAttributes: {
+                    class: 'task-item',
+                },
+            }),
             Mathematics.configure({
                 inlineOptions: {
                     onClick: (node, pos) => {
@@ -263,6 +277,15 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             const text = editor.getText();
             setEditorContent(text);
             debouncedOnChange(html);
+        },
+        onSelectionUpdate: ({ editor }) => {
+            const { from, to } = editor.state.selection;
+            if (from !== to) {
+                const selectedText = editor.state.doc.textBetween(from, to, ' ');
+                setSelectedText(selectedText);
+            } else {
+                setSelectedText('');
+            }
         },
         editorProps: {
             attributes: {
@@ -342,6 +365,25 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             return editorContent.replace(/[^\w\u4e00-\u9fff]/g, '').length;
         }
     }, [editorContent, includePunctuation]);
+
+    // 计算选中文字的字数
+    const selectedWordCount = useMemo(() => {
+        if (!selectedText) return 0;
+        const chineseChars = selectedText.match(/[\u4e00-\u9fff]/g) || [];
+        const englishWords = selectedText.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
+        return chineseChars.length + englishWords.length;
+    }, [selectedText]);
+
+    // 计算选中文字的字符数
+    const selectedCharCount = useMemo(() => {
+        if (!selectedText) return 0;
+        if (includePunctuation) {
+            return selectedText.length;
+        } else {
+            // 排除标点符号和空格
+            return selectedText.replace(/[^\w\u4e00-\u9fff]/g, '').length;
+        }
+    }, [selectedText, includePunctuation]);
 
     // 工具栏按钮组件 - 使用更直接的事件处理，集成animate ui tooltip
     const ToolbarButton: React.FC<{
@@ -664,7 +706,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         onClick={handleOpenMathDrawer}
                         title="数学公式"
                     >
-                        <Calculator className="h-4 w-4" />
+                        <Sigma className="h-4 w-4" />
                     </ToolbarButton>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -749,149 +791,179 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     };
 
     return (
-        <TooltipProvider>
-            <div className={cn("tiptap-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
-                {/* 目录 - 显示在左侧，可收起 */}
-                {showCatalog && (
-                    <TiptapEditorCatalog
-                        editor={editor}
-                        className={cn(
-                            "sticky top-4 order-first transition-all duration-300",
-                            catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
-                        )}
-                        isVisible={catalogVisible}
-                        onToggle={() => setCatalogVisible(!catalogVisible)}
-                    />
+        <div className={cn("tiptap-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
+            {/* 目录 - 显示在左侧，可收起 */}
+            {showCatalog && (
+                <TiptapEditorCatalog
+                    editor={editor}
+                    className={cn(
+                        "sticky top-4 order-first transition-all duration-300",
+                        catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
+                    )}
+                    isVisible={catalogVisible}
+                    onToggle={() => setCatalogVisible(!catalogVisible)}
+                />
+            )}
+
+            <div
+                className={cn(
+                    "tiptap-editor-wrapper border border-border rounded-lg bg-background",
+                    showCatalog ? "flex-1" : "w-full"
                 )}
+            >
+                <Toolbar
+                    editor={editor}
+                    onOpenMathDrawer={() => {
+                        setMathLatex('');
+                        setSelectedCategory('all');
+                        setShowMathDrawer(true);
+                    }}
+                />
 
                 <div
-                    className={cn(
-                        "tiptap-editor-wrapper border border-border rounded-lg bg-background",
-                        showCatalog ? "flex-1" : "w-full"
-                    )}
+                    className="tiptap-editor-content p-4 overflow-y-auto relative"
+                    style={{
+                        minHeight: customMinHeight,
+                        maxHeight: customMaxHeight,
+                        position: 'relative', // 确保BubbleMenu可以正确定位
+                    }}
                 >
-                    <Toolbar
-                        editor={editor}
-                        onOpenMathDrawer={() => {
-                            setMathLatex('');
-                            setSelectedCategory('all');
-                            setShowMathDrawer(true);
-                        }}
-                    />
+                    <EditorContent editor={editor} />
+                </div>
 
-                    <div
-                        className="tiptap-editor-content p-4 overflow-y-auto relative"
-                        style={{
-                            minHeight: customMinHeight,
-                            maxHeight: customMaxHeight,
-                            position: 'relative', // 确保BubbleMenu可以正确定位
+                {/* React版本的BubbleMenu */}
+                {editor && (
+                    <BubbleMenu
+                        editor={editor}
+                        pluginKey="bubbleMenu"
+                        shouldShow={({ state, from, to }) => {
+                            const text = state.doc.textBetween(from, to, ' ');
+                            const shouldShow = from !== to && text.trim().length > 0;
+                            console.log('BubbleMenu shouldShow:', shouldShow, 'text:', text);
+                            return shouldShow;
                         }}
+                        options={{ placement: 'top' }}
+                        updateDelay={250}
+                        className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg"
                     >
-                        <EditorContent editor={editor} />
-                    </div>
-
-                    {/* React版本的BubbleMenu */}
-                    {editor && (
-                        <BubbleMenu
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleBold().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                >
+                                    <Bold className="h-4 w-4" strokeWidth={2.5} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>加粗</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleItalic().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                >
+                                    <Italic className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>斜体</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleUnderline().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                >
+                                    <UnderlineIcon className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>下划线</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleStrike().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                >
+                                    <Strikethrough className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>删除线</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <ColorTextPopoverComponent
                             editor={editor}
-                            pluginKey="bubbleMenu"
-                            shouldShow={({ state, from, to }) => {
-                                const text = state.doc.textBetween(from, to, ' ');
-                                const shouldShow = from !== to && text.trim().length > 0;
-                                console.log('BubbleMenu shouldShow:', shouldShow, 'text:', text);
-                                return shouldShow;
-                            }}
-                            options={{ placement: 'top' }}
-                            updateDelay={250}
-                            className="bubble-menu flex items-center gap-1 p-2 bg-background border border-border rounded-lg shadow-lg"
-                        >
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    editor.chain().focus().toggleBold().run();
-                                }}
-                                className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:bg-accent rounded-sm flex items-center justify-center transition-colors ${editor.isActive('bold') ? 'bg-accent text-accent-foreground' : 'bg-transparent hover:bg-accent'}`}
-                                title="加粗"
-                            >
-                                <Bold className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    editor.chain().focus().toggleItalic().run();
-                                }}
-                                className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:bg-accent rounded-sm flex items-center justify-center transition-colors ${editor.isActive('italic') ? 'bg-accent text-accent-foreground' : 'bg-transparent hover:bg-accent'}`}
-                                title="斜体"
-                            >
-                                <Italic className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    editor.chain().focus().toggleUnderline().run();
-                                }}
-                                className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:bg-accent rounded-sm flex items-center justify-center transition-colors ${editor.isActive('underline') ? 'bg-accent text-accent-foreground' : 'bg-transparent hover:bg-accent'}`}
-                                title="下划线"
-                            >
-                                <UnderlineIcon className="h-4 w-4" />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    editor.chain().focus().toggleStrike().run();
-                                }}
-                                className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:bg-accent rounded-sm flex items-center justify-center transition-colors ${editor.isActive('strike') ? 'bg-accent text-accent-foreground' : 'bg-transparent hover:bg-accent'}`}
-                                title="删除线"
-                            >
-                                <Strikethrough className="h-4 w-4" />
-                            </button>
-                            <ColorTextPopoverComponent
-                                editor={editor}
-                                hideWhenUnavailable={false}
-                            />
-                            <button
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    editor.chain().focus().clearNodes().unsetAllMarks().run();
-                                }}
-                                className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:bg-accent rounded-sm flex items-center justify-center transition-colors bg-transparent hover:bg-accent"
-                                title="清除格式"
-                            >
-                                <Eraser className="h-4 w-4" />
-                            </button>
-                        </BubbleMenu>
-                    )}
-
-                    {/* 数学公式抽屉 */}
-                    <MathDrawer
-                        editor={editor}
-                        showMathDrawer={showMathDrawer}
-                        setShowMathDrawer={setShowMathDrawer}
-                        mathType={mathType}
-                        setMathType={setMathType}
-                        mathLatex={mathLatex}
-                        setMathLatex={setMathLatex}
-                    />
-
-                    {/* 字数统计 */}
-                    <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
-                        <WordCountConfig
-                            wordCount={wordCount}
-                            charCount={charCount}
-                            includePunctuation={includePunctuation}
-                            setIncludePunctuation={setIncludePunctuation}
-                            showWordCountOptions={showWordCountOptions}
-                            setShowWordCountOptions={setShowWordCountOptions}
+                            hideWhenUnavailable={false}
                         />
-                    </div>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().clearNodes().unsetAllMarks().run();
+                                    }}
+                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground"
+                                >
+                                    <Eraser className="h-4 w-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>清除格式</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </BubbleMenu>
+                )}
+
+                {/* 数学公式抽屉 */}
+                <MathDrawer
+                    editor={editor}
+                    showMathDrawer={showMathDrawer}
+                    setShowMathDrawer={setShowMathDrawer}
+                    mathType={mathType}
+                    setMathType={setMathType}
+                    mathLatex={mathLatex}
+                    setMathLatex={setMathLatex}
+                />
+
+                {/* 字数统计 */}
+                <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/50">
+                    <WordCountConfig
+                        wordCount={wordCount}
+                        charCount={charCount}
+                        selectedWordCount={selectedWordCount}
+                        selectedCharCount={selectedCharCount}
+                        includePunctuation={includePunctuation}
+                        setIncludePunctuation={setIncludePunctuation}
+                        showWordCountOptions={showWordCountOptions}
+                        setShowWordCountOptions={setShowWordCountOptions}
+                    />
                 </div>
             </div>
-        </TooltipProvider>
+        </div>
     );
 };
 

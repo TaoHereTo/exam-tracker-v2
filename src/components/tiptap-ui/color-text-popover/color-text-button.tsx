@@ -5,6 +5,11 @@ import { Editor } from '@tiptap/react';
 import { Palette } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TextStyleColorPanel } from './text-style-color-panel';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger
+} from '@/components/tiptap-ui-primitive/tooltip';
 
 interface ColorTextButtonProps {
     editor: Editor | null;
@@ -27,36 +32,42 @@ export function ColorTextButton({
 }: ColorTextButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
 
-    // 按照其他工具栏按钮的标准模式，使用title属性
+    // 使用统一的Tiptap tooltip结构
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-                <button
-                    type="button"
-                    disabled={!canToggle}
-                    onClick={() => {
-                        if (canToggle) {
-                            setIsOpen(!isOpen);
-                        }
-                    }}
-                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-sm flex items-center justify-center transition-colors bg-transparent hover:bg-accent ${!canToggle ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                    style={{
-                        border: 'none',
-                        boxShadow: 'none',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                    }}
-                    title={label}
-                >
-                    <Icon
-                        className="h-4 w-4"
-                        style={{
-                            color: activeTextStyle.color || 'currentColor',
-                            backgroundColor: activeHighlight.color || 'transparent',
-                        }}
-                    />
-                </button>
-            </PopoverTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <PopoverTrigger asChild>
+                        <button
+                            type="button"
+                            disabled={!canToggle}
+                            onClick={() => {
+                                if (canToggle) {
+                                    setIsOpen(!isOpen);
+                                }
+                            }}
+                            className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-lg flex items-center justify-center transition-colors bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent ${!canToggle ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            style={{
+                                border: 'none',
+                                boxShadow: 'none',
+                                outline: 'none',
+                                boxSizing: 'border-box'
+                            }}
+                        >
+                            <Icon
+                                className="h-4 w-4"
+                                style={{
+                                    color: activeTextStyle.color || 'currentColor',
+                                    backgroundColor: activeHighlight.color || 'transparent',
+                                }}
+                            />
+                        </button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
+                <TooltipContent>
+                    <p>{label}</p>
+                </TooltipContent>
+            </Tooltip>
             <PopoverContent
                 className="w-64 p-3 bg-background border border-border rounded-lg shadow-lg"
                 align="start"

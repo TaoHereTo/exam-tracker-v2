@@ -1,11 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../styles/button-variants.css";
+@import '../styles/_variables.scss';
+@import '../styles/_keyframe-animations.scss';
 
 /* ProseMirror styles */
 .ProseMirror {
   white-space: pre-wrap;
   outline: none;
+  background-color: var(--editor-background);
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
@@ -183,11 +186,14 @@ h6 .mixed-text {
   position: fixed !important;
 }
 
+
 /* 确保下拉框容器不会裁剪内容 */
 [data-radix-select-trigger] {
   position: relative;
   z-index: var(--z-base);
 }
+
+/* Tiptap 下拉菜单现在使用自定义 DropdownMenu 组件，动画由组件内部处理 */
 
 /* ========== 日历和按钮样式 ========== */
 /* 日历和按钮样式已统一到组件内部 */
@@ -457,7 +463,7 @@ h6 .mixed-text {
   --ring: oklch(0.6 0.15 250);
 
   /* 组件专用背景色 - 统一管理 */
-  --editor-background: var(--input);
+  --editor-background: #ffffff;
   --textarea-background: var(--input);
   --modal-background: var(--background);
   --card-modal-background: var(--card);
@@ -521,7 +527,7 @@ h6 .mixed-text {
   --ring: oklch(0.75 0.15 250);
 
   /* 深色模式组件专用背景色 */
-  --editor-background: #303030;
+  --editor-background: #262626;
   --textarea-background: var(--input);
   --modal-background: var(--background);
   --card-modal-background: var(--card);
@@ -1761,6 +1767,15 @@ textarea,
 }
 
 /* ========== 富文本编辑器列表样式 ========== */
+/* 富文本编辑器背景颜色设置 */
+.tiptap-editor-content,
+.tiptap-editor-content .ProseMirror,
+[contenteditable="true"],
+.rich-text-editor,
+.latex-rich-text-editor {
+  background-color: var(--editor-background) !important;
+}
+
 /* 确保富文本编辑器中的列表正确显示 */
 [contenteditable="true"] ul,
 [contenteditable="true"] ol,
