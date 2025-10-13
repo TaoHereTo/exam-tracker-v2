@@ -8,7 +8,7 @@ import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import TextAlign from '@tiptap/extension-text-align';
 import Color from '@tiptap/extension-color';
-import { TextStyle } from '@tiptap/extension-text-style';
+import { TextStyle, FontSize } from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
 import Underline from '@tiptap/extension-underline';
 import Strike from '@tiptap/extension-strike';
@@ -44,7 +44,14 @@ import {
     Type,
     Palette,
     Highlighter,
-    MoreHorizontal
+    MoreHorizontal,
+    Eraser,
+    RotateCcw,
+    Heading,
+    Hash,
+    ALargeSmall,
+    SeparatorHorizontal,
+    TypeOutline
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -113,6 +120,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                 types: ['textStyle'],
             }),
             FontFamily.configure({
+                types: ['textStyle'],
+            }),
+            FontSize.configure({
                 types: ['textStyle'],
             }),
             Underline,
@@ -278,9 +288,16 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             { name: 'Georgia', value: 'Georgia, serif' },
             { name: 'Verdana', value: 'Verdana, sans-serif' },
             { name: 'Courier New', value: 'Courier New, monospace' },
+            { name: 'Comic Sans MS', value: 'Comic Sans MS, cursive' },
+            { name: 'Impact', value: 'Impact, sans-serif' },
+            { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
             { name: '微软雅黑', value: 'Microsoft YaHei, sans-serif' },
             { name: '宋体', value: 'SimSun, serif' },
             { name: '黑体', value: 'SimHei, sans-serif' },
+            { name: '楷体', value: 'KaiTi, serif' },
+            { name: '仿宋', value: 'FangSong, serif' },
+            { name: '华文细黑', value: 'STXihei, sans-serif' },
+            { name: '华文楷体', value: 'STKaiti, serif' },
         ];
 
         const currentFont = editor?.getAttributes('textStyle').fontFamily || '';
@@ -302,8 +319,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     e.currentTarget.style.backgroundColor = 'transparent';
                 }}
             >
-                <Type className="h-4 w-4" />
-                {fonts.find(f => f.value === currentFont)?.name || '字体'}
+                <TypeOutline className="h-4 w-4" />
             </DropdownMenuTrigger>
         );
 
@@ -314,10 +330,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         {triggerElement}
                     </TooltipTrigger>
                     <TooltipContent>
-                        选择字体
+                        字体
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuContent align="start" className="w-48 z-[60]">
                     {fonts.map((font) => (
                         <DropdownMenuItem
                             key={font.value}
@@ -349,6 +365,238 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         );
     };
 
+    // 字体大小选择器组件
+    const FontSizeSelector: React.FC = () => {
+        const fontSizes = [
+            { name: '默认', value: '' },
+            { name: '8px', value: '8px' },
+            { name: '9px', value: '9px' },
+            { name: '10px', value: '10px' },
+            { name: '11px', value: '11px' },
+            { name: '12px', value: '12px' },
+            { name: '14px', value: '14px' },
+            { name: '16px', value: '16px' },
+            { name: '18px', value: '18px' },
+            { name: '20px', value: '20px' },
+            { name: '24px', value: '24px' },
+            { name: '28px', value: '28px' },
+        ];
+
+        const currentFontSize = editor?.getAttributes('textStyle').fontSize || '';
+
+        const triggerElement = (
+            <DropdownMenuTrigger
+                className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center gap-1 transition-colors"
+                style={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+            >
+                <ALargeSmall className="h-5 w-5" />
+            </DropdownMenuTrigger>
+        );
+
+        return (
+            <DropdownMenu>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {triggerElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        大小
+                    </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                    {fontSizes.map((size) => (
+                        <DropdownMenuItem
+                            key={size.value}
+                            onClick={() => {
+                                safeEditorCommand(() => {
+                                    if (editor) {
+                                        editor.commands.focus();
+                                        if (size.value) {
+                                            editor.commands.setFontSize(size.value);
+                                        } else {
+                                            editor.commands.unsetFontSize();
+                                        }
+                                    }
+                                });
+                            }}
+                            className={cn(
+                                "cursor-pointer",
+                                currentFontSize === size.value && "bg-accent"
+                            )}
+                        >
+                            <span style={{ fontSize: size.value || 'inherit' }}>
+                                {size.name}
+                            </span>
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        );
+    };
+
+    // 文本对齐选择器组件
+    const TextAlignSelector: React.FC = () => {
+        const alignments = [
+            { name: '左对齐', value: 'left', icon: AlignLeft },
+            { name: '居中对齐', value: 'center', icon: AlignCenter },
+            { name: '右对齐', value: 'right', icon: AlignRight },
+            { name: '两端对齐', value: 'justify', icon: AlignJustify },
+        ];
+
+        const currentAlignment = alignments.find(align =>
+            editor?.isActive({ textAlign: align.value })
+        ) || alignments[0];
+
+        const triggerElement = (
+            <DropdownMenuTrigger
+                className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center gap-1 transition-colors"
+                style={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+            >
+                <currentAlignment.icon className="h-4 w-4" />
+            </DropdownMenuTrigger>
+        );
+
+        return (
+            <DropdownMenu>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {triggerElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        对齐方式
+                    </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                    {alignments.map((alignment) => {
+                        const IconComponent = alignment.icon;
+                        return (
+                            <DropdownMenuItem
+                                key={alignment.value}
+                                onClick={() => {
+                                    safeEditorCommand(() => {
+                                        if (editor) {
+                                            editor.commands.focus();
+                                            editor.commands.setTextAlign(alignment.value as 'left' | 'center' | 'right' | 'justify');
+                                        }
+                                    });
+                                }}
+                                className={cn(
+                                    "cursor-pointer flex items-center gap-2",
+                                    editor?.isActive({ textAlign: alignment.value }) && "bg-accent"
+                                )}
+                            >
+                                <IconComponent className="h-4 w-4" />
+                                {alignment.name}
+                            </DropdownMenuItem>
+                        );
+                    })}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        );
+    };
+
+    // 列表选择器组件
+    const ListSelector: React.FC = () => {
+        const listTypes = [
+            { name: '无序列表', value: 'bulletList', icon: List },
+            { name: '有序列表', value: 'orderedList', icon: ListOrdered },
+        ];
+
+        const currentListType = listTypes.find(list =>
+            editor?.isActive(list.value)
+        );
+
+        const triggerElement = (
+            <DropdownMenuTrigger
+                className="h-8 px-2 text-xs border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none bg-transparent rounded-sm flex items-center justify-center gap-1 transition-colors"
+                style={{
+                    border: 'none',
+                    boxShadow: 'none',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+            >
+                {currentListType ? (
+                    <currentListType.icon className="h-4 w-4" />
+                ) : (
+                    <List className="h-4 w-4" />
+                )}
+            </DropdownMenuTrigger>
+        );
+
+        return (
+            <DropdownMenu>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        {triggerElement}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        列表类型
+                    </TooltipContent>
+                </Tooltip>
+                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                    {listTypes.map((listType) => {
+                        const IconComponent = listType.icon;
+                        return (
+                            <DropdownMenuItem
+                                key={listType.value}
+                                onClick={() => {
+                                    safeEditorCommand(() => {
+                                        if (editor) {
+                                            editor.commands.focus();
+                                            if (listType.value === 'bulletList') {
+                                                editor.commands.toggleBulletList();
+                                            } else if (listType.value === 'orderedList') {
+                                                editor.commands.toggleOrderedList();
+                                            }
+                                        }
+                                    });
+                                }}
+                                className={cn(
+                                    "cursor-pointer flex items-center gap-2",
+                                    editor?.isActive(listType.value) && "bg-accent"
+                                )}
+                            >
+                                <IconComponent className="h-4 w-4" />
+                                {listType.name}
+                            </DropdownMenuItem>
+                        );
+                    })}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        );
+    };
 
     // 标题选择器组件
     const HeadingSelector: React.FC = () => {
@@ -381,7 +629,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     e.currentTarget.style.backgroundColor = 'transparent';
                 }}
             >
-                {headings.find(h => h.value === currentHeading.toString())?.name || '正文'}
+                <Heading className="h-4 w-4" />
             </DropdownMenuTrigger>
         );
 
@@ -392,10 +640,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         {triggerElement}
                     </TooltipTrigger>
                     <TooltipContent>
-                        选择标题级别
+                        标题级别
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32">
+                <DropdownMenuContent align="start" className="w-32 z-[60]">
                     {headings.map((heading) => (
                         <DropdownMenuItem
                             key={heading.value}
@@ -559,7 +807,22 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     <Strikethrough className="h-4 w-4" />
                 </ToolbarButton>
 
-                <Separator orientation="vertical" className="h-6" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
+
+                <ToolbarButton
+                    onClick={() => {
+                        safeEditorCommand(() => {
+                            editor.commands.focus();
+                            // 使用Tiptap官方的清除格式命令
+                            editor.chain().focus().clearNodes().unsetAllMarks().run();
+                        });
+                    }}
+                    title="清除格式"
+                >
+                    <Eraser className="h-4 w-4" />
+                </ToolbarButton>
+
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
                 <div className="relative">
                     <input
@@ -650,14 +913,14 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
         return (
             <div className="flex flex-wrap items-center gap-1 p-3 border-b border-border bg-background/95 backdrop-blur-sm">
-                {/* 第一行：标题和字体 */}
+                {/* 第一组：标题、字体和字号 */}
                 <div className="flex items-center gap-1">
                     <HeadingSelector />
-                    <Separator orientation="vertical" className="h-6" />
                     <FontFamilySelector />
+                    <FontSizeSelector />
                 </div>
 
-                <Separator orientation="vertical" className="h-6" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
                 {/* 文本格式 */}
                 <div className="flex items-center gap-1">
@@ -715,19 +978,15 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
                     <ToolbarButton
                         onClick={() => {
-                            safeEditorCommand(() => {
-                                editor.commands.focus();
-                                editor.commands.toggleCode();
-                            });
+                            editor.chain().focus().setHorizontalRule().run();
                         }}
-                        isActive={editor.isActive('code')}
-                        title="行内代码"
+                        title="分割线"
                     >
-                        <Code className="h-4 w-4" />
+                        <SeparatorHorizontal className="h-4 w-4" />
                     </ToolbarButton>
                 </div>
 
-                <Separator orientation="vertical" className="h-6" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
                 {/* 颜色 */}
                 <div className="flex items-center gap-1">
@@ -811,109 +1070,31 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     </div>
                 </div>
 
-                <Separator orientation="vertical" className="h-6" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
-                {/* 对齐 */}
+                {/* 列表和对齐方式 */}
                 <div className="flex items-center gap-1">
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().setTextAlign('left').run();
-                        }}
-                        isActive={editor.isActive({ textAlign: 'left' })}
-                        title="左对齐"
-                    >
-                        <AlignLeft className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().setTextAlign('center').run();
-                        }}
-                        isActive={editor.isActive({ textAlign: 'center' })}
-                        title="居中对齐"
-                    >
-                        <AlignCenter className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().setTextAlign('right').run();
-                        }}
-                        isActive={editor.isActive({ textAlign: 'right' })}
-                        title="右对齐"
-                    >
-                        <AlignRight className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().setTextAlign('justify').run();
-                        }}
-                        isActive={editor.isActive({ textAlign: 'justify' })}
-                        title="两端对齐"
-                    >
-                        <AlignJustify className="h-4 w-4" />
-                    </ToolbarButton>
+                    <ListSelector />
+                    <TextAlignSelector />
                 </div>
 
-                <Separator orientation="vertical" className="h-6" />
+                <div className="w-px h-6 bg-gray-300 mx-1" />
 
-                {/* 列表和其他 */}
+                {/* 最后一组：清除格式、撤销、重做 */}
                 <div className="flex items-center gap-1">
                     <ToolbarButton
                         onClick={() => {
-                            editor.chain().focus().toggleBulletList().run();
+                            safeEditorCommand(() => {
+                                editor.commands.focus();
+                                // 使用Tiptap官方的清除格式命令
+                                editor.chain().focus().clearNodes().unsetAllMarks().run();
+                            });
                         }}
-                        isActive={editor.isActive('bulletList')}
-                        title="无序列表"
+                        title="清除格式"
                     >
-                        <List className="h-4 w-4" />
+                        <Eraser className="h-4 w-4" />
                     </ToolbarButton>
 
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().toggleOrderedList().run();
-                        }}
-                        isActive={editor.isActive('orderedList')}
-                        title="有序列表"
-                    >
-                        <ListOrdered className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().toggleBlockquote().run();
-                        }}
-                        isActive={editor.isActive('blockquote')}
-                        title="引用"
-                    >
-                        <Quote className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().toggleCodeBlock().run();
-                        }}
-                        isActive={editor.isActive('codeBlock')}
-                        title="代码块"
-                    >
-                        <Code2 className="h-4 w-4" />
-                    </ToolbarButton>
-
-                    <ToolbarButton
-                        onClick={() => {
-                            editor.chain().focus().setHorizontalRule().run();
-                        }}
-                        title="分割线"
-                    >
-                        <Minus className="h-4 w-4" />
-                    </ToolbarButton>
-                </div>
-
-                <Separator orientation="vertical" className="h-6" />
-
-                {/* 撤销重做 */}
-                <div className="flex items-center gap-1">
                     <ToolbarButton
                         onClick={() => {
                             editor.chain().focus().undo().run();
