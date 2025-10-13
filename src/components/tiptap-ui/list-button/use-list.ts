@@ -82,7 +82,7 @@ export function canToggleList(
       case "orderedList":
         return editor.can().toggleOrderedList()
       case "taskList":
-        return editor.can().toggleList("taskList", "taskItem")
+        return editor.can().toggleTaskList()
       default:
         return false
     }
@@ -183,7 +183,7 @@ export function toggleList(editor: Editor | null, type: ListType): boolean {
       const toggleMap: Record<ListType, () => typeof chain> = {
         bulletList: () => chain.toggleBulletList(),
         orderedList: () => chain.toggleOrderedList(),
-        taskList: () => chain.toggleList("taskList", "taskItem"),
+        taskList: () => chain.toggleTaskList(),
       }
 
       const toggle = toggleMap[type]

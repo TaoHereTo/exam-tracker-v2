@@ -195,6 +195,37 @@ h6 .mixed-text {
 
 /* Tiptap 下拉菜单现在使用自定义 DropdownMenu 组件，动画由组件内部处理 */
 
+/* Blockquote 样式 */
+.blockquote {
+  border-left: 4px solid #5B2CF5;
+  padding-left: 0.5rem;
+  margin: 1rem 0;
+  font-style: normal;
+  color: inherit;
+}
+
+.dark .blockquote {
+  border-left-color: #5B2CF5;
+  color: inherit;
+}
+
+/* Tiptap 官方任务列表样式 */
+.tiptap ul[data-type="taskList"] {
+  list-style: none;
+  padding-left: 0;
+}
+
+.tiptap ul[data-type="taskList"] li {
+  display: flex;
+  align-items: center;
+}
+
+.tiptap ul[data-type="taskList"] li input[type="checkbox"] {
+  margin-right: 0.5em;
+}
+
+
+
 /* ========== 日历和按钮样式 ========== */
 /* 日历和按钮样式已统一到组件内部 */
 
