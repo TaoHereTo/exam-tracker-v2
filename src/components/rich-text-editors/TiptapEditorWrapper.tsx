@@ -176,7 +176,6 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     const [editorContent, setEditorContent] = useState<string>('');
     const [selectedText, setSelectedText] = useState<string>('');
 
-
     // 防抖机制 - 官方推荐的方式
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
     const debouncedOnChange = useCallback((html: string) => {
@@ -263,6 +262,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             }),
             BubbleMenuExtension.configure({
                 pluginKey: 'bubbleMenu',
+                shouldShow: ({ editor, view, state, oldState, from, to }) => {
+                    const text = state.doc.textBetween(from, to, ' ');
+                    return from !== to && text.trim().length > 0;
+                },
             }),
         ],
         content,
@@ -855,15 +858,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         <BubbleMenu
                             editor={editor}
                             pluginKey="bubbleMenu"
-                            shouldShow={({ state, from, to }) => {
-                                const text = state.doc.textBetween(from, to, ' ');
-                                const shouldShow = from !== to && text.trim().length > 0;
-                                console.log('BubbleMenu shouldShow:', shouldShow, 'text:', text);
-                                return shouldShow;
-                            }}
-                            options={{ placement: 'top' }}
-                            updateDelay={250}
-                            className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg"
+                            className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg transition-opacity duration-200"
                         >
                             <Tooltip>
                                 <TooltipTrigger asChild>
