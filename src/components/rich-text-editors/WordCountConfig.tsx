@@ -1,0 +1,52 @@
+'use client';
+
+import React from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Checkbox } from '@/components/animate-ui/components/radix/checkbox';
+import { Label } from '@/components/ui/label';
+
+interface WordCountConfigProps {
+    wordCount: number;
+    charCount: number;
+    includePunctuation: boolean;
+    setIncludePunctuation: (include: boolean) => void;
+    showWordCountOptions: boolean;
+    setShowWordCountOptions: (show: boolean) => void;
+}
+
+export const WordCountConfig: React.FC<WordCountConfigProps> = ({
+    wordCount,
+    charCount,
+    includePunctuation,
+    setIncludePunctuation,
+    showWordCountOptions,
+    setShowWordCountOptions
+}) => {
+    return (
+        <Popover open={showWordCountOptions} onOpenChange={setShowWordCountOptions}>
+            <PopoverTrigger asChild>
+                <div className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 rounded px-2 py-1 transition-colors">
+                    <span>字数: {wordCount}</span>
+                    <span>字符: {charCount}</span>
+                </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-48" align="end">
+                <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                        <Checkbox
+                            id="include-punctuation"
+                            checked={includePunctuation}
+                            onCheckedChange={(checked) => setIncludePunctuation(checked as boolean)}
+                        />
+                        <Label
+                            htmlFor="include-punctuation"
+                            className="text-sm font-normal cursor-pointer"
+                        >
+                            包含标点符号
+                        </Label>
+                    </div>
+                </div>
+            </PopoverContent>
+        </Popover>
+    );
+};
