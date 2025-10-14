@@ -14,7 +14,7 @@ import {
     Palette,
     Eraser,
     SeparatorHorizontal,
-    List
+    ListTree
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-with-animation';
 import { ColorTextPopoverComponent } from '@/components/tiptap-ui/color-text-popover';
@@ -142,7 +142,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 isActive={isTableOfContentsVisible}
                 title={isTableOfContentsVisible ? "隐藏目录" : "显示目录"}
             >
-                <List className="h-4 w-4" />
+                <ListTree className="h-4 w-4" />
             </ToolbarButton>
         );
     };

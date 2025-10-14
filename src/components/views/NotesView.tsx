@@ -25,6 +25,7 @@ import {
     FileUp,
     FileDown,
     ListTree,
+    ScrollText,
     ChevronDown,
     Edit3,
     X,
@@ -896,14 +897,14 @@ export default function NotesView() {
 
     return (
         <TooltipProvider>
-            <div className="h-full flex flex-col p-4">
+            <div className="min-h-full flex flex-col p-4 pb-8">
                 {/* 顶部操作栏 */}
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    <ListTree className="h-4 w-4 mr-1" />
+                                    <ScrollText className="h-4 w-4 mr-1" />
                                     笔记列表
                                 </Button>
                             </SheetTrigger>
@@ -1412,7 +1413,7 @@ export default function NotesView() {
                                 </div>
                             </div>
 
-                            <div className="flex-1 min-h-[500px]">
+                            <div className="flex-1 min-h-[500px] mb-16">
                                 <TiptapEditorWrapper
                                     content={selectedNote.content}
                                     onChange={(content) => {
@@ -1426,7 +1427,7 @@ export default function NotesView() {
                                     className="h-full"
                                     showCatalog={true}
                                     customMinHeight="400px"
-                                    customMaxHeight="900px"
+                                    customMaxHeight="800px"
                                 />
                             </div>
                         </>

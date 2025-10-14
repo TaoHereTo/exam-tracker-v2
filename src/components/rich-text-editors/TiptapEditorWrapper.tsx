@@ -277,7 +277,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     customMaxHeight = '800px',
     showCatalog = false
 }) => {
-    const [catalogVisible, setCatalogVisible] = useState<boolean>(true);
+    const [catalogVisible, setCatalogVisible] = useState<boolean>(false);
     const [showMathDrawer, setShowMathDrawer] = useState<boolean>(false);
     const [mathType, setMathType] = useState<'inline' | 'block'>('inline');
     const [mathLatex, setMathLatex] = useState<string>('');
@@ -1040,8 +1040,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     return (
         <EditorContext.Provider value={{ editor }}>
             <div className={cn("tiptap-editor-with-catalog", className)}>
-                {/* 胶囊型工具栏 - 粘性固定在顶部 */}
-                <div className="sticky top-4 flex justify-center mb-4" style={{ zIndex: 'var(--z-sticky)' }}>
+                {/* 胶囊型工具栏 - 普通位置 */}
+                <div className="flex justify-center mb-4">
                     <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm backdrop-blur-sm">
                         <Toolbar
                             editor={editor}

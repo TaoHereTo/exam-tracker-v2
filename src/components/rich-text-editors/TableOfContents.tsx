@@ -3,7 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Editor } from '@tiptap/react';
 import { cn } from '@/lib/utils';
-import { List } from 'lucide-react';
+import { ListTree } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './TableOfContents.css';
 
@@ -173,8 +173,8 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
         };
     };
 
-    // 如果没有编辑器或锚点，不显示组件
-    if (!editor || anchors.length === 0) {
+    // 如果没有编辑器，不显示组件
+    if (!editor) {
         return null;
     }
 
@@ -194,7 +194,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
         >
             {/* 标题栏 */}
             <div className="flex items-center gap-2 p-3 border-b border-border flex-shrink-0">
-                <List className="h-4 w-4 text-muted-foreground" />
+                <ListTree className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">目录</span>
                 <span className="text-xs text-muted-foreground">({anchors.length})</span>
             </div>
@@ -208,48 +208,58 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                 }}
             >
                 <div className="space-y-1">
-                    {anchors.map((anchor, index) => {
-                        // 使用独立的滚动高亮状态，避免ToC扩展状态更新卡顿
-                        const isScrolledOver = scrolledOverIds.has(anchor.id);
+                    {anchors.length === 0 ? (
+                        <div className="flex items-center justify-center py-8 text-muted-foreground">
+                            <div className="text-center">
+                                <ListTree className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                <p className="text-sm">暂无标题</p>
+                                <p className="text-xs mt-1">添加标题后目录将自动生成</p>
+                            </div>
+                        </div>
+                    ) : (
+                        anchors.map((anchor, index) => {
+                            // 使用独立的滚动高亮状态，避免ToC扩展状态更新卡顿
+                            const isScrolledOver = scrolledOverIds.has(anchor.id);
 
-                        return (
-                            <motion.div
-                                key={anchor.id}
-                                className={cn(
-                                    "group cursor-pointer rounded-md px-2 py-1.5 text-sm transition-colors duration-300 ease-in-out",
-                                    "hover:bg-gray-100 dark:hover:bg-gray-800",
-                                    isScrolledOver ? "text-gray-400 dark:text-gray-500" : "text-black dark:text-white"
-                                )}
-                                style={{
-                                    ...getIndentStyle(anchor.level)
-                                }}
-                                onClick={(e) => handleAnchorClick(e, anchor)}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{
-                                    duration: 0.3,
-                                    delay: index * 0.05,
-                                    ease: "easeOut"
-                                }}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <span
-                                        className={cn(
-                                            "text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 transition-all duration-300 ease-in-out",
-                                            isScrolledOver
-                                                ? "bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500"
-                                                : "bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
-                                        )}
-                                    >
-                                        H{anchor.originalLevel}
-                                    </span>
-                                    <span className="truncate flex-1">
-                                        {anchor.textContent}
-                                    </span>
-                                </div>
-                            </motion.div>
-                        );
-                    })}
+                            return (
+                                <motion.div
+                                    key={anchor.id}
+                                    className={cn(
+                                        "group cursor-pointer rounded-md px-2 py-1.5 text-sm transition-colors duration-300 ease-in-out",
+                                        "hover:bg-gray-100 dark:hover:bg-gray-800",
+                                        isScrolledOver ? "text-gray-400 dark:text-gray-500" : "text-black dark:text-white"
+                                    )}
+                                    style={{
+                                        ...getIndentStyle(anchor.level)
+                                    }}
+                                    onClick={(e) => handleAnchorClick(e, anchor)}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{
+                                        duration: 0.3,
+                                        delay: index * 0.05,
+                                        ease: "easeOut"
+                                    }}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span
+                                            className={cn(
+                                                "text-xs px-1.5 py-0.5 rounded-full flex-shrink-0 transition-all duration-300 ease-in-out",
+                                                isScrolledOver
+                                                    ? "bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500"
+                                                    : "bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+                                            )}
+                                        >
+                                            H{anchor.originalLevel}
+                                        </span>
+                                        <span className="truncate flex-1">
+                                            {anchor.textContent}
+                                        </span>
+                                    </div>
+                                </motion.div>
+                            );
+                        })
+                    )}
                 </div>
             </div>
         </motion.div>
