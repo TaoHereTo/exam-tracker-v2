@@ -114,7 +114,6 @@ export const ExpandableCell: React.FC<ExpandableCellProps> = ({
                 className="expandable-cell-content text-sm leading-relaxed overflow-hidden"
                 style={{
                     maxHeight: isExpanded ? `${contentHeight}px` : `${collapsedHeight}px`,
-                    transition: 'max-height 300ms ease-in-out, opacity 200ms ease-in-out',
                 }}
             >
                 {content}

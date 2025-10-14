@@ -1023,7 +1023,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleBold().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
                                         <Bold className={`h-4 w-4 ${editor.isActive('bold') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} strokeWidth={2.5} />
                                     </button>
@@ -1040,7 +1040,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleItalic().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
                                         <Italic className={`h-4 w-4 ${editor.isActive('italic') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
@@ -1057,7 +1057,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleUnderline().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
                                         <UnderlineIcon className={`h-4 w-4 ${editor.isActive('underline') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
@@ -1074,7 +1074,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleStrike().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
                                         <Strikethrough className={`h-4 w-4 ${editor.isActive('strike') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
@@ -1095,7 +1095,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().clearNodes().unsetAllMarks().run();
                                         }}
-                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent"
+                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent"
                                     >
                                         <Eraser className="h-4 w-4 toolbar-button-icon" />
                                     </button>

@@ -24,7 +24,7 @@ import {
     BookOpen,
     FileUp,
     FileDown,
-    List,
+    ListTree,
     ChevronDown,
     Edit3,
     X,
@@ -903,7 +903,7 @@ export default function NotesView() {
                         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                             <SheetTrigger asChild>
                                 <Button variant="outline" size="sm">
-                                    <List className="h-4 w-4 mr-1" />
+                                    <ListTree className="h-4 w-4 mr-1" />
                                     笔记列表
                                 </Button>
                             </SheetTrigger>

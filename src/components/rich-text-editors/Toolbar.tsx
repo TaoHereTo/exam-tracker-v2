@@ -102,7 +102,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
     return (
         <div className="flex flex-wrap items-center gap-1 relative overflow-visible">
-            {/* 第一组：撤销重做 */}
+            {/* 第一组：撤销重做和清除格式 */}
             <div className="flex items-center gap-1">
                 <ToolbarButton
                     onClick={() => editor.chain().focus().undo().run()}
@@ -118,6 +118,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     title="重做"
                 >
                     <Redo className="h-4 w-4" />
+                </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
+                    title="清除格式"
+                >
+                    <Eraser className="h-4 w-4" />
                 </ToolbarButton>
             </div>
 
@@ -198,13 +205,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         console.log(`Applied ${type} color: ${label} (${value})`);
                     }}
                 />
-
-                <ToolbarButton
-                    onClick={() => editor.chain().focus().clearNodes().unsetAllMarks().run()}
-                    title="清除格式"
-                >
-                    <Eraser className="h-4 w-4" />
-                </ToolbarButton>
             </div>
 
             <Separator orientation="vertical" />
