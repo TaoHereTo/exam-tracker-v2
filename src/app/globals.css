@@ -985,103 +985,106 @@ html {
 ::view-transition-group(root) [data-slot="sidebar-container"],
 ::view-transition-group(root) .transition-transform,
 ::view-transition-group(root) .transition-all,
-::view-transition-group(root) .transition-colors {
+::view-transition-group(root) .transition-colors,
+::view-transition-group(root) .animate-fadeIn,
+::view-transition-group(root) .animate-fadeOut,
+::view-transition-group(root) .animate-zoomIn,
+::view-transition-group(root) .animate-zoomOut,
+::view-transition-group(root) .animate-slideFromTop,
+::view-transition-group(root) .animate-slideFromRight,
+::view-transition-group(root) .animate-slideFromLeft,
+::view-transition-group(root) .animate-slideFromBottom,
+::view-transition-group(root) .animate-spin {
   transition-duration: inherit !important;
 }
 
-/* 恢复过渡效果 */
+/* 恢复过渡效果 - 更精确的选择器 */
 html:not(:has(::view-transition-group(root))) * {
   transition-duration: inherit;
 }
 
-/* 强制恢复关键动画效果 - 防止动画丢失 */
-.expandable-cell-content {
-  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out !important;
+/* 确保动画类在主题切换后正常工作 */
+html:not(:has(::view-transition-group(root))) .animate-fadeIn,
+html:not(:has(::view-transition-group(root))) .animate-fadeOut,
+html:not(:has(::view-transition-group(root))) .animate-zoomIn,
+html:not(:has(::view-transition-group(root))) .animate-zoomOut,
+html:not(:has(::view-transition-group(root))) .animate-slideFromTop,
+html:not(:has(::view-transition-group(root))) .animate-slideFromRight,
+html:not(:has(::view-transition-group(root))) .animate-slideFromLeft,
+html:not(:has(::view-transition-group(root))) .animate-slideFromBottom,
+html:not(:has(::view-transition-group(root))) .animate-spin {
+  animation-duration: inherit !important;
+  transition-duration: inherit !important;
 }
 
-/* 强制恢复侧边栏动画 */
+/* 关键动画效果恢复 - 防止动画丢失 */
+.expandable-cell-content {
+  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out;
+}
+
+/* 侧边栏动画 */
 [data-slot="sidebar-menu-button"] {
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.2s ease-in-out;
 }
 
 [data-slot="sidebar-menu-button"] span,
 [data-slot="sidebar-header"] span {
-  transition: all 0.2s ease-linear !important;
+  transition: all 0.2s ease-linear;
 }
 
-/* 强制恢复整个侧边栏的展开收起动画 */
+/* 侧边栏展开收起动画 */
 [data-slot="sidebar-gap"] {
-  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15) !important;
+  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15);
 }
 
 [data-slot="sidebar-container"] {
-  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1) !important;
+  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1);
 }
 
-/* 确保侧边栏状态变化时的动画 */
+/* 侧边栏状态变化时的动画 */
 [data-slot="sidebar"][data-state="expanded"] [data-slot="sidebar-gap"],
 [data-slot="sidebar"][data-state="collapsed"] [data-slot="sidebar-gap"] {
-  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15) !important;
+  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15);
 }
 
 [data-slot="sidebar"][data-state="expanded"] [data-slot="sidebar-container"],
 [data-slot="sidebar"][data-state="collapsed"] [data-slot="sidebar-container"] {
-  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1) !important;
+  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1);
 }
 
-/* 强制恢复表格展开动画 */
+/* 通用过渡动画类 */
 .transition-transform {
-  transition: transform 0.3s ease-in-out !important;
+  transition: transform 0.3s ease-in-out;
 }
 
 .transition-all {
-  transition: all 0.3s ease-in-out !important;
+  transition: all 0.3s ease-in-out;
 }
 
 .transition-colors {
-  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out !important;
+  transition: color 0.3s ease-in-out, background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
 }
 
-/* 强制恢复侧边栏子菜单展开动画 */
+/* 侧边栏子菜单展开动画 */
 .sidebar-submenu-container {
-  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out !important;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
 }
 
-/* 强制恢复所有关键动画类 */
+/* 动画持续时间类 */
 .duration-300 {
-  transition-duration: 300ms !important;
+  transition-duration: 300ms;
 }
 
 .duration-200 {
-  transition-duration: 200ms !important;
+  transition-duration: 200ms;
 }
 
 .ease-in-out {
-  transition-timing-function: ease-in-out !important;
+  transition-timing-function: ease-in-out;
 }
 
 .ease-linear {
-  transition-timing-function: linear !important;
-}
-
-/* 最终强制规则 - 确保侧边栏动画在所有情况下都工作 */
-[data-slot="sidebar"] [data-slot="sidebar-gap"],
-[data-slot="sidebar"] [data-slot="sidebar-container"] {
-  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15) !important;
-}
-
-[data-slot="sidebar"] [data-slot="sidebar-container"] {
-  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1) !important;
-}
-
-/* 覆盖任何可能禁用动画的规则 */
-*[data-slot="sidebar-gap"],
-*[data-slot="sidebar-container"] {
-  transition: width 400ms cubic-bezier(0.7, -0.15, 0.25, 1.15) !important;
-}
-
-*[data-slot="sidebar-container"] {
-  transition: left 400ms cubic-bezier(0.75, 0, 0.25, 1), right 400ms cubic-bezier(0.75, 0, 0.25, 1), width 400ms cubic-bezier(0.75, 0, 0.25, 1) !important;
+  transition-timing-function: linear;
 }
 
 /* 在主题切换期间优化编辑器性能 */
