@@ -389,7 +389,6 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         .replace(/[\s_-]+/g, '-')
                         .replace(/^-+|-+$/g, '');
                     const id = slug || `heading-${Date.now()}`;
-                    console.log('Generated ID for content:', content, '-> ID:', id);
                     return id;
                 },
                 scrollParent: () => {

@@ -157,7 +157,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     levels={[1, 2, 3, 4, 5, 6]}
                     hideWhenUnavailable={false}
                     portal={true}
-                    onOpenChange={(isOpen) => console.log('Heading dropdown opened:', isOpen)}
+                    onOpenChange={() => { }}
                 />
                 <FontFamilyDropdownMenu
                     editor={editor}
@@ -171,14 +171,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     ]}
                     hideWhenUnavailable={false}
                     portal={true}
-                    onOpenChange={(isOpen) => console.log('Font family dropdown opened:', isOpen)}
+                    onOpenChange={() => { }}
                 />
                 <FontSizeDropdownMenu
                     editor={editor}
                     sizes={['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px']}
                     hideWhenUnavailable={false}
                     portal={true}
-                    onOpenChange={(isOpen) => console.log('Font size dropdown opened:', isOpen)}
+                    onOpenChange={() => { }}
                 />
             </div>
 
@@ -221,9 +221,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 <ColorTextPopoverComponent
                     editor={editor}
                     hideWhenUnavailable={false}
-                    onColorChanged={({ type, label, value }) => {
-                        console.log(`Applied ${type} color: ${label} (${value})`);
-                    }}
+                    onColorChanged={() => { }}
                 />
             </div>
 
@@ -264,14 +262,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     types={['bulletList', 'orderedList', 'taskList']}
                     hideWhenUnavailable={false}
                     portal={true}
-                    onOpenChange={(isOpen) => console.log('List dropdown opened:', isOpen)}
+                    onOpenChange={() => { }}
                 />
                 <TextAlignDropdownMenu
                     editor={editor}
                     alignments={['left', 'center', 'right', 'justify']}
                     hideWhenUnavailable={false}
                     portal={true}
-                    onOpenChange={(isOpen) => console.log('Text align dropdown opened:', isOpen)}
+                    onOpenChange={() => { }}
                 />
             </div>
         </div>

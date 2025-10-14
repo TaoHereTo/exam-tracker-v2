@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { BarChart2, BookOpen, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText, FileText as FileTextIcon, FileEdit, Brain } from "lucide-react";
+import { BarChart2, ClipboardList, Target, Settings, PieChart, LineChart, Trophy, Plus, History, Calendar, FileText, BookMarked, PenTool, BookCopy, NotebookPen, ListTodo, GalleryVerticalEnd, ChartSpline, AlarmClockCheck, ChevronRight, ChevronsUpDown, ChartLine, BookOpenText, FileText as FileTextIcon, FileEdit, Brain } from "lucide-react";
 import { MixedText } from "@/components/ui/MixedText";
 import {
     SidebarProvider,
@@ -173,12 +173,6 @@ const NAV_DATA = {
                     url: '#',
                     tab: 'notes',
                     icon: FileEdit,
-                },
-                {
-                    title: '目录功能测试',
-                    url: '/toc-test',
-                    tab: 'toc-test',
-                    icon: BookOpen,
                 },
             ],
         },

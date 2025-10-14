@@ -39,8 +39,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
     // 按照官方React最佳实践，直接使用传入的 anchors 数据
     // 不需要 useState 和 useEffect，数据由父组件管理
 
-    // 添加点击时的临时高亮状态
-    const [clickedAnchorId, setClickedAnchorId] = useState<string>('');
+    // 移除点击时的蓝色高亮状态
     const animationFrameRef = useRef<number | null>(null);
 
     // 平滑滚动到指定位置（仅滚动容器，不影响页面）
@@ -86,10 +85,9 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
         if (!editor) return;
 
         try {
-            // 立即设置点击高亮状态
-            setClickedAnchorId(anchor.id);
+            // 不设置点击高亮，避免蓝色高亮
 
-            console.log('Clicking anchor:', anchor.textContent, 'dom:', anchor.dom, 'pos:', anchor.pos);
+            // 点击日志已移除
 
             if (anchor.dom) {
                 // 仅滚动编辑区域：不要更改 selection 或 focus，以避免 ProseMirror 触发窗口滚动
@@ -111,10 +109,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                 console.error('No DOM element found for anchor:', anchor.textContent);
             }
 
-            // 清除点击高亮状态（让扩展的检测接管）
-            setTimeout(() => {
-                setClickedAnchorId('');
-            }, 2000);
+            // 不使用点击高亮，无需清除
         } catch (error) {
             console.error('滚动到锚点失败:', error);
         }
@@ -167,8 +162,7 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                     transition={{ duration: 0.3, delay: 0.2 }}
                 >
                     {anchors.map((anchor, index) => {
-                        // 判断是否应该高亮（点击状态或扩展检测的活跃状态）
-                        const isHighlighted = clickedAnchorId === anchor.id || anchor.isActive;
+                        // 仅保留滚动经过的浅灰标识，去掉蓝色高亮
                         const isScrolledOver = anchor.isScrolledOver;
 
                         return (
@@ -177,10 +171,8 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                                 className={cn(
                                     "group cursor-pointer rounded-md px-2 py-1.5 text-sm transition-all duration-200",
                                     "hover:bg-gray-100 dark:hover:bg-gray-800",
-                                    // 按照官方示例的样式类名
-                                    isHighlighted && !isScrolledOver ? "is-active" : "",
+                                    // 去掉蓝色高亮类，仅保留滚动经过的类
                                     isScrolledOver ? "is-scrolled-over" : "",
-                                    // 默认样式
                                     "text-black dark:text-white"
                                 )}
                                 style={getIndentStyle(anchor.level)}
@@ -192,11 +184,9 @@ export const TableOfContents: React.FC<TableOfContentsProps> = ({
                                 <div className="flex items-center gap-2">
                                     <span className={cn(
                                         "text-xs px-1.5 py-0.5 rounded-full flex-shrink-0",
-                                        isHighlighted
-                                            ? "bg-blue-200 dark:bg-blue-800 text-black dark:text-white"
-                                            : isScrolledOver
-                                                ? "bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500"
-                                                : "bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
+                                        isScrolledOver
+                                            ? "bg-gray-200 dark:bg-gray-600 text-gray-400 dark:text-gray-500"
+                                            : "bg-gray-100 dark:bg-gray-700 text-black dark:text-white"
                                     )}>
                                         H{anchor.originalLevel}
                                     </span>
