@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef, useDeferredValue } from 'react';
 import { useEditor, EditorContent, EditorContext, type Editor } from '@tiptap/react';
+import type { EditorState } from '@tiptap/pm/state';
 import { BubbleMenu } from '@tiptap/react/menus';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -17,6 +18,7 @@ import { TaskList } from '@tiptap/extension-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
+import Typography from '@tiptap/extension-typography';
 
 // 数学公式样式
 const mathStyles = `
@@ -298,120 +300,176 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
     // 按照官方React最佳实践，在组件内部管理锚点状态
     const [anchors, setAnchors] = useState<Anchor[]>([]);
+    const deferredAnchors = useDeferredValue(anchors);
+    // 程序化滚动窗口：在该窗口内暂停 ToC 更新，避免动画过程中的抖动
+    const programmaticScrollUntilRef = useRef<number>(0);
+    const [isProgrammaticScrolling, setIsProgrammaticScrolling] = useState(false);
+    // 将目录锚点更新批处理到每帧一次，避免滚动时频繁 setState
+    const anchorsRafIdRef = useRef<number | null>(null);
+    const pendingAnchorsRef = useRef<Anchor[] | null>(null);
+    const anchorsThrottleTimerRef = useRef<number | null>(null);
+    const lastAnchorsFlushRef = useRef<number>(0);
+
+    // 稳定的 BubbleMenu 显示逻辑，避免每次渲染重建
+    const bubbleMenuShouldShow = useCallback(({ state, from, to }: { state: EditorState; from: number; to: number; }) => {
+        const text = state.doc.textBetween(from, to, ' ');
+        return from !== to && text.trim().length > 0;
+    }, []);
+
+    // 稳定的 editor attributes，避免每次渲染重建对象
+    const editorAttributes = useMemo(() => ({
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
+        'aria-label': '富文本编辑器',
+        role: 'textbox',
+        'aria-multiline': 'true',
+    }), []);
+
+    // 扩展列表 memo 化，避免重建
+    const extensions = useMemo(() => ([
+        StarterKit.configure({
+            // 官方推荐：只禁用真正不需要的扩展
+            link: false, // 使用自定义 Link 扩展
+            heading: {
+                levels: [1, 2, 3, 4, 5, 6], // 确保所有标题级别都启用
+            },
+        }),
+        Placeholder.configure({
+            placeholder,
+        }),
+        Image.configure({
+            inline: true,
+            allowBase64: true,
+        }),
+        Link.configure({
+            openOnClick: false,
+            HTMLAttributes: {
+                class: 'text-blue-500 hover:text-blue-700 underline',
+            },
+        }),
+        TextAlign.configure({
+            types: ['heading', 'paragraph'],
+        }),
+        TextStyle,
+        Color.configure({
+            types: ['textStyle'],
+        }),
+        FontFamily.configure({
+            types: ['textStyle'],
+        }),
+        FontSize.configure({
+            types: ['textStyle'],
+        }),
+        Highlight.configure({
+            multicolor: true,
+        }),
+        // 智能排版（引号、省略号、破折号、箭头、版权符号等）
+        Typography,
+        TaskList,
+        TaskItem.configure({
+            nested: true,
+        }),
+        Mathematics.configure({
+            inlineOptions: {
+                onClick: (node, pos) => {
+                    // 点击内联数学公式时编辑
+                    setMathType('inline');
+                    setMathLatex(node.attrs.latex);
+                    setShowMathDrawer(true);
+                },
+            },
+            blockOptions: {
+                onClick: (node, pos) => {
+                    // 点击块级数学公式时编辑
+                    setMathType('block');
+                    setMathLatex(node.attrs.latex);
+                    setShowMathDrawer(true);
+                },
+            },
+            katexOptions: {
+                throwOnError: false, // 不抛出错误，显示渲染结果
+                strict: false, // 允许更宽松的解析
+                trust: true, // 信任输入内容
+                macros: {
+                    '\\R': '\\mathbb{R}', // 实数集
+                    '\\N': '\\mathbb{N}', // 自然数集
+                    '\\Z': '\\mathbb{Z}', // 整数集
+                    '\\Q': '\\mathbb{Q}', // 有理数集
+                    '\\C': '\\mathbb{C}', // 复数集
+                    '\\P': '\\mathbb{P}', // 素数集
+                    '\\E': '\\mathbb{E}', // 期望值
+                    '\\Var': '\\text{Var}', // 方差
+                    '\\Cov': '\\text{Cov}', // 协方差
+                },
+            },
+        }),
+        // 按照官方React最佳实践，在 useEditor 内部配置 TableOfContents
+        TableOfContentsExtension.configure({
+            anchorTypes: ['heading'],
+            getIndex: getHierarchicalIndexes,
+            getId: (content) => {
+                // 生成基于内容的ID，用于锚点定位
+                const slug = content
+                    .toLowerCase()
+                    .trim()
+                    .replace(/[^\w\s-]/g, '')
+                    .replace(/[\s_-]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
+                const id = slug || `heading-${Date.now()}`;
+                return id;
+            },
+            scrollParent: () => {
+                // 使用编辑器内容容器作为滚动父元素，确保只影响编辑区
+                if (typeof document !== 'undefined') {
+                    const container = document.querySelector('.tiptap-editor-content');
+                    if (container instanceof HTMLElement) return container;
+                }
+                return window;
+            },
+            onUpdate: (nextAnchors) => {
+                // 完全禁用滚动监听，只保留基本的目录数据更新
+                // 将数据裁剪为轻量结构，降低对象体积与比较成本
+                pendingAnchorsRef.current = nextAnchors.map((a: Anchor) => ({
+                    id: a.id,
+                    textContent: a.textContent,
+                    level: a.level,
+                    originalLevel: a.originalLevel,
+                    isActive: false, // 禁用活跃状态
+                    isScrolledOver: false, // 禁用滚动状态
+                    // 仍保留 editor 引用以满足类型，但不传递 dom/node/pos 等重对象到状态树
+                    editor: a.editor,
+                    dom: a.dom,
+                    node: a.node,
+                    itemIndex: a.itemIndex,
+                    pos: a.pos,
+                } as Anchor));
+                if (anchorsRafIdRef.current != null) return;
+                anchorsRafIdRef.current = requestAnimationFrame(() => {
+                    anchorsRafIdRef.current = null;
+                    const latest = pendingAnchorsRef.current || [];
+                    // 只在长度或顺序变化时更新，完全忽略滚动状态
+                    setAnchors(prev => {
+                        if (prev.length !== latest.length) return latest;
+                        for (let i = 0; i < prev.length; i++) {
+                            const a = prev[i] as Anchor;
+                            const b = latest[i] as Anchor;
+                            if (!b || a.id !== b.id) {
+                                return latest;
+                            }
+                        }
+                        return prev;
+                    });
+                });
+            },
+        }),
+        BubbleMenuExtension.configure({
+            pluginKey: 'bubbleMenu',
+            shouldShow: bubbleMenuShouldShow,
+        }),
+    ]), [placeholder, bubbleMenuShouldShow]);
 
     // 创建编辑器实例 - 遵循官方最佳实践，修复SSR问题
     const editor: Editor | null = useEditor({
-        extensions: [
-            StarterKit.configure({
-                // 官方推荐：只禁用真正不需要的扩展
-                link: false, // 使用自定义 Link 扩展
-                heading: {
-                    levels: [1, 2, 3, 4, 5, 6], // 确保所有标题级别都启用
-                },
-            }),
-            Placeholder.configure({
-                placeholder,
-            }),
-            Image.configure({
-                inline: true,
-                allowBase64: true,
-            }),
-            Link.configure({
-                openOnClick: false,
-                HTMLAttributes: {
-                    class: 'text-blue-500 hover:text-blue-700 underline',
-                },
-            }),
-            TextAlign.configure({
-                types: ['heading', 'paragraph'],
-            }),
-            TextStyle,
-            Color.configure({
-                types: ['textStyle'],
-            }),
-            FontFamily.configure({
-                types: ['textStyle'],
-            }),
-            FontSize.configure({
-                types: ['textStyle'],
-            }),
-            Highlight.configure({
-                multicolor: true,
-            }),
-            TaskList,
-            TaskItem.configure({
-                nested: true,
-            }),
-            Mathematics.configure({
-                inlineOptions: {
-                    onClick: (node, pos) => {
-                        // 点击内联数学公式时编辑
-                        setMathType('inline');
-                        setMathLatex(node.attrs.latex);
-                        setShowMathDrawer(true);
-                    },
-                },
-                blockOptions: {
-                    onClick: (node, pos) => {
-                        // 点击块级数学公式时编辑
-                        setMathType('block');
-                        setMathLatex(node.attrs.latex);
-                        setShowMathDrawer(true);
-                    },
-                },
-                katexOptions: {
-                    throwOnError: false, // 不抛出错误，显示渲染结果
-                    strict: false, // 允许更宽松的解析
-                    trust: true, // 信任输入内容
-                    macros: {
-                        '\\R': '\\mathbb{R}', // 实数集
-                        '\\N': '\\mathbb{N}', // 自然数集
-                        '\\Z': '\\mathbb{Z}', // 整数集
-                        '\\Q': '\\mathbb{Q}', // 有理数集
-                        '\\C': '\\mathbb{C}', // 复数集
-                        '\\P': '\\mathbb{P}', // 素数集
-                        '\\E': '\\mathbb{E}', // 期望值
-                        '\\Var': '\\text{Var}', // 方差
-                        '\\Cov': '\\text{Cov}', // 协方差
-                    },
-                },
-            }),
-            // 按照官方React最佳实践，在 useEditor 内部配置 TableOfContents
-            TableOfContentsExtension.configure({
-                anchorTypes: ['heading'],
-                getIndex: getHierarchicalIndexes,
-                getId: (content) => {
-                    // 生成基于内容的ID，用于锚点定位
-                    const slug = content
-                        .toLowerCase()
-                        .trim()
-                        .replace(/[^\w\s-]/g, '')
-                        .replace(/[\s_-]+/g, '-')
-                        .replace(/^-+|-+$/g, '');
-                    const id = slug || `heading-${Date.now()}`;
-                    return id;
-                },
-                scrollParent: () => {
-                    // 使用编辑器内容容器作为滚动父元素，确保只影响编辑区
-                    if (typeof document !== 'undefined') {
-                        const container = document.querySelector('.tiptap-editor-content');
-                        if (container instanceof HTMLElement) return container;
-                    }
-                    return window;
-                },
-                onUpdate: (anchors) => {
-                    // 按照官方React示例：setAnchors(anchors)
-                    setAnchors(anchors);
-                },
-            }),
-            BubbleMenuExtension.configure({
-                pluginKey: 'bubbleMenu',
-                shouldShow: ({ editor, view, state, oldState, from, to }) => {
-                    const text = state.doc.textBetween(from, to, ' ');
-                    return from !== to && text.trim().length > 0;
-                },
-            }),
-        ],
+        extensions,
         content,
         onCreate: ({ editor: currentEditor }) => {
             // 迁移现有的数学字符串到数学节点
@@ -426,27 +484,24 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         onUpdate: ({ editor }) => {
             const html = editor.getHTML();
             const text = editor.getText();
-            setEditorContent(text);
+            // 避免重复设置相同的文本内容
+            setEditorContent(prev => (prev === text ? prev : text));
             debouncedOnChange(html);
         },
         onSelectionUpdate: ({ editor }) => {
             const { from, to } = editor.state.selection;
             if (from !== to) {
-                const selectedText = editor.state.doc.textBetween(from, to, ' ');
-                setSelectedText(selectedText);
+                const nextSelected = editor.state.doc.textBetween(from, to, ' ');
+                setSelectedText(prev => (prev === nextSelected ? prev : nextSelected));
             } else {
-                setSelectedText('');
+                setSelectedText(prev => (prev === '' ? prev : ''));
             }
         },
         editorProps: {
-            attributes: {
-                class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
-                'aria-label': '富文本编辑器',
-                role: 'textbox',
-                'aria-multiline': 'true',
-            },
+            attributes: editorAttributes,
         },
         immediatelyRender: false, // 修复SSR问题
+        shouldRerenderOnTransaction: false, // 官方建议：避免每次事务都触发 React 重新渲染
     });
 
     // 当 content prop 变化时更新编辑器 - 官方推荐的方式
@@ -1023,6 +1078,15 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                         className="flex-1"
                                         isVisible={catalogVisible}
                                         onToggle={() => setCatalogVisible(!catalogVisible)}
+                                        onProgrammaticScroll={(durationMs: number) => {
+                                            // 延长暂停时间，确保整个滚动过程都跳过ToC更新
+                                            setIsProgrammaticScrolling(true);
+                                            programmaticScrollUntilRef.current = performance.now() + durationMs + 200;
+                                            // 滚动结束后恢复ToC更新
+                                            setTimeout(() => {
+                                                setIsProgrammaticScrolling(false);
+                                            }, durationMs + 200);
+                                        }}
                                     />
                                 )}
                             </div>

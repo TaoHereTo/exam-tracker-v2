@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Editor } from '@tiptap/react';
+import { Editor, useEditorState } from '@tiptap/react';
 import {
     Bold,
     Italic,
@@ -44,7 +44,35 @@ export const Toolbar: React.FC<ToolbarProps> = ({
     onToggleTableOfContents,
     isTableOfContentsVisible = false
 }) => {
-    if (!editor) return null;
+    // 官方建议：使用 useEditorState 精准订阅，避免不必要的重新渲染
+    // 注意：Hooks 需无条件调用，因此即便 editor 为空也要调用，并在 selector 中做空值防护
+    const toolbarState = useEditorState({
+        editor,
+        selector: ({ editor }) => {
+            if (!editor) {
+                return {
+                    canUndo: false,
+                    canRedo: false,
+                    isBold: false,
+                    isItalic: false,
+                    isUnderline: false,
+                    isStrike: false,
+                    isBlockquote: false
+                };
+            }
+            return {
+                canUndo: editor.can().undo(),
+                canRedo: editor.can().redo(),
+                isBold: editor.isActive('bold'),
+                isItalic: editor.isActive('italic'),
+                isUnderline: editor.isActive('underline'),
+                isStrike: editor.isActive('strike'),
+                isBlockquote: editor.isActive('blockquote')
+            };
+        }
+    });
+
+    if (!editor || !toolbarState) return null;
 
     // 工具栏按钮组件
     const ToolbarButton: React.FC<{
@@ -126,7 +154,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <div className="flex items-center gap-1">
                 <ToolbarButton
                     onClick={() => editor.chain().focus().undo().run()}
-                    disabled={!editor.can().undo()}
+                    disabled={!toolbarState.canUndo}
                     title="撤销"
                 >
                     <Undo className="h-4 w-4" />
@@ -134,7 +162,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
                 <ToolbarButton
                     onClick={() => editor.chain().focus().redo().run()}
-                    disabled={!editor.can().redo()}
+                    disabled={!toolbarState.canRedo}
                     title="重做"
                 >
                     <Redo className="h-4 w-4" />
@@ -188,7 +216,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
             <div className="flex items-center gap-1">
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleBold().run()}
-                    isActive={editor.isActive('bold')}
+                    isActive={toolbarState.isBold}
                     title="加粗"
                 >
                     <Bold className="h-4 w-4" strokeWidth={2.5} />
@@ -196,7 +224,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleItalic().run()}
-                    isActive={editor.isActive('italic')}
+                    isActive={toolbarState.isItalic}
                     title="斜体"
                 >
                     <Italic className="h-4 w-4" />
@@ -204,7 +232,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleUnderline().run()}
-                    isActive={editor.isActive('underline')}
+                    isActive={toolbarState.isUnderline}
                     title="下划线"
                 >
                     <Underline className="h-4 w-4" />
@@ -212,7 +240,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
                 <ToolbarButton
                     onClick={() => editor.chain().focus().toggleStrike().run()}
-                    isActive={editor.isActive('strike')}
+                    isActive={toolbarState.isStrike}
                     title="删除线"
                 >
                     <Strikethrough className="h-4 w-4" />
@@ -237,7 +265,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                             editor.commands.setBlockquote();
                         }
                     }}
-                    isActive={editor.isActive('blockquote')}
+                    isActive={toolbarState.isBlockquote}
                     title="引用"
                 >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
