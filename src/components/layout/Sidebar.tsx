@@ -174,6 +174,12 @@ const NAV_DATA = {
                     tab: 'notes',
                     icon: FileEdit,
                 },
+                {
+                    title: '目录功能测试',
+                    url: '/toc-test',
+                    tab: 'toc-test',
+                    icon: BookOpen,
+                },
             ],
         },
     ],

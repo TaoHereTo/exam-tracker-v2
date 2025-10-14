@@ -1,0 +1,27 @@
+/* TableOfContents 样式 - 按照官方示例 */
+
+.table-of-contents-expanded .is-active {
+    background-color: rgb(59 130 246 / 0.1);
+    /* blue-50 */
+    color: rgb(59 130 246);
+    /* blue-500 */
+    font-weight: 500;
+}
+
+.table-of-contents-expanded .is-scrolled-over {
+    color: rgb(107 114 128);
+    /* gray-500 */
+}
+
+/* 深色模式 */
+.dark .table-of-contents-expanded .is-active {
+    background-color: rgb(59 130 246 / 0.2);
+    /* blue-900/20 */
+    color: rgb(147 197 253);
+    /* blue-300 */
+}
+
+.dark .table-of-contents-expanded .is-scrolled-over {
+    color: rgb(156 163 175);
+    /* gray-400 */
+}

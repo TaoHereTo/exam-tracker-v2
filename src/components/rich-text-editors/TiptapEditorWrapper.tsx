@@ -15,8 +15,6 @@ import Highlight from '@tiptap/extension-highlight';
 import { Mathematics, migrateMathStrings } from '@tiptap/extension-mathematics';
 import { TaskList } from '@tiptap/extension-list';
 import { TaskItem } from '@tiptap/extension-task-item';
-import Blockquote from '@tiptap/extension-blockquote';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 
@@ -176,7 +174,23 @@ import BubbleMenuExtension from '@tiptap/extension-bubble-menu';
 import { ColorTextPopoverComponent } from '@/components/tiptap-ui/color-text-popover';
 
 import { cn } from '@/lib/utils';
-import TiptapEditorCatalog from './TiptapEditorCatalog';
+import { TableOfContents } from './TableOfContents';
+import { TableOfContents as TableOfContentsExtension, getLinearIndexes, getHierarchicalIndexes } from '@tiptap/extension-table-of-contents';
+
+// 定义Anchor类型
+interface Anchor {
+    dom: HTMLElement;
+    editor: Editor;
+    id: string;
+    isActive: boolean;
+    isScrolledOver: boolean;
+    itemIndex: number;
+    level: number;
+    node: unknown;
+    originalLevel: number;
+    pos: number;
+    textContent: string;
+}
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -282,12 +296,18 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         }, 300); // 300ms 防抖延迟
     }, [onChange]);
 
+    // 按照官方React最佳实践，在组件内部管理锚点状态
+    const [anchors, setAnchors] = useState<Anchor[]>([]);
+
     // 创建编辑器实例 - 遵循官方最佳实践，修复SSR问题
-    const editor = useEditor({
+    const editor: Editor | null = useEditor({
         extensions: [
             StarterKit.configure({
                 // 官方推荐：只禁用真正不需要的扩展
                 link: false, // 使用自定义 Link 扩展
+                heading: {
+                    levels: [1, 2, 3, 4, 5, 6], // 确保所有标题级别都启用
+                },
             }),
             Placeholder.configure({
                 placeholder,
@@ -321,16 +341,6 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             TaskList,
             TaskItem.configure({
                 nested: true,
-            }),
-            Blockquote.configure({
-                HTMLAttributes: {
-                    class: 'blockquote',
-                },
-            }),
-            HorizontalRule.configure({
-                HTMLAttributes: {
-                    class: 'my-horizontal-rule',
-                },
             }),
             Mathematics.configure({
                 inlineOptions: {
@@ -366,6 +376,35 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     },
                 },
             }),
+            // 按照官方React最佳实践，在 useEditor 内部配置 TableOfContents
+            TableOfContentsExtension.configure({
+                anchorTypes: ['heading'],
+                getIndex: getHierarchicalIndexes,
+                getId: (content) => {
+                    // 生成基于内容的ID，用于锚点定位
+                    const slug = content
+                        .toLowerCase()
+                        .trim()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/[\s_-]+/g, '-')
+                        .replace(/^-+|-+$/g, '');
+                    const id = slug || `heading-${Date.now()}`;
+                    console.log('Generated ID for content:', content, '-> ID:', id);
+                    return id;
+                },
+                scrollParent: () => {
+                    // 使用编辑器内容容器作为滚动父元素，确保只影响编辑区
+                    if (typeof document !== 'undefined') {
+                        const container = document.querySelector('.tiptap-editor-content');
+                        if (container instanceof HTMLElement) return container;
+                    }
+                    return window;
+                },
+                onUpdate: (anchors) => {
+                    // 按照官方React示例：setAnchors(anchors)
+                    setAnchors(anchors);
+                },
+            }),
             BubbleMenuExtension.configure({
                 pluginKey: 'bubbleMenu',
                 shouldShow: ({ editor, view, state, oldState, from, to }) => {
@@ -382,6 +421,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             } catch (error) {
                 console.warn('Math migration failed:', error);
             }
+
+            // 移除调试信息，避免控制台刷屏
         },
         onUpdate: ({ editor }) => {
             const html = editor.getHTML();
@@ -944,185 +985,195 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
     return (
         <EditorContext.Provider value={{ editor }}>
-            <div className={cn("tiptap-editor-with-catalog flex gap-4 flex-row-reverse", className)}>
-                {/* 目录 - 显示在左侧，可收起 */}
-                {showCatalog && (
-                    <TiptapEditorCatalog
-                        editor={editor}
-                        className={cn(
-                            "sticky top-4 order-first transition-all duration-300",
-                            catalogVisible ? "w-64 min-w-[256px]" : "w-10 min-w-[40px]"
+            <div className={cn("tiptap-editor-with-catalog", className)}>
+                {/* 胶囊型工具栏 - 粘性固定在顶部 */}
+                <div className="sticky top-4 flex justify-center mb-4" style={{ zIndex: 'var(--z-sticky)' }}>
+                    <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm backdrop-blur-sm">
+                        <Toolbar
+                            editor={editor}
+                            onOpenMathDrawer={() => {
+                                setMathLatex('');
+                                setSelectedCategory('all');
+                                setShowMathDrawer(true);
+                            }}
+                            onToggleTableOfContents={() => setCatalogVisible(!catalogVisible)}
+                            isTableOfContentsVisible={catalogVisible}
+                        />
+                    </div>
+                </div>
+
+                {/* 编辑器内容区域 - 内部左右分栏 */}
+                <div
+                    className="tiptap-editor-wrapper border border-border rounded-lg bg-background shadow-sm overflow-hidden"
+                    style={{
+                        height: customMaxHeight === 'none' ? '70vh' : customMaxHeight,
+                        minHeight: customMinHeight,
+                    }}
+                >
+                    <div className="flex h-full">
+                        {/* 左侧目录区域 - 添加动效 */}
+                        {showCatalog && (
+                            <div className={cn(
+                                "border-r border-border bg-white dark:bg-muted/20 flex-shrink-0 flex flex-col transition-all duration-300 ease-in-out overflow-hidden",
+                                catalogVisible ? "w-64 opacity-100" : "w-0 opacity-0"
+                            )}>
+                                {catalogVisible && (
+                                    <TableOfContents
+                                        editor={editor}
+                                        anchors={anchors}
+                                        className="flex-1"
+                                        isVisible={catalogVisible}
+                                        onToggle={() => setCatalogVisible(!catalogVisible)}
+                                    />
+                                )}
+                            </div>
                         )}
-                        isVisible={catalogVisible}
-                        onToggle={() => setCatalogVisible(!catalogVisible)}
-                    />
+
+                        {/* 右侧编辑器内容区域 */}
+                        <div className="flex-1 flex flex-col min-h-0">
+                            <div
+                                className="tiptap tiptap-editor-content p-4 overflow-y-auto relative flex-1 min-h-0"
+                                style={{
+                                    position: 'relative', // 确保BubbleMenu可以正确定位
+                                    scrollBehavior: 'smooth', // 添加平滑滚动
+                                    overscrollBehavior: 'contain', // 阻止滚动链传递到页面
+                                    WebkitOverflowScrolling: 'touch'
+                                }}
+                            >
+                                <EditorContent editor={editor} />
+                            </div>
+
+                            {/* 字数统计 - 合并到文本输入区域内 */}
+                            <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/30 flex-shrink-0">
+                                <WordCountConfig
+                                    wordCount={wordCount}
+                                    charCount={charCount}
+                                    selectedWordCount={selectedWordCount}
+                                    selectedCharCount={selectedCharCount}
+                                    includePunctuation={includePunctuation}
+                                    setIncludePunctuation={setIncludePunctuation}
+                                    showWordCountOptions={showWordCountOptions}
+                                    setShowWordCountOptions={setShowWordCountOptions}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* React版本的BubbleMenu */}
+                {editor && (
+                    <BubbleMenu
+                        editor={editor}
+                        pluginKey="bubbleMenu"
+                        className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg transition-opacity duration-200"
+                    >
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleBold().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                >
+                                    <Bold className={`h-4 w-4 ${editor.isActive('bold') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} strokeWidth={2.5} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>加粗</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleItalic().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                >
+                                    <Italic className={`h-4 w-4 ${editor.isActive('italic') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>斜体</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleUnderline().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                >
+                                    <UnderlineIcon className={`h-4 w-4 ${editor.isActive('underline') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>下划线</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().toggleStrike().run();
+                                    }}
+                                    className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
+                                >
+                                    <Strikethrough className={`h-4 w-4 ${editor.isActive('strike') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>删除线</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <ColorTextPopoverComponent
+                            editor={editor}
+                            hideWhenUnavailable={false}
+                        />
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        editor.chain().focus().clearNodes().unsetAllMarks().run();
+                                    }}
+                                    className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent"
+                                >
+                                    <Eraser className="h-4 w-4 toolbar-button-icon" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>清除格式</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </BubbleMenu>
                 )}
 
-                <div
-                    className={cn(
-                        "tiptap-editor-container flex flex-col gap-3",
-                        showCatalog ? "flex-1" : "w-full"
-                    )}
-                >
-                    {/* 胶囊型工具栏 - 粘性固定在顶部 */}
-                    <div className="sticky top-4 flex justify-center mb-4" style={{ zIndex: 'var(--z-sticky)' }}>
-                        <div className="inline-flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-full shadow-sm backdrop-blur-sm">
-                            <Toolbar
-                                editor={editor}
-                                onOpenMathDrawer={() => {
-                                    setMathLatex('');
-                                    setSelectedCategory('all');
-                                    setShowMathDrawer(true);
-                                }}
-                            />
-                        </div>
-                    </div>
+                {/* 数学公式抽屉 */}
+                <MathDrawer
+                    editor={editor}
+                    showMathDrawer={showMathDrawer}
+                    setShowMathDrawer={setShowMathDrawer}
+                    mathType={mathType}
+                    setMathType={setMathType}
+                    mathLatex={mathLatex}
+                    setMathLatex={setMathLatex}
+                    insertInlineMath={insertInlineMath}
+                    insertBlockMath={insertBlockMath}
+                    updateMathAtPosition={updateMathAtPosition}
+                    deleteMathAtPosition={deleteMathAtPosition}
+                />
 
-                    {/* 带圆角的文本输入区域 */}
-                    <div
-                        className="tiptap-editor-wrapper border border-border rounded-lg bg-background shadow-sm overflow-hidden"
-                    >
-                        <div
-                            className="tiptap tiptap-editor-content p-4 overflow-y-auto relative rounded-t-lg"
-                            style={{
-                                minHeight: customMinHeight,
-                                maxHeight: customMaxHeight,
-                                position: 'relative', // 确保BubbleMenu可以正确定位
-                            }}
-                        >
-                            <EditorContent editor={editor} />
-                        </div>
-
-                        {/* 字数统计 - 合并到文本输入区域内 */}
-                        <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/30">
-                            <WordCountConfig
-                                wordCount={wordCount}
-                                charCount={charCount}
-                                selectedWordCount={selectedWordCount}
-                                selectedCharCount={selectedCharCount}
-                                includePunctuation={includePunctuation}
-                                setIncludePunctuation={setIncludePunctuation}
-                                showWordCountOptions={showWordCountOptions}
-                                setShowWordCountOptions={setShowWordCountOptions}
-                            />
-                        </div>
-                    </div>
-
-                    {/* React版本的BubbleMenu */}
-                    {editor && (
-                        <BubbleMenu
-                            editor={editor}
-                            pluginKey="bubbleMenu"
-                            className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg transition-opacity duration-200"
-                        >
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().toggleBold().run();
-                                        }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
-                                    >
-                                        <Bold className={`h-4 w-4 ${editor.isActive('bold') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} strokeWidth={2.5} />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>加粗</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().toggleItalic().run();
-                                        }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
-                                    >
-                                        <Italic className={`h-4 w-4 ${editor.isActive('italic') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>斜体</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().toggleUnderline().run();
-                                        }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
-                                    >
-                                        <UnderlineIcon className={`h-4 w-4 ${editor.isActive('underline') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>下划线</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().toggleStrike().run();
-                                        }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
-                                    >
-                                        <Strikethrough className={`h-4 w-4 ${editor.isActive('strike') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>删除线</p>
-                                </TooltipContent>
-                            </Tooltip>
-                            <ColorTextPopoverComponent
-                                editor={editor}
-                                hideWhenUnavailable={false}
-                            />
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            editor.chain().focus().clearNodes().unsetAllMarks().run();
-                                        }}
-                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors cursor-pointer bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent"
-                                    >
-                                        <Eraser className="h-4 w-4 toolbar-button-icon" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    <p>清除格式</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </BubbleMenu>
-                    )}
-
-                    {/* 数学公式抽屉 */}
-                    <MathDrawer
-                        editor={editor}
-                        showMathDrawer={showMathDrawer}
-                        setShowMathDrawer={setShowMathDrawer}
-                        mathType={mathType}
-                        setMathType={setMathType}
-                        mathLatex={mathLatex}
-                        setMathLatex={setMathLatex}
-                        insertInlineMath={insertInlineMath}
-                        insertBlockMath={insertBlockMath}
-                        updateMathAtPosition={updateMathAtPosition}
-                        deleteMathAtPosition={deleteMathAtPosition}
-                    />
-
-                </div>
             </div>
         </EditorContext.Provider>
     );

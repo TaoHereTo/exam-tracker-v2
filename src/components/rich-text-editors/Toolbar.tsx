@@ -13,7 +13,8 @@ import {
     Sigma,
     Palette,
     Eraser,
-    SeparatorHorizontal
+    SeparatorHorizontal,
+    List
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-with-animation';
 import { ColorTextPopoverComponent } from '@/components/tiptap-ui/color-text-popover';
@@ -33,11 +34,15 @@ import {
 interface ToolbarProps {
     editor: Editor | null;
     onOpenMathDrawer: () => void;
+    onToggleTableOfContents?: () => void;
+    isTableOfContentsVisible?: boolean;
 }
 
 export const Toolbar: React.FC<ToolbarProps> = ({
     editor,
-    onOpenMathDrawer
+    onOpenMathDrawer,
+    onToggleTableOfContents,
+    isTableOfContentsVisible = false
 }) => {
     if (!editor) return null;
 
@@ -95,6 +100,21 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 title="数学公式"
             >
                 <Sigma className="h-4 w-4" />
+            </ToolbarButton>
+        );
+    };
+
+    // 目录切换组件
+    const TableOfContentsToggle: React.FC = () => {
+        if (!onToggleTableOfContents) return null;
+
+        return (
+            <ToolbarButton
+                onClick={onToggleTableOfContents}
+                isActive={isTableOfContentsVisible}
+                title={isTableOfContentsVisible ? "隐藏目录" : "显示目录"}
+            >
+                <List className="h-4 w-4" />
             </ToolbarButton>
         );
     };
@@ -238,6 +258,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 </ToolbarButton>
 
                 <MathSelector />
+                <TableOfContentsToggle />
                 <ListDropdownMenu
                     editor={editor}
                     types={['bulletList', 'orderedList', 'taskList']}
