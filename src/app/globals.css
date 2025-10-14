@@ -987,6 +987,92 @@ html:not(:has(::view-transition-group(root))) * {
   /* 暂时禁用交互 */
 }
 
+/* 确保展开动画不被主题切换影响 */
+.expandable-cell-content {
+  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out !important;
+}
+
+/* 在主题切换期间保持展开动画 */
+::view-transition-group(root) .expandable-cell-content {
+  transition: max-height 300ms ease-in-out, opacity 200ms ease-in-out !important;
+}
+
+/* 隐藏滚动条但保持滚动功能 */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* 统一的工具栏按钮颜色 */
+.toolbar-button-icon {
+  color: #000000;
+  /* 纯黑色 */
+  transition: color 0.2s ease;
+}
+
+.dark .toolbar-button-icon {
+  color: #ffffff;
+  /* 纯白色 */
+}
+
+.toolbar-button-icon:hover {
+  color: #333333;
+  /* 深灰色悬停 */
+}
+
+.dark .toolbar-button-icon:hover {
+  color: #e5e5e5;
+  /* 浅灰色悬停 */
+}
+
+.toolbar-button-icon.active {
+  color: #8b5cf6;
+  /* 紫色激活状态 */
+}
+
+.dark .toolbar-button-icon.active {
+  color: #a78bfa;
+  /* 浅紫色激活状态 */
+}
+
+/* 修复下拉菜单按钮的图标颜色 */
+.tiptap-button .tiptap-button-icon {
+  color: #000000 !important;
+  /* 纯黑色 */
+}
+
+.dark .tiptap-button .tiptap-button-icon {
+  color: #ffffff !important;
+  /* 纯白色 */
+}
+
+.tiptap-button:hover .tiptap-button-icon {
+  color: #333333 !important;
+  /* 深灰色悬停 */
+}
+
+.dark .tiptap-button:hover .tiptap-button-icon {
+  color: #e5e5e5 !important;
+  /* 浅灰色悬停 */
+}
+
+.tiptap-button[data-active-state="on"] .tiptap-button-icon {
+  color: #8b5cf6 !important;
+  /* 紫色激活状态 */
+}
+
+.dark .tiptap-button[data-active-state="on"] .tiptap-button-icon {
+  color: #a78bfa !important;
+  /* 浅紫色激活状态 */
+}
+
 ::view-transition-group(root) .knowledge-editor-textarea {
   will-change: auto;
   /* 移除will-change以减少合成层 */

@@ -12,7 +12,8 @@ import {
     ALargeSmall,
     Sigma,
     Palette,
-    Eraser
+    Eraser,
+    SeparatorHorizontal
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-with-animation';
 import { ColorTextPopoverComponent } from '@/components/tiptap-ui/color-text-popover';
@@ -56,8 +57,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         onClick={onClick}
                         disabled={disabled}
                         className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-lg flex items-center justify-center transition-colors ${isActive
-                            ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400'
-                            : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'
+                            ? 'bg-[#F3F3F4] dark:bg-accent'
+                            : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'
                             } ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         style={{
                             border: 'none',
@@ -66,7 +67,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                             boxSizing: 'border-box'
                         }}
                     >
-                        {children}
+                        <div className={isActive ? 'toolbar-button-icon active' : 'toolbar-button-icon'}>
+                            {children}
+                        </div>
                     </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -226,6 +229,14 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                         <path d="M8 18C8 17.4477 8.44772 17 9 17H16C16.5523 17 17 17.4477 17 18C17 18.5523 16.5523 19 16 19H9C8.44772 19 8 18.5523 8 18Z" fill="currentColor" />
                     </svg>
                 </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                    title="分割线"
+                >
+                    <SeparatorHorizontal className="h-4 w-4" />
+                </ToolbarButton>
+
                 <MathSelector />
                 <ListDropdownMenu
                     editor={editor}

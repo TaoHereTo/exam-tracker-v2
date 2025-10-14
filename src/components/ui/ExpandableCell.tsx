@@ -111,9 +111,10 @@ export const ExpandableCell: React.FC<ExpandableCellProps> = ({
             {/* 实际显示的内容 */}
             <div
                 ref={contentRef}
-                className="text-sm leading-relaxed overflow-hidden transition-all duration-500 ease-in-out"
+                className="expandable-cell-content text-sm leading-relaxed overflow-hidden"
                 style={{
                     maxHeight: isExpanded ? `${contentHeight}px` : `${collapsedHeight}px`,
+                    transition: 'max-height 300ms ease-in-out, opacity 200ms ease-in-out',
                 }}
             >
                 {content}

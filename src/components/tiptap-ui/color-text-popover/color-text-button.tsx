@@ -55,9 +55,9 @@ export function ColorTextButton({
                             }}
                         >
                             <Icon
-                                className="h-4 w-4"
+                                className="h-4 w-4 toolbar-button-icon"
                                 style={{
-                                    color: activeTextStyle.color || 'currentColor',
+                                    color: activeTextStyle.color || 'inherit',
                                     backgroundColor: activeHighlight.color || 'transparent',
                                 }}
                             />

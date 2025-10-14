@@ -16,6 +16,7 @@ import { Mathematics } from '@tiptap/extension-mathematics';
 import { TaskList } from '@tiptap/extension-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import Blockquote from '@tiptap/extension-blockquote';
+import HorizontalRule from '@tiptap/extension-horizontal-rule';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 
@@ -68,6 +69,18 @@ const mathStyles = `
 
 .katex-display {
     margin: 1em 0;
+}
+
+/* 分割线样式 */
+.my-horizontal-rule {
+    border: none;
+    border-top: 2px solid #e5e7eb;
+    margin: 1.5em 0;
+    width: 100%;
+}
+
+.dark .my-horizontal-rule {
+    border-top-color: #374151;
 }
 `;
 
@@ -230,6 +243,11 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             Blockquote.configure({
                 HTMLAttributes: {
                     class: 'blockquote',
+                },
+            }),
+            HorizontalRule.configure({
+                HTMLAttributes: {
+                    class: 'my-horizontal-rule',
                 },
             }),
             Mathematics.configure({
@@ -868,9 +886,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleBold().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('bold') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
-                                        <Bold className="h-4 w-4" strokeWidth={2.5} />
+                                        <Bold className={`h-4 w-4 ${editor.isActive('bold') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} strokeWidth={2.5} />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -885,9 +903,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleItalic().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('italic') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
-                                        <Italic className="h-4 w-4" />
+                                        <Italic className={`h-4 w-4 ${editor.isActive('italic') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -902,9 +920,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleUnderline().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('underline') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
-                                        <UnderlineIcon className="h-4 w-4" />
+                                        <UnderlineIcon className={`h-4 w-4 ${editor.isActive('underline') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -919,9 +937,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().toggleStrike().run();
                                         }}
-                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent text-purple-600 dark:text-purple-400' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground'}`}
+                                        className={`h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors ${editor.isActive('strike') ? 'bg-[#F3F3F4] dark:bg-accent' : 'bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent'}`}
                                     >
-                                        <Strikethrough className="h-4 w-4" />
+                                        <Strikethrough className={`h-4 w-4 ${editor.isActive('strike') ? 'toolbar-button-icon active' : 'toolbar-button-icon'}`} />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>
@@ -940,9 +958,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                                             e.stopPropagation();
                                             editor.chain().focus().clearNodes().unsetAllMarks().run();
                                         }}
-                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent text-foreground"
+                                        className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none rounded-lg flex items-center justify-center transition-colors bg-transparent hover:bg-[#F3F3F4] dark:hover:bg-accent active:bg-[#F3F3F4] dark:active:bg-accent"
                                     >
-                                        <Eraser className="h-4 w-4" />
+                                        <Eraser className="h-4 w-4 toolbar-button-icon" />
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent>

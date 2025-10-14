@@ -115,7 +115,7 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
 
     return (
         <Drawer open={showMathDrawer} onOpenChange={setShowMathDrawer}>
-            <DrawerContent className="max-h-[85vh]">
+            <DrawerContent className="h-[90vh] min-h-[80vh] max-h-[95vh]">
                 <DrawerHeader className="relative">
                     <DrawerTitle className="sr-only">数学公式</DrawerTitle>
                     <button
@@ -126,7 +126,7 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
                     </button>
                 </DrawerHeader>
 
-                <div className="px-4 space-y-4 flex-1 overflow-y-auto">
+                <div className="px-4 space-y-4 flex-1 overflow-y-auto min-h-[60vh]">
                     <div className="space-y-2">
                         <RadioGroup
                             value={mathType}
@@ -182,53 +182,51 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
                         </div>
                     </div>
 
-                    <div className="space-y-2">
-                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2 max-h-60 overflow-y-auto">
-                            {filteredTemplates.map((template, index) => {
-                                // 为每个模板渲染预览
-                                let templatePreview = '';
-                                try {
-                                    templatePreview = katex.renderToString(template.latex, {
-                                        throwOnError: false,
-                                        displayMode: false,
-                                        macros: {
-                                            '\\R': '\\mathbb{R}',
-                                            '\\N': '\\mathbb{N}',
-                                            '\\Z': '\\mathbb{Z}',
-                                            '\\Q': '\\mathbb{Q}',
-                                            '\\C': '\\mathbb{C}',
-                                        },
-                                    });
-                                } catch (error) {
-                                    templatePreview = '<span style="color: red;">渲染错误</span>';
-                                }
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                        {filteredTemplates.map((template, index) => {
+                            // 为每个模板渲染预览
+                            let templatePreview = '';
+                            try {
+                                templatePreview = katex.renderToString(template.latex, {
+                                    throwOnError: false,
+                                    displayMode: false,
+                                    macros: {
+                                        '\\R': '\\mathbb{R}',
+                                        '\\N': '\\mathbb{N}',
+                                        '\\Z': '\\mathbb{Z}',
+                                        '\\Q': '\\mathbb{Q}',
+                                        '\\C': '\\mathbb{C}',
+                                    },
+                                });
+                            } catch (error) {
+                                templatePreview = '<span style="color: red;">渲染错误</span>';
+                            }
 
-                                return (
-                                    <button
-                                        key={index}
-                                        onClick={() => handleTemplateClick(template.latex)}
-                                        className="text-left p-2 rounded-lg hover:bg-accent transition-colors border border-border bg-card"
-                                        title={template.description}
-                                    >
-                                        <div className="space-y-2">
-                                            <div className="flex items-center justify-between">
-                                                <div className="font-semibold text-sm truncate">{template.name}</div>
-                                                <Badge variant="secondary" className="text-xs shrink-0">
-                                                    {mathCategories.find(cat => cat.id === template.category)?.name}
-                                                </Badge>
-                                            </div>
-                                            <div className="text-xs text-muted-foreground font-mono break-all">
-                                                {template.latex}
-                                            </div>
-                                            <div
-                                                className="text-sm text-center"
-                                                dangerouslySetInnerHTML={{ __html: templatePreview }}
-                                            />
+                            return (
+                                <button
+                                    key={index}
+                                    onClick={() => handleTemplateClick(template.latex)}
+                                    className="text-left p-2 rounded-lg hover:bg-accent transition-colors border border-border bg-card"
+                                    title={template.description}
+                                >
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <div className="font-semibold text-sm truncate">{template.name}</div>
+                                            <Badge variant="secondary" className="text-xs shrink-0">
+                                                {mathCategories.find(cat => cat.id === template.category)?.name}
+                                            </Badge>
                                         </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
+                                        <div className="text-xs text-muted-foreground font-mono break-all">
+                                            {template.latex}
+                                        </div>
+                                        <div
+                                            className="text-sm text-center"
+                                            dangerouslySetInnerHTML={{ __html: templatePreview }}
+                                        />
+                                    </div>
+                                </button>
+                            );
+                        })}
                     </div>
 
                 </div>
