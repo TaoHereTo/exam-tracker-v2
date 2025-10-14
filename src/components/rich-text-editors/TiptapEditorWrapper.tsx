@@ -12,7 +12,7 @@ import Color from '@tiptap/extension-color';
 import { TextStyle, FontSize } from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
 import Highlight from '@tiptap/extension-highlight';
-import { Mathematics } from '@tiptap/extension-mathematics';
+import { Mathematics, migrateMathStrings } from '@tiptap/extension-mathematics';
 import { TaskList } from '@tiptap/extension-list';
 import { TaskItem } from '@tiptap/extension-task-item';
 import Blockquote from '@tiptap/extension-blockquote';
@@ -31,26 +31,38 @@ const mathStyles = `
     border: 1px solid rgba(0, 0, 0, 0.1);
     cursor: pointer;
     transition: all 0.2s ease;
+    position: relative;
 }
 
 .tiptap-mathematics-render:hover {
     background-color: rgba(0, 0, 0, 0.1);
     border-color: rgba(0, 0, 0, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tiptap-mathematics-render--editable {
     background-color: rgba(59, 130, 246, 0.1);
     border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .tiptap-mathematics-render[data-type="block-math"] {
     display: block;
     margin: 16px 0;
-    padding: 12px;
+    padding: 16px;
     text-align: center;
     background-color: rgba(0, 0, 0, 0.02);
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
+    position: relative;
+}
+
+.tiptap-mathematics-render[data-type="block-math"]:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tiptap-mathematics-render[data-type="inline-math"] {
@@ -60,15 +72,85 @@ const mathStyles = `
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.1);
+    vertical-align: baseline;
+}
+
+.tiptap-mathematics-render[data-type="inline-math"]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+/* 暗色主题下的数学公式样式 */
+.dark .tiptap-mathematics-render {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .tiptap-mathematics-render:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .tiptap-mathematics-render--editable {
+    background-color: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.dark .tiptap-mathematics-render[data-type="block-math"] {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .tiptap-mathematics-render[data-type="block-math"]:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* KaTeX 样式优化 */
 .katex {
     font-size: 1em;
+    line-height: 1.2;
 }
 
 .katex-display {
     margin: 1em 0;
+    text-align: center;
+}
+
+/* 确保数学符号正确显示 */
+.katex {
+    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+}
+
+/* 确保不等于符号正确显示 */
+.katex .mrel {
+    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+}
+
+.katex .mord {
+    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+}
+
+/* 简化不等于符号的显示 - 让 KaTeX 使用默认渲染 */
+.katex .mrel {
+    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+}
+
+/* 数学公式错误样式 */
+.tiptap-mathematics-render .katex-error {
+    color: #dc2626;
+    background-color: rgba(220, 38, 38, 0.1);
+    border: 1px dashed #dc2626;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.dark .tiptap-mathematics-render .katex-error {
+    color: #fca5a5;
+    background-color: rgba(220, 38, 38, 0.2);
+    border-color: #fca5a5;
 }
 
 /* 分割线样式 */
@@ -268,13 +350,19 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     },
                 },
                 katexOptions: {
-                    throwOnError: false, // 不抛出错误，显示错误信息
+                    throwOnError: false, // 不抛出错误，显示渲染结果
+                    strict: false, // 允许更宽松的解析
+                    trust: true, // 信任输入内容
                     macros: {
                         '\\R': '\\mathbb{R}', // 实数集
                         '\\N': '\\mathbb{N}', // 自然数集
                         '\\Z': '\\mathbb{Z}', // 整数集
                         '\\Q': '\\mathbb{Q}', // 有理数集
                         '\\C': '\\mathbb{C}', // 复数集
+                        '\\P': '\\mathbb{P}', // 素数集
+                        '\\E': '\\mathbb{E}', // 期望值
+                        '\\Var': '\\text{Var}', // 方差
+                        '\\Cov': '\\text{Cov}', // 协方差
                     },
                 },
             }),
@@ -287,6 +375,14 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             }),
         ],
         content,
+        onCreate: ({ editor: currentEditor }) => {
+            // 迁移现有的数学字符串到数学节点
+            try {
+                migrateMathStrings(currentEditor);
+            } catch (error) {
+                console.warn('Math migration failed:', error);
+            }
+        },
         onUpdate: ({ editor }) => {
             const html = editor.getHTML();
             const text = editor.getText();
@@ -343,6 +439,47 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             }
         }
     }, [editor]);
+
+    // 数学公式命令辅助函数
+    const insertInlineMath = useCallback((latex: string) => {
+        safeEditorCommand(() => {
+            if (editor) {
+                editor.commands.insertInlineMath({ latex });
+            }
+        });
+    }, [editor, safeEditorCommand]);
+
+    const insertBlockMath = useCallback((latex: string) => {
+        safeEditorCommand(() => {
+            if (editor) {
+                editor.commands.insertBlockMath({ latex });
+            }
+        });
+    }, [editor, safeEditorCommand]);
+
+    const updateMathAtPosition = useCallback((latex: string, type: 'inline' | 'block') => {
+        safeEditorCommand(() => {
+            if (editor) {
+                if (type === 'inline') {
+                    editor.commands.updateInlineMath({ latex });
+                } else {
+                    editor.commands.updateBlockMath({ latex });
+                }
+            }
+        });
+    }, [editor, safeEditorCommand]);
+
+    const deleteMathAtPosition = useCallback((type: 'inline' | 'block') => {
+        safeEditorCommand(() => {
+            if (editor) {
+                if (type === 'inline') {
+                    editor.commands.deleteInlineMath();
+                } else {
+                    editor.commands.deleteBlockMath();
+                }
+            }
+        });
+    }, [editor, safeEditorCommand]);
 
 
     // 确保编辑器在组件挂载后获得焦点
@@ -979,6 +1116,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         setMathType={setMathType}
                         mathLatex={mathLatex}
                         setMathLatex={setMathLatex}
+                        insertInlineMath={insertInlineMath}
+                        insertBlockMath={insertBlockMath}
+                        updateMathAtPosition={updateMathAtPosition}
+                        deleteMathAtPosition={deleteMathAtPosition}
                     />
 
                 </div>

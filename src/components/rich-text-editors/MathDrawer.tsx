@@ -19,6 +19,10 @@ interface MathDrawerProps {
     setMathType: (type: 'inline' | 'block') => void;
     mathLatex: string;
     setMathLatex: (latex: string) => void;
+    insertInlineMath?: (latex: string) => void;
+    insertBlockMath?: (latex: string) => void;
+    updateMathAtPosition?: (latex: string, type: 'inline' | 'block') => void;
+    deleteMathAtPosition?: (type: 'inline' | 'block') => void;
 }
 
 // 数学公式分类
@@ -29,6 +33,8 @@ const mathCategories = [
     { id: 'greek', name: '希腊字母' },
     { id: 'sets', name: '集合' },
     { id: 'calculus', name: '微积分' },
+    { id: 'algebra', name: '代数' },
+    { id: 'geometry', name: '几何' },
 ];
 
 // 常用数学公式模板（按分类组织）
@@ -42,7 +48,7 @@ const mathTemplates = [
     { name: '上下标', latex: 'x_1^2', description: 'x下标1上标2', category: 'basic' },
 
     // 符号
-    { name: '不等于', latex: '\\neq', description: '不等于', category: 'symbols' },
+    { name: '不等于', latex: '\\ne', description: '不等于', category: 'symbols' },
     { name: '小于等于', latex: '\\leq', description: '小于等于', category: 'symbols' },
     { name: '大于等于', latex: '\\geq', description: '大于等于', category: 'symbols' },
     { name: '约等于', latex: '\\approx', description: '约等于', category: 'symbols' },
@@ -76,6 +82,30 @@ const mathTemplates = [
     { name: '极限', latex: '\\lim_{x \\to \\infty} f(x)', description: '极限', category: 'calculus' },
     { name: '导数', latex: '\\frac{d}{dx}f(x)', description: '导数', category: 'calculus' },
     { name: '偏导数', latex: '\\frac{\\partial}{\\partial x}f(x,y)', description: '偏导数', category: 'calculus' },
+    { name: '二重积分', latex: '\\iint_D f(x,y) dxdy', description: '二重积分', category: 'calculus' },
+    { name: '三重积分', latex: '\\iiint_V f(x,y,z) dxdydz', description: '三重积分', category: 'calculus' },
+    { name: '曲线积分', latex: '\\oint_C f(x,y) ds', description: '曲线积分', category: 'calculus' },
+    { name: '梯度', latex: '\\nabla f', description: '梯度算子', category: 'calculus' },
+    { name: '散度', latex: '\\nabla \\cdot \\vec{F}', description: '散度', category: 'calculus' },
+    { name: '旋度', latex: '\\nabla \\times \\vec{F}', description: '旋度', category: 'calculus' },
+
+    // 代数
+    { name: '二次公式', latex: 'x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}', description: '二次方程求根公式', category: 'algebra' },
+    { name: '二项式定理', latex: '(a+b)^n = \\sum_{k=0}^{n} \\binom{n}{k} a^{n-k}b^k', description: '二项式定理', category: 'algebra' },
+    { name: '组合数', latex: '\\binom{n}{k} = \\frac{n!}{k!(n-k)!}', description: '组合数公式', category: 'algebra' },
+    { name: '排列数', latex: 'P(n,k) = \\frac{n!}{(n-k)!}', description: '排列数公式', category: 'algebra' },
+    { name: '对数', latex: '\\log_a b = \\frac{\\ln b}{\\ln a}', description: '换底公式', category: 'algebra' },
+    { name: '指数', latex: 'e^x = \\sum_{n=0}^{\\infty} \\frac{x^n}{n!}', description: '指数函数展开', category: 'algebra' },
+
+    // 几何
+    { name: '勾股定理', latex: 'a^2 + b^2 = c^2', description: '勾股定理', category: 'geometry' },
+    { name: '圆面积', latex: 'A = \\pi r^2', description: '圆面积公式', category: 'geometry' },
+    { name: '圆周长', latex: 'C = 2\\pi r', description: '圆周长公式', category: 'geometry' },
+    { name: '球体积', latex: 'V = \\frac{4}{3}\\pi r^3', description: '球体积公式', category: 'geometry' },
+    { name: '球表面积', latex: 'S = 4\\pi r^2', description: '球表面积公式', category: 'geometry' },
+    { name: '向量长度', latex: '|\\vec{v}| = \\sqrt{v_x^2 + v_y^2 + v_z^2}', description: '向量模长', category: 'geometry' },
+    { name: '点积', latex: '\\vec{a} \\cdot \\vec{b} = |\\vec{a}||\\vec{b}|\\cos\\theta', description: '向量点积', category: 'geometry' },
+    { name: '叉积', latex: '\\vec{a} \\times \\vec{b} = |\\vec{a}||\\vec{b}|\\sin\\theta \\hat{n}', description: '向量叉积', category: 'geometry' },
 ];
 
 export const MathDrawer: React.FC<MathDrawerProps> = ({
@@ -85,7 +115,11 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
     mathType,
     setMathType,
     mathLatex,
-    setMathLatex
+    setMathLatex,
+    insertInlineMath,
+    insertBlockMath,
+    updateMathAtPosition,
+    deleteMathAtPosition
 }) => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -101,12 +135,22 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
 
     // 插入公式到编辑器
     const handleInsertMath = () => {
-        if (!editor || !mathLatex.trim()) return;
+        if (!mathLatex.trim()) return;
 
-        if (mathType === 'inline') {
-            editor.chain().focus().insertInlineMath({ latex: mathLatex }).run();
-        } else {
-            editor.chain().focus().insertBlockMath({ latex: mathLatex }).run();
+        // 使用新的命令函数，如果可用的话
+        if (insertInlineMath && insertBlockMath) {
+            if (mathType === 'inline') {
+                insertInlineMath(mathLatex);
+            } else {
+                insertBlockMath(mathLatex);
+            }
+        } else if (editor) {
+            // 回退到原始方法
+            if (mathType === 'inline') {
+                editor.chain().focus().insertInlineMath({ latex: mathLatex }).run();
+            } else {
+                editor.chain().focus().insertBlockMath({ latex: mathLatex }).run();
+            }
         }
 
         setMathLatex('');
@@ -173,7 +217,7 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
                                 <Badge
                                     key={category.id}
                                     variant={selectedCategory === category.id ? "default" : "outline"}
-                                    className="cursor-pointer hover:bg-accent transition-colors"
+                                    className="cursor-pointer"
                                     onClick={() => setSelectedCategory(category.id)}
                                 >
                                     {category.name}
@@ -189,13 +233,18 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
                             try {
                                 templatePreview = katex.renderToString(template.latex, {
                                     throwOnError: false,
-                                    displayMode: false,
+                                    strict: false,
+                                    trust: true,
                                     macros: {
                                         '\\R': '\\mathbb{R}',
                                         '\\N': '\\mathbb{N}',
                                         '\\Z': '\\mathbb{Z}',
                                         '\\Q': '\\mathbb{Q}',
                                         '\\C': '\\mathbb{C}',
+                                        '\\P': '\\mathbb{P}',
+                                        '\\E': '\\mathbb{E}',
+                                        '\\Var': '\\text{Var}',
+                                        '\\Cov': '\\text{Cov}',
                                     },
                                 });
                             } catch (error) {
