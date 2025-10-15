@@ -160,6 +160,95 @@ const mathStyles = `
 .dark .my-horizontal-rule {
     border-top-color: #374151;
 }
+
+/* 多级编号列表样式 */
+.tiptap ol {
+    counter-reset: item;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.tiptap ol > li {
+    display: block;
+    counter-increment: item;
+    margin-bottom: 0.5em;
+}
+
+.tiptap ol > li:before {
+    content: counter(item) ". ";
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+/* 二级编号 - 使用嵌套计数器实现1.1格式 */
+.tiptap ol ol {
+    counter-reset: subitem;
+    margin-left: 1.5em;
+    margin-top: 0.5em;
+}
+
+.tiptap ol ol > li {
+    counter-increment: subitem;
+}
+
+.tiptap ol ol > li:before {
+    content: counter(item) "." counter(subitem) " ";
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+/* 三级编号 - 使用嵌套计数器实现1.1.1格式 */
+.tiptap ol ol ol {
+    counter-reset: subsubitem;
+    margin-left: 1.5em;
+    margin-top: 0.5em;
+}
+
+.tiptap ol ol ol > li {
+    counter-increment: subsubitem;
+}
+
+.tiptap ol ol ol > li:before {
+    content: counter(item) "." counter(subitem) "." counter(subsubitem) " ";
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+/* 四级编号 - 使用嵌套计数器实现1.1.1.1格式 */
+.tiptap ol ol ol ol {
+    counter-reset: subsubsubitem;
+    margin-left: 1.5em;
+    margin-top: 0.5em;
+}
+
+.tiptap ol ol ol ol > li {
+    counter-increment: subsubsubitem;
+}
+
+.tiptap ol ol ol ol > li:before {
+    content: counter(item) "." counter(subitem) "." counter(subsubitem) "." counter(subsubsubitem) " ";
+    font-weight: bold;
+    margin-right: 0.5em;
+}
+
+/* 确保列表项内容正确显示 */
+.tiptap ol li {
+    list-style: none;
+    position: relative;
+}
+
+.tiptap ol li p {
+    margin: 0;
+    display: inline;
+}
+
+/* 暗色主题下的列表样式 */
+.dark .tiptap ol > li:before,
+.dark .tiptap ol ol > li:before,
+.dark .tiptap ol ol ol > li:before,
+.dark .tiptap ol ol ol ol > li:before {
+    color: #e5e7eb;
+}
 `;
 
 // 注入样式

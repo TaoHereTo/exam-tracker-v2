@@ -14,7 +14,9 @@ import {
     Palette,
     Eraser,
     SeparatorHorizontal,
-    ListTree
+    ListTree,
+    Indent,
+    Outdent
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-with-animation';
 import { ColorTextPopoverComponent } from '@/components/tiptap-ui/color-text-popover';
@@ -57,7 +59,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     isItalic: false,
                     isUnderline: false,
                     isStrike: false,
-                    isBlockquote: false
+                    isBlockquote: false,
+                    canIndent: false,
+                    canOutdent: false
                 };
             }
             return {
@@ -67,7 +71,9 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 isItalic: editor.isActive('italic'),
                 isUnderline: editor.isActive('underline'),
                 isStrike: editor.isActive('strike'),
-                isBlockquote: editor.isActive('blockquote')
+                isBlockquote: editor.isActive('blockquote'),
+                canIndent: editor.can().sinkListItem('listItem'),
+                canOutdent: editor.can().liftListItem('listItem')
             };
         }
     });
@@ -293,6 +299,23 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                     portal={true}
                     onOpenChange={() => { }}
                 />
+
+                <ToolbarButton
+                    onClick={() => editor.chain().focus().sinkListItem('listItem').run()}
+                    disabled={!toolbarState.canIndent}
+                    title="增加缩进"
+                >
+                    <Indent className="h-4 w-4" />
+                </ToolbarButton>
+
+                <ToolbarButton
+                    onClick={() => editor.chain().focus().liftListItem('listItem').run()}
+                    disabled={!toolbarState.canOutdent}
+                    title="减少缩进"
+                >
+                    <Outdent className="h-4 w-4" />
+                </ToolbarButton>
+
                 <TextAlignDropdownMenu
                     editor={editor}
                     alignments={['left', 'center', 'right', 'justify']}
