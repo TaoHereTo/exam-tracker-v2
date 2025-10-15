@@ -795,13 +795,13 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 }
                 setShowForm(open);
             }}>
-                <DialogContent className="w-11/12 max-w-md sm:max-w-lg h-[73vh] overflow-y-auto">
+                <DialogContent className="w-11/12 max-w-md sm:max-w-lg max-h-[85vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
                             {editId ? <MixedText text="编辑倒计时" /> : <MixedText text="添加倒计时" />}
                         </DialogTitle>
                     </DialogHeader>
-                    <form onSubmit={handleSubmit} className="flex flex-col h-full space-y-8">
+                    <form onSubmit={handleSubmit} className="flex flex-col space-y-6">
                         <div className="space-y-2">
                             <FormField label={<MixedText text="倒计时名称" />} htmlFor="name" required>
                                 <Input

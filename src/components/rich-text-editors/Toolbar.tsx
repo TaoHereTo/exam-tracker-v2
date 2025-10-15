@@ -186,7 +186,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
 
             <Separator orientation="vertical" />
 
-            {/* 第二组：标题、字体和字号 */}
+            {/* 第二组：标题、字体、字号和对齐方式 */}
             <div className="flex items-center gap-1">
                 <HeadingDropdownMenu
                     editor={editor}
@@ -212,6 +212,13 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 <FontSizeDropdownMenu
                     editor={editor}
                     sizes={['12px', '14px', '16px', '18px', '20px', '24px', '28px', '32px', '36px']}
+                    hideWhenUnavailable={false}
+                    portal={true}
+                    onOpenChange={() => { }}
+                />
+                <TextAlignDropdownMenu
+                    editor={editor}
+                    alignments={['left', 'center', 'right', 'justify']}
                     hideWhenUnavailable={false}
                     portal={true}
                     onOpenChange={() => { }}
@@ -315,14 +322,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 >
                     <Outdent className="h-4 w-4" />
                 </ToolbarButton>
-
-                <TextAlignDropdownMenu
-                    editor={editor}
-                    alignments={['left', 'center', 'right', 'justify']}
-                    hideWhenUnavailable={false}
-                    portal={true}
-                    onOpenChange={() => { }}
-                />
             </div>
         </div>
     );

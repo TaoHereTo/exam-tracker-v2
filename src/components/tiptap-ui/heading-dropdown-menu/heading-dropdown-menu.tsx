@@ -102,6 +102,19 @@ export const HeadingDropdownMenu = React.forwardRef<
 
         <DropdownMenuContent align="start" portal={portal} className="min-w-[6rem] w-auto">
           <ButtonGroup>
+            {/* 正文选项 */}
+            <DropdownMenuItem 
+              key="paragraph" 
+              onClick={() => {
+                if (editor) {
+                  editor.chain().focus().setParagraph().run();
+                }
+              }}
+              className="cursor-pointer"
+            >
+              正文
+            </DropdownMenuItem>
+            {/* 标题选项 */}
             {levels.map((level) => (
               <DropdownMenuItem key={`heading-${level}`} asChild>
                 <HeadingButton

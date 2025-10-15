@@ -777,7 +777,7 @@ export function MainApp() {
                                             <AnimatedThemeToggler className="w-8 h-8" />
                                         </div>
 
-                                        <div className="flex flex-1 flex-col gap-layout-md p-page pt-6 pb-16 overflow-y-auto">
+                                        <div className="flex flex-1 flex-col gap-layout-md p-page pt-6 pb-16 min-h-0">
                                             {activeTab === 'overview' && (
                                                 <Suspense fallback={
                                                     <div className="flex items-center justify-center min-h-[60vh]">

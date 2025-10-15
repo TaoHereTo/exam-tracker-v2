@@ -616,7 +616,7 @@ export const OverviewView = function OverviewView({ records }: OverviewViewProps
                                 ))}
                             </TabsList>
                         </div>
-                        <TabsContents className="py-4 sm:py-6 px-2">
+                        <TabsContents className="py-4 sm:py-6 px-2 relative">
                             {moduleData.map((module) => (
                                 <TabsContent key={module.module} value={module.module} className="outline-none flex flex-col gap-6">
                                     <div className="w-full max-w-4xl mx-auto pb-4 space-y-4 sm:space-y-6">

@@ -208,11 +208,9 @@ export function TabsContent({ value, className, children, staticLayout = false }
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className={cn('mt-2', className)}
             style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                pointerEvents: isActive ? 'auto' : 'none'
+                position: 'relative',
+                pointerEvents: isActive ? 'auto' : 'none',
+                display: isActive ? 'block' : 'none'
             }}
         >
             {children}
