@@ -23,6 +23,7 @@ interface MathDrawerProps {
     insertBlockMath?: (latex: string) => void;
     updateMathAtPosition?: (latex: string, type: 'inline' | 'block') => void;
     deleteMathAtPosition?: (type: 'inline' | 'block') => void;
+    isEditing?: boolean; // 是否在编辑模式
 }
 
 // 数学公式分类
@@ -119,7 +120,8 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
     insertInlineMath,
     insertBlockMath,
     updateMathAtPosition,
-    deleteMathAtPosition
+    deleteMathAtPosition,
+    isEditing = false
 }) => {
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -133,12 +135,16 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
         setMathLatex(template);
     };
 
-    // 插入公式到编辑器
+    // 插入或更新公式到编辑器
     const handleInsertMath = () => {
         if (!mathLatex.trim()) return;
 
-        // 使用新的命令函数，如果可用的话
-        if (insertInlineMath && insertBlockMath) {
+        // 根据编辑模式决定使用更新还是插入
+        if (isEditing && updateMathAtPosition) {
+            // 编辑模式：更新现有数学公式
+            updateMathAtPosition(mathLatex, mathType);
+        } else if (insertInlineMath && insertBlockMath) {
+            // 插入模式：插入新的数学公式
             if (mathType === 'inline') {
                 insertInlineMath(mathLatex);
             } else {
@@ -155,6 +161,7 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
 
         setMathLatex('');
         setShowMathDrawer(false);
+        // 重置编辑状态在父组件中处理
     };
 
     return (
@@ -286,7 +293,7 @@ export const MathDrawer: React.FC<MathDrawerProps> = ({
                         disabled={!mathLatex.trim()}
                         className="w-full rounded-full bg-[#0d9488] hover:bg-[#0d9488]/90 text-white"
                     >
-                        插入公式
+                        {isEditing ? '更新公式' : '插入公式'}
                     </Button>
                 </DrawerFooter>
             </DrawerContent>

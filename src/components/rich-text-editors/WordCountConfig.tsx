@@ -29,11 +29,11 @@ export const WordCountConfig: React.FC<WordCountConfigProps> = ({
     return (
         <Popover open={showWordCountOptions} onOpenChange={setShowWordCountOptions}>
             <PopoverTrigger asChild>
-                <div className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 rounded px-2 py-1 transition-colors">
+                <div className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 rounded px-2 py-0.5 transition-colors">
                     {selectedWordCount > 0 ? (
                         <>
-                            <span>选中字数: {selectedWordCount}</span>
-                            <span>选中字符: {selectedCharCount}</span>
+                            <span className="text-blue-600 dark:text-blue-400">选中字数: {selectedWordCount}</span>
+                            <span className="text-blue-600 dark:text-blue-400">选中字符: {selectedCharCount}</span>
                         </>
                     ) : (
                         <>

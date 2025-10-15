@@ -174,6 +174,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 >
                     <Eraser className="h-4 w-4" />
                 </ToolbarButton>
+
+                <TableOfContentsToggle />
             </div>
 
             <Separator orientation="vertical" />
@@ -284,7 +286,6 @@ export const Toolbar: React.FC<ToolbarProps> = ({
                 </ToolbarButton>
 
                 <MathSelector />
-                <TableOfContentsToggle />
                 <ListDropdownMenu
                     editor={editor}
                     types={['bulletList', 'orderedList', 'taskList']}

@@ -26,25 +26,23 @@ const mathStyles = `
     display: inline-block;
     margin: 0 2px;
     padding: 2px 4px;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: transparent;
     border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
 }
 
 .tiptap-mathematics-render:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .tiptap-mathematics-render--editable {
-    background-color: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
 }
 
 .tiptap-mathematics-render[data-type="block-math"] {
@@ -52,58 +50,56 @@ const mathStyles = `
     margin: 16px 0;
     padding: 16px;
     text-align: center;
-    background-color: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: transparent;
+    border: 1px solid transparent;
     border-radius: 8px;
     position: relative;
 }
 
 .tiptap-mathematics-render[data-type="block-math"]:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    border-color: rgba(0, 0, 0, 0.2);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 .tiptap-mathematics-render[data-type="inline-math"] {
     display: inline-block;
     margin: 0 2px;
     padding: 2px 6px;
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: transparent;
     border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid transparent;
     vertical-align: baseline;
 }
 
 .tiptap-mathematics-render[data-type="inline-math"]:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-    border-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
 }
 
 /* 暗色主题下的数学公式样式 */
 .dark .tiptap-mathematics-render {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background-color: transparent;
+    border-color: transparent;
 }
 
 .dark .tiptap-mathematics-render:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-.dark .tiptap-mathematics-render--editable {
-    background-color: rgba(59, 130, 246, 0.2);
-    border-color: rgba(59, 130, 246, 0.4);
-}
-
-.dark .tiptap-mathematics-render[data-type="block-math"] {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(255, 255, 255, 0.05);
     border-color: rgba(255, 255, 255, 0.1);
 }
 
+.dark .tiptap-mathematics-render--editable {
+    background-color: transparent;
+    border-color: transparent;
+}
+
+.dark .tiptap-mathematics-render[data-type="block-math"] {
+    background-color: transparent;
+    border-color: transparent;
+}
+
 .dark .tiptap-mathematics-render[data-type="block-math"]:hover {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* KaTeX 样式优化 */
@@ -226,7 +222,6 @@ import {
     Heading,
     Hash,
     ALargeSmall,
-    SeparatorHorizontal,
     TypeOutline,
     Calculator,
     Sigma,
@@ -286,6 +281,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     const [showWordCountOptions, setShowWordCountOptions] = useState<boolean>(false);
     const [editorContent, setEditorContent] = useState<string>('');
     const [selectedText, setSelectedText] = useState<string>('');
+    const [isEditingMath, setIsEditingMath] = useState<boolean>(false);
 
     // 防抖机制 - 官方推荐的方式
     const debounceRef = useRef<NodeJS.Timeout | null>(null);
@@ -310,7 +306,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     const anchorsThrottleTimerRef = useRef<number | null>(null);
     const lastAnchorsFlushRef = useRef<number>(0);
 
-    // 稳定的 BubbleMenu 显示逻辑，避免每次渲染重建
+    // 防止 BubbleMenu 在点击下拉菜单时隐藏
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    // 简化的 BubbleMenu 显示逻辑
     const bubbleMenuShouldShow = useCallback(({ state, from, to }: { state: EditorState; from: number; to: number; }) => {
         const text = state.doc.textBetween(from, to, ' ');
         return from !== to && text.trim().length > 0;
@@ -371,17 +370,25 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         Mathematics.configure({
             inlineOptions: {
                 onClick: (node, pos) => {
-                    // 点击内联数学公式时编辑
+                    // 先选中节点，然后打开编辑抽屉
+                    if (editor) {
+                        editor.chain().setNodeSelection(pos).focus().run();
+                    }
                     setMathType('inline');
                     setMathLatex(node.attrs.latex);
+                    setIsEditingMath(true); // 设置为编辑模式
                     setShowMathDrawer(true);
                 },
             },
             blockOptions: {
                 onClick: (node, pos) => {
-                    // 点击块级数学公式时编辑
+                    // 先选中节点，然后打开编辑抽屉
+                    if (editor) {
+                        editor.chain().setNodeSelection(pos).focus().run();
+                    }
                     setMathType('block');
                     setMathLatex(node.attrs.latex);
+                    setIsEditingMath(true); // 设置为编辑模式
                     setShowMathDrawer(true);
                 },
             },
@@ -463,9 +470,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         }),
         BubbleMenuExtension.configure({
             pluginKey: 'bubbleMenu',
-            shouldShow: bubbleMenuShouldShow,
         }),
-    ]), [placeholder, bubbleMenuShouldShow]);
+    ]), [placeholder]);
 
     // 创建编辑器实例 - 遵循官方最佳实践，修复SSR问题
     const editor: Editor | null = useEditor({
@@ -555,6 +561,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     const updateMathAtPosition = useCallback((latex: string, type: 'inline' | 'block') => {
         safeEditorCommand(() => {
             if (editor) {
+                // 直接使用官方命令更新当前选中的数学公式节点
                 if (type === 'inline') {
                     editor.commands.updateInlineMath({ latex });
                 } else {
@@ -598,39 +605,43 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
     // 计算字数
     const wordCount = useMemo(() => {
         if (!editorContent) return 0;
-        const chineseChars = editorContent.match(/[\u4e00-\u9fff]/g) || [];
-        const englishWords = editorContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
-        return chineseChars.length + englishWords.length;
-    }, [editorContent]);
+        if (includePunctuation) {
+            // 如果包含标点符号，则所有非空格字符都算作字数
+            return editorContent.replace(/\s/g, '').length;
+        } else {
+            // 如果不包含标点符号，则只计算中文字符和英文单词
+            const chineseChars = editorContent.match(/[\u4e00-\u9fff]/g) || [];
+            const englishWords = editorContent.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
+            return chineseChars.length + englishWords.length;
+        }
+    }, [editorContent, includePunctuation]);
 
     const charCount = useMemo(() => {
         if (!editorContent) return 0;
-        if (includePunctuation) {
-            return editorContent.length;
-        } else {
-            // 排除标点符号和空格
-            return editorContent.replace(/[^\w\u4e00-\u9fff]/g, '').length;
-        }
-    }, [editorContent, includePunctuation]);
+        // 字符数始终是总字符数（包括标点符号和空格）
+        return editorContent.length;
+    }, [editorContent]);
 
     // 计算选中文字的字数
     const selectedWordCount = useMemo(() => {
         if (!selectedText) return 0;
-        const chineseChars = selectedText.match(/[\u4e00-\u9fff]/g) || [];
-        const englishWords = selectedText.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
-        return chineseChars.length + englishWords.length;
-    }, [selectedText]);
+        if (includePunctuation) {
+            // 如果包含标点符号，则所有非空格字符都算作字数
+            return selectedText.replace(/\s/g, '').length;
+        } else {
+            // 如果不包含标点符号，则只计算中文字符和英文单词
+            const chineseChars = selectedText.match(/[\u4e00-\u9fff]/g) || [];
+            const englishWords = selectedText.replace(/[\u4e00-\u9fff]/g, '').replace(/[^\w\s]/g, '').trim().split(/\s+/).filter(w => w.length > 0);
+            return chineseChars.length + englishWords.length;
+        }
+    }, [selectedText, includePunctuation]);
 
     // 计算选中文字的字符数
     const selectedCharCount = useMemo(() => {
         if (!selectedText) return 0;
-        if (includePunctuation) {
-            return selectedText.length;
-        } else {
-            // 排除标点符号和空格
-            return selectedText.replace(/[^\w\u4e00-\u9fff]/g, '').length;
-        }
-    }, [selectedText, includePunctuation]);
+        // 字符数始终是总字符数（包括标点符号和空格）
+        return selectedText.length;
+    }, [selectedText]);
 
     // 工具栏按钮组件 - 使用更直接的事件处理，集成animate ui tooltip
     const ToolbarButton: React.FC<{
@@ -880,6 +891,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     boxSizing: 'border-box',
                     backgroundColor: 'transparent'
                 }}
+                onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                 }}
@@ -896,7 +911,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         );
 
         return (
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => {
+                setIsDropdownOpen(open);
+            }}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         {triggerElement}
@@ -905,7 +922,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         列表类型
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                <DropdownMenuContent align="start" className="w-32 z-[1001]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
                     {listTypes.map((listType) => {
                         const IconComponent = listType.icon;
                         return (
@@ -987,6 +1004,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     boxSizing: 'border-box',
                     backgroundColor: 'transparent'
                 }}
+                onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
                 }}
@@ -999,7 +1020,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
         );
 
         return (
-            <DropdownMenu>
+            <DropdownMenu onOpenChange={(open) => {
+                setIsDropdownOpen(open);
+            }}>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         {triggerElement}
@@ -1008,7 +1031,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         标题级别
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                <DropdownMenuContent align="start" className="w-32 z-[1001]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
                     {headings.map((heading) => (
                         <DropdownMenuItem
                             key={heading.value}
@@ -1048,6 +1071,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                             onOpenMathDrawer={() => {
                                 setMathLatex('');
                                 setSelectedCategory('all');
+                                setIsEditingMath(false); // 设置为插入模式
                                 setShowMathDrawer(true);
                             }}
                             onToggleTableOfContents={() => setCatalogVisible(!catalogVisible)}
@@ -1107,7 +1131,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                             </div>
 
                             {/* 字数统计 - 合并到文本输入区域内 */}
-                            <div className="flex items-center justify-end px-4 py-2 text-sm text-muted-foreground border-t border-border bg-muted/30 flex-shrink-0">
+                            <div className="flex items-center justify-end px-4 py-1 text-sm text-muted-foreground border-t border-border bg-muted/30 flex-shrink-0">
                                 <WordCountConfig
                                     wordCount={wordCount}
                                     charCount={charCount}
@@ -1129,6 +1153,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         editor={editor}
                         pluginKey="bubbleMenu"
                         className="bubble-menu flex items-center gap-1 p-2 bg-white dark:bg-background border border-border rounded-lg shadow-lg transition-opacity duration-200"
+                        style={{ zIndex: 1000 }}
                     >
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -1202,6 +1227,10 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                             editor={editor}
                             hideWhenUnavailable={false}
                         />
+
+
+
+
                         <Tooltip>
                             <TooltipTrigger asChild>
                                 <button
@@ -1226,7 +1255,12 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                 <MathDrawer
                     editor={editor}
                     showMathDrawer={showMathDrawer}
-                    setShowMathDrawer={setShowMathDrawer}
+                    setShowMathDrawer={(show) => {
+                        setShowMathDrawer(show);
+                        if (!show) {
+                            setIsEditingMath(false); // 关闭抽屉时重置编辑状态
+                        }
+                    }}
                     mathType={mathType}
                     setMathType={setMathType}
                     mathLatex={mathLatex}
@@ -1235,6 +1269,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     insertBlockMath={insertBlockMath}
                     updateMathAtPosition={updateMathAtPosition}
                     deleteMathAtPosition={deleteMathAtPosition}
+                    isEditing={isEditingMath}
                 />
 
             </div>
