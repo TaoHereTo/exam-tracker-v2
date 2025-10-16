@@ -23,6 +23,16 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+      style={{
+        fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+        textRendering: 'optimizeLegibility',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        fontVariantLigatures: 'common-ligatures',
+        fontKerning: 'normal',
+        letterSpacing: '0.01em',
+        ...props.style
+      }}
       {...props}
     />
   )

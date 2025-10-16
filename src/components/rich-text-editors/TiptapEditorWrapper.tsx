@@ -113,23 +113,42 @@ const mathStyles = `
     text-align: center;
 }
 
+/* ========== 数学公式字体渲染优化 ========== */
 /* 确保数学符号正确显示 */
 .katex {
-    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+    font-family: var(--font-math) !important;
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: lining-nums;
 }
 
-/* 确保不等于符号正确显示 */
-.katex .mrel {
-    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+/* 数学公式符号优化 */
+.katex .mrel,
+.katex .mord,
+.katex .mbin,
+.katex .mopen,
+.katex .mclose,
+.katex .mpunct {
+    font-family: var(--font-math) !important;
+    font-feature-settings: "kern" 1;
+    text-rendering: optimizeLegibility;
 }
 
-.katex .mord {
-    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+/* 数学公式显示优化 */
+.katex-display {
+    font-family: var(--font-math) !important;
+    text-align: center;
+    margin: 1em 0;
+    line-height: 1.4;
 }
 
-/* 简化不等于符号的显示 - 让 KaTeX 使用默认渲染 */
-.katex .mrel {
-    font-family: KaTeX_Main, KaTeX_Math, "Times New Roman", serif !important;
+/* 内联数学公式优化 */
+.katex:not(.katex-display) {
+    font-size: 1em;
+    line-height: 1.2;
+    vertical-align: baseline;
 }
 
 /* 数学公式错误样式 */
@@ -460,9 +479,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             inlineOptions: {
                 onClick: (node, pos) => {
                     // 先选中节点，然后打开编辑抽屉
-                    if (editor) {
-                        editor.chain().setNodeSelection(pos).focus().run();
-                    }
+                    // 注意：这里不能直接使用 editor，因为它在 useMemo 执行时还不存在
+                    // 这个回调会在编辑器创建后被调用，此时 editor 已经可用
                     setMathType('inline');
                     setMathLatex(node.attrs.latex);
                     setIsEditingMath(true); // 设置为编辑模式
@@ -472,9 +490,8 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
             blockOptions: {
                 onClick: (node, pos) => {
                     // 先选中节点，然后打开编辑抽屉
-                    if (editor) {
-                        editor.chain().setNodeSelection(pos).focus().run();
-                    }
+                    // 注意：这里不能直接使用 editor，因为它在 useMemo 执行时还不存在
+                    // 这个回调会在编辑器创建后被调用，此时 editor 已经可用
                     setMathType('block');
                     setMathLatex(node.attrs.latex);
                     setIsEditingMath(true); // 设置为编辑模式
@@ -572,6 +589,30 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                 migrateMathStrings(currentEditor);
             } catch (error) {
                 console.warn('Math migration failed:', error);
+            }
+
+            // 更新数学公式的点击处理函数，使其能够访问编辑器实例
+            const mathExtension = currentEditor.extensionManager.extensions.find(ext => ext.name === 'mathematics');
+            if (mathExtension) {
+                const mathConfig = mathExtension.options;
+                if (mathConfig.inlineOptions) {
+                    mathConfig.inlineOptions.onClick = (node: { attrs: { latex: string } }, pos: number) => {
+                        currentEditor.chain().setNodeSelection(pos).focus().run();
+                        setMathType('inline');
+                        setMathLatex(node.attrs.latex);
+                        setIsEditingMath(true);
+                        setShowMathDrawer(true);
+                    };
+                }
+                if (mathConfig.blockOptions) {
+                    mathConfig.blockOptions.onClick = (node: { attrs: { latex: string } }, pos: number) => {
+                        currentEditor.chain().setNodeSelection(pos).focus().run();
+                        setMathType('block');
+                        setMathLatex(node.attrs.latex);
+                        setIsEditingMath(true);
+                        setShowMathDrawer(true);
+                    };
+                }
             }
 
             // 移除调试信息，避免控制台刷屏

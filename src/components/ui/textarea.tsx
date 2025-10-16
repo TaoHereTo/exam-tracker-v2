@@ -32,6 +32,17 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
             "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
             className
           )}
+          style={{
+            fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+            textRendering: 'optimizeLegibility',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            fontVariantLigatures: 'common-ligatures',
+            fontKerning: 'normal',
+            letterSpacing: '0.01em',
+            lineHeight: '1.6',
+            ...props.style
+          }}
           onKeyDown={e => {
             if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation();
             if (onKeyDown) onKeyDown(e);

@@ -140,7 +140,15 @@ export const MixedText = memo(function MixedText({
         return (
             <Component
                 className={cn("mixed-text", className)}
-                style={style}
+                style={{
+                    fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+                    textRendering: 'optimizeLegibility',
+                    WebkitFontSmoothing: 'antialiased',
+                    MozOsxFontSmoothing: 'grayscale',
+                    fontVariantLigatures: 'common-ligatures',
+                    fontKerning: 'normal',
+                    ...style
+                }}
                 onClick={onClick}
             >
                 {renderFormattedText(content)}
@@ -148,11 +156,19 @@ export const MixedText = memo(function MixedText({
         );
     }
 
-    // Simple text rendering without font optimization
+    // Simple text rendering with font optimization
     return (
         <Component
             className={cn("mixed-text", className)}
-            style={style}
+            style={{
+                fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+                textRendering: 'optimizeLegibility',
+                WebkitFontSmoothing: 'antialiased',
+                MozOsxFontSmoothing: 'grayscale',
+                fontVariantLigatures: 'common-ligatures',
+                fontKerning: 'normal',
+                ...style
+            }}
             onClick={onClick}
         >
             {content}
@@ -186,6 +202,13 @@ export const MixedTitle = memo(function MixedTitle({
     };
 
     const titleStyle: React.CSSProperties = {
+        fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+        textRendering: 'optimizeLegibility',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        fontVariantLigatures: 'common-ligatures',
+        fontKerning: 'normal',
+        letterSpacing: '-0.01em',
         ...style
     };
 
@@ -228,6 +251,14 @@ export const MixedParagraph = memo(function MixedParagraph({
     onClick
 }: MixedParagraphProps) {
     const paragraphStyle: React.CSSProperties = {
+        fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+        textRendering: 'optimizeLegibility',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        fontVariantLigatures: 'common-ligatures',
+        fontKerning: 'normal',
+        lineHeight: '1.6',
+        letterSpacing: '0.01em',
         ...style
     };
 
@@ -253,6 +284,13 @@ export const MixedLabel = memo(function MixedLabel({
     onClick
 }: MixedLabelProps) {
     const labelStyle: React.CSSProperties = {
+        fontFeatureSettings: '"kern" 1, "liga" 1, "calt" 1',
+        textRendering: 'optimizeLegibility',
+        WebkitFontSmoothing: 'antialiased',
+        MozOsxFontSmoothing: 'grayscale',
+        fontVariantLigatures: 'common-ligatures',
+        fontKerning: 'normal',
+        letterSpacing: '0.01em',
         ...style
     };
 
