@@ -212,7 +212,7 @@ export default function CountdownExpandableCard({
                     </div>
                 ) : null}
             </AnimatePresence>
-            <ul className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 grid-md">
+            <ul className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 <AnimatePresence mode="popLayout">
                     {countdowns.map((countdown) => {
                         const statusDisplay = getStatusDisplay(countdown.examDate);
@@ -223,14 +223,14 @@ export default function CountdownExpandableCard({
                                 layoutId={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 key={`card-${prefix}-${countdown.id}-${uniqueId}`}
                                 onClick={() => setActive(countdown)}
-                                className="p-card flex flex-col bg-white dark:bg-black hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-none hover:shadow-none transition-shadow"
+                                className="p-3 flex flex-col bg-white dark:bg-black hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg cursor-pointer border border-neutral-200 dark:border-neutral-700 shadow-none hover:shadow-none transition-shadow"
                                 style={{
                                     display: isActive ? 'none' : 'block'
                                 }}
                             >
-                                <div className="flex justify-between items-center mb-3">
+                                <div className="flex justify-between items-center mb-2">
                                     <div className="flex-1">
-                                        <h3 className="font-medium text-black dark:text-white text-left">
+                                        <h3 className="font-medium text-xs text-black dark:text-white text-left" style={{ fontSize: '0.875rem' }}>
                                             {countdown.name}
                                         </h3>
                                     </div>
@@ -241,7 +241,7 @@ export default function CountdownExpandableCard({
                                                     <Button
                                                         variant="outline"
                                                         size="icon"
-                                                        className="h-8 w-8 rounded-full"
+                                                        className="h-6 w-6 rounded-full"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             onTogglePin?.(countdown);
@@ -251,7 +251,7 @@ export default function CountdownExpandableCard({
                                                             borderColor: countdown.isPinned ? '#f59e0b' : '#6b7280'
                                                         }}
                                                     >
-                                                        {countdown.isPinned ? <Pin className="w-4 h-4 text-white" /> : <PinOff className="w-4 h-4 text-white" />}
+                                                        {countdown.isPinned ? <Pin className="w-3 h-3 text-white" /> : <PinOff className="w-3 h-3 text-white" />}
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -265,13 +265,13 @@ export default function CountdownExpandableCard({
                                                     >
                                                         <CircularButton
                                                             variant="success"
-                                                            size="default"
+                                                            size="sm"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 onEdit?.(countdown);
                                                             }}
                                                         >
-                                                            <Edit className="w-4 h-4" />
+                                                            <Edit className="w-3 h-3" />
                                                         </CircularButton>
                                                     </motion.div>
                                                 </TooltipTrigger>
@@ -283,13 +283,13 @@ export default function CountdownExpandableCard({
                                                 <TooltipTrigger asChild>
                                                     <CircularButton
                                                         variant="destructive"
-                                                        size="default"
+                                                        size="sm"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             onDelete?.(countdown.id);
                                                         }}
                                                     >
-                                                        <Trash2 className="w-4 h-4" />
+                                                        <Trash2 className="w-3 h-3" />
                                                     </CircularButton>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
@@ -301,14 +301,14 @@ export default function CountdownExpandableCard({
                                 </div>
 
                                 {/* 倒计时显示区域 */}
-                                <div className="mb-3">
+                                <div className="mb-2">
                                     {calculateDetailedCountdown(countdown.examDate)}
                                 </div>
 
                                 {/* 状态信息 */}
-                                <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-1">
                                     <div
-                                        className="w-2 h-2 rounded-full"
+                                        className="w-1.5 h-1.5 rounded-full"
                                         style={{ backgroundColor: statusDisplay.color }}
                                     />
                                     <span

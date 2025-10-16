@@ -73,6 +73,13 @@
 /* 全局字体设置 - 使用思源宋体 */
 * {
   font-family: 'Noto Serif SC', serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "pnum" 1, "tnum" 0;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-ligatures: common-ligatures;
+  font-kerning: normal;
+  letter-spacing: 0.01em;
 }
 
 
@@ -734,13 +741,14 @@ h6 .mixed-text {
   select,
   [data-slot="input"],
   [data-slot="textarea"] {
-    font-feature-settings: "kern" 1, "liga" 1, "calt" 1 !important;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1, "pnum" 1, "tnum" 0 !important;
     text-rendering: optimizeLegibility !important;
     -webkit-font-smoothing: antialiased !important;
     -moz-osx-font-smoothing: grayscale !important;
     font-variant-ligatures: common-ligatures !important;
     font-kerning: normal !important;
     letter-spacing: 0.01em !important;
+    font-family: 'Noto Serif SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', serif !important;
   }
 
   /* 密码输入框特殊优化 */

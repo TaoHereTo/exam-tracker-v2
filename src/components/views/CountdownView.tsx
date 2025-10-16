@@ -358,18 +358,18 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 const remainingHours = differenceInHours(exam, now) % 24;
                 const remainingMinutes = differenceInMinutes(exam, now) % 60;
                 return (
-                    <div className="flex items-center justify-center gap-6 sm:gap-8">
+                    <div className="flex items-center justify-center gap-3 sm:gap-4">
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffDays}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">天</div>
+                            <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{diffDays}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">天</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingHours}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
+                            <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{remainingHours}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">小时</div>
                         </div>
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingMinutes}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                            <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{remainingMinutes}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">分钟</div>
                         </div>
                     </div>
                 );
@@ -378,14 +378,14 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 if (diffHours > 0) {
                     const remainingMinutes = differenceInMinutes(exam, now) % 60;
                     return (
-                        <div className="flex items-center justify-center gap-6 sm:gap-8">
+                        <div className="flex items-center justify-center gap-3 sm:gap-4">
                             <div className="text-center">
-                                <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffHours}</div>
-                                <div className="text-xs sm:text-sm text-muted-foreground mt-1">小时</div>
+                                <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{diffHours}</div>
+                                <div className="text-xs text-muted-foreground mt-0.5">小时</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{remainingMinutes}</div>
-                                <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                                <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{remainingMinutes}</div>
+                                <div className="text-xs text-muted-foreground mt-0.5">分钟</div>
                             </div>
                         </div>
                     );
@@ -394,16 +394,16 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                     if (diffMinutes > 0) {
                         return (
                             <div className="text-center">
-                                <div className="text-3xl sm:text-4xl font-bold text-foreground leading-none">{diffMinutes}</div>
-                                <div className="text-xs sm:text-sm text-muted-foreground mt-1">分钟</div>
+                                <div className="text-xl sm:text-2xl font-bold text-foreground leading-none">{diffMinutes}</div>
+                                <div className="text-xs text-muted-foreground mt-0.5">分钟</div>
                             </div>
                         );
                     } else {
                         return (
-                            <div className="flex items-center justify-center gap-6 sm:gap-8">
+                            <div className="flex items-center justify-center gap-3 sm:gap-4">
                                 <div className="text-center">
-                                    <div className="text-3xl sm:text-4xl font-bold text-green-500 leading-none">已开始</div>
-                                    <div className="text-xs sm:text-sm text-muted-foreground mt-1">倒计时进行中</div>
+                                    <div className="text-xl sm:text-2xl font-bold text-green-500 leading-none">已开始</div>
+                                    <div className="text-xs text-muted-foreground mt-0.5">倒计时进行中</div>
                                 </div>
                             </div>
                         );
@@ -413,10 +413,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                 // 计算已过天数
                 const daysPassed = Math.max(0, differenceInDays(now, exam));
                 return (
-                    <div className="flex items-center justify-center gap-6 sm:gap-8">
+                    <div className="flex items-center justify-center gap-3 sm:gap-4">
                         <div className="text-center">
-                            <div className="text-3xl sm:text-4xl font-bold text-blue-500 leading-none">{daysPassed}</div>
-                            <div className="text-xs sm:text-sm text-muted-foreground mt-1">天前</div>
+                            <div className="text-xl sm:text-2xl font-bold text-blue-500 leading-none">{daysPassed}</div>
+                            <div className="text-xs text-muted-foreground mt-0.5">天前</div>
                         </div>
                     </div>
                 );
@@ -579,10 +579,10 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </TabsList>
                     </div>
 
-                    <TabsContents className="py-6 px-2">
+                    <TabsContents className="py-4 px-2">
                         <TabsContent value="active" className="outline-none">
-                            <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
-                                <div className="min-h-[500px]">
+                            <div className="w-full max-w-6xl mx-auto pb-2 px-2 sm:px-4 lg:px-6">
+                                <div className="min-h-[400px]">
                                     {activeCountdowns.length > 0 ? (
                                         /* 使用 CountdownExpandableCard 组件 */
                                         <CountdownExpandableCard
@@ -614,12 +614,12 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                         </TabsContent>
 
                         <TabsContent value="completed" className="outline-none">
-                            <div className="w-full max-w-6xl mx-auto pb-4 px-4 sm:px-6 lg:px-8">
-                                <div className="min-h-[500px]">
+                            <div className="w-full max-w-6xl mx-auto pb-2 px-2 sm:px-4 lg:px-6">
+                                <div className="min-h-[400px]">
                                     {completedCountdowns.length > 0 ? (
-                                        <div className="space-y-4">
+                                        <div className="space-y-3">
                                             {/* 批量操作栏 */}
-                                            <div className="flex items-center justify-between px-6 py-3 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
+                                            <div className="flex items-center justify-between px-4 py-2 rounded-lg bg-[#EEEDED] dark:bg-[#262626]">
                                                 <div className="flex items-center gap-3">
                                                     <Checkbox
                                                         checked={selectedCountdowns.size === paginatedCompletedCountdowns.length && paginatedCompletedCountdowns.length > 0}
@@ -692,7 +692,7 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                             <div className="flex-1 min-w-0">
                                                                                 <div className="flex items-center gap-4">
                                                                                     <div className="flex-1 min-w-0">
-                                                                                        <h3 className="text-base font-bold text-black dark:text-white truncate">{countdown.name}</h3>
+                                                                                        <h3 className="text-xs font-bold text-black dark:text-white truncate" style={{ fontSize: '0.875rem' }}>{countdown.name}</h3>
                                                                                         <div className="flex items-center gap-4 mt-0.5 text-xs text-muted-foreground">
                                                                                             <span>{countdown.examDate.split('T')[0]}</span>
                                                                                             {countdown.description && (
@@ -739,13 +739,13 @@ export default function CountdownView({ countdowns, onCreate, onUpdate, onDelete
                                                                 </HoverCardTrigger>
                                                                 <HoverCardContent className="w-80">
                                                                     <div className="space-y-2">
-                                                                        <h4 className="text-sm font-semibold">
-                                                                            <MixedText text="倒计时详情" />
+                                                                        <h4 className="text-xs font-semibold" style={{ fontSize: '0.75rem' }}>
+                                                                            <MixedText text="详情" />
                                                                         </h4>
-                                                                        <p className="text-sm text-muted-foreground">
+                                                                        <p className="text-xs text-muted-foreground" style={{ fontSize: '0.75rem' }}>
                                                                             <MixedText text={countdown.description || '暂无描述'} />
                                                                         </p>
-                                                                        <div className="text-xs text-muted-foreground">
+                                                                        <div className="text-xs text-muted-foreground" style={{ fontSize: '0.75rem' }}>
                                                                             <MixedText text={`目标日期: ${countdown.examDate.split('T')[0]}`} />
                                                                         </div>
                                                                     </div>
