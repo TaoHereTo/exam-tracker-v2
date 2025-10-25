@@ -105,12 +105,40 @@ html {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  overflow-y: auto;
   box-sizing: border-box;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* 修复select组件点击后滚动条消失导致页面左右移动的问题 */
+/* 解决方案：修复布局结构，确保只有一个滚动条 */
+
+/* 确保body和html只有一个滚动条 */
+html {
+  height: 100%;
+  overflow: hidden;
+  /* 防止html滚动 */
+}
+
+body {
+  height: 100%;
+  overflow: hidden;
+  /* 防止body滚动 */
+}
+
+/* 让主容器处理滚动 */
+#__next {
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* 确保SidebarInset正确处理滚动 */
+[data-slot="sidebar-inset"] {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 强制限制所有容器的最大宽度 */

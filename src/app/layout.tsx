@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Geist, Geist_Mono, Noto_Serif_SC } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
@@ -6,6 +6,7 @@ import { SwitchStyleProvider } from "@/contexts/SwitchStyleContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/components/magicui/NotificationProvider";
 import { TooltipProvider } from "@/components/animate-ui/components/animate/tooltip";
+import { ScrollbarFixProvider } from "@/components/ScrollbarFixProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +30,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -45,7 +45,9 @@ export default function RootLayout({
             <SwitchStyleProvider>
               <NotificationProvider>
                 <TooltipProvider>
-                  {children}
+                  <ScrollbarFixProvider>
+                    {children}
+                  </ScrollbarFixProvider>
                 </TooltipProvider>
               </NotificationProvider>
             </SwitchStyleProvider>
