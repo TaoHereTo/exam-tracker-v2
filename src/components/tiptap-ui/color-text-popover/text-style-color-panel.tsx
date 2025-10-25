@@ -45,11 +45,11 @@ export function TextStyleColorPanel({
             {/* 文字颜色 */}
             <div className="space-y-2">
                 <div className="text-sm font-medium">文字颜色</div>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-6 gap-3">
                     {TEXT_COLORS.map((color, index) => (
                         <button
                             key={`text-${color.value}`}
-                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-sm flex items-center justify-center transition-colors bg-transparent hover:bg-accent cursor-pointer"
+                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-md active:shadow-none rounded-full flex items-center justify-center transition-all duration-200 bg-transparent hover:bg-accent cursor-pointer hover:scale-110"
                             style={{
                                 border: 'none',
                                 boxShadow: 'none',
@@ -65,9 +65,10 @@ export function TextStyleColorPanel({
                             ) : (
                                 // 其他颜色显示为圆形
                                 <div
-                                    className="h-4 w-4 rounded-full"
+                                    className="h-4 w-4 rounded-full border border-gray-300 shadow-sm"
                                     style={{
                                         backgroundColor: color.color,
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                     }}
                                 />
                             )}
@@ -81,11 +82,11 @@ export function TextStyleColorPanel({
             {/* 背景高亮 */}
             <div className="space-y-2">
                 <div className="text-sm font-medium">背景高亮</div>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="grid grid-cols-6 gap-3">
                     {HIGHLIGHT_COLORS.map((color) => (
                         <button
                             key={`highlight-${color.value}`}
-                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-none active:shadow-none rounded-sm flex items-center justify-center transition-colors bg-transparent hover:bg-accent cursor-pointer"
+                            className="h-8 w-8 p-0 border-0 shadow-none outline-none ring-0 focus:ring-0 focus:outline-none hover:shadow-md active:shadow-none rounded-full flex items-center justify-center transition-all duration-200 bg-transparent hover:bg-accent cursor-pointer hover:scale-110"
                             style={{
                                 border: 'none',
                                 boxShadow: 'none',
@@ -99,9 +100,10 @@ export function TextStyleColorPanel({
                                 <CircleSlash className="h-4 w-4 text-muted-foreground" />
                             ) : (
                                 <div
-                                    className="h-4 w-4 rounded-full"
+                                    className="h-4 w-4 rounded-full border border-gray-300 shadow-sm"
                                     style={{
                                         backgroundColor: color.color,
+                                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
                                     }}
                                 />
                             )}
@@ -119,23 +121,27 @@ export function TextStyleColorPanel({
                     <div className="flex-1">
                         <div className="text-xs text-muted-foreground mb-2">文字颜色</div>
                         <div className="flex items-center gap-2">
-                            <input
-                                type="color"
-                                className="w-8 h-8 rounded-full cursor-pointer border-0 shadow-none outline-none"
-                                style={{
-                                    border: 'none',
-                                    boxShadow: 'none',
-                                    outline: 'none'
-                                }}
-                                onChange={(e) => {
-                                    setTextColor(e.target.value);
-                                    onColorChanged({
-                                        type: 'text',
-                                        label: '自定义文字颜色',
-                                        value: e.target.value
-                                    });
-                                }}
-                            />
+                            <div className="relative">
+                                <input
+                                    type="color"
+                                    value={textColor}
+                                    onChange={(e) => {
+                                        setTextColor(e.target.value);
+                                        onColorChanged({
+                                            type: 'text',
+                                            label: '自定义文字颜色',
+                                            value: e.target.value
+                                        });
+                                    }}
+                                    className="absolute inset-0 w-5 h-5 opacity-0 cursor-pointer"
+                                />
+                                <div
+                                    className="w-5 h-5 rounded-full border border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                    style={{
+                                        backgroundColor: textColor
+                                    }}
+                                />
+                            </div>
                             <span className="text-xs text-muted-foreground font-mono">
                                 {textColor}
                             </span>
@@ -144,23 +150,27 @@ export function TextStyleColorPanel({
                     <div className="flex-1">
                         <div className="text-xs text-muted-foreground mb-2">背景颜色</div>
                         <div className="flex items-center gap-2">
-                            <input
-                                type="color"
-                                className="w-8 h-8 rounded-full cursor-pointer border-0 shadow-none outline-none"
-                                style={{
-                                    border: 'none',
-                                    boxShadow: 'none',
-                                    outline: 'none'
-                                }}
-                                onChange={(e) => {
-                                    setHighlightColor(e.target.value);
-                                    onColorChanged({
-                                        type: 'highlight',
-                                        label: '自定义背景颜色',
-                                        value: e.target.value
-                                    });
-                                }}
-                            />
+                            <div className="relative">
+                                <input
+                                    type="color"
+                                    value={highlightColor}
+                                    onChange={(e) => {
+                                        setHighlightColor(e.target.value);
+                                        onColorChanged({
+                                            type: 'highlight',
+                                            label: '自定义背景颜色',
+                                            value: e.target.value
+                                        });
+                                    }}
+                                    className="absolute inset-0 w-5 h-5 opacity-0 cursor-pointer"
+                                />
+                                <div
+                                    className="w-5 h-5 rounded-full border border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                                    style={{
+                                        backgroundColor: highlightColor
+                                    }}
+                                />
+                            </div>
                             <span className="text-xs text-muted-foreground font-mono">
                                 {highlightColor}
                             </span>
