@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CircleSlash } from 'lucide-react';
@@ -37,6 +37,9 @@ interface TextStyleColorPanelProps {
 export function TextStyleColorPanel({
     onColorChanged
 }: TextStyleColorPanelProps) {
+    const [textColor, setTextColor] = useState('#000000');
+    const [highlightColor, setHighlightColor] = useState('#000000');
+
     return (
         <div className="space-y-4">
             {/* 文字颜色 */}
@@ -60,9 +63,9 @@ export function TextStyleColorPanel({
                                 // 默认颜色显示为圆圈图标
                                 <CircleSlash className="h-4 w-4 text-foreground" />
                             ) : (
-                                // 其他颜色显示为方块
+                                // 其他颜色显示为圆形
                                 <div
-                                    className="h-4 w-4 rounded-sm"
+                                    className="h-4 w-4 rounded-full"
                                     style={{
                                         backgroundColor: color.color,
                                     }}
@@ -96,7 +99,7 @@ export function TextStyleColorPanel({
                                 <CircleSlash className="h-4 w-4 text-muted-foreground" />
                             ) : (
                                 <div
-                                    className="h-4 w-4 rounded-sm"
+                                    className="h-4 w-4 rounded-full"
                                     style={{
                                         backgroundColor: color.color,
                                     }}
@@ -112,40 +115,56 @@ export function TextStyleColorPanel({
             {/* 自定义颜色选择器 */}
             <div className="space-y-2">
                 <div className="text-sm font-medium">自定义颜色</div>
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                     <div className="flex-1">
-                        <div className="text-xs text-muted-foreground mb-1">文字颜色</div>
-                        <input
-                            type="color"
-                            className="w-full h-8 rounded cursor-pointer border-0 shadow-none outline-none"
-                            style={{
-                                border: 'none',
-                                boxShadow: 'none',
-                                outline: 'none'
-                            }}
-                            onChange={(e) => onColorChanged({
-                                type: 'text',
-                                label: '自定义文字颜色',
-                                value: e.target.value
-                            })}
-                        />
+                        <div className="text-xs text-muted-foreground mb-2">文字颜色</div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                className="w-8 h-8 rounded-full cursor-pointer border-0 shadow-none outline-none"
+                                style={{
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                    outline: 'none'
+                                }}
+                                onChange={(e) => {
+                                    setTextColor(e.target.value);
+                                    onColorChanged({
+                                        type: 'text',
+                                        label: '自定义文字颜色',
+                                        value: e.target.value
+                                    });
+                                }}
+                            />
+                            <span className="text-xs text-muted-foreground font-mono">
+                                {textColor}
+                            </span>
+                        </div>
                     </div>
                     <div className="flex-1">
-                        <div className="text-xs text-muted-foreground mb-1">背景颜色</div>
-                        <input
-                            type="color"
-                            className="w-full h-8 rounded cursor-pointer border-0 shadow-none outline-none"
-                            style={{
-                                border: 'none',
-                                boxShadow: 'none',
-                                outline: 'none'
-                            }}
-                            onChange={(e) => onColorChanged({
-                                type: 'highlight',
-                                label: '自定义背景颜色',
-                                value: e.target.value
-                            })}
-                        />
+                        <div className="text-xs text-muted-foreground mb-2">背景颜色</div>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                className="w-8 h-8 rounded-full cursor-pointer border-0 shadow-none outline-none"
+                                style={{
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                    outline: 'none'
+                                }}
+                                onChange={(e) => {
+                                    setHighlightColor(e.target.value);
+                                    onColorChanged({
+                                        type: 'highlight',
+                                        label: '自定义背景颜色',
+                                        value: e.target.value
+                                    });
+                                }}
+                            />
+                            <span className="text-xs text-muted-foreground font-mono">
+                                {highlightColor}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
