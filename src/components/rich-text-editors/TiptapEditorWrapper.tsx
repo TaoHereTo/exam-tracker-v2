@@ -896,7 +896,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         大小
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                <DropdownMenuContent align="start" className="w-32 z-[var(--z-dialog-dropdown)]">
                     {fontSizes.map((size) => (
                         <DropdownMenuItem
                             key={size.value}
@@ -971,7 +971,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         对齐方式
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[60]">
+                <DropdownMenuContent align="start" className="w-32 z-[var(--z-dialog-dropdown)]">
                     {alignments.map((alignment) => {
                         const IconComponent = alignment.icon;
                         return (
@@ -1022,8 +1022,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     backgroundColor: 'transparent'
                 }}
                 onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    // 不要阻止默认行为，让下拉菜单能正常触发
+                    // e.preventDefault();
+                    // e.stopPropagation();
                 }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
@@ -1052,7 +1053,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         列表类型
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[1001]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
+                <DropdownMenuContent align="start" className="w-32 z-[var(--z-dialog-dropdown)]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
                     {listTypes.map((listType) => {
                         const IconComponent = listType.icon;
                         return (
@@ -1135,8 +1136,9 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                     backgroundColor: 'transparent'
                 }}
                 onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                    // 不要阻止默认行为，让下拉菜单能正常触发
+                    // e.preventDefault();
+                    // e.stopPropagation();
                 }}
                 onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
@@ -1161,7 +1163,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
                         标题级别
                     </TooltipContent>
                 </Tooltip>
-                <DropdownMenuContent align="start" className="w-32 z-[1001]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
+                <DropdownMenuContent align="start" className="w-32 z-[var(--z-dialog-dropdown)]" side="bottom" sideOffset={4} avoidCollisions={true} collisionPadding={8}>
                     {headings.map((heading) => (
                         <DropdownMenuItem
                             key={heading.value}
@@ -1212,7 +1214,7 @@ export const TiptapEditorWrapper: React.FC<TiptapEditorWrapperProps> = ({
 
                 {/* 编辑器内容区域 - 内部左右分栏 */}
                 <div
-                    className="tiptap-editor-wrapper border border-border rounded-lg bg-background shadow-sm overflow-hidden"
+                    className="tiptap-editor-wrapper border border-border rounded-lg bg-background shadow-sm"
                     style={{
                         height: customMaxHeight === 'none' ? '70vh' : customMaxHeight,
                         minHeight: customMinHeight,

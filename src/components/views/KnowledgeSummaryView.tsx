@@ -662,7 +662,7 @@ const KnowledgeSummaryView: React.FC<KnowledgeSummaryViewProps> = ({ knowledge, 
                         )}
                     </DrawerHeader>
                     {editItem && !editError && (
-                        <div className="flex-1 overflow-y-auto px-4 pb-6 min-h-0">
+                        <div className="flex-1 px-4 pb-6 min-h-0">
                             <Suspense fallback={<SimpleUiverseSpinner className="py-8" />}>
                                 <ModuleForm
                                     module={editItem.module}

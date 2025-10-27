@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { CircleSlash } from 'lucide-react';
+import { BeautifulColorPicker } from './beautiful-color-picker';
 
 // 预定义的颜色
 const TEXT_COLORS = [
@@ -121,27 +122,18 @@ export function TextStyleColorPanel({
                     <div className="flex-1">
                         <div className="text-xs text-muted-foreground mb-2">文字颜色</div>
                         <div className="flex items-center gap-2">
-                            <div className="relative">
-                                <input
-                                    type="color"
-                                    value={textColor}
-                                    onChange={(e) => {
-                                        setTextColor(e.target.value);
-                                        onColorChanged({
-                                            type: 'text',
-                                            label: '自定义文字颜色',
-                                            value: e.target.value
-                                        });
-                                    }}
-                                    className="absolute inset-0 w-5 h-5 opacity-0 cursor-pointer"
-                                />
-                                <div
-                                    className="w-5 h-5 rounded-full border border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                                    style={{
-                                        backgroundColor: textColor
-                                    }}
-                                />
-                            </div>
+                            <BeautifulColorPicker
+                                value={textColor}
+                                onChange={(color) => {
+                                    setTextColor(color);
+                                    onColorChanged({
+                                        type: 'text',
+                                        label: '自定义文字颜色',
+                                        value: color
+                                    });
+                                }}
+                                label="文字颜色"
+                            />
                             <span className="text-xs text-muted-foreground font-mono">
                                 {textColor}
                             </span>
@@ -150,27 +142,18 @@ export function TextStyleColorPanel({
                     <div className="flex-1">
                         <div className="text-xs text-muted-foreground mb-2">背景颜色</div>
                         <div className="flex items-center gap-2">
-                            <div className="relative">
-                                <input
-                                    type="color"
-                                    value={highlightColor}
-                                    onChange={(e) => {
-                                        setHighlightColor(e.target.value);
-                                        onColorChanged({
-                                            type: 'highlight',
-                                            label: '自定义背景颜色',
-                                            value: e.target.value
-                                        });
-                                    }}
-                                    className="absolute inset-0 w-5 h-5 opacity-0 cursor-pointer"
-                                />
-                                <div
-                                    className="w-5 h-5 rounded-full border border-gray-300 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                                    style={{
-                                        backgroundColor: highlightColor
-                                    }}
-                                />
-                            </div>
+                            <BeautifulColorPicker
+                                value={highlightColor}
+                                onChange={(color) => {
+                                    setHighlightColor(color);
+                                    onColorChanged({
+                                        type: 'highlight',
+                                        label: '自定义背景颜色',
+                                        value: color
+                                    });
+                                }}
+                                label="背景颜色"
+                            />
                             <span className="text-xs text-muted-foreground font-mono">
                                 {highlightColor}
                             </span>
