@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import React from 'react';
 import { Separator } from '@/components/ui/separator';
 import { CircleSlash } from 'lucide-react';
-import { BeautifulColorPicker } from './beautiful-color-picker';
 
 // 预定义的颜色
 const TEXT_COLORS = [
@@ -38,8 +36,6 @@ interface TextStyleColorPanelProps {
 export function TextStyleColorPanel({
     onColorChanged
 }: TextStyleColorPanelProps) {
-    const [textColor, setTextColor] = useState('#000000');
-    const [highlightColor, setHighlightColor] = useState('#000000');
 
     return (
         <div className="space-y-4">
@@ -110,55 +106,6 @@ export function TextStyleColorPanel({
                             )}
                         </button>
                     ))}
-                </div>
-            </div>
-
-            <Separator />
-
-            {/* 自定义颜色选择器 */}
-            <div className="space-y-2">
-                <div className="text-sm font-medium">自定义颜色</div>
-                <div className="flex gap-4">
-                    <div className="flex-1">
-                        <div className="text-xs text-muted-foreground mb-2">文字颜色</div>
-                        <div className="flex items-center gap-2">
-                            <BeautifulColorPicker
-                                value={textColor}
-                                onChange={(color) => {
-                                    setTextColor(color);
-                                    onColorChanged({
-                                        type: 'text',
-                                        label: '自定义文字颜色',
-                                        value: color
-                                    });
-                                }}
-                                label="文字颜色"
-                            />
-                            <span className="text-xs text-muted-foreground font-mono">
-                                {textColor}
-                            </span>
-                        </div>
-                    </div>
-                    <div className="flex-1">
-                        <div className="text-xs text-muted-foreground mb-2">背景颜色</div>
-                        <div className="flex items-center gap-2">
-                            <BeautifulColorPicker
-                                value={highlightColor}
-                                onChange={(color) => {
-                                    setHighlightColor(color);
-                                    onColorChanged({
-                                        type: 'highlight',
-                                        label: '自定义背景颜色',
-                                        value: color
-                                    });
-                                }}
-                                label="背景颜色"
-                            />
-                            <span className="text-xs text-muted-foreground font-mono">
-                                {highlightColor}
-                            </span>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>

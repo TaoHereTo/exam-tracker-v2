@@ -23,7 +23,10 @@ export function ColorHighlightButton({
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isOpen} onOpenChange={(open) => {
+            console.log('Highlight Popover onOpenChange:', open); // 调试日志
+            setIsOpen(open);
+        }}>
             <PopoverTrigger asChild>
                 <Button
                     variant="ghost"
@@ -40,11 +43,21 @@ export function ColorHighlightButton({
                     />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-64 p-3" align="start">
+            <PopoverContent
+                className="w-auto p-3"
+                align="start"
+                onInteractOutside={(e) => {
+                    console.log('Highlight PopoverContent onInteractOutside'); // 调试日志
+                    // 允许外部交互关闭Popover
+                    // e.preventDefault();
+                }}
+            >
                 <TextStyleColorPanel
                     onColorChanged={(colorData) => {
+                        console.log('Highlight TextStyleColorPanel onColorChanged'); // 调试日志
                         handleColorChanged({ ...colorData, type: 'highlight' });
-                        setIsOpen(false);
+                        // 不要自动关闭Popover，让用户手动关闭
+                        // setIsOpen(false);
                     }}
                 />
             </PopoverContent>
